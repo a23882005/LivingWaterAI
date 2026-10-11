@@ -1,9 +1,9 @@
-name: LivingWaterAI V70 Daily (05:00 Taiwan)
+name: LivingWaterAI V70 Daily (11:00 Taiwan)
 
 on:
   schedule:
-    # GitHub cron uses UTC: 21:00 UTC = next day 05:00 Asia/Taipei
-    - cron: '0 21 * * *'
+    # GitHub cron uses UTC: 03:00 UTC = same day 11:00 Asia/Taipei
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       manual_snapshot:

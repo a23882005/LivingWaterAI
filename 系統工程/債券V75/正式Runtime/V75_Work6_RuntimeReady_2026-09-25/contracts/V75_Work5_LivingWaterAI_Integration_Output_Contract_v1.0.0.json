@@ -1,0 +1,21 @@
+{
+  "contract_id": "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+  "engine_version": "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+  "scope": ["FINAL_CLASSIFICATION", "FINAL_SNAPSHOT", "LIVINGWATERAI_INTEGRATION_OUTPUT"],
+  "authoritative_upstream": ["WORK3_STRUCTURAL_STATE", "WORK4_DEPLOYMENT_DECISIONS"],
+  "must_preserve": [
+    "same_account_ownership", "same_currency_ownership", "bond_long_term_target",
+    "remaining_target_gap_amount", "work4_deployment_decisions", "sgov_bond_bucket_amount"
+  ],
+  "must_not_recompute": [
+    "eligibility", "long_term_target", "remaining_target_gap_amount", "PRED-001..010",
+    "deployment_state", "deployment_pct", "funding", "settlement", "account_isolation"
+  ],
+  "sgov_guards": {
+    "bond_bucket_preserved": true,
+    "dry_powder_input_read_only": true,
+    "dry_powder_final_aggregate_forbidden": true,
+    "undeployed_to_sgov_requires_same_account_usd": true
+  },
+  "work6_cutover_runtime_ready": "OUT_OF_SCOPE"
+}

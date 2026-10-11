@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "contract_id": {
+      "title": "Contract Id",
+      "type": "string"
+    },
+    "step10_rule_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Step10 Rule Ids",
+      "type": "array"
+    },
+    "step10_direct_veto_rule_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Step10 Direct Veto Rule Ids",
+      "type": "array"
+    },
+    "step10_cap_rule_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Step10 Cap Rule Ids",
+      "type": "array"
+    },
+    "step10_base_rule": {
+      "title": "Step10 Base Rule",
+      "type": "string"
+    }
+  },
+  "required": [
+    "asset_id",
+    "contract_id",
+    "step10_rule_ids",
+    "step10_direct_veto_rule_ids",
+    "step10_cap_rule_ids",
+    "step10_base_rule"
+  ],
+  "title": "Work4Step10Audit",
+  "type": "object"
+}

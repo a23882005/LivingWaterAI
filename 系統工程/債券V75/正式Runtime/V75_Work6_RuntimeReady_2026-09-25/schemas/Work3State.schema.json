@@ -1,0 +1,621 @@
+{
+  "$defs": {
+    "AssetEligibilityAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "authorized": {
+          "title": "Authorized",
+          "type": "boolean"
+        },
+        "bucket_class": {
+          "$ref": "#/$defs/Work3BucketClass"
+        },
+        "eligibility_state": {
+          "$ref": "#/$defs/Work3EligibilityState"
+        },
+        "existing_position_management_allowed": {
+          "title": "Existing Position Management Allowed",
+          "type": "boolean"
+        },
+        "new_long_term_target_allowed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "New Long Term Target Allowed"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "asset_id",
+        "eligibility_state",
+        "bucket_class",
+        "new_long_term_target_allowed",
+        "existing_position_management_allowed",
+        "authorized"
+      ],
+      "title": "AssetEligibilityAssessment",
+      "type": "object"
+    },
+    "BrokerDomainType": {
+      "enum": [
+        "TW_LOCAL_BROKER",
+        "TW_SUB_BROKERAGE",
+        "US_BROKER"
+      ],
+      "title": "BrokerDomainType",
+      "type": "string"
+    },
+    "BucketReconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "bond_long_term_target": {
+          "$ref": "#/$defs/Money"
+        },
+        "non_core_long_term_target": {
+          "$ref": "#/$defs/Money"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "target_sum_reconciled": {
+          "title": "Target Sum Reconciled",
+          "type": "boolean"
+        },
+        "tw_core_ratio_valid": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tw Core Ratio Valid"
+        },
+        "tw_generic_long_term_target": {
+          "$ref": "#/$defs/Money"
+        },
+        "us_core_ratio_valid": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Us Core Ratio Valid"
+        },
+        "us_generic_long_term_target": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "bond_long_term_target",
+        "us_generic_long_term_target",
+        "tw_generic_long_term_target",
+        "non_core_long_term_target",
+        "us_core_ratio_valid",
+        "tw_core_ratio_valid",
+        "target_sum_reconciled"
+      ],
+      "title": "BucketReconciliation",
+      "type": "object"
+    },
+    "CanonicalUnit": {
+      "enum": [
+        "PERCENT",
+        "PERCENTAGE_POINT",
+        "BASIS_POINT"
+      ],
+      "title": "CanonicalUnit",
+      "type": "string"
+    },
+    "EvaluationState": {
+      "enum": [
+        "COMPLETE",
+        "INSUFFICIENT_DATA",
+        "INVALID_INPUT",
+        "REVIEW_REQUIRED"
+      ],
+      "title": "EvaluationState",
+      "type": "string"
+    },
+    "GapCalculation": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "eligibility_state": {
+          "$ref": "#/$defs/Work3EligibilityState"
+        },
+        "eligible_existing_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "remaining_target_gap_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "target_amount": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "asset_id",
+        "target_amount",
+        "eligible_existing_amount",
+        "remaining_target_gap_amount",
+        "eligibility_state"
+      ],
+      "title": "GapCalculation",
+      "type": "object"
+    },
+    "LongTermBucketLine": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "bucket_class": {
+          "$ref": "#/$defs/Work3BucketClass"
+        },
+        "target_amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "template_weight_pct": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PercentValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "asset_id",
+        "bucket_class",
+        "target_amount"
+      ],
+      "title": "LongTermBucketLine",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "MoneyValue": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ValueStatus"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "MoneyValue",
+      "type": "object"
+    },
+    "PerAssetDeploymentInput": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "broker_account_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Broker Account Id"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        },
+        "eligibility_state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Eligibility State"
+        },
+        "existing_position_amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "remaining_target_gap_amount": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "asset_id",
+        "remaining_target_gap_amount",
+        "existing_position_amount",
+        "currency"
+      ],
+      "title": "PerAssetDeploymentInput",
+      "type": "object"
+    },
+    "PercentValue": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/CanonicalUnit",
+          "default": "PERCENT"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "PercentValue",
+      "type": "object"
+    },
+    "SgovRoleReconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "dry_powder_is_read_only_context": {
+          "default": true,
+          "title": "Dry Powder Is Read Only Context",
+          "type": "boolean"
+        },
+        "observed_role_total_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "roles_kept_separate": {
+          "default": true,
+          "title": "Roles Kept Separate",
+          "type": "boolean"
+        },
+        "sgov_bond_bucket_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "sgov_dry_powder_bucket_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        }
+      },
+      "required": [
+        "sgov_bond_bucket_amount",
+        "sgov_dry_powder_bucket_amount",
+        "observed_role_total_amount"
+      ],
+      "title": "SgovRoleReconciliation",
+      "type": "object"
+    },
+    "ValueStatus": {
+      "enum": [
+        "KNOWN",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "ValueStatus",
+      "type": "string"
+    },
+    "Work3BucketClass": {
+      "enum": [
+        "US_GENERIC_CORE",
+        "TW_GENERIC_CORE",
+        "AUTHORIZED_NON_CORE",
+        "EXISTING_ONLY",
+        "UNKNOWN",
+        "NONE"
+      ],
+      "title": "Work3BucketClass",
+      "type": "string"
+    },
+    "Work3EligibilityState": {
+      "enum": [
+        "ELIGIBLE",
+        "INELIGIBLE_NEW_ALLOCATION",
+        "INELIGIBLE",
+        "UNKNOWN"
+      ],
+      "title": "Work3EligibilityState",
+      "type": "string"
+    },
+    "Work3Issue": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asset Id"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "issue_class": {
+          "$ref": "#/$defs/Work3IssueClass"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "issue_class",
+        "code",
+        "message"
+      ],
+      "title": "Work3Issue",
+      "type": "object"
+    },
+    "Work3IssueClass": {
+      "enum": [
+        "INVALID_INPUT",
+        "INSUFFICIENT_DATA",
+        "REVIEW_REQUIRED",
+        "INFO"
+      ],
+      "title": "Work3IssueClass",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bond_long_term_target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "broker_account_id": {
+      "minLength": 1,
+      "title": "Broker Account Id",
+      "type": "string"
+    },
+    "broker_domain_type": {
+      "$ref": "#/$defs/BrokerDomainType"
+    },
+    "bucket_reconciliation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BucketReconciliation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "currency": {
+      "title": "Currency",
+      "type": "string"
+    },
+    "eligibility_assessments": {
+      "items": {
+        "$ref": "#/$defs/AssetEligibilityAssessment"
+      },
+      "title": "Eligibility Assessments",
+      "type": "array"
+    },
+    "evaluation_state": {
+      "$ref": "#/$defs/EvaluationState"
+    },
+    "gap_calculations": {
+      "items": {
+        "$ref": "#/$defs/GapCalculation"
+      },
+      "title": "Gap Calculations",
+      "type": "array"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/Work3Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "life_stage_code_passthrough": {
+      "minLength": 1,
+      "title": "Life Stage Code Passthrough",
+      "type": "string"
+    },
+    "long_term_bucket_lines": {
+      "items": {
+        "$ref": "#/$defs/LongTermBucketLine"
+      },
+      "title": "Long Term Bucket Lines",
+      "type": "array"
+    },
+    "missing_required_fields": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Required Fields",
+      "type": "array"
+    },
+    "per_asset_inputs": {
+      "items": {
+        "$ref": "#/$defs/PerAssetDeploymentInput"
+      },
+      "title": "Per Asset Inputs",
+      "type": "array"
+    },
+    "predicate_version": {
+      "minLength": 1,
+      "title": "Predicate Version",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "rule_version": {
+      "minLength": 1,
+      "title": "Rule Version",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "sgov_reconciliation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SgovRoleReconciliation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Lineage",
+      "type": "array"
+    },
+    "work3_complete": {
+      "title": "Work3 Complete",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "run_id",
+    "broker_account_id",
+    "broker_domain_type",
+    "currency",
+    "rule_version",
+    "predicate_version",
+    "life_stage_code_passthrough",
+    "evaluation_state",
+    "work3_complete"
+  ],
+  "title": "Work3State",
+  "type": "object"
+}

@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "AssetCreditClassModel": {
+      "enum": [
+        "TREASURY",
+        "CORPORATE",
+        "MIXED"
+      ],
+      "title": "AssetCreditClassModel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "asset_credit_class": {
+      "$ref": "#/$defs/AssetCreditClassModel"
+    },
+    "effective_duration_years": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Effective Duration Years"
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Lineage",
+      "type": "array"
+    }
+  },
+  "required": [
+    "asset_id",
+    "asset_credit_class",
+    "effective_duration_years",
+    "source_lineage"
+  ],
+  "title": "Work4StaticRiskProfile",
+  "type": "object"
+}

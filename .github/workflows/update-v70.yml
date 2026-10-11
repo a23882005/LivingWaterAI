@@ -1,0 +1,80 @@
+name: LivingWaterAI V70 Daily (05:00 Taiwan)
+
+on:
+  schedule:
+    # GitHub cron uses UTC: 21:00 UTC = next day 05:00 Asia/Taipei
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+    inputs:
+      manual_snapshot:
+        description: 'Fresh approved macro JSON (or set repository variable V70_MANUAL_SNAPSHOT)'
+        type: string
+        required: false
+        default: ''
+  push:
+    paths:
+      - '.github/workflows/update-v70.yml'
+      - 'p128.py'
+      - 'V70_Live.html'
+      - 'scripts/v70_update.py'
+      - 'tests/test_v70_update.py'
+      - 'requirements.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: livingwater-v70-update
+  cancel-in-progress: false
+
+jobs:
+  v70:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Source syntax and regression checks
+        run: |
+          python -m py_compile p128.py scripts/v70_update.py
+          python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Refresh candidate only when a verified snapshot exists
+        id: refresh
+        if: github.event_name != 'push'
+        env:
+          V70_MANUAL_SNAPSHOT: ${{ inputs.manual_snapshot || vars.V70_MANUAL_SNAPSHOT }}
+        run: |
+          if [ -z "$V70_MANUAL_SNAPSHOT" ]; then
+            echo "status=HOLD" >> "$GITHUB_OUTPUT"
+            echo "### HOLD: Missing a fresh approved V70_MANUAL_SNAPSHOT. Original HTML preserved." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          python scripts/v70_update.py
+          echo "status=READY" >> "$GITHUB_OUTPUT"
+
+      - name: Commit validated HTML
+        if: steps.refresh.outputs.status == 'READY'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add V70_Live.html
+          if git diff --cached --quiet; then
+            echo "No validated changes; HTML unchanged." >> "$GITHUB_STEP_SUMMARY"
+          else
+            git commit -m "Auto-update validated V70_Live.html"
+            git push
+            echo "Committed validated V70 HTML candidate." >> "$GITHUB_STEP_SUMMARY"
+          fi

@@ -1,0 +1,73 @@
+{
+  "contract_name": "C8C9 Work7 SGOV Runtime Semantic Contract",
+  "contract_version": "C8C9-W7-SGOV-CONTRACT-v1.0.1-RECHECK1",
+  "status": "QA_PASS_CLOSED",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "owner": "C8C9 Work7 Integration Layer",
+  "purpose": "Validate SGOV Runtime role/source/owner semantics without creating final aggregate or Family physical ledger.",
+  "roles": {
+    "SGOV_BOND_BUCKET": {
+      "owner": "V75 bond-role context",
+      "semantics": "formal bond allocation SGOV",
+      "must_remain_distinct": true
+    },
+    "SGOV_DRY_POWDER_BUCKET": {
+      "owner": "integration-layer final logical aggregate downstream; Work7 read-only current role",
+      "semantics": "dry-powder / waiting-for-deployment SGOV",
+      "must_remain_distinct": true
+    },
+    "V75_UNDEPLOYED_TO_SGOV": {
+      "owner": "Frozen V75 Runtime output contribution",
+      "destination_role": "SGOV_DRY_POWDER_BUCKET",
+      "final_aggregate_owner": false
+    }
+  },
+  "route_guard": {
+    "funding_domain": "US_BROKER",
+    "same_broker": true,
+    "same_account": true,
+    "currency": "USD"
+  },
+  "upstream_binding_guard": {
+    "work4_runtime_run_must_match": true,
+    "work4_serialized_owner_must_match": true,
+    "work4_work3_handoff_must_match": true,
+    "work4_c7_digest_must_match_work6": true,
+    "work4_equity_leg_must_match_owner_currency_available_pointer": true
+  },
+  "forbidden_auto_sources": [
+    "V82_EQUITY_EXECUTABLE_BUDGET",
+    "GENERAL_IDLE_AVAILABLE_USD",
+    "RESERVED_USD",
+    "UNSETTLED_USD",
+    "V82_UNDEPLOYED_TO_SGOV_FABRICATION"
+  ],
+  "double_count": {
+    "same_run_forbidden": true,
+    "work7_final_aggregate_computation": false,
+    "contribution_applied_to_aggregate_in_work7": false
+  },
+  "family_boundary": {
+    "physical_sgov_position_to_logical_role_subledger": "OUT_OF_SCOPE",
+    "physical_reconciliation": "OUT_OF_SCOPE"
+  },
+  "funding_boundary": {
+    "cash_basis": "AVAILABLE",
+    "available_formula": "MUST_NOT_INFER",
+    "second_funding_domain_engine": "FORBIDDEN",
+    "fx": "FORBIDDEN"
+  },
+  "forbidden_operations": [
+    "v75_patch",
+    "v82_patch",
+    "c_work1_to_7_reopen",
+    "frozen_baseline_modify",
+    "fx_conversion",
+    "second_funding_domain_engine",
+    "work8_early_start",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write"
+  ],
+  "source_policy": "PRESERVE_ROLES_VALIDATE_ROUTE_NO_AGGREGATE_NO_SECOND_FUNDING_ENGINE_NO_FX"
+}

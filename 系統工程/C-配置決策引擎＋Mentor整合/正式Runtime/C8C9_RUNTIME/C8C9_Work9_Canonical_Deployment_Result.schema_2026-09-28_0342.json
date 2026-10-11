@@ -1,0 +1,733 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "C8C9 Work9 Canonical Deployment Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "owner",
+    "currency",
+    "source_bindings",
+    "canonical_deployment_result",
+    "canonical_deployment_result_sha256",
+    "mentor_return",
+    "source_semantics_policy",
+    "integration_diagnostics"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work9.CanonicalDeploymentResult"
+    },
+    "contract_version": {
+      "const": "C8C9-W9-CDR-v1.0.0"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "funding_domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "funding_domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "source_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work3_context_handoff_id",
+        "work4_v82_integration_sha256",
+        "work5_v75_integration_sha256",
+        "work6_funding_isolation_sha256",
+        "work7_sgov_runtime_role_sha256",
+        "work8_protected_holding_sha256",
+        "final_target_allocation_id"
+      ],
+      "properties": {
+        "work3_context_handoff_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "work4_v82_integration_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "work5_v75_integration_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "work6_funding_isolation_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "work7_sgov_runtime_role_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "work8_protected_holding_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "final_target_allocation_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "canonical_deployment_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "undeployed_disposition",
+        "funding_context"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "item_id",
+              "source_engine",
+              "asset_id",
+              "canonical_action",
+              "source_action",
+              "client_preference_action",
+              "deployment_amount",
+              "deployment_ratio",
+              "account_owner",
+              "funding_source",
+              "reason_codes",
+              "data_lineage",
+              "rule_lineage",
+              "source_snapshot_digest_sha256",
+              "source_decision"
+            ],
+            "properties": {
+              "item_id": {
+                "type": "string",
+                "pattern": "^(V82|V75):.+$"
+              },
+              "source_engine": {
+                "enum": [
+                  "V82",
+                  "V75"
+                ]
+              },
+              "asset_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "canonical_action": {
+                "enum": [
+                  "BUY",
+                  "WAIT",
+                  "HOLD",
+                  "PAUSE",
+                  "NO_ACTION",
+                  "BLOCK",
+                  "UNKNOWN",
+                  "NEEDS_REVIEW"
+                ]
+              },
+              "source_action": {},
+              "client_preference_action": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "deployment_amount": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "value"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "KNOWN"
+                      },
+                      "value": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "amount",
+                          "currency"
+                        ],
+                        "properties": {
+                          "amount": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            ]
+                          },
+                          "currency": {
+                            "type": "string",
+                            "pattern": "^[A-Z]{3}$"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "value"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "UNKNOWN",
+                          "NOT_APPLICABLE"
+                        ]
+                      },
+                      "value": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                ]
+              },
+              "deployment_ratio": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "value"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "KNOWN"
+                      },
+                      "value": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "value",
+                          "unit"
+                        ],
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            ]
+                          },
+                          "unit": {
+                            "enum": [
+                              "PERCENT",
+                              "PERCENTAGE_POINT",
+                              "BASIS_POINT"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "value"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "UNKNOWN",
+                          "NOT_APPLICABLE"
+                        ]
+                      },
+                      "value": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                ]
+              },
+              "account_owner": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "funding_domain",
+                  "broker",
+                  "account"
+                ],
+                "properties": {
+                  "funding_domain": {
+                    "enum": [
+                      "TW_LOCAL_BROKER",
+                      "TW_SUB_BROKERAGE",
+                      "US_BROKER"
+                    ]
+                  },
+                  "broker": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "account": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "funding_source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "budget_type",
+                  "cash_basis",
+                  "amount",
+                  "currency",
+                  "source_pointer"
+                ],
+                "properties": {
+                  "budget_type": {
+                    "enum": [
+                      "EQUITY_EXECUTABLE_BUDGET",
+                      "BOND_EXECUTABLE_BUDGET"
+                    ]
+                  },
+                  "cash_basis": {
+                    "const": "AVAILABLE"
+                  },
+                  "amount": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    ]
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$"
+                  },
+                  "source_pointer": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              },
+              "data_lineage": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              },
+              "rule_lineage": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "source_snapshot_digest_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_decision": {
+                "type": "object"
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "undeployed_disposition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "source_role",
+            "destination_role",
+            "contribution",
+            "account_owner",
+            "contribution_applied_to_aggregate",
+            "final_dry_powder_aggregate_computed",
+            "family_physical_subledger_created"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "NONE",
+                "ROUTE_TO_SGOV_DRY_POWDER"
+              ]
+            },
+            "source_role": {
+              "const": "V75_UNDEPLOYED_TO_SGOV"
+            },
+            "destination_role": {
+              "const": "SGOV_DRY_POWDER_BUCKET"
+            },
+            "contribution": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "amount",
+                    "currency"
+                  ],
+                  "properties": {
+                    "amount": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      ]
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$"
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "account_owner": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "funding_domain",
+                "broker",
+                "account"
+              ],
+              "properties": {
+                "funding_domain": {
+                  "enum": [
+                    "TW_LOCAL_BROKER",
+                    "TW_SUB_BROKERAGE",
+                    "US_BROKER"
+                  ]
+                },
+                "broker": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "account": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "contribution_applied_to_aggregate": {
+              "const": false
+            },
+            "final_dry_powder_aggregate_computed": {
+              "const": false
+            },
+            "family_physical_subledger_created": {
+              "const": false
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "NONE"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "contribution": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "ROUTE_TO_SGOV_DRY_POWDER"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "contribution": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "amount",
+                      "currency"
+                    ],
+                    "properties": {
+                      "amount": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        ]
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "funding_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cash_basis",
+            "equity_executable_budget",
+            "bond_executable_budget",
+            "unsettled",
+            "reserved",
+            "funding_reallocation_performed",
+            "available_formula_recomputed"
+          ],
+          "properties": {
+            "cash_basis": {
+              "const": "AVAILABLE"
+            },
+            "equity_executable_budget": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "bond_executable_budget": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "unsettled": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "reserved": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "funding_reallocation_performed": {
+              "const": false
+            },
+            "available_formula_recomputed": {
+              "const": false
+            }
+          }
+        }
+      }
+    },
+    "canonical_deployment_result_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mentor_return": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "run_id",
+        "owner",
+        "currency",
+        "canonical_deployment_result_sha256",
+        "item_ids",
+        "interpretation_policy",
+        "unknown_false_zero_neutral_equivalence_forbidden",
+        "risk_signal_and_client_preference_must_remain_separate",
+        "cross_account_or_domain_reallocation_forbidden",
+        "mentor_may_explain_but_not_mutate_actions"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C8C9.Work9.MentorReturn"
+        },
+        "contract_version": {
+          "const": "C8C9-W9-MR-v1.0.0"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "funding_domain",
+            "broker",
+            "account"
+          ],
+          "properties": {
+            "funding_domain": {
+              "enum": [
+                "TW_LOCAL_BROKER",
+                "TW_SUB_BROKERAGE",
+                "US_BROKER"
+              ]
+            },
+            "broker": {
+              "type": "string",
+              "minLength": 1
+            },
+            "account": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "canonical_deployment_result_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "interpretation_policy": {
+          "const": "EXPLAIN_CANONICAL_SOURCE_FACTS_ONLY_NO_RECOMPUTE"
+        },
+        "unknown_false_zero_neutral_equivalence_forbidden": {
+          "const": true
+        },
+        "risk_signal_and_client_preference_must_remain_separate": {
+          "const": true
+        },
+        "cross_account_or_domain_reallocation_forbidden": {
+          "const": true
+        },
+        "mentor_may_explain_but_not_mutate_actions": {
+          "const": true
+        }
+      }
+    },
+    "source_semantics_policy": {
+      "const": "NORMALIZE_ONLY_PRESERVE_V82_V75_C_PROTECTION_FUNDING_AND_SGOV_SOURCE_FACTS_NO_RECOMPUTE"
+    },
+    "integration_diagnostics": {
+      "type": "array",
+      "maxItems": 0
+    }
+  }
+}

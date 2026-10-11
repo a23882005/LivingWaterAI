@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work7_SGOV_Runtime_Role_Input.schema.json",
+  "title": "LivingWaterAI C8C9 Work7 SGOV Runtime Role Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_name","contract_version","baseline_id","run_id","work3_handoff","work4_v82_adapter_result","work5_v75_integration_result","work6_funding_isolation_result"],
+  "properties": {
+    "contract_name": {"const": "LivingWaterAI.C8C9.Work7.SGOVRuntimeRoleInput"},
+    "contract_version": {"const": "C8C9-W7-SGOVI-v1.0.0"},
+    "baseline_id": {"const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"},
+    "run_id": {"type":"string","minLength":1},
+    "work3_handoff": {"type":"object"},
+    "work4_v82_adapter_result": {"type":"object"},
+    "work5_v75_integration_result": {"type":"object"},
+    "work6_funding_isolation_result": {"type":"object"}
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwater.ai/schema/c8c9/work8/protected-holding-input/v1.0.1",
+  "title": "LivingWaterAI C8C9 Work8 Protected Holding Protection Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "c_work7_asset_framework_result",
+    "work4_v82_integration_result"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work8.ProtectedHoldingProtectionInput"
+    },
+    "contract_version": {
+      "const": "C8C9-W8-PHPI-v1.0.1"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "c_work7_asset_framework_result": {
+      "type": "object"
+    },
+    "work4_v82_integration_result": {
+      "type": "object"
+    }
+  },
+  "description": "RECHECK2: structural envelope; runtime additionally validates exact frozen C Work7 and Work4 schemas plus cross-source lineage/authorization binding."
+}

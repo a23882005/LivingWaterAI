@@ -1,0 +1,51 @@
+{
+  "contract_name": "LivingWaterAI.C8C9.Work8.ProtectedHoldingClientActionProtectionContract",
+  "contract_version": "C8C9-W8-PHCP-v1.0.1",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "scope": "C8C9 Work8 only: bind existing C protected-holding preference semantics to preserved V82 runtime output without rewriting either source owner.",
+  "authoritative_source_contracts": {
+    "c_work7_asset_framework": "LivingWaterAI.C.Work7.AssetFrameworkIntegrationResult / C-W7-v1.2.0",
+    "work4_v82_integration": "LivingWaterAI.C8C9.Work4.V82IntegrationResult / C8C9-W4-V82AO-v1.0.0",
+    "v82_runtime_output": "LivingWaterAI.V82.RuntimeOutput / V82-OUTPUT-v1.0.1-W2-RECHECK2"
+  },
+  "invariants": [
+    "V82 canonical risk/fundamental/technical/execution evidence remains byte-semantically preserved in canonical_v82_output and is never rewritten to HOLD.",
+    "Protected holding Final Target Weight remains equal to Current Weight and Drift remains zero under the existing C Work6/7 contract until explicit client unlock.",
+    "Protected client_facing_action remains HOLD_PROTECTED; allocation optimization may not auto-create sell-all or reduce-to-zero.",
+    "A genuine V82 risk/reduction/sell signal remains visible as source-owned risk evidence and is not reclassified as an allocation action.",
+    "risk_warning_is_not_sell_instruction remains true; risk disclosure and client preference mutation are separate channels.",
+    "UNKNOWN is never coerced to zero/false/neutral; invalid protected/drift/source lineage fails closed.",
+    "Work8 does not recompute Final Target, Drift, V82 signals, Hard Gate state, or executable funding.",
+    "C Work7 serialized payload must validate against the exact frozen C-W7-v1.2.0 schema before Work8 consumes it.",
+    "C Work7 parent Work6 snapshot, canonical request lineage, confirmed Final Target allocation_id, and Work4 authorization_reference must remain one authoritative chain.",
+    "V82 canonical project_target_position must equal the same C Work7 integrated target for the evaluated asset; same-run target substitution fails closed."
+  ],
+  "forbidden_operations": [
+    "v82_patch",
+    "v75_patch",
+    "c_work1_7_reopen_or_modify",
+    "frozen_baseline_modify",
+    "final_target_recompute",
+    "drift_recompute",
+    "v82_signal_rewrite",
+    "v82_risk_action_reclassify_as_allocation_action",
+    "protected_sell_all_from_optimization",
+    "protected_reduce_to_zero_from_optimization",
+    "implicit_client_preference_unlock",
+    "second_funding_domain_engine",
+    "fx_conversion",
+    "work9_implementation_early_start",
+    "work10_implementation_early_start",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write"
+  ],
+  "hard_fail_action": "STOP_AND_RETURN_TO_ABC_PM_ON_TRUE_CROSS_LINE_CONTRACT_OR_SCHEMA_HARD_FAIL",
+  "recheck2_hardening": {
+    "frozen_c7_schema_validation": true,
+    "c7_snapshot_lineage_binding": "parent_work6_snapshot_id == snapshot_lineage.work6_snapshot_id; identity.request_id == snapshot_lineage.canonical_request_id",
+    "confirmed_final_target_binding": "Work4 authorization_reference == C7 work6_final_target_reference.allocation_id, with confirmed_at and confirmed_by non-empty",
+    "asset_target_binding": "V82 canonical project_target_position == C7 integrated_asset_framework.instrument_targets[asset].integrated_weight",
+    "purpose": "Close serialized same-run substitution gaps without changing C/V82/V75 economic semantics."
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "C8C9 Work9 Unified Deployment Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "work4_v82_integration_result",
+    "work5_v75_integration_result",
+    "work6_funding_account_isolation_result",
+    "work7_sgov_runtime_role_result",
+    "work8_protected_holding_result"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work9.UnifiedDeploymentInput"
+    },
+    "contract_version": {
+      "const": "C8C9-W9-UDI-v1.0.0"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work4_v82_integration_result": {
+      "type": "object"
+    },
+    "work5_v75_integration_result": {
+      "type": "object"
+    },
+    "work6_funding_account_isolation_result": {
+      "type": "object"
+    },
+    "work7_sgov_runtime_role_result": {
+      "type": "object"
+    },
+    "work8_protected_holding_result": {
+      "type": "object"
+    }
+  }
+}

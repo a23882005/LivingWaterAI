@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work7_SGOV_Runtime_Role_Output.schema.json",
+  "title": "LivingWaterAI C8C9 Work7 SGOV Runtime Role Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_name","contract_version","baseline_id","run_id","owner","currency","work3_context_handoff_id","source_digests","sgov_roles","route_safety","funding_evidence","source_semantics_policy","integration_diagnostics"],
+  "properties": {
+    "contract_name": {"const":"LivingWaterAI.C8C9.Work7.SGOVRuntimeRoleResult"},
+    "contract_version": {"const":"C8C9-W7-SGOVO-v1.0.0"},
+    "baseline_id": {"const":"C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"},
+    "run_id": {"type":"string","minLength":1},
+    "owner": {"$ref":"#/$defs/Owner"},
+    "currency": {"const":"USD"},
+    "work3_context_handoff_id": {"type":"string","minLength":1},
+    "source_digests": {
+      "type":"object","additionalProperties":false,
+      "required":["work4_v82_adapter_binding_sha256","work5_v75_integration_sha256","work6_funding_isolation_sha256"],
+      "properties": {
+        "work4_v82_adapter_binding_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "work5_v75_integration_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "work6_funding_isolation_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+      }
+    },
+    "sgov_roles": {
+      "type":"object","additionalProperties":false,
+      "required":["sgov_bond_bucket","sgov_dry_powder_bucket","v75_undeployed_to_sgov"],
+      "properties": {
+        "sgov_bond_bucket":{"$ref":"#/$defs/RoleBucketBond"},
+        "sgov_dry_powder_bucket":{"$ref":"#/$defs/RoleBucketDry"},
+        "v75_undeployed_to_sgov":{"$ref":"#/$defs/Contribution"}
+      }
+    },
+    "route_safety": {
+      "type":"object","additionalProperties":false,
+      "required":["roles_kept_separate","same_us_broker_account_guard_enforced","v82_equity_budget_auto_route_forbidden","idle_usd_auto_route_forbidden","reserved_cash_auto_route_forbidden","unsettled_cash_auto_route_forbidden","same_run_double_count_forbidden","final_dry_powder_aggregate_computed","family_physical_subledger_created"],
+      "properties": {
+        "roles_kept_separate":{"const":true},
+        "same_us_broker_account_guard_enforced":{"const":true},
+        "v82_equity_budget_auto_route_forbidden":{"const":true},
+        "idle_usd_auto_route_forbidden":{"const":true},
+        "reserved_cash_auto_route_forbidden":{"const":true},
+        "unsettled_cash_auto_route_forbidden":{"const":true},
+        "same_run_double_count_forbidden":{"const":true},
+        "final_dry_powder_aggregate_computed":{"const":false},
+        "family_physical_subledger_created":{"const":false}
+      }
+    },
+    "funding_evidence": {
+      "type":"object","additionalProperties":false,
+      "required":["cash_basis","equity_executable_budget","bond_executable_budget","unsettled","reserved","v75_undeployed_contribution"],
+      "properties": {
+        "cash_basis":{"const":"AVAILABLE"},
+        "equity_executable_budget":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},
+        "bond_executable_budget":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},
+        "unsettled":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},
+        "reserved":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},
+        "v75_undeployed_contribution":{"anyOf":[{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},{"type":"null"}]}
+      }
+    },
+    "source_semantics_policy": {"const":"PRESERVE_ROLES_VALIDATE_ROUTE_NO_AGGREGATE_NO_SECOND_FUNDING_ENGINE_NO_FX"},
+    "integration_diagnostics": {"type":"array","maxItems":0}
+  },
+  "$defs": {
+    "Owner": {
+      "type":"object","additionalProperties":false,"required":["funding_domain","broker","account"],
+      "properties":{"funding_domain":{"const":"US_BROKER"},"broker":{"type":"string","minLength":1},"account":{"type":"string","minLength":1}}
+    },
+    "Money": {
+      "type":"object","additionalProperties":false,"required":["amount","currency"],
+      "properties":{"amount":{"anyOf":[{"type":"number","minimum":0},{"type":"string","pattern":"^(0|[1-9][0-9]*)(\\.[0-9]+)?$"}]},"currency":{"const":"USD"}}
+    },
+    "RoleBucketBond": {
+      "type":"object","additionalProperties":false,"required":["role","source","amount","currency","aggregation_performed"],
+      "properties":{"role":{"const":"SGOV_BOND_BUCKET"},"source":{"const":"V75_BOND_ROLE_CONTEXT"},"amount":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},"currency":{"const":"USD"},"aggregation_performed":{"const":false}}
+    },
+    "RoleBucketDry": {
+      "type":"object","additionalProperties":false,"required":["role","source","amount","currency","aggregation_performed"],
+      "properties":{"role":{"const":"SGOV_DRY_POWDER_BUCKET"},"source":{"const":"READ_ONLY_UPSTREAM_CONTEXT"},"amount":{"type":"string","pattern":"^[0-9]+(\\.[0-9]+)?$"},"currency":{"const":"USD"},"aggregation_performed":{"const":false}}
+    },
+    "Contribution": {
+      "type":"object","additionalProperties":false,"required":["role","source","contribution","destination_role","contribution_applied_to_aggregate"],
+      "properties":{"role":{"const":"V75_UNDEPLOYED_TO_SGOV"},"source":{"const":"FROZEN_V75_OUTPUT"},"contribution":{"anyOf":[{"$ref":"#/$defs/Money"},{"type":"null"}]},"destination_role":{"const":"SGOV_DRY_POWDER_BUCKET"},"contribution_applied_to_aggregate":{"const":false}}
+    }
+  }
+}

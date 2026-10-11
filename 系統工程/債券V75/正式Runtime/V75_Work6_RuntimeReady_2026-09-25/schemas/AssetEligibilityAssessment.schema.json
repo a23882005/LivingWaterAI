@@ -1,0 +1,76 @@
+{
+  "$defs": {
+    "Work3BucketClass": {
+      "enum": [
+        "US_GENERIC_CORE",
+        "TW_GENERIC_CORE",
+        "AUTHORIZED_NON_CORE",
+        "EXISTING_ONLY",
+        "UNKNOWN",
+        "NONE"
+      ],
+      "title": "Work3BucketClass",
+      "type": "string"
+    },
+    "Work3EligibilityState": {
+      "enum": [
+        "ELIGIBLE",
+        "INELIGIBLE_NEW_ALLOCATION",
+        "INELIGIBLE",
+        "UNKNOWN"
+      ],
+      "title": "Work3EligibilityState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "authorized": {
+      "title": "Authorized",
+      "type": "boolean"
+    },
+    "bucket_class": {
+      "$ref": "#/$defs/Work3BucketClass"
+    },
+    "eligibility_state": {
+      "$ref": "#/$defs/Work3EligibilityState"
+    },
+    "existing_position_management_allowed": {
+      "title": "Existing Position Management Allowed",
+      "type": "boolean"
+    },
+    "new_long_term_target_allowed": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "New Long Term Target Allowed"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "asset_id",
+    "eligibility_state",
+    "bucket_class",
+    "new_long_term_target_allowed",
+    "existing_position_management_allowed",
+    "authorized"
+  ],
+  "title": "AssetEligibilityAssessment",
+  "type": "object"
+}

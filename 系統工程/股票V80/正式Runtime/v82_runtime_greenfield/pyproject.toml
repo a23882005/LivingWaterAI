@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "livingwater-v82-runtime"
+version = "0.9.0"
+description = "Greenfield V82 runtime scaffold — W9 canonical analysis/output/persistence/ports runtime"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.18"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+livingwater_v82_runtime = ["schema/*.json"]

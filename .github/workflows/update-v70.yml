@@ -17,7 +17,10 @@ on:
       - 'p128.py'
       - 'V70_Live.html'
       - 'scripts/v70_update.py'
+      - 'scripts/chatgpt_fallback.py'
+      - 'data/chatgpt_macro_snapshot.json'
       - 'tests/test_v70_update.py'
+      - 'tests/test_chatgpt_fallback.py'
       - 'requirements.txt'
 
 permissions:
@@ -48,7 +51,7 @@ jobs:
 
       - name: Source syntax and regression checks
         run: |
-          python -m py_compile p128.py scripts/v70_update.py
+          python -m py_compile p128.py scripts/v70_update.py scripts/chatgpt_fallback.py
           python -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Refresh candidate only when a verified snapshot exists
@@ -57,9 +60,9 @@ jobs:
         env:
           V70_MANUAL_SNAPSHOT: ${{ inputs.manual_snapshot || vars.V70_MANUAL_SNAPSHOT }}
         run: |
-          if [ -z "$V70_MANUAL_SNAPSHOT" ]; then
+          if [ -z "$V70_MANUAL_SNAPSHOT" ] && [ ! -s data/chatgpt_macro_snapshot.json ]; then
             echo "status=HOLD" >> "$GITHUB_OUTPUT"
-            echo "### HOLD: Missing a fresh approved V70_MANUAL_SNAPSHOT. Original HTML preserved." >> "$GITHUB_STEP_SUMMARY"
+            echo "### HOLD: No verified macro snapshot from ChatGPT Task yet. Original HTML preserved." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           python scripts/v70_update.py

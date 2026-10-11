@@ -1,0 +1,1330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:livingwaterai:c-work3:performance-risk-result:v1.0.1",
+  "title": "C Work3 Performance Risk ModuleResult v1.0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_name",
+    "status",
+    "formal_output_eligibility",
+    "payload",
+    "issues",
+    "traceability"
+  ],
+  "properties": {
+    "module_name": {
+      "const": "C_WORK3_PERFORMANCE_RISK"
+    },
+    "status": {
+      "enum": [
+        "SUCCESS",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "formal_output_eligibility": {
+      "$ref": "#/$defs/formalGate"
+    },
+    "payload": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/payload"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    },
+    "traceability": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trace"
+      }
+    }
+  },
+  "$defs": {
+    "formalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "scope",
+        "blocking_reasons",
+        "warning_reasons",
+        "evaluated_at",
+        "rule_references"
+      ],
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "scope": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "NONE"
+          ]
+        },
+        "blocking_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "warning_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": false
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "const": "NONE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": true
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "enum": [
+                  "FULL",
+                  "PARTIAL"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "scope": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "scope"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocking_reasons": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "field_path",
+        "message",
+        "owner",
+        "blocking",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "BLOCKING"
+          ]
+        },
+        "field_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "const": "C_INTEGRATION"
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "severity": {
+                "const": "BLOCKING"
+              }
+            },
+            "required": [
+              "severity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocking": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field_path",
+        "owner",
+        "rule_references",
+        "source_reference_ids",
+        "as_of",
+        "data_quality",
+        "issue_codes"
+      ],
+      "properties": {
+        "field_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "const": "C_INTEGRATION"
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "proxy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proxy_ticker",
+        "usage",
+        "authorization",
+        "source_native_status"
+      ],
+      "properties": {
+        "proxy_ticker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "usage": {
+          "enum": [
+            "NOT_USED",
+            "USED",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "authorization": {
+          "enum": [
+            "AUTHORIZED",
+            "UNAUTHORIZED",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source_native_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "usage": {
+                "const": "USED"
+              }
+            },
+            "required": [
+              "usage"
+            ]
+          },
+          "then": {
+            "properties": {
+              "proxy_ticker": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authorization": {
+                "const": "AUTHORIZED"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "usage": {
+                "enum": [
+                  "NOT_USED",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "usage"
+            ]
+          },
+          "then": {
+            "properties": {
+              "proxy_ticker": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "support_status",
+        "value_state",
+        "value",
+        "unit",
+        "as_of",
+        "data_quality",
+        "freshness",
+        "source_reference_ids",
+        "issue_codes",
+        "source_native_status",
+        "source_metric_key",
+        "method",
+        "rule_references",
+        "proxy",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "support_status": {
+          "enum": [
+            "SUPPORTED_BY_BASELINE",
+            "SUPPORTED_BY_EXPLICIT_ASSUMPTION",
+            "SOURCE_INELIGIBLE",
+            "UNSUPPORTED_BY_BASELINE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "source_native_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_metric_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "proxy": {
+          "$ref": "#/$defs/proxy"
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/formalGate"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "enum": [
+                  "NONE",
+                  "UNKNOWN",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "windowMetricMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "7y",
+        "10y",
+        "15y",
+        "inception"
+      ],
+      "properties": {
+        "7y": {
+          "$ref": "#/$defs/metric"
+        },
+        "10y": {
+          "$ref": "#/$defs/metric"
+        },
+        "15y": {
+          "$ref": "#/$defs/metric"
+        },
+        "inception": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "worstDrawdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "peak_date",
+        "trough_date",
+        "peak_to_trough_calendar_days",
+        "recovery_date",
+        "recovery_period"
+      ],
+      "properties": {
+        "peak_date": {
+          "$ref": "#/$defs/metric"
+        },
+        "trough_date": {
+          "$ref": "#/$defs/metric"
+        },
+        "peak_to_trough_calendar_days": {
+          "$ref": "#/$defs/metric"
+        },
+        "recovery_date": {
+          "$ref": "#/$defs/metric"
+        },
+        "recovery_period": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "historical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "long_term_cagr",
+        "max_drawdown",
+        "worst_drawdown",
+        "sharpe",
+        "sortino",
+        "calmar"
+      ],
+      "properties": {
+        "long_term_cagr": {
+          "$ref": "#/$defs/metric"
+        },
+        "max_drawdown": {
+          "$ref": "#/$defs/windowMetricMap"
+        },
+        "worst_drawdown": {
+          "$ref": "#/$defs/worstDrawdown"
+        },
+        "sharpe": {
+          "$ref": "#/$defs/windowMetricMap"
+        },
+        "sortino": {
+          "$ref": "#/$defs/windowMetricMap"
+        },
+        "calmar": {
+          "$ref": "#/$defs/windowMetricMap"
+        }
+      }
+    },
+    "moneyValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "amount",
+        "currency",
+        "as_of",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "enum": [
+                  "NONE",
+                  "UNKNOWN",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "monetaryWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "loss_amount",
+        "trough_amount"
+      ],
+      "properties": {
+        "loss_amount": {
+          "$ref": "#/$defs/metric"
+        },
+        "trough_amount": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "monetaryDrawdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "7y",
+        "10y",
+        "15y",
+        "inception"
+      ],
+      "properties": {
+        "7y": {
+          "$ref": "#/$defs/monetaryWindow"
+        },
+        "10y": {
+          "$ref": "#/$defs/monetaryWindow"
+        },
+        "15y": {
+          "$ref": "#/$defs/monetaryWindow"
+        },
+        "inception": {
+          "$ref": "#/$defs/monetaryWindow"
+        }
+      }
+    },
+    "projections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "1",
+        "3",
+        "5",
+        "7",
+        "10",
+        "20",
+        "30"
+      ],
+      "properties": {
+        "1": {
+          "$ref": "#/$defs/metric"
+        },
+        "3": {
+          "$ref": "#/$defs/metric"
+        },
+        "5": {
+          "$ref": "#/$defs/metric"
+        },
+        "7": {
+          "$ref": "#/$defs/metric"
+        },
+        "10": {
+          "$ref": "#/$defs/metric"
+        },
+        "20": {
+          "$ref": "#/$defs/metric"
+        },
+        "30": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "scenarioBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "annual_return",
+        "projections"
+      ],
+      "properties": {
+        "annual_return": {
+          "$ref": "#/$defs/metric"
+        },
+        "projections": {
+          "$ref": "#/$defs/projections"
+        }
+      }
+    },
+    "scenarios": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conservative",
+        "central",
+        "better"
+      ],
+      "properties": {
+        "conservative": {
+          "$ref": "#/$defs/scenarioBlock"
+        },
+        "central": {
+          "$ref": "#/$defs/scenarioBlock"
+        },
+        "better": {
+          "$ref": "#/$defs/scenarioBlock"
+        }
+      }
+    },
+    "planningScenarios": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "horizons_years",
+        "basis",
+        "assumption_id",
+        "currency_basis",
+        "scenarios",
+        "explicit_assumption_formally_usable"
+      ],
+      "properties": {
+        "horizons_years": {
+          "const": [
+            1,
+            3,
+            5,
+            7,
+            10,
+            20,
+            30
+          ]
+        },
+        "basis": {
+          "enum": [
+            "NO_FORMAL_ASSUMPTION",
+            "SINGLE_ASSET_B_CENTRAL_CAGR",
+            "EXPLICIT_PORTFOLIO_CURRENCY_ASSUMPTIONS",
+            "EXPLICIT_ASSUMPTIONS_INVALID"
+          ]
+        },
+        "assumption_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "currency_basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "scenarios": {
+          "$ref": "#/$defs/scenarios"
+        },
+        "explicit_assumption_formally_usable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "methodology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_capability",
+        "historical_portfolio_method",
+        "mixed_portfolio_requirement",
+        "weight_renormalization",
+        "fx_assumption",
+        "component_metrics_are_not_portfolio_metrics",
+        "rule_references"
+      ],
+      "properties": {
+        "baseline_capability": {
+          "const": "PER_ASSET_SUMMARY_METRICS_NO_ALIGNED_PORTFOLIO_WEALTH_SERIES"
+        },
+        "historical_portfolio_method": {
+          "enum": [
+            "SINGLE_ASSET_PASS_THROUGH",
+            "UNSUPPORTED_FOR_MIXED_PORTFOLIO"
+          ]
+        },
+        "mixed_portfolio_requirement": {
+          "const": "ALIGNED_TOTAL_RETURN_WEALTH_SERIES_REQUIRED"
+        },
+        "weight_renormalization": {
+          "const": "PROHIBITED"
+        },
+        "fx_assumption": {
+          "const": "NONE"
+        },
+        "component_metrics_are_not_portfolio_metrics": {
+          "const": true
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      }
+    },
+    "portfolioPosition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "weight",
+        "base_currency",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weight": {
+          "type": "number"
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "portfolioDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "denominator",
+        "effective_position_count",
+        "weight_sum",
+        "is_single_effective_asset",
+        "positions"
+      ],
+      "properties": {
+        "denominator": {
+          "$ref": "#/$defs/moneyValue"
+        },
+        "effective_position_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "weight_sum": {
+          "type": "number"
+        },
+        "is_single_effective_asset": {
+          "type": "boolean"
+        },
+        "positions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/portfolioPosition"
+          }
+        }
+      }
+    },
+    "componentDiagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "weight",
+        "base_currency",
+        "proxy",
+        "long_term_cagr",
+        "max_drawdown_inception",
+        "calmar_inception"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weight": {
+          "type": "number"
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "proxy": {
+          "$ref": "#/$defs/proxy"
+        },
+        "long_term_cagr": {
+          "$ref": "#/$defs/metric"
+        },
+        "max_drawdown_inception": {
+          "$ref": "#/$defs/metric"
+        },
+        "calmar_inception": {
+          "$ref": "#/$defs/metric"
+        }
+      }
+    },
+    "proxyDisclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "weight",
+        "proxy"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "weight": {
+          "type": "number"
+        },
+        "proxy": {
+          "$ref": "#/$defs/proxy"
+        }
+      }
+    },
+    "formalDataGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "scope",
+        "required_input",
+        "current_behavior"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_input": {
+          "type": "string",
+          "minLength": 1
+        },
+        "current_behavior": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work3_version",
+        "work2_version",
+        "work1_contract_version",
+        "allocation_id",
+        "allocation_stage",
+        "allocation_as_of",
+        "evaluated_at",
+        "methodology",
+        "portfolio_definition",
+        "historical_performance_risk",
+        "monetary_drawdown",
+        "planning_scenarios",
+        "component_diagnostics",
+        "proxy_disclosures",
+        "formal_data_gaps"
+      ],
+      "properties": {
+        "work3_version": {
+          "const": "C-W3-v1.0.1"
+        },
+        "work2_version": {
+          "const": "C-W2-v1.0.1"
+        },
+        "work1_contract_version": {
+          "const": "C-W1-v1.0.1"
+        },
+        "allocation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "allocation_stage": {
+          "enum": [
+            "CURRENT",
+            "PROPOSED",
+            "FINAL_TARGET"
+          ]
+        },
+        "allocation_as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evaluated_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "methodology": {
+          "$ref": "#/$defs/methodology"
+        },
+        "portfolio_definition": {
+          "$ref": "#/$defs/portfolioDefinition"
+        },
+        "historical_performance_risk": {
+          "$ref": "#/$defs/historical"
+        },
+        "monetary_drawdown": {
+          "$ref": "#/$defs/monetaryDrawdown"
+        },
+        "planning_scenarios": {
+          "$ref": "#/$defs/planningScenarios"
+        },
+        "component_diagnostics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/componentDiagnostic"
+          }
+        },
+        "proxy_disclosures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/proxyDisclosure"
+          }
+        },
+        "formal_data_gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/formalDataGap"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "SUCCESS",
+              "PARTIAL"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/payload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "SUCCESS"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "formal_output_eligibility": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/formalGate"
+              },
+              {
+                "properties": {
+                  "eligible": {
+                    "const": true
+                  },
+                  "scope": {
+                    "const": "FULL"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PARTIAL"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "formal_output_eligibility": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/formalGate"
+              },
+              {
+                "properties": {
+                  "eligible": {
+                    "const": true
+                  },
+                  "scope": {
+                    "const": "PARTIAL"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "BLOCKED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "formal_output_eligibility": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/formalGate"
+              },
+              {
+                "properties": {
+                  "eligible": {
+                    "const": false
+                  },
+                  "scope": {
+                    "const": "NONE"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

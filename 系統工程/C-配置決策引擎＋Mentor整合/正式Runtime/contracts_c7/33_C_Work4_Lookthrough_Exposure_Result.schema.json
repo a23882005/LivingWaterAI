@@ -1,0 +1,665 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C_Work4_Lookthrough_Exposure_Result.schema.json",
+  "title": "LivingWaterAI C Work4 Look-through Exposure Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_name",
+    "status",
+    "formal_output_eligibility",
+    "payload",
+    "issues",
+    "traceability"
+  ],
+  "properties": {
+    "module_name": {
+      "const": "lookthrough_exposure_result"
+    },
+    "status": {
+      "enum": [
+        "SUCCESS",
+        "PARTIAL",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "formal_output_eligibility": {
+      "$ref": "#/$defs/Gate"
+    },
+    "payload": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Payload"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "traceability": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "$defs": {
+    "Gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "scope",
+        "blocking_reasons",
+        "warning_reasons",
+        "evaluated_at",
+        "rule_references"
+      ],
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "scope": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "NONE"
+          ]
+        },
+        "blocking_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warning_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": false
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "const": "NONE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": true
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "enum": [
+                  "FULL",
+                  "PARTIAL"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "scope": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "scope"
+            ]
+          },
+          "then": {
+            "properties": {
+              "eligible": {
+                "const": true
+              },
+              "blocking_reasons": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "value",
+        "unit",
+        "source_reference_ids",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "const": "portfolio_weight"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "amount",
+        "currency",
+        "source_reference_ids",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN"
+          ]
+        },
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Contributor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticker",
+        "allocation_weight",
+        "primitive_weight",
+        "portfolio_contribution_weight",
+        "primitive_formal_eligible"
+      ],
+      "properties": {
+        "ticker": {
+          "type": "string"
+        },
+        "allocation_weight": {
+          "type": "number"
+        },
+        "primitive_weight": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "portfolio_contribution_weight": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "primitive_formal_eligible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exposure_id",
+        "name",
+        "portfolio_weight",
+        "portfolio_amount",
+        "contributors",
+        "as_of_min",
+        "as_of_max",
+        "source_reference_ids",
+        "issue_codes",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "exposure_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "portfolio_weight": {
+          "$ref": "#/$defs/Metric"
+        },
+        "portfolio_amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Contributor"
+          }
+        },
+        "as_of_min": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of_max": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dimension_root",
+        "dimension_name",
+        "taxonomy_category",
+        "coverage",
+        "conservation_policy",
+        "conservation_tolerance",
+        "per_position_diagnostics",
+        "items",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "dimension_root": {
+          "type": "string"
+        },
+        "dimension_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "taxonomy_category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "applicable_portfolio_weight",
+            "represented_portfolio_weight",
+            "formal_complete_portfolio_weight",
+            "blocked_or_unknown_portfolio_weight",
+            "missing_primitive_portfolio_weight"
+          ],
+          "properties": {
+            "applicable_portfolio_weight": {
+              "type": "number"
+            },
+            "represented_portfolio_weight": {
+              "type": "number"
+            },
+            "formal_complete_portfolio_weight": {
+              "type": "number"
+            },
+            "blocked_or_unknown_portfolio_weight": {
+              "type": "number"
+            },
+            "missing_primitive_portfolio_weight": {
+              "type": "number"
+            }
+          }
+        },
+        "conservation_policy": {
+          "type": "string"
+        },
+        "conservation_tolerance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "per_position_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Item"
+          }
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "RequiredView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view",
+        "roots",
+        "status",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "view": {
+          "type": "string"
+        },
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Unsupported": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view",
+        "reason",
+        "value_state",
+        "source_reference_ids",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "view": {
+          "type": "string"
+        },
+        "reason": {
+          "const": "UNSUPPORTED_BY_BASELINE"
+        },
+        "value_state": {
+          "const": "UNKNOWN"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Concentration": {
+      "type": "object",
+      "required": [
+        "basis",
+        "known_holding_coverage_weight",
+        "top1",
+        "top5",
+        "top5_known_weight",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "basis": {
+          "type": "string"
+        },
+        "interpretation": {
+          "type": "string"
+        },
+        "known_holding_coverage_weight": {
+          "type": "number"
+        },
+        "known_holding_coverage_amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "top1": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "top5": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "top5_known_weight": {
+          "type": "number"
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Overlap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "interpretation",
+        "pairs",
+        "formal_output_eligibility"
+      ],
+      "properties": {
+        "basis": {
+          "type": "string"
+        },
+        "interpretation": {
+          "type": "string"
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/Gate"
+        }
+      }
+    },
+    "Payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work4_version",
+        "work3_version_inherited",
+        "work2_version",
+        "work1_contract_version",
+        "allocation_id",
+        "stage",
+        "evaluated_at",
+        "portfolio_denominator",
+        "portfolio_total_weight",
+        "methodology",
+        "required_views",
+        "taxonomy_dimensions",
+        "concentration",
+        "overlap",
+        "unsupported_required_views",
+        "formal_data_gaps"
+      ],
+      "properties": {
+        "work4_version": {
+          "const": "C-W4-v1.0.0"
+        },
+        "work3_version_inherited": {
+          "const": "C-W3-v1.0.1"
+        },
+        "work2_version": {
+          "const": "C-W2-v1.0.1"
+        },
+        "work1_contract_version": {
+          "const": "C-W1-v1.0.1"
+        },
+        "allocation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "portfolio_denominator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "amount",
+            "currency"
+          ],
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string"
+            }
+          }
+        },
+        "portfolio_total_weight": {
+          "type": "number"
+        },
+        "methodology": {
+          "type": "object"
+        },
+        "required_views": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RequiredView"
+          }
+        },
+        "taxonomy_dimensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Dimension"
+          }
+        },
+        "concentration": {
+          "$ref": "#/$defs/Concentration"
+        },
+        "overlap": {
+          "$ref": "#/$defs/Overlap"
+        },
+        "unsupported_required_views": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Unsupported"
+          }
+        },
+        "formal_data_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

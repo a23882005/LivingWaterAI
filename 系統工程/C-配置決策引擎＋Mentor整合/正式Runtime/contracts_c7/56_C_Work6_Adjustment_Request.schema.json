@@ -1,0 +1,565 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C_Work6_Adjustment_Request.schema.json",
+  "title": "LivingWaterAI C Work6 Adjustment Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "adjustment_id",
+    "requested_change_types",
+    "weight_overrides",
+    "preference_decisions",
+    "confirmation",
+    "radar_scores",
+    "source_references",
+    "source_reference_ids"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C.Work6.AdjustmentRequest"
+    },
+    "contract_version": {
+      "const": "C-W6-v1.0.0"
+    },
+    "adjustment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_change_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "REVIEW_ONLY",
+          "WITHIN_BUCKET_REALLOCATION",
+          "PREFERENCE_LOCK_UPDATE",
+          "FINAL_TARGET_CONFIRMATION",
+          "FINAL_TARGET_REVOCATION",
+          "ASSET_CLASS_FRAMEWORK_CHANGE",
+          "FUNDING_HORIZON_CHANGE",
+          "WITHDRAWAL_REQUIREMENT_CHANGE",
+          "LIFE_STAGE_OR_RISK_CAPACITY_CHANGE"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "weight_overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instrument_id",
+          "value_state",
+          "weight",
+          "source_reference_ids"
+        ],
+        "properties": {
+          "instrument_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value_state": {
+            "type": "string",
+            "enum": [
+              "KNOWN",
+              "UNKNOWN",
+              "NONE",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "weight": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "source_reference_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "value_state": {
+                  "const": "KNOWN"
+                }
+              },
+              "required": [
+                "value_state"
+              ]
+            },
+            "then": {
+              "properties": {
+                "weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "value_state": {
+                  "enum": [
+                    "UNKNOWN",
+                    "NONE",
+                    "NOT_APPLICABLE"
+                  ]
+                }
+              },
+              "required": [
+                "value_state"
+              ]
+            },
+            "then": {
+              "properties": {
+                "weight": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "preference_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instrument_id",
+          "holding_kind",
+          "action",
+          "client_explicit_decision",
+          "confirmed_at",
+          "source_reference_ids"
+        ],
+        "properties": {
+          "instrument_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "holding_kind": {
+            "const": "INDIVIDUAL_COMPANY_STOCK"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "LOCK",
+              "UNLOCK",
+              "NO_CHANGE"
+            ]
+          },
+          "client_explicit_decision": {
+            "type": "string",
+            "enum": [
+              "TRUE",
+              "FALSE",
+              "UNKNOWN"
+            ]
+          },
+          "confirmed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_reference_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "client_explicit_decision",
+        "confirmed_at",
+        "confirmed_by",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "KEEP_PENDING",
+            "CONFIRM",
+            "REVOKE"
+          ]
+        },
+        "client_explicit_decision": {
+          "type": "string",
+          "enum": [
+            "TRUE",
+            "FALSE",
+            "UNKNOWN"
+          ]
+        },
+        "confirmed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confirmed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "radar_scores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "view_id",
+          "scores",
+          "source_reference_ids"
+        ],
+        "properties": {
+          "view_id": {
+            "type": "string",
+            "enum": [
+              "CURRENT_ATTACK",
+              "TARGET_ATTACK",
+              "CURRENT_DEFENSE",
+              "TARGET_DEFENSE"
+            ]
+          },
+          "scores": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "axis_id",
+                "value_state",
+                "value",
+                "source_reference_ids"
+              ],
+              "properties": {
+                "axis_id": {
+                  "type": "string",
+                  "enum": [
+                    "BULL_EARLY",
+                    "BULL_MID",
+                    "BULL_LATE",
+                    "BEAR_NON_RECESSION_VALUATION",
+                    "BEAR_RECESSION",
+                    "FINANCIAL_LIQUIDITY_CRISIS"
+                  ]
+                },
+                "value_state": {
+                  "type": "string",
+                  "enum": [
+                    "KNOWN",
+                    "UNKNOWN",
+                    "NONE",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "source_reference_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "value_state": {
+                        "const": "KNOWN"
+                      }
+                    },
+                    "required": [
+                      "value_state"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "value_state": {
+                        "enum": [
+                          "UNKNOWN",
+                          "NONE",
+                          "NOT_APPLICABLE"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "value_state"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "source_reference_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "source_references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SourceReference"
+      }
+    },
+    "source_reference_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "SourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "owner",
+        "source_reference",
+        "source_fingerprint",
+        "as_of",
+        "retrieved_at",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_native_status",
+        "notes",
+        "source_version",
+        "source_fingerprint_algorithm"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "BROKER_FACT",
+            "B_BENCHMARK_SOT",
+            "V70_SNAPSHOT",
+            "V82_SNAPSHOT",
+            "V75_SNAPSHOT",
+            "MENTOR",
+            "MARKET_DATA",
+            "FX_DATA",
+            "SYSTEM_DERIVED",
+            "OTHER"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "MENTOR",
+            "C_INTEGRATION",
+            "B_BENCHMARK",
+            "V70",
+            "V82",
+            "V75",
+            "REPORT_UI",
+            "BROKER_ADAPTER",
+            "DATA_PROVIDER"
+          ]
+        },
+        "source_reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "File ID, URL, snapshot ID, broker fact ID, client-project path, or equivalent traceable reference."
+        },
+        "source_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retrieved_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_native_status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Preserve upstream native sentinel/quality status verbatim; mapping occurs only in the owning adapter Work."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Upstream source/document/schema/business version when the source exposes one; otherwise null with native/issue metadata."
+        },
+        "source_fingerprint_algorithm": {
+          "type": "string",
+          "enum": [
+            "SHA256",
+            "ETAG",
+            "REVISION_ID",
+            "CONTENT_HASH_OTHER",
+            "NOT_APPLICABLE",
+            "UNKNOWN"
+          ],
+          "description": "How source_fingerprint must be interpreted; prevents an opaque fingerprint string from losing its algorithm semantics."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source_fingerprint": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_fingerprint"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_fingerprint_algorithm": {
+                "enum": [
+                  "SHA256",
+                  "ETAG",
+                  "REVISION_ID",
+                  "CONTENT_HASH_OTHER"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_fingerprint": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "source_fingerprint"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_fingerprint_algorithm": {
+                "enum": [
+                  "NOT_APPLICABLE",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

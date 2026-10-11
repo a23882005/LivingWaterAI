@@ -1,0 +1,778 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work3_Context_Handoff_Input_RECHECK2.schema.json",
+  "title": "LivingWaterAI C8C9 Work3 Context Handoff Input RECHECK2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "work2_envelope",
+    "client_state_context",
+    "v70_runtime_context",
+    "shared_decision_context"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work3.ContextHandoffInput"
+    },
+    "contract_version": {
+      "const": "C8C9-W3-CHI-v1.0.1-RECHECK2"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work2_envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "baseline_id",
+        "run_id",
+        "owner",
+        "currency",
+        "settlement",
+        "final_target",
+        "remaining_target_gap",
+        "executable_budget",
+        "temporal",
+        "versions",
+        "lineage",
+        "reason_status",
+        "sgov_boundary"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C8C9.Work2.UnifiedIntegrationEnvelope"
+        },
+        "contract_version": {
+          "const": "C8C9-W2-UIC-v1.0.1-RECHECK1"
+        },
+        "baseline_id": {
+          "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/Owner"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "settlement": {
+          "$ref": "#/$defs/Settlement"
+        },
+        "final_target": {
+          "$ref": "#/$defs/FinalTarget"
+        },
+        "remaining_target_gap": {
+          "$ref": "#/$defs/RemainingGapByEngine"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/ExecutableBudget"
+        },
+        "temporal": {
+          "$ref": "#/$defs/Temporal"
+        },
+        "versions": {
+          "$ref": "#/$defs/Versions"
+        },
+        "lineage": {
+          "$ref": "#/$defs/Lineage"
+        },
+        "reason_status": {
+          "$ref": "#/$defs/ReasonStatus"
+        },
+        "sgov_boundary": {
+          "$ref": "#/$defs/SgovBoundary"
+        }
+      }
+    },
+    "client_state_context": {
+      "$ref": "#/$defs/SourceContext"
+    },
+    "v70_runtime_context": {
+      "$ref": "#/$defs/V70Context"
+    },
+    "shared_decision_context": {
+      "$ref": "#/$defs/SharedDecisionContext"
+    }
+  },
+  "$defs": {
+    "Owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "funding_domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "funding_domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "NonnegativeAmount": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "pattern": "^\\+?\\d+(?:\\.\\d+)?$"
+        }
+      ]
+    },
+    "Money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "Settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cash_basis",
+        "cash_state",
+        "source_status"
+      ],
+      "properties": {
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "cash_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total",
+            "available",
+            "unsettled",
+            "reserved"
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "available": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unsettled": {
+              "type": "number",
+              "minimum": 0
+            },
+            "reserved": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "FinalTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "authorization_reference",
+        "confirmation_proof",
+        "payload"
+      ],
+      "properties": {
+        "allocation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "confirmed_at",
+            "confirmed_by"
+          ],
+          "properties": {
+            "confirmed_at": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confirmed_by": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "payload": {}
+      }
+    },
+    "V82GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V82_EXISTING_RUNTIME_DERIVED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "V75GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V75_EXISTING_EXPLICIT_GAP",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "RemainingGapByEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v82",
+        "v75"
+      ],
+      "properties": {
+        "v82": {
+          "$ref": "#/$defs/V82GapBinding"
+        },
+        "v75": {
+          "$ref": "#/$defs/V75GapBinding"
+        }
+      }
+    },
+    "ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "cash_basis",
+        "owner"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "owner": {
+          "$ref": "#/$defs/Owner"
+        }
+      }
+    },
+    "ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/ExecutableLeg"
+        }
+      }
+    },
+    "Temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "data_as_of"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_as_of": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      }
+    },
+    "Versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "data",
+        "schema"
+      ],
+      "properties": {
+        "rule": {
+          "type": "object"
+        },
+        "data": {
+          "type": "object"
+        },
+        "schema": {
+          "type": "object"
+        }
+      }
+    },
+    "Lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reference_ids",
+        "upstream_snapshot_ids"
+      ],
+      "properties": {
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "upstream_snapshot_ids": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "ReasonStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reason_codes",
+        "source_status_codes",
+        "integration_diagnostics"
+      ],
+      "properties": {
+        "source_reason_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "source_status_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "integration_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "V70DryPowderContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "weight",
+        "source_status"
+      ],
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "SgovBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v70_original_dry_powder",
+        "sgov_bond_bucket_amount",
+        "sgov_dry_powder_bucket_amount",
+        "v75_undeployed_to_sgov",
+        "v82_undeployed_to_sgov",
+        "roles_kept_separate",
+        "v82_access_forbidden",
+        "v82_raw_equity_budget_auto_route_forbidden",
+        "final_aggregate_computed_in_work2",
+        "physical_subledger_out_of_scope"
+      ],
+      "properties": {
+        "v70_original_dry_powder": {
+          "$ref": "#/$defs/V70DryPowderContext"
+        },
+        "sgov_bond_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sgov_dry_powder_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v75_undeployed_to_sgov": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v82_undeployed_to_sgov": {
+          "type": "null",
+          "description": "Current V82 Ready Output exposes no canonical v82_undeployed_to_sgov field; Work2 must not fabricate it."
+        },
+        "roles_kept_separate": {
+          "const": true
+        },
+        "v82_access_forbidden": {
+          "const": true
+        },
+        "v82_raw_equity_budget_auto_route_forbidden": {
+          "const": true
+        },
+        "final_aggregate_computed_in_work2": {
+          "const": false
+        },
+        "physical_subledger_out_of_scope": {
+          "const": true
+        }
+      }
+    },
+    "SourceContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      }
+    },
+    "V70Context": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "upstream_v70_snapshot_id",
+        "snapshot_as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_as_of": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "SharedDecisionContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "context_id",
+        "as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "versions": {
+          "type": "object"
+        }
+      }
+    },
+    "V82Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "authorization_reference",
+        "v70_original_dry_powder_executable",
+        "sgov_bucket_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V82"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/equity"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v82"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_original_dry_powder_executable": {
+          "const": false
+        },
+        "sgov_bucket_access": {
+          "const": "FORBIDDEN"
+        }
+      }
+    },
+    "V75Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "sgov_context_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V75"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/bond"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v75"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "sgov_context_access": {
+          "const": "READ_ONLY_BOUNDARY_CONTEXT"
+        }
+      }
+    }
+  }
+}

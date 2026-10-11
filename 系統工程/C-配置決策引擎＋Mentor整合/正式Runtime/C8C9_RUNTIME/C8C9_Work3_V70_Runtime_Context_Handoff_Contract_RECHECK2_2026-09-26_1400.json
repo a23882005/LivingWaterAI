@@ -1,0 +1,111 @@
+{
+  "contract_family": "LivingWaterAI.C8C9.Work3.ContextHandoff",
+  "input_contract": {
+    "name": "LivingWaterAI.C8C9.Work3.ContextHandoffInput",
+    "version": "C8C9-W3-CHI-v1.0.1-RECHECK2"
+  },
+  "output_contract": {
+    "name": "LivingWaterAI.C8C9.Work3.ContextHandoffResult",
+    "version": "C8C9-W3-CHO-v1.0.1-RECHECK2"
+  },
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "upstream_contract": "C8C9-W2-UIC-v1.0.1-RECHECK1",
+  "scope": "VALIDATE_BIND_AND_PRESERVE_CONTEXT_ONLY",
+  "business_logic_authority": "UNCHANGED_UPSTREAM_OWNERS",
+  "recheck2_hardening": {
+    "work2_envelope_schema_boundary": "FAIL_CLOSED_IN_ADAPTER_AND_INPUT_SCHEMA",
+    "monetary_representation": "NONNEGATIVE_JSON_NUMBER_OR_DECIMAL_STRING_ONLY",
+    "versions_lineage_reason_status": "REQUIRED_AND_STRUCTURALLY_VALIDATED",
+    "v70_snapshot_lineage": "WORK2.lineage.upstream_snapshot_ids.v70 MUST equal v70_runtime_context.upstream_v70_snapshot_id",
+    "v70_snapshot_as_of": "REQUIRED",
+    "shared_context_lineage": "at least one exact source_reference_id join to Work2 lineage",
+    "non_json_context": "FAIL_CLOSED",
+    "business_semantics_changed": false
+  },
+  "run_identity": {
+    "same_run_required": [
+      "work3_input",
+      "work2_envelope",
+      "client_state_context",
+      "v70_runtime_context",
+      "shared_decision_context",
+      "work3_output",
+      "engine_bindings.v82",
+      "engine_bindings.v75"
+    ],
+    "mismatch": "FAIL_CLOSED"
+  },
+  "shared_decision_context": {
+    "single_object_per_handoff": true,
+    "engine_specific_duplicate_contexts_forbidden": true,
+    "v82_v75_same_context_id_required": true,
+    "v82_v75_same_context_digest_required": true,
+    "digest_purpose": "PROVENANCE_ONLY_NO_BUSINESS_SEMANTICS",
+    "as_of_must_equal_work2_temporal_as_of": true,
+    "data_as_of_shape_preserved": true,
+    "lineage_join_required": true
+  },
+  "funding": {
+    "owner_key": [
+      "funding_domain",
+      "broker",
+      "account"
+    ],
+    "cash_basis": "AVAILABLE",
+    "available_formula": "MUST_NOT_INFER",
+    "fx": "FORBIDDEN",
+    "v82_budget_pointer": "/funding_context/executable_budget/equity",
+    "v75_budget_pointer": "/funding_context/executable_budget/bond",
+    "cross_owner_forbidden": true,
+    "cross_leg_forbidden": true,
+    "second_funding_domain_engine": "FORBIDDEN"
+  },
+  "final_target": {
+    "recompute_forbidden": true,
+    "authorization_reference_source": "confirmed C7 work6_final_target_reference.allocation_id",
+    "confirmation_required": [
+      "confirmed_at",
+      "confirmed_by"
+    ],
+    "new_authorization_rule_forbidden": true
+  },
+  "remaining_target_gap": {
+    "namespaces": [
+      "v82",
+      "v75"
+    ],
+    "global_gap_forbidden": true,
+    "recompute_forbidden": true
+  },
+  "sgov": {
+    "v70_original_dry_powder": "SOURCE_CONTEXT_ONLY_NOT_V82_EXECUTABLE",
+    "sgov_bond_bucket": "DISTINCT",
+    "sgov_dry_powder_bucket": "DISTINCT",
+    "v75_undeployed_to_sgov": "PRESERVE_SOURCE_SEMANTICS",
+    "v82_undeployed_to_sgov": "ABSENT_IN_CURRENT_READY_OUTPUT_MUST_NOT_FABRICATE",
+    "raw_v82_equity_budget_auto_route": "FORBIDDEN",
+    "final_aggregate_computation_in_work3": false,
+    "family_physical_subledger": "OUT_OF_SCOPE"
+  },
+  "allowed_operations": [
+    "structural_validation",
+    "identity_equality_checks",
+    "provenance_digest",
+    "pointer_reference_binding",
+    "integration_diagnostics"
+  ],
+  "forbidden_operations": [
+    "investment_threshold",
+    "investment_fallback",
+    "fx_conversion",
+    "rounding",
+    "target_recompute",
+    "gap_recompute",
+    "market_news_reinterpretation",
+    "v82_patch",
+    "v75_patch",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write"
+  ]
+}

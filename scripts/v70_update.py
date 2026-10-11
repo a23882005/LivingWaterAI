@@ -13,10 +13,11 @@ import re
 import runpy
 from unittest.mock import patch
 import requests
+from chatgpt_fallback import read_verified_fallback, make_manual_input
 
 BASE = Path(__file__).resolve().parent.parent
 HTML = BASE / "V70_Live.html"
-CORE = ("vix", "yield_curve", "hy", "real_y_fred", "fed_val", "pmi", "cpi")
+CORE = ("vix", "yield_10y", "yield_curve", "hy", "real_y_fred", "fed_val", "pmi", "cpi")
 
 def manual_snapshot(raw: str, today=None) -> dict:
     if not raw:
@@ -103,7 +104,16 @@ def apply_updates(html, data):
     return html,changed
 
 def main():
-    snap=manual_snapshot(os.environ.get("V70_MANUAL_SNAPSHOT",""))
+    fallback, rejected = read_verified_fallback(BASE / "data/chatgpt_macro_snapshot.json")
+    for message in rejected:
+        print("FALLBACK INFO:", message)
+    override = os.environ.get("V70_MANUAL_SNAPSHOT", "")
+    if override:
+        snap=manual_snapshot(override)
+        manual=make_manual_input({}, override)
+    else:
+        snap={"as_of": "ChatGPT snapshot" if fallback else "missing"}
+        manual=make_manual_input(fallback)
     if not HTML.exists(): raise FileNotFoundError(HTML)
     original=HTML.read_text(encoding="utf-8")
     if "投資戰情室 V70.2" not in original or "</html>" not in original:
@@ -113,12 +123,45 @@ def main():
     fn=ns["get_all_data"]
     g=fn.__globals__
     def noninteractive():
-        fed=round((snap["fed_target"]-snap["fed_current"])/0.25,1)
-        return {"fed":(fed,"Manual validated snapshot"),
-                "mmfi":snap.get("mmfi"),"pmi":snap["pmi"],"cpi":snap["cpi"]}
+        a,b=manual.get("fed_current"),manual.get("fed_target")
+        fed=round((b-a)/0.25,1) if a is not None and b is not None else None
+        return {"fed": (fed,"Source-checked ChatGPT macro snapshot") if fed is not None else None,
+                "mmfi":manual.get("mmfi"),
+                "pmi":manual.get("pmi"),"cpi":manual.get("cpi")}
     g["get_selenium_data"]=noninteractive
     g["get_fred_value"]=fred_last
+    # Original p128 market collector remains the primary source.
     data=fn()
+    # Official 10Y series wins over ^TNX, which may use x10 quote units.
+    official_10y=fred_last("https://fred.stlouisfed.org/series/DGS10")
+    if official_10y is not None:
+        data["yield_10y"]=official_10y
+    elif data.get("yield_10y") is not None and data["yield_10y"]>20:
+        data["yield_10y"]=None
+    official_curve=fred_last("https://fred.stlouisfed.org/series/T10Y2Y")
+    # Do not use the p128 fallback ^IRX as a two-year yield: it tracks 13-week bills.
+    data["yield_curve"]=official_curve
+    ranges={"vix":(5,120),"dxy":(65,160),"oil":(0,250),
+            "yield_10y":(0,20),"yield_curve":(-6,6),"hy":(0,30),
+            "real_y_fred":(-6,12),"pe":(1,120),"pe_qqq":(1,180),
+            "pe_vt":(1,120),"fear":(0,100),"mmfi":(0,100),
+            "pmi":(15,85),"cpi":(-1,15),"fed_val":(-25,25)}
+    origins={}
+    for key,(lo,hi) in ranges.items():
+        value=data.get(key)
+        if value is not None:
+            try:
+                numeric=float(value)
+                if not math.isfinite(numeric) or not lo <= numeric <= hi:
+                    data[key]=None
+            except (TypeError,ValueError):
+                data[key]=None
+    for key in ranges:
+        if data.get(key) is not None:
+            origins[key]="p128 / FRED (primary)"
+        elif key in fallback:
+            data[key]=fallback[key]["value"]
+            origins[key]=f"ChatGPT backup: {fallback[key]['source']}; data_date={fallback[key]['data_date']}"
     missing=[key for key in CORE if data.get(key) is None]
     if missing:
         raise RuntimeError("Essential real-world data missing; kept prior HTML: "+", ".join(missing))
@@ -132,7 +175,8 @@ def main():
         temp.write_text(result,encoding="utf-8")
         temp.replace(HTML)
     print(json.dumps({"status":"UPDATED" if result!=original else "UNCHANGED",
-                      "fields":changed,"manual_as_of":snap["as_of"]},
+                      "fields":changed,"manual_as_of":snap["as_of"],
+                      "origins":origins,"rejected_fallback":rejected},
                       ensure_ascii=False))
 if __name__=="__main__":
     main()

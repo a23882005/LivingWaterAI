@@ -1,0 +1,69 @@
+from decimal import Decimal
+from types import MappingProxyType
+from .enums import DeploymentState
+
+PREDICATE_VERSION = "V75_PREDICATE_PARAMS_v1.0.3"
+RULE_SOT_VERSION = "債券V75.md v2.7.0"
+
+# Representation only. Work2 MUST NOT execute the precedence chain.
+GLOBAL_EVALUATION_PRECEDENCE = (
+    "DATA_QUALITY_VERSION_SETTLEMENT_ACCOUNT_ISOLATION",
+    "ETF_STRUCTURE_LIQUIDITY_SEVERE_ABNORMAL",
+    "LIQUIDITY_SYSTEM_STATE",
+    "INFLATION_LOSS_OF_CONTROL",
+    "CREDIT_CRISIS_STRESS",
+    "FED_POLICY_RATE_HAWKISH_REPRICING",
+    "TREASURY_YIELD_VELOCITY",
+    "YIELD_ATTRACTIVENESS",
+    "TECHNICAL_ZONE",
+    "V75_ASSET_SPECIFIC_BRANCH",
+    "P0_02_DEPLOYMENT_MAPPING",
+)
+
+# Frozen contract representation only. No deployment calculation exists in Work2.
+DEPLOYMENT_PCT_CONTRACT = MappingProxyType({
+    DeploymentState.HARD_WAIT: Decimal("0"),
+    DeploymentState.PAUSE: Decimal("0"),
+    DeploymentState.SMALL_BUY: Decimal("25"),
+    DeploymentState.LEFT_BUY: Decimal("50"),
+    DeploymentState.DEEP_LEFT_BUY: Decimal("75"),
+    DeploymentState.RIGHT_COMPLETE: Decimal("100"),
+})
+
+PREDICATE_STATE_PRECEDENCE = MappingProxyType({
+    "PRED-001": ("EXTREME", "HIGH", "LOW", "NEUTRAL"),
+    "PRED-002": ("EXTREME_HAWKISH_REPRICING", "LARGE_HAWKISH_REPRICING", "NO_HAWKISH_REPRICING"),
+    "PRED-003": ("EXTREME_RISE", "SUSTAINED_SHARP_RISE", "NORMALIZING", "MIXED_STABLE"),
+    "PRED-004": ("CREDIT_CRISIS", "CREDIT_STRESS", "HY_CRISIS", "HY_RECESSION_STRESS", "HY_WATCH", "HY_NORMAL"),
+    "PRED-005": ("EXTREME", "SURGE", "NORMAL"),
+    "PRED-006": ("LOSS_OF_CONTROL", "INFLATION_REACCELERATION", "NO_INFLATION_ALERT"),
+    "PRED-007": ("SEVERE_ABNORMAL", "ABNORMAL", "MIXED", "NORMAL"),
+    "PRED-008": ("VERY_ATTRACTIVE", "ATTRACTIVE", "FAIR", "LOW_ATTRACTIVENESS"),
+    "PRED-009": ("TRIM_WATCH", "RIGHT_CONFIRM", "LEFT_MATURE", "TECHNICAL_NEUTRAL"),
+    "PRED-010": ("ETF_QUALITY_ABNORMAL", "ETF_QUALITY_REVIEW_REQUIRED", "ETF_QUALITY_UNKNOWN", "ETF_QUALITY_NORMAL"),
+})
+
+FORBIDDEN_GENERIC_SUB_STATES = frozenset({
+    "UNKNOWN",
+    "REVIEW_REQUIRED",
+    "INSUFFICIENT_DATA",
+    "NOT_APPLICABLE",
+    "SHORT_HISTORY",
+})
+
+# PRED-010 component states must remain predicate-internal, not shared sub_states[].
+PRED_010_INTERNAL_COMPONENT_STATES = frozenset({
+    "STRUCTURE_OK",
+    "STRUCTURE_ABNORMAL",
+    "LIQUIDITY_OK",
+    "LIQUIDITY_ABNORMAL",
+    "DISTRIBUTION_OK",
+    "DISTRIBUTION_ABNORMAL",
+})
+
+BANK_FUNDING_FIELD_MARKERS = (
+    "bank_cash",
+    "bank_funding",
+    "tw_bank",
+    "us_bank",
+)

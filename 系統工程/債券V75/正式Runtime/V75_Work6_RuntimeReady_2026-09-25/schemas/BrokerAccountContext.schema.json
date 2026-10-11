@@ -1,0 +1,35 @@
+{
+  "$defs": {
+    "BrokerDomainType": {
+      "enum": [
+        "TW_LOCAL_BROKER",
+        "TW_SUB_BROKERAGE",
+        "US_BROKER"
+      ],
+      "title": "BrokerDomainType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "broker_account_id": {
+      "minLength": 1,
+      "title": "Broker Account Id",
+      "type": "string"
+    },
+    "broker_domain_type": {
+      "$ref": "#/$defs/BrokerDomainType"
+    },
+    "currency": {
+      "title": "Currency",
+      "type": "string"
+    }
+  },
+  "required": [
+    "broker_account_id",
+    "broker_domain_type",
+    "currency"
+  ],
+  "title": "BrokerAccountContext",
+  "type": "object"
+}

@@ -1,0 +1,59 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "current_position_quantity": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Current Position Quantity"
+    },
+    "capital_gain_harvest_eligible": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capital Gain Harvest Eligible"
+    },
+    "rebound_reduction_eligible": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rebound Reduction Eligible"
+    },
+    "investment_logic_invalidated": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Investment Logic Invalidated"
+    }
+  },
+  "required": [
+    "current_position_quantity"
+  ],
+  "title": "ExistingPositionPolicyInput",
+  "type": "object"
+}

@@ -1,0 +1,1630 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work4_V82_Adapter_Input.schema.json",
+  "title": "C8C9 Work4 V82 Integration Adapter Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "work3_handoff",
+    "c7_funding_context",
+    "asset_context"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work4.V82AdapterInput"
+    },
+    "contract_version": {
+      "const": "C8C9-W4-V82AI-v1.0.0"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work3_handoff": {
+      "title": "LivingWaterAI C8C9 Work3 Context Handoff Result RECHECK2",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "baseline_id",
+        "work2_contract_version",
+        "context_handoff_id",
+        "run_id",
+        "owner",
+        "currency",
+        "final_target",
+        "client_state_context",
+        "funding_context",
+        "v70_runtime_context",
+        "shared_decision_context",
+        "temporal",
+        "versions",
+        "lineage",
+        "reason_status",
+        "engine_bindings",
+        "integration_diagnostics"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C8C9.Work3.ContextHandoffResult"
+        },
+        "contract_version": {
+          "const": "C8C9-W3-CHO-v1.0.1-RECHECK2"
+        },
+        "baseline_id": {
+          "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+        },
+        "work2_contract_version": {
+          "const": "C8C9-W2-UIC-v1.0.1-RECHECK1"
+        },
+        "context_handoff_id": {
+          "type": "string",
+          "pattern": "^C8C9-W3-[0-9a-f]{32}$"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "final_target": {
+          "$ref": "#/$defs/W3_FinalTarget"
+        },
+        "client_state_context": {
+          "$ref": "#/$defs/W3_SourceContext"
+        },
+        "funding_context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "settlement",
+            "executable_budget",
+            "remaining_target_gap",
+            "sgov_boundary"
+          ],
+          "properties": {
+            "settlement": {
+              "$ref": "#/$defs/W3_Settlement"
+            },
+            "executable_budget": {
+              "$ref": "#/$defs/W3_ExecutableBudget"
+            },
+            "remaining_target_gap": {
+              "$ref": "#/$defs/W3_RemainingGapByEngine"
+            },
+            "sgov_boundary": {
+              "$ref": "#/$defs/W3_SgovBoundary"
+            }
+          }
+        },
+        "v70_runtime_context": {
+          "$ref": "#/$defs/W3_V70Context"
+        },
+        "shared_decision_context": {
+          "$ref": "#/$defs/W3_SharedDecisionContext"
+        },
+        "temporal": {
+          "$ref": "#/$defs/W3_Temporal"
+        },
+        "versions": {
+          "$ref": "#/$defs/W3_Versions"
+        },
+        "lineage": {
+          "$ref": "#/$defs/W3_Lineage"
+        },
+        "reason_status": {
+          "$ref": "#/$defs/W3_ReasonStatus"
+        },
+        "engine_bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "v82",
+            "v75"
+          ],
+          "properties": {
+            "v82": {
+              "$ref": "#/$defs/W3_V82Binding"
+            },
+            "v75": {
+              "$ref": "#/$defs/W3_V75Binding"
+            }
+          }
+        },
+        "integration_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "c7_funding_context": {
+      "title": "LivingWaterAI C Work7 Funding Context",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "run_id",
+        "base_currency",
+        "bank_cash_scope",
+        "total_new_investment_amount",
+        "contexts",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C.Work7.FundingContext"
+        },
+        "contract_version": {
+          "const": "C-W7-FUND-v1.0.0"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "bank_cash_scope": {
+          "const": "OUT_OF_SCOPE"
+        },
+        "total_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "contexts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/C7_AccountContext"
+          }
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "asset_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset",
+        "client_project_version",
+        "project_target_pointer",
+        "confirmed_position_snapshot"
+      ],
+      "properties": {
+        "asset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "asset_id",
+            "asset_type",
+            "asset_grade",
+            "portfolio_role"
+          ],
+          "properties": {
+            "asset_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "asset_type": {
+              "enum": [
+                "INDIVIDUAL_STOCK",
+                "BROAD_ETF",
+                "SECTOR_ETF",
+                "INDUSTRY_ETF",
+                "THEME_ETF",
+                "HIGH_VOLATILITY_ETF",
+                "OTHER_APPROVED_EQUITY_VEHICLE"
+              ]
+            },
+            "asset_grade": {
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "portfolio_role": {
+              "enum": [
+                "CORE",
+                "SATELLITE",
+                "UNKNOWN"
+              ]
+            }
+          }
+        },
+        "client_project_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_target_pointer": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "confirmed_position_snapshot": {
+          "type": [
+            "object",
+            "string"
+          ],
+          "description": "Broker/confirmed-source position fact or immutable reference; detailed position arithmetic is W3/W8 scope."
+        },
+        "event_context": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Event/assertion/coverage facts consumed by V82-D07; generic quality remains V82-B03."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "W3_Owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "funding_domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "funding_domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "W3_NonnegativeAmount": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "pattern": "^\\+?\\d+(?:\\.\\d+)?$"
+        }
+      ]
+    },
+    "W3_Money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/W3_NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "W3_Settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cash_basis",
+        "cash_state",
+        "source_status"
+      ],
+      "properties": {
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "cash_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total",
+            "available",
+            "unsettled",
+            "reserved"
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "available": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unsettled": {
+              "type": "number",
+              "minimum": 0
+            },
+            "reserved": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "W3_FinalTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "authorization_reference",
+        "confirmation_proof",
+        "payload"
+      ],
+      "properties": {
+        "allocation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "confirmed_at",
+            "confirmed_by"
+          ],
+          "properties": {
+            "confirmed_at": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confirmed_by": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "payload": {}
+      }
+    },
+    "W3_V82GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V82_EXISTING_RUNTIME_DERIVED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "W3_V75GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V75_EXISTING_EXPLICIT_GAP",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "W3_RemainingGapByEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v82",
+        "v75"
+      ],
+      "properties": {
+        "v82": {
+          "$ref": "#/$defs/W3_V82GapBinding"
+        },
+        "v75": {
+          "$ref": "#/$defs/W3_V75GapBinding"
+        }
+      }
+    },
+    "W3_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "cash_basis",
+        "owner"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/W3_NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        }
+      }
+    },
+    "W3_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/W3_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/W3_ExecutableLeg"
+        }
+      }
+    },
+    "W3_Temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "data_as_of"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_as_of": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      }
+    },
+    "W3_Versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "data",
+        "schema"
+      ],
+      "properties": {
+        "rule": {
+          "type": "object"
+        },
+        "data": {
+          "type": "object"
+        },
+        "schema": {
+          "type": "object"
+        }
+      }
+    },
+    "W3_Lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reference_ids",
+        "upstream_snapshot_ids"
+      ],
+      "properties": {
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "upstream_snapshot_ids": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "W3_ReasonStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reason_codes",
+        "source_status_codes",
+        "integration_diagnostics"
+      ],
+      "properties": {
+        "source_reason_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "source_status_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "integration_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "W3_V70DryPowderContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "weight",
+        "source_status"
+      ],
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "W3_SgovBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v70_original_dry_powder",
+        "sgov_bond_bucket_amount",
+        "sgov_dry_powder_bucket_amount",
+        "v75_undeployed_to_sgov",
+        "v82_undeployed_to_sgov",
+        "roles_kept_separate",
+        "v82_access_forbidden",
+        "v82_raw_equity_budget_auto_route_forbidden",
+        "final_aggregate_computed_in_work2",
+        "physical_subledger_out_of_scope"
+      ],
+      "properties": {
+        "v70_original_dry_powder": {
+          "$ref": "#/$defs/W3_V70DryPowderContext"
+        },
+        "sgov_bond_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sgov_dry_powder_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v75_undeployed_to_sgov": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v82_undeployed_to_sgov": {
+          "type": "null",
+          "description": "Current V82 Ready Output exposes no canonical v82_undeployed_to_sgov field; Work2 must not fabricate it."
+        },
+        "roles_kept_separate": {
+          "const": true
+        },
+        "v82_access_forbidden": {
+          "const": true
+        },
+        "v82_raw_equity_budget_auto_route_forbidden": {
+          "const": true
+        },
+        "final_aggregate_computed_in_work2": {
+          "const": false
+        },
+        "physical_subledger_out_of_scope": {
+          "const": true
+        }
+      }
+    },
+    "W3_SourceContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      }
+    },
+    "W3_V70Context": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "upstream_v70_snapshot_id",
+        "snapshot_as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_as_of": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "W3_SharedDecisionContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "context_id",
+        "as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "versions": {
+          "type": "object"
+        }
+      }
+    },
+    "W3_V82Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "authorization_reference",
+        "v70_original_dry_powder_executable",
+        "sgov_bucket_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V82"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/equity"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v82"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_original_dry_powder_executable": {
+          "const": false
+        },
+        "sgov_bucket_access": {
+          "const": "FORBIDDEN"
+        }
+      }
+    },
+    "W3_V75Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "sgov_context_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V75"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/bond"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v75"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "sgov_context_access": {
+          "const": "READ_ONLY_BOUNDARY_CONTEXT"
+        }
+      }
+    },
+    "C7_CashState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "available",
+        "unsettled",
+        "reserved"
+      ],
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsettled": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "C7_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "C7_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/C7_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/C7_ExecutableLeg"
+        }
+      }
+    },
+    "C7_AccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "$ref": "#/$defs/C7_CashState"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/C7_ExecutableBudget"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "V82I_AssetIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "asset_type",
+        "asset_grade",
+        "portfolio_role"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_type": {
+          "enum": [
+            "INDIVIDUAL_STOCK",
+            "BROAD_ETF",
+            "SECTOR_ETF",
+            "INDUSTRY_ETF",
+            "THEME_ETF",
+            "HIGH_VOLATILITY_ETF",
+            "OTHER_APPROVED_EQUITY_VEHICLE"
+          ]
+        },
+        "asset_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "portfolio_role": {
+          "enum": [
+            "CORE",
+            "SATELLITE",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "V82I_ExecutionAccountRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82I_ClientTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_target_position",
+        "authorization_reference"
+      ],
+      "properties": {
+        "project_target_position": {},
+        "position_cap": {},
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Authorized client target/constraints. C/Mentor provides/orchestrates; V82 consumes and does not rewrite authorization."
+    },
+    "V82I_UpstreamV70Snapshot": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "upstream_v70_snapshot_id",
+        "v70_stock_tactical_budget_amount",
+        "v70_stock_tactical_budget_currency",
+        "v70_stock_tactical_budget_status",
+        "v70_stock_tactical_budget_data_as_of",
+        "v70_original_dry_powder_amount",
+        "v70_original_dry_powder_currency",
+        "v70_budget_source_reference",
+        "v70_budget_data_quality",
+        "v70_budget_issue_codes"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_stock_tactical_budget_amount": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "V70-owned amount. UNKNOWN representation may be passed as a sentinel string; executable UNKNOWN semantics are W3."
+        },
+        "v70_stock_tactical_budget_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "v70_stock_tactical_budget_status": {},
+        "v70_stock_tactical_budget_data_as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_original_dry_powder_amount": {},
+        "v70_original_dry_powder_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "v70_budget_source_reference": {},
+        "v70_budget_data_quality": {
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "v70_budget_issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "description": "Exact Engineering 63-A minimum V70→V82 Tactical Budget Envelope. V82 consumes this upstream context but does not recompute V70 strategic/tactical budget. v70_original_dry_powder_* is upstream context only and is NOT V82 executable funding; execution funding is exclusively the same-account C7 equity executable leg."
+    },
+    "V82I_CashState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "available",
+        "unsettled",
+        "reserved"
+      ],
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsettled": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "V82I_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82I_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/V82I_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/V82I_ExecutableLeg"
+        }
+      }
+    },
+    "V82I_AccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "$ref": "#/$defs/V82I_CashState"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/V82I_ExecutableBudget"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "V82I_C7FundingContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "run_id",
+        "base_currency",
+        "bank_cash_scope",
+        "total_new_investment_amount",
+        "contexts",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C.Work7.FundingContext"
+        },
+        "contract_version": {
+          "const": "C-W7-FUND-v1.0.0"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "bank_cash_scope": {
+          "const": "OUT_OF_SCOPE"
+        },
+        "total_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "contexts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/V82I_AccountContext"
+          }
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "description": "Verbatim structural consumer contract for C-W7-FUND-v1.0.0. Required semantic validation is frozen in x-semantic-invariants and A78_W02_Account_Isolation_Contract.json; W6 later implements it defensively."
+    },
+    "V82O_CanonicalMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_PositiveMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_NonnegativeMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_StructuredOrderPlanValue": {
+      "oneOf": [
+        {
+          "const": "UNKNOWN"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "should_place_order",
+            "order_type",
+            "limit_price",
+            "quantity",
+            "time_in_force",
+            "scheduling_mode",
+            "broker_or_adapter_constraints",
+            "order_intent_id"
+          ],
+          "properties": {
+            "should_place_order": {
+              "type": "boolean"
+            },
+            "order_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit_price": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                },
+                {
+                  "enum": [
+                    "UNKNOWN",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "quantity": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "enum": [
+                    "UNKNOWN",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "time_in_force": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scheduling_mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "broker_or_adapter_constraints": {},
+            "order_intent_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

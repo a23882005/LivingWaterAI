@@ -1,0 +1,129 @@
+{
+  "work": "C8C9 Work5 | V75 Integration Adapter",
+  "status": "RECHECK1_QA_PASS_CLOSED",
+  "generated_at": "2026-09-27T02:07:00+08:00",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "input_contract": {
+    "name": "LivingWaterAI.C8C9.Work5.V75AdapterInput",
+    "version": "C8C9-W5-V75AI-v1.0.1-RECHECK1"
+  },
+  "source_context_contract": {
+    "name": "LivingWaterAI.C8C9.Work5.V75SourceContext",
+    "version": "C8C9-W5-V75SC-v1.0.1-RECHECK1",
+    "role": "TRANSPORT_SEAM_FOR_SOURCE_OWNED_V75_REQUIRED_FIELDS_NOT_INVENTED_BY_ADAPTER"
+  },
+  "output_contract": {
+    "name": "LivingWaterAI.C8C9.Work5.V75IntegrationResult",
+    "version": "C8C9-W5-V75AO-v1.0.1-RECHECK1"
+  },
+  "upstream": {
+    "work3_output": "C8C9-W3-CHO-v1.0.1-RECHECK2",
+    "work2": "C8C9-W2-UIC-v1.0.1-RECHECK1",
+    "c7_funding": "C-W7-FUND-v1.0.0",
+    "v75_rule": "債券V75.md v2.7.0",
+    "v75_predicate": "V75_PREDICATE_PARAMS_v1.0.3",
+    "v75_work5_output": "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+    "v75_work6_ready": "V75_WORK6_RUNTIME_READY_CONTRACT_v1.0.0"
+  },
+  "funding": {
+    "consumable_pointer": "/funding_context/executable_budget/bond",
+    "cash_basis": "AVAILABLE",
+    "positive_executable_requires_settlement": "SETTLED_ONLY",
+    "equity_budget": "FORBIDDEN",
+    "bank_cash": "FORBIDDEN",
+    "reserved_unsettled_as_executable": "FORBIDDEN",
+    "fx": "FORBIDDEN",
+    "cross_owner_broker_domain": "FORBIDDEN",
+    "second_funding_domain_engine": "FORBIDDEN"
+  },
+  "context": {
+    "run_id_exact": true,
+    "owner_exact": true,
+    "v70_snapshot_exact_lineage": true,
+    "shared_context": "same Work3 context_id + exact SHA-256 digest",
+    "shared_market_binding": "V75 market payload + timestamp must be exact fragments of Work3 shared context, with exact source-reference lineage join",
+    "source_data_as_of": "must preserve required market + V70 snapshot timestamps",
+    "source_owned_v75_fields": "must be explicitly supplied and schema-valid; adapter never guesses",
+    "output_provenance": "Work3 context/shared id/shared digest + Work5 V75 source-context digest must survive Frozen V75 output and Work6 Ready snapshot"
+  },
+  "sgov": {
+    "SGOV_BOND_BUCKET": "PRESERVE",
+    "SGOV_DRY_POWDER_BUCKET": "READ_ONLY_INPUT_CONTEXT_ONLY",
+    "V75_UNDEPLOYED_TO_SGOV": "CONSUME_ONLY_IF_FROZEN_V75_EMITS",
+    "adapter_create_amount_or_route": "FORBIDDEN",
+    "route_guard": "same US_BROKER + same account + USD; deployed+undeployed exact budget reconciliation"
+  },
+  "runtime_enforcement": {
+    "caller_schema_validation_trusted": false,
+    "work5_input_schema_validated_inside_adapter": true,
+    "frozen_v75_input_schema_validated_inside_adapter": true,
+    "frozen_v75_work6_schema_validated_inside_adapter": true,
+    "work5_output_schema_validated_inside_adapter": true,
+    "decimal_transport_policy": "LOSSLESS_DECIMAL_STRING_WHERE_FROZEN_SCHEMA_ALLOWS",
+    "decimal_precision_loss": "FORBIDDEN",
+    "business_recompute": "FORBIDDEN"
+  },
+  "output": {
+    "canonical_v75_runtime_ready_snapshot": "PRESERVE",
+    "canonical_v75_output": "EXACT_TRANSPORT_ALIAS_OF_READY_SNAPSHOT_OUTPUT",
+    "reason_codes": "PRESERVE",
+    "no_action": "PRESERVE",
+    "diagnostics": "PRESERVE/NO_TRANSLATION_TO_SECOND_RULE"
+  },
+  "recheck1_fixes": [
+    "settlement guard widened from UNSETTLED-only to all non-SETTLED states for positive bond executable budget",
+    "V75 market snapshot bound to exact Work3 shared context payload/as-of/lineage",
+    "source data_as_of contradiction guard added",
+    "Frozen V75 output/Work6 Ready provenance lineage revalidated",
+    "Work5 contract versions bumped to v1.0.1-RECHECK1"
+  ],
+  "forbidden_operations": [
+    "v75_patch",
+    "v82_patch",
+    "c_work1_7_reopen",
+    "work2_work3_work4_business_semantics_change",
+    "investment_threshold",
+    "investment_fallback",
+    "second_business_rule",
+    "second_funding_domain_engine",
+    "fx_conversion",
+    "equity_budget_consumption",
+    "bank_cash_consumption",
+    "reserved_cash_consumption",
+    "unsettled_cash_consumption",
+    "adapter_created_sgov_amount_or_route",
+    "work6_early_start",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write"
+  ],
+  "qa": {
+    "work5": [
+      110,
+      110
+    ],
+    "negative": [
+      49,
+      49
+    ],
+    "work4_regression": [
+      69,
+      69
+    ],
+    "work3_regression": [
+      146,
+      146
+    ],
+    "work2_transitive_regression": [
+      115,
+      115
+    ],
+    "frozen_v75_pytest": [
+      155,
+      155
+    ],
+    "open_p0": 0,
+    "open_p1": 0,
+    "hard_cross_line_conflicts": 0
+  }
+}

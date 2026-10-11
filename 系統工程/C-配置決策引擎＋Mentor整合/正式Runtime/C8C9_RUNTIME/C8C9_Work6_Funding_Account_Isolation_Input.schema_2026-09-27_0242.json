@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work6_Funding_Account_Isolation_Input.schema.json",
+  "title": "LivingWaterAI C8C9 Work6 Funding Account Isolation Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_name", "contract_version", "baseline_id", "run_id", "work3_handoff", "c7_funding_context", "work4_adapter_result", "work5_adapter_result"],
+  "properties": {
+    "contract_name": {"const": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationInput"},
+    "contract_version": {"const": "C8C9-W6-FAII-v1.0.0"},
+    "baseline_id": {"const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"},
+    "run_id": {"type": "string", "minLength": 1},
+    "work3_handoff": {"type": "object"},
+    "c7_funding_context": {"type": "object"},
+    "work4_adapter_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["v82_runtime_input", "integration_binding"],
+      "properties": {"v82_runtime_input": {"type": "object"}, "integration_binding": {"type": "object"}}
+    },
+    "work5_adapter_result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["v75_runtime_input", "integration_binding"],
+      "properties": {"v75_runtime_input": {"type": "object"}, "integration_binding": {"type": "object"}}
+    }
+  }
+}

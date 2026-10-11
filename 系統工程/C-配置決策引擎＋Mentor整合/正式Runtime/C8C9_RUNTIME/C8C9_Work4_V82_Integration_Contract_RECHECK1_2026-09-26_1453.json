@@ -1,0 +1,121 @@
+{
+  "work": "C8C9 Work4 | V82 Integration Adapter",
+  "status": "QA_PASS_CLOSED",
+  "generated_at": "2026-09-26T14:29:00+08:00",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "input_contract": {
+    "name": "LivingWaterAI.C8C9.Work4.V82AdapterInput",
+    "version": "C8C9-W4-V82AI-v1.0.0"
+  },
+  "output_contract": {
+    "name": "LivingWaterAI.C8C9.Work4.V82IntegrationResult",
+    "version": "C8C9-W4-V82AO-v1.0.0"
+  },
+  "upstream": {
+    "work3_output": "C8C9-W3-CHO-v1.0.1-RECHECK2",
+    "work2": "C8C9-W2-UIC-v1.0.1-RECHECK1",
+    "c7_funding": "C-W7-FUND-v1.0.0",
+    "v82_input": "V82-INPUT-v1.0.1-W2-RECHECK2",
+    "v82_output": "V82-OUTPUT-v1.0.1-W2-RECHECK2",
+    "v82_rule": "V82-v1.21.0"
+  },
+  "funding": {
+    "consumable_pointer": "/funding_context/executable_budget/equity",
+    "cash_basis": "AVAILABLE",
+    "fx": "FORBIDDEN",
+    "cross_owner_broker_domain": "FORBIDDEN",
+    "bond_budget_consumption": "FORBIDDEN",
+    "bank_cash": "FORBIDDEN",
+    "reserved_unsettled": "FORBIDDEN",
+    "sgov_access": "FORBIDDEN",
+    "second_funding_domain_engine": "FORBIDDEN"
+  },
+  "interface_resolution": {
+    "frozen_v82_requires_full_c7_funding_context": true,
+    "method": "EXACT_C7_PASS_THROUGH_PLUS_OWNER_EQUITY_BINDING_VALIDATION",
+    "synthesize_missing_accounts": false,
+    "business_meaning": "full C7 object is only the frozen V82 validation/pass-through envelope; Work4 authorizes and records only the selected owner equity executable leg"
+  },
+  "context": {
+    "run_id_exact": true,
+    "owner_exact": true,
+    "authorization_reference": "C7 allocation_id only",
+    "v70_snapshot_same_lineage": true,
+    "v70_original_dry_powder": "CONTEXT_ONLY_NON_EXECUTABLE",
+    "shared_context": "same Work3 context_id + exact SHA-256 digest",
+    "data_as_of": "PRESERVE_SOURCE_SHAPE"
+  },
+  "output": {
+    "canonical_v82_output": "TRANSPORT_ONLY_SERIALIZATION_WITH_EXACT_CANONICAL_PROJECTION_EQUALITY",
+    "canonical_49": "PRESERVE",
+    "formal_13": "FROZEN_WIRE_ARRAY_OR_IN_MEMORY_MAPPING_TO_WIRE_ARRAY_TRANSPORT_ONLY",
+    "reason_codes": "PRESERVE",
+    "no_action": "PRESERVE",
+    "lossy_translation": "FORBIDDEN",
+    "V82_UNDEPLOYED_TO_SGOV": "FORBIDDEN"
+  },
+  "forbidden_operations": [
+    "v82_patch",
+    "v75_patch",
+    "c_work1_7_reopen",
+    "work2_work3_business_semantics_change",
+    "investment_threshold",
+    "investment_fallback",
+    "second_business_rule",
+    "second_funding_domain_engine",
+    "fx_conversion",
+    "work5_early",
+    "work6_early",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write",
+    "V82_UNDEPLOYED_TO_SGOV_fabrication",
+    "raw_equity_to_sgov_auto_route"
+  ],
+  "rechecked_at": "2026-09-26T14:53:00+08:00",
+  "implementation_revision": "RECHECK1",
+  "runtime_enforcement": {
+    "caller_schema_validation_trusted": false,
+    "work4_input_schema_validated_inside_adapter": true,
+    "work4_output_schema_validated_inside_adapter": true,
+    "decimal_transport_policy": "LOSSLESS_JSON_NUMBER_OR_FAIL_CLOSED",
+    "decimal_precision_loss": "FORBIDDEN"
+  },
+  "recheck1_findings": [
+    {
+      "severity": "P1",
+      "id": "W4-R1-P1-01",
+      "status": "FIXED",
+      "finding": "Adapter still partially relied on caller-side JSON Schema validation.",
+      "resolution": "Adapter now loads and validates the packaged Work4 input/output schemas internally and fails closed before returning an integrated result."
+    },
+    {
+      "severity": "P1",
+      "id": "W4-R1-P1-02",
+      "status": "FIXED",
+      "finding": "Decimal values were converted with float(value), which could silently lose source value precision.",
+      "resolution": "Decimal transport is allowed only when exactly representable as a JSON number; otherwise C8C9.W4.PRECISION_LOSS fails closed."
+    },
+    {
+      "severity": "P2",
+      "id": "W4-R1-P2-01",
+      "status": "FIXED",
+      "finding": "Saved final package verifier snapshot reported a pre-final manifest count.",
+      "resolution": "Final verifier is now a deliberately excluded derived metadata file so manifest/inventory counts are stable and self-verification is reproducible."
+    },
+    {
+      "severity": "P2",
+      "id": "W4-R1-P2-02",
+      "status": "FIXED",
+      "finding": "Contract JSON still said IMPLEMENTED_PENDING_QA inside a QA PASS/CLOSED checkpoint.",
+      "resolution": "Contract status is synchronized to QA_PASS_CLOSED."
+    },
+    {
+      "severity": "P2",
+      "id": "W4-R1-P2-03",
+      "status": "FIXED",
+      "finding": "Contract described canonical V82 output as EXACT_PASSTHROUGH despite the already documented formal-13 transport serialization.",
+      "resolution": "Wording now explicitly states transport-only serialization with exact canonical projection equality."
+    }
+  ]
+}

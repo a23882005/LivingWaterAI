@@ -1,0 +1,116 @@
+{
+  "work": "C8C9 Work6 | Funding + Account Isolation Integration",
+  "status": "QA_PASS_CLOSED",
+  "generated_at": "2026-09-27T02:42:00+08:00",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "input_contract": {
+    "name": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationInput",
+    "version": "C8C9-W6-FAII-v1.0.0"
+  },
+  "output_contract": {
+    "name": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationResult",
+    "version": "C8C9-W6-FAIO-v1.0.0"
+  },
+  "upstream": {
+    "c7_funding": "C-W7-FUND-v1.0.0",
+    "work3_output": "C8C9-W3-CHO-v1.0.1-RECHECK2",
+    "work4_adapter": "C8C9 Work4 V82 Integration Adapter / RECHECK1 QA PASS",
+    "work5_adapter": "C8C9 Work5 V75 Integration Adapter / v1.0.1-RECHECK1"
+  },
+  "owner_identity": {
+    "canonical_key": [
+      "funding_domain",
+      "broker",
+      "account"
+    ],
+    "exact_binding_required": true
+  },
+  "funding": {
+    "formal_domains": [
+      "TW_LOCAL_BROKER",
+      "TW_SUB_BROKERAGE",
+      "US_BROKER"
+    ],
+    "exact_three_domains": true,
+    "cash_basis": "AVAILABLE",
+    "available_formula": "MUST_NOT_INFER",
+    "bank_cash": "OUT_OF_SCOPE",
+    "funding_event_total": "MUST_EQUAL_SUM_OF_THREE_DOMAIN_BUCKETS",
+    "equity_consumer": "V82_ONLY_SAME_OWNER",
+    "bond_consumer": "V75_ONLY_SAME_OWNER",
+    "unsettled_as_executable": "FORBIDDEN",
+    "reserved_as_executable": "FORBIDDEN",
+    "cross_account": "FORBIDDEN",
+    "cross_broker": "FORBIDDEN",
+    "cross_domain": "FORBIDDEN",
+    "fx": "FORBIDDEN",
+    "second_funding_domain_engine": "FORBIDDEN"
+  },
+  "integration_guards": {
+    "c7_funding_schema_byte_frozen": true,
+    "work3_source_state_must_equal_selected_c7_owner": true,
+    "work4_v82_serialized_execution_account_exact": true,
+    "work5_v75_serialized_domain_account_exact": true,
+    "work4_work5_budget_amount_pointer_owner_lineage_exact": true,
+    "serialized_account_scope_tamper_fail_closed": true,
+    "business_recompute": "FORBIDDEN"
+  },
+  "output_semantics": {
+    "role": "VALIDATION_EVIDENCE_SNAPSHOT_ONLY",
+    "policy": "VALIDATE_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE_NO_FX",
+    "investment_decision_recompute": "FORBIDDEN"
+  },
+  "forbidden_operations": [
+    "v75_patch",
+    "v82_patch",
+    "c_work1_7_reopen",
+    "frozen_baseline_change",
+    "fx_conversion",
+    "second_funding_domain_engine",
+    "available_cash_formula_inference",
+    "bank_cash_consumption",
+    "unsettled_cash_consumption",
+    "reserved_cash_consumption",
+    "cross_owner_funding",
+    "investment_threshold",
+    "investment_fallback",
+    "sgov_role_integration_before_work7",
+    "work7_early_start",
+    "family_f2_release",
+    "production_cutover",
+    "shared_governance_write"
+  ],
+  "qa": {
+    "work6": [
+      64,
+      64
+    ],
+    "negative": [
+      41,
+      41
+    ],
+    "work5_regression": [
+      110,
+      110
+    ],
+    "work4_regression": [
+      69,
+      69
+    ],
+    "work3_regression": [
+      146,
+      146
+    ],
+    "work2_transitive_regression": [
+      115,
+      115
+    ],
+    "frozen_v75_pytest": [
+      155,
+      155
+    ],
+    "open_p0": 0,
+    "open_p1": 0,
+    "hard_cross_line_conflicts": 0
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$defs": {
+    "EvaluationState": {
+      "enum": [
+        "COMPLETE",
+        "INSUFFICIENT_DATA",
+        "INVALID_INPUT",
+        "REVIEW_REQUIRED"
+      ],
+      "title": "EvaluationState",
+      "type": "string"
+    },
+    "FreshnessState": {
+      "enum": [
+        "FRESH",
+        "STALE",
+        "SUPERSEDED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "FreshnessState",
+      "type": "string"
+    },
+    "GateState": {
+      "enum": [
+        "PASS",
+        "RESTRICT",
+        "HARD_WAIT",
+        "INSUFFICIENT_DATA",
+        "NOT_APPLICABLE"
+      ],
+      "title": "GateState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "evaluation_state": {
+      "$ref": "#/$defs/EvaluationState"
+    },
+    "freshness_state": {
+      "$ref": "#/$defs/FreshnessState"
+    },
+    "gate_state": {
+      "$ref": "#/$defs/GateState"
+    }
+  },
+  "required": [
+    "freshness_state",
+    "evaluation_state",
+    "gate_state"
+  ],
+  "title": "RuntimeStateModel",
+  "type": "object"
+}

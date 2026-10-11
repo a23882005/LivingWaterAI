@@ -1,0 +1,106 @@
+{
+  "$defs": {
+    "FreshnessState": {
+      "enum": [
+        "FRESH",
+        "STALE",
+        "SUPERSEDED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "FreshnessState",
+      "type": "string"
+    },
+    "PredicateAssessmentStatus": {
+      "enum": [
+        "VALID",
+        "INSUFFICIENT_DATA",
+        "INVALID_INPUT",
+        "REVIEW_REQUIRED",
+        "NOT_APPLICABLE"
+      ],
+      "title": "PredicateAssessmentStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aggregate_state": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aggregate State"
+    },
+    "as_of": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "format": "date",
+          "type": "string"
+        }
+      ],
+      "title": "As Of"
+    },
+    "assessment_status": {
+      "$ref": "#/$defs/PredicateAssessmentStatus"
+    },
+    "input_freshness_state": {
+      "$ref": "#/$defs/FreshnessState"
+    },
+    "predicate_id": {
+      "title": "Predicate Id",
+      "type": "string"
+    },
+    "predicate_version": {
+      "title": "Predicate Version",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "required_input_missing": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Input Missing",
+      "type": "array"
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Lineage",
+      "type": "array"
+    },
+    "sub_states": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Sub States",
+      "type": "array"
+    }
+  },
+  "required": [
+    "predicate_id",
+    "predicate_version",
+    "assessment_status",
+    "as_of",
+    "source_lineage",
+    "input_freshness_state"
+  ],
+  "title": "PredicateResult",
+  "type": "object"
+}

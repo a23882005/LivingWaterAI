@@ -1,0 +1,47 @@
+{
+  "$defs": {
+    "SettlementState": {
+      "enum": [
+        "SETTLED",
+        "UNSETTLED",
+        "PARTIAL",
+        "UNKNOWN"
+      ],
+      "title": "SettlementState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "format": "date",
+          "type": "string"
+        }
+      ],
+      "title": "As Of"
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Lineage",
+      "type": "array"
+    },
+    "state": {
+      "$ref": "#/$defs/SettlementState"
+    }
+  },
+  "required": [
+    "state",
+    "as_of",
+    "source_lineage"
+  ],
+  "title": "SettlementStateModel",
+  "type": "object"
+}

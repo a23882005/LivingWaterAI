@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "MoneyValue": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ValueStatus"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "MoneyValue",
+      "type": "object"
+    },
+    "ValueStatus": {
+      "enum": [
+        "KNOWN",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "ValueStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "dry_powder_is_read_only_context": {
+      "default": true,
+      "title": "Dry Powder Is Read Only Context",
+      "type": "boolean"
+    },
+    "observed_role_total_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "roles_kept_separate": {
+      "default": true,
+      "title": "Roles Kept Separate",
+      "type": "boolean"
+    },
+    "sgov_bond_bucket_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    },
+    "sgov_dry_powder_bucket_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    }
+  },
+  "required": [
+    "sgov_bond_bucket_amount",
+    "sgov_dry_powder_bucket_amount",
+    "observed_role_total_amount"
+  ],
+  "title": "SgovRoleReconciliation",
+  "type": "object"
+}

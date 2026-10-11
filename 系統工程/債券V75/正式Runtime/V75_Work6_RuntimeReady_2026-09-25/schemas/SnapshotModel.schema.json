@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "FreshnessState": {
+      "enum": [
+        "FRESH",
+        "STALE",
+        "SUPERSEDED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "FreshnessState",
+      "type": "string"
+    },
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "data_source": {
+      "minLength": 1,
+      "title": "Data Source",
+      "type": "string"
+    },
+    "data_timestamp": {
+      "format": "date-time",
+      "title": "Data Timestamp",
+      "type": "string"
+    },
+    "freshness_state": {
+      "$ref": "#/$defs/FreshnessState"
+    },
+    "payload": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Payload",
+      "type": "object"
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Lineage",
+      "type": "array"
+    }
+  },
+  "required": [
+    "data_timestamp",
+    "data_source",
+    "freshness_state"
+  ],
+  "title": "SnapshotModel",
+  "type": "object"
+}

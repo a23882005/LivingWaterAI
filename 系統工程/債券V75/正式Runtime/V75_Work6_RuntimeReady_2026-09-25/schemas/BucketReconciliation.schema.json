@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "bond_long_term_target": {
+      "$ref": "#/$defs/Money"
+    },
+    "non_core_long_term_target": {
+      "$ref": "#/$defs/Money"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "target_sum_reconciled": {
+      "title": "Target Sum Reconciled",
+      "type": "boolean"
+    },
+    "tw_core_ratio_valid": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Tw Core Ratio Valid"
+    },
+    "tw_generic_long_term_target": {
+      "$ref": "#/$defs/Money"
+    },
+    "us_core_ratio_valid": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Us Core Ratio Valid"
+    },
+    "us_generic_long_term_target": {
+      "$ref": "#/$defs/Money"
+    }
+  },
+  "required": [
+    "bond_long_term_target",
+    "us_generic_long_term_target",
+    "tw_generic_long_term_target",
+    "non_core_long_term_target",
+    "us_core_ratio_valid",
+    "tw_core_ratio_valid",
+    "target_sum_reconciled"
+  ],
+  "title": "BucketReconciliation",
+  "type": "object"
+}

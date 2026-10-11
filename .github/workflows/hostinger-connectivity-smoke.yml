@@ -1,0 +1,80 @@
+name: LivingWaterAI Hostinger Immediate Deployment Smoke Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hostinger-connectivity-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-hostinger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify Hostinger connection settings
+        env:
+          LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          LW_USER: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          LW_PASS: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+        run: |
+          ok=true
+          if [ -z "$LW_HOST" ]; then echo "::error::Missing GitHub secret HOSTINGER_SFTP_HOST"; ok=false; fi
+          if [ -z "$LW_USER" ]; then echo "::error::Missing GitHub secret HOSTINGER_SFTP_USERNAME"; ok=false; fi
+          if [ -z "$LW_PASS" ]; then echo "::error::Missing GitHub secret HOSTINGER_SFTP_PASSWORD"; ok=false; fi
+          if [ -z "$LW_DIR" ]; then echo "::error::Missing GitHub variable HOSTINGER_SITE_DIRECTORY"; ok=false; fi
+          if [ "$ok" != "true" ]; then exit 1; fi
+          case "$LW_DIR" in
+            public_html|*/public_html|*/public_html/) ;;
+            *) echo "::error::Site directory must end in public_html"; exit 1 ;;
+          esac
+          echo "Hostinger connection inputs present; testing remote upload next."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create harmless unique probe file
+        run: |
+          mkdir -p site_dist
+          printf 'LivingWaterAI Hostinger probe %s\n' "${{ github.run_id }}" > "site_dist/lw-smoke-${{ github.run_id }}.txt"
+
+      - name: Upload probe via Hostinger SSH
+        id: upload
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: site_dist/lw-smoke-${{ github.run_id }}.txt
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 1
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+
+      - name: Check probe visible through actual happihelp.com web server
+        run: |
+          for n in 1 2 3 4 5; do
+            if curl -fLsS --max-time 15 -H 'Cache-Control: no-cache' "https://happihelp.com/lw-smoke-${{ github.run_id }}.txt?try=$n" | grep -Fxq "LivingWaterAI Hostinger probe ${{ github.run_id }}"; then
+              echo "### PASS: Encrypted upload and public webroot match happihelp.com." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::Probe uploaded, but website served no matching file; inspect webroot/CDN."
+          exit 1
+
+      - name: Remove probe file (never touch index.html)
+        if: always() && steps.upload.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          script: rm -f "${{ vars.HOSTINGER_SITE_DIRECTORY }}/lw-smoke-${{ github.run_id }}.txt"

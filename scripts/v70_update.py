@@ -13,6 +13,8 @@ import re
 import runpy
 from unittest.mock import patch
 import requests
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from chatgpt_fallback import read_verified_fallback, make_manual_input
 
 BASE = Path(__file__).resolve().parent.parent

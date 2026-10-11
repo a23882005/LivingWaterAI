@@ -997,7 +997,8 @@ if (recBlack) {
             const mbEl = document.getElementById('macro-bar');
             if (mbEl) mbEl.style.width = `${clamp(mSafe_final,0,100)}%`;
 
-            // Zone（V70.2 四區）            const zEl = document.getElementById('macro-zone-text');
+            // Zone（V70.2 四區）
+            const zEl = document.getElementById('macro-zone-text');
 
             // 是否進入「恐慌黑」封頂（cap60）：沿用原本 UI 的「熔斷 overlay」表現，不改結構
             const isEmerg = (cap_panic <= 60);

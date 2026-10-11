@@ -1,0 +1,1848 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:livingwaterai:c:work1:canonical-input:v1.0.0",
+  "title": "LivingWaterAI C Canonical Input Object",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "identity",
+    "decision_phase",
+    "capital_context",
+    "allocations",
+    "v70_asset_framework",
+    "benchmark_reference",
+    "source_references",
+    "issues",
+    "traceability"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C.CanonicalInput"
+    },
+    "contract_version": {
+      "const": "C-W1-v1.0.1"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "client_id",
+        "portfolio_id",
+        "request_id"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Shared cross-system run identity; C must not create a competing run identity after one exists."
+        },
+        "client_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "portfolio_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "decision_phase": {
+      "type": "string",
+      "enum": [
+        "CONFIGURATION_DISCOVERY",
+        "PROPOSAL_REVIEW",
+        "FINAL_TARGET_REVIEW",
+        "FINAL_TARGET_CONFIRMED",
+        "DEPLOYMENT_PREP"
+      ]
+    },
+    "capital_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_investment_amount",
+        "base_currency",
+        "fx_metadata"
+      ],
+      "properties": {
+        "total_investment_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "fx_metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value_state",
+            "as_of",
+            "source_reference_ids",
+            "rates"
+          ],
+          "properties": {
+            "value_state": {
+              "type": "string",
+              "enum": [
+                "KNOWN",
+                "NONE",
+                "UNKNOWN",
+                "NOT_APPLICABLE"
+              ]
+            },
+            "as_of": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_reference_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true
+            },
+            "rates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "pair",
+                  "rate"
+                ],
+                "properties": {
+                  "pair": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "rate": {
+                    "$ref": "#/$defs/NumericMetricValue"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "allocations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_allocation",
+        "proposed_allocation",
+        "final_target"
+      ],
+      "properties": {
+        "current_allocation": {
+          "$ref": "#/$defs/CurrentAllocationSlot"
+        },
+        "proposed_allocation": {
+          "$ref": "#/$defs/ProposedAllocationSlot"
+        },
+        "final_target": {
+          "$ref": "#/$defs/FinalTargetAllocationSlot"
+        }
+      }
+    },
+    "v70_asset_framework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "run_id",
+        "upstream_v70_snapshot_id",
+        "strategic_stock_weight",
+        "strategic_bond_weight",
+        "tactical_tilt_t",
+        "stock_tactical_weight",
+        "bond_tactical_weight",
+        "v70_original_dry_powder_weight",
+        "stock_tactical_amount",
+        "bond_tactical_amount",
+        "v70_original_dry_powder_amount",
+        "life_stage_code",
+        "life_stage_label",
+        "snapshot_as_of",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "run_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "upstream_v70_snapshot_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "strategic_stock_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "strategic_bond_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "tactical_tilt_t": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "stock_tactical_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "bond_tactical_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "v70_original_dry_powder_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "stock_tactical_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "bond_tactical_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "v70_original_dry_powder_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "life_stage_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "life_stage_label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshot_as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "benchmark_reference": {
+      "$ref": "#/$defs/BenchmarkReference"
+    },
+    "source_references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SourceReference"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Issue"
+      }
+    },
+    "traceability": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TraceItem"
+      }
+    }
+  },
+  "$defs": {
+    "SourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "owner",
+        "source_reference",
+        "source_fingerprint",
+        "as_of",
+        "retrieved_at",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_native_status",
+        "notes",
+        "source_version",
+        "source_fingerprint_algorithm"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_kind": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "BROKER_FACT",
+            "B_BENCHMARK_SOT",
+            "V70_SNAPSHOT",
+            "V82_SNAPSHOT",
+            "V75_SNAPSHOT",
+            "MENTOR",
+            "MARKET_DATA",
+            "FX_DATA",
+            "SYSTEM_DERIVED",
+            "OTHER"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "MENTOR",
+            "C_INTEGRATION",
+            "B_BENCHMARK",
+            "V70",
+            "V82",
+            "V75",
+            "REPORT_UI",
+            "BROKER_ADAPTER",
+            "DATA_PROVIDER"
+          ]
+        },
+        "source_reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "File ID, URL, snapshot ID, broker fact ID, client-project path, or equivalent traceable reference."
+        },
+        "source_fingerprint": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retrieved_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_native_status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Preserve upstream native sentinel/quality status verbatim; mapping occurs only in the owning adapter Work."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Upstream source/document/schema/business version when the source exposes one; otherwise null with native/issue metadata."
+        },
+        "source_fingerprint_algorithm": {
+          "type": "string",
+          "enum": [
+            "SHA256",
+            "ETAG",
+            "REVISION_ID",
+            "CONTENT_HASH_OTHER",
+            "NOT_APPLICABLE",
+            "UNKNOWN"
+          ],
+          "description": "How source_fingerprint must be interpreted; prevents an opaque fingerprint string from losing its algorithm semantics."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source_fingerprint": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_fingerprint"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_fingerprint_algorithm": {
+                "enum": [
+                  "SHA256",
+                  "ETAG",
+                  "REVISION_ID",
+                  "CONTENT_HASH_OTHER"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source_fingerprint": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "source_fingerprint"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_fingerprint_algorithm": {
+                "enum": [
+                  "NOT_APPLICABLE",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "MoneyValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "amount",
+        "currency",
+        "as_of",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "enum": [
+                  "NONE",
+                  "UNKNOWN",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "amount": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "data_quality": {
+                "enum": [
+                  "INSUFFICIENT",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "MetricValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "value",
+        "unit",
+        "as_of",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_reference_ids",
+        "source_native_status"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_native_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "enum": [
+                  "NONE",
+                  "UNKNOWN",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "data_quality": {
+                "enum": [
+                  "INSUFFICIENT",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ProxyMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usage_state",
+        "authorization_state",
+        "proxy_instrument_id",
+        "authority_reference",
+        "notes"
+      ],
+      "properties": {
+        "usage_state": {
+          "type": "string",
+          "enum": [
+            "NOT_USED",
+            "USED",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "authorization_state": {
+          "type": "string",
+          "enum": [
+            "AUTHORIZED",
+            "UNAUTHORIZED",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "proxy_instrument_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "authority_reference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "usage_state": {
+                "const": "USED"
+              }
+            },
+            "required": [
+              "usage_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "proxy_instrument_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authorization_state": {
+                "enum": [
+                  "AUTHORIZED",
+                  "UNAUTHORIZED",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "usage_state": {
+                "enum": [
+                  "NOT_USED",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "usage_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "proxy_instrument_id": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "authorization_state": {
+                "const": "AUTHORIZED"
+              }
+            },
+            "required": [
+              "authorization_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "authority_reference": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "BenchmarkMetricEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric",
+        "proxy",
+        "rule_references"
+      ],
+      "properties": {
+        "metric": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "proxy": {
+          "$ref": "#/$defs/ProxyMetadata"
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "AllocationLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "ticker",
+        "display_name",
+        "asset_type",
+        "market",
+        "base_currency",
+        "value_state",
+        "weight",
+        "portfolio_amount",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ticker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "display_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "asset_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "market": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "base_currency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "portfolio_amount": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "AllocationSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "stage",
+        "as_of",
+        "denominator",
+        "positions",
+        "declared_total_weight",
+        "confirmation_status",
+        "confirmed_at",
+        "confirmed_by",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "allocation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage": {
+          "type": "string",
+          "enum": [
+            "CURRENT",
+            "PROPOSED",
+            "FINAL_TARGET"
+          ]
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "denominator": {
+          "$ref": "#/$defs/MoneyValue"
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationLine"
+          }
+        },
+        "declared_total_weight": {
+          "$ref": "#/$defs/NumericMetricValue"
+        },
+        "confirmation_status": {
+          "type": "string",
+          "enum": [
+            "NOT_APPLICABLE",
+            "PENDING",
+            "CONFIRMED",
+            "REVOKED"
+          ]
+        },
+        "confirmed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confirmed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "confirmation_status": {
+                "const": "CONFIRMED"
+              }
+            },
+            "required": [
+              "confirmation_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "confirmed_at": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirmed_by": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "confirmation_status": {
+                "enum": [
+                  "NOT_APPLICABLE",
+                  "PENDING",
+                  "REVOKED"
+                ]
+              }
+            },
+            "required": [
+              "confirmation_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "confirmed_at": {
+                "type": "null"
+              },
+              "confirmed_by": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "AllocationSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "snapshot",
+        "reason"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AllocationSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "snapshot": {
+                "$ref": "#/$defs/AllocationSnapshot"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "enum": [
+                  "NONE",
+                  "UNKNOWN",
+                  "NOT_APPLICABLE"
+                ]
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "snapshot": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "field_path",
+        "message",
+        "owner",
+        "blocking",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "BLOCKING"
+          ]
+        },
+        "field_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "MENTOR",
+            "C_INTEGRATION",
+            "B_BENCHMARK",
+            "V70",
+            "V82",
+            "V75",
+            "REPORT_UI",
+            "BROKER_ADAPTER",
+            "DATA_PROVIDER"
+          ]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "severity": {
+                "const": "BLOCKING"
+              }
+            },
+            "required": [
+              "severity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocking": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TraceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field_path",
+        "owner",
+        "rule_references",
+        "source_reference_ids",
+        "as_of",
+        "data_quality",
+        "issue_codes"
+      ],
+      "properties": {
+        "field_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "CLIENT_PROJECT",
+            "MENTOR",
+            "C_INTEGRATION",
+            "B_BENCHMARK",
+            "V70",
+            "V82",
+            "V75",
+            "REPORT_UI",
+            "BROKER_ADAPTER",
+            "DATA_PROVIDER"
+          ]
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "FormalOutputEligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "scope",
+        "blocking_reasons",
+        "warning_reasons",
+        "evaluated_at",
+        "rule_references"
+      ],
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "NONE"
+          ]
+        },
+        "blocking_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warning_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": false
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "const": "NONE"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": true
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "scope": {
+                "enum": [
+                  "FULL",
+                  "PARTIAL"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "scope": {
+                "const": "FULL"
+              }
+            },
+            "required": [
+              "scope"
+            ]
+          },
+          "then": {
+            "properties": {
+              "eligible": {
+                "const": true
+              },
+              "blocking_reasons": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ModuleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module_name",
+        "status",
+        "formal_output_eligibility",
+        "payload",
+        "issues",
+        "traceability"
+      ],
+      "properties": {
+        "module_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_RUN",
+            "SUCCESS",
+            "PARTIAL",
+            "BLOCKED",
+            "FAILED"
+          ]
+        },
+        "formal_output_eligibility": {
+          "$ref": "#/$defs/FormalOutputEligibility"
+        },
+        "payload": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "traceability": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TraceItem"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "NOT_RUN"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "type": "null"
+              },
+              "formal_output_eligibility": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/FormalOutputEligibility"
+                  },
+                  {
+                    "properties": {
+                      "eligible": {
+                        "const": false
+                      },
+                      "scope": {
+                        "const": "NONE"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "NumericMetricValue": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/MetricValue"
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CurrentAllocationSlot": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationSlot"
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "snapshot": {
+                "properties": {
+                  "stage": {
+                    "const": "CURRENT"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ProposedAllocationSlot": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationSlot"
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "snapshot": {
+                "properties": {
+                  "stage": {
+                    "const": "PROPOSED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "FinalTargetAllocationSlot": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationSlot"
+        },
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "snapshot": {
+                "properties": {
+                  "stage": {
+                    "const": "FINAL_TARGET"
+                  },
+                  "confirmation_status": {
+                    "const": "CONFIRMED"
+                  },
+                  "confirmed_at": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "confirmed_by": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "BenchmarkReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workbook_name",
+        "drive_file_id",
+        "file_fingerprint_sha256",
+        "sheets",
+        "data_quality",
+        "freshness",
+        "issue_codes",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "workbook_name": {
+          "const": "標的績效基準資料.xlsx"
+        },
+        "drive_file_id": {
+          "const": "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-"
+        },
+        "file_fingerprint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sheets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Sheet1_標的績效基準資料",
+            "Sheet2_來源計算代理規則",
+            "Sheet3_曝險度項目定義",
+            "Sheet4_標的曝險基準資料"
+          ],
+          "properties": {
+            "Sheet1_標的績效基準資料": {
+              "$ref": "#/$defs/BenchmarkSheetReferencePerformance"
+            },
+            "Sheet2_來源計算代理規則": {
+              "$ref": "#/$defs/BenchmarkSheetReferenceRules"
+            },
+            "Sheet3_曝險度項目定義": {
+              "$ref": "#/$defs/BenchmarkSheetReferenceTaxonomy"
+            },
+            "Sheet4_標的曝險基準資料": {
+              "$ref": "#/$defs/BenchmarkSheetReferencePrimitives"
+            }
+          }
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "FRESH",
+            "STALE",
+            "UNKNOWN",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "BenchmarkSheetReferencePerformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "header_fingerprint_sha256"
+      ],
+      "properties": {
+        "role": {
+          "const": "PERFORMANCE_RISK_BASELINE"
+        },
+        "header_fingerprint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "BenchmarkSheetReferenceRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "header_fingerprint_sha256"
+      ],
+      "properties": {
+        "role": {
+          "const": "SOURCE_CALC_PROXY_RULES"
+        },
+        "header_fingerprint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "BenchmarkSheetReferenceTaxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "header_fingerprint_sha256"
+      ],
+      "properties": {
+        "role": {
+          "const": "EXPOSURE_TAXONOMY"
+        },
+        "header_fingerprint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "BenchmarkSheetReferencePrimitives": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "header_fingerprint_sha256"
+      ],
+      "properties": {
+        "role": {
+          "const": "EXPOSURE_PRIMITIVES"
+        },
+        "header_fingerprint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "contract_version": "C-W1-v1.0.1",
+  "FieldValueState": [
+    "KNOWN",
+    "NONE",
+    "UNKNOWN",
+    "NOT_APPLICABLE"
+  ],
+  "DataQualityState": [
+    "OK",
+    "FALLBACK_USED",
+    "INSUFFICIENT",
+    "UNKNOWN"
+  ],
+  "FreshnessState": [
+    "FRESH",
+    "STALE",
+    "UNKNOWN",
+    "NOT_APPLICABLE"
+  ],
+  "TriState": [
+    "TRUE",
+    "FALSE",
+    "UNKNOWN"
+  ],
+  "AllocationStage": [
+    "CURRENT",
+    "PROPOSED",
+    "FINAL_TARGET"
+  ],
+  "ConfirmationStatus": [
+    "NOT_APPLICABLE",
+    "PENDING",
+    "CONFIRMED",
+    "REVOKED"
+  ],
+  "DecisionPhase": [
+    "CONFIGURATION_DISCOVERY",
+    "PROPOSAL_REVIEW",
+    "FINAL_TARGET_REVIEW",
+    "FINAL_TARGET_CONFIRMED",
+    "DEPLOYMENT_PREP"
+  ],
+  "ProxyUsageState": [
+    "NOT_USED",
+    "USED",
+    "UNKNOWN",
+    "NOT_APPLICABLE"
+  ],
+  "ProxyAuthorizationState": [
+    "AUTHORIZED",
+    "UNAUTHORIZED",
+    "UNKNOWN",
+    "NOT_APPLICABLE"
+  ],
+  "ModuleStatus": [
+    "NOT_RUN",
+    "SUCCESS",
+    "PARTIAL",
+    "BLOCKED",
+    "FAILED"
+  ],
+  "ResultStatus": [
+    "NOT_RUN",
+    "SUCCESS",
+    "PARTIAL",
+    "BLOCKED",
+    "FAILED"
+  ],
+  "IssueSeverity": [
+    "INFO",
+    "WARNING",
+    "ERROR",
+    "BLOCKING"
+  ],
+  "FormalOutputScope": [
+    "FULL",
+    "PARTIAL",
+    "NONE"
+  ],
+  "SourceKind": [
+    "CLIENT_PROJECT",
+    "BROKER_FACT",
+    "B_BENCHMARK_SOT",
+    "V70_SNAPSHOT",
+    "V82_SNAPSHOT",
+    "V75_SNAPSHOT",
+    "MENTOR",
+    "MARKET_DATA",
+    "FX_DATA",
+    "SYSTEM_DERIVED",
+    "OTHER"
+  ],
+  "OwnerRef": [
+    "CLIENT_PROJECT",
+    "MENTOR",
+    "C_INTEGRATION",
+    "B_BENCHMARK",
+    "V70",
+    "V82",
+    "V75",
+    "REPORT_UI",
+    "BROKER_ADAPTER",
+    "DATA_PROVIDER"
+  ],
+  "BNativeSentinelExamples": [
+    "KNOWN",
+    "UNKNOWN",
+    "NOT_APPLICABLE",
+    "PENDING_DERIVATION",
+    "NOT_RECOVERED"
+  ],
+  "BQualityFlagExamples": [
+    "OFFICIAL_DIRECT",
+    "OFFICIAL_DERIVED",
+    "RECONCILED_THIRD_PARTY",
+    "FALLBACK_USED",
+    "PROXY_USED",
+    "SHORT_HISTORY",
+    "STALE",
+    "INSUFFICIENT",
+    "TAX_CLASSIFICATION_UNKNOWN",
+    "PERSONAL_TAX_NOT_MODELED",
+    "UNKNOWN"
+  ]
+}

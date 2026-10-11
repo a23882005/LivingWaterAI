@@ -1,0 +1,37 @@
+{
+  "$defs": {
+    "CanonicalUnit": {
+      "enum": [
+        "PERCENT",
+        "PERCENTAGE_POINT",
+        "BASIS_POINT"
+      ],
+      "title": "CanonicalUnit",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "unit": {
+      "$ref": "#/$defs/CanonicalUnit",
+      "default": "PERCENTAGE_POINT"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Value"
+    }
+  },
+  "required": [
+    "value"
+  ],
+  "title": "PercentagePointValue",
+  "type": "object"
+}

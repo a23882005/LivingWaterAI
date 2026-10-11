@@ -1,0 +1,396 @@
+{
+  "$defs": {
+    "BrokerDomainType": {
+      "enum": [
+        "TW_LOCAL_BROKER",
+        "TW_SUB_BROKERAGE",
+        "US_BROKER"
+      ],
+      "title": "BrokerDomainType",
+      "type": "string"
+    },
+    "CanonicalUnit": {
+      "enum": [
+        "PERCENT",
+        "PERCENTAGE_POINT",
+        "BASIS_POINT"
+      ],
+      "title": "CanonicalUnit",
+      "type": "string"
+    },
+    "DeploymentState": {
+      "enum": [
+        "HARD_WAIT",
+        "PAUSE",
+        "SMALL_BUY",
+        "LEFT_BUY",
+        "DEEP_LEFT_BUY",
+        "RIGHT_COMPLETE"
+      ],
+      "title": "DeploymentState",
+      "type": "string"
+    },
+    "EvaluationState": {
+      "enum": [
+        "COMPLETE",
+        "INSUFFICIENT_DATA",
+        "INVALID_INPUT",
+        "REVIEW_REQUIRED"
+      ],
+      "title": "EvaluationState",
+      "type": "string"
+    },
+    "ExistingPositionAction": {
+      "enum": [
+        "HOLD",
+        "REBOUND_SMALL_SELL",
+        "TECHNICAL_TRIM",
+        "TRUE_RISK_REDUCTION",
+        "NOT_APPLICABLE"
+      ],
+      "title": "ExistingPositionAction",
+      "type": "string"
+    },
+    "GateState": {
+      "enum": [
+        "PASS",
+        "RESTRICT",
+        "HARD_WAIT",
+        "INSUFFICIENT_DATA",
+        "NOT_APPLICABLE"
+      ],
+      "title": "GateState",
+      "type": "string"
+    },
+    "JsonValue": {},
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "MoneyValue": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ValueStatus"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "MoneyValue",
+      "type": "object"
+    },
+    "NewMoneyAction": {
+      "enum": [
+        "PAUSE",
+        "WAIT",
+        "SMALL_BUY",
+        "LEFT_BUY",
+        "DEEP_LEFT_BUY",
+        "RIGHT_COMPLETE",
+        "NOT_APPLICABLE"
+      ],
+      "title": "NewMoneyAction",
+      "type": "string"
+    },
+    "PerAssetDecision": {
+      "additionalProperties": false,
+      "description": "Schema only. Work2 never creates a decision or calculates amounts.",
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "classification": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Classification",
+          "type": "array"
+        },
+        "deploy_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "deployment_pct": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PercentValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "deployment_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeploymentState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evaluation_state": {
+          "$ref": "#/$defs/EvaluationState"
+        },
+        "existing_position_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExistingPositionAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "existing_reduction_pct": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PercentValue"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "gate_state": {
+          "$ref": "#/$defs/GateState"
+        },
+        "new_money_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewMoneyAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "source_lineage": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Lineage",
+          "type": "array"
+        }
+      },
+      "required": [
+        "asset_id",
+        "gate_state",
+        "evaluation_state"
+      ],
+      "title": "PerAssetDecision",
+      "type": "object"
+    },
+    "PercentValue": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/CanonicalUnit",
+          "default": "PERCENT"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "PercentValue",
+      "type": "object"
+    },
+    "ValueStatus": {
+      "enum": [
+        "KNOWN",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "ValueStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Output schema skeleton only. No Work2 engine populates investment decisions.",
+  "properties": {
+    "bond_allocation_final": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Bond Allocation Final",
+      "type": "object"
+    },
+    "bond_long_term_target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "broker_account_id": {
+      "minLength": 1,
+      "title": "Broker Account Id",
+      "type": "string"
+    },
+    "broker_domain_type": {
+      "$ref": "#/$defs/BrokerDomainType"
+    },
+    "currency": {
+      "title": "Currency",
+      "type": "string"
+    },
+    "deployment_parameter_version": {
+      "minLength": 1,
+      "title": "Deployment Parameter Version",
+      "type": "string"
+    },
+    "evaluation_state": {
+      "$ref": "#/$defs/EvaluationState"
+    },
+    "formal_output_eligible": {
+      "title": "Formal Output Eligible",
+      "type": "boolean"
+    },
+    "missing_required_fields": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Required Fields",
+      "type": "array"
+    },
+    "per_asset_decisions": {
+      "items": {
+        "$ref": "#/$defs/PerAssetDecision"
+      },
+      "title": "Per Asset Decisions",
+      "type": "array"
+    },
+    "predicate_version": {
+      "title": "Predicate Version",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "rule_version": {
+      "minLength": 1,
+      "title": "Rule Version",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "sgov_bond_bucket_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    },
+    "source_lineage": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Lineage",
+      "type": "array"
+    },
+    "v75_undeployed_to_sgov": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "run_id",
+    "rule_version",
+    "predicate_version",
+    "deployment_parameter_version",
+    "broker_account_id",
+    "broker_domain_type",
+    "currency",
+    "sgov_bond_bucket_amount",
+    "formal_output_eligible",
+    "evaluation_state"
+  ],
+  "title": "V75RunOutput",
+  "type": "object"
+}

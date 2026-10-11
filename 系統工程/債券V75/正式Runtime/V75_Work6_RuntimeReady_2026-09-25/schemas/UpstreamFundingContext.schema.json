@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Upstream-only representation. V75 does not move funds between these buckets.",
+  "properties": {
+    "new_investment_cash_total": {
+      "$ref": "#/$defs/Money"
+    },
+    "tw_local_broker_new_investment_amount": {
+      "$ref": "#/$defs/Money"
+    },
+    "tw_sub_brokerage_new_investment_amount": {
+      "$ref": "#/$defs/Money"
+    },
+    "us_broker_new_investment_amount": {
+      "$ref": "#/$defs/Money"
+    }
+  },
+  "required": [
+    "new_investment_cash_total",
+    "tw_local_broker_new_investment_amount",
+    "tw_sub_brokerage_new_investment_amount",
+    "us_broker_new_investment_amount"
+  ],
+  "title": "UpstreamFundingContext",
+  "type": "object"
+}

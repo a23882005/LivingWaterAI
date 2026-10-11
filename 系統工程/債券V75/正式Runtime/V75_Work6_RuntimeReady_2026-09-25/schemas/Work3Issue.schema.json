@@ -1,0 +1,61 @@
+{
+  "$defs": {
+    "Work3IssueClass": {
+      "enum": [
+        "INVALID_INPUT",
+        "INSUFFICIENT_DATA",
+        "REVIEW_REQUIRED",
+        "INFO"
+      ],
+      "title": "Work3IssueClass",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Asset Id"
+    },
+    "code": {
+      "minLength": 1,
+      "title": "Code",
+      "type": "string"
+    },
+    "field": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Field"
+    },
+    "issue_class": {
+      "$ref": "#/$defs/Work3IssueClass"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    }
+  },
+  "required": [
+    "issue_class",
+    "code",
+    "message"
+  ],
+  "title": "Work3Issue",
+  "type": "object"
+}

@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "MoneyValue": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ValueStatus"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "MoneyValue",
+      "type": "object"
+    },
+    "ValueStatus": {
+      "enum": [
+        "KNOWN",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "title": "ValueStatus",
+      "type": "string"
+    },
+    "Work3EligibilityState": {
+      "enum": [
+        "ELIGIBLE",
+        "INELIGIBLE_NEW_ALLOCATION",
+        "INELIGIBLE",
+        "UNKNOWN"
+      ],
+      "title": "Work3EligibilityState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "eligibility_state": {
+      "$ref": "#/$defs/Work3EligibilityState"
+    },
+    "eligible_existing_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    },
+    "reason_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "remaining_target_gap_amount": {
+      "$ref": "#/$defs/MoneyValue"
+    },
+    "target_amount": {
+      "$ref": "#/$defs/Money"
+    }
+  },
+  "required": [
+    "asset_id",
+    "target_amount",
+    "eligible_existing_amount",
+    "remaining_target_gap_amount",
+    "eligibility_state"
+  ],
+  "title": "GapCalculation",
+  "type": "object"
+}

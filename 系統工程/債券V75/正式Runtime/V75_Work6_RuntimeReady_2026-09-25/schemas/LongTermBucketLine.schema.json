@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "CanonicalUnit": {
+      "enum": [
+        "PERCENT",
+        "PERCENTAGE_POINT",
+        "BASIS_POINT"
+      ],
+      "title": "CanonicalUnit",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
+        },
+        "currency": {
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PercentValue": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/CanonicalUnit",
+          "default": "PERCENT"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "PercentValue",
+      "type": "object"
+    },
+    "Work3BucketClass": {
+      "enum": [
+        "US_GENERIC_CORE",
+        "TW_GENERIC_CORE",
+        "AUTHORIZED_NON_CORE",
+        "EXISTING_ONLY",
+        "UNKNOWN",
+        "NONE"
+      ],
+      "title": "Work3BucketClass",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "minLength": 1,
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "bucket_class": {
+      "$ref": "#/$defs/Work3BucketClass"
+    },
+    "target_amount": {
+      "$ref": "#/$defs/Money"
+    },
+    "template_weight_pct": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PercentValue"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "asset_id",
+    "bucket_class",
+    "target_amount"
+  ],
+  "title": "LongTermBucketLine",
+  "type": "object"
+}

@@ -14,9 +14,12 @@ TOOL = {'name':'pf_read_resource','description':'Read an authorized synthetic re
         'inputSchema': {'type':'object','properties':{'active_client_id':{'type':'string'},'resource_id':{'type':'string'}},
                         'required':['active_client_id','resource_id'],'additionalProperties':False}}
 
-def attach_mcp(app, verifier, scope):
+def attach_mcp(app, verifier, scope, deployment_config=None):
     # Synthetic metadata URL; replace with actual HTTPS origin and OAuth issuer before deployment.
-    metadata_url = 'https://pf.example.test/.well-known/oauth-protected-resource'
+    resource_origin = deployment_config.resource_origin if deployment_config else 'https://pf.example.test'
+    authorization_origin = deployment_config.authorization_origin if deployment_config else 'https://auth.example.test'
+    allowed_origin = deployment_config.allowed_browser_origin if deployment_config else 'https://trusted.example.test'
+    metadata_url = resource_origin + '/.well-known/oauth-protected-resource'
     challenge = {'WWW-Authenticate': f'Bearer resource_metadata="{metadata_url}"'}
 
     @app.middleware('http')
@@ -28,14 +31,14 @@ def attach_mcp(app, verifier, scope):
 
     @app.get('/.well-known/oauth-protected-resource')
     def protected_resource_metadata():
-        return {'resource':'https://pf.example.test/mcp',
-                'authorization_servers':['https://auth.example.test'],
+        return {'resource':resource_origin + '/mcp',
+                'authorization_servers':[authorization_origin],
                 'scopes_supported':['pf:read']}
 
     @app.post('/mcp')
     def mcp_rpc(body: RpcBody, authorization: str | None = Header(default=None), origin: str | None = Header(default=None)):
         # Synthetic allowlist. Real deployment must load exact allowed origins from trusted configuration.
-        if origin is not None and origin not in {'https://trusted.example.test'}:
+        if origin is not None and origin != allowed_origin:
             scope.audit.append({'action':'mcp_origin','decision':'DENY','reason':'untrusted_origin'})
             raise HTTPException(403,'forbidden_origin')
         if not authorization or not authorization.startswith('Bearer '):

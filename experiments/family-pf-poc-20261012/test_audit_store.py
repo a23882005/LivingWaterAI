@@ -49,3 +49,19 @@ def test_wrong_key_detected(tmp_path):
 
 def test_empty_log(tmp_path):
     assert AuditStore(tmp_path/"audit.sqlite",KEY).verify()==0
+
+def test_subject_pseudonyms_are_stable_distinct_and_secret_free(tmp_path):
+    store=AuditStore(tmp_path/"pseudonyms.sqlite",KEY)
+    first=store.pseudonymize("synthetic-first")
+    again=store.pseudonymize("synthetic-first")
+    second=store.pseudonymize("synthetic-second")
+    assert first==again and first!=second
+    assert "synthetic" not in first and len(first)==36
+    different=AuditStore(tmp_path/"other.sqlite",b"a-separate-valid-key-with-more-than-32-bytes")
+    assert different.pseudonymize("synthetic-first")!=first
+
+def test_subject_pseudonym_rejects_missing_identity(tmp_path):
+    store=AuditStore(tmp_path/"pseudonyms.sqlite",KEY)
+    for invalid in ("",None,7):
+        with pytest.raises(ValueError):
+            store.pseudonymize(invalid)

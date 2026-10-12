@@ -14,7 +14,7 @@ on:
 permissions:
   contents: read
 jobs:
-  verify-pf-full-100:
+  verify-pf-full-104:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -50,10 +50,11 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_mcp_negative_extended.py pf-ci-source/tests/test_mcp_negative_extended.py
           cp experiments/family-pf-poc-20261012/test_mcp_request_reauthorization.py pf-ci-source/tests/test_mcp_request_reauthorization.py
           cp experiments/family-pf-poc-20261012/test_mcp_origin_security.py pf-ci-source/tests/test_mcp_origin_security.py
+          cp experiments/family-pf-poc-20261012/test_mcp_oauth_discovery.py pf-ci-source/tests/test_mcp_oauth_discovery.py
       - name: Install test dependencies
         working-directory: pf-ci-source
         run: python -m pip install -r requirements.txt 'cryptography==46.0.4'
-      - name: Run full 100-test suite
+      - name: Run full 104-test suite
         working-directory: pf-ci-source
         env:
           PYTHONPATH: .:tests

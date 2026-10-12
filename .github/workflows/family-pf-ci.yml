@@ -31,10 +31,15 @@ jobs:
         run: |
           mkdir -p pf-ci-source
           tar -xJf experiments/family-pf-poc-20261012/PF_Local_PoC_39Tests_Source.tar.xz -C pf-ci-source
+      - name: Verify OAuth extension SHA-256 and extract
+        shell: bash
+        run: |
+          printf '%s  %s\\n' 'da59224eb417997494530c1ff8f851151b941dde30623682d7dc15362ee3841d' 'experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz' | sha256sum -c -
+          tar -xJf experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz -C pf-ci-source
       - name: Install test dependencies
         working-directory: pf-ci-source
-        run: python -m pip install -r requirements.txt
-      - name: Run 39 tests
+        run: python -m pip install -r requirements.txt 'cryptography==46.0.4'
+      - name: Run all 72 tests
         working-directory: pf-ci-source
         env:
           PYTHONPATH: .

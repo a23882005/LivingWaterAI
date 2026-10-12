@@ -23,6 +23,12 @@ def attach_mcp(app, verifier, scope, deployment_config=None, persistent_audit=No
     metadata_url = resource_origin + '/.well-known/oauth-protected-resource'
     challenge = {'WWW-Authenticate': f'Bearer resource_metadata="{metadata_url}"'}
 
+    def record_denial(action, reason):
+        if persistent_audit is not None:
+            persistent_audit.append({'action':action,'decision':'DENY',
+                                     'reason':reason,'actor_ref':'anonymous',
+                                     'request_id':str(uuid4())})
+
     @app.middleware('http')
     async def ensure_oauth_challenge(request, call_next):
         response = await call_next(request)
@@ -40,14 +46,17 @@ def attach_mcp(app, verifier, scope, deployment_config=None, persistent_audit=No
     def mcp_rpc(body: RpcBody, authorization: str | None = Header(default=None), origin: str | None = Header(default=None)):
         # Synthetic allowlist. Real deployment must load exact allowed origins from trusted configuration.
         if origin is not None and origin != allowed_origin:
+            record_denial('mcp_origin','untrusted_origin')
             scope.audit.append({'action':'mcp_origin','decision':'DENY','reason':'untrusted_origin'})
             raise HTTPException(403,'forbidden_origin')
         if not authorization or not authorization.startswith('Bearer '):
+            record_denial('mcp_authentication','missing_bearer')
             scope.audit.append({'action':'mcp_authentication','decision':'DENY','reason':'missing_bearer'})
             raise HTTPException(401,'unauthorized',headers=challenge)
         try:
             principal=verifier.verify(authorization[7:])
         except TokenRejected as ex:
+            record_denial('mcp_authentication','token_rejected')
             scope.audit.append({'action':'mcp_authentication','decision':'DENY','reason':str(ex)})
             raise HTTPException(401,'unauthorized') from ex
         if body.jsonrpc != '2.0' or body.id is None:

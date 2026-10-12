@@ -31,7 +31,8 @@ def test_mcp_both_cross_client_denials_persist(env,tmp_path):
     with sqlite3.connect(db) as con:
         rows=con.execute("SELECT decision,reason,actor_ref FROM audit_events ORDER BY seq").fetchall()
     assert [row[0] for row in rows]==["DENY","DENY","ALLOW","ALLOW"]
-    assert all(row[2]=="synthetic_subject" for row in rows)
+    assert [row[2] for row in rows]==[store.pseudonymize("joseph"),store.pseudonymize("mou"),store.pseudonymize("joseph"),store.pseudonymize("mou")]
+    assert all("joseph" not in row[2] and "mou" not in row[2] for row in rows)
 
 class BrokenAudit:
     def append(self,event):

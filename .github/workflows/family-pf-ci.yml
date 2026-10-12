@@ -65,6 +65,11 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
           cp experiments/family-pf-poc-20261012/pf_remote_preflight.py pf-ci-source/pf_remote_preflight.py
           cp experiments/family-pf-poc-20261012/test_remote_preflight.py pf-ci-source/tests/test_remote_preflight.py
+      - name: Install persistent audit synthetic extension
+        shell: bash
+        run: |
+          cp experiments/family-pf-poc-20261012/pf_audit_store.py pf-ci-source/pf_audit_store.py
+          cp experiments/family-pf-poc-20261012/test_audit_store.py pf-ci-source/tests/test_audit_store.py
       - name: Install test dependencies
         working-directory: pf-ci-source
         run: python -m pip install -r requirements.txt 'cryptography==46.0.4' 'uvicorn>=0.30,<1'

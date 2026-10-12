@@ -14,7 +14,7 @@ on:
 permissions:
   contents: read
 jobs:
-  verify-pf-original-39:
+  verify-pf-full-72:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -34,7 +34,7 @@ jobs:
       - name: Verify OAuth extension SHA-256 and extract
         shell: bash
         run: |
-          printf '%s  %s\\n' 'da59224eb417997494530c1ff8f851151b941dde30623682d7dc15362ee3841d' 'experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz' | sha256sum -c -
+          printf '%s  %s\n' 'da59224eb417997494530c1ff8f851151b941dde30623682d7dc15362ee3841d' 'experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz' | sha256sum -c -
           tar -xJf experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz -C pf-ci-source
       - name: Install test dependencies
         working-directory: pf-ci-source

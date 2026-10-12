@@ -19,6 +19,13 @@ def attach_mcp(app, verifier, scope):
     metadata_url = 'https://pf.example.test/.well-known/oauth-protected-resource'
     challenge = {'WWW-Authenticate': f'Bearer resource_metadata="{metadata_url}"'}
 
+    @app.middleware('http')
+    async def ensure_oauth_challenge(request, call_next):
+        response = await call_next(request)
+        if request.url.path == '/mcp' and response.status_code == 401:
+            response.headers['WWW-Authenticate'] = challenge['WWW-Authenticate']
+        return response
+
     @app.get('/.well-known/oauth-protected-resource')
     def protected_resource_metadata():
         return {'resource':'https://pf.example.test/mcp',

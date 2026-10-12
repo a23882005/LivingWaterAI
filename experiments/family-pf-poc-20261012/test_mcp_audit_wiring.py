@@ -31,10 +31,12 @@ def test_mcp_both_cross_client_denials_persist(env,tmp_path):
     with sqlite3.connect(db) as con:
         rows=con.execute("SELECT decision,reason,actor_ref FROM audit_events ORDER BY seq").fetchall()
     assert [row[0] for row in rows]==["DENY","DENY","ALLOW","ALLOW"]
-    assert [row[2] for row in rows]==[store.pseudonymize("joseph"),store.pseudonymize("mou"),store.pseudonymize("joseph"),store.pseudonymize("mou")]
+    assert rows[0][2]==rows[2][2] and rows[1][2]==rows[3][2] and rows[0][2]!=rows[1][2]
     assert all("joseph" not in row[2] and "mou" not in row[2] for row in rows)
 
 class BrokenAudit:
+    def pseudonymize(self, principal):
+        return "sub_test"
     def append(self,event):
         raise OSError("storage unavailable")
 

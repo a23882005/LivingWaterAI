@@ -1,5 +1,6 @@
 """Synthetic stateless JSON-RPC MCP transport. No production deployment."""
 from fastapi import Header, HTTPException
+from uuid import uuid4
 from pydantic import BaseModel, Field
 from pf_backend_auth import AuthorizationDenied
 from pf_oauth_verifier import TokenRejected
@@ -14,7 +15,7 @@ TOOL = {'name':'pf_read_resource','description':'Read an authorized synthetic re
         'inputSchema': {'type':'object','properties':{'active_client_id':{'type':'string'},'resource_id':{'type':'string'}},
                         'required':['active_client_id','resource_id'],'additionalProperties':False}}
 
-def attach_mcp(app, verifier, scope, deployment_config=None):
+def attach_mcp(app, verifier, scope, deployment_config=None, persistent_audit=None):
     # Synthetic metadata URL; replace with actual HTTPS origin and OAuth issuer before deployment.
     resource_origin = deployment_config.resource_origin if deployment_config else 'https://pf.example.test'
     authorization_origin = deployment_config.authorization_origin if deployment_config else 'https://auth.example.test'
@@ -64,7 +65,11 @@ def attach_mcp(app, verifier, scope, deployment_config=None):
             try:
                 value=scope.read(verified_user_id=principal,active_client_id=args['active_client_id'],resource_id=args['resource_id'])
             except AuthorizationDenied:
+                if persistent_audit is not None:
+                    persistent_audit.append({'action':'resource_read','decision':'DENY','reason':'authorization_denied','actor_ref':'synthetic_subject','request_id':str(uuid4())})
                 return {'jsonrpc':'2.0','id':body.id,'result':{'content':[{'type':'text','text':'access_denied'}],'isError':True}}
+            if persistent_audit is not None:
+                persistent_audit.append({'action':'resource_read','decision':'ALLOW','reason':'authorized','actor_ref':'synthetic_subject','request_id':str(uuid4())})
             result={'content':[{'type':'text','text':value}]}
         else:
             return {'jsonrpc':'2.0','id':body.id,'error':{'code':-32601,'message':'Method not found'}}

@@ -35,6 +35,11 @@ class AuditStore:
         db = sqlite3.connect(self.db_path, timeout=10)
         db.execute("PRAGMA busy_timeout=10000")
         return db
+    def pseudonymize(self, verified_subject):
+        if not isinstance(verified_subject, str) or not verified_subject:
+            raise ValueError("Verified subject required")
+        digest=hmac.new(self.key,("family-pf-subject-v1:"+verified_subject).encode("utf-8"),hashlib.sha256).hexdigest()
+        return "sub_"+digest[:32]
     def append(self, event):
         allowed = {"action","decision","reason","actor_ref","request_id"}
         if not isinstance(event, dict) or set(event) != allowed:

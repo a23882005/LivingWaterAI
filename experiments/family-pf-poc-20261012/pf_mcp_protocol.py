@@ -75,10 +75,10 @@ def attach_mcp(app, verifier, scope, deployment_config=None, persistent_audit=No
                 value=scope.read(verified_user_id=principal,active_client_id=args['active_client_id'],resource_id=args['resource_id'])
             except AuthorizationDenied:
                 if persistent_audit is not None:
-                    persistent_audit.append({'action':'resource_read','decision':'DENY','reason':'authorization_denied','actor_ref':'synthetic_subject','request_id':str(uuid4())})
+                    persistent_audit.append({'action':'resource_read','decision':'DENY','reason':'authorization_denied','actor_ref':persistent_audit.pseudonymize(principal),'request_id':str(uuid4())})
                 return {'jsonrpc':'2.0','id':body.id,'result':{'content':[{'type':'text','text':'access_denied'}],'isError':True}}
             if persistent_audit is not None:
-                persistent_audit.append({'action':'resource_read','decision':'ALLOW','reason':'authorized','actor_ref':'synthetic_subject','request_id':str(uuid4())})
+                persistent_audit.append({'action':'resource_read','decision':'ALLOW','reason':'authorized','actor_ref':persistent_audit.pseudonymize(principal),'request_id':str(uuid4())})
             result={'content':[{'type':'text','text':value}]}
         else:
             return {'jsonrpc':'2.0','id':body.id,'error':{'code':-32601,'message':'Method not found'}}

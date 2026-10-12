@@ -16,7 +16,11 @@ TOOL = {'name':'pf_read_resource','description':'Read an authorized synthetic re
 
 def attach_mcp(app, verifier, scope):
     @app.post('/mcp')
-    def mcp_rpc(body: RpcBody, authorization: str | None = Header(default=None)):
+    def mcp_rpc(body: RpcBody, authorization: str | None = Header(default=None), origin: str | None = Header(default=None)):
+        # Synthetic allowlist. Real deployment must load exact allowed origins from trusted configuration.
+        if origin is not None and origin not in {'https://trusted.example.test'}:
+            scope.audit.append({'action':'mcp_origin','decision':'DENY','reason':'untrusted_origin'})
+            raise HTTPException(403,'forbidden_origin')
         if not authorization or not authorization.startswith('Bearer '):
             scope.audit.append({'action':'mcp_authentication','decision':'DENY','reason':'missing_bearer'})
             raise HTTPException(401,'unauthorized')

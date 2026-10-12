@@ -14,7 +14,7 @@ on:
 permissions:
   contents: read
 jobs:
-  verify-pf-full-75:
+  verify-pf-full-84:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,13 +42,18 @@ jobs:
           cp experiments/family-pf-poc-20261012/hardening_azp_75.py pf-ci-source/hardening_azp_75.py
           cd pf-ci-source
           python hardening_azp_75.py
+      - name: Install synthetic MCP transport and tests
+        shell: bash
+        run: |
+          cp experiments/family-pf-poc-20261012/pf_mcp_protocol.py pf-ci-source/pf_mcp_protocol.py
+          cp experiments/family-pf-poc-20261012/test_mcp_protocol.py pf-ci-source/tests/test_mcp_protocol.py
       - name: Install test dependencies
         working-directory: pf-ci-source
         run: python -m pip install -r requirements.txt 'cryptography==46.0.4'
-      - name: Run full 75-test suite
+      - name: Run full 84-test suite
         working-directory: pf-ci-source
         env:
-          PYTHONPATH: .
+          PYTHONPATH: .:tests
         run: python -m pytest -q tests
       - name: Run demo
         working-directory: pf-ci-source

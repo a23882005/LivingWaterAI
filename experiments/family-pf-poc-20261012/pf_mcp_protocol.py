@@ -15,6 +15,16 @@ TOOL = {'name':'pf_read_resource','description':'Read an authorized synthetic re
                         'required':['active_client_id','resource_id'],'additionalProperties':False}}
 
 def attach_mcp(app, verifier, scope):
+    # Synthetic metadata URL; replace with actual HTTPS origin and OAuth issuer before deployment.
+    metadata_url = 'https://pf.example.test/.well-known/oauth-protected-resource'
+    challenge = {'WWW-Authenticate': f'Bearer resource_metadata="{metadata_url}"'}
+
+    @app.get('/.well-known/oauth-protected-resource')
+    def protected_resource_metadata():
+        return {'resource':'https://pf.example.test/mcp',
+                'authorization_servers':['https://auth.example.test'],
+                'scopes_supported':['pf:read']}
+
     @app.post('/mcp')
     def mcp_rpc(body: RpcBody, authorization: str | None = Header(default=None), origin: str | None = Header(default=None)):
         # Synthetic allowlist. Real deployment must load exact allowed origins from trusted configuration.
@@ -23,7 +33,7 @@ def attach_mcp(app, verifier, scope):
             raise HTTPException(403,'forbidden_origin')
         if not authorization or not authorization.startswith('Bearer '):
             scope.audit.append({'action':'mcp_authentication','decision':'DENY','reason':'missing_bearer'})
-            raise HTTPException(401,'unauthorized')
+            raise HTTPException(401,'unauthorized',headers=challenge)
         try:
             principal=verifier.verify(authorization[7:])
         except TokenRejected as ex:

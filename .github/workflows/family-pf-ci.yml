@@ -14,7 +14,7 @@ on:
 permissions:
   contents: read
 jobs:
-  verify-pf-full-104:
+  verify-pf-full-107:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -51,10 +51,11 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_mcp_request_reauthorization.py pf-ci-source/tests/test_mcp_request_reauthorization.py
           cp experiments/family-pf-poc-20261012/test_mcp_origin_security.py pf-ci-source/tests/test_mcp_origin_security.py
           cp experiments/family-pf-poc-20261012/test_mcp_oauth_discovery.py pf-ci-source/tests/test_mcp_oauth_discovery.py
+          cp experiments/family-pf-poc-20261012/test_mcp_live_loopback.py pf-ci-source/tests/test_mcp_live_loopback.py
       - name: Install test dependencies
         working-directory: pf-ci-source
-        run: python -m pip install -r requirements.txt 'cryptography==46.0.4'
-      - name: Run full 104-test suite
+        run: python -m pip install -r requirements.txt 'cryptography==46.0.4' 'uvicorn>=0.30,<1'
+      - name: Run full 107-test suite
         working-directory: pf-ci-source
         env:
           PYTHONPATH: .:tests

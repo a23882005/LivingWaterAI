@@ -76,3 +76,12 @@ def test_odd_url_separator_stays_hold():
     items=records()
     items['remote_https_reachable']['evidence_url']='https://auditor.example.org/a' + chr(92) + 'b'
     assert inspect_inventory(items,NOW)['state']=='HOLD'
+
+
+def test_control_character_in_evidence_reference_rejected():
+    for ch in (chr(10), chr(13), chr(9), chr(127)):
+        items=records()
+        items['remote_https_reachable']['evidence_url']='https://auditor.example.org/review/a'+ch+'b'
+        result=inspect_inventory(items,NOW)
+        assert result['state']=='HOLD'
+        assert result['gate_a']=='HOLD'

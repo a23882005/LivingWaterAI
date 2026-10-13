@@ -91,3 +91,40 @@ def test_invalid_path_with_null_byte_rejected(tmp_path):
 def test_empty_path_map_is_hold(tmp_path):
     entries,_=make_package(tmp_path)
     assert verify_package(entries,{},NOW)["gate_a"]=="HOLD"
+
+
+def test_package_with_trusted_root_matches(tmp_path):
+    entries,paths=make_package(tmp_path)
+    result=verify_package(entries,paths,NOW,trusted_root=tmp_path)
+    assert result["state"]=="FILES_MATCH_INVENTORY"
+    assert result["gate_a"]=="HOLD"
+
+def test_artifact_outside_trusted_root_fails_closed(tmp_path):
+    vault=tmp_path/"vault"
+    vault.mkdir()
+    entries,paths=make_package(tmp_path)
+    result=verify_package(entries,paths,NOW,trusted_root=vault)
+    assert result["state"]=="HOLD"
+    assert result["artifacts"][REQUIRED_EVIDENCE[0]]=="outside_trusted_root"
+
+def test_missing_trusted_root_fails_closed(tmp_path):
+    entries,paths=make_package(tmp_path)
+    result=verify_package(entries,paths,NOW,trusted_root=tmp_path/"missing")
+    assert result["state"]=="HOLD"
+    assert result["path_policy"]=="invalid_trusted_root"
+
+def test_trusted_root_symlink_escape_rejected(tmp_path):
+    vault=tmp_path/"vault"
+    vault.mkdir()
+    outside=tmp_path/"outside"
+    outside.mkdir()
+    entries,paths=make_package(tmp_path)
+    first=REQUIRED_EVIDENCE[0]
+    destination=outside/"proof.bin"
+    destination.write_bytes(paths[first].read_bytes())
+    alias=vault/"proof-link"
+    alias.symlink_to(destination)
+    paths[first]=alias
+    result=verify_package(entries,paths,NOW,trusted_root=vault)
+    assert result["state"]=="HOLD"
+    assert result["artifacts"][first]=="outside_trusted_root"

@@ -29,7 +29,7 @@ jobs:
   macro24:
     # V70.3 daily macro 8+16: verify published data first; Hostinger deployment requires independently validated credentials and rollout gate.
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4

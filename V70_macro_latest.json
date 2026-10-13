@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T04:22:39.976304+08:00",
+  "asOf": "2026-10-14T04:50:50.990166+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -8,6 +8,20 @@
       "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "unit": "",
       "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列"
+    },
+    "m01": {
+      "value": 0.42,
+      "dataDate": "2026-10-13",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury official daily_treasury_yield_curve daily CSV"
+    },
+    "m08": {
+      "value": 2.88,
+      "dataDate": "2026-10-13",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m04": {
       "value": 54.5,
@@ -17,21 +31,21 @@
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m09": {
-      "value": 102.197998,
+      "value": 102.209999,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.730003,
+      "value": 94.919998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 101.057999,
+      "value": 101.091797,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
@@ -43,29 +57,39 @@
       "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
       "unit": "",
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對"
+    },
+    "m19": {
+      "value": 4.2,
+      "dataDate": "2026-09-01",
+      "source": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
+      "unit": "%",
+      "method": "BLS_OFFICIAL_API 官方或鏡像時間序列"
+    },
+    "m20": {
+      "value": 50.666667,
+      "dataDate": "2026-09-01",
+      "source": "https://fred.stlouisfed.org/series/PAYEMS",
+      "unit": "千人",
+      "method": "FRED 非農就業存量，近3個月月增平均，單位千人"
     }
   },
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 6,
+    "valid": 10,
     "totalRequired": 21,
     "missing": [
-      "m01: MISSING (not verified OK)",
       "m06: MISSING (not verified OK)",
-      "m08: MISSING (not verified OK)",
       "m03_qqq: MISSING (not verified OK)",
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
       "m02: MISSING (not verified OK)",
-      "m05: MISSING (not verified OK)",
+      "m05: STALE (not verified OK)",
       "m13: MISSING (not verified OK)",
       "m17: MISSING (not verified OK)",
       "m14: MISSING (not verified OK)",
       "m16: MISSING (not verified OK)",
-      "m18: MISSING (not verified OK)",
-      "m19: MISSING (not verified OK)",
-      "m20: MISSING (not verified OK)"
+      "m18: MISSING (not verified OK)"
     ]
   }
 }

@@ -1,11 +1,11 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T04:22:39.976304+08:00",
+  "generated_at": "2026-10-14T04:50:50.990166+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 8,
-    "STALE": 0,
-    "MISSING": 16
+    "OK": 12,
+    "STALE": 1,
+    "MISSING": 11
   },
   "items": {
     "m07": {
@@ -23,14 +23,14 @@
     "m01": {
       "id": "m01",
       "label": "10Y−2Y 殖利率曲線",
-      "value": null,
+      "value": 0.42,
       "unit": "%",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/T10Y2Y",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for T10Y2Y | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
+      "observation_date": "2026-10-13",
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "method": "Treasury official daily_treasury_yield_curve daily CSV",
+      "status": "OK",
+      "detail": "Matched observation date for nominal 10Y minus 2Y",
+      "error": ""
     },
     "m06": {
       "id": "m06",
@@ -47,14 +47,14 @@
     "m08": {
       "id": "m08",
       "label": "10Y 實質殖利率",
-      "value": null,
+      "value": 2.88,
       "unit": "%",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/DFII10",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for DFII10 | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
+      "observation_date": "2026-10-13",
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
+      "status": "OK",
+      "detail": "10Y TIPS real yield",
+      "error": ""
     },
     "m03_qqq": {
       "id": "m03_qqq",
@@ -119,19 +119,19 @@
     "m05": {
       "id": "m05",
       "label": "Core CPI YoY",
-      "value": null,
+      "value": 2.446163,
       "unit": "%",
-      "observation_date": null,
+      "observation_date": "2026-08-01",
       "source_url": "https://fred.stlouisfed.org/series/CPILFESL",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for CPILFESL | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: "
+      "method": "FRED CPILFESL 同一數列 YoY",
+      "status": "STALE",
+      "detail": "比較基期 2025-08-01; 距今 74 天 > 65 天",
+      "error": ""
     },
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.197998,
+      "value": 102.209999,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.730003,
+      "value": 94.919998,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -155,7 +155,7 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 101.057999,
+      "value": 101.091797,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
@@ -239,26 +239,26 @@
     "m19": {
       "id": "m19",
       "label": "U3 失業率",
-      "value": null,
+      "value": 4.2,
       "unit": "%",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/UNRATE",
-      "method": "抓取失敗",
-      "status": "MISSING",
+      "observation_date": "2026-09-01",
+      "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
+      "method": "BLS_OFFICIAL_API 官方或鏡像時間序列",
+      "status": "OK",
       "detail": "",
-      "error": "All FRED sources failed for UNRATE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
+      "error": ""
     },
     "m20": {
       "id": "m20",
       "label": "3個月平均非農新增就業（千人）",
-      "value": null,
+      "value": 50.666667,
       "unit": "千人",
-      "observation_date": null,
+      "observation_date": "2026-09-01",
       "source_url": "https://fred.stlouisfed.org/series/PAYEMS",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for PAYEMS | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
+      "method": "FRED 非農就業存量，近3個月月增平均，單位千人",
+      "status": "OK",
+      "detail": "注意歷史值可能修訂",
+      "error": ""
     },
     "s03": {
       "id": "s03",

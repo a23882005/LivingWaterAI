@@ -102,6 +102,8 @@ class Fetcher:
             providers.insert(0,('CBOE_OFFICIAL_VIX','https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv'))
             providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))
         bls_map={'UNRATE':'LNS14000000','CPILFESL':'CUSR0000SA0L1E','PAYEMS':'CES0000000001'}
+        if series=='UNRATE':
+            providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         if series in bls_map:
             providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
         # Optional official FRED API when a GitHub Actions secret is configured.
@@ -112,9 +114,14 @@ class Fetcher:
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
         for provider,url in providers:
             try:
-                response=self.s.get(url,timeout=(5,self.timeout))
+                if provider=='BLS_HISTORY_V2':
+                    current_year=dt.datetime.now().year
+                    payload={'seriesid':['LNS14000000'],'startyear':str(current_year-3),'endyear':str(current_year)}
+                    response=self.s.post(url,json=payload,timeout=(5,self.timeout))
+                else:
+                    response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider=='BLS_OFFICIAL_API':
+                if provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2'):
                     obj=response.json()
                     if obj.get('status')!='REQUEST_SUCCEEDED':
                         raise ValueError('BLS response: '+str(obj.get('message'))[:130])

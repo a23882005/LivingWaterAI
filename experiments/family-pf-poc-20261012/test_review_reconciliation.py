@@ -80,3 +80,23 @@ def test_unanimously_positive_is_not_authorized():
     locked(out)
     assert out["disputed_checks"]==[]
     assert out["safe_to_release"] is False
+
+
+def test_unanimous_claim_marker_never_authorizes():
+    out=reconcile_review_claims([claim(),claim()])
+    locked(out)
+    assert out["all_claims_positive"] is True
+    assert out["state"]=="REQUIRES_INDEPENDENT_VERIFICATION"
+
+def test_mixed_claim_marker_false():
+    first=claim()
+    second=claim()
+    second["checks"]["real_oauth_and_resource_binding"]=False
+    out=reconcile_review_claims([first,second])
+    locked(out)
+    assert out["all_claims_positive"] is False
+
+def test_invalid_claim_marker_false():
+    out=reconcile_review_claims([{"checks":{}}])
+    locked(out)
+    assert out["all_claims_positive"] is False

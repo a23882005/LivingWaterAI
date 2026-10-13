@@ -28,7 +28,7 @@ def reconcile_review_claims(claims):
             result["reason"] = "invalid_claim"
             return result
     for key in REVIEW_CHECKS:
-        values = [claim.get("checks", {}).get(key) for claim in claims]
+        values = [claim["checks"].get(key) if isinstance(claim.get("checks"), dict) else None for claim in claims]
         if any(v is not True for v in values):
             result["conflicted_checks"].append(key)
     result["reason"] = "claims_do_not_substitute_for_independent_evidence"

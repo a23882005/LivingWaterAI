@@ -74,3 +74,15 @@ def test_bad_oauth_issuer_never_discovers(issuer):
         result=verify_remote_metadata(URL,c)
     assert result["metadata"]=="NOT_VERIFIED"
     assert result["gate_a"]=="HOLD"
+
+@pytest.mark.parametrize("issuer", [
+    "https://auth.example.com:8443",
+    "https://auth.example.com:99999",
+])
+def test_invalid_issuer_ports_keep_gate_on_hold(issuer):
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200,json={
+            "resource":URL,"authorization_servers":[issuer]}))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"

@@ -378,6 +378,10 @@ def sahm_from_unrate(f):
                    getattr(f,'fredsources',{}).get('UNRATE',('BLS','https://api.bls.gov'))[1],
                    'Sahm computed from 3-month unemployment average versus minimum over preceding 12 months')
     except Exception as exc:
+        # A confirmed missing survey month is not a network failure. Never
+        # infer the missing U3 value or waste a FRED request on this condition.
+        if isinstance(exc, ValueError) and '2025-10 CPS not collected per BLS' in str(exc):
+            raise ValueError('Sahm not calculable from official U3 history: '+str(exc)) from exc
         print('SAHM_FALLBACK',type(exc).__name__,str(exc)[:450],flush=True)
         try:
             return latest(f,'m18','SAHMCURRENT')

@@ -1,25 +1,13 @@
-name: LivingWaterAI Macro24 Daily (11:00 Taiwan) / Legacy V70.2 Manual
+name: LivingWaterAI Macro24 Daily (11:00 Taiwan) / 24-Item Collector Only
 
 on:
   schedule:
     # 03:00 UTC = 11:00 Asia/Taipei (GitHub can start late).
     - cron: '0 3 * * *'
   workflow_dispatch:
-    inputs:
-      manual_snapshot:
-        description: 'Current approved macro input JSON (optional when verified data file or repository variable is set)'
-        type: string
-        required: false
-        default: ''
   push:
     paths:
       - '.github/workflows/update-v70.yml'
-      - 'p128.py'
-      - 'V70_Live.html'
-      - 'scripts/v70_update.py'
-      - 'scripts/chatgpt_fallback.py'
-      - 'scripts/prepare_deploy.py'
-      - 'data/chatgpt_macro_snapshot.json'
       - '系統工程/總經V70/找24項總經資料.py'
       - 'scripts/build_v703_feed.py'
       - 'tests/**'
@@ -33,117 +21,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  v70:
-    # Preserve old V70.2 code for deliberate manual operation only; daily run cannot overwrite the production homepage.
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install requirements
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Source syntax and regression checks
-        run: |
-          python -m py_compile p128.py scripts/v70_update.py scripts/chatgpt_fallback.py scripts/prepare_deploy.py
-          python -m unittest discover -s tests -p 'test_*.py' -v
-
-      - name: Run p128 adapter with verified inputs (schedule/manual only)
-        id: refresh
-        if: github.event_name != 'push'
-        env:
-          V70_MANUAL_SNAPSHOT: ${{ github.event.inputs.manual_snapshot || vars.V70_MANUAL_SNAPSHOT }}
-        run: |
-          if [ -z "$V70_MANUAL_SNAPSHOT" ] && [ ! -s data/chatgpt_macro_snapshot.json ]; then
-            echo "status=HOLD" >> "$GITHUB_OUTPUT"
-            echo "### HOLD: Awaiting verified public macro snapshot. Live V70.2 and production index.html remain unchanged." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          python scripts/v70_update.py
-          echo "status=READY" >> "$GITHUB_OUTPUT"
-
-      - name: Commit validated macro HTML
-        if: steps.refresh.outputs.status == 'READY'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add V70_Live.html
-          if git diff --cached --quiet; then
-            echo "No fresh values changed: V70.2 HTML preserved." >> "$GITHUB_STEP_SUMMARY"
-          else
-            git commit -m "Auto-update verified V70.2 macro indicators"
-            git push
-            echo "Verified V70.2 market data committed." >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Package validated public index.html
-        if: steps.refresh.outputs.status == 'READY'
-        run: |
-          python scripts/prepare_deploy.py --run-id ${{ github.run_id }}
-          test -s site_dist/index.html
-
-      - name: Check Hostinger SSH/SFTP configuration
-        id: hostinger
-        if: steps.refresh.outputs.status == 'READY'
-        env:
-          LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}
-          LW_USER: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
-          LW_PASSWORD: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
-          LW_DIRECTORY: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
-        run: |
-          if [ -z "$LW_HOST" ] || [ -z "$LW_USER" ] || [ -z "$LW_PASSWORD" ] || [ -z "$LW_DIRECTORY" ]; then
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "### DEPLOY HOLD: Configure HOSTINGER_SFTP_HOST / HOSTINGER_SFTP_USERNAME / HOSTINGER_SFTP_PASSWORD (secrets), and HOSTINGER_SITE_DIRECTORY (variable)." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          case "$LW_DIRECTORY" in
-            *public_html|*public_html/) ;;
-            *) echo "::error::Hostinger destination must be the exact public_html directory"; exit 1 ;;
-          esac
-          echo "ready=true" >> "$GITHUB_OUTPUT"
-
-      - name: Upload only index.html via encrypted SSH/SCP
-        if: steps.hostinger.outputs.ready == 'true'
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
-          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
-          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
-          port: 65002
-          source: site_dist/index.html
-          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
-          strip_components: 1
-          overwrite: true
-          timeout: 90s
-          command_timeout: 90s
-
-      - name: Verify live homepage with cache-busting request
-        if: steps.hostinger.outputs.ready == 'true'
-        run: |
-          marker="LivingWaterAI V70.2 verified deployment run=${{ github.run_id }}"
-          for attempt in 1 2 3 4 5; do
-            if curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "https://www.happihelp.com/?lw_build=${{ github.run_id }}-$attempt" | grep -Fq "$marker"; then
-              echo "### PASS: V70.2 homepage deployed to happihelp.com and verified by build marker." >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            sleep 10
-          done
-          echo "::error::Production HTML marker not visible yet. Confirm public_html destination and clear Hostinger cache/CDN."
-          exit 1
-
   macro24:
     # Independent V70.3 source pipeline. Do not deploy or overwrite HTML/site files.
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

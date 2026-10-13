@@ -1,0 +1,18 @@
+{
+  "m04": {
+    "value": 54.5,
+    "observation_date": "2026-09-01",
+    "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+    "method": "ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
+    "unit": "",
+    "detail": "統計月份2026-09；8月54.6"
+  },
+  "m15": {
+    "value": 54.9,
+    "observation_date": "2026-09-01",
+    "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+    "method": "ISM官方2026年9月Services PMI；截至2026-10-14已核對",
+    "unit": "",
+    "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4"
+  }
+}

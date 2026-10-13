@@ -16,8 +16,10 @@ def validated_url(url):
     p=urlsplit(url)
     if p.scheme!="https" or not p.hostname or p.username or p.password or p.query or p.fragment:
         raise ValueError("HTTPS origin without embedded credentials or query required")
-    if p.hostname in ("localhost","127.0.0.1") or p.hostname.endswith((".test",".invalid",".example",".localhost")):
+    if p.hostname in ("localhost","127.0.0.1","::1") or p.hostname.endswith((".test",".invalid",".example",".localhost")):
         raise ValueError("Placeholder or loopback URL cannot be used as remote evidence")
+    if p.port not in (None,443):
+        raise ValueError("Nonstandard HTTPS port not permitted")
     if p.path != "/mcp":
         raise ValueError("Endpoint must end in /mcp")
     return url

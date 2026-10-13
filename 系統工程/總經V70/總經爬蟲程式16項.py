@@ -348,8 +348,11 @@ def sahm_from_unrate(f):
                    f.fredsources.get('UNRATE',('BLS','https://api.bls.gov'))[1],
                    'Sahm computed from 3-month unemployment average versus minimum over preceding 12 months')
     except Exception as exc:
-        print('SAHM_FALLBACK',str(exc)[:160],flush=True)
-        return latest(f,'m18','SAHMCURRENT')
+        print('SAHM_FALLBACK',type(exc).__name__,str(exc)[:450],flush=True)
+        try:
+            return latest(f,'m18','SAHMCURRENT')
+        except Exception as fallback_error:
+            raise RuntimeError('Sahm U3 calculation failed: '+str(exc)[:240]+' | SAHMCURRENT fallback failed: '+str(fallback_error)[:240]) from fallback_error
 
 def nfp(f):
     s=f.fred('PAYEMS')

@@ -220,3 +220,16 @@ def test_full_deletion_detected_by_high_water_mark(tmp_path):
         store.verify()
     with pytest.raises(AuditIntegrityError):
         store.export_anchor()
+
+def test_append_after_tail_loss_is_rejected_across_restart(tmp_path):
+    path=tmp_path/"restart_tail.sqlite"
+    first=AuditStore(path,KEY)
+    first.append(event(request="first"))
+    first.append(event(request="second"))
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM audit_events WHERE seq=2")
+    reopened=AuditStore(path,KEY)
+    with pytest.raises(AuditIntegrityError):
+        reopened.append(event(request="third"))
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0]==1

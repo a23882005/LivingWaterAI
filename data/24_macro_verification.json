@@ -1,10 +1,10 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T05:55:23.257296+08:00",
+  "generated_at": "2026-10-14T05:59:43.966310+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 14,
-    "STALE": 1,
+    "OK": 13,
+    "STALE": 2,
     "MISSING": 9
   },
   "items": {
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.205002,
+      "value": 102.212997,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -234,7 +234,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "Sahm U3 calculation failed: Sahm missing recent monthly observations: 2025-10 | SAHMCURRENT fallback failed: All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed."
+      "error": "Sahm U3 calculation failed: All FRED sources failed for UNRATE | BLS_HISTORY_V2: ValueError: Insufficient UNRATE history; missing 2025-10 | BLS_HISTORY_V1: ValueError: Insufficient UNRATE history; missing 2025-10 | BLS_O"
     },
     "m19": {
       "id": "m19",
@@ -243,9 +243,9 @@
       "unit": "%",
       "observation_date": "2026-09-01",
       "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      "method": "BLS_HISTORY_V2 官方或鏡像時間序列",
-      "status": "OK",
-      "detail": "",
+      "method": "人工查證輸入：既有快取再驗證",
+      "status": "STALE",
+      "detail": "歷史快取備援；不代表目前已重新查證來源",
       "error": ""
     },
     "m20": {

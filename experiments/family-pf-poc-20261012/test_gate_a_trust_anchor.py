@@ -62,3 +62,13 @@ def test_tampered_signature_holds():
 def test_valid_pinned_key_never_reports_release_pass():
     p,s,key,fp=evidence()
     assert review_with_pinned_reviewer(p,s,key,fp,NOW)["state"]=="ATTESTED_FOR_REVIEW"
+
+
+def test_wrong_fingerprint_rejected():
+    p,s,key,fp=evidence()
+    bad=('0' if fp[0]!='0' else '1')+fp[1:]
+    assert review_with_pinned_reviewer(p,s,key,bad,NOW)['state']=='HOLD'
+
+def test_uppercase_fingerprint_is_review_only():
+    p,s,key,fp=evidence()
+    assert review_with_pinned_reviewer(p,s,key,fp.upper(),NOW)['state']=='ATTESTED_FOR_REVIEW'

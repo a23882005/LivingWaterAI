@@ -3,6 +3,7 @@ import base64
 import json
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlsplit
+import ipaddress
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 from pf_gate_a_checklist import evaluate_gate_a, REQUIRED_EVIDENCE
@@ -10,7 +11,16 @@ from pf_gate_a_checklist import evaluate_gate_a, REQUIRED_EVIDENCE
 def _url(url):
     try:
         p=urlsplit(url)
-        return p.scheme=="https" and bool(p.hostname) and not p.username and not p.password and not p.hostname.endswith((".test",".example",".invalid"))
+        if p.scheme != "https" or not p.hostname or p.username or p.password or p.query or p.fragment:
+            return False
+        if p.port not in (None,443) or p.hostname.lower() == "localhost":
+            return False
+        if p.hostname.lower().endswith((".test",".example",".invalid",".localhost")):
+            return False
+        try:
+            return ipaddress.ip_address(p.hostname).is_global
+        except ValueError:
+            return True
     except (TypeError, ValueError):
         return False
 

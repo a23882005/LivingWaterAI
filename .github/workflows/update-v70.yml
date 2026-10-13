@@ -75,6 +75,8 @@ jobs:
           print('FAIL-CLOSED QA PASS')
           PY
       - name: Collect audited macro observations
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
           if [ ! -f data/verified_overrides.json ]; then
             echo 'ERROR: verified_overrides.json missing; do not publish stale or fabricated HTML'

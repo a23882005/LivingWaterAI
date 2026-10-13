@@ -45,3 +45,7 @@ def test_signed_payload_tampering_holds():
     p,s,key,fp=evidence()
     p['environment']='not_live'
     assert review_with_pinned_reviewer(p,s,key,fp,NOW)['state']=='HOLD'
+
+def test_nonhex_reviewer_fingerprint_holds():
+    p,s,key,fp=evidence()
+    assert review_with_pinned_reviewer(p,s,key,"z"*64,NOW)["state"]=="HOLD"

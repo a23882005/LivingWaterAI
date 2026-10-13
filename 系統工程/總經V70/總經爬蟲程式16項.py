@@ -100,6 +100,7 @@ class Fetcher:
         ]
         if series=='VIXCLS':
             providers.insert(0,('CBOE_OFFICIAL_VIX','https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv'))
+            providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -110,7 +111,13 @@ class Fetcher:
             try:
                 response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider=='CBOE_OFFICIAL_VIX':
+                if provider=='YAHOO_VIX_CHART':
+                    chart=response.json()['chart']['result'][0]
+                    stamps=chart['timestamp']
+                    closes=chart['indicators']['quote'][0]['close']
+                    dates=pd.to_datetime(stamps,unit='s',utc=True).tz_convert(None)
+                    values=pd.to_numeric(closes,errors='coerce')
+                elif provider=='CBOE_OFFICIAL_VIX':
                     frame=pd.read_csv(StringIO(response.text))
                     frame.columns=[str(x).strip().upper() for x in frame.columns]
                     if 'DATE' not in frame.columns or 'CLOSE' not in frame.columns:

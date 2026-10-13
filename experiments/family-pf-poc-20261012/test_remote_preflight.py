@@ -203,3 +203,28 @@ def test_successful_metadata_discovery_not_live_oauth_verification():
     assert result["cross_client_isolation"]=="NOT_TESTED"
     assert result["audit_logs"]=="NOT_TESTED"
     assert result["gate_a"]=="HOLD"
+
+
+def test_discovery_does_not_follow_redirect_to_other_host():
+    seen=[]
+    def handler(request):
+        seen.append(str(request.url))
+        return httpx.Response(302,headers={"Location":"https://unapproved.example.net/.well-known/oauth-protected-resource"})
+    with httpx.Client(transport=httpx.MockTransport(handler),follow_redirects=False) as client:
+        result=verify_remote_metadata(URL,client)
+    assert len(seen)==1
+    assert seen==[META]
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"
+
+def test_remote_preflight_does_not_send_customer_data():
+    def handler(request):
+        assert request.method=="GET"
+        assert request.content==b""
+        assert "authorization" not in request.headers
+        assert "cookie" not in request.headers
+        return httpx.Response(200,json={"resource":URL,"authorization_servers":["https://auth.example.com"]})
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="DISCOVERABLE"
+    assert result["gate_a"]=="HOLD"

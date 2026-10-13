@@ -52,7 +52,15 @@ def verify_remote_metadata(url, transport=None):
             result["reason"]="resource_identifier_mismatch"
             return result
         issuers=obj.get("authorization_servers")
-        if not isinstance(issuers,list) or len(issuers)!=1 or not isinstance(issuers[0],str) or not issuers[0].startswith("https://"):
+        if not isinstance(issuers,list) or len(issuers)!=1 or not isinstance(issuers[0],str):
+            result["reason"]="invalid_authorization_server"
+            return result
+        try:
+            issuer=urlsplit(issuers[0])
+            if issuer.scheme!="https" or not issuer.hostname or issuer.username or issuer.password or issuer.query or issuer.fragment:
+                result["reason"]="invalid_authorization_server"
+                return result
+        except ValueError:
             result["reason"]="invalid_authorization_server"
             return result
         result["metadata"]="DISCOVERABLE"

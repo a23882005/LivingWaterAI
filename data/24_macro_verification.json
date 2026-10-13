@@ -1,11 +1,11 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T04:50:50.990166+08:00",
+  "generated_at": "2026-10-14T04:55:46.174615+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 12,
+    "OK": 14,
     "STALE": 1,
-    "MISSING": 11
+    "MISSING": 9
   },
   "items": {
     "m07": {
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.209999,
+      "value": 102.210999,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.919998,
+      "value": 94.980003,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -167,26 +167,26 @@
     "m13": {
       "id": "m13",
       "label": "5Y Breakeven",
-      "value": null,
+      "value": 2.33,
       "unit": "%",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/T5YIE",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for T5YIE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
+      "observation_date": "2026-10-13",
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
+      "status": "OK",
+      "detail": "5Y nominal minus 5Y TIPS real yield on same day",
+      "error": ""
     },
     "m17": {
       "id": "m17",
       "label": "5Y Breakeven 近1月變化（pp）",
-      "value": null,
+      "value": -0.07,
       "unit": "pp",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/T5YIE",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "All FRED sources failed for T5YIE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
+      "observation_date": "2026-10-13",
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
+      "status": "OK",
+      "detail": "5Y breakeven change from 2026-09-11",
+      "error": ""
     },
     "m14": {
       "id": "m14",

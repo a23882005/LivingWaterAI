@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T04:50:50.990166+08:00",
+  "asOf": "2026-10-14T04:55:46.174615+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -31,14 +31,14 @@
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m09": {
-      "value": 102.209999,
+      "value": 102.210999,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.919998,
+      "value": 94.980003,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -50,6 +50,20 @@
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
+    },
+    "m13": {
+      "value": 2.33,
+      "dataDate": "2026-10-13",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
+    },
+    "m17": {
+      "value": -0.07,
+      "dataDate": "2026-10-13",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "pp",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m15": {
       "value": 54.9,
@@ -76,7 +90,7 @@
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 10,
+    "valid": 12,
     "totalRequired": 21,
     "missing": [
       "m06: MISSING (not verified OK)",
@@ -85,8 +99,6 @@
       "m03_vt: MISSING (not verified OK)",
       "m02: MISSING (not verified OK)",
       "m05: STALE (not verified OK)",
-      "m13: MISSING (not verified OK)",
-      "m17: MISSING (not verified OK)",
       "m14: MISSING (not verified OK)",
       "m16: MISSING (not verified OK)",
       "m18: MISSING (not verified OK)"

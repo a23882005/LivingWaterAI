@@ -90,10 +90,6 @@ jobs:
             exit 1
           fi
           python "系統工程/總經V70/總經爬蟲程式16項.py" --out build/macro24 --cache data/24_macro_verification.json --overrides data/verified_overrides.json
-      - name: Probe eight official macro sources (diagnostic only)
-        continue-on-error: true
-        run: |
-          python scripts/probe_extra8.py
       - name: Generate V70.3 feed contract
         run: |
           python scripts/build_v703_feed.py --input build/macro24/24_macro_verification.json --output build/macro24/V70_macro_latest.json

@@ -233,3 +233,8 @@ def test_append_after_tail_loss_is_rejected_across_restart(tmp_path):
         reopened.append(event(request="third"))
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0]==1
+
+def test_anchor_rejects_bool_count(tmp_path):
+    store=AuditStore(tmp_path/"bool.sqlite",KEY)
+    with pytest.raises(AuditIntegrityError):
+        store.verify_anchor({"event_count":True,"last_mac":"GENESIS"})

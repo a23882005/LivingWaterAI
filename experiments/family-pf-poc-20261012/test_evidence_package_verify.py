@@ -70,3 +70,24 @@ def test_non_path_mapping_value_rejected(tmp_path):
     entries,paths=make_package(tmp_path)
     paths[REQUIRED_EVIDENCE[0]]=123
     assert verify_package(entries,paths,NOW)["state"]=="HOLD"
+
+
+def test_identical_digest_across_different_files_rejected(tmp_path):
+    entries,paths=make_package(tmp_path)
+    first,second=REQUIRED_EVIDENCE[:2]
+    paths[second].write_bytes(paths[first].read_bytes())
+    entries[second]["sha256"]=entries[first]["sha256"]
+    result=verify_package(entries,paths,NOW)
+    assert result["state"]=="HOLD"
+    assert result["artifacts"][second]=="duplicate_artifact_digest"
+
+def test_invalid_path_with_null_byte_rejected(tmp_path):
+    entries,paths=make_package(tmp_path)
+    paths[REQUIRED_EVIDENCE[0]]="invalid"+chr(0)+"path"
+    result=verify_package(entries,paths,NOW)
+    assert result["state"]=="HOLD"
+    assert result["artifacts"][REQUIRED_EVIDENCE[0]]=="invalid_artifact_path"
+
+def test_empty_path_map_is_hold(tmp_path):
+    entries,_=make_package(tmp_path)
+    assert verify_package(entries,{},NOW)["gate_a"]=="HOLD"

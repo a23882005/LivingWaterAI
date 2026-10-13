@@ -95,3 +95,23 @@ def test_non_string_timestamp_holds():
     priv,pub,p=fixture()
     p["verified_at"]=123
     assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+
+def test_valid_signature_with_wrong_environment_holds():
+    priv,pub,p=fixture()
+    p["environment"]="synthetic_ci"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_signature_with_missing_evidence_url_holds():
+    priv,pub,p=fixture()
+    del p["evidence_urls"]["audit_denials_verified"]
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_signature_with_untrusted_plain_http_url_holds():
+    priv,pub,p=fixture()
+    p["evidence_urls"]["remote_https_reachable"]="http://auditor.example.org/proof"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_complete_signed_record_never_becomes_gate_pass():
+    priv,pub,p=fixture()
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="ATTESTED_FOR_REVIEW"

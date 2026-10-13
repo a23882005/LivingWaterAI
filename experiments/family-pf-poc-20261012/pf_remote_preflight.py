@@ -63,6 +63,13 @@ def verify_remote_metadata(url, transport=None):
         except ValueError:
             result["reason"]="invalid_authorization_server"
             return result
+        try:
+            issuer_ip=ipaddress.ip_address(issuer.hostname)
+        except ValueError:
+            issuer_ip=None
+        if issuer.hostname.lower()=="localhost" or issuer.hostname.lower().endswith((".localhost",".test",".invalid",".example")) or (issuer_ip is not None and not issuer_ip.is_global):
+            result["reason"]="invalid_authorization_server"
+            return result
         result["metadata"]="DISCOVERABLE"
         # No credential or login attempts. A metadata response is NOT OAuth verification.
         return result

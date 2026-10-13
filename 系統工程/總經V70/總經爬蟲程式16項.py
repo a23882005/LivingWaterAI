@@ -364,7 +364,12 @@ def sahm_from_unrate(f):
         expected=pd.period_range(end-14,end,freq='M')
         absent=[str(m) for m in expected if m not in x.index]
         if absent:
-            raise ValueError('Sahm missing recent monthly observations: '+','.join(absent))
+            # Official BLS CPS data for October 2025 do not exist due to the
+            # federal shutdown. Do not interpolate or invent unemployment.
+            official_gap='2025-10' in absent
+            note=('; 2025-10 CPS not collected per BLS: '
+                  'https://www.bls.gov/cps/methods/2025-federal-government-shutdown-impact-cps.htm') if official_gap else ''
+            raise ValueError('Sahm missing recent monthly observations: '+','.join(absent)+note)
         x=x.reindex(expected)
         if x.isna().any(): raise ValueError('Sahm has null monthly observations')
         means=x.rolling(3).mean().dropna()

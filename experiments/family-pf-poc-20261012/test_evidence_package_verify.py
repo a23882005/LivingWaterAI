@@ -48,3 +48,25 @@ def test_invalid_inventory_holds_without_trusting_files(tmp_path):
     entries,paths=make_package(tmp_path)
     entries["cross_client_negative_verified"]["result"]="PLANNED"
     assert verify_package(entries,paths,NOW)["state"]=="HOLD"
+
+
+def test_duplicate_artifact_mapping_is_rejected(tmp_path):
+    entries,paths=make_package(tmp_path)
+    first=REQUIRED_EVIDENCE[0]
+    second=REQUIRED_EVIDENCE[1]
+    paths[second]=paths[first]
+    entries[second]["sha256"]=entries[first]["sha256"]
+    result=verify_package(entries,paths,NOW)
+    assert result["state"]=="HOLD"
+    assert result["artifacts"][second]=="duplicate_artifact_path"
+    assert result["gate_a"]=="HOLD"
+
+def test_extra_path_mapping_is_rejected(tmp_path):
+    entries,paths=make_package(tmp_path)
+    paths["unexpected"]=tmp_path/"extra"
+    assert verify_package(entries,paths,NOW)["state"]=="HOLD"
+
+def test_non_path_mapping_value_rejected(tmp_path):
+    entries,paths=make_package(tmp_path)
+    paths[REQUIRED_EVIDENCE[0]]=123
+    assert verify_package(entries,paths,NOW)["state"]=="HOLD"

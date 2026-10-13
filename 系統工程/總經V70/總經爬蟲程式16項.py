@@ -104,7 +104,7 @@ class Fetcher:
         bls_map={'UNRATE':'LNS14000000','CPILFESL':'CUSR0000SA0L1E','PAYEMS':'CES0000000001'}
         if series in bls_map:
             providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
-        if series=='UNRATE':
+        if series in bls_map:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
@@ -116,7 +116,7 @@ class Fetcher:
             try:
                 if provider=='BLS_HISTORY_V2':
                     current_year=dt.datetime.now().year
-                    payload={'seriesid':['LNS14000000'],'startyear':str(current_year-3),'endyear':str(current_year)}
+                    payload={'seriesid':[bls_map[series]],'startyear':str(current_year-3),'endyear':str(current_year)}
                     response=self.s.post(url,json=payload,timeout=(5,self.timeout))
                 else:
                     response=self.s.get(url,timeout=(5,self.timeout))

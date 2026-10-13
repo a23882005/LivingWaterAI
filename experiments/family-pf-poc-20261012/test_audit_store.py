@@ -124,3 +124,11 @@ def test_anchor_detects_additional_entries_and_bad_shape(tmp_path):
         store.verify_anchor(anchor)
     with pytest.raises(AuditIntegrityError):
         store.verify_anchor({"event_count":1})
+
+def test_anchor_snapshot_reopen(tmp_path):
+    path=tmp_path/"snapshot.sqlite"
+    first=AuditStore(path,KEY)
+    first.append(event())
+    anchor=first.export_anchor()
+    assert AuditStore(path,KEY).verify_anchor(anchor)
+    assert anchor["event_count"]==1

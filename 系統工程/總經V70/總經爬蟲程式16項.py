@@ -564,6 +564,13 @@ def selftest():
             return pd.Series(values[key],index=dates)
     nl=netliq(MockF())
     assert nl['value']==-123.579, nl
+    # Verify Sahm Rule without network: a stable U3 series must return zero.
+    class MockSahmU3:
+        fredsources={'UNRATE':('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/')}
+        def fred(self,key):
+            assert key=='UNRATE'
+            return pd.Series([4.0]*18,index=pd.date_range('2025-01-01',periods=18,freq='MS'))
+    assert sahm_from_unrate(MockSahmU3())['value']==0.0
     # 缺月的 CPI 不得用更早月份偷代替；欠缺連續就業月份不得算三月均值。
     class MockCPI:
         def fred(self,key):

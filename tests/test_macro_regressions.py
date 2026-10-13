@@ -46,6 +46,18 @@ class MacroRegression(unittest.TestCase):
         r=macro.core_cpi(BareProvider())
         self.assertEqual(r["value"],5.0)
 
+    def test_sahm_gapped_months(self):
+        class GappedSource:
+            fredsources={"UNRATE":("BLS","https://api.bls.gov/publicAPI/v2/timeseries/data/")}
+            def fred(self,key):
+                if key=="UNRATE":
+                    dates=pd.date_range("2025-01-01",periods=18,freq="MS")
+                    return pd.Series([4.0]*17,index=dates.delete(7))
+                raise ValueError("Sahm source missing")
+        with self.assertRaises(RuntimeError) as ctx:
+            macro.sahm_from_unrate(GappedSource())
+        self.assertIn("2025-08",str(ctx.exception))
+
     def test_future_date_rejected(self):
         import datetime as dt
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()

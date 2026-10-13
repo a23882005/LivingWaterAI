@@ -94,10 +94,9 @@ class Fetcher:
         if series in self.frederrors: raise RuntimeError(self.frederrors[series])
         from io import StringIO
         errors=[]
-        providers=[
-            ('FRED_CSV', FRED+series),
-            ('DBNOMICS_FRED_MIRROR','https://api.db.nomics.world/v22/series/FRED/'+series+'?observations=1')
-        ]
+        # DBnomics series API requires provider/dataset/series; the former
+        # FRED/<series> URL was invalid (HTTP 404), not a genuine fallback.
+        providers=[('FRED_CSV', FRED+series)]
         if series=='VIXCLS':
             providers.insert(0,('CBOE_OFFICIAL_VIX','https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv'))
             providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))

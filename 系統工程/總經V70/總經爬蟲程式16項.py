@@ -320,7 +320,7 @@ def core_cpi(f):
     prior=float(prior_series.iloc[0])
     if prior<=0 or float(last)<=0: raise ValueError('CPILFESL 指數必須大於0')
     val=(last/prior-1)*100
-    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),f.fredsources.get('CPILFESL',('FRED',SOURCES['m05'][0]))[1],
+    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),getattr(f,'fredsources',{}).get('CPILFESL',('FRED',SOURCES['m05'][0]))[1],
                'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def breakeven_5y(f):
@@ -351,7 +351,7 @@ def sahm_from_unrate(f):
         means=x.rolling(3).mean().dropna()
         value=float(means.iloc[-1]-means.tail(13).min())
         return row('m18',value,x.index[-1].to_timestamp().date().isoformat(),
-                   f.fredsources.get('UNRATE',('BLS','https://api.bls.gov'))[1],
+                   getattr(f,'fredsources',{}).get('UNRATE',('BLS','https://api.bls.gov'))[1],
                    'Sahm computed from 3-month unemployment average versus minimum over preceding 12 months')
     except Exception as exc:
         print('SAHM_FALLBACK',type(exc).__name__,str(exc)[:450],flush=True)
@@ -366,7 +366,7 @@ def nfp(f):
     if len(recent)!=4 or any((recent.index[i].to_period('M')-recent.index[i-1].to_period('M')).n!=1 for i in range(1,4)):
         raise ValueError('PAYEMS 最近四個月不連續，拒絕錯算月增')
     changes=recent.diff().dropna()
-    return row('m20',changes.tail(3).mean(),str(s.index[-1].date()),f.fredsources.get('PAYEMS',('FRED',SOURCES['m20'][0]))[1],
+    return row('m20',changes.tail(3).mean(),str(s.index[-1].date()),getattr(f,'fredsources',{}).get('PAYEMS',('FRED',SOURCES['m20'][0]))[1],
                'BLS/FRED 非農就業存量，近3個月月增平均，單位千人',detail='注意歷史值可能修訂')
 
 def netliq(f):

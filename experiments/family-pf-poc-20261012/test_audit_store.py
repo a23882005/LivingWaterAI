@@ -139,3 +139,14 @@ def test_anchor_consistent_connection(tmp_path):
     with store._connect() as db:
         assert store.verify(_connection=db)==1
     assert store.export_anchor()["event_count"]==1
+
+def test_append_rejects_corrupt_audit_history(tmp_path):
+    path=tmp_path/"corrupted.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event(request="first"))
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE audit_events SET reason='changed' WHERE seq=1")
+    with pytest.raises(AuditIntegrityError):
+        store.append(event(request="second"))
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT count(*) FROM audit_events").fetchone()[0]==1

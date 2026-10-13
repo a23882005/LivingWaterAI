@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T06:30:42.513716+08:00",
+  "asOf": "2026-10-14T06:36:32.825053+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -38,7 +38,7 @@
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.739998,
+      "value": 94.730003,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",

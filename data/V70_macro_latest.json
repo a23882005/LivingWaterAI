@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T07:05:12.613434+08:00",
+  "asOf": "2026-10-14T07:52:58.503681+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -30,15 +30,22 @@
       "unit": "",
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
+    "m05": {
+      "value": 2.446163,
+      "dataDate": "2026-08-01",
+      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "unit": "%",
+      "method": "FRED CPILFESL 同一數列 YoY"
+    },
     "m09": {
-      "value": 102.214996,
+      "value": 102.211998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.669998,
+      "value": 94.760002,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -90,7 +97,7 @@
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 12,
+    "valid": 13,
     "totalRequired": 21,
     "missing": [
       "m06: MISSING (not verified OK)",
@@ -98,7 +105,6 @@
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
       "m02: MISSING (not verified OK)",
-      "m05: STALE (not verified OK)",
       "m14: MISSING (not verified OK)",
       "m16: MISSING (not verified OK)",
       "m18: MISSING (not verified OK)"

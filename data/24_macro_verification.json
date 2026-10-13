@@ -1,10 +1,10 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T07:05:12.613434+08:00",
+  "generated_at": "2026-10-14T07:52:58.503681+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 14,
-    "STALE": 1,
+    "OK": 15,
+    "STALE": 0,
     "MISSING": 9
   },
   "items": {
@@ -124,14 +124,14 @@
       "observation_date": "2026-08-01",
       "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "method": "FRED CPILFESL 同一數列 YoY",
-      "status": "STALE",
-      "detail": "比較基期 2025-08-01; 距今 74 天 > 65 天",
+      "status": "OK",
+      "detail": "比較基期 2025-08-01",
       "error": ""
     },
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.214996,
+      "value": 102.211998,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.669998,
+      "value": 94.760002,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",

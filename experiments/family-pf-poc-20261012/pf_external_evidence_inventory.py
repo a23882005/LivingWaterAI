@@ -25,7 +25,7 @@ def _safe_reference(ref):
                 return False
         except ValueError:
             pass
-        return bool(parts.path and parts.path != "/")
+        return bool(parts.path and parts.path != "/" and "\\" not in parts.path)
     except (TypeError, ValueError):
         return False
 

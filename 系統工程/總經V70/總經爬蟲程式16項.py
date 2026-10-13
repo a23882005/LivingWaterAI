@@ -325,6 +325,22 @@ def month_delta(f):
     return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
                '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
 
+def sahm_from_unrate(f):
+    try:
+        s=f.fred('UNRATE').sort_index()
+        x=s.groupby(s.index.to_period('M')).last().tail(15)
+        if len(x)!=15: raise ValueError('Sahm requires 15 months')
+        if any((x.index[i]-x.index[i-1]).n!=1 for i in range(1,15)):
+            raise ValueError('Sahm requires consecutive months')
+        means=x.rolling(3).mean().dropna()
+        value=float(means.iloc[-1]-means.tail(13).min())
+        return row('m18',value,x.index[-1].to_timestamp().date().isoformat(),
+                   f.fredsources.get('UNRATE',('BLS','https://api.bls.gov'))[1],
+                   'Sahm computed from 3-month unemployment average versus minimum over preceding 12 months')
+    except Exception as exc:
+        print('SAHM_FALLBACK',str(exc)[:160],flush=True)
+        return latest(f,'m18','SAHMCURRENT')
+
 def nfp(f):
     s=f.fred('PAYEMS')
     recent=s.tail(4)
@@ -417,7 +433,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
-      'm18':lambda:latest(f,'m18','SAHMCURRENT'),
+      'm18':lambda:sahm_from_unrate(f),
       'm19':lambda:latest(f,'m19','UNRATE'),
       'm20':lambda:nfp(f),
       'm05':lambda:core_cpi(f),

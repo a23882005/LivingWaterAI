@@ -1,0 +1,53 @@
+{
+  "schema": "V70.3/macro-feed-v1",
+  "asOf": "2026-10-14T01:52:13.871691+08:00",
+  "indicators": {
+    "m09": {
+      "value": 102.251999,
+      "dataDate": "2026-10-13",
+      "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
+      "unit": "",
+      "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
+    },
+    "m10": {
+      "value": 94.199997,
+      "dataDate": "2026-10-13",
+      "source": "https://finance.yahoo.com/quote/CL=F/",
+      "unit": "USD/bbl",
+      "method": "yfinance Yahoo Finance CL=F 日K Close"
+    },
+    "m12": {
+      "value": 100.9272,
+      "dataDate": "2026-10-13",
+      "source": "https://finance.yahoo.com/quote/%5EMOVE/",
+      "unit": "",
+      "method": "yfinance Yahoo Finance ^MOVE 日K Close"
+    }
+  },
+  "news": [],
+  "verification": {
+    "ready": false,
+    "valid": 3,
+    "totalRequired": 21,
+    "missing": [
+      "m07: MISSING (not verified OK)",
+      "m01: MISSING (not verified OK)",
+      "m06: MISSING (not verified OK)",
+      "m08: MISSING (not verified OK)",
+      "m03_qqq: MISSING (not verified OK)",
+      "m03_spy: MISSING (not verified OK)",
+      "m03_vt: MISSING (not verified OK)",
+      "m02: MISSING (not verified OK)",
+      "m04: MISSING (not verified OK)",
+      "m05: MISSING (not verified OK)",
+      "m13: MISSING (not verified OK)",
+      "m17: MISSING (not verified OK)",
+      "m14: MISSING (not verified OK)",
+      "m15: MISSING (not verified OK)",
+      "m16: MISSING (not verified OK)",
+      "m18: MISSING (not verified OK)",
+      "m19: MISSING (not verified OK)",
+      "m20: MISSING (not verified OK)"
+    ]
+  }
+}

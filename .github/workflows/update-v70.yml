@@ -41,6 +41,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Network diagnostic FRED and Yahoo
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import socket, urllib.request
+          urls = {
+            'FRED_CSV': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS',
+            'YAHOO_CHART': 'https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF',
+          }
+          for label, url in urls.items():
+              host=urllib.request.urlparse(url).hostname
+              try:
+                  print(label, 'DNS', socket.getaddrinfo(host,443)[0][4][0])
+                  request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+                  with urllib.request.urlopen(request, timeout=12) as response:
+                      print(label, 'HTTP',response.status,'bytes_sample',len(response.read(100)))
+              except Exception as exc:
+                  print(label,'FAILED',type(exc).__name__,str(exc)[:250])
+          PY
       - name: QA 24-item collector and adapter
         run: |
           python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py

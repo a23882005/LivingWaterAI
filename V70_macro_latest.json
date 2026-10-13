@@ -1,33 +1,47 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T01:52:13.871691+08:00",
+  "asOf": "2026-10-14T02:27:45.833424+08:00",
   "indicators": {
+    "m04": {
+      "value": 54.5,
+      "dataDate": "2026-09-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+      "unit": "",
+      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
+    },
     "m09": {
-      "value": 102.251999,
+      "value": 102.183998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.199997,
+      "value": 94.309998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 100.9272,
+      "value": 100.929199,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
+    },
+    "m15": {
+      "value": 54.9,
+      "dataDate": "2026-09-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+      "unit": "",
+      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對"
     }
   },
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 3,
+    "valid": 5,
     "totalRequired": 21,
     "missing": [
       "m07: MISSING (not verified OK)",
@@ -38,12 +52,10 @@
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
       "m02: MISSING (not verified OK)",
-      "m04: MISSING (not verified OK)",
       "m05: MISSING (not verified OK)",
       "m13: MISSING (not verified OK)",
       "m17: MISSING (not verified OK)",
       "m14: MISSING (not verified OK)",
-      "m15: MISSING (not verified OK)",
       "m16: MISSING (not verified OK)",
       "m18: MISSING (not verified OK)",
       "m19: MISSING (not verified OK)",

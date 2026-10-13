@@ -1,11 +1,11 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T01:52:13.871691+08:00",
+  "generated_at": "2026-10-14T02:27:45.833424+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 4,
+    "OK": 6,
     "STALE": 0,
-    "MISSING": 20
+    "MISSING": 18
   },
   "items": {
     "m07": {
@@ -107,14 +107,14 @@
     "m04": {
       "id": "m04",
       "label": "ISM 製造業 PMI",
-      "value": null,
+      "value": 54.5,
       "unit": "",
-      "observation_date": null,
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/",
-      "method": "須人工核實或授權 API",
-      "status": "MISSING",
-      "detail": "",
-      "error": "ISM 官方製造業發布頁需依版本核對，不能無來源抓任意網頁數字"
+      "observation_date": "2026-09-01",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
+      "status": "OK",
+      "detail": "統計月份2026-09；8月54.6",
+      "error": ""
     },
     "m05": {
       "id": "m05",
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.251999,
+      "value": 102.183998,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.199997,
+      "value": 94.309998,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -155,7 +155,7 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 100.9272,
+      "value": 100.929199,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
@@ -203,14 +203,14 @@
     "m15": {
       "id": "m15",
       "label": "ISM 服務業 PMI",
-      "value": null,
+      "value": 54.9,
       "unit": "",
-      "observation_date": null,
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/",
-      "method": "須人工核實或授權 API",
-      "status": "MISSING",
-      "detail": "",
-      "error": "ISM 官方服務業發布頁需依版本核對，不能無來源抓任意網頁數字"
+      "observation_date": "2026-09-01",
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
+      "status": "OK",
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4",
+      "error": ""
     },
     "m16": {
       "id": "m16",
@@ -275,7 +275,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 43.971429,
+      "value": 44.657143,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",

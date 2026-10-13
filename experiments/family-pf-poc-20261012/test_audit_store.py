@@ -112,7 +112,8 @@ def test_external_anchor_detects_tail_truncation(tmp_path):
     assert store.verify_anchor(anchor)
     with sqlite3.connect(path) as db:
         db.execute("DELETE FROM audit_events WHERE seq=2")
-    assert store.verify()==1
+    with pytest.raises(AuditIntegrityError):
+        store.verify()
     with pytest.raises(AuditIntegrityError):
         store.verify_anchor(anchor)
 

@@ -65,3 +65,20 @@ def test_subject_pseudonym_rejects_missing_identity(tmp_path):
     for invalid in ("",None,7):
         with pytest.raises(ValueError):
             store.pseudonymize(invalid)
+
+def test_independent_pseudonym_key_does_not_change_audit_integrity(tmp_path):
+    path=tmp_path/"separated.sqlite"
+    pseudo_a=b"pseudonym-key-A-at-least-32-bytes-secret"
+    pseudo_b=b"pseudonym-key-B-at-least-32-bytes-secret"
+    first=AuditStore(path,KEY,pseudonym_key=pseudo_a)
+    actor=first.pseudonymize("verified-subject")
+    first.append(event(actor=actor))
+    rotated=AuditStore(path,KEY,pseudonym_key=pseudo_b)
+    assert rotated.verify()==1
+    assert rotated.pseudonymize("verified-subject")!=actor
+
+def test_separate_keys_reject_equal_or_invalid_keys(tmp_path):
+    with pytest.raises(ValueError):
+        AuditStore(tmp_path/"bad.sqlite",KEY,pseudonym_key=KEY)
+    with pytest.raises(ValueError):
+        AuditStore(tmp_path/"bad2.sqlite",KEY,pseudonym_key=b"short")

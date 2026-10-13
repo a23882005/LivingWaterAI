@@ -228,3 +228,22 @@ def test_remote_preflight_does_not_send_customer_data():
         result=verify_remote_metadata(URL,client)
     assert result["metadata"]=="DISCOVERABLE"
     assert result["gate_a"]=="HOLD"
+
+
+@pytest.mark.parametrize("bad_url", [
+    "https://192.0.2.1/mcp",
+    "https://198.51.100.1/mcp",
+    "https://203.0.113.1/mcp",
+    "https://[2001:db8::1]/mcp",
+])
+def test_documentation_network_addresses_not_live_evidence(bad_url):
+    with pytest.raises(ValueError):
+        validated_url(bad_url)
+
+def test_invalid_content_type_never_claims_external_oauth():
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda req:httpx.Response(200,headers={"content-type":"text/plain"},text="not metadata"))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["external_oauth_login"]=="NOT_TESTED"
+    assert result["gate_a"]=="HOLD"

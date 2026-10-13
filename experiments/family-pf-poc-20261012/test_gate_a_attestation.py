@@ -85,3 +85,13 @@ def test_signed_evidence_with_nonstandard_port_is_rejected():
     priv,pub,p=fixture()
     p["evidence_urls"]["audit_denials_verified"]="https://auditor.example.org:8443/proof"
     assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_naive_validation_clock_holds():
+    priv,pub,p=fixture()
+    naive=datetime(2026,10,12)
+    assert verify_attestation(p,sign(priv,p),pub,naive)["state"]=="HOLD"
+
+def test_non_string_timestamp_holds():
+    priv,pub,p=fixture()
+    p["verified_at"]=123
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"

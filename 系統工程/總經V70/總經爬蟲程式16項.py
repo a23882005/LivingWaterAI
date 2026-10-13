@@ -97,11 +97,21 @@ class Fetcher:
             ('FRED_CSV', FRED+series),
             ('DBNOMICS_FRED_MIRROR','https://api.db.nomics.world/v22/series/FRED/'+series+'?observations=1')
         ]
+        # Optional official FRED API when a GitHub Actions secret is configured.
+        api_key=os.environ.get('FRED_API_KEY','').strip()
+        if api_key:
+            from urllib.parse import urlencode
+            params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json'})
+            providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
         for provider,url in providers:
             try:
                 response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider=='FRED_CSV':
+                if provider=='FRED_OFFICIAL_API':
+                    obs=response.json()['observations']
+                    dates=pd.to_datetime([x['date'] for x in obs],errors='coerce')
+                    values=pd.to_numeric([x['value'] for x in obs],errors='coerce')
+                elif provider=='FRED_CSV':
                     frame=pd.read_csv(StringIO(response.text))
                     datecol='DATE' if 'DATE' in frame.columns else 'observation_date'
                     if datecol not in frame or series not in frame: raise ValueError('CSV schema mismatch')

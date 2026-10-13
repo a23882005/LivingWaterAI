@@ -149,3 +149,28 @@ def test_multiple_authorization_servers_fail_closed():
         result = verify_remote_metadata(URL, client)
     assert result["metadata"] == "NOT_VERIFIED"
     assert result["gate_a"] == "HOLD"
+
+
+@pytest.mark.parametrize("url", [
+    "https://pf.example.com/mcp?access_token=secret",
+    "https://pf.example.com/mcp#fragment",
+    "https://user@pf.example.com/mcp",
+    "https://pf.example.com:8443/mcp",
+    "https://10.0.0.1/mcp",
+])
+def test_untrusted_metadata_target_rejected_before_network(url):
+    with pytest.raises(ValueError):
+        validated_url(url)
+
+def test_metadata_array_is_rejected():
+    with httpx.Client(transport=httpx.MockTransport(lambda req:httpx.Response(200,json=[]))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"
+
+def test_metadata_issuer_non_string_is_rejected():
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda req:httpx.Response(200,json={"resource":URL,"authorization_servers":[123]}))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"

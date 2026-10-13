@@ -175,3 +175,24 @@ def test_append_after_prior_failure_rolls_back_cleanly(tmp_path):
         db.execute("UPDATE audit_events SET reason='foreign_client' WHERE seq=1")
     assert store.append(event(request="recovered"))==2
     assert store.verify()==2
+
+def test_append_fails_after_middle_row_deleted(tmp_path):
+    path=tmp_path/"deleted.sqlite"
+    store=AuditStore(path,KEY)
+    for i in range(3):
+        store.append(event(request=f"r-{i}"))
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM audit_events WHERE seq=2")
+    with pytest.raises(AuditIntegrityError):
+        store.append(event(request="new"))
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0]==2
+
+def test_export_anchor_fails_if_history_modified(tmp_path):
+    path=tmp_path/"modified.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event())
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE audit_events SET mac='bad' WHERE seq=1")
+    with pytest.raises(AuditIntegrityError):
+        store.export_anchor()

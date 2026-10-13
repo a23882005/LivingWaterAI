@@ -210,6 +210,44 @@ def row(key, value=None, date=None, src=None, method=None, error=None, status=No
             'unit':UNITS.get(key,''),'observation_date':date,'source_url':src,
             'method':method or '', 'status':status,'detail':detail or '', 'error':error or ''}
 
+def treasury_breakeven(f, key):
+    """5Y market breakeven from matching Treasury nominal and real yield dates."""
+    from io import StringIO
+    today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    for year in (today.year, today.year-1):
+        def load(kind):
+            url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
+                 +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
+            resp=f.s.get(url,timeout=(5,f.timeout));resp.raise_for_status()
+            df=pd.read_csv(StringIO(resp.text))
+            df.columns=[str(x).strip().lower() for x in df.columns]
+            if 'date' not in df.columns: raise ValueError('Treasury missing Date')
+            col=next((x for x in ('5-year','5 year','5 yr') if x in df.columns),None)
+            if col is None: raise ValueError('Treasury missing 5Y yield')
+            df['date']=pd.to_datetime(df['date'],errors='coerce')
+            df['yield']=pd.to_numeric(df[col],errors='coerce')
+            return df[['date','yield']].dropna().drop_duplicates('date'),url
+        try:
+            nominal,u1=load('daily_treasury_yield_curve')
+            real,u2=load('daily_treasury_real_yield_curve')
+            both=nominal.merge(real,on='date',suffixes=('_nominal','_real')).sort_values('date')
+            if both.empty: raise ValueError('Treasury nominal/real dates do not overlap')
+            both['be']=both['yield_nominal']-both['yield_real']
+            end=both.iloc[-1];asof=end['date']
+            if key=='m13': val=float(end['be']);detail='5Y nominal minus 5Y TIPS real yield on same day'
+            else:
+                target=asof-pd.DateOffset(months=1)
+                prior=both.loc[both['date']<=target]
+                if prior.empty or (target-prior.iloc[-1]['date']).days>7:
+                    raise ValueError('One-month breakeven reference unavailable or too old')
+                val=float(end['be']-prior.iloc[-1]['be'])
+                detail='5Y breakeven change from '+prior.iloc[-1]['date'].date().isoformat()
+            return row(key,val,asof.date().isoformat(),u1+' | '+u2,
+                       'Treasury derived five-year breakeven; not direct FRED T5YIE',detail=detail)
+        except (ValueError,KeyError,requests.RequestException):
+            if year==today.year-1: raise
+    raise ValueError('Treasury breakeven unavailable')
+
 def treasury_latest(f, key):
     """Treasury official daily CSV fallback for nominal 10Y-2Y and real 10Y."""
     from io import StringIO
@@ -270,6 +308,8 @@ def core_cpi(f):
                'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def month_delta(f):
+    try: return treasury_breakeven(f,'m17')
+    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
     s=f.fred('T5YIE'); latest_date=s.index[-1]
     target=latest_date-pd.DateOffset(months=1)
     hist=s.loc[:target]
@@ -369,7 +409,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm01':lambda:latest(f,'m01','T10Y2Y'),
       'm08':lambda:latest(f,'m08','DFII10'),
       'm02':lambda:latest(f,'m02','BAMLH0A0HYM2'),
-      'm13':lambda:latest(f,'m13','T5YIE'),
+      'm13':lambda:treasury_breakeven(f,'m13'),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
       'm18':lambda:latest(f,'m18','SAHMCURRENT'),

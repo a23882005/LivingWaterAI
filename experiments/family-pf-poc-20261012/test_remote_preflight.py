@@ -174,3 +174,32 @@ def test_metadata_issuer_non_string_is_rejected():
         result=verify_remote_metadata(URL,client)
     assert result["metadata"]=="NOT_VERIFIED"
     assert result["gate_a"]=="HOLD"
+
+
+@pytest.mark.parametrize("issuer", [
+    "http://auth.example.com",
+    "https://auth.example.com?api_key=secret",
+    "https://user:password@auth.example.com",
+    "https://auth.example.com:444",
+])
+def test_issuer_auth_metadata_unsafe_origins_hold(issuer):
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, json={
+            "resource": URL, "authorization_servers": [issuer]
+        }))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"
+
+def test_successful_metadata_discovery_not_live_oauth_verification():
+    def handler(request):
+        return httpx.Response(200,json={
+            "resource":URL,"authorization_servers":["https://auth.example.com"]
+        })
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="DISCOVERABLE"
+    assert result["external_oauth_login"]=="NOT_TESTED"
+    assert result["cross_client_isolation"]=="NOT_TESTED"
+    assert result["audit_logs"]=="NOT_TESTED"
+    assert result["gate_a"]=="HOLD"

@@ -56,6 +56,7 @@ class AuditStore:
         stamp=datetime.now(timezone.utc).isoformat()
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
+            self.verify(_connection=db)
             prior=db.execute("SELECT seq,mac FROM audit_events ORDER BY seq DESC LIMIT 1").fetchone()
             seq=1 if prior is None else prior[0]+1
             prev="GENESIS" if prior is None else prior[1]

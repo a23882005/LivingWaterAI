@@ -77,3 +77,32 @@ def test_mismatched_digest_stays_hold(tmp_path):
     out=check_artifact(p,hashlib.sha256(b"old").hexdigest())
     assert out["match"] is False
     assert out["gate_a"]=="HOLD"
+
+
+def test_fifo_is_not_read_as_evidence(tmp_path):
+    import os
+    import pytest
+    if not hasattr(os, "mkfifo"):
+        pytest.skip("FIFO unsupported")
+    p=tmp_path/"pipe"
+    os.mkfifo(p)
+    out=check_artifact(p,"a"*64)
+    assert out["match"] is False
+    assert out["gate_a"]=="HOLD"
+
+def test_digest_bytes_type_is_rejected(tmp_path):
+    p=tmp_path/"proof.bin"
+    p.write_bytes(b"payload")
+    assert check_artifact(p,b"a"*64)["reason"]=="invalid_digest"
+
+def test_exact_maximum_size_is_permitted(tmp_path):
+    p=tmp_path/"boundary.bin"
+    with p.open("wb") as stream:
+        stream.truncate(MAX_BYTES)
+    digest=hashlib.sha256()
+    with p.open("rb") as stream:
+        while block:=stream.read(65536):
+            digest.update(block)
+    result=check_artifact(p,digest.hexdigest())
+    assert result["match"] is True
+    assert result["gate_a"]=="HOLD"

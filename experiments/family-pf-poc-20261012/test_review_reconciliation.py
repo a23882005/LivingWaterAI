@@ -59,3 +59,24 @@ def test_mixed_valid_and_incomplete_batch_rejected():
     out=reconcile_review_claims([claim(), {"checks":{"real_oauth_and_resource_binding":True}}])
     locked(out)
     assert out["reason"]=="invalid_claim"
+
+
+def test_disputed_checks_separate_from_unverified(tmp_path=None):
+    a=claim()
+    b=claim()
+    b["checks"]["bilateral_live_tenant_denials"]=False
+    out=reconcile_review_claims([a,b])
+    locked(out)
+    assert out["disputed_checks"]==["bilateral_live_tenant_denials"]
+
+def test_unanimously_negative_is_not_mislabeled_dispute():
+    out=reconcile_review_claims([claim(False),claim(False)])
+    locked(out)
+    assert out["disputed_checks"]==[]
+    assert len(out["conflicted_checks"])==len(REVIEW_CHECKS)
+
+def test_unanimously_positive_is_not_authorized():
+    out=reconcile_review_claims([claim(True),claim(True)])
+    locked(out)
+    assert out["disputed_checks"]==[]
+    assert out["safe_to_release"] is False

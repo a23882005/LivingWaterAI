@@ -42,6 +42,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Official FRED API availability check
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os,requests
+          key=os.environ.get('FRED_API_KEY','').strip()
+          if not key:
+              print('FRED_OFFICIAL_API: NO_KEY_CONFIGURED (official HY OAS / WALCL fallback unavailable)')
+          else:
+              for sid in ['BAMLH0A0HYM2','WALCL']:
+                  try:
+                      resp=requests.get('https://api.stlouisfed.org/fred/series/observations',
+                          params={'series_id':sid,'api_key':key,'file_type':'json',
+                                  'sort_order':'desc','limit':1},timeout=(5,18))
+                      print('FRED_OFFICIAL_API',sid,'HTTP',resp.status_code)
+                      if resp.ok:
+                          obs=resp.json().get('observations',[])
+                          print('FRED_OFFICIAL_API',sid,'observation_count',len(obs),
+                                'latest_date',obs[0].get('date') if obs else 'none')
+                  except Exception as exc:
+                      print('FRED_OFFICIAL_API',sid,'ERROR',type(exc).__name__)
+          PY
       - name: Network diagnostic FRED and Yahoo
         continue-on-error: true
         run: |

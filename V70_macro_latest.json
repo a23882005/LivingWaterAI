@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T05:06:56.773012+08:00",
+  "asOf": "2026-10-14T05:48:54.987965+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -31,14 +31,14 @@
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m09": {
-      "value": 102.198997,
+      "value": 102.200996,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.82,
+      "value": 94.790001,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -75,16 +75,16 @@
     "m19": {
       "value": 4.2,
       "dataDate": "2026-09-01",
-      "source": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
+      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "unit": "%",
-      "method": "BLS_OFFICIAL_API 官方或鏡像時間序列"
+      "method": "BLS_HISTORY_V2 官方或鏡像時間序列"
     },
     "m20": {
       "value": 50.666667,
       "dataDate": "2026-09-01",
-      "source": "https://fred.stlouisfed.org/series/PAYEMS",
+      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "unit": "千人",
-      "method": "FRED 非農就業存量，近3個月月增平均，單位千人"
+      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人"
     }
   },
   "news": [],

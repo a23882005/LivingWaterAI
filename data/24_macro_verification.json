@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T05:06:56.773012+08:00",
+  "generated_at": "2026-10-14T05:48:54.987965+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 14,
@@ -102,7 +102,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "All FRED sources failed for BAMLH0A0HYM2 | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Err"
+      "error": "All FRED sources failed for BAMLH0A0HYM2 | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=BAMLH0A0HYM2 (Caused by ReadTimeoutE"
     },
     "m04": {
       "id": "m04",
@@ -122,7 +122,7 @@
       "value": 2.446163,
       "unit": "%",
       "observation_date": "2026-08-01",
-      "source_url": "https://fred.stlouisfed.org/series/CPILFESL",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "method": "FRED CPILFESL 同一數列 YoY",
       "status": "STALE",
       "detail": "比較基期 2025-08-01; 距今 74 天 > 65 天",
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.198997,
+      "value": 102.200996,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.82,
+      "value": 94.790001,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -198,7 +198,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "All FRED sources failed for WALCL | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
+      "error": "All FRED sources failed for WALCL | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=WALCL (Caused by ReadTimeoutError(\"HTTPSCon"
     },
     "m15": {
       "id": "m15",
@@ -234,7 +234,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Erro"
+      "error": "Sahm U3 calculation failed: Sahm requires consecutive months | SAHMCURRENT fallback failed: All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): "
     },
     "m19": {
       "id": "m19",
@@ -242,8 +242,8 @@
       "value": 4.2,
       "unit": "%",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
-      "method": "BLS_OFFICIAL_API 官方或鏡像時間序列",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "method": "BLS_HISTORY_V2 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
       "error": ""
@@ -254,8 +254,8 @@
       "value": 50.666667,
       "unit": "千人",
       "observation_date": "2026-09-01",
-      "source_url": "https://fred.stlouisfed.org/series/PAYEMS",
-      "method": "FRED 非農就業存量，近3個月月增平均，單位千人",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
       "error": ""

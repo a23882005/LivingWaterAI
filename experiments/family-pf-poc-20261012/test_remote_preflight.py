@@ -120,3 +120,32 @@ def test_empty_metadata_keeps_gate_on_hold():
         result = verify_remote_metadata(URL, client)
     assert result['metadata'] == 'NOT_VERIFIED'
     assert result['gate_a'] == 'HOLD'
+
+def test_network_timeout_keeps_gate_on_hold():
+    def timeout(request):
+        raise httpx.ReadTimeout("synthetic timeout")
+    with httpx.Client(transport=httpx.MockTransport(timeout)) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result["metadata"] == "NOT_VERIFIED"
+    assert result["gate_a"] == "HOLD"
+
+def test_metadata_probe_sends_no_authorization():
+    seen = []
+    def handler(request):
+        seen.append(request)
+        return httpx.Response(200, json={"resource":URL, "authorization_servers":["https://auth.example.com"]})
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        result = verify_remote_metadata(URL, client)
+    assert len(seen) == 1
+    assert seen[0].method == "GET"
+    assert str(seen[0].url) == META
+    assert "authorization" not in seen[0].headers
+    assert result["gate_a"] == "HOLD"
+
+def test_multiple_authorization_servers_fail_closed():
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, json={"resource":URL, "authorization_servers":["https://one.example.com", "https://two.example.com"]})
+    )) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result["metadata"] == "NOT_VERIFIED"
+    assert result["gate_a"] == "HOLD"

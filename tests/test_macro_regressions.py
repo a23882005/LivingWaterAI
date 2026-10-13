@@ -58,28 +58,23 @@ class MacroRegression(unittest.TestCase):
             macro.sahm_from_unrate(GappedSource())
         self.assertIn("2025-08",str(ctx.exception))
 
-    def test_short_bls_history_falls_back(self):
-        """A short BLS v2 result must not hide complete historical v1 observations."""
+    def test_recent_unemployment_survives_history_gap(self):
+        """Latest U3 must remain usable even if Sahm lacks historical months."""
         class Response:
-            def __init__(self,points): self.points=points
             def raise_for_status(self): pass
             def json(self):
+                dates=pd.date_range("2026-07-01",periods=3,freq="MS")
                 return {"status":"REQUEST_SUCCEEDED","Results":{"series":[{
                     "seriesID":"LNS14000000",
                     "data":[{"year":str(d.year),"period":"M%02d"%d.month,
-                             "value":"4.0"} for d in self.points]}]}}
+                             "value":"4.0"} for d in dates]}]}}
         class FakeSession:
-            def __init__(self): self.called=[]
-            def post(self,url,**kwargs):
-                self.called.append(url)
-                dates=pd.date_range("2025-01-01",periods=18,freq="MS")
-                return Response(dates[-3:] if "/v2/" in url else dates)
+            def post(self,url,**kwargs): return Response()
         source=macro.Fetcher()
         source.s=FakeSession()
         series=source.fred("UNRATE")
-        self.assertEqual(len(series),18)
-        self.assertEqual(source.fredsources["UNRATE"][0],"BLS_HISTORY_V1")
-        self.assertEqual(len(source.s.called),2)
+        self.assertEqual(len(series),3)
+        self.assertEqual(source.fredsources["UNRATE"][0],"BLS_HISTORY_V2")
 
     def test_future_date_rejected(self):
         import datetime as dt

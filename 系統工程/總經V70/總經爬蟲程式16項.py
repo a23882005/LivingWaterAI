@@ -87,6 +87,7 @@ class Fetcher:
         self.timeout=timeout
         self.fredcache={}
         self.frederrors={}
+        self.fredsources={}
 
     def fred(self, series):
         if series in self.fredcache: return self.fredcache[series]
@@ -97,6 +98,8 @@ class Fetcher:
             ('FRED_CSV', FRED+series),
             ('DBNOMICS_FRED_MIRROR','https://api.db.nomics.world/v22/series/FRED/'+series+'?observations=1')
         ]
+        if series=='VIXCLS':
+            providers.insert(0,('CBOE_OFFICIAL_VIX','https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -107,7 +110,14 @@ class Fetcher:
             try:
                 response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider=='FRED_OFFICIAL_API':
+                if provider=='CBOE_OFFICIAL_VIX':
+                    frame=pd.read_csv(StringIO(response.text))
+                    frame.columns=[str(x).strip().upper() for x in frame.columns]
+                    if 'DATE' not in frame.columns or 'CLOSE' not in frame.columns:
+                        raise ValueError('CBOE CSV schema mismatch')
+                    dates=pd.to_datetime(frame['DATE'],errors='coerce')
+                    values=pd.to_numeric(frame['CLOSE'],errors='coerce')
+                elif provider=='FRED_OFFICIAL_API':
                     obs=response.json()['observations']
                     dates=pd.to_datetime([x['date'] for x in obs],errors='coerce')
                     values=pd.to_numeric([x['value'] for x in obs],errors='coerce')
@@ -127,6 +137,7 @@ class Fetcher:
                 if data.empty: raise ValueError('No numeric observations')
                 out=pd.Series(data['value'].to_numpy(),index=pd.DatetimeIndex(data['date']),name=series)
                 self.fredcache[series]=out
+                self.fredsources[series]=(provider,url)
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:
@@ -183,7 +194,8 @@ def row(key, value=None, date=None, src=None, method=None, error=None, status=No
 
 def latest(f, key, name):
     s=f.fred(name);d=s.index[-1].strftime('%Y-%m-%d')
-    return row(key,s.iloc[-1],d,'https://fred.stlouisfed.org/series/'+name,'FRED CSV')
+    provider,source=f.fredsources.get(name,('FRED','https://fred.stlouisfed.org/series/'+name))
+    return row(key,s.iloc[-1],d,source,provider+' 官方或鏡像時間序列')
 
 def core_cpi(f):
     s=f.fred('CPILFESL');last=s.iloc[-1]

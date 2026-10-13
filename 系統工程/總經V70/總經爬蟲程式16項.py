@@ -344,10 +344,15 @@ def month_delta(f):
 def sahm_from_unrate(f):
     try:
         s=f.fred('UNRATE').sort_index()
-        x=s.groupby(s.index.to_period('M')).last().tail(15)
-        if len(x)!=15: raise ValueError('Sahm requires 15 months')
-        if any((x.index[i]-x.index[i-1]).n!=1 for i in range(1,15)):
-            raise ValueError('Sahm requires consecutive months')
+        x=s.groupby(s.index.to_period('M')).last().sort_index()
+        # The latest reported 15 calendar months must be consecutive; never bridge gaps.
+        end=x.index[-1]
+        expected=pd.period_range(end-14,end,freq='M')
+        absent=[str(m) for m in expected if m not in x.index]
+        if absent:
+            raise ValueError('Sahm missing recent monthly observations: '+','.join(absent))
+        x=x.reindex(expected)
+        if x.isna().any(): raise ValueError('Sahm has null monthly observations')
         means=x.rolling(3).mean().dropna()
         value=float(means.iloc[-1]-means.tail(13).min())
         return row('m18',value,x.index[-1].to_timestamp().date().isoformat(),

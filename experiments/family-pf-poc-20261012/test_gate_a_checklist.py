@@ -47,3 +47,13 @@ def test_extra_unrelated_claim_does_not_authorize_release():
     evidence["local_ci_passed"] = True
     evidence["release_approved"] = True
     assert evaluate_gate_a(evidence)["state"] == "READY_FOR_REVIEW"
+
+
+def test_evidence_null_or_zero_not_accepted():
+    for invalid in (None, 0, [], {}):
+        evidence={key:True for key in REQUIRED_EVIDENCE}
+        evidence["audit_denials_verified"]=invalid
+        assert evaluate_gate_a(evidence)["state"]=="HOLD"
+
+def test_no_evidence_and_empty_dict_same_required_missing():
+    assert evaluate_gate_a({})=={"state":"HOLD","missing":list(REQUIRED_EVIDENCE)}

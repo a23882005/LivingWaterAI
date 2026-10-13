@@ -307,6 +307,11 @@ def core_cpi(f):
     return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),SOURCES['m05'][0],
                'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
+def breakeven_5y(f):
+    try: return treasury_breakeven(f,'m13')
+    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
+    return latest(f,'m13','T5YIE')
+
 def month_delta(f):
     try: return treasury_breakeven(f,'m17')
     except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
@@ -409,7 +414,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm01':lambda:latest(f,'m01','T10Y2Y'),
       'm08':lambda:latest(f,'m08','DFII10'),
       'm02':lambda:latest(f,'m02','BAMLH0A0HYM2'),
-      'm13':lambda:treasury_breakeven(f,'m13'),
+      'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
       'm18':lambda:latest(f,'m18','SAHMCURRENT'),

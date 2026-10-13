@@ -12,4 +12,4 @@ def evaluate_gate_a(evidence):
     if not isinstance(evidence, dict):
         return {"state": "HOLD", "missing": list(REQUIRED_EVIDENCE)}
     missing = [item for item in REQUIRED_EVIDENCE if evidence.get(item) is not True]
-    return {"state": "PASS" if not missing else "HOLD", "missing": missing}
+    return {"state": "READY_FOR_REVIEW" if not missing else "HOLD", "missing": missing}

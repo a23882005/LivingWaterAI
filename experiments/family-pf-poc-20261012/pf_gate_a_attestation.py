@@ -46,12 +46,12 @@ def verify_attestation(payload, signature_b64, reviewer_pubkey_b64, now=None):
     try:
         instant=datetime.fromisoformat(payload["verified_at"].replace("Z","+00:00"))
         moment=now or datetime.now(timezone.utc)
-        if instant.tzinfo is None or instant>moment or moment-instant>timedelta(days=7):
+        if instant.tzinfo is None or moment.tzinfo is None or instant>moment or moment-instant>timedelta(days=7):
             return hold
         key=Ed25519PublicKey.from_public_bytes(base64.b64decode(reviewer_pubkey_b64,validate=True))
         signature=base64.b64decode(signature_b64,validate=True)
         message=json.dumps(payload,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode("utf-8")
         key.verify(signature,message)
-    except (ValueError,TypeError,KeyError,InvalidSignature):
+    except (ValueError,TypeError,KeyError,InvalidSignature,OverflowError,AttributeError):
         return hold
     return {"state":"ATTESTED_FOR_REVIEW"}

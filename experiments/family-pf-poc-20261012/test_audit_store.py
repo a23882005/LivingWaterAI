@@ -196,3 +196,26 @@ def test_export_anchor_fails_if_history_modified(tmp_path):
         db.execute("UPDATE audit_events SET mac='bad' WHERE seq=1")
     with pytest.raises(AuditIntegrityError):
         store.export_anchor()
+
+def test_tail_deletion_detected_without_external_anchor(tmp_path):
+    path=tmp_path/"tail_missing.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event(request="first"))
+    store.append(event(request="second"))
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM audit_events WHERE seq=2")
+    with pytest.raises(AuditIntegrityError):
+        store.verify()
+    with pytest.raises(AuditIntegrityError):
+        store.append(event(request="third"))
+
+def test_full_deletion_detected_by_high_water_mark(tmp_path):
+    path=tmp_path/"cleared.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event())
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM audit_events")
+    with pytest.raises(AuditIntegrityError):
+        store.verify()
+    with pytest.raises(AuditIntegrityError):
+        store.export_anchor()

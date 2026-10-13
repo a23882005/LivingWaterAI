@@ -108,6 +108,18 @@ class MacroRegression(unittest.TestCase):
         self.assertIn("BAMLH0A0HYM2",source.s.url)
 
 
+    def test_invalid_mirror_removed(self):
+        class Session:
+            def __init__(self): self.urls=[]
+            def get(self,url,**kwargs):
+                self.urls.append(url)
+                raise RuntimeError("unavailable")
+        f=macro.Fetcher()
+        f.s=Session()
+        with patch.dict("os.environ",{"FRED_API_KEY":""}):
+            with self.assertRaises(RuntimeError): f.fred("BAMLH0A0HYM2")
+        self.assertEqual(len(f.s.urls),1)
+
     def test_future_date_rejected(self):
         import datetime as dt
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()

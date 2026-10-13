@@ -1,0 +1,65 @@
+{
+  "as_of": "2026-10-12T10:00:20+08:00",
+  "metrics": {
+    "fed_current": {
+      "value": 3.75,
+      "data_date": "2026-10-11",
+      "source": "FRED DFEDTARL",
+      "url": "https://fred.stlouisfed.org/series/DFEDTARL"
+    },
+    "pmi": {
+      "value": 54.5,
+      "data_date": "2026-10-01",
+      "source": "ISM",
+      "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/"
+    },
+    "cpi": {
+      "value": 2.4,
+      "data_date": "2026-09-11",
+      "source": "BLS",
+      "url": "https://www.bls.gov/news.release/cpi.htm"
+    },
+    "vix": {
+      "value": 14.84,
+      "data_date": "2026-10-09",
+      "source": "Cboe via Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/%5EVIX/history/"
+    },
+    "dxy": {
+      "value": 102.21,
+      "data_date": "2026-10-09",
+      "source": "ICE via Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/DX-Y.NYB/history/"
+    },
+    "oil": {
+      "value": 91.85,
+      "data_date": "2026-10-09",
+      "source": "Reuters WTI settlement",
+      "url": "https://www.reuters.com/business/energy/oil-falls-trump-comments-iran-talks-ease-supply-concerns-2026-10-09/"
+    },
+    "yield_10y": {
+      "value": 5.22,
+      "data_date": "2026-10-08",
+      "source": "FRED DGS10",
+      "url": "https://fred.stlouisfed.org/series/DGS10"
+    },
+    "yield_curve": {
+      "value": 0.44,
+      "data_date": "2026-10-09",
+      "source": "FRED T10Y2Y",
+      "url": "https://fred.stlouisfed.org/series/T10Y2Y"
+    },
+    "hy": {
+      "value": 3.15,
+      "data_date": "2026-10-08",
+      "source": "FRED BAMLH0A0HYM2",
+      "url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
+    },
+    "real_y_fred": {
+      "value": 2.87,
+      "data_date": "2026-10-08",
+      "source": "FRED DFII10",
+      "url": "https://fred.stlouisfed.org/series/DFII10"
+    }
+  }
+}

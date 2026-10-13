@@ -132,3 +132,14 @@ def test_signed_record_future_by_one_second_holds():
     priv,pub,p=fixture()
     p['verified_at']=(NOW+timedelta(seconds=1)).isoformat()
     assert verify_attestation(p,sign(priv,p),pub,NOW)['state']=='HOLD'
+
+
+def test_signed_record_missing_server_binding_holds():
+    priv,pub,p=fixture()
+    del p['checks']['server_client_binding_verified']
+    assert verify_attestation(p,sign(priv,p),pub,NOW)['state']=='HOLD'
+
+def test_signed_record_exact_seven_days_is_review_only():
+    priv,pub,p=fixture()
+    p['verified_at']=(NOW-timedelta(days=7)).isoformat()
+    assert verify_attestation(p,sign(priv,p),pub,NOW)['state']=='ATTESTED_FOR_REVIEW'

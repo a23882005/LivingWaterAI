@@ -14,9 +14,12 @@ class AuditIntegrityError(RuntimeError):
     pass
 
 class AuditStore:
-    def __init__(self, db_path, integrity_key):
+    def __init__(self, db_path, integrity_key, pseudonym_key=None):
         if not isinstance(integrity_key, bytes) or len(integrity_key) < 32:
             raise ValueError("Dedicated audit integrity key must contain >=32 bytes")
+        if pseudonym_key is not None and (not isinstance(pseudonym_key, bytes) or len(pseudonym_key) < 32 or pseudonym_key == integrity_key):
+            raise ValueError('Independent pseudonym key must contain >=32 bytes and differ from audit key')
+        self.pseudonym_key = pseudonym_key if pseudonym_key is not None else integrity_key
         self.key = integrity_key
         self.db_path = str(db_path)
         with self._connect() as db:
@@ -38,7 +41,7 @@ class AuditStore:
     def pseudonymize(self, verified_subject):
         if not isinstance(verified_subject, str) or not verified_subject:
             raise ValueError("Verified subject required")
-        digest=hmac.new(self.key,("family-pf-subject-v1:"+verified_subject).encode("utf-8"),hashlib.sha256).hexdigest()
+        digest=hmac.new(self.pseudonym_key,("family-pf-subject-v1:"+verified_subject).encode("utf-8"),hashlib.sha256).hexdigest()
         return "sub_"+digest[:32]
     def append(self, event):
         allowed = {"action","decision","reason","actor_ref","request_id"}

@@ -57,7 +57,7 @@ def verify_remote_metadata(url, transport=None):
             return result
         try:
             issuer=urlsplit(issuers[0])
-            if issuer.scheme!="https" or not issuer.hostname or issuer.username or issuer.password or issuer.query or issuer.fragment:
+            if issuer.scheme!="https" or not issuer.hostname or issuer.username or issuer.password or issuer.query or issuer.fragment or issuer.port not in (None,443):
                 result["reason"]="invalid_authorization_server"
                 return result
         except ValueError:

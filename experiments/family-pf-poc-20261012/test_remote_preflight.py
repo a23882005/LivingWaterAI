@@ -48,3 +48,15 @@ def test_redirect_not_accepted():
 def test_no_provider_is_not_oauth_success():
     with httpx.Client(transport=httpx.MockTransport(lambda req:httpx.Response(200,json={"resource":URL,"authorization_servers":[]}))) as c:
         assert verify_remote_metadata(URL,c)["metadata"]=="NOT_VERIFIED"
+
+def test_private_ipv4_rejected():
+    with pytest.raises(ValueError):
+        validated_url("https://192.168.1.10/mcp")
+
+def test_link_local_ipv4_rejected():
+    with pytest.raises(ValueError):
+        validated_url("https://169.254.169.254/mcp")
+
+def test_private_ipv6_rejected():
+    with pytest.raises(ValueError):
+        validated_url("https://[fd00::1]/mcp")

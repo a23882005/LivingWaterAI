@@ -82,3 +82,23 @@ def test_separate_keys_reject_equal_or_invalid_keys(tmp_path):
         AuditStore(tmp_path/"bad.sqlite",KEY,pseudonym_key=KEY)
     with pytest.raises(ValueError):
         AuditStore(tmp_path/"bad2.sqlite",KEY,pseudonym_key=b"short")
+
+def test_multiple_independent_writers_preserve_chain(tmp_path):
+    path=tmp_path/"multi.sqlite"
+    stores=[AuditStore(path,KEY) for _ in range(3)]
+    for i in range(12):
+        stores[i%3].append(event(request=f"request-{i:03}"))
+    assert AuditStore(path,KEY).verify()==12
+    with sqlite3.connect(path) as db:
+        ids=[row[0] for row in db.execute("SELECT request_id FROM audit_events ORDER BY seq")]
+    assert len(ids)==len(set(ids))==12
+
+def test_pseudonym_key_rotation_retains_existing_identity_records(tmp_path):
+    path=tmp_path/"rotation.sqlite"
+    a=AuditStore(path,KEY,pseudonym_key=b"pseudonym-v1-key-at-least-32-bytes-secret")
+    v1=a.pseudonymize("verified-synthetic")
+    a.append(event(actor=v1))
+    b=AuditStore(path,KEY,pseudonym_key=b"pseudonym-v2-key-at-least-32-bytes-secret")
+    v2=b.pseudonymize("verified-synthetic")
+    b.append(event(actor=v2,request="request-rotation"))
+    assert b.verify()==2 and v1!=v2

@@ -74,49 +74,86 @@ SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
 
 class Fetcher:
-    def __init__(self, timeout=16):
+    def __init__(self, timeout=8):
         self.s=requests.Session()
-        # Retry only transient HTTP errors, never silently invent a datum.
         from requests.adapters import HTTPAdapter
         from urllib3.util.retry import Retry
-        retry=Retry(total=3, connect=3, read=3, backoff_factor=0.7,
+        retry=Retry(total=1, connect=1, read=1, backoff_factor=0.3,
                     status_forcelist=[429,500,502,503,504],
                     allowed_methods=frozenset(['GET']), respect_retry_after_header=True)
         adapter=HTTPAdapter(max_retries=retry)
         self.s.mount('https://',adapter)
-        self.s.headers.update({'User-Agent':'Mozilla/5.0 (compatible; macro-data-research/1.0)'})
+        self.s.headers.update({'User-Agent':'Mozilla/5.0 (compatible; macro-data-research/1.2)'})
         self.timeout=timeout
         self.fredcache={}
+        self.frederrors={}
+
     def fred(self, series):
         if series in self.fredcache: return self.fredcache[series]
+        if series in self.frederrors: raise RuntimeError(self.frederrors[series])
         from io import StringIO
-        r=self.s.get(FRED+series,timeout=self.timeout)
-        r.raise_for_status()
-        frame=pd.read_csv(StringIO(r.text))
-        datecol='DATE' if 'DATE' in frame.columns else 'observation_date'
-        if datecol not in frame or series not in frame: raise ValueError('FRED CSV 欄位格式異常 '+series)
-        frame[datecol]=pd.to_datetime(frame[datecol],errors='coerce')
-        frame[series]=pd.to_numeric(frame[series],errors='coerce')
-        a=frame[[datecol,series]].dropna().sort_values(datecol).drop_duplicates(datecol,keep='last')
-        if a.empty: raise ValueError('FRED 無有效資料 '+series)
-        out=pd.Series(a[series].values,index=pd.DatetimeIndex(a[datecol]),name=series)
-        self.fredcache[series]=out
-        return out
+        errors=[]
+        providers=[
+            ('FRED_CSV', FRED+series),
+            ('DBNOMICS_FRED_MIRROR','https://api.db.nomics.world/v22/series/FRED/'+series+'?observations=1')
+        ]
+        for provider,url in providers:
+            try:
+                response=self.s.get(url,timeout=(5,self.timeout))
+                response.raise_for_status()
+                if provider=='FRED_CSV':
+                    frame=pd.read_csv(StringIO(response.text))
+                    datecol='DATE' if 'DATE' in frame.columns else 'observation_date'
+                    if datecol not in frame or series not in frame: raise ValueError('CSV schema mismatch')
+                    dates=pd.to_datetime(frame[datecol],errors='coerce')
+                    values=pd.to_numeric(frame[series],errors='coerce')
+                else:
+                    datasets=response.json()['series']['docs']
+                    doc=next(d for d in datasets if d.get('series_code')==series)
+                    dates=pd.to_datetime(doc['period'],errors='coerce')
+                    values=pd.to_numeric(doc['value'],errors='coerce')
+                data=pd.DataFrame({'date':dates,'value':values}).dropna()
+                data=data.sort_values('date').drop_duplicates('date',keep='last')
+                if data.empty: raise ValueError('No numeric observations')
+                out=pd.Series(data['value'].to_numpy(),index=pd.DatetimeIndex(data['date']),name=series)
+                self.fredcache[series]=out
+                print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
+                return out
+            except Exception as exc:
+                errors.append(provider+': '+type(exc).__name__+': '+str(exc)[:100])
+        message='All FRED sources failed for '+series+' | '+' | '.join(errors)
+        self.frederrors[series]=message
+        raise RuntimeError(message)
+
     def yahoo(self,ticker,info_key=None):
-        try: import yfinance as yf
-        except ImportError as e: raise RuntimeError('缺少 yfinance 套件') from e
-        t=yf.Ticker(ticker)
         if info_key:
-            inf=t.info
-            v=inf.get(info_key)
-            if v is None: raise ValueError('Yahoo Finance 未提供 '+info_key)
-            # Yahoo info field is a snapshot, not a confirmed observation date.
-            raise ValueError('估值快照無可核實的觀測日；不作正式數值。可用人工查證 overrides 輸入')
-        h=t.history(period='1mo',auto_adjust=False)
-        if h.empty: raise ValueError('Yahoo 無價格資料 '+ticker)
-        last=h.dropna(subset=['Close']).iloc[-1]
-        stamp=str(h.dropna(subset=['Close']).index[-1].date())
-        return float(last['Close']),stamp
+            raise ValueError('ETF valuation requires verified as-of date; use official source overrides')
+        errors=[]
+        try:
+            import yfinance as yf
+            h=yf.Ticker(ticker).history(period='1mo',auto_adjust=False,timeout=self.timeout)
+            if not h.empty:
+                valid=h.dropna(subset=['Close'])
+                if not valid.empty:
+                    return float(valid.iloc[-1]['Close']),str(valid.index[-1].date())
+            errors.append('yfinance: empty')
+        except Exception as exc:
+            errors.append('yfinance: '+type(exc).__name__+': '+str(exc)[:110])
+        # Yahoo public chart JSON fallback: actual timestamp from quote data.
+        try:
+            from urllib.parse import quote
+            url='https://query1.finance.yahoo.com/v8/finance/chart/'+quote(ticker,safe='')
+            r=self.s.get(url,params={'range':'1mo','interval':'1d'},timeout=(5,self.timeout))
+            r.raise_for_status()
+            v=r.json()['chart']['result'][0]
+            closes=v['indicators']['quote'][0]['close']
+            points=[(stamp,price) for stamp,price in zip(v['timestamp'],closes) if price is not None and math.isfinite(float(price))]
+            if not points: raise ValueError('empty chart prices')
+            ts,price=points[-1]
+            return float(price),dt.datetime.fromtimestamp(ts,dt.timezone.utc).date().isoformat()
+        except Exception as exc:
+            errors.append('yahoo chart: '+type(exc).__name__+': '+str(exc)[:110])
+        raise RuntimeError(' | '.join(errors))
 
 def row(key, value=None, date=None, src=None, method=None, error=None, status=None, detail=None):
     if status is None: status='OK' if (value is not None and date and src) else 'MISSING'

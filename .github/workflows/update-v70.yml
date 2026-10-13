@@ -53,7 +53,7 @@ jobs:
           if not key:
               print('FRED_OFFICIAL_API: NO_KEY_CONFIGURED (official HY OAS / WALCL fallback unavailable)')
           else:
-              for sid in ['BAMLH0A0HYM2','WALCL']:
+              for sid in ['BAMLH0A0HYM2','WALCL','WDTGAL','RRPONTSYD']:
                   try:
                       resp=requests.get('https://api.stlouisfed.org/fred/series/observations',
                           params={'series_id':sid,'api_key':key,'file_type':'json',
@@ -62,7 +62,8 @@ jobs:
                       if resp.ok:
                           obs=resp.json().get('observations',[])
                           print('FRED_OFFICIAL_API',sid,'observation_count',len(obs),
-                                'latest_date',obs[0].get('date') if obs else 'none')
+                                'latest_date',obs[0].get('date') if obs else 'none',
+                                'numeric',bool(obs and obs[0].get('value') not in (None,'.','')))
                   except Exception as exc:
                       print('FRED_OFFICIAL_API',sid,'ERROR',type(exc).__name__)
           PY

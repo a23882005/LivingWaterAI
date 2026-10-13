@@ -9,6 +9,7 @@ def records():
     return {key: {"result": "OBSERVED",
                   "evidence_url": "https://auditor.example.org/review/" + key,
                   "witness_role": "independent_security_reviewer",
+                  "sha256": "a" * 64,
                   "observed_at": NOW.isoformat()} for key in REQUIRED_EVIDENCE}
 
 def test_empty_inventory_holds():
@@ -94,3 +95,23 @@ def test_unicode_whitespace_evidence_url_rejected():
         result=inspect_inventory(items,NOW)
         assert result['state']=='HOLD'
         assert result['gate_a']=='HOLD'
+
+
+def test_missing_digest_keeps_inventory_on_hold():
+    items=records()
+    del items["audit_denials_verified"]["sha256"]
+    result=inspect_inventory(items,NOW)
+    assert result["state"]=="HOLD"
+    assert result["invalid"]==["audit_denials_verified"]
+
+def test_invalid_digest_format_is_rejected():
+    for invalid in ("", "abc", "G"*64, "a"*63, "A"*64, None):
+        items=records()
+        items["external_oauth_login_verified"]["sha256"]=invalid
+        assert inspect_inventory(items,NOW)["state"]=="HOLD"
+
+def test_digest_syntax_does_not_prove_authenticity():
+    result=inspect_inventory(records(),NOW)
+    assert result["state"]=="REVIEW_PACKAGE_READY"
+    assert result["verification"]=="NOT_INDEPENDENTLY_VERIFIED"
+    assert result["gate_a"]=="HOLD"

@@ -115,3 +115,14 @@ def test_signature_with_untrusted_plain_http_url_holds():
 def test_complete_signed_record_never_becomes_gate_pass():
     priv,pub,p=fixture()
     assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="ATTESTED_FOR_REVIEW"
+
+
+def test_evidence_urls_with_extra_query_are_rejected():
+    priv,pub,p=fixture()
+    p["evidence_urls"]["audit_denials_verified"]="https://auditor.example.org/proof?token=not-safe"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_stale_signed_record_at_eight_days_holds():
+    priv,pub,p=fixture()
+    p["verified_at"]=(NOW-timedelta(days=8)).isoformat()
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"

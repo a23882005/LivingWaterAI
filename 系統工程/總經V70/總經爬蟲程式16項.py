@@ -172,7 +172,7 @@ class Fetcher:
                     monthly=out.groupby(out.index.to_period('M')).last().sort_index()
                     period=monthly.index[-1]
                     if series=='UNRATE':
-                        required=pd.period_range(period-14,period,freq='M')
+                        required=pd.PeriodIndex([period],freq='M')  # current U3; Sahm enforces 15 months
                     elif series=='PAYEMS':
                         required=pd.period_range(period-3,period,freq='M')
                     else:

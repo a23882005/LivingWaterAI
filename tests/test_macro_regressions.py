@@ -58,6 +58,29 @@ class MacroRegression(unittest.TestCase):
             macro.sahm_from_unrate(GappedSource())
         self.assertIn("2025-08",str(ctx.exception))
 
+    def test_short_bls_history_falls_back(self):
+        """A short BLS v2 result must not hide complete historical v1 observations."""
+        class Response:
+            def __init__(self,points): self.points=points
+            def raise_for_status(self): pass
+            def json(self):
+                return {"status":"REQUEST_SUCCEEDED","Results":{"series":[{
+                    "seriesID":"LNS14000000",
+                    "data":[{"year":str(d.year),"period":"M%02d"%d.month,
+                             "value":"4.0"} for d in self.points]}]}}
+        class FakeSession:
+            def __init__(self): self.called=[]
+            def post(self,url,**kwargs):
+                self.called.append(url)
+                dates=pd.date_range("2025-01-01",periods=18,freq="MS")
+                return Response(dates[-3:] if "/v2/" in url else dates)
+        source=macro.Fetcher()
+        source.s=FakeSession()
+        series=source.fred("UNRATE")
+        self.assertEqual(len(series),18)
+        self.assertEqual(source.fredsources["UNRATE"][0],"BLS_HISTORY_V1")
+        self.assertEqual(len(source.s.called),2)
+
     def test_future_date_rejected(self):
         import datetime as dt
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()

@@ -210,7 +210,45 @@ def row(key, value=None, date=None, src=None, method=None, error=None, status=No
             'unit':UNITS.get(key,''),'observation_date':date,'source_url':src,
             'method':method or '', 'status':status,'detail':detail or '', 'error':error or ''}
 
+def treasury_latest(f, key):
+    """Treasury official daily CSV fallback for nominal 10Y-2Y and real 10Y."""
+    from io import StringIO
+    today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    kind='daily_treasury_yield_curve' if key=='m01' else 'daily_treasury_real_yield_curve'
+    last_error=None
+    for year in (today.year,today.year-1):
+        url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
+             +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
+        try:
+            resp=f.s.get(url,timeout=(5,f.timeout))
+            resp.raise_for_status()
+            data=pd.read_csv(StringIO(resp.text))
+            data.columns=[str(x).strip().lower() for x in data.columns]
+            if 'date' not in data.columns: raise ValueError('Treasury CSV missing Date')
+            data['date']=pd.to_datetime(data['date'],errors='coerce')
+            def col(years):
+                for s in (f'{years}-year',f'{years} year',f'{years} yr'):
+                    if s in data.columns: return s
+                raise ValueError(f'Treasury missing {years} year column; found {list(data.columns)}')
+            y10=pd.to_numeric(data[col(10)],errors='coerce')
+            if key=='m01':
+                y2=pd.to_numeric(data[col(2)],errors='coerce')
+                data['computed']=y10-y2
+            else:
+                data['computed']=y10
+            data=data.dropna(subset=['date','computed']).sort_values('date')
+            if data.empty: raise ValueError('Treasury CSV no numeric dated rows')
+            last=data.iloc[-1]
+            return row(key,float(last['computed']),last['date'].date().isoformat(),
+                       url,'Treasury official '+kind+' daily CSV',
+                       detail='Matched observation date for nominal 10Y minus 2Y' if key=='m01' else '10Y TIPS real yield')
+        except Exception as exc: last_error=str(exc)[:230]
+    raise RuntimeError('Treasury direct fallback failed: '+str(last_error))
+
 def latest(f, key, name):
+    if key in ('m01','m08'):
+        try: return treasury_latest(f,key)
+        except Exception as exc: print('TREASURY_FALLBACK',key,str(exc)[:220],flush=True)
     s=f.fred(name);d=s.index[-1].strftime('%Y-%m-%d')
     provider,source=f.fredsources.get(name,('FRED','https://fred.stlouisfed.org/series/'+name))
     return row(key,s.iloc[-1],d,source,provider+' 官方或鏡像時間序列')

@@ -126,3 +126,9 @@ def test_stale_signed_record_at_eight_days_holds():
     priv,pub,p=fixture()
     p["verified_at"]=(NOW-timedelta(days=8)).isoformat()
     assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+
+def test_signed_record_future_by_one_second_holds():
+    priv,pub,p=fixture()
+    p['verified_at']=(NOW+timedelta(seconds=1)).isoformat()
+    assert verify_attestation(p,sign(priv,p),pub,NOW)['state']=='HOLD'

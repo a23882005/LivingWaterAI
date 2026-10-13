@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T04:00:42.699676+08:00",
+  "generated_at": "2026-10-14T04:07:46.405659+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 6,
@@ -18,7 +18,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=VIXCLS (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed "
+      "error": "All FRED sources failed for VIXCLS | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
     },
     "m01": {
       "id": "m01",
@@ -30,7 +30,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=T10Y2Y (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed "
+      "error": "All FRED sources failed for T10Y2Y | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
     },
     "m06": {
       "id": "m06",
@@ -54,7 +54,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=DFII10 (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed "
+      "error": "All FRED sources failed for DFII10 | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
     },
     "m03_qqq": {
       "id": "m03_qqq",
@@ -102,7 +102,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=BAMLH0A0HYM2 (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read "
+      "error": "All FRED sources failed for BAMLH0A0HYM2 | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Err"
     },
     "m04": {
       "id": "m04",
@@ -126,12 +126,12 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=CPILFESL (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read time"
+      "error": "All FRED sources failed for CPILFESL | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: "
     },
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.192001,
+      "value": 102.197998,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.489998,
+      "value": 94.610001,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -155,7 +155,7 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 100.923103,
+      "value": 101.108902,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
@@ -174,7 +174,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=T5YIE (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed o"
+      "error": "All FRED sources failed for T5YIE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
     },
     "m17": {
       "id": "m17",
@@ -186,7 +186,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=T5YIE (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed o"
+      "error": "All FRED sources failed for T5YIE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
     },
     "m14": {
       "id": "m14",
@@ -198,7 +198,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=WALCL (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed o"
+      "error": "All FRED sources failed for WALCL | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NOT"
     },
     "m15": {
       "id": "m15",
@@ -234,7 +234,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=SAHMCURRENT (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read t"
+      "error": "All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Erro"
     },
     "m19": {
       "id": "m19",
@@ -246,7 +246,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=UNRATE (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed "
+      "error": "All FRED sources failed for UNRATE | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
     },
     "m20": {
       "id": "m20",
@@ -258,7 +258,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fredgraph.csv?id=PAYEMS (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed "
+      "error": "All FRED sources failed for PAYEMS | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Max retries exceeded with url: /graph/fre | DBNOMICS_FRED_MIRROR: HTTPError: 404 Client Error: NO"
     },
     "s03": {
       "id": "s03",
@@ -275,7 +275,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 44.942857,
+      "value": 45.057143,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",

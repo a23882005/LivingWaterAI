@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T04:00:42.699676+08:00",
+  "asOf": "2026-10-14T04:07:46.405659+08:00",
   "indicators": {
     "m04": {
       "value": 54.5,
@@ -10,21 +10,21 @@
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m09": {
-      "value": 102.192001,
+      "value": 102.197998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.489998,
+      "value": 94.610001,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 100.923103,
+      "value": 101.108902,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",

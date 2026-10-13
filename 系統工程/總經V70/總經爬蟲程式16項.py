@@ -112,7 +112,12 @@ class Fetcher:
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
             from urllib.parse import urlencode
-            params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json'})
+            # Bounded official queries: enough history for 13-week liquidity,
+            # 12-month CPI YoY, Sahm lookback, and 1-month breakeven change.
+            lookback_days=900 if series in ('UNRATE','CPILFESL','PAYEMS') else 210
+            earliest=(dt.datetime.now(dt.timezone.utc).date()-dt.timedelta(days=lookback_days)).isoformat()
+            params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json',
+                              'observation_start':earliest})
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
         for provider,url in providers:
             try:

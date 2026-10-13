@@ -14,6 +14,14 @@ def test_reject_placeholder():
 def test_reject_password():
     with pytest.raises(ValueError):validated_url("https://user:pass@pf.example.com/mcp")
 
+def test_reject_ipv6_loopback():
+    with pytest.raises(ValueError):
+        validated_url("https://[::1]/mcp")
+
+def test_reject_nonstandard_port():
+    with pytest.raises(ValueError):
+        validated_url("https://pf.example.com:8443/mcp")
+
 def test_reject_wrong_route():
     with pytest.raises(ValueError):validated_url("https://pf.example.com/admin")
 

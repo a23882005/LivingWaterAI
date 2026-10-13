@@ -12,3 +12,10 @@ def test_populated_audit_after_reopen(tmp_path):
     first = AuditStore(path, key)
     first.append({'action': 'read', 'decision': 'DENY', 'reason': 'test', 'actor_ref': 'sample', 'request_id': 'r1'})
     assert AuditStore(path, key).verify() == 1
+
+def test_saved_snapshot_reopen(tmp_path):
+    path = tmp_path / 'saved.sqlite'
+    key = b'test-key-32-bytes-and-longer-123456789'
+    first = AuditStore(path, key)
+    first.append({'action':'read','decision':'DENY','reason':'test','actor_ref':'sample','request_id':'r1'})
+    assert AuditStore(path, key).verify_anchor(first.export_anchor())

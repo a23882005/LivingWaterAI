@@ -3,7 +3,7 @@
 A complete inventory is REVIEW_PACKAGE_READY, never Gate A PASS.
 Evidence references and review decisions must be verified by a separate authority.
 """
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urlsplit
 import ipaddress
 from pf_gate_a_checklist import REQUIRED_EVIDENCE
@@ -66,7 +66,7 @@ def inspect_inventory(entries, now=None):
         except ValueError:
             result["invalid"].append(key)
             continue
-        if observed.tzinfo is None or observed > moment:
+        if observed.tzinfo is None or observed > moment or moment - observed > timedelta(days=7):
             result["invalid"].append(key)
     if not result["missing"] and not result["invalid"]:
         result["state"] = "REVIEW_PACKAGE_READY"

@@ -12,6 +12,7 @@ on:
       - 'scripts/build_v703_feed.py'
       - 'tests/**'
       - 'requirements.txt'
+      - 'data/verified_overrides.json'
 
 permissions:
   contents: write
@@ -52,7 +53,7 @@ jobs:
           PY
       - name: Collect audited macro observations
         run: |
-          python "系統工程/總經V70/找24項總經資料.py" --out build/macro24 --cache data/24_macro_verification.json
+          python "系統工程/總經V70/找24項總經資料.py" --out build/macro24 --cache data/24_macro_verification.json --overrides data/verified_overrides.json
       - name: Generate V70.3 feed contract
         run: |
           python scripts/build_v703_feed.py --input build/macro24/24_macro_verification.json --output build/macro24/V70_macro_latest.json

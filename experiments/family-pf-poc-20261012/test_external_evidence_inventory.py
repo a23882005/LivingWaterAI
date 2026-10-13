@@ -55,3 +55,18 @@ def test_no_unobserved_evidence_claims_allowed():
 
 def test_naive_validation_clock_holds():
     assert inspect_inventory(records(), datetime(2026,10,14))["state"] == "HOLD"
+
+
+def test_stale_evidence_rejected():
+    items=records()
+    items['audit_denials_verified']['observed_at']=(NOW-timedelta(days=8)).isoformat()
+    result=inspect_inventory(items,NOW)
+    assert result['state']=='HOLD'
+    assert result['invalid']==['audit_denials_verified']
+
+def test_fresh_evidence_within_window_review_only():
+    items=records()
+    items['audit_denials_verified']['observed_at']=(NOW-timedelta(days=6)).isoformat()
+    result=inspect_inventory(items,NOW)
+    assert result['state']=='REVIEW_PACKAGE_READY'
+    assert result['gate_a']=='HOLD'

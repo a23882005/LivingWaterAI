@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T06:03:26.646009+08:00",
+  "generated_at": "2026-10-14T06:11:54.700032+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 14,
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.209999,
+      "value": 102.208,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.790001,
+      "value": 94.709999,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -234,7 +234,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "Sahm U3 calculation failed: Sahm missing recent monthly observations: 2025-10 | SAHMCURRENT fallback failed: All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed."
+      "error": "Sahm U3 calculation failed: Sahm missing recent monthly observations: 2025-10; 2025-10 CPS not collected per BLS: https://www.bls.gov/cps/methods/2025-federal-government-shutdown-impact-cps.htm | SAHMCURRENT fallback fai"
     },
     "m19": {
       "id": "m19",

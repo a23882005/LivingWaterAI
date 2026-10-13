@@ -1,4 +1,4 @@
-name: LivingWaterAI Macro24 Daily (11:00 Taiwan) / 24-Item Collector Only
+name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
 
 on:
   schedule:
@@ -8,7 +8,10 @@ on:
   push:
     paths:
       - '.github/workflows/update-v70.yml'
-      - '系統工程/總經V70/找24項總經資料.py'
+      - '系統工程/總經V70/總經爬蟲程式16項.py'
+      - '系統工程/總經V70/ChatGPT 總經爬蟲8項.md'
+      - '系統工程/總經V70/每天總經及html更新程序.md'
+      - '系統工程/總經V70/V70-3-10.html'
       - 'scripts/build_v703_feed.py'
       - 'tests/**'
       - 'requirements.txt'
@@ -23,7 +26,7 @@ concurrency:
 
 jobs:
   macro24:
-    # Independent V70.3 source pipeline. Do not deploy or overwrite HTML/site files.
+    # V70.3 daily macro 8+16: verify published data first; Hostinger deployment requires independently validated credentials and rollout gate.
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -40,8 +43,8 @@ jobs:
           pip install -r requirements.txt
       - name: QA 24-item collector and adapter
         run: |
-          python -m py_compile "系統工程/總經V70/找24項總經資料.py" scripts/build_v703_feed.py
-          python "系統工程/總經V70/找24項總經資料.py" --self-test
+          python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py
+          python "系統工程/總經V70/總經爬蟲程式16項.py" --self-test
           python - <<'PY'
           import sys
           sys.path.insert(0, 'scripts')
@@ -53,7 +56,11 @@ jobs:
           PY
       - name: Collect audited macro observations
         run: |
-          python "系統工程/總經V70/找24項總經資料.py" --out build/macro24 --cache data/24_macro_verification.json --overrides data/verified_overrides.json
+          if [ ! -f data/verified_overrides.json ]; then
+            echo 'ERROR: verified_overrides.json missing; do not publish stale or fabricated HTML'
+            exit 1
+          fi
+          python "系統工程/總經V70/總經爬蟲程式16項.py" --out build/macro24 --cache data/24_macro_verification.json --overrides data/verified_overrides.json
       - name: Generate V70.3 feed contract
         run: |
           python scripts/build_v703_feed.py --input build/macro24/24_macro_verification.json --output build/macro24/V70_macro_latest.json
@@ -90,4 +97,4 @@ jobs:
             git pull --rebase origin main
             git push
           fi
-          echo "V70.3 feed saved under data/, not yet published beside hosted HTML." >> "$GITHUB_STEP_SUMMARY"
+          echo "Canonical website source: 系統工程/總經V70/V70-3-10.html; Hostinger public_html/index.html upload/restore not yet implemented in this workflow." >> "$GITHUB_STEP_SUMMARY"

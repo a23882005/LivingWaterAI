@@ -106,6 +106,8 @@ class Fetcher:
             providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
         if series in bls_map:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
+        if series in bls_map:
+            providers.insert(1,('BLS_HISTORY_V1','https://api.bls.gov/publicAPI/v1/timeseries/data/'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -114,14 +116,14 @@ class Fetcher:
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
         for provider,url in providers:
             try:
-                if provider=='BLS_HISTORY_V2':
+                if provider in ('BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     current_year=dt.datetime.now().year
                     payload={'seriesid':[bls_map[series]],'startyear':str(current_year-3),'endyear':str(current_year)}
                     response=self.s.post(url,json=payload,timeout=(5,self.timeout))
                 else:
                     response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2'):
+                if provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     obj=response.json()
                     if obj.get('status')!='REQUEST_SUCCEEDED':
                         raise ValueError('BLS response: '+str(obj.get('message'))[:130])

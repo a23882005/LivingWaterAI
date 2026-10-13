@@ -18,11 +18,6 @@ def verify_package(entries, local_paths, now=None):
         path=local_paths.get(key)
         if not isinstance(path,(str,Path)):
             return result
-        digest=entries[key]["sha256"]
-        if digest in seen_digests:
-            result["artifacts"][key]="duplicate_artifact_digest"
-            return result
-        seen_digests.add(digest)
         try:
             canonical=Path(path).resolve(strict=False)
         except (OSError, RuntimeError, ValueError):
@@ -32,6 +27,11 @@ def verify_package(entries, local_paths, now=None):
             result["artifacts"][key]="duplicate_artifact_path"
             return result
         seen_paths.add(canonical)
+        digest=entries[key]["sha256"]
+        if digest in seen_digests:
+            result["artifacts"][key]="duplicate_artifact_digest"
+            return result
+        seen_digests.add(digest)
         checked=check_artifact(path,entries[key]["sha256"])
         result["artifacts"][key]=checked["reason"]
         if not checked["match"]:

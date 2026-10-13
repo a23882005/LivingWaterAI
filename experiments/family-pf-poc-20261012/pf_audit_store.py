@@ -87,10 +87,11 @@ class AuditStore:
 
     def export_anchor(self):
         """A snapshot to store outside the DB via an independent trusted channel."""
-        count=self.verify()
         with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            count=self.verify()
             latest=db.execute("SELECT mac FROM audit_events ORDER BY seq DESC LIMIT 1").fetchone()
-        return {"event_count":count,"last_mac":latest[0] if latest else "GENESIS"}
+            return {"event_count":count,"last_mac":latest[0] if latest else "GENESIS"}
 
     def verify_anchor(self, anchor):
         """Detect record loss against previously exported external evidence."""

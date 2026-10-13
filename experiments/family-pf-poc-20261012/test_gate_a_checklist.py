@@ -67,3 +67,18 @@ def test_integer_one_not_accepted_as_evidence():
 def test_unexpected_evidence_does_not_override_missing_required():
     evidence={'release_approved':True,'local_ci_passed':True}
     assert evaluate_gate_a(evidence)=={'state':'HOLD','missing':list(REQUIRED_EVIDENCE)}
+
+
+def test_each_required_evidence_explicit_false_blocks_review():
+    for field in REQUIRED_EVIDENCE:
+        checks={name:True for name in REQUIRED_EVIDENCE}
+        checks[field]=False
+        result=evaluate_gate_a(checks)
+        assert result=={"state":"HOLD","missing":[field]}
+
+def test_multiple_missing_evidence_reports_all_missing():
+    checks={name:True for name in REQUIRED_EVIDENCE}
+    missing=(REQUIRED_EVIDENCE[0],REQUIRED_EVIDENCE[-1])
+    for field in missing:
+        checks[field]=False
+    assert evaluate_gate_a(checks)=={"state":"HOLD","missing":list(missing)}

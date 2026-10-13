@@ -24,7 +24,7 @@ def reconcile_review_claims(claims):
             result["reason"] = "invalid_claim"
             return result
         verdict = inspect_claimed_review(claim)
-        if verdict["reason"] == "invalid_review_input":
+        if verdict["reason"] in ("invalid_review_input", "incomplete_review_claim"):
             result["reason"] = "invalid_claim"
             return result
     for key in REVIEW_CHECKS:

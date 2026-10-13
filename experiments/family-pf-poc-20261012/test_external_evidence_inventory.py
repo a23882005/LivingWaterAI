@@ -70,3 +70,9 @@ def test_fresh_evidence_within_window_review_only():
     result=inspect_inventory(items,NOW)
     assert result['state']=='REVIEW_PACKAGE_READY'
     assert result['gate_a']=='HOLD'
+
+
+def test_odd_url_separator_stays_hold():
+    items=records()
+    items['remote_https_reachable']['evidence_url']='https://auditor.example.org/a' + chr(92) + 'b'
+    assert inspect_inventory(items,NOW)['state']=='HOLD'

@@ -32,12 +32,18 @@ def check_artifact(path, expected_digest):
             if opened.st_size > MAX_BYTES:
                 result["reason"] = "oversized_file"
                 return result
+            before = (opened.st_dev, opened.st_ino, opened.st_size, opened.st_mtime_ns, opened.st_ctime_ns)
             while block := stream.read(65536):
                 total += len(block)
                 if total > MAX_BYTES:
                     result["reason"] = "oversized_file"
                     return result
                 digest.update(block)
+            finished = os.fstat(stream.fileno())
+            after = (finished.st_dev, finished.st_ino, finished.st_size, finished.st_mtime_ns, finished.st_ctime_ns)
+            if after != before:
+                result["reason"] = "file_changed_during_read"
+                return result
         result["match"] = hmac.compare_digest(digest.hexdigest(), expected_digest)
         result["reason"] = "digest_match" if result["match"] else "digest_mismatch"
         return result

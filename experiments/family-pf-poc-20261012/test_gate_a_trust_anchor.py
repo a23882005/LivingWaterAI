@@ -72,3 +72,13 @@ def test_wrong_fingerprint_rejected():
 def test_uppercase_fingerprint_is_review_only():
     p,s,key,fp=evidence()
     assert review_with_pinned_reviewer(p,s,key,fp.upper(),NOW)['state']=='ATTESTED_FOR_REVIEW'
+
+
+def test_unsigned_claims_with_valid_fingerprint_hold():
+    p,s,key,fp=evidence()
+    assert review_with_pinned_reviewer(p,'',key,fp,NOW)['state']=='HOLD'
+
+def test_signed_claims_with_wrong_reviewer_role_hold():
+    p,s,key,fp=evidence()
+    p['reviewer_role']='developer'
+    assert review_with_pinned_reviewer(p,s,key,fp,NOW)['state']=='HOLD'

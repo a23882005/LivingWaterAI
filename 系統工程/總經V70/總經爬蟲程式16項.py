@@ -155,7 +155,7 @@ class Fetcher:
                 if data.empty: raise ValueError('No numeric observations')
                 out=pd.Series(data['value'].to_numpy(),index=pd.DatetimeIndex(data['date']),name=series)
                 self.fredcache[series]=out
-                self.fredsources[series]=(provider,url)
+                self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:

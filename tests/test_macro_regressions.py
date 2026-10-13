@@ -66,7 +66,7 @@ class MacroRegression(unittest.TestCase):
                 dates=pd.date_range("2025-07-01",periods=15,freq="MS")
                 dates=dates[dates.to_period("M")!=pd.Period("2025-10")]
                 return pd.Series([4.0]*len(dates),index=dates)
-        with self.assertRaises(RuntimeError) as ctx:
+        with self.assertRaises(ValueError) as ctx:
             macro.sahm_from_unrate(Gap())
         self.assertIn("2025-10 CPS not collected per BLS",str(ctx.exception))
 

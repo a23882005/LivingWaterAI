@@ -58,3 +58,19 @@ def test_reused_audit_keys_fail_closed(env,tmp_path):
     with pytest.raises(ValueError):
         attach_production_mcp(c.app,verifier,scope,config)
     assert all(getattr(r,'path',None)!='/mcp' for r in c.app.routes)
+
+def test_invalid_audit_key_encoding_denied_before_route(env,tmp_path):
+    c,scope,sign,verifier,_=env
+    config=audit_env(tmp_path)
+    config["PF_AUDIT_INTEGRITY_KEY_B64"]="!invalid!"
+    with pytest.raises(ValueError):
+        attach_production_mcp(c.app,verifier,scope,config)
+    assert all(getattr(r,"path",None)!="/mcp" for r in c.app.routes)
+
+def test_relative_audit_path_denied_before_route(env,tmp_path):
+    c,scope,sign,verifier,_=env
+    config=audit_env(tmp_path)
+    config["PF_AUDIT_DB_PATH"]="relative.sqlite"
+    with pytest.raises(ValueError):
+        attach_production_mcp(c.app,verifier,scope,config)
+    assert all(getattr(r,"path",None)!="/mcp" for r in c.app.routes)

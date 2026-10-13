@@ -39,6 +39,13 @@ class MacroRegression(unittest.TestCase):
             self.assertEqual(r["value"],2.4)
             mocked.assert_called_once()
 
+    def test_cpi_provider_without_provenance(self):
+        class BareProvider:
+            def fred(self,key):
+                return pd.Series([300,315],index=pd.to_datetime(["2025-09-01","2026-09-01"]))
+        r=macro.core_cpi(BareProvider())
+        self.assertEqual(r["value"],5.0)
+
     def test_future_date_rejected(self):
         import datetime as dt
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()

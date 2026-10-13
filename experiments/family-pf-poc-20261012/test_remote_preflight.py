@@ -101,3 +101,22 @@ def test_private_issuer_addresses_fail_closed(issuer):
         result=verify_remote_metadata(URL,client)
     assert result["metadata"]=="NOT_VERIFIED"
     assert result["gate_a"]=="HOLD"
+
+
+def test_server_error_keeps_gate_on_hold():
+    with httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(500))) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result['metadata'] == 'NOT_VERIFIED'
+    assert result['gate_a'] == 'HOLD'
+
+def test_malformed_metadata_keeps_gate_on_hold():
+    with httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, text='invalid json'))) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result['metadata'] == 'NOT_VERIFIED'
+    assert result['gate_a'] == 'HOLD'
+
+def test_empty_metadata_keeps_gate_on_hold():
+    with httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={}))) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result['metadata'] == 'NOT_VERIFIED'
+    assert result['gate_a'] == 'HOLD'

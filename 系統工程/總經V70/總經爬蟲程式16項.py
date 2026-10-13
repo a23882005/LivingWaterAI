@@ -125,7 +125,10 @@ class Fetcher:
                     obj=response.json()
                     if obj.get('status')!='REQUEST_SUCCEEDED':
                         raise ValueError('BLS response: '+str(obj.get('message'))[:130])
-                    dataset=obj['Results']['series'][0]['data']
+                    data_series=obj['Results']['series']
+                    if len(data_series)!=1 or data_series[0].get('seriesID')!=bls_map[series]:
+                        raise ValueError('BLS_RESPONSE_SERIES mismatch')
+                    dataset=data_series[0]['data']
                     monthly=[x for x in dataset if x.get('period','').startswith('M') and x['period']!='M13']
                     dates=pd.to_datetime([x['year']+'-'+x['period'][1:]+'-01' for x in monthly],errors='coerce')
                     values=pd.to_numeric([x['value'].replace(',','') for x in monthly],errors='coerce')

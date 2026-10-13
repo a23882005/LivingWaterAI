@@ -150,3 +150,28 @@ def test_append_rejects_corrupt_audit_history(tmp_path):
         store.append(event(request="second"))
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT count(*) FROM audit_events").fetchone()[0]==1
+
+def test_reopen_refuses_append_after_historical_mutation(tmp_path):
+    path=tmp_path/"restart.sqlite"
+    original=AuditStore(path,KEY)
+    original.append(event(request="first"))
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE audit_events SET reason='modified' WHERE seq=1")
+    reopened=AuditStore(path,KEY)
+    with pytest.raises(AuditIntegrityError):
+        reopened.append(event(request="second"))
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0]==1
+
+def test_append_after_prior_failure_rolls_back_cleanly(tmp_path):
+    path=tmp_path/"rollback.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event(request="first"))
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE audit_events SET reason='modified' WHERE seq=1")
+    with pytest.raises(AuditIntegrityError):
+        store.append(event(request="bad"))
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE audit_events SET reason='foreign_client' WHERE seq=1")
+    assert store.append(event(request="recovered"))==2
+    assert store.verify()==2

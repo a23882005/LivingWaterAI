@@ -62,3 +62,18 @@ def test_file_under_size_cap_matches(tmp_path):
     out=check_artifact(p,hashlib.sha256(p.read_bytes()).hexdigest())
     assert out["reason"]=="digest_match"
     assert out["gate_a"]=="HOLD"
+
+def test_artifact_digest_result_never_authorizes_release(tmp_path):
+    p=tmp_path/"evidence.bin"
+    p.write_bytes(b"synthetic")
+    out=check_artifact(p,hashlib.sha256(b"synthetic").hexdigest())
+    assert out["match"] is True
+    assert out["state"]=="HOLD"
+    assert out["gate_a"]=="HOLD"
+
+def test_mismatched_digest_stays_hold(tmp_path):
+    p=tmp_path/"evidence.bin"
+    p.write_bytes(b"new")
+    out=check_artifact(p,hashlib.sha256(b"old").hexdigest())
+    assert out["match"] is False
+    assert out["gate_a"]=="HOLD"

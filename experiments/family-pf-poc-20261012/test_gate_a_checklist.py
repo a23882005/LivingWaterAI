@@ -22,4 +22,4 @@ def test_non_boolean_claim_cannot_count_as_proof():
 
 def test_complete_evidence_checklist_is_eligible_for_review():
     evidence={key:True for key in REQUIRED_EVIDENCE}
-    assert evaluate_gate_a(evidence)=={"state":"PASS","missing":[]}
+    assert evaluate_gate_a(evidence)=={"state":"READY_FOR_REVIEW","missing":[]}

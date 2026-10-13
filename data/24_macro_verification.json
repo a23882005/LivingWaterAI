@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T05:52:11.000510+08:00",
+  "generated_at": "2026-10-14T05:55:23.257296+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 14,
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.198997,
+      "value": 102.205002,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -234,7 +234,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "Sahm U3 calculation failed: Sahm requires consecutive months | SAHMCURRENT fallback failed: All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): "
+      "error": "Sahm U3 calculation failed: Sahm missing recent monthly observations: 2025-10 | SAHMCURRENT fallback failed: All FRED sources failed for SAHMCURRENT | FRED_CSV: ConnectionError: HTTPSConnectionPool(host='fred.stlouisfed."
     },
     "m19": {
       "id": "m19",

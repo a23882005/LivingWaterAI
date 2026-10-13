@@ -103,7 +103,9 @@ class AuditStore:
 
     def verify_anchor(self, anchor):
         """Detect record loss against previously exported external evidence."""
-        if not isinstance(anchor,dict) or set(anchor)!={"event_count","last_mac"}:
+        if (not isinstance(anchor,dict) or set(anchor)!={"event_count","last_mac"}
+                or type(anchor["event_count"]) is not int or anchor["event_count"]<0
+                or not isinstance(anchor["last_mac"],str)):
             raise AuditIntegrityError("Untrusted anchor shape")
         current=self.export_anchor()
         if current!=anchor:

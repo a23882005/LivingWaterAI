@@ -25,7 +25,7 @@ def _safe_reference(ref):
                 return False
         except ValueError:
             pass
-        return bool(parts.path and parts.path != "/" and "\\" not in parts.path and not any(ord(ch) < 32 or ord(ch) == 127 for ch in ref))
+        return bool(parts.path and parts.path != "/" and "\\" not in parts.path and not any(ord(ch) < 32 or ord(ch) == 127 for ch in ref) and not any(ch.isspace() for ch in ref))
     except (TypeError, ValueError):
         return False
 

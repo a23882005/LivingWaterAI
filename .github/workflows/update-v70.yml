@@ -111,6 +111,11 @@ jobs:
                   print(key, item.get('status'), str(item.get('error') or item.get('detail') or '')[:200])
           print('V70.3:',feed['verification']['valid'],'/21; ready=',feed['verification']['ready'])
           PY
+      - name: Write diagnostic summary on failure
+        if: failure()
+        run: |
+          echo "Macro pipeline failed; download macro24-audit artifact or inspect preceding step logs." >> "$GITHUB_STEP_SUMMARY"
+          echo "No missing item may be represented as a verified market observation." >> "$GITHUB_STEP_SUMMARY"
       - name: Publish audit artifact (even when data incomplete)
         if: always()
         uses: actions/upload-artifact@v4

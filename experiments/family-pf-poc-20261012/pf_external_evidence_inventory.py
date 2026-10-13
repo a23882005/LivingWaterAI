@@ -6,6 +6,7 @@ Evidence references and review decisions must be verified by a separate authorit
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlsplit
 import ipaddress
+import re
 from pf_gate_a_checklist import REQUIRED_EVIDENCE
 
 def _safe_reference(ref):
@@ -55,6 +56,10 @@ def inspect_inventory(entries, now=None):
             result["invalid"].append(key)
             continue
         if not isinstance(record.get("witness_role"), str) or record["witness_role"] != "independent_security_reviewer":
+            result["invalid"].append(key)
+            continue
+        digest = record.get("sha256")
+        if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:
             result["invalid"].append(key)
             continue
         stamp = record.get("observed_at")

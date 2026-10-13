@@ -166,6 +166,20 @@ class Fetcher:
                 data=data.sort_values('date').drop_duplicates('date',keep='last')
                 if data.empty: raise ValueError('No numeric observations')
                 out=pd.Series(data['value'].to_numpy(),index=pd.DatetimeIndex(data['date']),name=series)
+                # Reject truncated BLS histories before caching: allow the next
+                # provider to supply sufficient data for the actual calculation.
+                if series in bls_map:
+                    monthly=out.groupby(out.index.to_period('M')).last().sort_index()
+                    period=monthly.index[-1]
+                    if series=='UNRATE':
+                        required=pd.period_range(period-14,period,freq='M')
+                    elif series=='PAYEMS':
+                        required=pd.period_range(period-3,period,freq='M')
+                    else:
+                        required=pd.PeriodIndex([period-12,period],freq='M')
+                    missing=[str(p) for p in required if p not in monthly.index]
+                    if missing:
+                        raise ValueError('Insufficient '+series+' history; missing '+','.join(missing))
                 self.fredcache[series]=out
                 self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)

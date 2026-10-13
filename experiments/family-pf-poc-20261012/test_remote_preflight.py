@@ -247,3 +247,27 @@ def test_invalid_content_type_never_claims_external_oauth():
     assert result["metadata"]=="NOT_VERIFIED"
     assert result["external_oauth_login"]=="NOT_TESTED"
     assert result["gate_a"]=="HOLD"
+
+
+@pytest.mark.parametrize("value", [
+    None,
+    123,
+    [],
+    {},
+    "not-a-url",
+])
+def test_invalid_url_argument_is_rejected(value):
+    with pytest.raises((ValueError, TypeError, AttributeError)):
+        validated_url(value)
+
+def test_successful_metadata_always_requires_independent_review():
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda req:httpx.Response(200,json={
+            "resource":URL,"authorization_servers":["https://auth.example.com"]
+        }))) as client:
+        result=verify_remote_metadata(URL,client)
+    assert result["metadata"]=="DISCOVERABLE"
+    assert result["external_oauth_login"]=="NOT_TESTED"
+    assert result["cross_client_isolation"]=="NOT_TESTED"
+    assert result["audit_logs"]=="NOT_TESTED"
+    assert result["gate_a"]=="HOLD"

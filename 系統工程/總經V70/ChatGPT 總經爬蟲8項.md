@@ -7,7 +7,7 @@
 ## 一、兩部分正式順序（先AI八項，再Python十六項）
 
 1. **第一步《ChatGPT 總經爬蟲8項.md》**：ChatGPT 先依本文件查證固定8項，完成真實日期、來源、單位、口徑與數值的證據核對；無法確認就標 MISSING，不編造。
-2. **第二步《總經爬蟲16項.py》**：執行 Python 自動查詢 FRED／Yahoo Finance／CNN，取得16欄（包含 VIX 共用欄），並保留24欄 JSON 結構。未自動取得的8欄先標 MISSING。
+2. **第二步《總經爬蟲程式16項.py》**：執行 Python 自動查詢 FRED／Yahoo Finance／CNN，取得16欄（包含 VIX 共用欄），並保留24欄 JSON 結構。未自動取得的8欄先標 MISSING。
 3. **第三步合併與 QA**：將已核實的8項整理為 `verified_overrides.json`，用 Python `--overrides` 合併，核對24欄來源、觀測日期、單位、數值與 OK／STALE／MISSING。16項其中抓取失敗者可再由 ChatGPT 查證補值。
 4. **第四步產製報告**：查核完成後再分析七群風險、V70.3、V82、債券V75及完整每日總經報告；關鍵欄位不足時 HOLD 或標示信心降低，不將示範數值當正式判斷。
 5. **第五步 GitHub 交接**：只有實際寫入交接檔且讀回驗證，才稱已交給 GitHub Actions；僅修改 Task 文字不代表資料已自動送達。
@@ -47,7 +47,7 @@
 
 - Python 第二步產出 `24_macro_verification.json`、`24_macro_verification.csv`、`24_macro_report.md`。
 - ChatGPT 先查8項，必要時再補查 Python 第二步本輪其他 `MISSING`／需重查項目。逐筆完成來源與日期驗證後，放入 `verified_overrides.json`。
-- 使用同一支Python重新執行（例如 `python "總經爬蟲16項.py" --overrides verified_overrides.json --cache Python 輸出路徑/24_macro_verification.json --out 合併輸出路徑`）。歷史快取只作 STALE 備援，不能冒充新值。
+- 使用同一支Python重新執行（例如 `python "總經爬蟲程式16項.py" --overrides verified_overrides.json --cache Python 輸出路徑/24_macro_verification.json --out 合併輸出路徑`）。歷史快取只作 STALE 備援，不能冒充新值。
 - 核對 `m07` 與 `s03` 同值、`m06` 單位「碼」、`m14` 單位 USD bn、`m17` 單位 pp，並在決策前審核每個重要欄位的資料新鮮度。
 - 需要將 ChatGPT 補值自動寫回 GitHub，須另行具備**可用的授權執行工具、實際寫入與讀回驗證**；只改 Task 描述並不等於 GitHub Actions 能直接呼叫 ChatGPT。
 

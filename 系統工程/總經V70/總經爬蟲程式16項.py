@@ -169,7 +169,11 @@ class Fetcher:
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:
-                errors.append(provider+': '+type(exc).__name__+': '+str(exc).replace(api_key,'[REDACTED]' if api_key else '')[:100])
+                detail=str(exc)
+                if api_key: detail=detail.replace(api_key,'[REDACTED]')
+                diagnostic=provider+': '+type(exc).__name__+': '+detail[:220]
+                errors.append(diagnostic)
+                print('DATA_SOURCE_FAILED',series,diagnostic,flush=True)
         message='All FRED sources failed for '+series+' | '+' | '.join(errors)
         self.frederrors[series]=message
         raise RuntimeError(message)

@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+
+<!-- V70.3 全量改造版 2026/10/13：由 V70_Live.html 完整繼承；原始資料日期不等於當日即時數據。｜Ownership Contract：Strategic Risk Budget／S0-B0 Rule Owner=V70；Current/Legacy Producer=Mentor／人工流程；本HTML目前只消費已核准S0/B0並執行Macro C/T戰術微調，不自行從客戶風險資料推導S0/B0。V70只輸出股票／債券／V70_ORIGINAL_DRY_POWDER戰術總額度，逐檔股票交V82、逐檔債券交債券V75。 -->
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>投資戰情室 V70.3 (Macro V70.3)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&amp;family=Noto+Sans+TC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+        if (typeof tailwind !== "undefined") tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] },
+                    colors: { 'slate-850': '#151f32' }
+                }
+            }
+        }
+    </script>
+<style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0f172a; color: #f1f5f9; }
+        .raw-input { background-color: #1e293b; border: 1px solid #475569; color: #fff; font-family: 'JetBrains Mono', monospace; text-align: center; font-weight: bold; width: 100%; padding: 0.5rem; border-radius: 0.5rem; }
+        .raw-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .card-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .score-box { font-variant-numeric: tabular-nums; }
+        input[type=range] { -webkit-appearance: none; background: transparent; height: 30px; width: 100%; position: relative; z-index: 20; cursor: default; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 10px; border-radius: 4px; background: #3b82f6; margin-top: -10px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.5); transform: scale(1); opacity: 1 !important; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: transparent; }
+        input[type=range]:disabled { opacity: 1; }
+        .ruler-bg { background: linear-gradient(to right, #22c55e 0%, #eab308 50%, #ef4444 100%); height: 4px; width: 100%; position: absolute; top: 50%; transform: translateY(-50%); border-radius: 2px; z-index: 10; }
+        .ruler-bond-bg { background: linear-gradient(to right, #ef4444 0%, #eab308 50%, #22c55e 100%); height: 4px; width: 100%; position: absolute; top: 50%; transform: translateY(-50%); border-radius: 2px; z-index: 10; }
+        .alloc-bar { transition: width 1s ease-in-out; }
+        .tech-check-item { cursor: pointer; user-select: none; transition: all 0.2s; }
+        .tech-check-item.checked { background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.5); }
+        .check-box { width: 18px; height: 18px; border: 2px solid #64748b; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #0f172a; }
+        .tech-check-item.checked .check-box { background-color: #3b82f6; border-color: #3b82f6; }
+        .tech-check-item.checked .check-box i { opacity: 1; }
+        .timeframe-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 8px; text-transform: uppercase; }
+        .tf-daily { background: #be123c; color: white; } 
+        .tf-weekly { background: #1d4ed8; color: white; }
+    </style>
+<style id="v703-family-readonly-mode">
+/* Family-facing mode: preserve ALL original macro/bond dashboards, but avoid requesting inputs or downloads. */
+#v70-internal-output-contract { display: none !important; }
+/* Family-facing original dashboard values are display-only; system JavaScript can still update them. */
+#v703-legacy-shell input:not([type="hidden"]),
+#v703-legacy-shell textarea,
+#v703-legacy-shell select { pointer-events: none !important; caret-color: transparent; }
+#v703-legacy-shell input[type="range"] { pointer-events: none !important; }
+#v703-legacy-shell #v703-demo-panel { display: none !important; }
+/* Two profile selectors are shown in the family result section below; hide old duplicates only. */
+#v703-legacy-shell label:has(> #life-stage-select),
+#v703-legacy-shell div:has(> label[for="v703-risk-preference"]) { display:none !important; }
+</style>
+<style id="v703-bluegold-final-panel">
+/* 活水書院｜山水霧光：僅作用於家人版結果，原本總經/債券儀表盤保持原樣。 */
+#v703-section.v703-bluegold {
+ background:linear-gradient(180deg,rgba(238,244,240,.95),rgba(225,237,230,.96) 52%,rgba(243,239,224,.98));
+ color:#203d38;border-top:1px solid #b8bea8;
+}
+#v703-section .v703-bluegold-card {
+ position:relative;overflow:hidden;background:linear-gradient(154deg,#f7f7f0 0%,#eef3ec 52%,#e9eee8 100%);
+ border:1px solid #c2c9b8;border-radius:23px;
+ box-shadow:0 18px 45px rgba(34,62,54,.12),0 2px 7px rgba(54,73,60,.06);
+}
+#v703-section .v703-bluegold-card::before {
+ content:"";display:block;height:6px; margin:-20px -20px 20px;
+ background:linear-gradient(90deg,#496c62,#9eae92 42%,#b89b5f 77%,#d0bd83);
+}
+#v703-section h2 {color:#294f46!important;letter-spacing:.025em;line-height:1.38}
+#v703-section .v703-bluegold-card > p,#v703-section #family-news {color:#4f675f!important;line-height:1.8}
+#v703-section #v703-result {
+ background:linear-gradient(165deg,#fffefa,#f9f9f2 70%,#f4f4e9);color:#253e37;
+ border:1px solid #d9d4bf;border-radius:18px;box-shadow:0 9px 25px rgba(48,75,61,.07);
+ padding:24px;line-height:1.85;
+}
+#v703-section #v703-result .text-cyan-200 {color:#275f65!important}
+#v703-section #v703-result .text-blue-300 {color:#275f65!important}
+#v703-section #v703-result .text-green-300 {color:#3b6950!important}
+#v703-section #v703-result .text-yellow-300 {color:#92723a!important}
+#v703-section #v703-result .text-amber-200 {color:#7c6537!important}
+#v703-section #v703-result .text-slate-300,#v703-section #v703-result .text-slate-400 {color:#60766c!important}
+#v703-section #v703-result .border-slate-700\/60,#v703-section #v703-result .border-slate-600 {border-color:#d8dfd6!important}
+#v703-section #v703-result .border-amber-700 {background:#f6f2e6;border:1px solid #d8c49a!important;color:#685334!important;border-radius:12px;padding:14px}
+#v703-section #v703-result b,#v703-section #v703-result strong {font-weight:800}
+#v703-section #v703-result .font-mono {font-family:inherit;font-variant-numeric:tabular-nums}
+#v703-section #v703-result .border-t {border-color:#bba56d!important;color:#2c574c;font-size:1.11rem}
+#v703-section #v703-result .border-b {border-bottom-width:1px}
+@media(max-width:640px){
+ #v703-section{padding:22px 12px}
+ #v703-section .v703-bluegold-card{padding:18px}
+ #v703-section .v703-bluegold-card::before{margin:-18px -18px 18px}
+ #v703-section #v703-result{padding:17px;font-size:15px}
+ #v703-section h2{font-size:1.38rem}
+}
+</style>
+</head>
+<body class="min-h-screen pb-32">
+<nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
+<div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center">
+<div class="bg-gradient-to-br from-slate-700 to-slate-900 p-2 rounded-lg mr-3 shadow-lg border border-slate-600">
+<i class="fas fa-chess-king text-yellow-500 text-lg"></i>
+</div>
+<div><div class="font-bold text-xl leading-none text-white tracking-wider">投資戰情室 V70.3</div><div class="text-xs text-blue-400 mt-1 font-bold">LivingWaterAI｜核准S0/B0 × Macro戰術微調（Rule Owner=V70）</div></div>
+</div>
+<div class="text-right hidden md:block">
+<div class="text-[10px] text-slate-400 uppercase tracking-widest">System Status</div>
+<div class="text-sm font-mono font-bold text-green-400"><i class="fas fa-circle text-[8px] mr-1 animate-pulse"></i>資料狀態依快照</div>
+</div>
+</div>
+</nav>
+<section id="v703-family-profile" class="max-w-7xl mx-auto px-4 mt-5 mb-5" aria-label="家人版配置條件">
+ <div class="rounded-2xl border border-cyan-700 bg-slate-800 p-5 shadow-lg">
+  <h2 class="font-bold text-lg text-cyan-300 mb-2">🍎 家人版｜先選人生情境與投資風格</h2>
+  <p class="text-xs text-slate-300 mb-3">全頁共用同一組設定。下方總經、戰術配置與七類建議會自動連動，不需要再次選擇。</p>
+  <div class="grid gap-3 md:grid-cols-2">
+   <label class="text-sm text-slate-200">人生情境（10種）<select id="family-life" class="mt-2 block w-full bg-slate-950 border border-slate-600 rounded-lg p-3 text-white"><option value="L1">1 小資累積</option><option value="L2" selected>2 穩定上班族</option><option value="L3">3 收入不穩自營</option><option value="L4">4 突然大額資金</option><option value="L5">5 距退休5～10年</option><option value="L6">6 已退休需生活費</option><option value="L7">7 學生</option><option value="L8">8 服兵役</option><option value="L9">9 待業求職</option><option value="L10">10 暫時／長期無法工作</option></select></label>
+   <label class="text-sm text-slate-200">投資風格（4種）<select id="family-style" class="mt-2 block w-full bg-slate-950 border border-slate-600 rounded-lg p-3 text-white"><option value="conservative">保守</option><option value="balanced" selected>平衡</option><option value="growth">平衡成長</option><option value="aggressive">積極</option></select></label>
+  </div>
+ </div>
+</section>
+<div id="v703-legacy-shell"><div class="max-w-7xl mx-auto px-4 mt-6">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-7 space-y-8">
+<div class="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 shadow-xl">
+<div class="card-header p-5 border-b border-slate-700">
+<h2 class="text-xl font-bold text-purple-400 flex items-center">
+<span class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3 text-sm border border-purple-500/30 font-mono">1</span>
+                            Macro 總經 (12大指標)
+                        </h2>
+</div>
+<div class="p-6 grid grid-cols-1 gap-y-6" id="macro-inputs"></div>
+</div>
+
+<div class="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 shadow-xl">
+<div class="card-header p-5 border-b border-slate-700">
+<h2 class="text-xl font-bold text-green-400 flex items-center">
+<span class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center mr-3 text-sm border border-green-500/30 font-mono">3</span>
+                            債券戰區
+                        </h2>
+</div>
+<div class="p-6">
+<div class="mb-6 p-4 bg-slate-900/60 rounded-xl border border-slate-700">
+<p class="text-sm font-bold text-slate-300 mb-3 border-b border-slate-700 pb-2"><i class="fas fa-calculator mr-2 text-slate-500"></i>實質收益率 (bScore) 公式：</p>
+<div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+<div>
+<a class="text-blue-400 hover:text-white border-b border-dashed border-slate-600 transition-colors" href="https://fred.stlouisfed.org/series/DGS10" target="_blank">10Y Yield</a>
+<span>: 5.242%</span>
+</div>
+<span>-</span>
+<div>
+<a class="text-blue-400 hover:text-white border-b border-dashed border-slate-600 transition-colors" href="https://tradingeconomics.com/united-states/core-inflation-rate" target="_blank">Core CPI</a>
+<span>: 2.6%</span>
+</div>
+<span>=</span>
+<span class="text-white font-bold text-sm">2.64%</span>
+</div>
+<p class="text-xs text-slate-500 mt-3 border-t border-slate-700/50 pt-2"><i class="fas fa-info-circle mr-1"></i> 下方數值由系統背景資料更新；家人無須輸入。</p>
+</div>
+<div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-slate-300">實質收益率檢核</h3>
+<span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-600 font-mono"><span class="text-red-400">0分:-1.0%</span> | <span class="text-yellow-400">5分:+0.5%</span> | <span class="text-green-400">10分:+2.0%</span></span>
+</div>
+<div class="flex gap-4 items-center">
+<div class="relative"><input class="raw-input w-24" id="bond-raw" oninput="updateBond(this.value)" type="text" value="2.64"/><span class="absolute right-2 top-2 text-xs text-slate-500">%</span></div>
+<div class="flex-1 relative h-8">
+<div class="ruler-bond-bg"></div>
+<input class="w-full h-full absolute top-0 z-20 opacity-100" disabled="" id="bond-slider" max="10" min="0" step="0.1" type="range" value="5"/>
+</div>
+<div class="w-12 text-right font-mono font-bold text-xl text-green-400" id="bond-score-display">5.0</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 space-y-6">
+<div class="lg:sticky lg:top-24 space-y-6">
+<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl relative overflow-hidden">
+<div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總倉位)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">0.0</div></div>
+<div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width: 50%"></div></div>
+<div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">...</div>
+<div class="hidden absolute inset-0 bg-red-900/95 flex flex-col items-center justify-center text-white z-20 backdrop-blur-md" id="circuit-breaker-overlay">
+<i class="fas fa-radiation text-6xl mb-4 animate-pulse text-yellow-400"></i>
+<div class="text-2xl font-bold uppercase tracking-widest border-b-2 border-white pb-2 mb-2">系統熔斷</div>
+<div class="text-lg font-mono text-red-200">VIX ≥ 35 TRIGGERED</div>
+</div>
+</div>
+
+<div class="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl border border-slate-600 shadow-2xl p-6">
+<h3 class="text-lg font-bold text-white mb-4 flex items-center border-b border-slate-700 pb-4"><i class="fas fa-chart-pie text-yellow-400 mr-3"></i>V70.3 戰術配置</h3>
+<div class="mb-4 bg-slate-900/40 border border-slate-700 rounded-xl p-3">
+<div class="text-[11px] text-slate-400 mb-2 font-bold">長期股債基準 S0/B0（10×4 自動計算／核准覆蓋）</div>
+<div class="grid grid-cols-2 gap-3">
+<label class="text-[10px] text-slate-400">股票 S0 (%)
+                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white font-mono" id="strategic-stock" readonly title="由10×4矩陣自動決定" max="100" min="0" onchange="syncStrategicAllocation('stock')" step="1" type="number" value="60"/>
+</label>
+<label class="text-[10px] text-slate-400">債券 B0 (%)
+                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white font-mono" id="strategic-bond" readonly title="由10×4矩陣自動決定" max="100" min="0" onchange="syncStrategicAllocation('bond')" step="1" type="number" value="40"/>
+</label>
+</div>
+<div class="mt-2 text-[10px] text-blue-300" id="mentor-base-note">核准基準：60 / 40。Rule Owner=V70；Current/Legacy Producer=Mentor／人工流程；V70.3會套用已核准 S0/B0；未載入核准矩陣時採明確標示的候選預覽，並做總經戰術調整。</div>
+<div class="mt-1 text-[10px] text-yellow-300" id="tactical-tilt-note">戰術微調：計算中...</div>
+</div>
+<div class="mb-4">
+<label class="block text-[11px] text-slate-400 mb-1" for="life-stage-select">人生情境｜參與 S0／B0 計算（債券逐檔仍由 V75 判斷）</label>
+<select class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white" id="life-stage-select" onchange="v703ApplyApprovedMatrix()">
+<option value="L1">1 小資累積</option>
+<option selected="" value="L2">2 穩定上班族</option>
+<option value="L3">3 收入不穩自營</option>
+<option value="L4">4 突然大額資金</option>
+<option value="L5">5 距退休5～10年</option>
+<option value="L6">6 已退休需生活費</option>
+<option value="L7">7 學生</option>
+<option value="L8">8 服兵役</option>
+<option value="L9">9 待業求職</option>
+<option value="L10">10 暫時／長期無法工作</option>
+</select>
+<div class="mt-1 text-[10px] text-slate-500" id="bond-location-note">V70.3的人生情境會參與候選／核准 S0／B0 計算；個別債券久期、信用與買賣價格由債券V75驗證。</div>
+</div>
+<div class="mt-3 rounded-lg border border-cyan-800 p-3 text-xs text-slate-200">
+<label for="v703-risk-preference" class="font-semibold">四種投資風格（大旋鈕既有分類）</label>
+<select id="v703-risk-preference" class="mt-2 w-full bg-slate-950 p-2 rounded border border-slate-600" onchange="v703SetPreference(this.value)">
+<option value="conservative">保守</option><option value="balanced" selected>平衡</option><option value="growth">平衡成長</option><option value="aggressive">積極</option></select>
+<p id="v703-strategic-source" class="mt-2 text-amber-300">首次預覽採候選10×4矩陣；若載入核准矩陣，則優先採用核准數值。</p>
+</div>
+<div class="my-3 rounded-xl border-2 border-amber-500 bg-amber-950/70 p-3" id="v703-demo-panel" hidden style="display:none !important">
+<strong class="text-amber-200">🍎 家人版完整配置示範</strong>
+<p class="text-xs text-amber-100 mt-1">缺少的資料可暫以各指標風險中間錨點 t5 代入，產生完整七類百分比。示範資料不代表最新市場報價，不會自動永久儲存。</p>
+<div class="flex flex-wrap gap-2 mt-2"><button type="button" id="v703-demo-start" onclick="v703StartDemo()" class="bg-amber-400 text-slate-950 font-bold px-3 py-2 rounded">▶ 以中間數顯示完整結果</button><button type="button" onclick="v703StopDemo()" class="bg-slate-700 text-white px-3 py-2 rounded">退出示範／恢復正式檢查</button></div>
+<div id="v703-demo-banner" role="status" class="mt-2 text-amber-200 font-bold text-sm">目前：正式資料模式</div>
+</div>
+<div id="v703-data-state" role="status" aria-live="polite" class="text-xs text-amber-300 mt-2"></div>
+<div class="space-y-4" id="allocation-list"></div>
+<div class="mt-6 pt-4 border-t border-slate-700 grid grid-cols-3 text-center">
+<div><div class="text-[10px] text-slate-400 uppercase">Dry Powder SGOV</div><div class="font-mono font-bold text-white" id="total-cash">0%</div></div>
+<div><div class="text-[10px] text-slate-400 uppercase">Bond</div><div class="font-mono font-bold text-green-400" id="total-bond">0%</div></div>
+<div><div class="text-[10px] text-slate-400 uppercase">Stock</div><div class="font-mono font-bold text-blue-400" id="total-stock">0%</div></div>
+</div>
+</div>
+<details id="v70-internal-output-contract" hidden style="display:none !important" aria-hidden="true">
+<summary>系統內部資料契約（家人版不顯示）</summary>
+<div class="mt-4 space-y-3">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<label class="text-[10px] text-slate-400">客戶名字
+                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white" id="v70-client-name" type="text" value="客戶名字"/>
+</label>
+<label class="text-[10px] text-slate-400">Run ID（可留空自動產生）
+                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white" id="v70-run-id" placeholder="RUN-YYYYMMDD-HHMMSS" type="text"/>
+</label>
+<label class="text-[10px] text-slate-400">共用資料截止時間／As-of
+                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white" id="v70-snapshot-asof" placeholder="例如 2026/09/13 16:30 台灣時間" type="text"/>
+</label>
+</div>
+<label class="block text-[10px] text-slate-400">最近1～2日重要總經／政策／市場新聞（可由 Mentor／API 注入）
+                                <textarea class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-xs text-white" id="v70-news-input" placeholder="每行一則；正式系統可用 setLivingWaterMacroNews(...) 注入結構化新聞" rows="4"></textarea>
+</label>
+<label class="block text-[10px] text-slate-400">下游共用補充總經快照 JSON（V82／債券V75／報告共用；例如 PPI、CPI、PCE、2Y/10Y/30Y、OAS、MOVE、SOFR/OIS、Repo）
+                                <textarea class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-[11px] font-mono text-white" id="v70-shared-macro-input" placeholder='{"PPI":{"value":0,"unit":"%","dataDate":"YYYY-MM-DD","source":"..."}}' rows="4"></textarea>
+</label>
+<div class="text-[10px] text-slate-400" id="v70-output-status">正式輸出檔名：V70產出-客戶名字.md。V70 原生子彈＝V70_ORIGINAL_DRY_POWDER；最終 SGOV_DRY_POWDER_BUCKET 由 Integration Layer 依固定Contract加總，客戶專案只保存正式結果。</div>
+
+</div>
+</details>
+<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl">
+<h3 class="text-xs text-slate-500 font-bold uppercase mb-3 tracking-widest"><i class="fas fa-bullhorn mr-1"></i>指揮官指令</h3>
+<div class="text-sm text-white mb-3 leading-relaxed border-l-2 border-blue-500 pl-3" id="final-stock">計算中...</div>
+<div class="text-sm text-white leading-relaxed border-l-2 border-green-500 pl-3" id="final-bond">計算中...</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+        // --- 1. 配置 (Config) [Updated V30.3 - Final Fixed] ---
+                        const macroConfig = [
+            // ====== Visible (原 12 大指標 UI 不變) ======
+            { id: 'm07', label: 'VIX 恐慌指數', t0: 14, t5: 20, t10: 35, unit: '', gamma: 2.0, desc: '恐慌封頂：>=28 / >=35', url: "https://www.tradingview.com/chart/?symbol=VIX", val: 14.84 },
+            { id: 'm01', label: '殖利率曲線 (10Y-2Y)', t0: 0.5, t5: 0.2, t10: -0.5, unit: '%', gamma: 1.8, desc: '曲線倒掛風險', url: "https://fred.stlouisfed.org/series/T10Y2Y", val: 0.45 },
+            { id: 'm06', label: 'Fed 降息預期', t0: -4, t5: 0, t10: 2, unit: '碼', gamma: 2.0, desc: '負=降息', manual: false, url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", val: 1.0 },
+
+            { id: 'm08', label: '10Y 實質利率 (Real 10Y)', t0: 1.0, t5: 1.8, t10: 2.5, unit: '%', gamma: 1.8, desc: '危機觸發：>=2.5%', url: "https://fred.stlouisfed.org/series/DFII10", val: 'N/A' },
+
+            { id: 'm03_qqq', label: 'QQQ 估值（TTM P/E，過去12個月本益比）', t0: 18, t5: 30, t10: 45, unit: 'x', gamma: 1.07, desc: '估值風險', calibrated: true, url: "https://tw.stock.yahoo.com/quote/QQQ", val: 29.62 },
+            { id: 'm03_spy', label: 'SPY 估值（TTM P/E，過去12個月本益比）', t0: 14, t5: 22, t10: 32, unit: 'x', gamma: 1.07, desc: '估值風險', url: "https://tw.stock.yahoo.com/quote/SPY", val: 25.15 },
+            { id: 'm03_vt', label: 'VT 估值（TTM P/E，過去12個月本益比）', t0: 12, t5: 18, t10: 28, unit: 'x', gamma: 1.07, desc: '估值風險', url: "https://finance.yahoo.com/quote/VT/", val: 22.23 },
+
+            { id: 'm02', label: '信用利差 HY OAS', t0: 3.0, t5: 4.5, t10: 6.0, unit: '%', gamma: 2.0, desc: '危機觸發：>=6.0%', url: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", val: 'N/A' },
+            { id: 'm04', label: 'PMI 製造業', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.4, desc: '景氣', url: "https://tradingeconomics.com/united-states/business-confidence", val: 52.0 },
+            { id: 'm05', label: '核心通膨 Core CPI YoY', t0: 2.0, t5: 3.0, t10: 4.0, unit: '%', gamma: 1.4, desc: '通膨風險', url: "https://tradingeconomics.com/united-states/core-inflation-rate", val: 2.6 },
+            { id: 'm09', label: '美元 DXY', t0: 98, t5: 103, t10: 108, unit: '', gamma: 1.6, desc: '加速器：>=108/112', url: "https://www.tradingview.com/chart/?symbol=DXY", val: 102.231 },
+            { id: 'm10', label: '油價 WTI', t0: 75, t5: 90, t10: 110, unit: '$', gamma: 1.3, desc: '加速器：>=110/125 (需通膨AND)', url: "https://www.tradingview.com/chart/?symbol=USOIL", val: 91.66 },
+
+            // ====== Hidden (V70.3 三層覆蓋 + 七大群權重 需要，但不顯示，避免破壞「12大指標」UI) ======
+            { id: 'm12', label: 'MOVE 債券波動 (hidden)', t0: 80, t5: 110, t10: 140, unit: '', gamma: 1.8, desc: '恐慌/危機封頂：>=160', url: "https://fred.stlouisfed.org/series/MOVE", val: 59.20, hidden: true },
+
+            { id: 'm13', label: '5Y Breakeven (5yBE) (hidden)', t0: 2.0, t5: 2.5, t10: 3.0, unit: '%', gamma: 1.6, desc: '危機觸發：>=2.6%', url: "https://fred.stlouisfed.org/series/T5YIE", val: 2.53, hidden: true },
+            { id: 'm17', label: '5yBE 近1月上升 (Δ1M) (hidden)', t0: 0.0, t5: 0.15, t10: 0.30, unit: '%pt', gamma: 1.6, desc: '危機觸發：>=0.25', url: "https://fred.stlouisfed.org/series/T5YIE", val: 0.05, hidden: true },
+
+            { id: 'm14', label: '淨流動性 Δ13W (hidden)', t0: 300, t5: 0, t10: -300, unit: '$bn', gamma: 2.0, desc: '危機觸發：<=-500', url: "https://fred.stlouisfed.org/series/WALCL", val: -3.629, hidden: true },
+
+            { id: 'm15', label: 'PMI 服務業 (hidden)', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.4, desc: '景氣', url: "https://tradingeconomics.com/united-states/services-pmi", val: 52.0, hidden: true },
+            // 你指出 LEI 現在約 -3.74；這會觸發「衰退層 cap55」
+            { id: 'm16', label: 'LEI YoY (hidden)', t0: 2, t5: 0, t10: -4, unit: '%', gamma: 1.6, desc: '衰退封頂：Sahm≥0.4→cap55；或 LEI連3月<0 且（U3 失業率≥4.5% 或 NFP 3M Avg≤0）→cap55；更強：Sahm≥0.5 或 NFP 3M Avg≤0 或（LEI≤-4 且 U3≥4.5%）→cap45', url: "https://share.google/wKaNN0uj1v392N6bV", val: -3.74, hidden: true },
+
+            { id: 'm18', label: 'Sahm Rule (hidden)', t0: 0.2, t5: 0.4, t10: 0.6, unit: '', gamma: 2.2, desc: '衰退封頂：>=0.4/0.5', url: "https://fred.stlouisfed.org/series/SAHMCURRENT", val: 0.13, hidden: true },
+            { id: 'm19', label: 'U3 失業率 (hidden)', t0: 3.5, t5: 4.5, t10: 5.5, unit: '%', gamma: 1.8, desc: '衰退封頂條件', url: "https://fred.stlouisfed.org/series/UNRATE", val: 4.4, hidden: true },
+            { id: 'm20', label: 'NFP 3M Avg (hidden)', t0: 200, t5: 50, t10: 0, unit: 'K', gamma: 1.6, desc: '衰退封頂：<=0', url: "https://fred.stlouisfed.org/series/PAYEMS", val: -22, hidden: true }
+        ];
+
+        // V70.3: bond real-yield input -> 0..10 score; t0=-1%, t5=0.5%, t10=2%.
+        function updateBond(val) {
+            const raw = String(val ?? '').trim();
+            const num = raw === '' ? NaN : Number(raw);
+            const slider = document.getElementById('bond-slider');
+            const score = document.getElementById('bond-score-display');
+            if (!Number.isFinite(num)) {
+                if (slider) slider.value = 0;
+                if (score) score.textContent = 'NA';
+            } else {
+                const s = num <= -1 ? 0 : num >= 2 ? 10 :
+                    num <= 0.5 ? (num + 1) / 1.5 * 5 : 5 + (num - 0.5) / 1.5 * 5;
+                const rounded = Math.max(0, Math.min(10, s));
+                if (slider) slider.value = rounded;
+                if (score) score.textContent = rounded.toFixed(1);
+            }
+            if (typeof calcTotal === 'function') calcTotal();
+        }
+
+        // Metadata: a user's manual entry date is NOT automatically today's observation date.
+        // For each indicator require a valid observation date and actual source, and check frequency freshness.
+        function v703DateNowUTC() {
+            const d = new Date();
+            return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+        }
+        function v703TradingDaysBetween(date, today) {
+            let n=0; const d=new Date(date.getTime());
+            while(d<today && n<=400) {d.setUTCDate(d.getUTCDate()+1);if(d.getUTCDay()!==0 && d.getUTCDay()!==6)n++;}
+            return n;
+        }
+        window.v703ValidateDates = function() {
+            if(window.v703DemoMode===true) {
+                const ok=macroConfig.every(cfg=>{const e=document.getElementById('in_'+cfg.id);return e&&e.value.trim()!==''&&Number.isFinite(Number(e.value));});
+                window.v703DateIssues=ok?[]:['DEMO:數值不完整'];
+                return ok;
+            }
+            const today=v703DateNowUTC();
+            const problems=[];
+            const configs = Array.isArray(macroConfig) ? macroConfig : [];
+            for (const cfg of configs) {
+                // All numeric macro indicators used by the scoring engine or CAP are mandatory.
+                const val=document.getElementById('in_'+cfg.id);
+                const dt=document.getElementById('v703-date-'+cfg.id);
+                const src=document.getElementById('v703-source-'+cfg.id);
+                const n=val && val.value.trim()!=='' ? Number(val.value) : NaN;
+                const rawDate=dt?.value || '';
+                const date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? new Date(rawDate+'T00:00:00Z') : null;
+                if(!Number.isFinite(n)) {problems.push(cfg.id+':無有效數值');continue;}
+                if(!date || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==rawDate || date>today) {problems.push(cfg.id+':缺少／無效日期');continue;}
+                if(!src?.value.trim()) {problems.push(cfg.id+':缺少資料來源');continue;}
+                const days=Math.floor((today-date)/86400000);
+                const frequency=cfg.frequency || (['m04','m05','m15','m16','m18','m19','m20','m21'].includes(cfg.id)?'monthly':'daily');
+                const stale=frequency==='monthly'?days>45:frequency==='weekly'?days>14:v703TradingDaysBetween(date,today)>3;
+                if(stale) problems.push(cfg.id+':資料過期');
+            }
+            window.v703DateIssues=problems;
+            return problems.length===0;
+        };
+
+        function v703BuildDateControls() {
+            const el=document.getElementById('v703-date-controls');
+            if(!el)return;
+            el.innerHTML = macroConfig.map(cfg=>{
+                const key=cfg.id.replace(/[^a-zA-Z0-9_-]/g,'');
+                return `<div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-center border-b border-slate-700/60 py-2"><label class="text-xs text-slate-200">${key}｜${cfg.label}</label><input type="date" id="v703-date-${key}" class="bg-slate-950 border border-slate-600 rounded p-2 text-xs" aria-label="${key}觀測日期"/><input type="text" id="v703-source-${key}" placeholder="本筆數值的實際來源／網址" class="bg-slate-950 border border-slate-600 rounded p-2 text-xs" aria-label="${key}數據來源"/></div>`;
+            }).join('');
+            for(const cfg of macroConfig){
+                for(const field of ['date','source']){
+                    const el=document.getElementById(`v703-${field}-${cfg.id}`);
+                    if(!el)continue;
+                    try {el.value=localStorage.getItem(`v703-${field}-${cfg.id}`) || '';}catch(e){}
+                    el.addEventListener('change',()=>{
+                        try{localStorage.setItem(`v703-${field}-${cfg.id}`,el.value);}catch(e){}
+                        calcTotal();
+                    });
+                }
+            }
+        }
+
+        function applyGamma(x, g=1.6) { return Math.round(Math.pow(x/10, g) * 100) / 10; }
+                function mapToScore(val, t0, t5, t10, g) { 
+            if (val === '' || val == null || !Number.isFinite(Number(val))) return NaN;
+            val = parseFloat(val);
+            let s = 5.0;
+            const asc = t10 > t0; // asc: higher value = higher risk score
+            if (asc) {
+                if (val <= t0) s = 0;
+                else if (val >= t10) s = 10;
+                else if (val <= t5) s = ((val - t0) / (t5 - t0)) * 5;
+                else s = 5 + ((val - t5) / (t10 - t5)) * 5;
+            } else {
+                // desc: lower value = higher risk score
+                if (val >= t0) s = 0;
+                else if (val <= t10) s = 10;
+                else if (val >= t5) s = ((t0 - val) / (t0 - t5)) * 5;
+                else s = 5 + ((t5 - val) / (t5 - t10)) * 5;
+            }
+            return applyGamma(s, g); 
+        }
+
+        const C_VALUATION_IDS = new Set(['m03_qqq','m03_spy','m03_vt']);
+        const C_VALUATION_ALPHA = 0.7; // C類估值：中線收斂（降振幅）
+
+                function renderInputs(cid, cfg) {
+            const prefix = (cid === 'macro-inputs')
+                ? `<div id="macro-cap-panel" class="bg-slate-900/40 border border-slate-700 rounded-xl p-4 text-xs text-slate-300 leading-relaxed mb-4">
+    <div class="flex items-center justify-between mb-3">
+        <div class="font-bold text-slate-200">V70.3 Macro 三層覆蓋（cap）規則 + 當前數值</div>
+<div class="text-[10px] text-slate-400 font-mono">UI：NFP 3M Avg / U3 失業率</div>
+    </div>
+
+    <!-- 0) 規則（最上面先告知使用者） -->
+    <div class="bg-slate-900/40 border border-slate-700 rounded-lg p-3 mb-4">
+        <div class="font-bold text-slate-200 mb-2">三層覆蓋CAP 規則（請先看規則，再調參數）</div>
+
+        <div class="space-y-3 font-mono leading-relaxed text-slate-200">
+          <div>
+            <div class="text-slate-300">恐慌層</div>
+            <div>A. VIX≥28 → cap70</div>
+            <div>B. VIX≥35 或（VIX≥28 且 MOVE≥140）→ cap60</div>
+          </div>
+
+          <div>
+            <div class="text-slate-300">危機層</div>
+            <div>A. HYOAS≥600bps</div>
+            <div>B. 5yBE≥2.6 且 Δ1M≥0.25</div>
+            <div>C. MOVE≥160</div>
+            <div>D. Δ13W≤-500</div>
+            <div>E. Real10Y≥2.5</div>
+            <div class="text-slate-400">------------------</div>
+            <div class="text-slate-200">以上 ≥2點 cap55；≥3點 cap45</div>
+          </div>
+
+          <div>
+            <div class="text-slate-300">衰退層</div>
+            <div>A. Sahm≥0.4 → cap55</div>
+            <div>B. [（LEI連3月&lt;0）且（U3 失業率≥4.5% 或 NFP 3M Avg≤0）] → cap55</div>
+            <div>C. Sahm≥0.5 或 NFP 3M Avg≤0 或（LEI≤-4 且 U3 失業率≥4.5%）→ cap45</div>
+          </div>
+        </div>
+      </div>
+<!-- 教學：CAP 是什麼（白話版） -->
+    <div class="bg-slate-900/30 border border-slate-700 rounded-lg p-3 mb-4">
+        <div class="font-bold text-slate-200 mb-2">三層覆蓋CAP講解</div>
+        <div class="text-[11px] text-slate-300 leading-relaxed space-y-2">
+            <div>1) <span class="font-bold text-white">mSafe_raw</span> 是「天氣分數」：依七大群風險算出 0–100，分數越高＝越安全。</div>
+            <div>2) <span class="font-bold text-white">CAP</span> 是「保護蓋」：只要遇到恐慌／危機／衰退的明顯訊號，就把分數「封頂」在 70 / 60 / 55 / 45，避免你被假象的高分騙去重倉。</div>
+            <div>3) 你看這一區只要出現 <span class="px-2 py-0.5 rounded bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 text-[10px] font-bold">⚠ 觸發中</span>，代表那一層已經啟動封頂規則。</div>
+            <div>4) 最後用一句話記：<span class="font-bold text-white">mSafe_raw 是「理想分」，mSafe_final 是「戴安全帽後的分」</span>。投資要看 <span class="font-bold text-white">mSafe_final</span>，這是最後的Macro分數。</div>
+        </div>
+    </div>
+
+    <!-- 1) CAP 指標輸入（可點、可改、可理解；分三區） -->
+    <div class="bg-slate-900/40 border border-slate-700 rounded-lg p-3 mb-4">
+        <div class="flex items-center justify-between mb-3">
+            <div class="font-bold text-slate-200">CAP 指標（可點連結看圖／可改值）</div>
+            <div class="text-[10px] text-slate-500">修改後會同步影響下方「目前／結果／封頂」</div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <div class="text-[11px] font-bold text-slate-200 mb-2 flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-300">恐慌層</span>
+                    <span id="cap-badge-panic" class="hidden px-2 py-0.5 rounded bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 text-[10px] font-bold tracking-widest">⚠ 觸發中</span>
+                    <span class="text-slate-500 font-normal">（VIX / MOVE）</span>
+                </div>
+                <div id="cap-controls-panic" class="space-y-3"></div>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-200 mb-2 flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-yellow-500/10 border border-yellow-500/30 text-yellow-300">危機層</span>
+                    <span id="cap-badge-crisis" class="hidden px-2 py-0.5 rounded bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 text-[10px] font-bold tracking-widest">⚠ 觸發中</span>
+                    <span class="text-slate-500 font-normal">（信用 / 通膨 / 流動性 / 利率）</span>
+                </div>
+                <div id="cap-controls-crisis" class="space-y-3"></div>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-200 mb-2 flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-orange-500/10 border border-orange-500/30 text-orange-300">衰退層</span>
+                    <span id="cap-badge-recession" class="hidden px-2 py-0.5 rounded bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 text-[10px] font-bold tracking-widest">⚠ 觸發中</span>
+                    <span class="text-slate-500 font-normal">（景氣 / 就業）</span>
+                </div>
+                <div id="cap-controls-recession" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2) CAP 答案（目前 / 結果 / 封頂） -->
+    <div class="border-t border-slate-700 pt-3">
+        <div id="macro-cap-text" class="space-y-3"></div>
+    </div>
+</div>`
+                : '';
+            document.getElementById(cid).innerHTML = prefix + cfg.map(c => `
+                <div class="relative group ${c.hidden ? "hidden" : ""}"> 
+                    <div class="flex justify-between items-end mb-2"> 
+                        <div class="flex items-center gap-2">
+                            ${c.url ? `<a href="${c.url}" target="_blank" class="text-blue-400 hover:text-white bg-slate-700 p-1 rounded"><i class="fas fa-external-link-alt text-[10px]"></i></a>` : ''}
+                            <label class="font-bold text-sm text-slate-300">${c.label}<span class="text-[9px] text-slate-500 ml-1 border border-slate-600 px-1 rounded">γ${c.gamma||1.6}</span></label> 
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-mono">0:${c.t0} | 5:${c.t5} | 10:${c.t10}</div>
+                    </div> 
+                    <div class="flex gap-4 items-center"> 
+                        <input type="text" id="in_${c.id}" class="raw-input text-sm w-20 h-9" oninput="handleInput('${c.id}')" value="${c.val}"> 
+                        <div class="flex-1 relative h-6 bg-slate-700/50 rounded overflow-hidden">
+                            <div class="ruler-bg"></div>
+                            <input type="range" id="sl_${c.id}" min="0" max="10" step="0.1" value="5" disabled class="w-full h-full absolute top-0 z-20 opacity-100">
+                        </div> 
+                        <div id="sc_${c.id}" class="w-10 text-right font-mono font-bold text-lg text-yellow-400 score-box">5.0</div> 
+                    </div> 
+                </div>`).join('');
+        }
+
+                // --- CAP 指標清單（只做 UI：可點連結看圖／可改值；計算核心不動）---
+        
+
+function syncCapInput(id, val) {
+    // 將 cap 清單的輸入值，寫回原本的 input（in_mxx），並沿用既有 handleInput/calcTotal
+    const src = document.getElementById(`in_${id}`);
+    if (src) src.value = val;
+    try { handleInput(id); } catch (e) {}
+    try { if (id === 'm02') updateCapBps(); } catch (e) {}
+}
+
+function _toNum(x) {
+    if (x === null || x === undefined) return NaN;
+    const s = String(x).trim().replace(/,/g,'');
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : NaN;
+}
+
+function recalcNetLiquidity() {
+    // netLiquidity = FED - RRP - TGA
+    const fedNow = _toNum(document.getElementById('nl_fed_now')?.value);
+    const rrpNow = _toNum(document.getElementById('nl_rrp_now')?.value);
+    const tgaNow = _toNum(document.getElementById('nl_tga_now')?.value);
+
+    const fed13 = _toNum(document.getElementById('nl_fed_13w')?.value);
+    const rrp13 = _toNum(document.getElementById('nl_rrp_13w')?.value);
+    const tga13 = _toNum(document.getElementById('nl_tga_13w')?.value);
+
+    const nowOK = [fedNow, rrpNow, tgaNow].every(Number.isFinite);
+    const pOK = [fed13, rrp13, tga13].every(Number.isFinite);
+
+    const nowNet = nowOK ? (fedNow - rrpNow - tgaNow) : NaN;
+    const pNet = pOK ? (fed13 - rrp13 - tga13) : NaN;
+    const d13w = (Number.isFinite(nowNet) && Number.isFinite(pNet)) ? (nowNet - pNet) : NaN;
+
+    const setText = (id, v) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = Number.isFinite(v) ? String(Math.round(v * 100) / 100) : '—';
+    };
+
+    setText('nl_now_out', nowNet);
+    setText('nl_13w_out', pNet);
+    setText('nl_d13w_out', d13w);
+
+    // 把 Δ13W 回寫到「淨流動性 Δ13W」(m14)
+    if (Number.isFinite(d13w)) {
+        const capInput = document.getElementById('cap_in_m14');
+        if (capInput) capInput.value = String(Math.round(d13w * 100) / 100);
+        syncCapInput('m14', String(d13w));
+    }
+}
+
+
+function updateCapBps() {
+    // HY OAS：輸入用「%」，旁邊顯示 bps（%×100）
+    const el = document.getElementById('cap_bps_m02');
+    const src = document.getElementById('in_m02');
+    if (!el || !src) return;
+    const pct = parseFloat(src.value);
+    if (!isFinite(pct)) { el.textContent = '—'; return; }
+    el.textContent = `${Math.round(pct * 100)} bps`;
+}
+
+function renderCapControls() {
+    // 只渲染「cap 相關」指標（不碰後面計算核心）
+    const groups = {
+        panic:     ['m07','m12'],
+        crisis:    ['m02','m13','m17','m14','m08'],
+        recession: ['m18','m16','m19','m20']
+    };
+
+    const wrap = (id) => macroConfig.find(x => x.id === id);
+
+    const elP = document.getElementById('cap-controls-panic');
+    const elC = document.getElementById('cap-controls-crisis');
+    const elR = document.getElementById('cap-controls-recession');
+    if (!elP || !elC || !elR) return;
+
+    const linkBtn = (url) => url
+        ? `<a href="${url}" target="_blank" class="text-blue-400 hover:text-white bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                <i class="fas fa-external-link-alt text-[10px]"></i>
+           </a>`
+        : `<span class="text-slate-600 bg-slate-800 px-2 py-1 rounded border border-slate-700" title="尚未設定來源連結">
+                <i class="fas fa-link text-[10px]"></i>
+           </span>`;
+
+    const row = (c) => {
+        const unit = c.unit || '';
+        const hint = (c.desc || '').replace(' (hidden)', '');
+        const extra = (c.id === 'm02')
+            ? `<div class="text-[10px] text-slate-500 mt-1">顯示：<span id="cap_bps_m02" class="font-mono text-slate-300">—</span></div>`
+            : '';
+
+        const netliqExtra = (c.id === 'm14')
+            ? `
+                <div class="mt-3 border-t border-slate-700/60 pt-3">
+                    <div class="text-[11px] text-slate-300 font-bold mb-2">用 FED / RRP / TGA 算出 Δ13W（自動回寫到「淨流動性 Δ13W」）
+<div class="small muted" style="margin-top:8px;line-height:1.5;">本期日期：RRP 2026-02-02｜FED/TGA 2026-01-28<br>13週前日期：RRP 2025-11-03｜FED/TGA 2025-10-29</div></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- NOW -->
+                        <div class="bg-slate-900/40 border border-slate-700 rounded-lg p-3">
+                            <div class="text-[11px] text-slate-200 font-bold mb-2">現在（本期）</div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">FED (WALCL) <span class="small muted">(2025-10-29)</span> <span class="small muted">(2026-01-28)</span></span>
+                                        <a href="https://fred.stlouisfed.org/series/WALCL" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_fed_now" type="text" class="raw-input w-28 text-sm" value="6587.568" oninput="recalcNetLiquidity()">
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">RRP (RRPONTSYD) <span class="small muted">(2025-11-03)</span> <span class="small muted">(2026-02-02)</span></span>
+                                        <a href="https://fred.stlouisfed.org/series/RRPONTSYD" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_rrp_now" type="text" class="raw-input w-28 text-sm" value="10.415" oninput="recalcNetLiquidity()">
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">TGA (WTREGEN) <span class="small muted">(2025-10-29)</span> <span class="small muted">(2026-01-28)</span></span>
+                                        <a href="https://fred.stlouisfed.org/series/WTREGEN" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_tga_now" type="text" class="raw-input w-28 text-sm" value="923.042" oninput="recalcNetLiquidity()">
+                                </div>
+                            </div>
+
+                            <div class="mt-2 text-[11px] text-slate-300">
+                                本期 netLiquidity = <span id="nl_now_out" class="font-mono text-slate-100">0</span> <span class="text-slate-500">（同單位）</span>
+                            </div>
+                        </div>
+
+                        <!-- 13W AGO -->
+                        <div class="bg-slate-900/40 border border-slate-700 rounded-lg p-3">
+                            <div class="text-[11px] text-slate-200 font-bold mb-2">13 週前</div>
+
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">FED (WALCL)</span>
+                                        <a href="https://fred.stlouisfed.org/series/WALCL" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_fed_13w" type="text" class="raw-input w-28 text-sm" value="6589.533" oninput="recalcNetLiquidity()">
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">RRP (RRPONTSYD)</span>
+                                        <a href="https://fred.stlouisfed.org/series/RRPONTSYD" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_rrp_13w" type="text" class="raw-input w-28 text-sm" value="23.792" oninput="recalcNetLiquidity()">
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] text-slate-400">TGA (WTREGEN)</span>
+                                        <a href="https://fred.stlouisfed.org/series/WTREGEN" target="_blank" class="text-blue-400 hover:text-white">
+                                            <i class="fas fa-external-link-alt text-[10px]"></i>
+                                        </a>
+                                    </div>
+                                    <input id="nl_tga_13w" type="text" class="raw-input w-28 text-sm" value="908.001" oninput="recalcNetLiquidity()">
+                                </div>
+                            </div>
+
+                            <div class="mt-2 text-[11px] text-slate-300">
+                                13 週前 netLiquidity = <span id="nl_13w_out" class="font-mono text-slate-100">0</span> <span class="text-slate-500">（同單位）</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-[12px] text-slate-200">
+                        Δ13W = 本期 - 13週前 = <span id="nl_d13w_out" class="font-mono text-emerald-300">0</span>
+                        <span class="text-slate-500">（自動回寫到上方「淨流動性 Δ13W」欄位，用於所有計算）</span>
+                    </div>
+
+                    <div class="mt-1 text-[10px] text-slate-500">
+                        建議輸入單位：$bn（十億美元），讓門檻（≤ -500）一致。
+                    </div>
+                </div>
+            `
+            : '';
+
+
+        return `
+            <div class="bg-slate-900/30 border border-slate-700 rounded-xl p-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-start gap-2 min-w-0">
+                        <div class="mt-0.5">${linkBtn(c.url)}</div>
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-200 text-sm leading-snug">${c.label.replace(' (hidden)','')}</div>
+                            <div class="text-[10px] text-slate-500 leading-snug mt-0.5">${hint}</div>
+                            <div class="text-[10px] text-slate-600 font-mono mt-1">門檻：0=${c.t0}｜5=${c.t5}｜10=${c.t10}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="relative">
+                            <input type="text"
+                                   id="cap_in_${c.id}"
+                                   class="raw-input w-24 text-sm ${c.id==='m14' ? 'opacity-80 cursor-not-allowed' : ''}"
+                                   value="${c.val}"
+                                   ${c.id==='m14' ? 'readonly' : ''}
+                                   oninput="syncCapInput('${c.id}', this.value)">
+                            ${unit ? `<span class="absolute right-2 top-2 text-xs text-slate-500">${unit}</span>` : ''}
+                        </div>
+                        ${extra}
+                        ${netliqExtra}
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    elP.innerHTML = groups.panic.map(id => row(wrap(id))).join('');
+    elC.innerHTML = groups.crisis.map(id => row(wrap(id))).join('');
+    elR.innerHTML = groups.recession.map(id => row(wrap(id))).join('');
+
+    
+    // Insert LEI 3M quick check inside recession section
+    elR.insertAdjacentHTML('beforeend', `
+<div class="mt-3 p-3 rounded border border-amber-500/30 bg-amber-500/5 text-[12px] text-slate-200">
+  <div class="flex items-start justify-between gap-3">
+    <div class="font-semibold text-amber-400">
+      LEI YoY &lt; 0（連續 3 個月判定）
+      <span class="ml-2 px-1 py-0.5 rounded bg-slate-900/40 border border-amber-500/30 text-[10px] text-amber-300">衰退層</span>
+    </div>
+    <a href="https://share.google/wKaNN0uj1v392N6bV" target="_blank"
+       class="text-amber-400 hover:text-amber-300 text-sm"
+       title="資料來源：MacroMicro（經濟諮商局 LEI YoY）">↗</a>
+  </div>
+
+  <div class="mt-2 grid grid-cols-2 gap-3">
+    <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
+      <input type="checkbox" id="lei_m2" class="accent-amber-400">
+      <span>上上月 &lt; 0</span>
+    </label>
+    <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
+      <input type="checkbox" id="lei_m1" class="accent-amber-400">
+      <span>上月 &lt; 0</span>
+    </label>
+    <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
+      <input type="checkbox" id="lei_m0" class="accent-amber-400">
+      <span>本月 &lt; 0</span>
+    </label>
+    <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2 opacity-90">
+      <input type="checkbox" id="lei_3m" disabled class="accent-amber-400">
+      <span class="font-semibold">是否連續三個月 &lt; 0</span>
+    </label>
+  </div>
+
+  <input type="hidden" id="in_m21" value="0">
+  <div class="mt-2 text-[11px] text-slate-400">
+    系統規則：前三項皆勾選 → 自動判定為「連續三個月 &lt; 0」，並回寫 <span class="font-mono">m21 = 1</span>（取消任一項則回寫 <span class="font-mono">m21 = 0</span>）。
+  </div>
+</div>
+`);
+// HY OAS：輸入仍用「%」，但旁邊同步顯示 bps
+    try { updateCapBps(); } catch (e) {}
+}
+
+        function handleInput(id, options = {}) {
+        const item = macroConfig.find(c => c.id === id);
+        if (!item) return;
+
+        const inEl = document.getElementById(`in_${id}`);
+        const slEl = document.getElementById(`sl_${id}`);
+        const scEl = document.getElementById(`sc_${id}`);
+
+        if (!inEl || !slEl || !scEl) {
+            console.warn('[handleInput] missing elements', { id, inEl: !!inEl, slEl: !!slEl, scEl: !!scEl });
+            return;
+        }
+
+        const v = inEl.value.trim() === '' ? NaN : Number(inEl.value);
+        if (!Number.isFinite(v)) {
+            scEl.textContent='NA'; slEl.value=0;
+            try { calcTotal(); } catch(e){}
+            console.warn('[handleInput] non-numeric value', { id, value: inEl.value });
+            return;
+        }
+
+        let s = mapToScore(v, item.t0, item.t5, item.t10, item.gamma);
+        if (C_VALUATION_IDS.has(item.id)) {
+            s = 5 + C_VALUATION_ALPHA * (s - 5);
+            s = Math.round(s * 10) / 10;
+        }
+        scEl.textContent = s.toFixed(1);
+        slEl.value = s;
+
+        try { localStorage.setItem(`v52_${id}`, String(v)); } catch (e) {}
+        // A changed value cannot inherit the date/source of a different observation.
+        if (!options.preserveProvenance) {
+            const existingDate=document.getElementById('v703-date-'+id);
+            const existingSource=document.getElementById('v703-source-'+id);
+            if(existingDate && existingDate.value){existingDate.value='';try{localStorage.removeItem('v703-date-'+id)}catch(e){}}
+            if(existingSource && existingSource.value){existingSource.value='';try{localStorage.removeItem('v703-source-'+id)}catch(e){}}
+        }
+
+        try { calcTotal(); } catch (e) { console.warn('[handleInput] calcTotal failed', e); }
+    }
+
+                function calcTotal() {
+            // =========================
+            // V70.3 Macro (mSafe_raw + 加速器 + 三層封頂)
+            // 注意：UI 不改；只替換計算核心
+            // =========================
+
+            // --- 讀取「風險分數」(0~10) ---
+            const getRisk = (id) => {
+                const el = document.getElementById(`sc_${id}`);
+                const v = parseFloat(el ? el.innerText : NaN);
+                return isFinite(v) ? v : NaN;
+            };
+            const getRaw = (id) => {
+                const el = document.getElementById(`in_${id}`);
+                const v = parseFloat(el ? el.value : NaN);
+                return isFinite(v) ? v : NaN;
+            };
+
+            // --- 七大群風險（群內平均） ---
+            const groups = {
+                panic_vol: ['m07','m12'],
+                credit: ['m02'],
+                inflation: ['m05','m13'],
+                rates_curve: ['m08','m01'],
+                liquidity_fc: ['m14','m09','m10'],
+                growth: ['m04','m15','m16'],
+                valuation: ['m03_qqq','m03_spy','m03_vt']
+            };
+
+            const weights = { panic_vol:18, credit:16, inflation:14, rates_curve:12, liquidity_fc:16, growth:14, valuation:10 };
+
+            const avg = (arr) => {
+                const vals = arr.map(getRisk);
+                if (vals.some(v => !Number.isFinite(v))) return null;
+                return vals.reduce((a,b)=>a+b,0) / vals.length;
+            };
+
+            let weightedSum = 0, weightSum = 0;
+            const groupRisk = {};
+            for (const g in groups) {
+                const gr = avg(groups[g]);
+                groupRisk[g] = gr;
+                if (gr !== null) { weightedSum += gr * weights[g]; weightSum += weights[g]; }
+            }
+            const avgRiskBase = (weightSum===100) ? (weightedSum/100) : NaN;
+            window.v703DataComplete = (weightSum === 100) && macroConfig.every(cfg=>{const el=document.getElementById('in_'+cfg.id);return el && el.value.trim()!=='' && Number.isFinite(Number(el.value));});
+            window.v703VerifiedDataDates = window.v703ValidateDates ? window.v703ValidateDates() : false;
+            window.v703MissingGroups = Object.keys(groupRisk).filter(k=>groupRisk[k]===null);
+
+            // --- 加速器（加在 avgRisk 上） ---
+            let accelAdd = 0;
+            const netliq = getRaw('m14');         // Δ13W
+            const dxy = getRaw('m09');
+            const wti = getRaw('m10');
+            const be5y = getRaw('m13');
+
+            if (isFinite(netliq)) {
+                if (netliq <= -500) accelAdd += 1.2;
+                else if (netliq <= -300) accelAdd += 0.7;
+            }
+            if (isFinite(dxy)) {
+                if (dxy >= 112) accelAdd += 0.8;
+                else if (dxy >= 108) accelAdd += 0.4;
+            }
+            // 油價×通膨 AND（用 5yBE 當通膨 proxy）
+            if (isFinite(wti) && isFinite(be5y)) {
+                if (wti >= 125 && be5y >= 2.7) accelAdd += 1.0;
+                else if (wti >= 110 && be5y >= 2.6) accelAdd += 0.6;
+            }
+
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+            const avgRiskAdj = clamp(avgRiskBase + accelAdd, 0, 10);
+
+            // --- mSafe_raw ---
+            const mSafe_raw = (10 - avgRiskAdj) * 10;
+
+            // --- 三層封頂 ---
+            const vix = getRaw('m07');
+            const move = getRaw('m12');
+            const real10y = getRaw('m08');
+            const be5y_chg_1m = getRaw('m17');
+
+            // HY OAS：UI 習慣是「%」，危機條件用「bps」；因此做容錯轉換
+            const hy_pct = getRaw('m02');
+            const hy_bps = (isFinite(hy_pct) && hy_pct < 50) ? (hy_pct * 100) : hy_pct;
+
+            // 恐慌層
+            let cap_panic = 100;
+            let panicWhy = "";
+            if (isFinite(vix) && (vix >= 35 || (vix >= 28 && isFinite(move) && move >= 140))) {
+                cap_panic = 60;
+                panicWhy = "VIX≥35 或 (VIX≥28 且 MOVE≥140)";
+            } else if (isFinite(vix) && vix >= 28) {
+                cap_panic = 70;
+                panicWhy = "VIX≥28";
+            }
+
+            // 危機層：5 觸發點計數
+            const crisis = [];
+            if (isFinite(hy_bps) && hy_bps >= 600) crisis.push("A：HY OAS≥600bps");
+            if (isFinite(be5y) && isFinite(be5y_chg_1m) && (be5y >= 2.6 && be5y_chg_1m >= 0.25)) crisis.push("B：5yBE≥2.6 且 1月↑≥0.25");
+            if (isFinite(move) && move >= 160) crisis.push("C：MOVE≥160");
+            if (isFinite(netliq) && netliq <= -500) crisis.push("D：Δ13W流動性≤-500");
+            if (isFinite(real10y) && real10y >= 2.5) crisis.push("E：10Y實質≥2.5");
+
+            let cap_crisis = 100;
+            if (crisis.length >= 3) cap_crisis = 45;
+            else if (crisis.length >= 2) cap_crisis = 55;
+
+            // 衰退層
+            const sahm = getRaw('m18');
+            const lei_yoy = getRaw('m16');
+            const lei_neg_3m = (getRaw('m21') >= 1);
+            const nfp_3m_avg = getRaw('m20');
+            const u3 = getRaw('m19');
+
+            let cap_recession = 100;
+            const recWhy = [];
+
+            const recRed =
+                (isFinite(sahm) && sahm >= 0.4) ||
+                (lei_neg_3m && ((isFinite(u3) && u3 >= 4.5) || (isFinite(nfp_3m_avg) && nfp_3m_avg <= 0)));
+
+            const recBlack =
+                (isFinite(sahm) && sahm >= 0.5) ||
+                (isFinite(nfp_3m_avg) && nfp_3m_avg <= 0) ||
+                (isFinite(lei_yoy) && isFinite(u3) && (lei_yoy <= -4 && u3 >= 4.5));
+if (recBlack) {
+                cap_recession = 45;
+                if (isFinite(sahm) && sahm >= 0.5) recWhy.push("Sahm≥0.5");
+                if (isFinite(nfp_3m_avg) && nfp_3m_avg <= 0) recWhy.push("NFP 3M Avg≤0");
+                if (isFinite(lei_yoy) && isFinite(u3) && (lei_yoy <= -4 && u3 >= 4.5)) recWhy.push("LEI≤-4 且 U3 失業率≥4.5%");
+            } else if (recRed) {
+                cap_recession = 55;
+                if (isFinite(sahm) && sahm >= 0.4) recWhy.push("Sahm≥0.4");
+                if (lei_neg_3m) recWhy.push("LEI連3月<0 且(U3≥4.5% 或 NFP≤0)");
+            }
+
+            const capMin = Math.min(cap_panic, cap_crisis, cap_recession);
+            const mSafe_final = Math.min(mSafe_raw, capMin);
+
+            // --- 封頂說明 ---
+            let capNote = "未封頂";
+            if (mSafe_final < mSafe_raw) {
+                const parts = [];
+                if (cap_panic < 100 && cap_panic <= capMin) parts.push(`恐慌層 cap=${cap_panic}（${panicWhy}）`);
+                if (cap_crisis < 100 && cap_crisis <= capMin) parts.push(`危機層 cap=${cap_crisis}（觸發${crisis.length}點：${crisis.join("；")}）`);
+                if (cap_recession < 100 && cap_recession <= capMin) parts.push(`衰退層 cap=${cap_recession}（${recWhy.join("；")}）`);
+                capNote = `⚠ 封頂：raw=${mSafe_raw.toFixed(1)} → final=${mSafe_final.toFixed(1)}；原因：${parts.join(" / ")}`;
+            }
+
+                        
+            // --- CAP「⚠ 觸發中」標籤（純 UI，不影響任何計算/決策） ---
+            const setCapBadge = (id, on) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.toggle('hidden', !on);
+            };
+            setCapBadge('cap-badge-panic', cap_panic < 100);
+            setCapBadge('cap-badge-crisis', cap_crisis < 100);
+            setCapBadge('cap-badge-recession', cap_recession < 100);
+
+// --- 顯示「三層覆蓋規則 + 當前數值」（放在 Macro 區塊最上面）---
+                        const capEl = document.getElementById('macro-cap-text');
+            if (capEl) {
+                const fmt = (v, d=2) => (isFinite(v) ? Number(v).toFixed(d) : 'NA');
+                const fmt0 = (v) => (isFinite(v) ? String(Number(v).toFixed(0)) : 'NA');
+
+                const cur = [
+                    ['VIX', `${fmt(vix,1)}`],
+                    ['MOVE', `${fmt(move,0)}`],
+                    ['HY OAS', `${fmt(hy_bps,0)} bps`],
+                    ['5yBE', `${fmt(be5y,2)}`],
+                    ['Δ1M', `${fmt(be5y_chg_1m,2)}`],
+                    ['Real10Y', `${fmt(real10y,2)}%`],
+                    ['Δ13W', `${fmt(netliq,0)}`],
+                    ['Sahm', `${fmt(sahm,2)}`],
+                    ['LEI YoY', `${fmt(lei_yoy,2)}%`],
+                    ['U3 失業率', `${fmt(u3,1)}%`],
+                    ['NFP 3M Avg', `${fmt0(nfp_3m_avg)}`],
+                ];
+
+                const curGrid = `
+                    <div class="bg-slate-900/30 border border-slate-700 rounded-lg p-3">
+                        <div class="font-bold text-slate-200 mb-2">目前（由上方輸入決定）</div>
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] font-mono">
+                            ${cur.map(([k,v]) => `
+                                <div class="flex justify-between gap-2 bg-slate-900/20 border border-slate-800 rounded px-2 py-1">
+                                    <span class="text-slate-400">${k}</span>
+                                    <span class="text-slate-100">${v}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                const resultBox = `
+                    <div class="bg-slate-900/30 border border-slate-700 rounded-lg p-3">
+                        <div class="font-bold text-slate-200 mb-2">結果</div>
+                        <div class="text-[11px] font-mono leading-relaxed">
+                            mSafe_raw=${fmt(mSafe_raw,1)}；cap_panic=${fmt0(cap_panic)}；cap_crisis=${fmt0(cap_crisis)}；cap_recession=${fmt0(cap_recession)}；mSafe_final=${fmt(mSafe_final,1)}
+                        </div>
+                    </div>
+                `;
+
+                const capBox = `
+                    <div class="bg-slate-900/30 border border-slate-700 rounded-lg p-3">
+                        <div class="font-bold text-slate-200 mb-2">封頂</div>
+                        <div class="text-[11px] font-mono leading-relaxed ${mSafe_final < mSafe_raw ? 'text-yellow-300' : 'text-slate-300'}">
+                            ${capNote === "未封頂" ? "未封頂" : capNote}
+                        </div>
+                    </div>
+                `;
+
+                capEl.innerHTML = curGrid + resultBox + capBox;
+            }
+            // --- UI 更新（mSafe_final 作為總倉位） ---
+            const msEl = document.getElementById('macro-safety-val');
+            if (msEl) msEl.innerText = Number.isFinite(mSafe_final) ? mSafe_final.toFixed(1) : "NA";
+            const mbEl = document.getElementById('macro-bar');
+            if (mbEl) mbEl.style.width = Number.isFinite(mSafe_final) ? `${clamp(mSafe_final,0,100)}%` : "0%";
+
+            // Zone（V70.3 四區）
+            const zEl = document.getElementById('macro-zone-text');
+
+            // 是否進入「恐慌黑」封頂（cap60）：沿用原本 UI 的「熔斷 overlay」表現，不改結構
+            const isEmerg = (cap_panic <= 60);
+
+            if (isEmerg) {
+                zEl.innerText = "⛔ 系統熔斷 (恐慌封頂 cap60)";
+                zEl.className = "text-red-500 animate-pulse font-bold mt-3";
+                document.getElementById('circuit-breaker-overlay').classList.remove('hidden');
+            } else {
+                document.getElementById('circuit-breaker-overlay').classList.add('hidden');
+
+                let zoneText = "";
+                if (mSafe_final >= 70) zoneText = "🟢 進攻 (≥70)";
+                else if (mSafe_final >= 55) zoneText = "🟡 穩健 (55–70)";
+                else if (mSafe_final >= 40) zoneText = "🟠 防守 (40–55)";
+                else zoneText = Number.isFinite(mSafe_final) ? "🔴 停車 (<40)" : "⚠ 資料不足（NA）";
+
+                zEl.innerText = zoneText;
+                // 不改 zEl.className，維持原本預設樣式
+            }
+
+            // Overlay：只在「恐慌黑 cap60」時顯示（不再用 mSafe=0 的熔斷邏輯）
+            const overlay = document.getElementById('circuit-breaker-overlay');
+            if (cap_panic <= 60) {
+                overlay.classList.remove('hidden');
+                // 更新 overlay 文字（不改結構，只改字）
+                const sub = overlay.querySelector('.text-lg.font-mono');
+                if (sub) sub.innerText = panicWhy ? (`${panicWhy} TRIGGERED`) : "PANIC CAP TRIGGERED";
+            } else {
+                overlay.classList.add('hidden');
+            }
+
+            // Allocation / Orders：客戶已核准S0/B0（Rule Owner=V70；現行Producer可為Mentor/人工Legacy）× V70.3 子彈池 C × Tactical Tilt T
+            let bScore = parseFloat(document.getElementById('bond-score-display').innerText);
+            let alloc = calcAlloc(mSafe_final, bScore, isEmerg, {
+                groupRisk,
+                cap_panic,
+                cap_crisis,
+                cap_recession
+            });
+            if (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final)) {
+                renderAlloc(alloc);
+            } else {
+                const al=document.getElementById("allocation-list"); if(al) al.textContent="NA｜必要總經資料或日期未通過驗證，暫停發布新配置";
+                for(const id of ["total-cash","total-bond","total-stock"]) {const el=document.getElementById(id);if(el)el.textContent="NA";}
+                const tilt=document.getElementById("tactical-tilt-note");if(tilt)tilt.textContent="NA｜沿用上次已核准配置；不得將本輪公式試算當正式配置";
+            }
+            const allocWarning=document.getElementById('v703-data-state');
+            if(allocWarning) allocWarning.textContent=(!window.v703DataComplete || !window.v703VerifiedDataDates)
+              ? '⚠ 日期／必要指標未驗證：以下僅供模擬，不可作為正式配置或交易依據。'
+              : '輸入日期／來源欄位與七群數值通過格式及時效檢查（來源真實性尚未獨立核實）；逐檔交易仍需 V82／V75 驗證。';
+
+            if (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) updateOrders(mSafe_final, bScore, isEmerg, alloc.meta);
+            else {for(const id of ["stock-action","bond-action"]) {const el=document.getElementById(id);if(el)el.textContent="資料未驗證，暫停新配置／交易建議";}}
+
+            // 保存本輪 V70.3 計算結果，供客戶專屬 Markdown 交接檔輸出。
+            if (typeof captureLivingWaterV70State === 'function') {
+                captureLivingWaterV70State({
+                    calculatedAt: new Date().toISOString(),
+                    avgRiskBase, accelAdd, avgRiskAdj,
+                    mSafe_raw, mSafe_final,
+                    cap_panic, cap_crisis, cap_recession, capNote,
+                    panicWhy, crisis, recWhy,
+                    isEmerg, groupRisk, bScore,
+                    macroZone: zEl ? zEl.innerText : '',
+                    allocation: (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) ? alloc.meta : null,
+                    allocationItems: alloc.items
+                });
+            }
+        }
+
+
+
+
+        // LivingWaterAI：人生情境同時保留在下游 metadata，並供 V70.3 候選／核准 10×4 基準配置使用。
+        // 自 2026/09/13 23:36 起，V70 不再依人生情境拆美／台債券子桶，也不指定逐檔債券比例。
+        const lifeStageLabels = {
+            L1: "小資累積", L2: "穩定上班族", L3: "收入不穩自營", L4: "突然大額資金",
+            L5: "距退休5～10年", L6: "已退休需生活費", L7: "學生", L8: "服兵役",
+            L9: "待業求職", L10: "暫時／長期無法工作"
+        };
+
+        function getLifeStageMeta(){
+            const el = document.getElementById('life-stage-select');
+            const code = el ? el.value : 'L2';
+            return { code, label: lifeStageLabels[code] || lifeStageLabels.L2 };
+        }
+
+        // 供 Mentor／未來 API 指定人生情境；此欄位參與 V70.3 的 10×4 配置。
+        window.setLivingWaterLifeStage = function(code){
+            const el = document.getElementById('life-stage-select');
+            if(el && lifeStageLabels[code]){
+                el.value = code;
+                if(typeof calcTotal === 'function') calcTotal();
+                return true;
+            }
+            return false;
+        };
+
+        function clampNum(v, lo, hi) {
+            return Math.max(lo, Math.min(hi, v));
+        }
+
+        function getStrategicAllocation() {
+            const sEl = document.getElementById('strategic-stock');
+            const bEl = document.getElementById('strategic-bond');
+            const stock = Number(sEl?.value);
+            const bond = Number(bEl?.value);
+            if (!sEl || !bEl || sEl.value.trim()==='' || bEl.value.trim()==='' ||
+                !Number.isFinite(stock) || !Number.isFinite(bond) ||
+                stock < 0 || bond < 0 || stock > 100 || bond > 100 ||
+                Math.abs(stock + bond - 100) > 0.01) {
+                return {stock:NaN, bond:NaN};
+            }
+            return {stock,bond};
+        }
+
+        function syncStrategicAllocation(changed) {
+            const sEl = document.getElementById('strategic-stock');
+            const bEl = document.getElementById('strategic-bond');
+            if (!sEl || !bEl) return;
+            if (changed === 'stock') {
+                let s0 = clampNum(parseFloat(sEl.value) || 0, 0, 100);
+                sEl.value = String(Math.round(s0 * 10) / 10);
+                bEl.value = String(Math.round((100 - s0) * 10) / 10);
+            } else {
+                let b0 = clampNum(parseFloat(bEl.value) || 0, 0, 100);
+                bEl.value = String(Math.round(b0 * 10) / 10);
+                sEl.value = String(Math.round((100 - b0) * 10) / 10);
+            }
+            if (typeof calcTotal === 'function') calcTotal();
+        }
+
+        // Current input adapter：供Mentor／人工Legacy流程／未來API注入客戶已核准S0/B0。此介面不代表Mentor擁有S0/B0 Rule Authority，也不代表V70_3已能自行推導S0/B0。
+        window.setLivingWaterStrategicAllocation = function(stock, bond) {
+            stock = Number(stock); bond = Number(bond);
+            if (!isFinite(stock) || !isFinite(bond) || stock < 0 || bond < 0 || Math.abs((stock + bond) - 100) > 0.01) {
+                console.warn('[V70.3] strategic allocation rejected: S0+B0 must equal 100');
+                return false;
+            }
+            const sEl = document.getElementById('strategic-stock');
+            const bEl = document.getElementById('strategic-bond');
+            if (sEl) sEl.value = String(stock);
+            if (bEl) bEl.value = String(bond);
+            if (typeof calcTotal === 'function') calcTotal();
+            return true;
+        };
+
+        // 家人版候選 10×4 大旋鈕：工程預覽用，未經風險訪談及回測，不代表既有正式核准矩陣。
+        // 各風格為股票基準；特殊人生狀態依流動性與期限保守調整。
+        const v703StyleStocks={conservative:30,balanced:50,growth:65,aggressive:80};
+        const v703StageAdjust={L1:0,L2:0,L3:-10,L4:-5,L5:-15,L6:-25,L7:-10,L8:-15,L9:-20,L10:-25};
+        window.v703CandidateMatrix=Object.fromEntries(Object.entries(v703StageAdjust).map(([life,adj])=>[
+            life,Object.fromEntries(Object.entries(v703StyleStocks).map(([pref,base])=>{
+                const stock=Math.min(85,Math.max(10,base+adj));return [pref,{stock,bond:100-stock}];
+            }))
+        ]));
+        window.v703ApprovedMatrix=null;
+        window.v703SetApprovedMatrix=function(matrix){
+            if(!matrix||typeof matrix!=='object')return false;
+            for(let i=1;i<=10;i++)for(const pref of Object.keys(v703StyleStocks)){
+                const v=matrix['L'+i]?.[pref];
+                if(!v||!Number.isFinite(v.stock)||!Number.isFinite(v.bond)||v.stock<0||v.bond<0||Math.abs(v.stock+v.bond-100)>0.01)return false;
+            }
+            window.v703ApprovedMatrix=JSON.parse(JSON.stringify(matrix));
+            window.v703ApplyApprovedMatrix();return true;
+        };
+        window.v703SetPreference=function(pref){
+            if(!Object.hasOwn(v703StyleStocks,pref))return false;
+            const el=document.getElementById('v703-risk-preference');if(el)el.value=pref;
+            return window.v703ApplyApprovedMatrix();
+        };
+        window.v703ApplyApprovedMatrix=function(){
+            const life=document.getElementById('life-stage-select')?.value||'L2';
+            const pref=document.getElementById('v703-risk-preference')?.value||'balanced';
+            const approved=!!window.v703ApprovedMatrix;
+            const v=(approved?window.v703ApprovedMatrix:window.v703CandidateMatrix)?.[life]?.[pref];
+            const note=document.getElementById('v703-strategic-source');
+            if(note)note.textContent=approved?'✅ 核准10×4配置：'+life+'／'+pref+' → '+v.stock+'% 股票、'+v.bond+'% 債券':'⚠ 工程預覽候選10×4（尚未核准／回測）：'+life+'／'+pref+' → '+v.stock+'% 股票、'+v.bond+'% 債券；現金生活費另行保留';
+            const baseNote=document.getElementById('mentor-base-note');
+            if(baseNote)baseNote.textContent=(approved?'核准10×4':'候選預覽10×4（未經核准）')+'：S0 '+v.stock+'%／B0 '+v.bond+'%；Rule Owner=V70；個別標的由 V82／V75 驗證。';
+            window.v703StrategyKind=approved?'APPROVED_MATRIX':'UNVERIFIED_CANDIDATE_10X4';
+            return window.setLivingWaterStrategicAllocation(v.stock,v.bond);
+        };
+        window.v703StressModel=function(g,caps){
+            const keys=['credit','liquidity_fc','inflation','rates_curve','growth','panic_vol','valuation'];
+            if (keys.some(k => !Number.isFinite(g?.[k]) || g[k] < 0 || g[k] > 10)) return null;
+            if (!caps || !Number.isFinite(caps.capPanic) || !Number.isFinite(caps.capCrisis) || !Number.isFinite(caps.capRecession)) return null;
+            const weight={credit:1.3,liquidity_fc:1.3,inflation:1.0,rates_curve:0.8,growth:1.0,panic_vol:0.45,valuation:0.6};
+            const strengths={}; let weighted=0, count=0;
+            for(const k of keys){const v=g?.[k];const z=Number.isFinite(v)?Math.max(0,Math.min(1,(v-5)/5)):0;strengths[k]=z;if(z>=0.4)count++;weighted+=z*weight[k];}
+            const multi=Math.min(1,Math.max(0,(weighted-0.65)/2.7));
+            const severe=(caps.capCrisis<=55||caps.capRecession<=55)?2:0;
+            const extraCash=Math.min(15,Math.round((multi*13+severe)*10)/10);
+            return {strengths,extraCash,concurrentRisks:count,weightedPressure:+weighted.toFixed(3)};
+        };
+
+        function calcAlloc(mSafe, bScore, isEmerg, ctx = {}) {
+            const strategic = getStrategicAllocation();
+            const S0 = strategic.stock;
+            const B0 = strategic.bond;
+            const groupRisk = ctx.groupRisk || {};
+            const capPanic = Number(ctx.cap_panic ?? 100);
+            const capCrisis = Number(ctx.cap_crisis ?? 100);
+            const capRecession = Number(ctx.cap_recession ?? 100);
+            const anyCapActive = capPanic < 100 || capCrisis < 100 || capRecession < 100;
+
+            const high = (v) => isFinite(v) && v >= 7;
+            const valuationHigh = high(groupRisk.valuation);
+            const creditHigh = high(groupRisk.credit);
+            const liquidityHigh = high(groupRisk.liquidity_fc);
+            const inflationHigh = high(groupRisk.inflation);
+            const ratesHigh = high(groupRisk.rates_curve);
+
+            let sTot = 0, bTot = 0, cTot = 0;
+            let T = 0;
+            let mode = 'normal';
+            const why = [];
+
+            // V70.3：CAP 只限制 Macro 分數，不會導致既有股票與債券自動清零。
+            // 戰略目標是模擬目標，不等同執行指令。實際調整需有資金來源。
+            {
+                // 多重總經風險的子彈池：基礎10/20%，重大共振加0～15點；
+                // 不靠實際持倉金額，這是建議配置而非已成交交易。候選參數待回測。
+                const stress = window.v703StressModel ? window.v703StressModel(groupRisk, {capPanic,capCrisis,capRecession}) : null;
+                if (!stress) return {items:[], meta:null, blocked:true, reason:'總經七群資料／CAP 不完整，不得計算新配置'};
+                cTot = Math.min(35, ((mSafe < 55) ? 20 : 10) + stress.extraCash);
+                cTot = Math.round(cTot * 10) / 10;
+                if(stress.extraCash > 0) why.push('多重風險共振：子彈池額外+' + stress.extraCash.toFixed(1) + '個百分點');
+                T = (mSafe >= 70) ? 5 : ((mSafe >= 55) ? 0 : -5);
+                if (isEmerg) why.push('恐慌CAP60已觸發：審查信用／流動性，不強制清倉');
+                if (mSafe < 40) why.push('總經紅燈：保留長期核心，七類風險逐類審查');
+                if (T > 0 && (valuationHigh || creditHigh || liquidityHigh || anyCapActive)) {
+                    why.push('股票正偏移遭估值／信用／流動性／CAP否決');
+                    T = 0;
+                }
+
+                // 向債券偏移前，必須確認債券條件；不適合時回到客戶已核准S0/B0，不機械加債。
+                if (T < 0 && ((!isFinite(bScore) || bScore < 5) || inflationHigh || ratesHigh || creditHigh)) {
+                    why.push('債券負偏移遭 bScore／通膨／利率／信用否決');
+                    T = 0;
+                }
+
+                // 非危機且債券條件明顯有利，可再向債券降低5點，總T下限-10。
+                if (!anyCapActive && isFinite(bScore) && bScore >= 7 && !inflationHigh && !creditHigh && !ratesHigh) {
+                    const before = T;
+                    T = Math.max(-10, T - 5);
+                    if (T !== before) why.push('bScore≥7且通膨／信用／利率未否決：債券偏移再-5');
+                }
+
+                T = clampNum(T, -10, 10);
+                const D = 100 - cTot;
+                const Srel = clampNum(S0 + T, 0, 100);
+                const Brel = 100 - Srel;
+                sTot = Math.round((D * Srel / 100) * 10) / 10;
+                bTot = Math.round((D - sTot) * 10) / 10;
+                mode = 'tactical';
+            }
+
+            // V70.3：目標比例只是規劃，家人版不需要持倉或交易金額；七類直接提供佔總投資資產的建議百分比。
+            // V70 權責到「總額度」為止：不得再拆美／台債券子桶，也不得指定任何逐檔債券比例。
+            // V70.3 七類建議比例包含 B1～B4；債券V75提供逐檔風險與執行驗證，不應直接覆蓋已產生的七類策略百分比。
+            const items = [
+                { name: 'C0 SGOV 子彈池（Dry Powder）', val: cTot, color: 'bg-slate-500', bucket: 'cash' },
+                { name: '債券戰術總額度（交債券V75執行）', val: bTot, color: 'bg-green-600', bucket: 'bond' },
+                { name: '股票戰術總額度（交V82執行）', val: sTot, color: 'bg-blue-500', bucket: 'stock' }
+            ];
+
+            const stage = getLifeStageMeta();
+            const meta = {
+                S0, B0, T, cTot, sTot, bTot, mode, why,
+                lifeStageCode: stage.code,
+                lifeStageLabel: stage.label,
+                bondAllocationOwner: '債券V75',
+                stockAllocationOwner: 'V82'
+            };
+            return { items, meta };
+        }
+
+        function renderAlloc(result) {
+            const a = Array.isArray(result) ? result : (result.items || []);
+            const meta = result.meta || {};
+            let h = '', ts = 0, tb = 0, tc = 0;
+            const fmt = (v) => Number(v).toFixed(Number(v) % 1 === 0 ? 0 : 1);
+            a.forEach(i => {
+                if(i.val > 0) h += `<div class="mb-2"><div class="flex justify-between text-xs mb-1 text-slate-300"><span>${i.name}</span><span class="font-mono font-bold">${fmt(i.val)}%</span></div><div class="w-full bg-slate-700 rounded-full h-2 overflow-hidden"><div class="h-full ${i.color} alloc-bar" style="width: ${i.val}%"></div></div></div>`;
+                if(i.bucket === 'cash') tc += i.val; else if(i.bucket === 'bond') tb += i.val; else ts += i.val;
+            });
+            const al = document.getElementById('allocation-list');
+            if (al) al.innerHTML = h;
+            const tCash = document.getElementById('total-cash');
+            const tBond = document.getElementById('total-bond');
+            const tStock = document.getElementById('total-stock');
+            if (tCash) tCash.innerText = fmt(tc) + '%';
+            if (tBond) tBond.innerText = fmt(tb) + '%';
+            if (tStock) tStock.innerText = fmt(ts) + '%';
+
+            const baseNote = document.getElementById('mentor-base-note');
+            if (baseNote && isFinite(meta.S0) && isFinite(meta.B0)) {
+                baseNote.innerText = `核准基準：${fmt(meta.S0)} / ${fmt(meta.B0)}。Rule Owner=V70；V70.3目前只做戰術微調，不自行推導S0/B0。`;
+            }
+            const tiltNote = document.getElementById('tactical-tilt-note');
+            if (tiltNote) {
+                const tTxt = meta.mode === 'tactical' ? `${meta.T >= 0 ? '+' : ''}${fmt(meta.T)}%` : '不使用一般T';
+                const reason = (meta.why && meta.why.length) ? `｜${meta.why.join('；')}` : '';
+                tiltNote.innerText = `今日：股票 ${fmt(meta.sTot || 0)}%／債券 ${fmt(meta.bTot || 0)}%／SGOV子彈池 ${fmt(meta.cTot || 0)}%｜T=${tTxt}${reason}`;
+            }
+        }
+
+        function updateOrders(mSafe, bScore, isEmerg, meta = {}) {
+            let sa="", sc="", ba="", bc="";
+            const stockPct = isFinite(meta.sTot) ? meta.sTot : 0;
+            const bondPct = isFinite(meta.bTot) ? meta.bTot : 0;
+            const cashPct = isFinite(meta.cTot) ? meta.cTot : 0;
+
+            if(isEmerg) { sa=`恐慌警戒：股票目標 ${stockPct}%，核心不機械清倉；實際買點交V82`; sc="text-red-500 animate-pulse"; }
+            else if(mSafe<40) { sa=`紅燈警戒：股票目標額度 ${stockPct}%，不強制清倉；實際股票標的交 V82`; sc="text-red-500"; }
+            else {
+                sa=`股票戰術額度 ${stockPct}%；買哪一檔、何時買、買多少交 V82`; sc=stockPct>0?"text-blue-400":"text-yellow-400";
+            }
+
+            if(isEmerg) { ba=`恐慌警戒：債券目標 ${bondPct}%；依久期／信用風險交債券V75確認`; bc="text-red-500 animate-pulse"; }
+            else if(bScore>=7) { ba=`債券戰術額度 ${bondPct}%：Macro收益條件較有利，實際久期／信用／買點交債券V75`; bc="text-green-400"; }
+            else if(bScore>=4) { ba=`債券戰術額度 ${bondPct}%：環境中性，是否部署交債券V75`; bc="text-blue-400"; }
+            else { ba=`債券戰術額度 ${bondPct}%：Macro收益條件偏弱，新增資金優先保留SGOV子彈池 ${cashPct}%`; bc="text-red-400"; }
+
+            const fs = document.getElementById('final-stock');
+            const fb = document.getElementById('final-bond');
+            if (fs) fs.innerHTML = `<span class='text-slate-400 mr-2 font-mono'>[股票]</span><span class="${sc} font-bold">${sa}</span>`;
+            if (fb) fb.innerHTML = `<span class='text-slate-400 mr-2 font-mono'>[債券]</span><span class="${bc} font-bold">${ba}</span>`;
+        }
+
+        // ============================================================
+        // LivingWaterAI｜V70 客戶專屬 Markdown Output Contract v1.1.1｜Run ID＋Dry Powder 分帳版
+        // 正式檔名：V70產出-<客戶名字>.md
+        // 用途：把同一輪總經原始數字、新聞、V70衍生分數與股／債／V70_ORIGINAL_DRY_POWDER戰術額度
+        //      傳給 V82、債券V75 與客戶報告；下游仍必須依自己的規則再判斷一次。
+        // ============================================================
+        const livingWaterV70OutputState = {
+            clientName: '客戶名字',
+            projectName: '',
+            runId: '',
+            snapshotAsOf: '',
+            macroNews: [],
+            newsMirrorText: '',
+            sharedMacro: {},
+            sharedMeta: {},
+            lastCalc: null
+        };
+
+        function captureLivingWaterV70State(calc) {
+            livingWaterV70OutputState.lastCalc = calc || null;
+            window.v703MacroSnapshot = calc || null;
+            if (typeof window.v703Recompute === 'function') window.v703Recompute();
+        }
+
+        function safeClientFileName(name) {
+            const cleaned = String(name || '客戶名字').trim().replace(/[\\/:*?"<>|]/g, '_');
+            return cleaned || '客戶名字';
+        }
+
+        function generateLivingWaterRunId(dateObj = new Date()) {
+            const parts = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            }).formatToParts(dateObj).reduce((o,p) => (o[p.type] = p.value, o), {});
+            return `RUN-${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}${parts.second}`;
+        }
+
+        function parseSharedMacroTextarea() {
+            const el = document.getElementById('v70-shared-macro-input');
+            if (!el || !String(el.value || '').trim()) return livingWaterV70OutputState.sharedMacro || {};
+            try {
+                const parsed = JSON.parse(el.value);
+                return (parsed && typeof parsed === 'object') ? parsed : {};
+            } catch (e) {
+                return { '_parse_error': { value: String(el.value), note: 'JSON解析失敗；下游不得把此欄視為正式數字' } };
+            }
+        }
+
+        function collectV70Inputs() {
+            const metaMap = (livingWaterV70OutputState.sharedMeta && (livingWaterV70OutputState.sharedMeta.indicators || livingWaterV70OutputState.sharedMeta.macroInputs)) || {};
+            const one = (c) => {
+                const rawEl = document.getElementById(`in_${c.id}`);
+                const scoreEl = document.getElementById(`sc_${c.id}`);
+                const im = metaMap[c.id] || {};
+                return {
+                    id: c.id,
+                    label: c.label.replace(' (hidden)',''),
+                    value: rawEl ? rawEl.value : '',
+                    unit: c.unit || '',
+                    riskScore: scoreEl ? scoreEl.innerText : '',
+                    dataDate: document.getElementById('v703-date-'+c.id) ? document.getElementById('v703-date-'+c.id).value : (im.dataDate || im.date || ''),
+                    source: document.getElementById('v703-source-'+c.id) ? document.getElementById('v703-source-'+c.id).value.trim() : (im.source || im.url || ''),
+                    hidden: !!c.hidden
+                };
+            };
+            return {
+                macro: macroConfig.map(one),
+                lei3mNegative: document.getElementById('in_m21')?.value === '1',
+                bondRealYieldInput: document.getElementById('bond-raw')?.value || '',
+                bondScore: document.getElementById('bond-score-display')?.innerText || ''
+            };
+        }
+
+        function normalizeNewsForOutput() {
+            const ta = document.getElementById('v70-news-input');
+            const typed = ta ? String(ta.value || '').trim() : '';
+            const src = livingWaterV70OutputState.macroNews;
+            const mirror = String(livingWaterV70OutputState.newsMirrorText || '').trim();
+
+            // API 注入的結構化新聞優先保留 date/title/summary/impact/url/source。
+            // 只有使用者在 textarea 手動改成不同文字時，才以手動內容覆蓋。
+            if (Array.isArray(src) && src.length && (!typed || typed === mirror)) return src;
+            if (typed) return typed.split(/\n+/).map(x => x.trim()).filter(Boolean).map(text => ({ text }));
+            if (Array.isArray(src)) return src;
+            if (typeof src === 'string' && src.trim()) return src.split(/\n+/).map(text => ({ text: text.trim() })).filter(x => x.text);
+            return [];
+        }
+
+        function mdCell(v) {
+            if (v === null || v === undefined || v === '') return '—';
+            if (typeof v === 'object') return String(v.value ?? JSON.stringify(v)).replace(/\|/g,'\\|').replace(/\n/g,' ');
+            return String(v).replace(/\|/g,'\\|').replace(/\n/g,' ');
+        }
+
+        function getSharedMacroRows(obj) {
+            if (!obj || typeof obj !== 'object') return [];
+            return Object.entries(obj).map(([key, val]) => {
+                if (val && typeof val === 'object' && !Array.isArray(val)) {
+                    return {
+                        key,
+                        value: val.value ?? val.latest ?? val.result ?? '',
+                        unit: val.unit ?? '',
+                        dataDate: val.dataDate ?? val.date ?? '',
+                        source: val.source ?? val.url ?? '',
+                        note: val.note ?? val.direction ?? ''
+                    };
+                }
+                return { key, value: val, unit: '', dataDate: '', source: '', note: '' };
+            });
+        }
+
+        function buildLivingWaterV70Markdown() {
+            const nameEl = document.getElementById('v70-client-name');
+            const runEl = document.getElementById('v70-run-id');
+            const asOfEl = document.getElementById('v70-snapshot-asof');
+            const clientName = safeClientFileName(nameEl ? nameEl.value : livingWaterV70OutputState.clientName);
+            const runId = String(runEl?.value || livingWaterV70OutputState.runId || generateLivingWaterRunId()).trim();
+            livingWaterV70OutputState.runId = runId;
+            if (runEl && !String(runEl.value || '').trim()) runEl.value = runId;
+            const snapshotAsOf = String(asOfEl?.value || livingWaterV70OutputState.snapshotAsOf || '').trim();
+            const calc = livingWaterV70OutputState.lastCalc || {};
+            const inputs = collectV70Inputs();
+            const sharedMacro = parseSharedMacroTextarea();
+            const sharedRows = getSharedMacroRows(sharedMacro);
+            const news = normalizeNewsForOutput();
+            const alloc = calc.allocation || {};
+            const generated = new Date();
+            const generatedText = generated.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hour12: false });
+
+            const incompleteReasons = [];
+            if (!clientName || clientName === '客戶名字') incompleteReasons.push('客戶名字仍為預設值');
+            if (!snapshotAsOf) incompleteReasons.push('缺少共用資料截止時間 As-of');
+            if(window.v703DataComplete!==true) incompleteReasons.push('七群風險資料不完整');
+            if(window.v703VerifiedDataDates!==true) incompleteReasons.push('必要指標資料日期缺失或過期');
+            if (!news.length) incompleteReasons.push('缺少最近1～2日重大新聞');
+            const incompleteNews = news.filter(n => {
+                if (!n || typeof n === 'string') return true;
+                return !(n.date && (n.summary || n.text || n.title) && n.impact && (n.url || n.source));
+            });
+            if (news.length && incompleteNews.length) incompleteReasons.push('重大新聞欄位不完整：需日期／核心結果／市場影響／來源');
+            if (!sharedRows.length) incompleteReasons.push('缺少下游共用補充 Macro Snapshot');
+            if (sharedMacro && sharedMacro._parse_error) incompleteReasons.push('補充 Macro Snapshot JSON 解析失敗');
+            const sharedRowsMissingMeta = sharedRows.filter(r => r.key !== '_parse_error' && (!r.dataDate || !r.source));
+            if (sharedRowsMissingMeta.length) incompleteReasons.push('補充 Macro Snapshot 有指標缺資料日期／來源');
+            const missingInputDates = inputs.macro.filter(x => x.value !== '' && !x.dataDate).map(x => x.id);
+            if (missingInputDates.length) incompleteReasons.push(`V70輸入缺資料日期：${missingInputDates.join(', ')}`);
+            if (!['S0','B0','T','sTot','bTot','cTot'].every(k => typeof alloc[k] === 'number' && Number.isFinite(alloc[k])) || Math.abs((alloc.sTot||0)+(alloc.bTot||0)+(alloc.cTot||0)-100)>0.051) incompleteReasons.push('尚未形成有效股債金戰術額度');
+            // 七類細分必須與本輪總經 Snapshot 一致，不能匯出舊資料或只匯出三大池。
+            if (typeof window.v703Recompute === 'function') window.v703Recompute();
+            const seven = window.v703Latest;
+            if (!seven || !seven.percentages || Math.abs(seven.totals.all - 100) > 0.001) {
+                incompleteReasons.push('七類股票／債券／子彈池配置無有效同步結果');
+            }
+            const incomplete = incompleteReasons.length > 0;
+            const lines = [];
+
+            lines.push(`最後修改日期時間：${generatedText}（台灣時間）`);
+            lines.push(`# V70產出-${clientName}`);
+            lines.push('');
+            lines.push('> **定位：** 本檔是該客戶本輪 V70.3 的共用總經／重大新聞／戰術總額度交接檔。它是下游共同事實來源與戰術資金額度，不是逐檔股票或債券的最終買賣指令。');
+            lines.push('> **V70 原生等待資金：** `V70_ORIGINAL_DRY_POWDER`。它不是最終 `SGOV_DRY_POWDER_BUCKET`；最終值由 Mentor／Integration Layer 依固定 Integration Contract 加總 V70＋V82＋V75 各自已算好的輸出，客戶專案只保存正式結果。');
+            lines.push('');
+            lines.push('## 1. 身分與新鮮度');
+            lines.push(`- 客戶：**${clientName}**`);
+            lines.push(`- run_id：**${runId}**`);
+            lines.push(`- V70版本：**V70.3**`);
+            lines.push(`- 共用資料截止時間（As-of）：**${snapshotAsOf || '未提供｜正式下游判斷前必須補齊'}**`);
+            lines.push(`- 本檔產出時間：**${generatedText}（台灣時間）**`);
+            lines.push(`- 資料完整度：**${incomplete ? '⚠ 不完整｜下游必須補抓／重驗證最新資料' : '可作本輪共用Snapshot；下游仍須檢查是否有更新事件'}**`);
+            if (incompleteReasons.length) lines.push(`- 待補項目：${incompleteReasons.join('；')}`);
+            lines.push('');
+
+            if(incomplete) lines.push('> ⚠ 未通過正式資料有效性檢查：本報告僅供研究，不可作為正式客戶配置或交易依據。');
+            lines.push('## 2. Strategic Risk Budget Ownership × V70 Current Input Contract');
+            lines.push(`- 客戶已核准 S0/B0：**股票 ${mdCell(alloc.S0)}%／債券 ${mdCell(alloc.B0)}%**`);
+            lines.push(`- Ownership：**Rule Owner=V70；Current/Legacy Producer=Mentor／人工流程；V70_3目前只消費輸入，S0/B0推導算法=Migration Required**`);
+            lines.push(`- V70 Tactical Tilt T：**${(typeof alloc.T==='number' && Number.isFinite(alloc.T)) ? (alloc.T>=0?'+':'')+alloc.T.toFixed(1)+'%' : '—'}**`);
+            lines.push(`- 今日戰術總額度：**股票 ${mdCell(alloc.sTot)}%／債券 ${mdCell(alloc.bTot)}%／V70_ORIGINAL_DRY_POWDER ${mdCell(alloc.cTot)}%**`);
+            lines.push(`- 模式：**${mdCell(alloc.mode)}**`);
+            if (Array.isArray(alloc.why) && alloc.why.length) lines.push(`- 主要理由：${alloc.why.join('；')}`);
+            lines.push('');
+
+            lines.push('### V70.3 七類資產自動建議比例');
+            if (seven && seven.percentages && !incompleteReasons.some(r => r.includes('七類股票'))) {
+                lines.push('| 資產類別 | 整體可投資資產配置比例 |');
+                lines.push('|---|---:|');
+                const names={S1:'S1 分散核心股票',S2:'S2 成長集中股票',S3:'S3 高風險股票',B1:'B1 超短公債',B2:'B2 中短天期投資級債券（如 SPSB）',B3:'B3 長天期公債',B4:'B4 信用敏感公司債',C0:'SGOV 子彈池'};
+                for (const id of ['S1','S2','S3','B1','B2','B3','B4','C0']) lines.push(`| ${names[id]} | ${Number(seven.percentages[id]).toFixed(1)}% |`);
+                lines.push(`| **合計** | **${Number(seven.totals.all).toFixed(1)}%** |`);
+                lines.push(`- 決策類型：**${seven.status}**；多重風險候選權重，尚未通過完整歷史回測。`);
+                lines.push(`- 大旋鈕對照表狀態：**${window.v703ApprovedMatrix ? '已載入外部核准矩陣' : '未載入；沿用核准S0/B0，非自動10×4映射'}**`);
+            } else {
+                lines.push('**NA｜必要總經數值、資料日期或完整七群風險未通過驗證，停止輸出新七類比例。**');
+            }
+            lines.push('');
+            lines.push('## 3. V70 Macro 核心結果');
+            lines.push(`- Macro Zone：**${mdCell(calc.macroZone)}**`);
+            lines.push(`- mSafe_raw：**${mdCell(calc.mSafe_raw)}**`);
+            lines.push(`- Accelerator：**+${mdCell(calc.accelAdd)} risk points**`);
+            lines.push(`- mSafe_final：**${mdCell(calc.mSafe_final)}**`);
+            lines.push(`- cap_panic／cap_crisis／cap_recession：**${mdCell(calc.cap_panic)}／${mdCell(calc.cap_crisis)}／${mdCell(calc.cap_recession)}**`);
+            lines.push(`- bScore：**${mdCell(calc.bScore)}**`);
+            lines.push(`- Emergency：**${calc.isEmerg ? 'YES' : 'NO'}**`);
+            lines.push(`- CAP說明：${mdCell(calc.capNote)}`);
+            lines.push('');
+            lines.push('### 七大風險群組');
+            lines.push('| 群組 | 風險分數 0–10 |');
+            lines.push('|---|---:|');
+            const groupLabels = {panic_vol:'恐慌／波動',credit:'信用',inflation:'通膨',rates_curve:'利率／曲線',liquidity_fc:'流動性／金融條件',growth:'景氣',valuation:'估值'};
+            Object.entries(calc.groupRisk || {}).forEach(([k,v]) => lines.push(`| ${groupLabels[k] || k} | ${mdCell(v)} |`));
+            lines.push('');
+
+            lines.push('## 4. V70模型實際使用的原始數字');
+            lines.push('| ID | 指標 | 數值 | 單位 | Risk 0–10 | 資料日期 | 來源 |');
+            lines.push('|---|---|---:|---|---:|---|---|');
+            inputs.macro.forEach(x => lines.push(`| ${x.id} | ${mdCell(x.label)} | ${mdCell(x.value)} | ${mdCell(x.unit)} | ${mdCell(x.riskScore)} | ${mdCell(x.dataDate)} | ${x.source ? `[來源](${x.source})` : '—'} |`));
+            lines.push(`- LEI連續三個月負值：**${inputs.lei3mNegative ? 'YES' : 'NO'}**`);
+            lines.push('');
+
+            lines.push('## 5. 下游共用補充總經快照');
+            lines.push('> 本區用來攜帶 V82／債券V75／客戶報告仍需要、但不一定直接進 V70 七群組公式的資料，例如 PPI、Headline CPI、PCE、2Y/5Y/10Y/20Y/30Y、IG/BBB/A OAS、SOFR/OIS、Repo、Treasury供給等。');
+            if (sharedRows.length) {
+                lines.push('| 指標 | 最新值 | 單位 | 資料日期 | 來源 | 備註 |');
+                lines.push('|---|---:|---|---|---|---|');
+                sharedRows.forEach(r => lines.push(`| ${mdCell(r.key)} | ${mdCell(r.value)} | ${mdCell(r.unit)} | ${mdCell(r.dataDate)} | ${mdCell(r.source)} | ${mdCell(r.note)} |`));
+            } else {
+                lines.push('- **目前未注入補充快照。V82／債券V75／報告在正式使用前必須自行補齊所需最新資料。**');
+            }
+            lines.push('');
+
+            lines.push('## 6. 最近1～2日重大總經／政策／市場新聞');
+            if (news.length) {
+                news.forEach((n,i) => {
+                    if (typeof n === 'string') lines.push(`${i+1}. ${n}`);
+                    else {
+                        const head = [n.date, n.title].filter(Boolean).join('｜') || `新聞${i+1}`;
+                        const body = n.summary || n.text || '';
+                        const impact = n.impact ? `｜市場影響：${n.impact}` : '';
+                        const src = n.url ? `｜[來源](${n.url})` : (n.source ? `｜來源：${n.source}` : '');
+                        lines.push(`${i+1}. **${head}**：${body}${impact}${src}`);
+                    }
+                });
+            } else {
+                lines.push('- **尚未注入新聞。正式交給 V82／債券V75／客戶報告前，必須先補最近1～2日重大新聞。**');
+            }
+            lines.push('');
+            lines.push('## 7. 債券戰術總額度（V70 不拆逐檔）');
+            lines.push(`- 人生情境 metadata：**${mdCell(alloc.lifeStageCode)}｜${mdCell(alloc.lifeStageLabel)}**（僅供下游參考，不參與V70債券拆分）。`);
+            lines.push(`- 今日債券戰術總額度：**${mdCell(alloc.bTot)}%**。`);
+            lines.push('- **V70到此停止。美國／台灣債券所在地、SGOV／SPSB／00859B／00860B或其他既有持倉逐檔比例、久期與信用部署，全部交由最新版債券V75依客戶條件與最新市場重新判斷。**');
+            lines.push('- 目標債券配置是中長期終點；即使債券V75選定長期目標，也不代表今天一次買滿。');
+            lines.push('');
+
+            lines.push('## 8. 下游強制契約');
+            lines.push('### 給 V82');
+            lines.push('- 讀取本檔的最新 Macro／新聞與「股票戰術總額度」作為共用輸入。');
+            lines.push('- 必須再依 V82 的基本面、估值、價格地圖、技術、多時間框架、Hard Gate、Runaway Down、客戶目標完成率做逐檔第二次判斷。');
+            lines.push('- V70 股票% **不是** 要 V82 當天把股票買滿的指令。');
+            lines.push('### 給債券V75');
+            lines.push('- 讀取本檔的最新 Macro／新聞與「債券戰術總額度」作為共用輸入。');
+            lines.push('- 必須再依 Fed路徑、完整殖利率曲線、通膨、期限溢價、信用、流動性、Treasury供給、久期、ETF結構與技術做逐檔第二次判斷。');
+            lines.push('- V70 債券% **不是** 要債券V75當天把債券買滿的指令。');
+            lines.push('### 給客戶報告／HTML');
+            lines.push('- 報告以本檔作同一輪 Macro／新聞／戰術總額度的共用事實來源，再合併 V82 與債券V75 的逐檔結果；最終配置以客戶專案 `## 最新正式配置狀態` 為準。');
+            lines.push('- 最終 SGOV_DRY_POWDER_BUCKET = V70_ORIGINAL_DRY_POWDER + V82_UNDEPLOYED_TO_SGOV + V75_UNDEPLOYED_TO_SGOV；V70 不可自行宣告最終值。');
+            lines.push('- 客戶頁只顯示必要數字、新聞結果、理由與執行節奏，不顯示內部檔名、debug、分數工程細節。');
+            lines.push('- 若本檔之後發生重大數據、Fed、Treasury、地緣政治、信用或流動性更新，正式報告前必須先更新本檔或明確覆寫 Delta。');
+            lines.push('');
+            lines.push('---');
+            lines.push('本檔為活水AI內部決策交接資料。逐檔投資建議仍須由最新版 V82／債券V75 完整判斷後產生。');
+            return { clientName, runId, fileName: `V70產出-${clientName}.md`, markdown: lines.join('\n'), incomplete, incompleteReasons };
+        }
+
+        window.setLivingWaterClientContext = function(ctx = {}) {
+            if (ctx.clientName) livingWaterV70OutputState.clientName = String(ctx.clientName);
+            if (ctx.projectName) livingWaterV70OutputState.projectName = String(ctx.projectName);
+            if (ctx.runId) livingWaterV70OutputState.runId = String(ctx.runId);
+            if (ctx.snapshotAsOf) livingWaterV70OutputState.snapshotAsOf = String(ctx.snapshotAsOf);
+            const n = document.getElementById('v70-client-name');
+            const r = document.getElementById('v70-run-id');
+            const a = document.getElementById('v70-snapshot-asof');
+            if (n && ctx.clientName) n.value = String(ctx.clientName);
+            if (r && ctx.runId) r.value = String(ctx.runId);
+            if (a && ctx.snapshotAsOf) a.value = String(ctx.snapshotAsOf);
+            return true;
+        };
+
+        window.setLivingWaterMacroNews = function(items) {
+            livingWaterV70OutputState.macroNews = Array.isArray(items) ? items : (items || []);
+            const ta = document.getElementById('v70-news-input');
+            let mirror = '';
+            if (Array.isArray(items)) mirror = items.map(x => typeof x === 'string' ? x : [x.date, x.title, x.summary || x.text, x.impact].filter(Boolean).join('｜')).join('\n');
+            else if (typeof items === 'string') mirror = items;
+            livingWaterV70OutputState.newsMirrorText = mirror;
+            if (ta) ta.value = mirror;
+            return true;
+        };
+
+        window.setLivingWaterMacroInputMeta = function(indicators = {}) {
+            if (!livingWaterV70OutputState.sharedMeta || typeof livingWaterV70OutputState.sharedMeta !== 'object') livingWaterV70OutputState.sharedMeta = {};
+            const prev = (livingWaterV70OutputState.sharedMeta.indicators && typeof livingWaterV70OutputState.sharedMeta.indicators === 'object')
+                ? livingWaterV70OutputState.sharedMeta.indicators : {};
+            livingWaterV70OutputState.sharedMeta.indicators = {
+                ...prev,
+                ...((indicators && typeof indicators === 'object') ? indicators : {})
+            };
+            return true;
+        };
+
+        window.setLivingWaterSharedMacroSnapshot = function(data, meta = {}) {
+            livingWaterV70OutputState.sharedMacro = (data && typeof data === 'object') ? data : {};
+            const prevMeta = (livingWaterV70OutputState.sharedMeta && typeof livingWaterV70OutputState.sharedMeta === 'object')
+                ? livingWaterV70OutputState.sharedMeta : {};
+            const nextMeta = (meta && typeof meta === 'object') ? meta : {};
+            const prevIndicators = prevMeta.indicators || prevMeta.macroInputs || {};
+            const incomingIndicators = nextMeta.indicators || nextMeta.macroInputs || {};
+            livingWaterV70OutputState.sharedMeta = { ...prevMeta, ...nextMeta };
+            if (Object.keys(prevIndicators).length || Object.keys(incomingIndicators).length) {
+                livingWaterV70OutputState.sharedMeta.indicators = {
+                    ...prevIndicators,
+                    ...incomingIndicators
+                };
+            }
+            if (meta.asOf) livingWaterV70OutputState.snapshotAsOf = String(meta.asOf);
+            const ta = document.getElementById('v70-shared-macro-input');
+            const asOfEl = document.getElementById('v70-snapshot-asof');
+            if (ta) ta.value = JSON.stringify(livingWaterV70OutputState.sharedMacro, null, 2);
+            if (asOfEl && meta.asOf) asOfEl.value = String(meta.asOf);
+            return true;
+        };
+
+        window.getLivingWaterV70Output = function() {
+            try { calcTotal(); } catch (e) { console.warn('[V70 output] calcTotal failed before getter export', e); }
+            return buildLivingWaterV70Markdown();
+        };
+        window.getLivingWaterV70Markdown = function() { return window.getLivingWaterV70Output().markdown; };
+
+        window.downloadLivingWaterV70Markdown = function() {
+            try { calcTotal(); } catch (e) { console.warn('[V70 output] calcTotal failed before export', e); }
+            const out = buildLivingWaterV70Markdown();
+            const blob = new Blob([out.markdown], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = out.fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            const st = document.getElementById('v70-output-status');
+            if (st) st.innerText = `已產出：${out.fileName}${out.incomplete ? '｜⚠ 資料仍有缺口，正式下游使用前需補齊' : '｜可交下游再判斷'}`;
+            return out;
+        };
+
+        // Init
+        renderInputs('macro-inputs', macroConfig);
+        renderCapControls();
+    try { recalcNetLiquidity(); } catch(e) {}
+        updateCapBps();
+
+        macroConfig.forEach(c => {
+            // Recover only the last valid manual number; never recover NA/N/A or Infinity.
+            const el=document.getElementById('in_'+c.id);
+            try {const saved=localStorage.getItem('v52_'+c.id);
+              if(el && saved !== null && saved.trim() !== '' && Number.isFinite(Number(saved))) el.value=saved;
+            } catch(e) {}
+            try { handleInput(c.id, {preserveProvenance:true}); }
+            catch (e) { console.warn('[init] handleInput failed', c.id, e); }
+        });
+
+
+        { 
+            const bi = document.getElementById('bond-raw'); 
+            updateBond(bi ? bi.value : '1.94'); 
+        } 
+    </script>
+<div class="max-w-5xl mx-auto px-6 py-10 mt-6 border-t border-slate-800/50">
+<div class="text-[11px] text-slate-400 text-center leading-relaxed font-sans mb-4">
+<span class="font-bold text-slate-200">免責聲明：</span>本系統僅供研究、決策輔助及教學之用，非個別化投資建議或投資顧問服務，亦不構成任何投資要約、招攬、推薦或交易指示。過去績效不保證未來結果；投資有風險且可能損失本金，投資人應審慎評估並自負盈虧。
+        </div>
+<div class="text-[10px] text-slate-500 text-center font-mono tracking-wider">
+<p class="text-slate-400">Copyright © 2025 Josephine Morgan. All rights reserved.</p>
+<p class="mt-1 text-[9px] opacity-75">版權所有，嚴禁未經授權之轉載、改作或逆向工程 (Reverse Engineering)。</p>
+</div>
+<div class="h-8"></div>
+</div>
+<script>
+(function(){
+  function syncLEI3M(){
+    const m2 = document.getElementById('lei_m2');
+    const m1 = document.getElementById('lei_m1');
+    const m0 = document.getElementById('lei_m0');
+    const out = document.getElementById('lei_3m');
+    if(!m2||!m1||!m0||!out) return;
+    const ok = m2.checked && m1.checked && m0.checked;
+    out.checked = ok;
+    const state = document.getElementById('in_m21');
+    if(state) state.value = ok ? '1' : '0';
+    if(typeof calcTotal==='function') calcTotal();
+  }
+  ['lei_m2','lei_m1','lei_m0'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change', syncLEI3M);
+  });
+})();
+</script>
+<!-- ===== Gamma 工程說明（放最後） ===== -->
+<section class="mt-6">
+<div class="card">
+<div class="card-header">
+<div class="badge badge-purple">Γ</div>
+<div>
+<div class="card-title">Gamma 工程說明（放最後）</div>
+<div class="card-subtitle">A / B / C 類：怎麼把「數值」變成「風險 0–10」</div>
+</div>
+</div>
+<div class="card-body">
+<div class="note">
+<div class="note-title">一句話先懂</div>
+<div class="note-text">
+          我們先把每個指標變成 <b>risk 0–10</b>（0=安全、10=危險），再用權重平均成 <b>avgRisk</b>，
+          最後算 <b>mSafe_raw = (10-avgRisk)*10</b>。Gamma 的工作，就是讓「高風險訊號」更不容易被稀釋或誤判。
+        </div>
+</div>
+<div class="grid-2">
+<div class="panel">
+<div class="panel-title">A 類（門檻/觸發型）</div>
+<div class="panel-text">
+<b>用 piecewiseGamma 鎖定 t5=5 不動點</b>：<br/>
+            只要指標已經越過 t5（代表風險已經不小），就保證 risk ≥ 5，避免出現「False Calm（明明危險卻被算成安全）」。
+            <div class="mini">
+              例：VIX、HY OAS、MOVE、Real10Y、Δ13W 淨流動性、5yBE+Δ1M、Sahm、U3 失業率、NFP 3M Avg、LEI 連3月等。
+            </div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">B 類（連續/景氣循環型）</div>
+<div class="panel-text">
+<b>維持線性或輕 gamma</b>：<br/>
+            這類指標本來就是「慢慢變壞/變好」，不適合硬門檻，否則會讓分數跳來跳去。
+            <div class="mini">
+              例：殖利率曲線/期限利差、PMI、核心通膨趨勢、金融條件等（依你的配置為準）。
+            </div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">C 類（噪音/估值/情緒型）</div>
+<div class="panel-text">
+<b>不鎖 t5=5</b>，而且 <b>降權/降振幅</b>：<br/>
+            情緒與估值會亂飄，不能因一次波動就把 Macro 拉爆。做法：線性或 very-light gamma，
+            再做「中線收斂」：<br/>
+<code>risk' = 5 + α*(risk-5)</code>（α&lt;1，例 α=0.7）<br/>
+            這代表：它最多只能「提醒你脆弱度」，不會一拳把總分打爛。
+          </div>
+</div>
+<div class="panel">
+<div class="panel-title">WTI / DXY 的定位</div>
+<div class="panel-text">
+<b>WTI</b>：不放 A 類、不進 CAP，留在 AND accelerator（油價×通膨AND）用來當加速器。<br/>
+<b>DXY</b>：可做 A 類（防 False Calm），但不進 CAP（避免美元單點把 final 封頂）。
+          </div>
+</div>
+</div>
+<div class="note mt-4">
+<div class="note-title">關於「線性 0 / 5 / 10」怎麼辦？</div>
+<div class="note-text">
+<b>線性（0/5/10）只是第一步映射</b>：把原始值映射成 risk 0–10 的「底稿」。<br/>
+          - A 類：底稿 → piecewiseGamma（鎖 t5） → riskA<br/>
+          - B 類：底稿 → lightGamma 或線性 → riskB<br/>
+          - C 類：底稿 → veryLight/線性 → 中線收斂（α）→ riskC
+        </div>
+</div>
+</div>
+</div>
+</section>
+<div class="max-w-5xl mx-auto px-6 py-10 mt-6 border-t border-slate-800/50">
+<div class="text-[11px] text-slate-400 text-center leading-relaxed font-sans mb-4">
+<span class="font-bold text-slate-200">免責聲明：</span>本系統僅供研究、決策輔助及教學之用，非個別化投資建議或投資顧問服務，亦不構成任何投資要約、招攬、推薦或交易指示。過去績效不保證未來結果；投資有風險且可能損失本金，投資人應審慎評估並自負盈虧。
+        </div>
+<div class="text-[10px] text-slate-500 text-center font-mono tracking-wider">
+<p class="text-slate-400">Copyright © 2025 Josephine Morgan. All rights reserved.</p>
+<p class="mt-1 text-[9px] opacity-75">版權所有，嚴禁未經授權之轉載、改作或逆向工程 (Reverse Engineering)。</p>
+</div>
+<div class="h-8"></div>
+</div>
+</div>
+<section class="max-w-5xl mx-auto px-4 py-8 v703-bluegold" id="v703-section">
+ <div class="rounded-2xl border border-cyan-700 bg-slate-900/70 p-5 space-y-4 v703-bluegold-card">
+  <h2 class="text-2xl font-bold text-cyan-300">🍎 活水AI｜家人版資產配置戰情室</h2>
+  <p class="text-sm text-slate-300">家人版：選擇人生情境與投資風格，總經資料由背景快照載入，自動產生股票三類、債券四類及 SGOV 子彈池比例、增加／持有／減少與原因。<strong>無須輸入持倉、金額或新增資金。</strong></p>
+  <details hidden class="border border-slate-700 rounded p-3"><summary class="cursor-pointer text-sm font-semibold">系統背景資料日期與來源</summary><p class="text-xs text-amber-300 my-2">每日超過3交易日、每週14日、每月45日判定過期。日期指觀測日；若能取得公布日，應另行保留。</p><div id="v703-date-controls" class="max-h-96 overflow-y-auto"></div></details>
+  <p class="text-xs text-slate-400 mb-3">人生情境與投資風格已於頁面最上方選擇；以下顯示同一組設定的計算結果。</p>
+  <div id="family-data-status" role="status" aria-live="polite" class="sr-only">正在載入資料…</div>
+  <div id="family-news" class="text-sm text-slate-300 mb-3" aria-live="polite"></div>
+  <div aria-live="polite" class="rounded-lg bg-slate-800 p-4 text-sm space-y-3" id="v703-result">正在讀取總經資料…</div>
+
+  <p class="text-xs text-slate-400">S1／S2／S3、B1／B2／B3／B4 是資產風險類別；B1 的正式債券配置與 SGOV 子彈池用途分帳，總和只計一次。個別 ETF 的買賣價格仍由 V82／債券V75 判斷。</p>
+ </div>
+</section>
+<script>
+(function(){
+ 'use strict';
+ const labels={S1:'分散核心股票（VT／VOO）',S2:'成長集中股票（QQQ／SOXX）',S3:'高風險股票',B1:'超短公債（正式債券池）',B2:'中短天期投資級公司債（如 SPSB，主要持有約1～5年期、投資級信用評等公司債；仍有利率與信用風險）',B3:'長天期美國公債',B4:'信用敏感公司債',C0:'SGOV 等待部署子彈池'};
+ // 股/債池內部的基準權重。每列分別加總100%，不是整體投資比例。
+ // 規則版本：V70.3-MULTI-RISK-20261013，屬待回測候選參數。
+ const maps={
+   normal:{name:'一般／無顯著壓力',s:[70,25,5],b:[45,35,15,5]},
+   inflation:{name:'通膨／長端利率壓力',s:[75,23,2],b:[60,33,4,3]},
+   credit:{name:'信用危機',s:[80,18,2],b:[65,30,5,0]},
+   recession:{name:'景氣衰退',s:[75,23,2],b:[50,30,18,2]},
+   liquidity:{name:'流動性緊縮',s:[85,14,1],b:[70,25,5,0]},
+   panic:{name:'恐慌／價格折價',s:[75,23,2],b:[45,35,17,3]}
+ };
+ const finite=v=>typeof v==='number'&&Number.isFinite(v);
+ function dynamicWeights(snap){
+   const g=snap.groupRisk||{};
+   const stress=window.v703StressModel ? window.v703StressModel(g,{capPanic:snap.cap_panic??100,capCrisis:snap.cap_crisis??100,capRecession:snap.cap_recession??100}) : null;
+   if(!stress) return null;
+   // 多因子加權；不再只選單一危機類型，六類壓力可同時生效。
+   const z=stress.strengths||{};
+   const w={
+     inflation:Math.max(z.inflation||0,z.rates_curve||0),
+     credit:z.credit||0,
+     recession:z.growth||0,
+     liquidity:z.liquidity_fc||0,
+     panic:(z.panic_vol||0)*0.35
+   };
+   const riskTotal=Object.values(w).reduce((a,b)=>a+b,0);
+   const k=Math.min(0.90,riskTotal/2.0);
+   const weights={normal:1-k};
+   if(riskTotal>0)for(const [key,val] of Object.entries(w))weights[key]=k*val/riskTotal;
+   const blend=(part)=>maps.normal[part].map((_,i)=>Object.entries(weights).reduce((sum,[key,weight])=>sum+maps[key][part][i]*weight,0));
+   const sw=blend('s'),bw=blend('b');
+   const fix=v=>v.map(x=>x/v.reduce((a,b)=>a+b,0));
+   return {s:fix(sw),b:fix(bw),weights,stress,summary:Object.entries(weights).filter(([_,v])=>v>=0.05).map(([k,v])=>maps[k].name+' '+(v*100).toFixed(0)+'%').join('、')};
+ }
+ function amounts(total,ratio,keys){
+   // 最大餘數法：以0.1百分點為整數單位分配，不得讓末類出現負值。
+   const units=Math.round(total*10);
+   if(!Number.isFinite(units)||units<0||ratio.length!==keys.length||ratio.some(x=>!Number.isFinite(x)||x<0)) throw new Error('invalid allocation');
+   const sum=ratio.reduce((a,b)=>a+b,0);
+   if(sum<=0)throw new Error('zero allocation weights');
+   const ideal=ratio.map(x=>units*x/sum);
+   const quota=ideal.map(x=>Math.floor(x));
+   let remain=units-quota.reduce((a,b)=>a+b,0);
+   const order=ideal.map((x,i)=>({i,f:x-quota[i]})).sort((a,b)=>b.f-a.f||a.i-b.i);
+   for(let i=0;i<remain;i++)quota[order[i].i]++;
+   return Object.fromEntries(keys.map((k,i)=>[k,quota[i]/10]));
+ }
+ window.v703Recompute=function(){
+   const box=document.getElementById('v703-result');if(!box)return;
+   const snap=window.v703MacroSnapshot;
+   const valid=window.v703DataComplete===true && window.v703VerifiedDataDates===true && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
+   if(!valid){box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式建議：NA</div><div>必要總經資料、日期或配置尚未通過驗證；不發布新的七類百分比。請在上方核對資料日期及來源。</div>';window.v703Latest=null;return;}
+   const a=snap.allocation;let s=a.sTot,b=a.bTot,c=a.cTot;
+   if([s,b,c].some(x=>x<0||x>100)||Math.abs(s+b+c-100)>0.051){box.innerHTML='<div class="text-red-300">配置計算異常，停止輸出。</div>';window.v703Latest=null;return;}
+   // 各資產只顯示一位小數；現金/子彈池承接總數的尾差。
+   // 依整數十分之一百分點對帳，避免浮點捨入造成0.1%錯差。
+   const s10=Math.round(s*10),b10=Math.round(b*10);
+   if(s10<0 || b10<0 || s10+b10>1000){box.textContent='⚠ 股債總額超界，停止輸出。';window.v703Latest=null;return;}
+   s=s10/10;b=b10/10;c=(1000-s10-b10)/10;
+   const rule=dynamicWeights(snap);
+   if(!rule){box.textContent='⚠ 七群風險資料或 CAP 不完整，停止輸出。';window.v703Latest=null;return;}
+   const ss=amounts(s,rule.s,['S1','S2','S3']);
+   const bb=amounts(b,rule.b,['B1','B2','B3','B4']);
+   const pct={...ss,...bb,C0:c};
+   // 「增／持／減」是相較同一客戶 S0/B0 的正常中性市場基準（10%子彈池、T=0），不是叫客戶立刻下單。
+   const baselineStock=90*a.S0/100,baselineBond=90*a.B0/100;
+   const ref={...amounts(baselineStock,maps.normal.s,['S1','S2','S3']),...amounts(baselineBond,maps.normal.b,['B1','B2','B3','B4']),C0:10};
+   const delta=Object.fromEntries(Object.keys(pct).map(k=>[k,Math.round((pct[k]-ref[k])*10)/10]));
+   const action=Object.fromEntries(Object.entries(delta).map(([k,d])=>[k,(window.v703DemoMode?'模擬':'建議')+(d>0.5?'增加':d< -0.5?'減少':'持有')]));
+
+   const total=Object.values(pct).reduce((sum,x)=>sum+x,0);
+   if(Math.abs(total-100)>0.001 || Object.values(pct).some(x=>!Number.isFinite(x)||x<0) || Math.abs(ss.S1+ss.S2+ss.S3-s)>0.001 || Math.abs(bb.B1+bb.B2+bb.B3+bb.B4-b)>0.001 || ['S1','S2','B1','B2','B3'].some((k,i)=>Math.abs(pct[k] - (i<2?s*rule.s[i]:b*rule.b[i-2]))>0.101)){box.innerHTML='<div class="text-red-300">七類分配對帳失敗，停止輸出。</div>';window.v703Latest=null;return;}
+   const line=(id)=>`<div class="flex flex-wrap justify-between gap-2 border-b border-slate-700/60 py-2"><span>${id}｜${labels[id]}</span><span class="font-mono text-cyan-200"><b>${pct[id].toFixed(1)}%</b>　${action[id]} (${delta[id]>=0?'+':''}${delta[id].toFixed(1)}%)</span></div>`;
+   box.innerHTML=(window.v703DemoMode?'<div class="text-xs text-slate-400 mb-2">測試預覽</div>':'')+`<div class="rounded border border-amber-700 p-2 mb-2 text-amber-200">${window.v703StrategyKind==='APPROVED_MATRIX'?'已載入核准10×4矩陣':'⚠ 10×4採候選示範配置，非正式核准值'}｜人生：${document.getElementById('life-stage-select')?.selectedOptions[0]?.textContent||''}；風格：${document.getElementById('v703-risk-preference')?.selectedOptions[0]?.textContent||''}</div>`+
+    `<div><strong>總經安全分數：</strong>${snap.mSafe_final.toFixed(1)}／100　<strong>風險模式：</strong>${rule.summary||"一般市場"}</div>`+
+    `<div class="text-xs text-slate-300">S0/B0：${a.S0.toFixed(1)}%／${a.B0.toFixed(1)}%；總經 T：${a.T>0?'+':''}${a.T} 點；子彈池 C：${c.toFixed(1)}%</div>`+
+    `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%</div>`+['S1','S2','S3'].map(line).join('')+
+    `<div class="font-bold text-green-300 mt-2">債券池 ${b.toFixed(1)}%</div>`+['B1','B2','B3','B4'].map(line).join('')+
+    `<div class="font-bold text-yellow-300 mt-2">${labels.C0}　${c.toFixed(1)}%</div>`+
+    `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計　${total.toFixed(1)}%</div>`+
+    `<div class="text-xs text-slate-300 mt-2">增／減表示占總資產配置比重的變化：例如原本10%，調整為12%，就是增加2%；此處僅為配置比較，尚未進行實際交易。</div>`+
+    `<div class="text-xs text-amber-200">多風險連續加權之七類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;
+   window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('life-stage-select')?.value,preference:document.getElementById('v703-risk-preference')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true};
+ };
+ window.v703Export=function(){window.v703Recompute();if(!window.v703Latest){alert('必要總經資料／日期未通過驗證，無法匯出新配置');return;}const blob=new Blob([JSON.stringify(window.v703Latest,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='V70-3-seven-class-allocation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ window.v703StartDemo=function(){
+   window.v703DemoMode=true;
+   const stamp=new Date().toISOString().slice(0,10);
+   macroConfig.forEach(cfg=>{
+     const input=document.getElementById('in_'+cfg.id);
+     if(input){input.value=String(cfg.id==='m21'?0:cfg.t5);}
+     const d=document.getElementById('v703-date-'+cfg.id),u=document.getElementById('v703-source-'+cfg.id);
+     if(d)d.value=stamp;
+     if(u)u.value='DEMO｜t5 中間錨點（非真實觀測）';
+     const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=input?.value||'';
+     const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
+     if(slider && score){let risk=mapToScore(Number(input.value),cfg.t0,cfg.t5,cfg.t10,cfg.gamma);if(C_VALUATION_IDS.has(cfg.id))risk=Math.round((5+C_VALUATION_ALPHA*(risk-5))*10)/10;slider.value=risk;score.textContent=risk.toFixed(1);}
+   });
+   const flag=document.getElementById('v703-demo-banner');if(flag)flag.textContent='測試預覽';
+   if(typeof calcTotal==='function')calcTotal();
+   if(typeof window.v703Recompute==='function')window.v703Recompute();
+ };
+ window.v703StopDemo=function(){
+   window.v703DemoMode=false;
+   const b=document.getElementById('v703-demo-banner');if(b)b.textContent='正式資料模式：缺資料時顯示 NA。';
+   // 原始數值／日期重新載入，避免演示的中間數污染正式輸出。
+   macroConfig.forEach(cfg=>{
+     const input=document.getElementById('in_'+cfg.id);
+     if(input){let saved=null;try{saved=localStorage.getItem('v52_'+cfg.id)}catch(e){}input.value=saved!==null?saved:String(cfg.val??'');}
+     for(const field of ['date','source']){const el=document.getElementById('v703-'+field+'-'+cfg.id);if(el){let saved='';try{saved=localStorage.getItem('v703-'+field+'-'+cfg.id)||''}catch(e){}el.value=saved;}}
+     const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=input?.value||'';
+   });
+   if(typeof calcTotal==='function')calcTotal();
+   if(typeof window.v703Recompute==='function')window.v703Recompute();
+ };
+ if(typeof v703BuildDateControls==='function')v703BuildDateControls();
+ if(typeof window.v703ApplyApprovedMatrix==='function')window.v703ApplyApprovedMatrix();
+ if(typeof calcTotal==='function')calcTotal();
+ window.v703Recompute();
+ // 測試中間值由下方資料載入器在正式 feed 不可用時自動填入，不寫入本機儲存。
+ // Family auto loader runs after initialization.
+})();
+</script>
+<script>
+/* Family-only display: all source controls stay as internal calculation adapter.
+ * Optional V70_macro_latest.json is published by a server job (p128.py pipeline),
+ * NOT fetched from finance vendors directly by this standalone browser file.
+ * Supported: {indicators:{m07:{value:23,dataDate:"YYYY-MM-DD",source:"..."},...},
+ *              news:["..."],asOf:"..."}. 21 macroConfig IDs are required.
+ */
+(function(){
+ 'use strict';
+ const familyLife=document.getElementById('family-life');
+ const familyStyle=document.getElementById('family-style');
+ const status=document.getElementById('family-data-status');
+ const newsBox=document.getElementById('family-news');
+ let sourceMode='';
+ function synchronize(){
+   const l=document.getElementById('life-stage-select'),p=document.getElementById('v703-risk-preference');
+   if(!l||!p)return;
+   l.value=familyLife.value;p.value=familyStyle.value;
+   if(typeof window.v703ApplyApprovedMatrix==='function') window.v703ApplyApprovedMatrix();
+   if(typeof window.v703Recompute==='function')window.v703Recompute();
+ }
+ familyLife.addEventListener('change',synchronize);
+ familyStyle.addEventListener('change',synchronize);
+ async function loadFeed(){
+   status.textContent='正在讀取最新總經快照…';
+   try{
+     const url=new URL('V70_macro_latest.json',location.href);
+     const response=await fetch(url,{cache:'no-store'});
+     if(!response.ok)throw new Error('快照 HTTP '+response.status);
+     const doc=await response.json();
+     // Python 24項蒐集器先執行，將已驗證資料轉為此資料契約；不得使用 MISSING/STALE 冒充正式數值。
+     if(!doc.verification || doc.verification.ready!==true){
+       const n=doc.verification.valid??0, total=doc.verification.totalRequired??21;
+       throw new Error('24項蒐集器仍有缺項（配置必要欄位 '+n+'/'+total+' 項），僅展示明確標示的示範比例');
+     }
+     if(doc.schema!=='V70.3/family-macro-feed-v1')throw new Error('不支援的資料快照格式');
+     // Reject yesterday's deployment once it exceeds the documented update window.
+     // Old JSON must never masquerade as a current verified macro feed.
+     const produced=Date.parse(String(doc.asOf||''));
+     if(!Number.isFinite(produced)||produced>Date.now()+5*60*1000||Date.now()-produced>26*3600*1000)throw new Error('快照產出時間超過26小時／缺失；等待資料更新');
+
+     const data=doc.indicators||doc.macroIndicators||doc.macro;
+     if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
+     if(typeof macroConfig==='undefined')throw new Error('找不到原始總經模型');
+     // First validate all records; never partially import invalid source data.
+     for(const cfg of macroConfig){
+       const r=data[cfg.id];
+       if(!r || r.value===null || String(r.value).trim()==='' || !Number.isFinite(Number(r.value)) || !/^(19|20)\d{2}-\d{2}-\d{2}$/.test(String(r.dataDate||'')) || !String(r.source||'').trim()) throw new Error('缺少有效 '+cfg.id+' 日期／數值／來源');
+       const obs = new Date(String(r.dataDate)+'T00:00:00Z');
+       if(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000) throw new Error('日期錯誤 '+cfg.id);
+       if(!/^https:\/\//.test(String(r.source||'')))throw new Error('資料來源不是HTTPS '+cfg.id);
+       const dayAge=Math.floor((Date.now()-obs.getTime())/86400000);
+       const monthly=['m04','m05','m15','m16','m18','m19','m20'].includes(cfg.id);
+       let workDays=0;
+       if(!monthly){for(let day=1;day<=dayAge;day++){const w=new Date(obs.getTime()+day*86400000).getUTCDay();if(w!==0&&w!==6)workDays++;}}
+       if(dayAge<0||(monthly?dayAge>46:workDays>4))throw new Error('總經觀測日已過期 '+cfg.id);
+       const n=Number(r.value);
+       if(Math.abs(n)>1e9 || (cfg.id==='m07' && n<0) || (cfg.id==='m12' && n<0)) throw new Error('指標超出基本合理範圍 '+cfg.id);
+     }
+     window.v703DemoMode=false;
+     for(const cfg of macroConfig){
+       const r=data[cfg.id], input=document.getElementById('in_'+cfg.id);
+       if(!input)throw new Error('缺少欄位 '+cfg.id);
+       input.value=String(r.value);
+       const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
+       if(d)d.value=r.dataDate;if(src)src.value=String(r.source);
+       const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=input.value;
+       const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
+       let val=mapToScore(Number(r.value),cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
+       if(['m03_qqq','m03_spy','m03_vt'].includes(cfg.id)) val=Math.round((5+0.7*(val-5))*10)/10;
+       if(slider)slider.value=val;if(score)score.textContent=val.toFixed(1);
+     }
+     if(typeof calcTotal==='function')calcTotal();
+     synchronize();
+     sourceMode='feed';
+     const valid=window.v703Latest;
+     status.textContent=valid?'✅ 已讀取總經快照（'+String(doc.asOf||'時間依各指標')+'），並完成資料日期驗證。':'⚠ 快照已讀取，但資料已過期或未通過完整驗證；正式配置顯示 NA。';
+     const items=Array.isArray(doc.news)?doc.news.slice(0,5):[];
+     newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
+   }catch(err){
+     sourceMode='hold';
+     // 本機 HTML 測試：以中間錨點自動生成完整畫面，保留 synthetic 狀態於內部結果。
+     if(typeof window.v703StartDemo==='function')window.v703StartDemo();
+     status.textContent='測試預覽';
+     newsBox.textContent='';
+   }
+ }
+ // 自動更新資料；本機 content:// 未能載入 feed 時自動展示測試中間值。
+ synchronize();loadFeed();
+})();
+</script>
+<section class="max-w-5xl mx-auto my-4 px-6 text-xs text-slate-300" aria-label="活水書院｜詩在遠方"><div class="text-slate-400 font-semibold px-4 pt-3">🖼️ 活水書院｜詩在遠方</div><div class="whitespace-pre-line p-4">一脈活水，流過歲月，
+釀成青山，也釀成遠方。
+
+不逐一時風起，
+只守四季花開。
+
+讓時間沉澱豐盛，
+讓資產在歲月裡生長；
+今日種下一方山水，
+來日收成人生的富足。</div></section><script id="v703-family-no-manual-inputs">
+(function(){
+  // Family-facing original macro dashboard is read-only. Updates from the background feed
+  // still assign .value programmatically; profile selection remains in #v703-section.
+  function protect(){
+    const panel=document.getElementById('v703-legacy-shell');
+    if(!panel)return;
+    panel.querySelectorAll('input, textarea, select').forEach(function(el){
+      if(el.type==='hidden')return;
+      if(el.type==='text' || el.type==='number' || el.type==='date' || el.tagName==='TEXTAREA')el.readOnly=true;
+      el.tabIndex=-1;
+      el.setAttribute('aria-label',(el.getAttribute('aria-label')||'總經資料')+'（系統自動更新；家人版唯讀）');
+    });
+  }
+  function start(){
+    protect();
+    const panel=document.getElementById('v703-legacy-shell');
+    if(panel && typeof MutationObserver!=='undefined'){
+      const observer=new MutationObserver(protect);
+      observer.observe(panel,{childList:true,subtree:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
+  else start();
+})();
+</script>
+</body>
+</html>

@@ -64,6 +64,9 @@ jobs:
               except Exception as exc:
                   print(label,'FAILED',type(exc).__name__,str(exc)[:250])
           PY
+      - name: Run source probe before QA
+        continue-on-error: true
+        run: python scripts/probe_extra8.py
       - name: QA 24-item collector and adapter
         run: |
           python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py

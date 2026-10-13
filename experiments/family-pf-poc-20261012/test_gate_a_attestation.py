@@ -70,3 +70,18 @@ def test_unknown_reviewer_role_rejected():
 def test_nonsensical_signature_rejected():
     priv,pub,p=fixture()
     assert verify_attestation(p,"not base64!",pub,NOW)["state"]=="HOLD"
+
+def test_signed_private_evidence_url_is_not_sufficient():
+    priv,pub,p=fixture()
+    p["evidence_urls"]["remote_https_reachable"]="https://127.0.0.1/proof"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_signed_localhost_url_is_not_sufficient():
+    priv,pub,p=fixture()
+    p["evidence_urls"]["external_oauth_login_verified"]="https://localhost/proof"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"
+
+def test_signed_evidence_with_nonstandard_port_is_rejected():
+    priv,pub,p=fixture()
+    p["evidence_urls"]["audit_denials_verified"]="https://auditor.example.org:8443/proof"
+    assert verify_attestation(p,sign(priv,p),pub,NOW)["state"]=="HOLD"

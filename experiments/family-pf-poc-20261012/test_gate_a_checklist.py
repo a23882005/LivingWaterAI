@@ -57,3 +57,13 @@ def test_evidence_null_or_zero_not_accepted():
 
 def test_no_evidence_and_empty_dict_same_required_missing():
     assert evaluate_gate_a({})=={"state":"HOLD","missing":list(REQUIRED_EVIDENCE)}
+
+
+def test_integer_one_not_accepted_as_evidence():
+    evidence={key:True for key in REQUIRED_EVIDENCE}
+    evidence['external_oauth_login_verified']=1
+    assert evaluate_gate_a(evidence)['state']=='HOLD'
+
+def test_unexpected_evidence_does_not_override_missing_required():
+    evidence={'release_approved':True,'local_ci_passed':True}
+    assert evaluate_gate_a(evidence)=={'state':'HOLD','missing':list(REQUIRED_EVIDENCE)}

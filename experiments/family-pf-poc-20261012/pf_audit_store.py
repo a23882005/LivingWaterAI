@@ -84,3 +84,19 @@ class AuditStore:
             expected_seq+=1
             prev=mac
         return len(rows)
+
+    def export_anchor(self):
+        """A snapshot to store outside the DB via an independent trusted channel."""
+        count=self.verify()
+        with self._connect() as db:
+            latest=db.execute("SELECT mac FROM audit_events ORDER BY seq DESC LIMIT 1").fetchone()
+        return {"event_count":count,"last_mac":latest[0] if latest else "GENESIS"}
+
+    def verify_anchor(self, anchor):
+        """Detect record loss against previously exported external evidence."""
+        if not isinstance(anchor,dict) or set(anchor)!={"event_count","last_mac"}:
+            raise AuditIntegrityError("Untrusted anchor shape")
+        current=self.export_anchor()
+        if current!=anchor:
+            raise AuditIntegrityError("Audit anchor mismatch")
+        return True

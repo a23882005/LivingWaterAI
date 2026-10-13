@@ -73,6 +73,7 @@ class AuditStore:
         expected_seq=1
         if _connection is None:
             with self._connect() as db:
+                db.execute("BEGIN")  # Pin one read snapshot across rows and high-water metadata.
                 return self.verify(_connection=db)
         rows=_connection.execute("""SELECT seq,occurred_at,action,decision,reason,
                 actor_ref,request_id,prev_mac,mac FROM audit_events ORDER BY seq""").fetchall()

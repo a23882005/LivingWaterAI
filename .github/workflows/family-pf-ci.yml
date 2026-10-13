@@ -63,6 +63,8 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_gate_a_attestation.py pf-ci-source/tests/test_gate_a_attestation.py
           cp experiments/family-pf-poc-20261012/pf_gate_a_trust_anchor.py pf-ci-source/pf_gate_a_trust_anchor.py
           cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
+          cp experiments/family-pf-poc-20261012/pf_evidence_digest_verify.py pf-ci-source/pf_evidence_digest_verify.py
+          cp experiments/family-pf-poc-20261012/test_evidence_digest_verify.py pf-ci-source/tests/test_evidence_digest_verify.py
           cp experiments/family-pf-poc-20261012/pf_external_evidence_inventory.py pf-ci-source/pf_external_evidence_inventory.py
           cp experiments/family-pf-poc-20261012/test_external_evidence_inventory.py pf-ci-source/tests/test_external_evidence_inventory.py
           cp experiments/family-pf-poc-20261012/pf_remote_preflight.py pf-ci-source/pf_remote_preflight.py

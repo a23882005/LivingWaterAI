@@ -76,6 +76,10 @@ class AuditStore:
                 return self.verify(_connection=db)
         rows=_connection.execute("""SELECT seq,occurred_at,action,decision,reason,
                 actor_ref,request_id,prev_mac,mac FROM audit_events ORDER BY seq""").fetchall()
+        sequence_row=_connection.execute("SELECT seq FROM sqlite_sequence WHERE name=?",("audit_events",)).fetchone()
+        high_water=sequence_row[0] if sequence_row else 0
+        if high_water != (rows[-1][0] if rows else 0):
+            raise AuditIntegrityError("Audit high-water sequence mismatch")
         for seq,stamp,action,decision,reason,actor,request_id,previous,mac in rows:
             if seq!=expected_seq or previous!=prev:
                 raise AuditIntegrityError("Sequence or chain continuity failed")

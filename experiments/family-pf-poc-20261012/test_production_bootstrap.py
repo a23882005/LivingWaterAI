@@ -38,7 +38,7 @@ def test_valid_production_environment_wires_metadata(env,tmp_path):
 
 def test_valid_bootstrap_denies_cross_client(env,tmp_path):
     c, scope, sign, verifier, _=env
-    attach_production_mcp(c.app, verifier, scope, GOOD)
+    attach_production_mcp(c.app, verifier, scope, audit_env(tmp_path))
     r=c.post('/mcp',headers={'Authorization':'Bearer '+sign('joseph')},
       json={'jsonrpc':'2.0','id':1,'method':'tools/call','params':{
       'name':'pf_read_resource','arguments':{'active_client_id':'mou','resource_id':'r-m'}}})

@@ -60,3 +60,17 @@ def test_link_local_ipv4_rejected():
 def test_private_ipv6_rejected():
     with pytest.raises(ValueError):
         validated_url("https://[fd00::1]/mcp")
+
+@pytest.mark.parametrize("issuer", [
+    "https://user:secret@auth.example.com",
+    "https://auth.example.com?token=secret",
+    "https://auth.example.com#fragment",
+    "https://",
+])
+def test_bad_oauth_issuer_never_discovers(issuer):
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda req: httpx.Response(200,json={
+            "resource":URL,"authorization_servers":[issuer]}))) as c:
+        result=verify_remote_metadata(URL,c)
+    assert result["metadata"]=="NOT_VERIFIED"
+    assert result["gate_a"]=="HOLD"

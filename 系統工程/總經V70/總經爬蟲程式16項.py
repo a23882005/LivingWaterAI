@@ -578,6 +578,13 @@ def selftest():
             assert key=='UNRATE'
             return pd.Series([4.0]*18,index=pd.date_range('2025-01-01',periods=18,freq='MS'))
     assert sahm_from_unrate(MockSahmU3())['value']==0.0
+    class SahmSourceMock:
+        fredsources={'UNRATE':('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/')}
+        def fred(self,key):
+            if key!='UNRATE': raise ValueError('wrong series')
+            return pd.Series([4.0]*15,index=pd.date_range('2025-01-01',periods=15,freq='MS'))
+    sahm_result=sahm_from_unrate(SahmSourceMock())
+    assert sahm_result['status']=='OK' and sahm_result['source_url'].startswith('https://api.bls.gov/')
     # 缺月的 CPI 不得用更早月份偷代替；欠缺連續就業月份不得算三月均值。
     class MockCPI:
         def fred(self,key):

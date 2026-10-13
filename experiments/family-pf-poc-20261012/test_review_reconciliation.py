@@ -26,13 +26,13 @@ def test_conflicting_claims_visible():
 def test_incomplete_claim_fail_closed():
     out=reconcile_review_claims([{"checks": {}}])
     locked(out)
-    assert len(out["conflicted_checks"])==len(REVIEW_CHECKS)
+    assert out["reason"]=="invalid_claim"
 
 def test_malformed_checks_fail_closed():
     for entry in ({"checks": []}, {"checks": None}, {"checks": "yes"}):
         out=reconcile_review_claims([entry])
         locked(out)
-        assert len(out["conflicted_checks"])==len(REVIEW_CHECKS)
+        assert out["reason"]=="invalid_claim"
 
 def test_invalid_batches_fail_closed():
     for entries in (None, [], {}, [None], [claim()]*21):
@@ -46,3 +46,16 @@ def test_no_personal_payload_reflection():
     out=reconcile_review_claims([data])
     locked(out)
     assert "private-untrusted-test-marker" not in str(out)
+
+
+def test_extra_claim_category_rejected():
+    entry=claim()
+    entry["checks"]["unrecognized"]="yes"
+    out=reconcile_review_claims([entry])
+    locked(out)
+    assert out["reason"]=="invalid_claim"
+
+def test_mixed_valid_and_incomplete_batch_rejected():
+    out=reconcile_review_claims([claim(), {"checks":{"real_oauth_and_resource_binding":True}}])
+    locked(out)
+    assert out["reason"]=="invalid_claim"

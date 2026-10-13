@@ -67,11 +67,13 @@ class AuditStore:
                 (seq,stamp,event["action"],event["decision"],event["reason"],
                 event["actor_ref"],event["request_id"],prev,mac))
         return seq
-    def verify(self):
+    def verify(self, _connection=None):
         prev="GENESIS"
         expected_seq=1
-        with self._connect() as db:
-            rows=db.execute("""SELECT seq,occurred_at,action,decision,reason,
+        if _connection is None:
+            with self._connect() as db:
+                return self.verify(_connection=db)
+        rows=_connection.execute("""SELECT seq,occurred_at,action,decision,reason,
                 actor_ref,request_id,prev_mac,mac FROM audit_events ORDER BY seq""").fetchall()
         for seq,stamp,action,decision,reason,actor,request_id,previous,mac in rows:
             if seq!=expected_seq or previous!=prev:
@@ -89,7 +91,7 @@ class AuditStore:
         """A snapshot to store outside the DB via an independent trusted channel."""
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            count=self.verify()
+            count=self.verify(_connection=db)
             latest=db.execute("SELECT mac FROM audit_events ORDER BY seq DESC LIMIT 1").fetchone()
             return {"event_count":count,"last_mac":latest[0] if latest else "GENESIS"}
 

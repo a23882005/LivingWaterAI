@@ -7,6 +7,7 @@ No credentials, user records, or OAuth tokens are sent. Redirects are disabled.
 """
 import json
 import sys
+import ipaddress
 from urllib.parse import urlsplit
 import httpx
 
@@ -20,6 +21,12 @@ def validated_url(url):
         raise ValueError("Placeholder or loopback URL cannot be used as remote evidence")
     if p.port not in (None,443):
         raise ValueError("Nonstandard HTTPS port not permitted")
+    try:
+        if not ipaddress.ip_address(p.hostname).is_global:
+            raise ValueError("Non-public IP cannot be used as evidence")
+    except ValueError as exc:
+        if str(exc) == "Non-public IP cannot be used as evidence":
+            raise
     if p.path != "/mcp":
         raise ValueError("Endpoint must end in /mcp")
     return url

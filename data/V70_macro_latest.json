@@ -1,7 +1,14 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T04:15:41.561968+08:00",
+  "asOf": "2026-10-14T04:22:39.976304+08:00",
   "indicators": {
+    "m07": {
+      "value": 15.21,
+      "dataDate": "2026-10-12",
+      "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "unit": "",
+      "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列"
+    },
     "m04": {
       "value": 54.5,
       "dataDate": "2026-09-01",
@@ -10,21 +17,21 @@
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m09": {
-      "value": 102.203003,
+      "value": 102.197998,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.650002,
+      "value": 94.730003,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 101.108902,
+      "value": 101.057999,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
@@ -41,10 +48,9 @@
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 5,
+    "valid": 6,
     "totalRequired": 21,
     "missing": [
-      "m07: MISSING (not verified OK)",
       "m01: MISSING (not verified OK)",
       "m06: MISSING (not verified OK)",
       "m08: MISSING (not verified OK)",

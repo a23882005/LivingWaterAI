@@ -1,4 +1,4 @@
-name: LivingWaterAI V70.2 Daily (11:00 Taiwan) and Hostinger
+name: LivingWaterAI Macro24 Daily (11:00 Taiwan) / Legacy V70.2 Manual
 
 on:
   schedule:
@@ -20,6 +20,8 @@ on:
       - 'scripts/chatgpt_fallback.py'
       - 'scripts/prepare_deploy.py'
       - 'data/chatgpt_macro_snapshot.json'
+      - '系統工程/總經V70/找24項總經資料.py'
+      - 'scripts/build_v703_feed.py'
       - 'tests/**'
       - 'requirements.txt'
 
@@ -32,6 +34,8 @@ concurrency:
 
 jobs:
   v70:
+    # Preserve old V70.2 code for deliberate manual operation only; daily run cannot overwrite the production homepage.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -136,3 +140,72 @@ jobs:
           done
           echo "::error::Production HTML marker not visible yet. Confirm public_html destination and clear Hostinger cache/CDN."
           exit 1
+
+  macro24:
+    # Independent V70.3 source pipeline. Do not deploy or overwrite HTML/site files.
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: QA 24-item collector and adapter
+        run: |
+          python -m py_compile "系統工程/總經V70/找24項總經資料.py" scripts/build_v703_feed.py
+          python "系統工程/總經V70/找24項總經資料.py" --self-test
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, 'scripts')
+          from build_v703_feed import convert, NEEDED
+          sample=convert({'items':{}})
+          assert len(NEEDED)==21 and sample['verification']['ready'] is False
+          assert sample['verification']['valid']==0
+          print('FAIL-CLOSED QA PASS')
+          PY
+      - name: Collect audited macro observations
+        run: |
+          python "系統工程/總經V70/找24項總經資料.py" --out build/macro24 --cache data/24_macro_verification.json
+      - name: Generate V70.3 feed contract
+        run: |
+          python scripts/build_v703_feed.py --input build/macro24/24_macro_verification.json --output build/macro24/V70_macro_latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          audit=json.loads(Path('build/macro24/24_macro_verification.json').read_text(encoding='utf-8'))
+          feed=json.loads(Path('build/macro24/V70_macro_latest.json').read_text(encoding='utf-8'))
+          assert len(audit['items'])==24
+          assert feed['verification']['totalRequired']==21
+          print('AUDIT:',audit['summary'])
+          print('V70.3:',feed['verification']['valid'],'/21; ready=',feed['verification']['ready'])
+          PY
+      - name: Publish audit artifact (even when data incomplete)
+        uses: actions/upload-artifact@v4
+        with:
+          name: macro24-audit-${{ github.run_id }}
+          path: build/macro24/
+          retention-days: 30
+      - name: Commit research JSON and fail-closed V70.3 feed
+        run: |
+          mkdir -p data
+          cp build/macro24/24_macro_verification.json data/24_macro_verification.json
+          cp build/macro24/V70_macro_latest.json data/V70_macro_latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/24_macro_verification.json data/V70_macro_latest.json
+          if git diff --cached --quiet; then
+            echo "Macro audit unchanged" >> "$GITHUB_STEP_SUMMARY"
+          else
+            git commit -m "data(macro): dated 24-item audit and V70.3 feed"
+            git pull --rebase origin main
+            git push
+          fi
+          echo "V70.3 feed saved under data/, not yet published beside hosted HTML." >> "$GITHUB_STEP_SUMMARY"

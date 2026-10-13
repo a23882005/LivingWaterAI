@@ -50,6 +50,9 @@ jobs:
           urls = {
             'FRED_CSV': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS',
             'YAHOO_CHART': 'https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF',
+            'CBOE_VIX': 'https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv',
+            'BLS_API': 'https://api.bls.gov/publicAPI/v2/timeseries/data/LNS14000000',
+            'DBNOMICS': 'https://api.db.nomics.world/v22/series/FRED/VIXCLS?observations=1',
           }
           for label, url in urls.items():
               host=urllib.request.urlparse(url).hostname

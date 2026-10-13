@@ -85,3 +85,12 @@ def test_control_character_in_evidence_reference_rejected():
         result=inspect_inventory(items,NOW)
         assert result['state']=='HOLD'
         assert result['gate_a']=='HOLD'
+
+
+def test_unicode_whitespace_evidence_url_rejected():
+    for ch in (chr(32), chr(160), chr(8195)):
+        items=records()
+        items['remote_https_reachable']['evidence_url']='https://auditor.example.org/review/a'+ch+'b'
+        result=inspect_inventory(items,NOW)
+        assert result['state']=='HOLD'
+        assert result['gate_a']=='HOLD'

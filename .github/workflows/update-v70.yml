@@ -68,6 +68,7 @@ jobs:
         run: |
           python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py
           python "系統工程/總經V70/總經爬蟲程式16項.py" --self-test
+          python -m unittest discover -s tests -p "test_macro_regressions.py" -v
           python - <<'PY'
           import sys
           sys.path.insert(0, 'scripts')

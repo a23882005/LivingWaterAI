@@ -58,6 +58,18 @@ class MacroRegression(unittest.TestCase):
             macro.sahm_from_unrate(GappedSource())
         self.assertIn("2025-08",str(ctx.exception))
 
+    def test_sahm_shutdown_gap_official(self):
+        class Gap:
+            fredsources={"UNRATE":("BLS","https://api.bls.gov/")}
+            def fred(self,key):
+                if key!="UNRATE": raise RuntimeError("unavailable")
+                dates=pd.date_range("2025-07-01",periods=15,freq="MS")
+                dates=dates[dates.to_period("M")!=pd.Period("2025-10")]
+                return pd.Series([4.0]*len(dates),index=dates)
+        with self.assertRaises(RuntimeError) as ctx:
+            macro.sahm_from_unrate(Gap())
+        self.assertIn("2025-10 CPS not collected per BLS",str(ctx.exception))
+
     def test_recent_unemployment_survives_history_gap(self):
         """Latest U3 must remain usable even if Sahm lacks historical months."""
         class Response:

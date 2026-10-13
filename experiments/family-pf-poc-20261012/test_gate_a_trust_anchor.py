@@ -49,3 +49,16 @@ def test_signed_payload_tampering_holds():
 def test_nonhex_reviewer_fingerprint_holds():
     p,s,key,fp=evidence()
     assert review_with_pinned_reviewer(p,s,key,"z"*64,NOW)["state"]=="HOLD"
+
+
+def test_tampered_signature_holds():
+    p,s,key,fp=evidence()
+    import base64
+    raw=bytearray(base64.b64decode(s))
+    raw[0]^=1
+    changed=base64.b64encode(raw).decode()
+    assert review_with_pinned_reviewer(p,changed,key,fp,NOW)["state"]=="HOLD"
+
+def test_valid_pinned_key_never_reports_release_pass():
+    p,s,key,fp=evidence()
+    assert review_with_pinned_reviewer(p,s,key,fp,NOW)["state"]=="ATTESTED_FOR_REVIEW"

@@ -14,14 +14,14 @@ GitHub 對應目錄：`a23882005/LivingWaterAI/系統工程/總經V70/`
 5. **V82、債券V75與情境圖**：依最新正式股票ETF V82、債券ETF V75分析標的，產出具體操作建議、情境機率及既定三張情境圖；保留完整原報告內容。
 6. **總經報告第12項及交接**：產生 `verified_overrides.json`（8項已核實資料）和完整24項JSON（含日期、來源、狀態及版本），以及11:00流程所需報告資料；寫入 GitHub `a23882005/LivingWaterAI` 指定資料路徑，完成讀回驗證。若寫入或驗證失敗，明列「GitHub交接未完成」，保留當輪結果與錯誤紀錄。
 
-## 每日 11:00｜GitHub Actions｜步驟7
+## 每日 11:00｜GitHub Actions｜步驟7（資料自動化已實作；Hostinger 部署尚未實作）
 
-7. **接力部署正式網站**：透過 `.github/workflows/update-v70.yml` 的每日11:00排程（UTC 03:00）接收同批、最新、已驗證的JSON；確認日期、schema、品質狀態與完整性；生成最新版總經 `index.html`；對HTML做完整性及版本檢查；備份Hostinger現有 `public_html/index.html`；上傳並覆蓋該檔；驗證 `https://www.happihelp.com` 實際呈現本次新版本（必要時處理快取）；保存Actions日誌、部署版本、成功/失敗結果。部署或網站驗證失敗時，保留／回復上一正常版本並發出異常通知。GitHub排程可能較11:00延遲，必須紀錄實際執行時間。
+7. **最終目標：接力部署正式網站（尚未實作／未驗收）**：透過 `.github/workflows/update-v70.yml` 的每日11:00排程（UTC 03:00）接收同批、最新、已驗證的JSON；確認日期、schema、品質狀態與完整性；生成最新版總經 `index.html`；對HTML做完整性及版本檢查；備份Hostinger現有 `public_html/index.html`；上傳並覆蓋該檔；驗證 `https://www.happihelp.com` 實際呈現本次新版本（必要時處理快取）；保存Actions日誌、部署版本、成功/失敗結果。部署或網站驗證失敗時，保留／回復上一正常版本並發出異常通知。GitHub排程可能較11:00延遲，必須紀錄實際執行時間。
 
 ## 正式驗收標準
 
 - 10:00 Task：步驟1～6確實完成、資料可追溯，8＋16合併及正式報告完整；GitHub交接有讀回證據。
-- 11:00 Actions：讀到當輪已驗證JSON、生成HTML並通過QA、備份、Hostinger覆蓋及網站實際驗證全數成功，才能標記「每日部署PASS」。
+- 11:00 Actions：現有 `update-v70.yml` 只負責抓取、稽核、建立 V70.3 JSON feed 並提交 GitHub，**不會自動上傳 Hostinger、也尚未產出部署版 index.html**。只有未來新增實際部署流程且完成備份、上傳、網站驗證後，才可標記「每日部署PASS」。
 - 不新增重複Task；不變動無關Family家人版Runtime、DB、其他網站或施工Gate。正式規則更新與部署時遵守Google Drive根目錄《檔案管理.md》及版本、備份、Checkpoint規範。
 - 本檔為**工作程序規格**；GitHub Actions至Hostinger的自動上傳、備份及實站驗收須以實際執行紀錄確認，不能把規格文件當成部署完成證據。
 

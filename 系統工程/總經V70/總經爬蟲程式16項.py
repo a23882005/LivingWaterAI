@@ -101,6 +101,9 @@ class Fetcher:
         if series=='VIXCLS':
             providers.insert(0,('CBOE_OFFICIAL_VIX','https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv'))
             providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))
+        bls_map={'UNRATE':'LNS14000000','CPILFESL':'CUSR0000SA0L1E','PAYEMS':'CES0000000001'}
+        if series in bls_map:
+            providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -111,7 +114,15 @@ class Fetcher:
             try:
                 response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider=='YAHOO_VIX_CHART':
+                if provider=='BLS_OFFICIAL_API':
+                    obj=response.json()
+                    if obj.get('status')!='REQUEST_SUCCEEDED':
+                        raise ValueError('BLS response: '+str(obj.get('message'))[:130])
+                    dataset=obj['Results']['series'][0]['data']
+                    monthly=[x for x in dataset if x.get('period','').startswith('M') and x['period']!='M13']
+                    dates=pd.to_datetime([x['year']+'-'+x['period'][1:]+'-01' for x in monthly],errors='coerce')
+                    values=pd.to_numeric([x['value'].replace(',','') for x in monthly],errors='coerce')
+                elif provider=='YAHOO_VIX_CHART':
                     chart=response.json()['chart']['result'][0]
                     stamps=chart['timestamp']
                     closes=chart['indicators']['quote'][0]['close']

@@ -40,3 +40,17 @@ def test_other_client_success_never_grants_backdoor(env):
     denied=send(client,sign('joseph'),'mou','r-m').json()
     assert denied['result']['isError'] is True
     assert scope.audit[-1]['decision']=='DENY'
+
+
+def test_each_client_denied_other_clients_resource(env):
+    client,scope,sign,verifier,_=env
+    attach_mcp(client.app,verifier,scope)
+    cases=(("joseph","r-j","r-m"),("mou","r-m","r-j"))
+    for owner, own_resource, foreign_resource in cases:
+        token=sign(owner)
+        own=send(client,token,owner,own_resource)
+        assert own.status_code==200
+        assert own.json()["result"]["content"][0]["text"] in ("synthetic-j","synthetic-m")
+        blocked=send(client,token,owner,foreign_resource)
+        assert blocked.json()["result"]["isError"] is True
+        assert scope.audit[-1]["decision"]=="DENY"

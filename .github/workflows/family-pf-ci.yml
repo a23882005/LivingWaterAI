@@ -70,6 +70,7 @@ jobs:
         run: |
           cp experiments/family-pf-poc-20261012/pf_audit_store.py pf-ci-source/pf_audit_store.py
           cp experiments/family-pf-poc-20261012/test_audit_store.py pf-ci-source/tests/test_audit_store.py
+          cp experiments/family-pf-poc-20261012/test_audit_reopen_snapshot.py pf-ci-source/tests/test_audit_reopen_snapshot.py
           cp experiments/family-pf-poc-20261012/test_mcp_audit_wiring.py pf-ci-source/tests/test_mcp_audit_wiring.py
           cp experiments/family-pf-poc-20261012/test_mcp_persistent_auth_denials.py pf-ci-source/tests/test_mcp_persistent_auth_denials.py
       - name: Install test dependencies

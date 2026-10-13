@@ -13,6 +13,7 @@ def reconcile_review_claims(claims):
         "state": "REQUIRES_INDEPENDENT_VERIFICATION",
         "claim_count": 0,
         "conflicted_checks": [],
+        "disputed_checks": [],
         "unresolved_checks": list(REVIEW_CHECKS),
     }
     if not isinstance(claims, list) or not claims or len(claims) > 20:
@@ -31,5 +32,7 @@ def reconcile_review_claims(claims):
         values = [claim["checks"].get(key) if isinstance(claim.get("checks"), dict) else None for claim in claims]
         if any(v is not True for v in values):
             result["conflicted_checks"].append(key)
+        if any(v is True for v in values) and any(v is not True for v in values):
+            result["disputed_checks"].append(key)
     result["reason"] = "claims_do_not_substitute_for_independent_evidence"
     return result

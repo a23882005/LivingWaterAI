@@ -104,6 +104,9 @@ class MacroRegression(unittest.TestCase):
         self.assertAlmostEqual(float(series.iloc[-1]),3.25)
         self.assertEqual(source.fredsources["BAMLH0A0HYM2"][0],"FRED_OFFICIAL_API")
         self.assertNotIn("test_secret_key",source.fredsources["BAMLH0A0HYM2"][1])
+        self.assertIn("observation_start=",source.s.url)
+        self.assertIn("BAMLH0A0HYM2",source.s.url)
+
 
     def test_future_date_rejected(self):
         import datetime as dt

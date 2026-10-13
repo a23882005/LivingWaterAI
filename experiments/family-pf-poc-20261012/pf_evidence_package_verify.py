@@ -13,11 +13,21 @@ def verify_package(entries, local_paths, now=None):
     if not isinstance(local_paths,dict) or set(local_paths)!=set(REQUIRED_EVIDENCE):
         return result
     seen_paths=set()
+    seen_digests=set()
     for key in REQUIRED_EVIDENCE:
         path=local_paths.get(key)
         if not isinstance(path,(str,Path)):
             return result
-        canonical=Path(path).resolve(strict=False)
+        digest=entries[key]["sha256"]
+        if digest in seen_digests:
+            result["artifacts"][key]="duplicate_artifact_digest"
+            return result
+        seen_digests.add(digest)
+        try:
+            canonical=Path(path).resolve(strict=False)
+        except (OSError, RuntimeError, ValueError):
+            result["artifacts"][key]="invalid_artifact_path"
+            return result
         if canonical in seen_paths:
             result["artifacts"][key]="duplicate_artifact_path"
             return result

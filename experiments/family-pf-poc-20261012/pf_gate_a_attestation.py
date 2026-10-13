@@ -34,7 +34,7 @@ def verify_attestation(payload, signature_b64, reviewer_pubkey_b64, now=None):
     if not (isinstance(payload,dict) and isinstance(signature_b64,str)
             and isinstance(reviewer_pubkey_b64,str)):
         return hold
-    if evaluate_gate_a(payload.get("checks")).get("state")!="PASS":
+    if evaluate_gate_a(payload.get("checks")).get("state")!="READY_FOR_REVIEW":
         return hold
     if payload.get("reviewer_role")!="independent_gate_a_reviewer":
         return hold

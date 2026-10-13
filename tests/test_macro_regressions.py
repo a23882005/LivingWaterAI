@@ -88,6 +88,23 @@ class MacroRegression(unittest.TestCase):
         self.assertEqual(len(series),3)
         self.assertEqual(source.fredsources["UNRATE"][0],"BLS_HISTORY_V2")
 
+    def test_official_fred_api_parses_hy_oas_and_hides_key(self):
+        class FakeResponse:
+            def raise_for_status(self): pass
+            def json(self):
+                return {"observations":[{"date":"2026-10-13","value":"3.25"}]}
+        class FakeSession:
+            def get(self,url,**kwargs):
+                self.url=url
+                return FakeResponse()
+        source=macro.Fetcher()
+        source.s=FakeSession()
+        with patch.dict("os.environ",{"FRED_API_KEY":"test_secret_key"}):
+            series=source.fred("BAMLH0A0HYM2")
+        self.assertAlmostEqual(float(series.iloc[-1]),3.25)
+        self.assertEqual(source.fredsources["BAMLH0A0HYM2"][0],"FRED_OFFICIAL_API")
+        self.assertNotIn("test_secret_key",source.fredsources["BAMLH0A0HYM2"][1])
+
     def test_future_date_rejected(self):
         import datetime as dt
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()

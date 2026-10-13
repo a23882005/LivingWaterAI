@@ -6,9 +6,9 @@
 此檔獨立、唯讀，不修改既有程式或 GitHub。
 
 安裝: pip install requests pandas yfinance
-執行: python '總經爬蟲16項.py'
-可選: python '總經爬蟲16項.py' --overrides verified_overrides.json --out results
-測試: python '總經爬蟲16項.py' --self-test
+執行: python '總經爬蟲程式16項.py'
+可選: python '總經爬蟲程式16項.py' --overrides verified_overrides.json --out results
+測試: python '總經爬蟲程式16項.py' --self-test
 
 資料紀律:
 * 對於只有動態網頁、無穩定免費機器介面的資料，輸出 MISSING，絕不填入 HTML 預設值。

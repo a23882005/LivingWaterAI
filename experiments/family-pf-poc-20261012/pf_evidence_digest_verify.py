@@ -1,6 +1,8 @@
 """Offline, bounded, explicit-path digest comparison. Never authorizes Gate A."""
 import hashlib
 import hmac
+import os
+import stat
 from pathlib import Path
 
 MAX_BYTES = 16 * 1024 * 1024
@@ -20,7 +22,16 @@ def check_artifact(path, expected_digest):
             return result
         digest = hashlib.sha256()
         total = 0
-        with p.open("rb") as stream:
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        fd = os.open(p, flags)
+        with os.fdopen(fd, "rb") as stream:
+            opened = os.fstat(stream.fileno())
+            if not stat.S_ISREG(opened.st_mode):
+                result["reason"] = "not_regular_file"
+                return result
+            if opened.st_size > MAX_BYTES:
+                result["reason"] = "oversized_file"
+                return result
             while block := stream.read(65536):
                 total += len(block)
                 if total > MAX_BYTES:

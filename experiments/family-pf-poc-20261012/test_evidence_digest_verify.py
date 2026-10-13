@@ -42,3 +42,23 @@ def test_oversized_artifact_rejected(tmp_path):
     with p.open("wb") as f:
         f.truncate(MAX_BYTES + 1)
     assert check_artifact(p, "a"*64)["reason"]=="oversized_file"
+
+
+def test_empty_file_hash_match_still_hold(tmp_path):
+    p=tmp_path/"empty.bin"
+    p.write_bytes(b"")
+    out=check_artifact(p,hashlib.sha256(b"").hexdigest())
+    assert out["match"] is True
+    assert out["gate_a"]=="HOLD"
+
+def test_directory_rejected(tmp_path):
+    out=check_artifact(tmp_path,"a"*64)
+    assert out["reason"]=="not_regular_file"
+    assert out["match"] is False
+
+def test_file_under_size_cap_matches(tmp_path):
+    p=tmp_path/"small.bin"
+    p.write_bytes(b"x"*1024)
+    out=check_artifact(p,hashlib.sha256(p.read_bytes()).hexdigest())
+    assert out["reason"]=="digest_match"
+    assert out["gate_a"]=="HOLD"

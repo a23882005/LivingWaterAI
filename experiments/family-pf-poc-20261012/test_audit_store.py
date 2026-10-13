@@ -102,3 +102,25 @@ def test_pseudonym_key_rotation_retains_existing_identity_records(tmp_path):
     v2=b.pseudonymize("verified-synthetic")
     b.append(event(actor=v2,request="request-rotation"))
     assert b.verify()==2 and v1!=v2
+
+def test_external_anchor_detects_tail_truncation(tmp_path):
+    path=tmp_path/"tail.sqlite"
+    store=AuditStore(path,KEY)
+    store.append(event(request="first"))
+    store.append(event(request="second"))
+    anchor=store.export_anchor()
+    assert store.verify_anchor(anchor)
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM audit_events WHERE seq=2")
+    assert store.verify()==1
+    with pytest.raises(AuditIntegrityError):
+        store.verify_anchor(anchor)
+
+def test_anchor_detects_additional_entries_and_bad_shape(tmp_path):
+    store=AuditStore(tmp_path/"anchor.sqlite",KEY)
+    anchor=store.export_anchor()
+    store.append(event())
+    with pytest.raises(AuditIntegrityError):
+        store.verify_anchor(anchor)
+    with pytest.raises(AuditIntegrityError):
+        store.verify_anchor({"event_count":1})

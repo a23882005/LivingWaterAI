@@ -132,3 +132,10 @@ def test_anchor_snapshot_reopen(tmp_path):
     anchor=first.export_anchor()
     assert AuditStore(path,KEY).verify_anchor(anchor)
     assert anchor["event_count"]==1
+
+def test_anchor_consistent_connection(tmp_path):
+    store=AuditStore(tmp_path/"one.sqlite",KEY)
+    store.append(event())
+    with store._connect() as db:
+        assert store.verify(_connection=db)==1
+    assert store.export_anchor()["event_count"]==1

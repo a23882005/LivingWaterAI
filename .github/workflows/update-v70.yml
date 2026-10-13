@@ -99,10 +99,12 @@ jobs:
           print('V70.3:',feed['verification']['valid'],'/21; ready=',feed['verification']['ready'])
           PY
       - name: Publish audit artifact (even when data incomplete)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: macro24-audit-${{ github.run_id }}
           path: build/macro24/
+          if-no-files-found: warn
           retention-days: 30
       - name: Commit research JSON and fail-closed V70.3 feed
         run: |

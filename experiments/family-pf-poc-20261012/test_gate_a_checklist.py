@@ -82,3 +82,16 @@ def test_multiple_missing_evidence_reports_all_missing():
     for field in missing:
         checks[field]=False
     assert evaluate_gate_a(checks)=={"state":"HOLD","missing":list(missing)}
+
+
+def test_all_rejected_claims_remain_in_required_order():
+    evidence={name:False for name in REQUIRED_EVIDENCE}
+    result=evaluate_gate_a(evidence)
+    assert result['state']=='HOLD'
+    assert result['missing']==list(REQUIRED_EVIDENCE)
+
+def test_only_five_required_true_flags_are_review_eligible():
+    evidence={name:True for name in REQUIRED_EVIDENCE}
+    result=evaluate_gate_a(evidence)
+    assert result['state']=='READY_FOR_REVIEW'
+    assert 'PASS' not in result['state']

@@ -69,4 +69,4 @@ jobs:
             git push origin HEAD:main
           fi
 
-# Manual full-chain trial requested 2026-10-14 (09h collector job)
+# Manual full-chain trial requested 2026-10-15 (18-item collector run)

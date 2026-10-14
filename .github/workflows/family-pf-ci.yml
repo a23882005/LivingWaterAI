@@ -71,6 +71,8 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
           cp experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py pf-ci-source/pf_ci_evidence_receipt.py
           cp experiments/family-pf-poc-20261012/test_pf_ci_evidence_receipt.py pf-ci-source/tests/test_pf_ci_evidence_receipt.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_external_matrix.py pf-ci-source/pf_gate_a_external_matrix.py
+          cp experiments/family-pf-poc-20261012/test_pf_gate_a_external_matrix.py pf-ci-source/tests/test_pf_gate_a_external_matrix.py
           cp experiments/family-pf-poc-20261012/pf_external_evidence_plan.py pf-ci-source/pf_external_evidence_plan.py
           cp experiments/family-pf-poc-20261012/test_pf_external_evidence_plan.py pf-ci-source/tests/test_pf_external_evidence_plan.py
           cp experiments/family-pf-poc-20261012/pf_external_start_guard.py pf-ci-source/pf_external_start_guard.py
@@ -125,6 +127,9 @@ jobs:
       - name: Generate offline Gate A outstanding evidence plan
         working-directory: pf-ci-source
         run: python pf_external_evidence_plan.py --output ci-evidence/gate-a-workplan.json
+      - name: Generate external review matrix without external requests
+        working-directory: pf-ci-source
+        run: python pf_gate_a_external_matrix.py --output ci-evidence/external-matrix.json
       - name: Upload synthetic evidence receipt
         if: success()
         uses: actions/upload-artifact@v4
@@ -161,6 +166,17 @@ jobs:
           assert p["authorization_preflight"] == "BLOCKED"
           assert [e["id"] for e in p["evidence_required"]] == [f"EA-{i:02d}" for i in range(1,10)]
           assert all(e["state"] == "NOT_VERIFIED" for e in p["evidence_required"])
+          PY
+      - name: Verify external claims remain HOLD in separate job
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc = json.loads(Path("downloaded-receipt/external-matrix.json").read_text())
+          assert doc["gate_a"] == "HOLD" and doc["work13_allowed"] is False
+          assert doc["external_evidence_verified"] is False
+          assert [x["id"] for x in doc["controls"]] == [f"EA-{i:02d}" for i in range(1,10)]
+          assert all(x["state"] == "NOT_VERIFIED" for x in doc["controls"])
           PY
       - name: Verify receipt integrity and gate claim
         env:

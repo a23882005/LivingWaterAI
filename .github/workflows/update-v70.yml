@@ -98,6 +98,7 @@ jobs:
           python "系統工程/總經V70/總經爬蟲程式16項.py" --self-test
           python -m unittest discover -s tests -p "test_macro_regressions.py" -v
           python -m unittest discover -s tests -p "test_v703_audit_integrity.py" -v
+          python -m unittest discover -s tests -p "test_lei_vintage_safety.py" -v
           python - <<'PY'
           import sys
           sys.path.insert(0, 'scripts')

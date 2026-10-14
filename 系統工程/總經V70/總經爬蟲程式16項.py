@@ -794,11 +794,11 @@ def probe_spy_issuer_index_pe(f):
                  headers={'User-Agent':'Mozilla/5.0'})
     resp.raise_for_status()
     text=' '.join(BeautifulSoup(resp.text,'html.parser').stripped_strings)
-    m=re.search(r'Index Characteristics as of\\s+([A-Za-z]{3}\\s+\\d{1,2}\\s+\\d{4})',text,re.I)
+    m=re.search(r'Index Characteristics as of\s+([A-Za-z]{3}\s+\d{1,2}\s+\d{4})',text,re.I)
     if not m: raise ValueError('State Street dated Index Characteristics absent')
     date=dt.datetime.strptime(m.group(1),'%b %d %Y').date()
     segment=text[m.end():m.end()+1800]
-    pe=re.search(r'Price/Earnings(?!\\s+Ratio\\s+FY1)\\s+(\\d+(?:\\.\\d+)?)',segment,re.I)
+    pe=re.search(r'Price/Earnings(?!\s+Ratio\s+FY1)\s+(\d+(?:\.\d+)?)',segment,re.I)
     if not pe: raise ValueError('State Street index PE field absent')
     value=float(pe.group(1))
     now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()

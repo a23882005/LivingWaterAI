@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/probe_m06_fedwatch_free.py'
       - '.github/workflows/probe-m06-fedwatch-free.yml'
+      - 'tests/test_m06_fedwatch_free.py'
 
 permissions:
   contents: read
@@ -21,6 +22,8 @@ jobs:
           python-version: '3.11'
       - name: Install research-only dependency
         run: python -m pip install 'cme-fedwatch==0.2.1'
+      - name: Offline m06 boundary regression tests
+        run: python -m unittest discover -s tests -p 'test_m06_fedwatch_free.py' -v
       - name: Probe available market settlement and compute candidate m06
         run: python scripts/probe_m06_fedwatch_free.py
       - name: Validate JSON and reveal status

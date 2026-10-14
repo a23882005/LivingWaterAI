@@ -25,6 +25,14 @@ def main():
     s = requests.Session()
     s.headers["User-Agent"] = "LivingWaterAI-Macro-Audit/1.0 (source verification only)"
     records = {}
+    # Inspect structured JSON availability without promoting values to verified OK.
+    for ticker in ("QQQ", "SPY", "VT"):
+        try:
+            url = "https://query1.finance.yahoo.com/v7/finance/quote"
+            response = s.get(url, params={"symbols": ticker}, timeout=(5, 20))
+            print("ETF_JSON_PROBE", ticker, "HTTP", response.status_code, "JSON", "json" in response.headers.get("content-type", "").lower(), flush=True)
+        except requests.RequestException as exc:
+            print("ETF_JSON_PROBE", ticker, type(exc).__name__, flush=True)
     for key, (label, url) in TARGETS.items():
         item = {"label": label, "source": url, "status": "UNVERIFIED", "candidate": None}
         try:

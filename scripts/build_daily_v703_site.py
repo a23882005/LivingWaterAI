@@ -11,6 +11,8 @@ DUPLICATE_ID = "s03"
 EXPECTED_INDEPENDENT = 23
 EXPECTED_TRANSPORT = 24
 MONTHLY = frozenset(("m04", "m05", "m15", "m16", "m18", "m19", "m20"))
+VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
+ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
 
 
 def _read(path):
@@ -26,7 +28,7 @@ def _validate(key, item, today):
     problems = []
     if not isinstance(item, dict):
         return [f"{key}: record not object"]
-    if item.get("status") != "OK":
+    if item.get("status") not in ACCEPTED_STATUS:
         problems.append(f"{key}: status {item.get('status')}")
     v = item.get("value")
     if isinstance(v, bool) or v is None:
@@ -48,6 +50,9 @@ def _validate(key, item, today):
             elif key in MONTHLY:
                 if age > 46:
                     problems.append(f"{key}: monthly data over 46 days")
+            elif key in VALUATION_REFERENCE:
+                if age > 90:
+                    problems.append(f"{key}: valuation reference over 90 days")
             else:
                 workdays = sum((obs + dt.timedelta(days=n)).weekday() < 5 for n in range(1, age + 1))
                 if workdays > 4:
@@ -58,6 +63,8 @@ def _validate(key, item, today):
         problems.append(f"{key}: missing HTTPS source")
     if not str(item.get("method") or "").strip():
         problems.append(f"{key}: missing method")
+    if item.get("status") == "USABLE" and not str(item.get("detail") or "").strip():
+        problems.append(f"{key}: USABLE requires methodology detail")
     return problems
 
 
@@ -83,12 +90,11 @@ def build(macro, supplement, html, dest):
     now = dt.datetime.now(dt.timezone.utc)
     today = now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
     problems = [problem for key, item in items.items() for problem in _validate(key, item, today)]
-    for k in ("s05",):
-        try:
-            if not 0 <= float(items[k]["value"]) <= 100:
-                problems.append(f"{k}: outside 0-100")
-        except (ValueError, TypeError, KeyError):
-            problems.append(f"{k}: no percentage")
+    try:
+        if not 0 <= float(items["s05"]["value"]) <= 100:
+            problems.append("s05: outside 0-100")
+    except (ValueError, TypeError, KeyError):
+        problems.append("s05: no percentage")
     if problems:
         raise ValueError("QUALITY_GATE_BLOCKED: " + "; ".join(problems))
     template = Path(html).read_text(encoding="utf-8")
@@ -97,7 +103,8 @@ def build(macro, supplement, html, dest):
     indicators = {
         k: {"value": float(v["value"]), "dataDate": v["observation_date"],
             "source": v["source_url"], "unit": v.get("unit", ""),
-            "method": v.get("method", ""), "status": "OK"}
+            "method": v.get("method", ""), "status": v.get("status", "OK"),
+            "detail": v.get("detail", "")}
         for k, v in items.items()
     }
     feed = {"schema": "V70.3/family-macro-feed-v1",
@@ -105,13 +112,14 @@ def build(macro, supplement, html, dest):
             "verification": {"ready": True, "valid": EXPECTED_TRANSPORT,
                              "totalRequired": EXPECTED_TRANSPORT,
                              "independentIndicators": EXPECTED_INDEPENDENT,
-                             "sources": ["09:00/18", "10:00/5"]},
+                             "sources": ["09:00/18", "10:00/5"],
+                             "usableWithCaveat": sorted(k for k,v in items.items() if v.get("status") == "USABLE")},
             "indicators": indicators, "news": []}
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     shutil.copyfile(html, out / "index.html")
-    (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"]}, indent=2) + "\n", encoding="utf-8")
+    (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"], "usableWithCaveat": feed["verification"]["usableWithCaveat"]}, indent=2) + "\n", encoding="utf-8")
     print("QUALITY_GATE_PASS: 18+5, independent=23 transport=24, family feed v1")
     return True
 

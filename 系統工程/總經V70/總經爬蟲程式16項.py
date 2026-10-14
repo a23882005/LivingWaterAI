@@ -600,8 +600,40 @@ def run(outdir,overrides_path=None,cache_path=None):
     print('完成輸出:',out.resolve(),'統計:',summary)
     return report
 
+def fedwatch_expected_codes(distribution, current_mid):
+    """Weighted 12-month target-rate midpoint change, in 25bp units.
+
+    distribution: list of {"lower": percent, "upper": percent,
+    "probability": fraction from 0 to 1}. Caller must supply a verified
+    dated distribution for the last scheduled FOMC within 12 months.
+    No futures quotes, inferred dates or made-up probabilities are accepted.
+    """
+    if not distribution or not math.isfinite(float(current_mid)):
+        raise ValueError('Missing verified FedWatch inputs')
+    total=0.0
+    expectation=0.0
+    for item in distribution:
+        lo, hi, p=(float(item[k]) for k in ('lower','upper','probability'))
+        if not all(math.isfinite(x) for x in (lo,hi,p)):
+            raise ValueError('Non-finite probability or interest rate')
+        if lo>=hi or hi-lo>0.5 or lo<0 or hi>30 or p<0 or p>1:
+            raise ValueError('Invalid target range/probability')
+        total+=p
+        expectation+=p*(lo+hi)/2
+    if abs(total-1.0)>0.001:
+        raise ValueError('Probabilities do not sum to 1')
+    return (expectation/total-float(current_mid))/0.25
+
+
 def selftest():
     # No network; formula and unit conversions check independently.
+    assert abs(fedwatch_expected_codes([
+        {'lower':3.5,'upper':3.75,'probability':0.6},
+        {'lower':3.0,'upper':3.25,'probability':0.4}
+    ],4.125)-(-2.8))<1e-9
+    try: fedwatch_expected_codes([{'lower':3,'upper':3.25,'probability':0.6}],4.125)
+    except ValueError: pass
+    else: raise AssertionError('Incomplete FedWatch probabilities must fail closed')
     assert abs((119.51-1365.39+10.09)-(-1235.79))<1e-8
     assert abs((-1235.79/10)-(-123.579))<1e-8
     x=validate_manual('m14',{'value':-123.579,'unit':'USD bn','observation_date':'2026-10-07',

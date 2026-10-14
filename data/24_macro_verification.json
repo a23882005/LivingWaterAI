@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T10:31:45.210983+08:00",
+  "generated_at": "2026-10-14T11:18:08.937464+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 18,
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.133003,
+      "value": 102.103996,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.959999,
+      "value": 95.029999,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -294,7 +294,7 @@
       "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "MMFI live source unavailable: $MMFI: 404 Client Error: Not Found for url: https://query1.finance.yahoo.com/v8/finance/chart/%24MMFI?range=10d&inter | ^MMFI: 404 Client Error: Not Found for url: https://query1.finance.yah"
+      "error": "MMFI live source unavailable: BARCHART: BARCHART_ONDEMAND_API_KEY absent; $MMFI history requires approved Barchart access | $MMFI: 404 Client Error: Not Found for url: https://query1.finance.yahoo.com/v8/finance/chart/%2"
     }
   }
 }

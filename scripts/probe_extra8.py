@@ -69,20 +69,11 @@ def main():
     s = requests.Session()
     s.headers["User-Agent"] = "LivingWaterAI-Macro-Audit/1.0 (source verification only)"
     records = {}
-    # Verify actual FRED LEI candidate series endpoint before allowing m16.
-    # This is evidence gathering, never a substitute for Conference Board LEI.
-    lei_probe = {"status": "UNVERIFIED", "series": "USSLIND"}
-    try:
-        response = s.get(
-            "https://fred.stlouisfed.org/graph/fredgraph.csv",
-            params={"id": "USSLIND"}, timeout=(5, 20))
-        lei_probe["http_status"] = response.status_code
-        lei_probe["csv_header"] = response.text.splitlines()[0][:120] if response.ok else ""
-        lei_probe["status"] = "CSV_REACHABLE_UNVERIFIED" if response.ok and "USSLIND" in lei_probe["csv_header"] else "UNVERIFIED"
-    except requests.RequestException as exc:
-        lei_probe["status"] = "UNREACHABLE"
-        lei_probe["error"] = type(exc).__name__
-    print("LEI_FRED_DIAGNOSTIC", lei_probe, flush=True)
+    # Conference Board LEI must not be confused with discontinued FRED
+    # USSLIND (Philadelphia Fed leading index, last observation 2020).
+    lei_probe = {"status": "MISSING", "series": "Conference Board US LEI",
+                 "reason": "No verified same-vintage current and prior-year index observations"}
+    print("LEI_OFFICIAL_SOURCE", lei_probe["status"], lei_probe["reason"], flush=True)
     valuation_diagnostics = {}
     for ticker, key in (("QQQ", "m03_qqq"), ("SPY", "m03_spy"), ("VT", "m03_vt")):
         valuation_diagnostics[key] = {"yahoo": probe_yahoo_crumb(s, ticker), "issuer": probe_issuer(s, key, TARGETS[key][1])}

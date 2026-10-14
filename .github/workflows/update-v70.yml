@@ -139,7 +139,7 @@ jobs:
                     'retrieved_utc=', datum.get('retrieved_at_utc') if datum else 'NO_DATA',
                     'holdings_asof=',datum.get('fund_holdings_pe_asof') if datum else 'UNVERIFIED',
                     'status=UNVERIFIED')
-          print('AUDIT:',audit['summary'])
+          print('AUDIT: independent=', audit.get('independent_indicators',{}), 'transport_fields=',audit['summary'])
           print('MISSING / STALE DIAGNOSTICS:')
           for key,item in audit['items'].items():
               if item.get('status')!='OK':

@@ -271,3 +271,27 @@ def test_successful_metadata_always_requires_independent_review():
     assert result["cross_client_isolation"]=="NOT_TESTED"
     assert result["audit_logs"]=="NOT_TESTED"
     assert result["gate_a"]=="HOLD"
+
+@pytest.mark.parametrize("bad", [
+    "https://LOCALHOST/mcp",
+    "https://service.ExAmPlE/mcp",
+    "https://pf.example.com/mcp\\\\extra",
+    "https://pf.example.com/mcp bad",
+    "https://pf.example.com:99999/mcp",
+])
+def test_ambiguous_and_reserved_targets_rejected(bad):
+    with pytest.raises(ValueError):
+        validated_url(bad)
+
+@pytest.mark.parametrize("issuer", [
+    "https://AUTH.EXAMPLE.TEST",
+    "https://auth.example.com/invalid path",
+    "https://auth.example.com\\\\evil",
+])
+def test_ambiguous_issuer_never_verified(issuer):
+    with httpx.Client(transport=httpx.MockTransport(
+        lambda req: httpx.Response(200,json={"resource":URL,"authorization_servers":[issuer]})
+    )) as client:
+        result = verify_remote_metadata(URL, client)
+    assert result["metadata"] == "NOT_VERIFIED"
+    assert result["gate_a"] == "HOLD"

@@ -63,6 +63,8 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_gate_a_attestation.py pf-ci-source/tests/test_gate_a_attestation.py
           cp experiments/family-pf-poc-20261012/pf_gate_a_trust_anchor.py pf-ci-source/pf_gate_a_trust_anchor.py
           cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
+          cp experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py pf-ci-source/pf_ci_evidence_receipt.py
+          cp experiments/family-pf-poc-20261012/test_pf_ci_evidence_receipt.py pf-ci-source/tests/test_pf_ci_evidence_receipt.py
           cp experiments/family-pf-poc-20261012/pf_external_start_guard.py pf-ci-source/pf_external_start_guard.py
           cp experiments/family-pf-poc-20261012/test_pf_external_start_guard.py pf-ci-source/tests/test_pf_external_start_guard.py
           cp experiments/family-pf-poc-20261012/pf_gate_a_readiness.py pf-ci-source/pf_gate_a_readiness.py
@@ -98,9 +100,38 @@ jobs:
         working-directory: pf-ci-source
         env:
           PYTHONPATH: .:tests
-        run: python -m pytest -q tests
+        run: python -m pytest -q tests --junitxml=ci-results.xml
       - name: Run demo
         working-directory: pf-ci-source
         env:
           PYTHONPATH: .
         run: python run_demo.py
+      - name: Emit minimal synthetic evidence receipt
+        if: success()
+        working-directory: pf-ci-source
+        env:
+          PF_HEAD_SHA: ${{ github.sha }}
+        run: python pf_ci_evidence_receipt.py emit --junit ci-results.xml --commit "$PF_HEAD_SHA" --directory ci-evidence
+      - name: Upload synthetic evidence receipt
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: family-pf-synthetic-receipt
+          path: pf-ci-source/ci-evidence/
+          retention-days: 7
+          if-no-files-found: error
+  verify-evidence-receipt:
+    needs: verify-pf-full-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: family-pf-synthetic-receipt
+          path: downloaded-receipt
+      - name: Verify receipt integrity and gate claim
+        run: python experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py verify --directory downloaded-receipt

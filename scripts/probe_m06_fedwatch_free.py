@@ -31,12 +31,18 @@ def calculate(feed, today):
     if not 0 <= current_mid <= 25:
         raise ValueError("Current target out of range")
     candidates=[]
+    seen_meeting_dates=set()
     horizon=trade_date + dt.timedelta(days=365)
     for m in feed.get("meetings", []):
         d=dt.date.fromisoformat(m["date"])
         if abs((d-horizon).days)>45:
             continue
+        if d in seen_meeting_dates:
+            raise ValueError(f'Duplicate FOMC meeting date: {d}')
+        seen_meeting_dates.add(d)
         probs=m.get("probabilities",{})
+        if not isinstance(probs,dict) or not probs:
+            raise ValueError('Missing target-rate probability distribution')
         weighted=0.0
         total=0.0
         for rate,p in probs.items():
@@ -45,6 +51,7 @@ def calculate(feed, today):
             low,high=map(float,r)
             if not (0<=low<high<=25 and abs((high-low)-0.25)<0.00001):
                 raise ValueError("Unexpected interval width")
+            if isinstance(p,bool): raise ValueError('Boolean probability invalid')
             p=float(p)
             if not math.isfinite(p) or not 0<=p<=100: raise ValueError("Invalid probability")
             total+=p

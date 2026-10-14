@@ -1,42 +1,129 @@
-"""Build a fail-closed daily V70.3 web package from 09h observations and 10h s05."""
-import argparse,datetime as dt,json,shutil
+"""LivingWaterAI V70.3 11:00 site builder: verified 18+5 -> family feed v1."""
+import argparse
+import datetime as dt
+import json
+import math
+import shutil
 from pathlib import Path
-def build(macro,mmfi,html,dest):
-    m=json.loads(Path(macro).read_text(encoding="utf-8"))
-    items=dict(m.get("items",{}))
-    if "s03" not in items and "m07" in items: items["s03"]=dict(items["m07"],id="s03")
-    if Path(mmfi).exists():
-        supplement=json.loads(Path(mmfi).read_text(encoding="utf-8"))
-        record=supplement.get("s05",supplement.get("items",{}).get("s05",supplement))
-        if isinstance(record,dict): items["s05"]=record
-    now=dt.datetime.now(dt.timezone.utc)
-    problems=[]
-    if len(items)!=24: problems.append(f"expected 24 transport fields, got {len(items)}")
-    if "s03" in items and "m07" in items and items["s03"].get("value")!=items["m07"].get("value"):problems.append("s03/m07 mismatch")
-    for key,item in items.items():
-        if item.get("status")!="OK" or item.get("value") is None:problems.append(f"{key}: {item.get('status')} / missing")
-        raw=item.get("observation_date")
-        if not raw:problems.append(f"{key}: no observation_date")
-        else:
-            try:
-                obs=dt.date.fromisoformat(raw[:10])
-                if obs>now.date():problems.append(f"{key}: future observation")
-            except ValueError:problems.append(f"{key}: invalid date")
-    if "s05" in items:
-        s=items["s05"]
-        if s.get("value") is not None and not 0<=float(s["value"])<=100:problems.append("s05 must be percentage 0..100")
-    site=Path(dest);site.mkdir(parents=True,exist_ok=True)
-    output={"schema":"V70.3/daily-verified-feed-v1","generated_utc":now.isoformat(),"ready":not problems,"problems":problems,"items":items}
-    (site/"V70_macro_latest.json").write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    shutil.copyfile(html,site/"index.html")
-    (site/"QA.json").write_text(json.dumps({"ready":not problems,"problems":problems},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print(json.dumps({"ready":not problems,"problems":problems},ensure_ascii=False))
-    return not problems
-if __name__=="__main__":
-    p=argparse.ArgumentParser()
-    p.add_argument("--macro",default="data/22_macro_verification.json")
-    p.add_argument("--mmfi",default="data/s05_mmfi_verified.json")
-    p.add_argument("--html",default="系統工程/總經V70/V70-3-10.html")
-    p.add_argument("--out",default="build/site")
-    a=p.parse_args()
-    if not build(a.macro,a.mmfi,a.html,a.out):raise SystemExit("QUALITY_GATE_BLOCKED: preserve current published site")
+
+SUPPLEMENT_IDS = frozenset(("s05", "m06", "m03_qqq", "m03_spy", "m03_vt"))
+DUPLICATE_ID = "s03"
+EXPECTED_INDEPENDENT = 23
+EXPECTED_TRANSPORT = 24
+MONTHLY = frozenset(("m04", "m05", "m15", "m16", "m18", "m19", "m20"))
+
+
+def _read(path):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _days_old(observation, today):
+    d = dt.date.fromisoformat(observation)
+    return (today - d).days, d
+
+
+def _validate(key, item, today):
+    problems = []
+    if not isinstance(item, dict):
+        return [f"{key}: record not object"]
+    if item.get("status") != "OK":
+        problems.append(f"{key}: status {item.get('status')}")
+    v = item.get("value")
+    if isinstance(v, bool) or v is None:
+        problems.append(f"{key}: no numeric value")
+    else:
+        try:
+            if not math.isfinite(float(v)):
+                problems.append(f"{key}: nonfinite value")
+        except (TypeError, ValueError):
+            problems.append(f"{key}: invalid numeric value")
+    date = item.get("observation_date")
+    if not isinstance(date, str):
+        problems.append(f"{key}: missing observation_date")
+    else:
+        try:
+            age, obs = _days_old(date, today)
+            if age < 0:
+                problems.append(f"{key}: future observation")
+            elif key in MONTHLY:
+                if age > 46:
+                    problems.append(f"{key}: monthly data over 46 days")
+            else:
+                workdays = sum((obs + dt.timedelta(days=n)).weekday() < 5 for n in range(1, age + 1))
+                if workdays > 4:
+                    problems.append(f"{key}: market data over 4 weekdays")
+        except ValueError:
+            problems.append(f"{key}: invalid observation_date")
+    if not str(item.get("source_url") or "").startswith("https://"):
+        problems.append(f"{key}: missing HTTPS source")
+    if not str(item.get("method") or "").strip():
+        problems.append(f"{key}: missing method")
+    return problems
+
+
+def build(macro, supplement, html, dest):
+    src = _read(macro)
+    base = src.get("items")
+    if not isinstance(base, dict):
+        raise ValueError("18-item collector JSON missing items")
+    if len(base) != 19 or set(base).intersection(SUPPLEMENT_IDS) or DUPLICATE_ID not in base:
+        raise ValueError("09h contract requires exactly 18 independent + s03 = 19 transport fields")
+    extra = _read(supplement)
+    records = extra.get("items", extra)
+    if not isinstance(records, dict) or set(records) != SUPPLEMENT_IDS:
+        raise ValueError("10h supplement requires precisely five keys: " + ",".join(sorted(SUPPLEMENT_IDS)))
+    items = dict(base)
+    items.update(records)
+    if len(items) != EXPECTED_TRANSPORT or len(set(items) - {DUPLICATE_ID}) != EXPECTED_INDEPENDENT:
+        raise ValueError("23 independent / 24 transport contract mismatch")
+    if items["s03"].get("value") != items["m07"].get("value"):
+        raise ValueError("s03 and m07 VIX values mismatch")
+    if items["s03"].get("observation_date") != items["m07"].get("observation_date"):
+        raise ValueError("s03 and m07 VIX dates mismatch")
+    now = dt.datetime.now(dt.timezone.utc)
+    today = now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
+    problems = [problem for key, item in items.items() for problem in _validate(key, item, today)]
+    for k in ("s05",):
+        try:
+            if not 0 <= float(items[k]["value"]) <= 100:
+                problems.append(f"{k}: outside 0-100")
+        except (ValueError, TypeError, KeyError):
+            problems.append(f"{k}: no percentage")
+    if problems:
+        raise ValueError("QUALITY_GATE_BLOCKED: " + "; ".join(problems))
+    template = Path(html).read_text(encoding="utf-8")
+    if "V70_macro_latest.json" not in template or "V70.3/family-macro-feed-v1" not in template:
+        raise ValueError("V70-3-10.html does not support the expected family feed contract")
+    indicators = {
+        k: {"value": float(v["value"]), "dataDate": v["observation_date"],
+            "source": v["source_url"], "unit": v.get("unit", ""),
+            "method": v.get("method", ""), "status": "OK"}
+        for k, v in items.items()
+    }
+    feed = {"schema": "V70.3/family-macro-feed-v1",
+            "asOf": now.isoformat().replace("+00:00", "Z"),
+            "verification": {"ready": True, "valid": EXPECTED_TRANSPORT,
+                             "totalRequired": EXPECTED_TRANSPORT,
+                             "independentIndicators": EXPECTED_INDEPENDENT,
+                             "sources": ["09:00/18", "10:00/5"]},
+            "indicators": indicators, "news": []}
+    out = Path(dest)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shutil.copyfile(html, out / "index.html")
+    (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"]}, indent=2) + "\n", encoding="utf-8")
+    print("QUALITY_GATE_PASS: 18+5, independent=23 transport=24, family feed v1")
+    return True
+
+
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("--macro", default="data/18_macro_verification.json")
+    p.add_argument("--supplement", default="data/5_macro_verified.json")
+    p.add_argument("--html", default="系統工程/總經V70/V70-3-10.html")
+    p.add_argument("--out", default="build/site")
+    args = p.parse_args()
+    try:
+        build(args.macro, args.supplement, args.html, args.out)
+    except (ValueError, OSError, KeyError, json.JSONDecodeError) as exc:
+        raise SystemExit(str(exc) + " | preserve existing published site")

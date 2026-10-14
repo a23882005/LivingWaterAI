@@ -782,7 +782,7 @@ def fetch_etf_valuation_candidate(f, ticker, key):
         raise ValueError('Yahoo ETF metadata unavailable')
     pe=info.get('trailingPE')
     if pe is not None:
-        if not hasattr(f,'etf_candidates'): f.etf_candidates={}
+        if not isinstance(getattr(f,'etf_candidates',None),dict): f.etf_candidates={}
         f.etf_candidates[ticker]={
             'candidate_trailing_pe':pe,
             'retrieved_at_utc':dt.datetime.now(dt.timezone.utc).isoformat(),

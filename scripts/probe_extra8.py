@@ -132,7 +132,7 @@ def collect_market_history(symbols=("VOO", "SPY", "VT", "QQQ"), directory="data/
     for i in range(0,len(symbols),4):
         group = symbols[i:i+4]
         cache_by_symbol={}
-        earliest=now-dt.timedelta(days=365*17)
+        earliest=now
         for symbol in group:
             file=root/(symbol+".csv")
             if file.is_file():
@@ -142,9 +142,11 @@ def collect_market_history(symbols=("VOO", "SPY", "VT", "QQQ"), directory="data/
                         prior['Date']=pd.to_datetime(prior['Date'],errors='coerce').dt.date
                         if prior['Date'].notna().all() and prior['Date'].is_unique:
                             cache_by_symbol[symbol]=prior
-                            earliest=max(earliest,prior['Date'].max()-dt.timedelta(days=7))
+                            earliest=min(earliest,prior['Date'].max()-dt.timedelta(days=7))
                 except Exception as exc:
                     print("CACHE_REJECTED",symbol,type(exc).__name__,flush=True)
+        if any(symbol not in cache_by_symbol for symbol in group):
+            earliest=min(earliest,now-dt.timedelta(days=365*17))
         time.sleep(random.uniform(.5,1.5))
         last_error=""
         downloaded=None
@@ -210,7 +212,7 @@ def collect_market_history(symbols=("VOO", "SPY", "VT", "QQQ"), directory="data/
                         record["observation_date"]=str(cache_by_symbol[symbol]['Date'].max())
             report["items"][symbol]=record
             print("MARKET_DOWNLOAD",symbol,record["status"],record.get("observation_date"),flush=True)
-    (root/"manifest.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    (root/"manifest.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return report
 
 if __name__ == "__main__":

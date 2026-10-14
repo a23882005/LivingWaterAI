@@ -61,6 +61,22 @@ class M06BoundaryQA(unittest.TestCase):
         for p in ({"3.75%-4.00%":95},{"3.75%-4.00%":101},{"3.75%-4.50%":100}):
             with self.subTest(p=p),self.assertRaises(ValueError):
                 mod.calculate(sample(probabilities=p),TODAY)
+    def test_duplicate_meeting_and_no_probabilities_rejected(self):
+        a=sample()
+        a["meetings"].append(dict(a["meetings"][0]))
+        with self.assertRaisesRegex(ValueError,"Duplicate FOMC"):
+            mod.calculate(a,TODAY)
+        for probs in ({},None):
+            a=sample()
+            a["meetings"][0]["probabilities"]=probs
+            with self.assertRaisesRegex(ValueError,"Missing target-rate probability"):
+                mod.calculate(a,TODAY)
+    def test_boolean_probability_rejected(self):
+        a=sample()
+        a["meetings"][0]["probabilities"]={"3.75%-4.00%":True}
+        with self.assertRaisesRegex(ValueError,"Boolean probability"):
+            mod.calculate(a,TODAY)
+
     def test_non_fred_target_rejected(self):
         a=sample();a["target_source"]="unspecified"
         with self.assertRaises(ValueError):mod.calculate(a,TODAY)

@@ -1,9 +1,7 @@
 name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
 
 on:
-  schedule:
-    # 03:00 UTC = 11:00 Asia/Taipei (GitHub can start late).
-    - cron: '0 3 * * *'
+  # Legacy 11h cron migrated to v703-site-deploy-1100.yml; manual dispatch retained.
   workflow_dispatch:
   push:
     paths:

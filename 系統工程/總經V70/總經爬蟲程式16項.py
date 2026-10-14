@@ -495,6 +495,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm07':lambda:latest(f,'m07','VIXCLS'),
       'm01':lambda:latest(f,'m01','T10Y2Y'),
       'm08':lambda:latest(f,'m08','DFII10'),
+      'm06':lambda:fetch_m06_cme(f),
       'm02':lambda:latest(f,'m02','BAMLH0A0HYM2'),
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
@@ -625,8 +626,58 @@ def fedwatch_expected_codes(distribution, current_mid):
     return (expectation/total-float(current_mid))/0.25
 
 
+def fetch_m06_cme(f):
+    """Use CME's authenticated FedWatch EOD REST API; fail closed without access."""
+    from urllib.parse import urlparse
+    token=os.environ.get('CME_FEDWATCH_BEARER','').strip()
+    if not token:
+        raise ValueError('CME_FEDWATCH_BEARER not configured; official CME FedWatch API requires subscription')
+    endpoint='https://markets.api.cmegroup.com/fedwatch/v1/forecasts'
+    response=f.s.get(endpoint,headers={'Authorization':'Bearer '+token,
+                     'Accept':'application/json'},timeout=(5,30))
+    response.raise_for_status()
+    body=response.json()
+    forecasts=body.get('payload')
+    if not isinstance(forecasts,list) or not forecasts:
+        raise ValueError('CME forecast payload absent')
+    today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    horizon=today+dt.timedelta(days=365)
+    eligible=[]
+    for entry in forecasts:
+        meeting=dt.date.fromisoformat(entry['meetingDt'])
+        reported=dt.date.fromisoformat(entry['reportingDt'])
+        if today<=meeting<=horizon and 0<=(today-reported).days<=7:
+            eligible.append((meeting,reported,entry))
+    if not eligible:
+        raise ValueError('No timely FOMC forecast for next 12 months')
+    meeting,reported,last=max(eligible,key=lambda x:x[0])
+    # Actual current TARGET range must be sourced, not assumed from EFFR.
+    lower=f.fred('DFEDTARL')
+    upper=f.fred('DFEDTARU')
+    rates=pd.concat([lower.rename('lower'),upper.rename('upper')],axis=1,join='inner').dropna()
+    if rates.empty or (today-rates.index[-1].date()).days>14:
+        raise ValueError('Current Fed target range not independently verified')
+    cur_lo=float(rates.iloc[-1]['lower'])
+    cur_hi=float(rates.iloc[-1]['upper'])
+    if cur_lo>=cur_hi: raise ValueError('Invalid official current Fed range')
+    ranges=last.get('rateRange')
+    if not isinstance(ranges,list): raise ValueError('CME rateRange absent')
+    distribution=[{'lower':float(x['lowerRt'])/100,
+                   'upper':float(x['upperRt'])/100,
+                   'probability':float(x['probability'])} for x in ranges]
+    current_mid=(cur_lo+cur_hi)/2
+    codes=fedwatch_expected_codes(distribution,current_mid)
+    return row('m06',codes,str(reported),
+               endpoint,'CME FedWatch EOD: final meeting '+meeting.isoformat()+
+               '; probability-weighted target midpoint vs official FRED target midpoint',
+               detail='FOMC '+meeting.isoformat()+'; current target '+str(cur_lo)+'-'+str(cur_hi)+'%; units=25bp')
+
 def selftest():
     # No network; formula and unit conversions check independently.
+    assert abs(fedwatch_expected_codes([
+        {'lower':3.0,'upper':3.25,'probability':0.25},
+        {'lower':3.5,'upper':3.75,'probability':0.75}
+    ],4.125)-(-2.5))<1e-9
     assert abs(fedwatch_expected_codes([
         {'lower':3.5,'upper':3.75,'probability':0.6},
         {'lower':3.0,'upper':3.25,'probability':0.4}

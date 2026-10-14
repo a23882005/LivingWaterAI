@@ -1,0 +1,14 @@
+# Seed watchlist; expand only with a verified IBKR-tradable universe.
+VOO
+VT
+QQQ
+SGOV
+TLT
+IEF
+SPLB
+SPSB
+SOXX
+PPH
+NVDA
+MSFT
+GOOGL

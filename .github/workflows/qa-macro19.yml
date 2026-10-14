@@ -1,0 +1,39 @@
+name: V70.3 19 Macro Collector QA
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '系統工程/總經V70/總經19項爬蟲.py'
+      - 'scripts/probe_m06_fedwatch_free.py'
+      - '.github/workflows/qa-macro19.yml'
+permissions:
+  contents: read
+jobs:
+  test19:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests pandas
+      - name: Compile both Python scripts
+        run: |
+          python -m py_compile '系統工程/總經V70/總經19項爬蟲.py' scripts/probe_m06_fedwatch_free.py
+      - name: Self-test count, m16 and exclusion
+        run: python '系統工程/總經V70/總經19項爬蟲.py' --self-test
+      - name: Verify m06 fail-closed offline
+        run: |
+          python - <<'PY'
+          import ast,pathlib
+          p=pathlib.Path('系統工程/總經V70/總經19項爬蟲.py')
+          ns={}
+          for node in ast.parse(p.read_text(encoding='utf8')).body:
+              if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='LABELS' for t in node.targets):
+                  ns=ast.literal_eval(node.value)
+          assert len(ns)==20 and len(set(ns)-{'s03'})==19
+          assert 'm06' in ns
+          assert not set(('m03_qqq','m03_spy','m03_vt','s05')) & set(ns)
+          print('19 INDICATORS CONTRACT PASS')
+          PY

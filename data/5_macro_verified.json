@@ -1,16 +1,16 @@
 {
   "schema": "V70.3/10h-five-supplement-v1",
-  "observation_context": "2026-10-15 manual trial, source observations dated 2026-10-13/14, uncertain candidates kept UNVERIFIED",
+  "observation_context": "Manual macro task rerun 2026-10-15; independent source lookup; observations Oct 13-14",
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.90875,
+      "value": 0.80475,
       "unit": "percentage_point",
       "observation_date": "2026-10-14",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "method": "Investing.com Oct 27 2027 FOMC Current Probability weighted target midpoint minus current Fed target midpoint 3.875",
+      "method": "Investing Fed Rate Monitor 2027-10-27 probabilities 0.6,6.5,21.2,31.9,25.3,11.3,2.8,0.4%; weighted +0.80475 percentage points versus 3.875 current midpoint",
       "status": "OK",
-      "detail": "Oct 14 2026 10:35 EDT probability-weighted 2027-10-27 FOMC: +0.90875 percentage points"
+      "detail": "Probability sum 100%; Oct 14 04:05 EDT snapshot; 2027-10-27 closest FOMC to 12 months. Market probabilities can change."
     },
     "m03_qqq": {
       "id": "m03_qqq",
@@ -26,11 +26,11 @@
       "id": "m03_spy",
       "value": 25.16,
       "unit": "x",
-      "observation_date": null,
+      "observation_date": "2026-10-13",
       "source_url": "https://stockanalysis.com/etf/spy/holdings/",
       "method": "Stock Analysis ETF holdings PE Ratio field; TTM definition not explicitly shown",
       "status": "UNVERIFIED",
-      "detail": "Stock Analysis PE Ratio 25.16; TTM not expressly stated"
+      "detail": "P/E 25.16 from Stock Analysis SPY holdings, as of Oct 13, checked Oct 14; site does not label TTM. Value is usable as P/E reference, not a verified TTM."
     },
     "m03_vt": {
       "id": "m03_vt",
@@ -40,7 +40,7 @@
       "source_url": "https://stockanalysis.com/etf/vt/holdings/",
       "method": "Stock Analysis ETF holdings PE Ratio field; TTM definition not explicitly shown",
       "status": "UNVERIFIED",
-      "detail": "Found 22.23 on Stock Analysis; TTM not explicitly shown, awaiting stronger source; PV direct VT page inaccessible."
+      "detail": "P/E 22.23 from Stock Analysis holdings; ETF P/E reference, source not explicitly TTM."
     },
     "s05": {
       "id": "s05",
@@ -48,9 +48,9 @@
       "unit": "%",
       "observation_date": "2026-10-13",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-      "method": "MMFI INDEX latest recorded breadth 50-day average (provider quote)",
+      "method": "Macroaxis MMFI Index observed October 13, 2026; Percent of Stocks breadth",
       "status": "OK",
-      "detail": "Macroaxis MMFI index 29.17 as of Oct 13, 2026"
+      "detail": "Macroaxis states latest level 29.17 as of Oct 13. Not an Oct 15 real-time quote."
     }
   }
 }

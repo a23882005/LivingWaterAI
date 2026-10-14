@@ -100,3 +100,38 @@ def test_real_tcp_loopback_switching_active_tenant_cannot_escalate(env):
         assert "synthetic-m" not in denied.text
         assert allowed_again.json()["result"]["content"][0]["text"] == "synthetic-j"
         assert [event["decision"] for event in scope.audit[-3:]] == ["ALLOW", "DENY", "ALLOW"]
+
+def test_loopback_missing_token_does_not_expose_any_tenant_resource(env):
+    with live_server(env) as (base, sign, scope):
+        for active, resource in (("joseph", "r-j"), ("mou", "r-m")):
+            response = invoke(base, active=active, resource=resource)
+            assert response.status_code == 401
+            assert "synthetic-j" not in response.text
+            assert "synthetic-m" not in response.text
+        assert [entry["decision"] for entry in scope.audit[-2:]] == ["DENY", "DENY"]
+
+def test_loopback_wrong_tenant_resource_even_if_active_tenant_matches(env):
+    with live_server(env) as (base, sign, scope):
+        cases = [
+            (sign("joseph"), "joseph", "r-m", "synthetic-m"),
+            (sign("mou"), "mou", "r-j", "synthetic-j"),
+        ]
+        for token, active, resource, secret in cases:
+            response = invoke(base, token, active=active, resource=resource)
+            assert response.status_code == 200
+            assert response.json()["result"]["isError"] is True
+            assert secret not in response.text
+        assert [event["decision"] for event in scope.audit[-2:]] == ["DENY", "DENY"]
+
+def test_loopback_alternating_principals_stays_isolated(env):
+    with live_server(env) as (base, sign, scope):
+        first = invoke(base, sign("joseph"), active="joseph", resource="r-j")
+        second = invoke(base, sign("mou"), active="mou", resource="r-m")
+        third = invoke(base, sign("joseph"), active="mou", resource="r-m")
+        fourth = invoke(base, sign("mou"), active="joseph", resource="r-j")
+        assert [first.status_code, second.status_code, third.status_code, fourth.status_code] == [200]*4
+        assert first.json()["result"]["content"][0]["text"] == "synthetic-j"
+        assert second.json()["result"]["content"][0]["text"] == "synthetic-m"
+        assert third.json()["result"]["isError"] is True
+        assert fourth.json()["result"]["isError"] is True
+        assert [event["decision"] for event in scope.audit[-4:]] == ["ALLOW", "ALLOW", "DENY", "DENY"]

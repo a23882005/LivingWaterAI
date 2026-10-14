@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlsplit
 import ipaddress
+from datetime import datetime, timezone
 
 REQUIRED = (
     "approved_scope_id", "environment_id", "endpoint_origin", "test_window_utc",
@@ -35,6 +36,23 @@ def assess(manifest):
         result["errors"].append("must_use_synthetic_only")
     if manifest.get("approval_for_live_test") is not True:
         result["errors"].append("live_test_not_explicitly_approved")
+    # Require a real, unambiguous future test window, rather than a prose label.
+    window = manifest.get("test_window_utc")
+    if isinstance(window, str) and "/" in window:
+        try:
+            start_s, end_s = window.split("/")
+            def utc_time(value):
+                dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                if dt.tzinfo is None or dt.utcoffset().total_seconds() != 0:
+                    raise ValueError("non_utc_timestamp")
+                return dt.astimezone(timezone.utc)
+            start, end = utc_time(start_s), utc_time(end_s)
+            if not (start < end and start > datetime.now(timezone.utc) and (end - start).total_seconds() <= 86400):
+                raise ValueError("invalid_window_bounds")
+        except (ValueError, TypeError, AttributeError):
+            result["errors"].append("test_window_must_be_future_utc_under_24h")
+    else:
+        result["errors"].append("test_window_must_be_future_utc_under_24h")
     if manifest.get("synthetic_tenant_a_id") == manifest.get("synthetic_tenant_b_id"):
         result["errors"].append("test_tenants_must_differ")
     if manifest.get("test_executor_id") == manifest.get("independent_reviewer_id"):

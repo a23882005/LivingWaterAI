@@ -496,6 +496,9 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm01':lambda:latest(f,'m01','T10Y2Y'),
       'm08':lambda:latest(f,'m08','DFII10'),
       'm06':lambda:fetch_m06_cme(f),
+      'm03_qqq':lambda:fetch_etf_valuation_candidate(f,'QQQ','m03_qqq'),
+      'm03_spy':lambda:fetch_etf_valuation_candidate(f,'SPY','m03_spy'),
+      'm03_vt':lambda:fetch_etf_valuation_candidate(f,'VT','m03_vt'),
       'm02':lambda:latest(f,'m02','BAMLH0A0HYM2'),
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
@@ -671,6 +674,32 @@ def fetch_m06_cme(f):
                endpoint,'CME FedWatch EOD: final meeting '+meeting.isoformat()+
                '; probability-weighted target midpoint vs official FRED target midpoint',
                detail='FOMC '+meeting.isoformat()+'; current target '+str(cur_lo)+'-'+str(cur_hi)+'%; units=25bp')
+
+def fetch_etf_valuation_candidate(f, ticker, key):
+    """Try live yfinance ETF TTM PE and require provider-stamped valuation date.
+
+    A quote retrieval timestamp, last trade time, or today's clock time is
+    NOT the underlying holdings P/E valuation as-of date.
+    """
+    import yfinance as yf
+    info=yf.Ticker(ticker).get_info()
+    if not isinstance(info,dict):
+        raise ValueError('Yahoo ETF metadata unavailable')
+    pe=info.get('trailingPE')
+    if pe is None or not math.isfinite(float(pe)) or float(pe)<=0:
+        raise ValueError('Yahoo trailingPE absent for '+ticker)
+    # ETF P/E must have an explicit dated holdings valuation and a compatible
+    # provider methodology; Yahoo quote time is insufficient evidence.
+    date=info.get('trailingPEAsOfDate')
+    methodology=info.get('trailingPEMethodology')
+    if not date or methodology!='holdings_weighted_ttm':
+        raise ValueError(ticker+' Yahoo trailingPE candidate obtained but ETF valuation date/methodology unverified')
+    observed=dt.date.fromisoformat(str(date))
+    if observed>dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date():
+        raise ValueError('ETF valuation date in future')
+    return row(key,float(pe),observed.isoformat(),'https://finance.yahoo.com/quote/'+ticker+'/',
+               'Yahoo fund holdings weighted trailing 12 months P/E, explicitly dated')
+
 
 def selftest():
     # No network; formula and unit conversions check independently.

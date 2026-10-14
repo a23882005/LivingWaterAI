@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Five ChatGPT-owned indicators (m06, m03_qqq, m03_spy, m03_vt, s05) are EXCLUDED.
-17 series use the prior official/live sourcing and verified overrides; m16 is
-the project-approved 2026-08 fixed LEI baseline and must be refreshed monthly.
+17 series use the prior official/live sourcing and verified overrides; m16 reads
+published LEI YoY and carries three-month auxiliary history, refreshed monthly.
 The s03 VIX transport duplicate is included but excluded from independent count.
 Existing runner and source modules preserved; output is 18_macro_verification.
 """
@@ -12,6 +12,7 @@ import csv
 import datetime as dt
 import json
 import math
+import re
 import os
 import sys
 import time
@@ -452,7 +453,7 @@ def validate_manual(k,v):
                '人工查證輸入：'+v['method'],detail=v.get('detail',''))
 
 def freshen(r,today):
-    if r['status']!='OK':return r
+    if r['status'] not in ('OK','USABLE'):return r
     if r['observation_date'] is None:return r
     age=(today-dt.date.fromisoformat(r['observation_date'])).days
     # Frequency-aware staleness: monthly releases have longer valid windows.
@@ -463,10 +464,11 @@ def freshen(r,today):
     # do not expire its latest available observation by an arbitrary day count.
     # Historical cache fallback remains STALE upstream in run().
     if r['id']=='m16':
-        # User-approved August reference remains current until the announced
-        # October 22 LEI release, after which a new observation is mandatory.
-        if today > dt.date(2026,10,22):
+        # August's published annual growth must refresh after the next release.
+        if r['observation_date']=='2026-08-01' and today > dt.date(2026,10,22):
             r['status']='STALE'; r['detail']+='; 2026-10-22 release deadline passed'
+        elif age<0 or age>90:
+            r['status']='STALE'; r['detail']+='; LEI monthly observation outside 90-day window'
         return r
     if r['id']=='m05':
         if age<0:
@@ -530,18 +532,77 @@ def fetch_pe_portfolio_visualizer(ticker):
                status='UNVERIFIED',
                detail='Date is retrieval date, NOT issuer valuation as-of; primary fund verified')
 
-def lei_approved_baseline():
-    """2026-08 LEI reference values explicitly approved by project owner.
-    The 2025-08 index is a historical-publication candidate, not a
-    same-vintage revision check. Fixed historical baseline, not daily retrieval.
-    """
-    latest_index=99.5
-    previous_index=98.5
-    yoy=(latest_index/previous_index-1)*100
-    return row('m16',yoy,'2026-08-01',
-        'https://www.conference-board.org/topics/us-leading-indicators',
-        'Approved fixed LEI 2026-08/2025-08 baseline; manual historical figures',
-        detail='2026-08=99.5; 2025-08=98.5; user-approved 2026-10-14; reference-only until next monthly update')
+LEI_PNC_ROOT='https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/'
+LEI_PUBLISHED_HISTORY=[
+    ('2026-06-01',-1.4,'2026-07-20','PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf'),
+    ('2026-07-01',-1.1,'2026-08-20','PNC_Economics_Research_LEI_20_August_2026.pdf'),
+    ('2026-08-01',-0.7,'2026-09-18','PNC_Economics_Research_CB_LEI_September_182026.pdf'),
+]
+
+def parse_lei_pnc(text, source):
+    """Read explicitly stated annual growth; never derive it from mixed index vintages."""
+    text=re.sub(r'\s+',' ',text).replace('−','-').replace('–','-')
+    release=re.search(r'\b(\d{1,2} [A-Z][a-z]+ 20\d{2})\b',text)
+    observed=re.search(r'\(LEI\)\s+(?:slipped|slid|rose|fell|increased|decreased)\b.{0,100}?\bin ([A-Z][a-z]+)\b',text)
+    growth=re.search(r'\byear(?:[- ]earlier| ago) growth rate\b.{0,80}?\bto\s+([+-]?\d+(?:\.\d+)?)\s*%',text,re.I)
+    if not release or not observed or not growth:
+        raise ValueError('PNC LEI PDF lacks explicit observation month / annual growth / release date')
+    published=dt.datetime.strptime(release.group(1),'%d %B %Y').date()
+    month=dt.datetime.strptime(observed.group(1),'%B').month
+    year=published.year-(month>published.month)
+    observation=dt.date(year,month,1)
+    value=float(growth.group(1))
+    if observation>published or not -50<=value<=50:
+        raise ValueError('PNC LEI date or annual growth invalid')
+    return {'observation_date':observation.isoformat(),'value':value,'unit':'%',
+            'source_url':source,'publication_date':published.isoformat(),'status':'OK',
+            'method':'Read explicitly stated LEI year-over-year growth from PNC research PDF',
+            'detail':'As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series',
+            'retrieved_at':dt.datetime.now(dt.timezone.utc).isoformat()}
+
+def lei_verified_history(f, cache_path=None):
+    """Existing m16 producer also carries three-month auxiliary history (no extra indicator)."""
+    history={d:{'observation_date':d,'value':v,'unit':'%','source_url':LEI_PNC_ROOT+name,
+                'publication_date':published,'status':'OK',
+                'method':'Work-verified explicitly stated LEI YoY; retained published reference',
+                'detail':'Verified 2026-10-15; as-published YoY, not mixed-vintage index division or daily retrieval'}
+             for d,v,published,name in LEI_PUBLISHED_HISTORY}
+    if cache_path and Path(cache_path).exists():
+        for r in json.loads(Path(cache_path).read_text(encoding='utf-8')).get('lei_history',[]):
+            if (isinstance(r,dict) and r.get('status')=='OK' and isinstance(r.get('value'),(int,float))
+                    and math.isfinite(r['value']) and str(r.get('source_url','')).startswith('https://www.pnc.com/')
+                    and re.fullmatch(r'20\d{2}-\d{2}-01',str(r.get('observation_date','')))):
+                history[r['observation_date']]=r
+    urls=[r['source_url'] for r in history.values()][-3:]
+    try:
+        listing=f.s.get('https://www.pnc.com/en/about-pnc/media/economic-reports.html',timeout=(5,f.timeout))
+        listing.raise_for_status()
+        from urllib.parse import urljoin
+        links=re.findall(r'href=["\']([^"\']+\.pdf)["\']',listing.text,re.I)
+        urls += [urljoin('https://www.pnc.com',u) for u in links
+                 if re.search(r'(?:[_-]LEI[_-]|Leading[_-]Economic[_-]Index)',u,re.I)]
+    except Exception as exc:
+        print('LEI_DISCOVERY_FAILED',str(exc)[:180],flush=True)
+    for url in list(dict.fromkeys(urls))[-6:]:
+        try:
+            from io import BytesIO
+            from pypdf import PdfReader
+            response=f.s.get(url,timeout=(5,f.timeout));response.raise_for_status()
+            if not response.content.startswith(b'%PDF'):
+                raise ValueError('LEI source is not PDF')
+            record=parse_lei_pnc(PdfReader(BytesIO(response.content)).pages[0].extract_text(),url)
+            if record['observation_date']>dt.datetime.now(dt.timezone.utc).date().isoformat():
+                raise ValueError('Future LEI observation rejected')
+            previous=history.get(record['observation_date'])
+            if not previous or record['publication_date']>=previous['publication_date']:
+                history[record['observation_date']]=record
+            print('LEI_PNC_VERIFIED',record['observation_date'],record['value'],flush=True)
+        except Exception as exc:
+            print('LEI_SOURCE_FAILED',url,str(exc)[:180],flush=True)
+    f.lei_history=sorted(history.values(),key=lambda r:r['observation_date'])[-3:]
+    latest=f.lei_history[-1]
+    return row('m16',latest['value'],latest['observation_date'],latest['source_url'],latest['method'],
+               detail=latest['detail']+'; supersedes mixed-vintage 99.5/98.5 baseline')
 
 def run(outdir,overrides_path=None,cache_path=None):
     f=Fetcher()
@@ -562,7 +623,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm10':lambda:yahoo_price(f,'m10','CL=F'),
       'm12':lambda:yahoo_price(f,'m12','^MOVE'),
       's04':lambda:cnn(f),
-      'm16':lambda:lei_approved_baseline(),
+      'm16':lambda:lei_verified_history(f,cache_path),
     }
     # Must not invent an HTTP scraper for a dynamic or terms-protected source.
     reasons={
@@ -608,7 +669,7 @@ def run(outdir,overrides_path=None,cache_path=None):
                 if results[k]['value'] is None and prior.get('value') is not None:
                     try:
                         # 快取只讀入先前 OK/STALE 且有來源的紀錄；重新驗日期、數值、單位。
-                        if prior.get('status') not in ('OK','STALE'):
+                        if prior.get('status') not in ('OK','USABLE','STALE'):
                             continue
                         checked=validate_manual(k, {'value':prior['value'],
                             'observation_date':prior['observation_date'],
@@ -616,8 +677,10 @@ def run(outdir,overrides_path=None,cache_path=None):
                             'method':'既有快取再驗證',
                             'unit':prior.get('unit',''),
                             'detail':prior.get('detail','')})
-                        checked['status']='STALE'
-                        checked['detail']='歷史快取備援；不代表目前已重新查證來源'
+                        # A still-current published monthly observation is usable
+                        # as a retained reference, never a new live-source retrieval.
+                        checked['status']='USABLE' if k in ('m04','m15','m18') else 'STALE'
+                        checked['detail']='歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用'
                         results[k]=checked
                     except (ValueError,TypeError,KeyError,OverflowError) as e:
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)
@@ -629,13 +692,14 @@ def run(outdir,overrides_path=None,cache_path=None):
         results['s03']=row('s03',a['value'],a['observation_date'],a['source_url'],'與 m07 同步',status=a['status'],detail='同一 VIX 數列')
     else:
         results['s03']=row('s03',src=SOURCES['m07'][0],method='與 m07 同步',error='m07 沒有可信值；禁止使用獨立 s03 備援')
-    summary={s:sum(x['status']==s for x in results.values()) for s in ('OK','STALE','MISSING')}
+    summary={s:sum(x['status']==s for x in results.values()) for s in ('OK','USABLE','STALE','MISSING')}
     independent_ids=[key for key in LABELS if key!='s03']
     independent_summary={status:sum(results[key]['status']==status for key in independent_ids)
-                         for status in ('OK','STALE','MISSING')}
+                         for status in ('OK','USABLE','STALE','MISSING')}
     report={'schema':'V70.3/18-macro-collector-v1','generated_at':dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).isoformat(),
             'note':'僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算',
-            'summary':summary,'independent_indicators':{'total':len(independent_ids), 'excluded_duplicate':'s03 (same VIX as m07)', 'summary':independent_summary},'items':results}
+            'summary':summary,'independent_indicators':{'total':len(independent_ids), 'excluded_duplicate':'s03 (same VIX as m07)', 'summary':independent_summary},'items':results,
+            'lei_history':getattr(f,'lei_history',[])}
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
     (out/'18_macro_verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     with (out/'18_macro_verification.csv').open('w',newline='',encoding='utf-8-sig') as w:
@@ -878,13 +942,19 @@ def selftest():
     assert len(LABELS)==19
     assert len([k for k in LABELS if k!='s03'])==18
     assert all(k not in LABELS for k in ["s05"])
-    r=lei_approved_baseline()
-    assert r['status']=='OK' and abs(r['value']-1.015228)<0.00001
+    r=parse_lei_pnc('18 September 2026 The Conference Board Leading Economic Index (LEI) slipped 0.1% in August to 99.5. The year earlier growth rate improved to -0.7%.',LEI_PNC_ROOT+LEI_PUBLISHED_HISTORY[-1][3])
+    assert r['status']=='OK' and r['value']==-0.7
     assert r['observation_date']=='2026-08-01'
+    r['id']='m16'
     assert freshen(dict(r),dt.date(2026,10,14))['status']=='OK'
     assert freshen(dict(r),dt.date(2026,10,23))['status']=='STALE'
+    try:
+        parse_lei_pnc('18 September 2026 (LEI) slipped 0.1% in August. Six-month growth rate to -0.7%.',LEI_PNC_ROOT)
+        raise AssertionError('Must not mistake six-month growth for annual growth')
+    except ValueError:
+        pass
     assert all(k not in LABELS for k in ('m06','m03_qqq','m03_spy','m03_vt'))
-    print('SELF-TEST PASS: 18 independent macros + s03 duplicate; LEI fixed baseline; s05 delegated')
+    print('SELF-TEST PASS: 18 independent macros + s03 duplicate; explicitly published LEI YoY; s05 delegated')
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser(description='V70.3 18 項自動抓取與已核定LEI基準')
@@ -898,3 +968,4 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
+

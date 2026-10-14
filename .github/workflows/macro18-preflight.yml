@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
       - name: Install and static QA
         run: |
-          python -m pip install requests pandas yfinance
+          python -m pip install requests pandas yfinance pypdf
           python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
       - name: Fetch independent 18 macro indicators, preserve previous verified data
@@ -47,6 +47,10 @@ jobs:
           assert len(items)==19 and 's03' in items and all(k not in items for k in ('s05','m06','m03_qqq','m03_spy','m03_vt'))
           assert len(set(items)-{'s03'})==18
           assert d['independent_indicators']['total']==18
+          history=d.get('lei_history',[])
+          assert len(history)==3, 'LEI three-month history missing'
+          assert history[-1]['observation_date']==items['m16']['observation_date']
+          assert abs(history[-1]['value']-items['m16']['value'])<0.000001
           pathlib.Path('data').mkdir(exist_ok=True)
           pathlib.Path('data/18_macro_verification.json').write_text(
               json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
@@ -75,3 +79,4 @@ jobs:
 # Manual rerun request 2026-10-15, preserve all workflow logic
 
 # manual-run-request-20261015-verify18
+

@@ -342,6 +342,14 @@
             while(d<today && n<=400) {d.setUTCDate(d.getUTCDate()+1);if(d.getUTCDay()!==0 && d.getUTCDay()!==6)n++;}
             return n;
         }
+        function v703ObservationStale(id, date, today) {
+            const days=Math.floor((today-date)/86400000);
+            if(days<0)return true;
+            if(['m16','m03_qqq','m03_spy','m03_vt'].includes(id))return days>90;
+            if(id==='m14')return days>14;
+            if(['m04','m05','m15','m18','m19','m20'].includes(id))return days>46;
+            return v703TradingDaysBetween(date,today)>4;
+        }
         window.v703ValidateDates = function() {
             if(window.v703DemoMode===true) {
                 const ok=macroConfig.every(cfg=>{const e=document.getElementById('in_'+cfg.id);return e&&e.value.trim()!==''&&Number.isFinite(Number(e.value));});
@@ -363,10 +371,10 @@
                 if(!date || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==rawDate || date>today) {problems.push(cfg.id+':缺少／無效日期');continue;}
                 if(!src?.value.trim()) {problems.push(cfg.id+':缺少資料來源');continue;}
                 const days=Math.floor((today-date)/86400000);
-                const frequency=cfg.frequency || (['m04','m05','m15','m16','m18','m19','m20','m21'].includes(cfg.id)?'monthly':'daily');
-                const stale=frequency==='monthly'?days>45:frequency==='weekly'?days>14:v703TradingDaysBetween(date,today)>3;
+                const stale=v703ObservationStale(cfg.id,date,today);
                 if(stale) problems.push(cfg.id+':資料過期');
             }
+            if(window.v703LEIHistoryVerified!==true)problems.push('LEI:缺少有效連續三月YoY資料');
             window.v703DateIssues=problems;
             return problems.length===0;
         };
@@ -774,26 +782,26 @@ function renderCapControls() {
 
   <div class="mt-2 grid grid-cols-2 gap-3">
     <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
-      <input type="checkbox" id="lei_m2" class="accent-amber-400">
-      <span>上上月 &lt; 0</span>
+      <input type="checkbox" id="lei_m2" disabled class="accent-amber-400">
+      <span id="lei_label_m2">上上期：待資料</span>
     </label>
     <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
-      <input type="checkbox" id="lei_m1" class="accent-amber-400">
-      <span>上月 &lt; 0</span>
+      <input type="checkbox" id="lei_m1" disabled class="accent-amber-400">
+      <span id="lei_label_m1">上期：待資料</span>
     </label>
     <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2">
-      <input type="checkbox" id="lei_m0" class="accent-amber-400">
-      <span>本月 &lt; 0</span>
+      <input type="checkbox" id="lei_m0" disabled class="accent-amber-400">
+      <span id="lei_label_m0">最新期：待資料</span>
     </label>
     <label class="flex items-center gap-2 bg-slate-900/30 border border-slate-700 rounded-lg px-2 py-2 opacity-90">
       <input type="checkbox" id="lei_3m" disabled class="accent-amber-400">
-      <span class="font-semibold">是否連續三個月 &lt; 0</span>
+      <span id="lei_label_3m" class="font-semibold">連續三期 &lt; 0：待資料</span>
     </label>
   </div>
 
-  <input type="hidden" id="in_m21" value="0">
-  <div class="mt-2 text-[11px] text-slate-400">
-    系統規則：前三項皆勾選 → 自動判定為「連續三個月 &lt; 0」，並回寫 <span class="font-mono">m21 = 1</span>（取消任一項則回寫 <span class="font-mono">m21 = 0</span>）。
+  <input type="hidden" id="in_m21" value="">
+  <div id="lei_history_status" class="mt-2 text-[11px] text-slate-400">
+    依最新已公布的三個連續資料月份，自動判定各期 YoY 是否小於零；缺資料時顯示待資料。
   </div>
 </div>
 `);
@@ -1465,7 +1473,8 @@ if (recBlack) {
             };
             return {
                 macro: macroConfig.map(one),
-                lei3mNegative: document.getElementById('in_m21')?.value === '1',
+                lei3mNegative: window.v703LEIHistoryVerified===true ? document.getElementById('in_m21')?.value === '1' : null,
+                leiHistory: window.v703LEIHistory || [],
                 bondRealYieldInput: document.getElementById('bond-raw')?.value || '',
                 bondScore: document.getElementById('bond-score-display')?.innerText || ''
             };
@@ -1614,7 +1623,7 @@ if (recBlack) {
             lines.push('| ID | 指標 | 數值 | 單位 | Risk 0–10 | 資料日期 | 來源 |');
             lines.push('|---|---|---:|---|---:|---|---|');
             inputs.macro.forEach(x => lines.push(`| ${x.id} | ${mdCell(x.label)} | ${mdCell(x.value)} | ${mdCell(x.unit)} | ${mdCell(x.riskScore)} | ${mdCell(x.dataDate)} | ${x.source ? `[來源](${x.source})` : '—'} |`));
-            lines.push(`- LEI連續三個月負值：**${inputs.lei3mNegative ? 'YES' : 'NO'}**`);
+            lines.push(`- LEI連續三個月負值：**${inputs.lei3mNegative===null ? '待資料' : inputs.lei3mNegative ? 'YES' : 'NO'}**`);
             lines.push('');
 
             lines.push('## 5. 下游共用補充總經快照');
@@ -1786,22 +1795,38 @@ if (recBlack) {
 </div>
 <script>
 (function(){
-  function syncLEI3M(){
-    const m2 = document.getElementById('lei_m2');
-    const m1 = document.getElementById('lei_m1');
-    const m0 = document.getElementById('lei_m0');
-    const out = document.getElementById('lei_3m');
-    if(!m2||!m1||!m0||!out) return;
-    const ok = m2.checked && m1.checked && m0.checked;
-    out.checked = ok;
-    const state = document.getElementById('in_m21');
-    if(state) state.value = ok ? '1' : '0';
-    if(typeof calcTotal==='function') calcTotal();
+  window.v703CheckLEIHistory=function(history, latest){
+    if(!Array.isArray(history)||history.length!==3)throw new Error('LEI缺少三期歷史資料');
+    const rows=history.slice().sort((a,b)=>String(a.observation_date).localeCompare(String(b.observation_date)));
+    const periods=rows.map(r=>{
+      if(!r || typeof r.value!=='number' || !Number.isFinite(r.value) || Math.abs(r.value)>50 || !['OK','USABLE'].includes(r.status) || !/^https:\/\//.test(String(r.source_url||'')) || !r.method || !/^20\d{2}-\d{2}-01$/.test(String(r.observation_date||'')))throw new Error('LEI歷史資料缺少日期／數值／來源');
+      const d=new Date(r.observation_date+'T00:00:00Z');
+      if(!Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==r.observation_date)throw new Error('LEI歷史月份無效');
+      return d.getUTCFullYear()*12+d.getUTCMonth();
+    });
+    if(periods[1]!==periods[0]+1||periods[2]!==periods[1]+1)throw new Error('LEI三期月份不連續');
+    if(!latest || latest.value===null || !Number.isFinite(Number(latest.value)) || rows[2].observation_date!==latest.dataDate || Math.abs(rows[2].value-Number(latest.value))>0.000001)throw new Error('LEI最新期與m16不一致');
+    return rows;
+  };
+  window.v703ApplyLEIHistory=function(history,latest){
+    let rows=[];
+    try{rows=window.v703CheckLEIHistory(history,latest);}catch(e){}
+    const ready=rows.length===3;
+    window.v703LEIHistoryVerified=ready;
+    window.v703LEIHistory=rows;
+    ['m2','m1','m0'].forEach((suffix,i)=>{
+      const box=document.getElementById('lei_'+suffix),label=document.getElementById('lei_label_'+suffix);
+      if(box){box.disabled=true;box.indeterminate=!ready;box.checked=ready&&rows[i].value<0;box.title=ready?rows[i].source_url:'等待有效歷史資料';}
+      if(label)label.textContent=ready?rows[i].observation_date.slice(0,7)+' YoY '+(rows[i].value>0?'+':'')+rows[i].value.toFixed(2)+'% < 0':('期'+(i+1)+'：待資料');
+    });
+    const negative=ready&&rows.every(r=>r.value<0),out=document.getElementById('lei_3m'),state=document.getElementById('in_m21'),label=document.getElementById('lei_label_3m');
+    if(out){out.checked=negative;out.indeterminate=!ready;}
+    if(state)state.value=ready?(negative?'1':'0'):'';
+    if(label)label.textContent='連續三期 < 0：'+(ready?(negative?'是':'否'):'待資料');
+    const status=document.getElementById('lei_history_status');
+    if(status)status.textContent=ready?'來源：PNC／Conference Board；各期公布版 YoY，非同一修訂版本歷史序列。m21='+state.value:'依最新已公布的三個連續資料月份判定；目前歷史資料尚未完整。';
   }
-  ['lei_m2','lei_m1','lei_m0'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('change', syncLEI3M);
-  });
+  window.v703ApplyLEIHistory([],null);
 })();
 </script>
 <!-- ===== Gamma 工程說明（放最後） ===== -->
@@ -2056,7 +2081,7 @@ if (recBlack) {
      // Python 24項蒐集器先執行，將已驗證資料轉為此資料契約；不得使用 MISSING/STALE 冒充正式數值。
      if(!doc.verification || doc.verification.ready!==true){
        const n=doc.verification.valid??0, total=doc.verification.totalRequired??21;
-       throw new Error('24項蒐集器仍有缺項（配置必要欄位 '+n+'/'+total+' 項），僅展示明確標示的示範比例');
+       throw new Error('24欄資料仍有缺項（配置必要欄位 '+n+'/'+total+' 項）');
      }
      if(doc.schema!=='V70.3/family-macro-feed-v1')throw new Error('不支援的資料快照格式');
      // Reject yesterday's deployment once it exceeds the documented update window.
@@ -2075,13 +2100,11 @@ if (recBlack) {
        if(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000) throw new Error('日期錯誤 '+cfg.id);
        if(!/^https:\/\//.test(String(r.source||'')))throw new Error('資料來源不是HTTPS '+cfg.id);
        const dayAge=Math.floor((Date.now()-obs.getTime())/86400000);
-       const monthly=['m04','m05','m15','m16','m18','m19','m20'].includes(cfg.id);
-       let workDays=0;
-       if(!monthly){for(let day=1;day<=dayAge;day++){const w=new Date(obs.getTime()+day*86400000).getUTCDay();if(w!==0&&w!==6)workDays++;}}
-       if(dayAge<0||(monthly?dayAge>46:workDays>4))throw new Error('總經觀測日已過期 '+cfg.id);
+       if(v703ObservationStale(cfg.id,obs,v703DateNowUTC()))throw new Error('總經觀測日已過期 '+cfg.id);
        const n=Number(r.value);
        if(Math.abs(n)>1e9 || (cfg.id==='m07' && n<0) || (cfg.id==='m12' && n<0)) throw new Error('指標超出基本合理範圍 '+cfg.id);
      }
+     const leiRows=window.v703CheckLEIHistory(doc.leiHistory,data.m16);
      window.v703DemoMode=false;
      for(const cfg of macroConfig){
        const r=data[cfg.id], input=document.getElementById('in_'+cfg.id);
@@ -2095,6 +2118,7 @@ if (recBlack) {
        if(['m03_qqq','m03_spy','m03_vt'].includes(cfg.id)) val=Math.round((5+0.7*(val-5))*10)/10;
        if(slider)slider.value=val;if(score)score.textContent=val.toFixed(1);
      }
+     window.v703ApplyLEIHistory(leiRows,data.m16);
      if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
@@ -2104,9 +2128,19 @@ if (recBlack) {
      newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
    }catch(err){
      sourceMode='hold';
-     // 本機 HTML 測試：以中間錨點自動生成完整畫面，保留 synthetic 狀態於內部結果。
-     if(typeof window.v703StartDemo==='function')window.v703StartDemo();
-     status.textContent='測試預覽';
+     window.v703ApplyLEIHistory([],null);
+     // Only an explicitly local preview uses synthetic midpoint inputs.
+     if(['file:','content:'].includes(location.protocol)){
+       if(typeof window.v703StartDemo==='function')window.v703StartDemo();
+       status.textContent='測試預覽';
+     }else{
+       window.v703DemoMode=false;
+       window.v703DataComplete=false;
+       window.v703VerifiedDataDates=false;
+       window.v703Latest=null;
+       if(typeof window.v703Recompute==='function')window.v703Recompute();
+       status.textContent='等待正式資料更新：'+String(err.message||err);
+     }
      newsBox.textContent='';
    }
  }
@@ -2151,3 +2185,4 @@ if (recBlack) {
 </script>
 </body>
 </html>
+

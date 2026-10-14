@@ -76,6 +76,28 @@ def _validate(key, item, today):
     return problems
 
 
+def _lei_history(src, latest):
+    records = src.get('lei_history', [])
+    if not isinstance(records, list) or len(records) != 3:
+        raise ValueError('LEI_HISTORY_BLOCKED: need three explicitly sourced monthly YoY observations')
+    records = sorted(records, key=lambda r: r.get('observation_date', ''))
+    periods = []
+    for r in records:
+        date = dt.date.fromisoformat(r['observation_date'])
+        if (date.day != 1 or r.get('status') not in ACCEPTED_STATUS
+                or isinstance(r.get('value'), bool) or not isinstance(r.get('value'), (int, float))
+                or not math.isfinite(r['value']) or not -50 <= r['value'] <= 50
+                or not str(r.get('source_url', '')).startswith('https://')
+                or not r.get('method')):
+            raise ValueError('LEI_HISTORY_BLOCKED: invalid date/value/source/method/status')
+        periods.append(date.year * 12 + date.month)
+    if periods[1] != periods[0] + 1 or periods[2] != periods[1] + 1:
+        raise ValueError('LEI_HISTORY_BLOCKED: months must be consecutive and unique')
+    if records[-1]['observation_date'] != latest['observation_date'] or abs(records[-1]['value'] - float(latest['value'])) > 0.000001:
+        raise ValueError('LEI_HISTORY_BLOCKED: latest history must agree with m16')
+    return records
+
+
 def build(macro, supplement, html, dest):
     src = _read(macro)
     base = src.get("items")
@@ -105,6 +127,7 @@ def build(macro, supplement, html, dest):
         problems.append("s05: no percentage")
     if problems:
         raise ValueError("QUALITY_GATE_BLOCKED: " + "; ".join(problems))
+    lei_history = _lei_history(src, items['m16'])
     template = Path(html).read_text(encoding="utf-8")
     if "V70_macro_latest.json" not in template or "V70.3/family-macro-feed-v1" not in template:
         raise ValueError("V70-3-10.html does not support the expected family feed contract")
@@ -122,12 +145,16 @@ def build(macro, supplement, html, dest):
                              "independentIndicators": EXPECTED_INDEPENDENT,
                              "sources": ["09:00/18", "10:00/5"],
                              "usableWithCaveat": sorted(k for k,v in items.items() if v.get("status") == "USABLE")},
-            "indicators": indicators, "news": []}
+            "indicators": indicators, "news": [],
+            "leiHistory": lei_history,
+            "derived": {"m21": {"value": int(all(r['value'] < 0 for r in lei_history)),
+                                "method": "All three consecutive published monthly LEI YoY values < 0",
+                                "independentIndicator": False}}}
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     shutil.copyfile(html, out / "index.html")
-    (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"], "usableWithCaveat": feed["verification"]["usableWithCaveat"]}, indent=2) + "\n", encoding="utf-8")
+    (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"], "usableWithCaveat": feed["verification"]["usableWithCaveat"], "leiHistoryReady": True, "leiHistory": lei_history, "m21": feed['derived']['m21']['value']}, indent=2) + "\n", encoding="utf-8")
     print("QUALITY_GATE_PASS: 18+5, independent=23 transport=24, family feed v1")
     return True
 
@@ -143,3 +170,4 @@ if __name__ == "__main__":
         build(args.macro, args.supplement, args.html, args.out)
     except (ValueError, OSError, KeyError, json.JSONDecodeError) as exc:
         raise SystemExit(str(exc) + " | preserve existing published site")
+

@@ -10,7 +10,7 @@ SUPPLEMENT_IDS = frozenset(("s05", "m06", "m03_qqq", "m03_spy", "m03_vt"))
 DUPLICATE_ID = "s03"
 EXPECTED_INDEPENDENT = 23
 EXPECTED_TRANSPORT = 24
-MONTHLY = frozenset(("m04", "m05", "m15", "m16", "m18", "m19", "m20"))
+MONTHLY = frozenset(("m04", "m05", "m15", "m18", "m19", "m20"))\nSLOW_MONTHLY = frozenset(("m16",))\nWEEKLY = frozenset(("m14",))
 VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
 

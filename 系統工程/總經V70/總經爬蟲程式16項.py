@@ -74,16 +74,22 @@ SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
 
 class Fetcher:
-    def __init__(self, timeout=8):
+    def __init__(self, timeout=30):
         self.s=requests.Session()
         from requests.adapters import HTTPAdapter
         from urllib3.util.retry import Retry
-        retry=Retry(total=1, connect=1, read=1, backoff_factor=0.3,
+        retry=Retry(total=2, connect=2, read=2, backoff_factor=2.5,
                     status_forcelist=[429,500,502,503,504],
                     allowed_methods=frozenset(['GET']), respect_retry_after_header=True)
         adapter=HTTPAdapter(max_retries=retry)
         self.s.mount('https://',adapter)
-        self.s.headers.update({'User-Agent':'Mozilla/5.0 (compatible; macro-data-research/1.2)'})
+        self.s.headers.update({
+            'User-Agent':'LivingWaterAI-MacroCollector/1.3 (+GitHub Actions; official data research)',
+            'Accept':'application/json,text/csv,text/plain,*/*',
+            'Accept-Language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding':'gzip, deflate',
+            'Connection':'keep-alive',
+        })
         self.timeout=timeout
         self.fredcache={}
         self.frederrors={}

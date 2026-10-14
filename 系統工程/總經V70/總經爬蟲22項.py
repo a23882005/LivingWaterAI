@@ -504,8 +504,10 @@ def fetch_m06_from_authorized_cme():
             '; permission gate enabled; source parity remains independently reviewable')
 
 def fetch_pe_portfolio_visualizer(ticker):
-    """Primary PV TTM P/E; fail closed on missing identity, value or dated evidence."""
-    import re, requests
+    """Portfolio Visualizer first; keep a numeric candidate and its provenance.
+    HTTP retrieval time is NOT asserted to be holdings P/E valuation date.
+    """
+    import re
     from html import unescape
     if ticker not in ('QQQ','SPY','VT'): raise ValueError('Unapproved ticker')
     url='https://www.portfoliovisualizer.com/fund-performance?s=y&symbol='+ticker
@@ -515,15 +517,18 @@ def fetch_pe_portfolio_visualizer(ticker):
     if len(response.content)>4_000_000: raise ValueError('Oversize page')
     text=unescape(re.sub(r'<[^>]*>',' ',response.text))
     text=re.sub(r'\\s+',' ',text)
-    # Verify the selected main fund, never infer from a benchmark mention.
-    if not re.search(r'(?i)Fund Information.{0,2000}\\b'+ticker+r'\\b',text):
+    # Verify the selected primary fund; SPY/QQQ/VT as benchmark is insufficient.
+    if not re.search(r'(?i)Fund Information.{0,2500}\\b'+ticker+r'\\b',text):
         raise ValueError('Portfolio Visualizer primary fund identity unverified')
     matches=re.findall(r'(?i)Price\\s*/\\s*Earnings\\s*\\(\\s*TTM\\s*\\)\\s*([0-9]+(?:\\.[0-9]+)?)',text)
     if len(matches)!=1: raise ValueError('P/E (TTM) field ambiguous or unavailable')
     pe=float(matches[0])
     if not 1<pe<200: raise ValueError('P/E out of bounds')
-    # Retrieval date is not a holdings P/E valuation date.
-    raise ValueError(f'{ticker} PV PE TTM candidate={pe:g}; valuation as-of date not independently confirmed')
+    retrieved=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date().isoformat()
+    return row('m03_'+ticker.lower(),pe,retrieved,url,
+               'Portfolio Visualizer Fund Information Price/Earnings (TTM)',
+               status='UNVERIFIED',
+               detail='Date is retrieval date, NOT issuer valuation as-of; primary fund verified')
 
 def lei_approved_baseline():
     """2026-08 LEI reference values explicitly approved by project owner.
@@ -882,6 +887,7 @@ def selftest():
     assert r['observation_date']=='2026-08-01'
     assert freshen(dict(r),dt.date(2026,10,14))['status']=='OK'
     assert freshen(dict(r),dt.date(2026,10,23))['status']=='STALE'
+    assert 'm03_qqq' in LABELS and 'm03_spy' in LABELS and 'm03_vt' in LABELS
     print('SELF-TEST PASS: 22 independent macros + s03 duplicate; LEI fixed baseline; s05 delegated')
 
 if __name__=='__main__':

@@ -21,10 +21,58 @@ TARGETS = {
     "m16": ("Conference Board LEI", "https://www.conference-board.org/topics/us-leading-indicators"),
     "s05": ("TradingView MMFI", "https://www.tradingview.com/symbols/INDEX-MMFI/"),
 }
+def probe_yahoo_crumb(session, ticker):
+    """Check Yahoo authentication and valuation JSON; diagnostics only."""
+    record = {"ticker": ticker, "status": "UNVERIFIED"}
+    try:
+        home = session.get("https://finance.yahoo.com/quote/" + ticker + "/", timeout=(5, 15))
+        record["homepage_http"] = home.status_code
+        crumb = session.get("https://query1.finance.yahoo.com/v1/test/getcrumb", timeout=(5, 15))
+        record["crumb_http"] = crumb.status_code
+        token = crumb.text.strip()
+        if not crumb.ok or len(token) > 200 or "<" in token:
+            record["status"] = "CRUMB_UNAVAILABLE"
+            return record
+        url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/" + ticker
+        response = session.get(url, params={"modules": "summaryDetail", "crumb": token}, timeout=(5, 20))
+        record["quote_http"] = response.status_code
+        if response.ok:
+            data = response.json()
+            result = (data.get("quoteSummary", {}).get("result") or [None])[0] or {}
+            fields = result.get("summaryDetail", {})
+            record["trailing_pe_present"] = bool(fields.get("trailingPE", {}).get("raw"))
+            record["forward_pe_present"] = bool(fields.get("forwardPE", {}).get("raw"))
+            record["status"] = "SCHEMA_CHECKED_UNVERIFIED"
+        else:
+            record["status"] = "QUOTE_HTTP_ERROR"
+    except (requests.RequestException, ValueError, KeyError, IndexError, TypeError) as exc:
+        record["status"] = "UNREACHABLE"
+        record["error"] = type(exc).__name__
+    return record
+
+
+def probe_issuer(session, key, url):
+    record = {"source": url, "status": "UNVERIFIED"}
+    try:
+        response = session.get(url, timeout=(5, 20))
+        record["http_status"] = response.status_code
+        record["content_type"] = response.headers.get("content-type", "")[:100]
+        record["bytes"] = len(response.content)
+        record["status"] = "REACHABLE_UNVERIFIED" if response.ok else "HTTP_ERROR"
+    except requests.RequestException as exc:
+        record["status"] = "UNREACHABLE"
+        record["error"] = type(exc).__name__
+    return record
+
+
 def main():
     s = requests.Session()
     s.headers["User-Agent"] = "LivingWaterAI-Macro-Audit/1.0 (source verification only)"
     records = {}
+    valuation_diagnostics = {}
+    for ticker, key in (("QQQ", "m03_qqq"), ("SPY", "m03_spy"), ("VT", "m03_vt")):
+        valuation_diagnostics[key] = {"yahoo": probe_yahoo_crumb(s, ticker), "issuer": probe_issuer(s, key, TARGETS[key][1])}
+        print("VALUATION_DIAGNOSTIC", key, valuation_diagnostics[key]["yahoo"]["status"], valuation_diagnostics[key]["issuer"]["status"], flush=True)
     # Inspect structured JSON availability without promoting values to verified OK.
     for ticker in ("QQQ", "SPY", "VT"):
         try:
@@ -53,7 +101,7 @@ def main():
     result = {"schema": "LivingWaterAI/probe-extra8-v1",
               "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
               "note": "Source connectivity only; no source has yet passed indicator value/date/unit QA.",
-              "indicators": records}
+              "indicators": records, "valuation_diagnostics": valuation_diagnostics}
     out = pathlib.Path("build/macro24/extra8_probe.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

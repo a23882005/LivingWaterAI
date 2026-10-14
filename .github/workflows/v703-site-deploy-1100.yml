@@ -32,33 +32,31 @@ jobs:
           if-no-files-found: warn
       - name: Check deployment configuration
         env:
-          FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
-          FTP_USER: ${{ secrets.HOSTINGER_FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          LW_USER: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          LW_PASS: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
         run: |
-          test -n "$FTP_HOST" && test -n "$FTP_USER" && test -n "$FTP_PASSWORD" || {
-            echo "Hostinger credentials unavailable; build artifact retained, production untouched"; exit 1;
+          test -n "$LW_HOST" && test -n "$LW_USER" && test -n "$LW_PASS" && test -n "$LW_DIR" || {
+            echo "Hostinger SFTP configuration unavailable; build artifact retained"; exit 1;
           }
-      - name: Deploy validated index.html and JSON via FTP
-        env:
-          FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
-          FTP_USER: ${{ secrets.HOSTINGER_FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
-          FTP_REMOTE_DIR: ${{ vars.HOSTINGER_FTP_REMOTE_DIR }}
-        run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
-          REMOTE_DIR="${FTP_REMOTE_DIR:-public_html}"
-          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<EOF
-          set ftp:ssl-force true
-          set ssl:verify-certificate true
-          set net:max-retries 2
-          set net:timeout 20
-          cd $REMOTE_DIR
-          put build/site/V70_macro_latest.json -o V70_macro_latest.json
-          put build/site/index.html -o index.html
-          bye
-          EOF
-          echo "FTP upload completed; checking published website."
+          case "$LW_DIR" in
+            public_html|*/public_html|*/public_html/) ;;
+            *) echo "::error::Site directory must end in public_html"; exit 1 ;;
+          esac
+      - name: Deploy validated index.html and JSON via Hostinger SSH
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/V70_macro_latest.json,build/site/index.html
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
 
       - name: Verify Hostinger homepage and live JSON
         env:

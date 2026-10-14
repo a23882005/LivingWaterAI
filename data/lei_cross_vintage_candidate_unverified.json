@@ -1,0 +1,20 @@
+{
+  "schema": "V70.3/lei-candidate-v1",
+  "indicator": "m16",
+  "target": "The Conference Board US Leading Economic Index YoY",
+  "status": "UNVERIFIED_MIXED_RELEASE_VINTAGES",
+  "latest": {
+    "observation_date": "2026-08-01",
+    "index": 99.5,
+    "release_date": "2026-09-18",
+    "source_url": "https://www.conference-board.org/topics/us-leading-indicators/index.cfm"
+  },
+  "year_earlier": {
+    "observation_date": "2025-08-01",
+    "index": 98.4,
+    "release_date": "2025-09-18",
+    "source_url": "https://www.conference-board.org/pdf_free/press/US%20LEI%20PRESS%20RELEASE-Sep%202025.pdf"
+  },
+  "illustrative_cross_vintage_yoy_percent": 1.12,
+  "note": "Different release vintages. This is a diagnostic candidate ONLY. NEVER promote m16 to OK without same-vintage prior-year observation; 2026-10-22 September release is not yet published as of 2026-10-14."
+}

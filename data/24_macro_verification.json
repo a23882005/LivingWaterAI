@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T08:55:46.340400+08:00",
+  "generated_at": "2026-10-14T09:35:55.204615+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 18,
@@ -11,9 +11,9 @@
     "m07": {
       "id": "m07",
       "label": "VIX",
-      "value": 15.21,
+      "value": 15.27,
       "unit": "",
-      "observation_date": "2026-10-12",
+      "observation_date": "2026-10-13",
       "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
       "status": "OK",
@@ -39,10 +39,10 @@
       "unit": "碼",
       "observation_date": null,
       "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
-      "method": "須人工核實或授權 API",
+      "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "CME/Investing 機率分布未有穩定公開介面；需每個會議利率機率換算12個月預期碼數"
+      "error": "CME_FEDWATCH_BEARER not configured; official CME FedWatch API requires subscription"
     },
     "m08": {
       "id": "m08",
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.160004,
+      "value": 102.171997,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.910004,
+      "value": 95.25,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -263,9 +263,9 @@
     "s03": {
       "id": "s03",
       "label": "VIX 短期",
-      "value": 15.21,
+      "value": 15.27,
       "unit": "",
-      "observation_date": "2026-10-12",
+      "observation_date": "2026-10-13",
       "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "method": "與 m07 同步",
       "status": "OK",

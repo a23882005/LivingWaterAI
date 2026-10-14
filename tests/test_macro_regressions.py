@@ -183,5 +183,18 @@ class MacroRegression(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"absent"):
                 macro.fetch_mmfi_barchart_history(Mock())
 
+
+    def test_etf_candidate_numeric_kept_separate_from_verified_data(self):
+        from unittest.mock import Mock
+        source=Mock()
+        ticker=Mock()
+        ticker.get_info.return_value={"trailingPE":23.7}
+        with patch("yfinance.Ticker",return_value=ticker):
+            with self.assertRaisesRegex(ValueError,"methodology unverified"):
+                macro.fetch_etf_valuation_candidate(source,"SPY","m03_spy")
+        self.assertEqual(source.etf_candidates["SPY"]["candidate_trailing_pe"],23.7)
+        self.assertEqual(source.etf_candidates["SPY"]["validation"],
+                         "UNVERIFIED: retrieval time is not valuation date")
+
 if __name__=="__main__":
     unittest.main()

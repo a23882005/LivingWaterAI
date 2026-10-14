@@ -69,4 +69,5 @@ jobs:
             git push origin HEAD:main
           fi
 
-# Manual full-chain trial requested 2026-10-15 (18-item collector run)
+
+# Re-run collector on 2026-10-15 for end-to-end verification

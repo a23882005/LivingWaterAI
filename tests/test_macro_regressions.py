@@ -221,5 +221,27 @@ class MacroRegression(unittest.TestCase):
         self.assertEqual(result["candidate_index_pe"],25.21)
         self.assertIn("INDEX_PROXY_ONLY",result["validation"])
 
+
+    def test_incremental_market_history_dated_csv_and_no_fake_mmfi(self):
+        import tempfile
+        import datetime as dt
+        from scripts.probe_extra8 import collect_market_history
+        today=dt.datetime.now(dt.timezone.utc).date()
+        dates=pd.bdate_range(end=today-dt.timedelta(days=1),periods=61)
+        bars=pd.DataFrame({'Open':[100.0]*61,'High':[102.0]*61,
+            'Low':[99.0]*61,'Close':[101.0]*61,'Adj Close':[100.5]*61,
+            'Volume':[1000]*61,'Dividends':[0.0]*61,'Stock Splits':[0.0]*61},
+            index=pd.DatetimeIndex(dates,name='Date'))
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch('yfinance.download',return_value=bars),patch('time.sleep'):
+                report=collect_market_history(('VOO',),directory=tmp)
+            self.assertEqual(report['items']['VOO']['status'],'OK')
+            result=pd.read_csv(pathlib.Path(tmp)/'VOO.csv')
+            self.assertIn('Adj Close',result)
+            self.assertIn('MA50_Close',result)
+            self.assertNotIn('s05_Market_Breadth (%)',result)
+            self.assertTrue((result['Close']>0).all())
+            self.assertTrue((pathlib.Path(tmp)/'manifest.json').is_file())
+
 if __name__=="__main__":
     unittest.main()

@@ -134,4 +134,6 @@ jobs:
           name: family-pf-synthetic-receipt
           path: downloaded-receipt
       - name: Verify receipt integrity and gate claim
-        run: python experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py verify --directory downloaded-receipt
+        env:
+          PF_EXPECTED_SHA: ${{ github.sha }}
+        run: python experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py verify --directory downloaded-receipt --expected-commit "$PF_EXPECTED_SHA"

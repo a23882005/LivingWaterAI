@@ -10,3 +10,7 @@
 6. **s05 MMFI** 依序：https://www.barchart.com/stocks/quotes/%24MMFI/comparison → https://stockcharts.com/h-sc/ui?s=%24MMFI → https://www.marketinout.com/stock-screener/above-50-day-moving-average → https://www.tradingview.com/symbols/INDEX-MMFI/ 。需驗證NYSE市場股票站上MA50比例、原始日線觀測日、0～100；Barchart Last 無可核對日期時僅記候選，不當今日值。
 7. **其他任何缺項**：優先查原始來源與正式指標字典；官方入口 FRED https://fred.stlouisfed.org/ 、BLS https://www.bls.gov/ 、BEA https://www.bea.gov/ 、Treasury https://home.treasury.gov/ 、Fed https://www.federalreserve.gov/ 、ISM https://www.ismworld.org/ 、Conference Board https://www.conference-board.org/ 。按原指標公式重算，禁止為填數而變更定義。
 8. 每項保留 id/value/unit/observation_date/retrieved_at/source_url/method/status/error；只有同口徑且有日期來源證據才OK，否則MISSING/STALE/UNVERIFIED。合併22+s05=23獨立項，另s03=m07形成24欄。向使用者交付**原完整總經報告**，並實際用已連接GitHub工具回寫整合JSON再讀回確認，交給11:00 Actions；未能回寫要明示阻礙，不得假稱交接/部署完成。
+
+
+## 2026-10-14｜QQQ／SPY／VT 三檔PE一致採用 Portfolio Visualizer
+三檔均以 Portfolio Visualizer 的 **Fund Information → Price/Earnings (TTM)** 為第一來源，先確認頁面主標的是正確ETF（不可把 Benchmark 的資料讀錯），**直接讀數值，不自行算PE**。m03_qqq URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=QQQ`；m03_spy URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=SPY`；m03_vt URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=VT`。已知歷史參考 QQQ 28.32、SPY 24.20；不硬編碼為每日最新值。VT PV 最新值未核對，不以發行商不同日期值冒充。失敗時由10:00總經Task依相同方法讀網頁並紀錄 value、TTM口徑、來源、觀測日期與抓取時間；其餘備援依原規則。

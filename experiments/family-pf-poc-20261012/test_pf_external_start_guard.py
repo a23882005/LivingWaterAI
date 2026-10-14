@@ -1,7 +1,12 @@
+from datetime import datetime, timezone, timedelta
 from pf_external_start_guard import assess, REQUIRED
 
 def good():
     x = {key: "approved-" + key for key in REQUIRED}
+    now = datetime.now(timezone.utc)
+    start = (now + timedelta(hours=1)).isoformat()
+    end = (now + timedelta(hours=2)).isoformat()
+    x["test_window_utc"] = start + "/" + end
     x.update(environment_type="isolated_nonproduction",
              test_data_class="synthetic_only", approval_for_live_test=True,
              endpoint_origin="https://approved.external.org")
@@ -75,3 +80,13 @@ def test_public_https_origin_still_requires_human_review():
     r = assess(x)
     assert r["external_test_start"] == "READY_FOR_AUTHORIZED_OPERATOR_REVIEW"
     assert r["gate_a"] == "HOLD"
+
+def test_window_must_be_future_bounded_utc():
+    for value in ("pending", "2026-01-01T00:00:00Z/2026-01-02T00:00:00Z",
+                  "2029-01-01T00:00:00/2029-01-01T01:00:00",
+                  "2099-01-01T00:00:00Z/2099-01-04T00:00:00Z",
+                  "2099-01-01T02:00:00Z/2099-01-01T01:00:00Z"):
+        x = good()
+        x["test_window_utc"] = value
+        assert "test_window_must_be_future_utc_under_24h" in assess(x)["errors"]
+        assert assess(x)["external_test_start"] == "BLOCKED"

@@ -1,0 +1,56 @@
+{
+  "schema": "V70.3/10h-five-supplement-v1",
+  "observation_context": "2026-10-14 US market sources / trial run",
+  "items": {
+    "m06": {
+      "id": "m06",
+      "value": 0.923924,
+      "unit": "percentage_point",
+      "observation_date": "2026-10-14",
+      "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
+      "method": "2027-10-27 FOMC target-rate distribution weighted midpoint minus 2026-10-14 current target midpoint (3.875), rounded probability sum 99.9%",
+      "status": "OK",
+      "detail": "FOMC 2027-10-27 target 12 months from Oct 15; probabilities 0.2,3.1,13.4,27.5,30.1,18.4,6.1,1.0,0.1%, midpoints 3.875 to 6.125; expected 4.798924; +0.923924 pp; source page updated 2026-10-14 11:05 EDT"
+    },
+    "m03_qqq": {
+      "id": "m03_qqq",
+      "value": null,
+      "unit": "x",
+      "observation_date": null,
+      "source_url": "",
+      "method": "TTM ETF holding-weighted P/E source and as-of date not independently verified",
+      "status": "MISSING",
+      "detail": "No reliably dated TTM figure found"
+    },
+    "m03_spy": {
+      "id": "m03_spy",
+      "value": null,
+      "unit": "x",
+      "observation_date": null,
+      "source_url": "",
+      "method": "TTM ETF holding-weighted P/E source and as-of date not independently verified",
+      "status": "MISSING",
+      "detail": "FY1 forward P/E cannot substitute for TTM"
+    },
+    "m03_vt": {
+      "id": "m03_vt",
+      "value": null,
+      "unit": "x",
+      "observation_date": null,
+      "source_url": "",
+      "method": "TTM ETF holding-weighted P/E source and as-of date not independently verified",
+      "status": "MISSING",
+      "detail": "No reliably dated TTM figure found"
+    },
+    "s05": {
+      "id": "s05",
+      "value": 29.17,
+      "unit": "%",
+      "observation_date": "2026-10-13",
+      "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "method": "MMFI INDEX latest recorded breadth 50-day average (provider quote)",
+      "status": "OK",
+      "detail": "Percent of NYSE stocks above 50-day SMA; as of October 13, 2026, 29.17%"
+    }
+  }
+}

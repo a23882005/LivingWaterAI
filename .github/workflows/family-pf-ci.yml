@@ -71,6 +71,8 @@ jobs:
           cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
           cp experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py pf-ci-source/pf_ci_evidence_receipt.py
           cp experiments/family-pf-poc-20261012/test_pf_ci_evidence_receipt.py pf-ci-source/tests/test_pf_ci_evidence_receipt.py
+          cp experiments/family-pf-poc-20261012/pf_external_evidence_plan.py pf-ci-source/pf_external_evidence_plan.py
+          cp experiments/family-pf-poc-20261012/test_pf_external_evidence_plan.py pf-ci-source/tests/test_pf_external_evidence_plan.py
           cp experiments/family-pf-poc-20261012/pf_external_start_guard.py pf-ci-source/pf_external_start_guard.py
           cp experiments/family-pf-poc-20261012/test_pf_external_start_guard.py pf-ci-source/tests/test_pf_external_start_guard.py
           cp experiments/family-pf-poc-20261012/pf_gate_a_readiness.py pf-ci-source/pf_gate_a_readiness.py
@@ -120,6 +122,9 @@ jobs:
         env:
           PF_HEAD_SHA: ${{ github.sha }}
         run: python pf_ci_evidence_receipt.py emit --junit ci-results.xml --commit "$PF_HEAD_SHA" --directory ci-evidence
+      - name: Generate offline Gate A outstanding evidence plan
+        working-directory: pf-ci-source
+        run: python pf_external_evidence_plan.py --output ci-evidence/gate-a-workplan.json
       - name: Upload synthetic evidence receipt
         if: success()
         uses: actions/upload-artifact@v4
@@ -144,6 +149,19 @@ jobs:
         with:
           name: family-pf-synthetic-receipt
           path: downloaded-receipt
+      - name: Verify nine external controls remain unverified
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("downloaded-receipt/gate-a-workplan.json").read_text())
+          assert p["gate_a"] == "HOLD"
+          assert p["work13_allowed"] is False
+          assert p["remote_tests_executed"] is False
+          assert p["authorization_preflight"] == "BLOCKED"
+          assert [e["id"] for e in p["evidence_required"]] == [f"EA-{i:02d}" for i in range(1,10)]
+          assert all(e["state"] == "NOT_VERIFIED" for e in p["evidence_required"])
+          PY
       - name: Verify receipt integrity and gate claim
         env:
           PF_EXPECTED_SHA: ${{ github.sha }}

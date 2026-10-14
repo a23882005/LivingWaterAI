@@ -42,7 +42,7 @@ def assess(manifest):
         if isinstance(value, str) and (
             len(value) > MAX_FIELD_LENGTH or
             any(ord(ch) < 32 or ord(ch) == 127 for ch in value) or
-            value != value.strip()
+            value != value.strip() or chr(92) in value
         ):
             result["errors"].append("unsafe_manifest_field_value")
             break

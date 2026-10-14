@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T08:02:07.960696+08:00",
+  "asOf": "2026-10-14T08:05:30.055563+08:00",
   "indicators": {
     "m07": {
       "value": 15.21,
@@ -23,6 +23,13 @@
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
+    "m02": {
+      "value": 3.11,
+      "dataDate": "2026-10-12",
+      "source": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+      "unit": "%",
+      "method": "FRED_CSV 官方或鏡像時間序列"
+    },
     "m04": {
       "value": 54.5,
       "dataDate": "2026-09-01",
@@ -38,14 +45,14 @@
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 102.193001,
+      "value": 102.188004,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 94.849998,
+      "value": 94.860001,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -71,6 +78,13 @@
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
+    },
+    "m14": {
+      "value": -123.579,
+      "dataDate": "2026-10-07",
+      "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
+      "unit": "USD bn",
+      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元"
     },
     "m15": {
       "value": 54.9,
@@ -104,15 +118,13 @@
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 14,
+    "valid": 16,
     "totalRequired": 21,
     "missing": [
       "m06: MISSING (not verified OK)",
       "m03_qqq: MISSING (not verified OK)",
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
-      "m02: MISSING (not verified OK)",
-      "m14: MISSING (not verified OK)",
       "m16: MISSING (not verified OK)"
     ]
   }

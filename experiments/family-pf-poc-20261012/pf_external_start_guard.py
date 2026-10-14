@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlsplit
 import ipaddress
+import re
 from datetime import datetime, timezone
 
 REQUIRED = (
@@ -16,6 +17,9 @@ REQUIRED = (
     "audit_custodian_id", "audit_store_approval_id",
     "independent_reviewer_id", "gate_governance_owner_id",
 )
+MAX_MANIFEST_BYTES = 65536
+MAX_FIELD_LENGTH = 512
+DNS_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$")
 SECRET_MARKERS = ("token", "password", "secret", "cookie", "private_key", "authorization_header")
 
 def assess(manifest):
@@ -31,6 +35,17 @@ def assess(manifest):
     permitted = set(REQUIRED) | {"environment_type", "test_data_class", "approval_for_live_test"}
     if set(manifest) - permitted:
         result["errors"].append("unknown_manifest_fields")
+    for key, value in manifest.items():
+        if not isinstance(key, str) or not isinstance(value, (str, bool)):
+            result["errors"].append("invalid_manifest_field_type")
+            break
+        if isinstance(value, str) and (
+            len(value) > MAX_FIELD_LENGTH or
+            any(ord(ch) < 32 or ord(ch) == 127 for ch in value) or
+            value != value.strip()
+        ):
+            result["errors"].append("unsafe_manifest_field_value")
+            break
     for field in REQUIRED:
         val = manifest.get(field)
         if not isinstance(val, str) or not val.strip() or val.strip().lower() in {"pending", "tbd", "none", "blocked", "todo", "unknown"}:
@@ -58,7 +73,7 @@ def assess(manifest):
             result["errors"].append("test_window_must_be_future_utc_under_24h")
     else:
         result["errors"].append("test_window_must_be_future_utc_under_24h")
-    if manifest.get("synthetic_tenant_a_id") == manifest.get("synthetic_tenant_b_id"):
+    if str(manifest.get("synthetic_tenant_a_id", "")).strip().casefold() == str(manifest.get("synthetic_tenant_b_id", "")).strip().casefold():
         result["errors"].append("test_tenants_must_differ")
     # Separation of duties must cover all three operating roles, not just two.
     roles = [manifest.get(k) for k in ("test_executor_id", "audit_custodian_id",
@@ -77,6 +92,8 @@ def assess(manifest):
             not parsed.query and not parsed.fragment and "\\" not in origin and
             not any(ch.isspace() for ch in origin) and
             parsed.hostname.lower() not in {"localhost"} and
+            not parsed.hostname.endswith(".") and
+            all(DNS_LABEL.fullmatch(label) for label in parsed.hostname.lower().split(".")) and
             not parsed.hostname.lower().endswith((".localhost", ".test", ".invalid", ".example"))
         )
         if valid_origin:
@@ -94,13 +111,28 @@ def assess(manifest):
         result["external_test_start"] = "READY_FOR_AUTHORIZED_OPERATOR_REVIEW"
     return result
 
+def load_manifest(path):
+    """Bound input and reject ambiguous duplicate JSON object keys before approval."""
+    raw = Path(path).read_bytes()
+    if len(raw) > MAX_MANIFEST_BYTES:
+        raise ValueError("manifest_too_large")
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate_manifest_key")
+            result[key] = value
+        return result
+    return json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest", type=Path)
     args = parser.parse_args()
     try:
-        doc = json.loads(args.manifest.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        doc = load_manifest(args.manifest)
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
         doc = None
     outcome = assess(doc)
     print(json.dumps(outcome, ensure_ascii=False, sort_keys=True, indent=2))

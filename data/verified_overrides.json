@@ -14,5 +14,13 @@
     "method": "ISM官方2026年9月Services PMI；截至2026-10-14已核對",
     "unit": "",
     "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4"
+  },
+  "m18": {
+    "value": 0,
+    "observation_date": "2026-09-01",
+    "source_url": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
+    "method": "ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
+    "unit": "",
+    "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率"
   }
 }

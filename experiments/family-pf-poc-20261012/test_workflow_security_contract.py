@@ -26,3 +26,16 @@ def test_workflow_requires_second_job_receipt_verification():
     assert "needs: verify-pf-full-suite" in text
     assert '--expected-commit "$PF_EXPECTED_SHA"' in text
     assert "family-pf-synthetic-receipt" in text
+
+def test_workflow_never_runs_unapproved_public_endpoint_probe():
+    content = WORKFLOW.read_text(encoding="utf-8")
+    assert "pf_remote_preflight.py https://" not in content
+    assert "curl https://" not in content
+    assert "secrets." not in content
+
+def test_receipt_cannot_authorize_gate_or_production():
+    content = WORKFLOW.read_text(encoding="utf-8")
+    assert "verify-evidence-receipt:" in content
+    assert "upload-artifact@v4" in content
+    assert "deploy-pages" not in content
+    assert "environment: production" not in content

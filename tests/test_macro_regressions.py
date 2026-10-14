@@ -196,5 +196,15 @@ class MacroRegression(unittest.TestCase):
         self.assertEqual(source.etf_candidates["SPY"]["validation"],
                          "UNVERIFIED: retrieval time is not valuation date")
 
+
+    def test_23_independent_macro_fields_accounting(self):
+        self.assertEqual(len(macro.LABELS),24)
+        self.assertIn("m07",macro.LABELS)
+        self.assertIn("s03",macro.LABELS)
+        ids=[key for key in macro.LABELS if key!="s03"]
+        self.assertEqual(len(ids),23)
+        # Neither output schema nor source VIX values are silently deleted.
+        self.assertIn("s03",macro.LABELS)
+
 if __name__=="__main__":
     unittest.main()

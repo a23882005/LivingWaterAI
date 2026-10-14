@@ -17,9 +17,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Validate 09h macro and 10h ChatGPT MMFI; build site
+      - name: Validate 09h 18 and 10h 5 verified metrics; build site
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
+          test -s data/18_macro_verification.json
+          test -s data/5_macro_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-10.html" --out build/site
       - name: Upload QA package
         if: always()
@@ -56,4 +58,32 @@ jobs:
           put build/site/index.html -o index.html
           bye
           EOF
-          echo "Deployed validated site; inspect Hostinger homepage and JSON for final verification."
+          echo "FTP upload completed; checking published website."
+
+      - name: Verify Hostinger homepage and live JSON
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+        run: |
+          python - <<'PY'
+          import json,os,time,urllib.request
+          from pathlib import Path
+          base=(os.environ.get("SITE_BASE_URL") or "https://www.happihelp.com").rstrip("/")
+          expected=json.loads(Path("build/site/V70_macro_latest.json").read_text())
+          for attempt in range(4):
+              try:
+                  stamp=expected["asOf"].replace(":","").replace("+","")
+                  with urllib.request.urlopen(base+"/V70_macro_latest.json?v="+stamp,timeout=20) as response:
+                      live=json.load(response)
+                  with urllib.request.urlopen(base+"/?v="+stamp,timeout=20) as response:
+                      page=response.read().decode("utf-8")
+                  assert live["schema"]==expected["schema"]
+                  assert live["asOf"]==expected["asOf"]
+                  assert live["verification"]["ready"] is True
+                  assert len(live["indicators"])==24
+                  assert "V70_macro_latest.json" in page
+                  print("HOSTINGER_LIVE_PASS",base,expected["asOf"])
+                  break
+              except Exception as exc:
+                  if attempt==3: raise SystemExit("HOSTINGER_LIVE_VERIFY_FAILED: "+repr(exc))
+                  time.sleep(12)
+          PY

@@ -45,3 +45,12 @@ GitHub 對應目錄：`a23882005/LivingWaterAI/系統工程/總經V70/`
 - **四站依序：** ① Barchart $MMFI：https://www.barchart.com/stocks/quotes/%24MMFI ② StockCharts $MMFI：https://stockcharts.com/h-sc/ui?s=%24MMFI ③ Market-In-Out：https://www.marketinout.com/stock-screener/above-50-day-moving-average （必須確認切換 NYSE 後口徑與 MMFI 相同）④ TradingView INDEX:MMFI：https://www.tradingview.com/symbols/INDEX-MMFI/ 。
 - **品質規則：** 必須實際讀頁面最新數值與觀測日期；驗證 NYSE 股票站上 MA50 比例、0–100、資料時間與來源。搜尋索引中的歷史數字、無日期的「29.17」或其他市場股票池的百分比，不能當作當日最新值；不能取得則標示 MISSING／STALE，不捏造。
 - **Gmail 角色：** Gemini 寄來的 s05 可作備援交叉核對；優先採 Task 當次自行查得且通過品質驗證的 s05。其餘原有 Task 章節、10:00 時間與 11:00 GitHub Actions 交接均維持。
+
+## 2026/10/14｜先爬蟲、後總經 Task（修正前後順序）
+
+1. **09:00 台灣時間：** GitHub Actions `.github/workflows/macro22-preflight.yml` 執行 `系統工程/總經V70/總經爬蟲22項.py`，產出並提交 `data/22_macro_verification.json`（22個獨立指標，另有s03重複VIX欄）。
+2. **10:00 台灣時間：** 現有「總體經濟狀況」Task 應**先讀取** `https://raw.githubusercontent.com/a23882005/LivingWaterAI/main/data/22_macro_verification.json`，核對 `generated_at`、每項 `status`、`observation_date`、`source_url`，確認09:00爬蟲是否成功產生當日檔。若GitHub Actions延後/失敗，保留上次資料，標STALE或MISSING；不得宣稱今日22項已更新。
+3. **10:00 Task 自行處理：** 按 Barchart→StockCharts→Market-In-Out→TradingView 順序直接查 s05/MMFI，核對NYSE MA50定義、最新數值與日期，合併23個獨立指標（24傳輸欄，s03=m07）。
+4. **11:00 台灣時間：** 原 `.github/workflows/update-v70.yml` 仍跑16項舊版，**尚未整合上述10:00 Task 的最新輸出**；正式部署前必須另行對接驗證，不能宣稱全自動網站更新已完成。
+
+**重要：** 本頁為既有 Task 的工程交接規範，不代表已直接修改該 Task 的儲存提示文字。執行時如遇原Task舊提示與本頁先後順序衝突，以最新經核定工序為準；不刪原Task其他分析要求。

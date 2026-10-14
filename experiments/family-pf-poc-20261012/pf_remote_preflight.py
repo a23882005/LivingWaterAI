@@ -14,10 +14,12 @@ import httpx
 def validated_url(url):
     if not isinstance(url, str):
         raise ValueError("An explicit HTTPS endpoint is required")
+    if any(c.isspace() for c in url) or "\\" in url:
+        raise ValueError("Ambiguous URL characters forbidden")
     p=urlsplit(url)
     if p.scheme!="https" or not p.hostname or p.username or p.password or p.query or p.fragment:
         raise ValueError("HTTPS origin without embedded credentials or query required")
-    if p.hostname in ("localhost","127.0.0.1","::1") or p.hostname.endswith((".test",".invalid",".example",".localhost")):
+    if p.hostname.lower() in ("localhost","127.0.0.1","::1") or p.hostname.lower().endswith((".test",".invalid",".example",".localhost")):
         raise ValueError("Placeholder or loopback URL cannot be used as remote evidence")
     if p.port not in (None,443):
         raise ValueError("Nonstandard HTTPS port not permitted")
@@ -57,6 +59,9 @@ def verify_remote_metadata(url, transport=None):
             return result
         try:
             issuer=urlsplit(issuers[0])
+            if any(c.isspace() for c in issuers[0]) or "\\" in issuers[0]:
+                result["reason"]="invalid_authorization_server"
+                return result
             if issuer.scheme!="https" or not issuer.hostname or issuer.username or issuer.password or issuer.query or issuer.fragment or issuer.port not in (None,443):
                 result["reason"]="invalid_authorization_server"
                 return result

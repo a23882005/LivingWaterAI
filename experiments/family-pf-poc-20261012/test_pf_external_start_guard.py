@@ -53,3 +53,25 @@ def test_url_must_not_contain_embedded_secret():
 
 def test_non_object_blocks():
     assert assess([])["external_test_start"] == "BLOCKED"
+
+def test_origin_rejects_nonpublic_and_malformed_urls():
+    for invalid in (
+        "https://localhost", "https://127.0.0.1", "https://192.168.1.2",
+        "https://[::1]", "https://example.test",
+        "https://site.org/private/path", "https://site.org:8443",
+        "https://site.org?auth=1", "https://site.org#fragment",
+        "https://site.org\\\\attack", "https://site.org bad", "https://",
+        "http://site.org", "https://site.org@evil.org",
+    ):
+        x = good()
+        x["endpoint_origin"] = invalid
+        r = assess(x)
+        assert r["external_test_start"] == "BLOCKED", invalid
+        assert "endpoint_must_be_public_https_origin" in r["errors"], invalid
+
+def test_public_https_origin_still_requires_human_review():
+    x = good()
+    x["endpoint_origin"] = "https://auth.example.org:443"
+    r = assess(x)
+    assert r["external_test_start"] == "READY_FOR_AUTHORIZED_OPERATOR_REVIEW"
+    assert r["gate_a"] == "HOLD"

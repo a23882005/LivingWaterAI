@@ -1,0 +1,59 @@
+name: LivingWaterAI 11h Verified V70.3 Site Deploy
+on:
+  schedule:
+    - cron: '0 3 * * *' # 11:00 Asia/Taipei
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: lw-v703-site-deploy
+  cancel-in-progress: false
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate 09h macro and 10h ChatGPT MMFI; build site
+        run: |
+          python -m py_compile scripts/build_daily_v703_site.py
+          python scripts/build_daily_v703_site.py --out build/site
+      - name: Upload QA package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v703-11h-qa-${{ github.run_id }}
+          path: build/site/
+          if-no-files-found: warn
+      - name: Check deployment configuration
+        env:
+          FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
+          FTP_USER: ${{ secrets.HOSTINGER_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+        run: |
+          test -n "$FTP_HOST" && test -n "$FTP_USER" && test -n "$FTP_PASSWORD" || {
+            echo "Hostinger credentials unavailable; build artifact retained, production untouched"; exit 1;
+          }
+      - name: Deploy validated index.html and JSON via FTP
+        env:
+          FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
+          FTP_USER: ${{ secrets.HOSTINGER_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          FTP_REMOTE_DIR: ${{ vars.HOSTINGER_FTP_REMOTE_DIR }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          REMOTE_DIR="${FTP_REMOTE_DIR:-public_html}"
+          lftp -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST" <<EOF
+          set ftp:ssl-force true
+          set ssl:verify-certificate true
+          set net:max-retries 2
+          set net:timeout 20
+          cd $REMOTE_DIR
+          put build/site/V70_macro_latest.json -o V70_macro_latest.json
+          put build/site/index.html -o index.html
+          bye
+          EOF
+          echo "Deployed validated site; inspect Hostinger homepage and JSON for final verification."

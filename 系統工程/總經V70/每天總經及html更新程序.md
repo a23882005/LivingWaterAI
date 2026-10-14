@@ -12,7 +12,7 @@ GitHub：`a23882005/LivingWaterAI/系統工程/總經V70/`
 | 台灣時間 | 執行者 | 工作與正式產出 |
 |---|---|---|
 | **🍎07:00** | GitHub Actions **任務1** | 下載／增量更新 IB 可交易之國外股票、債券、ETF 歷史資料，輸出帶日期與品質狀態的 CSV／JSON |
-| **🍎09:00** | GitHub Actions **任務2** | 執行 `系統工程/總經V70/總經爬蟲22項.py`，輸出並提交 `data/22_macro_verification.json`，附日期、來源、OK／STALE／MISSING |
+| **🍎09:00** | GitHub Actions **任務2** | 執行 `系統工程/總經V70/總經爬蟲18項.py`，輸出並提交 `data/18_macro_verification.json`，附日期、來源、OK／STALE／MISSING |
 | **🖼️10:00** | ChatGPT「總體經濟狀況」Task | **先讀 GitHub 09:00 結果**，查證與補充 NYSE MMFI（s05），完成最新總經分析報告，將合格資料回寫 GitHub 並讀回驗收 |
 | **🍎11:00** | GitHub Actions **任務3** | 讀取09:00＋10:00正式已驗證資料，以 **`V70-3-10.html`** 為唯一HTML母版產生 `index.html`，QA通過後部署Hostinger並驗證 |
 | **🍎14:30** | GitHub Actions **任務4** | 下載／增量更新 IB 可交易之台灣股票、債券、ETF 歷史資料，輸出帶日期與品質狀態的 CSV／JSON |
@@ -23,16 +23,16 @@ GitHub：`a23882005/LivingWaterAI/系統工程/總經V70/`
 - 對已核實為IB可交易的國外股票、債券、ETF進行分批增量更新；保存開高低收、成交量與可得的還原價、配息／拆股資料。初期清單只是試跑清單，**尚未代表IB所有可交易商品全集**。
 - 每次產出真實觀測日期、時區、來源與品質狀態；遇失敗沿用前次已驗證資料並標STALE。
 
-## 09:00｜任務2：22項總經爬蟲
+## 09:00｜任務2：18項總經爬蟲
 
-- Actions：`.github/workflows/macro22-preflight.yml`；主程式：`系統工程/總經V70/總經爬蟲22項.py`。
-- 執行主程式、自我測試及欄位契約QA；保留歷史有效快取，產出 `data/22_macro_verification.json`、CSV、查核報告與 Actions artifact。
-- **22項為22個獨立來源／計算指標**；`s03` 與 `m07` 是重複傳輸的VIX欄，非第23個獨立指標。`s05`（NYSE MMFI）留給10:00補入。合併後 **23個獨立指標、24個傳輸欄**。
+- Actions：`.github/workflows/macro18-preflight.yml`；主程式：`系統工程/總經V70/總經爬蟲18項.py`。
+- 執行主程式、自我測試及欄位契約QA；保留歷史有效快取，產出 `data/18_macro_verification.json`、CSV、查核報告與 Actions artifact。
+- **18項為18個獨立來源／計算指標**；`s03` 與 `m07` 是重複傳輸的VIX欄，非第23個獨立指標。`s05`（NYSE MMFI）留給10:00補入。合併後 **23個獨立指標、24個傳輸欄**。
 - 日期、單位、來源、值均需查核；m06、QQQ/SPY/VT本益比等缺值不可造數或以舊值冒充當日。
 
 ## 10:00｜ChatGPT總經Task（非GitHub Actions第五個任務）
 
-1. **先讀GitHub `data/22_macro_verification.json`**；查核執行時間、每個 `value`、`observation_date`、`source_url`、`method`、`status`、`detail`，判定22項實際成功數。GitHub Action延後／失敗要明示。
+1. **先讀GitHub `data/18_macro_verification.json`**；查核執行時間、每個 `value`、`observation_date`、`source_url`、`method`、`status`、`detail`，判定18項實際成功數。GitHub Action延後／失敗要明示。
 2. **補s05／NYSE MMFI**：依序參考Barchart `$MMFI`、StockCharts `$MMFI`、Market-In-Out（確認NYSE股票池與定義）、TradingView `INDEX:MMFI`，取得真正的NYSE站上50日均線百分比、觀測日期與來源；需品質驗證。Gmail提供的有日期數值可作備援交叉核對。
 3. 對09:00缺值逐項查核可靠官方／發行商／正式市場來源，不能混用ETF TTM與FY1本益比，也不把未驗證候選數字標成OK。
 4. 依既有完整「總體經濟狀況」Task正式章節產生總經報告；完整監控通膨、信用、利率、流動性、就業消費、估值、市場廣度、AI盈利、重大新聞及6個月／1年／3年情境，最新V82／債券V75規則仍獨立有效。
@@ -79,4 +79,8 @@ GitHub：`a23882005/LivingWaterAI/系統工程/總經V70/`
 
 
 ## 最新補抓最高優先（2026-10-14）
-10:00「總體經濟狀況」Task 首先依最新09:00 GitHub Actions `data/22_macro_verification.json` 進行查核，**所有** MISSING、STALE、UNVERIFIED（不限m06與三檔本益比）均由Task自行直接查原始網站、依指定公式計算；s05 MMFI亦自行查。**正式資料來源、網站與全部計算/備援規則：** [`系統工程/總經V70/總經Task_爬蟲缺值補抓規則.md`](./總經Task_爬蟲缺值補抓規則.md)。成功後實際回寫合併23獨立指標（24傳輸欄）至GitHub並read-back；不能寫入要如實標示。原Task其餘內容和完整總經報告均保留。
+10:00「總體經濟狀況」Task 首先依最新09:00 GitHub Actions `data/18_macro_verification.json` 進行查核，**所有** MISSING、STALE、UNVERIFIED（不限m06與三檔本益比）均由Task自行直接查原始網站、依指定公式計算；s05 MMFI亦自行查。**正式資料來源、網站與全部計算/備援規則：** [`系統工程/總經V70/總經Task_爬蟲缺值補抓規則.md`](./總經Task_爬蟲缺值補抓規則.md)。成功後實際回寫合併23獨立指標（24傳輸欄）至GitHub並read-back；不能寫入要如實標示。原Task其餘內容和完整總經報告均保留。
+
+
+## 2026-10-14 最新正式覆蓋規則｜18 + 5
+**本節優先於上方未更新的舊版22項文字。** 09:00 GitHub Actions 正式執行 `總經爬蟲18項.py`，輸出 `data/18_macro_verification.json`；10:00 ChatGPT「總體經濟狀況」Task 先補 `m06`（一年後機率加權政策利率與現行中點之差，原始百分點值另存，除0.25才是碼數）、`m03_qqq`、`m03_spy`、`m03_vt`（Portfolio Visualizer基金TTM PE），以及 `s05`（NYSE MMFI）；其他18項任何失敗也由Task自行查補。23獨立項＋重複VIX s03，共24欄。11:00 Action 僅能消費已驗證整合檔，禁止沿用舊16/22工作流或未驗證值自動覆蓋網站。

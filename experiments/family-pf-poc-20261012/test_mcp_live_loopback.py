@@ -66,3 +66,37 @@ def test_real_tcp_loopback_cross_client_denial(env):
         assert result.json()["result"]["isError"] is True
         assert "synthetic-m" not in result.text
         assert scope.audit[-1]["decision"] == "DENY"
+
+
+def test_real_tcp_loopback_second_identity_authorized(env):
+    """Second synthetic test tenant must independently access its own fixture."""
+    with live_server(env) as (base, sign, scope):
+        response = invoke(base, sign("mou"), active="mou", resource="r-m")
+        assert response.status_code == 200
+        assert response.json()["result"]["content"][0]["text"] == "synthetic-m"
+        assert scope.audit[-1]["decision"] == "ALLOW"
+
+
+def test_real_tcp_loopback_reverse_cross_client_denial(env):
+    """Reject cross-tenant access in the B-to-A direction, not only A-to-B."""
+    with live_server(env) as (base, sign, scope):
+        response = invoke(base, sign("mou"), active="joseph", resource="r-j")
+        assert response.status_code == 200
+        assert response.json()["result"]["isError"] is True
+        assert "synthetic-j" not in response.text
+        assert scope.audit[-1]["decision"] == "DENY"
+
+
+def test_real_tcp_loopback_switching_active_tenant_cannot_escalate(env):
+    """Requests by the same principal must re-authorize every tenant switch."""
+    with live_server(env) as (base, sign, scope):
+        token = sign("joseph")
+        allowed = invoke(base, token, active="joseph", resource="r-j")
+        denied = invoke(base, token, active="mou", resource="r-m")
+        allowed_again = invoke(base, token, active="joseph", resource="r-j")
+        assert allowed.status_code == denied.status_code == allowed_again.status_code == 200
+        assert allowed.json()["result"]["content"][0]["text"] == "synthetic-j"
+        assert denied.json()["result"]["isError"] is True
+        assert "synthetic-m" not in denied.text
+        assert allowed_again.json()["result"]["content"][0]["text"] == "synthetic-j"
+        assert [event["decision"] for event in scope.audit[-3:]] == ["ALLOW", "DENY", "ALLOW"]

@@ -472,11 +472,16 @@ def freshen(r,today):
     age=(today-dt.date.fromisoformat(r['observation_date'])).days
     # Frequency-aware staleness: monthly releases have longer valid windows.
     monthly={'m04','m05','m15','m16','m18','m19','m20'}
-    # Core CPI (index observation dated first of month) can remain the latest
-    # officially released month for >65 days during delayed release schedules.
-    # 80 days is a bounded fallback, not a claim that a newer CPI does not exist.
-    # The collector must still prefer a newly published official observation.
-    limit=80 if r['id']=='m05' else (65 if r['id'] in monthly else 12)
+    # Core CPI is a release-based monthly series. The observation date labels
+    # the measured month (usually day 1), NOT the BLS publication date.
+    # A successful live official time-series retrieval is the freshness evidence:
+    # do not expire its latest available observation by an arbitrary day count.
+    # Historical cache fallback remains STALE upstream in run().
+    if r['id']=='m05':
+        if age<0:
+            r['status']='MISSING';r['error']='觀測日期在未來，拒絕使用';r['value']=None
+        return r
+    limit=65 if r['id'] in monthly else 12
     if age<0:
         r['status']='MISSING';r['error']='觀測日期在未來，拒絕使用';r['value']=None
     elif age>limit:
@@ -680,7 +685,9 @@ def selftest():
     # a bounded grace window prevents a premature STALE without accepting old archives.
     cpi_example=row('m05',2.4,'2026-08-01',SOURCES['m05'][0],'regression fixture')
     assert freshen(dict(cpi_example),dt.date(2026,10,14))['status']=='OK'
-    assert freshen(dict(cpi_example),dt.date(2026,11,5))['status']=='STALE'
+    assert freshen(dict(cpi_example),dt.date(2026,11,5))['status']=='OK'
+    cached=dict(cpi_example); cached['status']='STALE'
+    assert freshen(cached,dt.date(2026,11,5))['status']=='STALE'
     assert len(LABELS)==24 and len(set(LABELS))==24
     print('SELF-TEST PASS: 24 欄位、m06/m14 單位、防呆、同日期三組數列淨流動性計算')
 

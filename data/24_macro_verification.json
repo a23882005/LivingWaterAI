@@ -1,11 +1,11 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T07:52:58.503681+08:00",
+  "generated_at": "2026-10-14T08:02:07.960696+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 15,
+    "OK": 16,
     "STALE": 0,
-    "MISSING": 9
+    "MISSING": 8
   },
   "items": {
     "m07": {
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.211998,
+      "value": 102.193001,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.760002,
+      "value": 94.849998,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -227,14 +227,14 @@
     "m18": {
       "id": "m18",
       "label": "Sahm Rule",
-      "value": null,
+      "value": 0.0,
       "unit": "",
-      "observation_date": null,
-      "source_url": "https://fred.stlouisfed.org/series/SAHMCURRENT",
-      "method": "抓取失敗",
-      "status": "MISSING",
-      "detail": "",
-      "error": "Sahm not calculable from official U3 history: Sahm missing recent monthly observations: 2025-10; 2025-10 CPS not collected per BLS: https://www.bls.gov/cps/methods/2025-federal-government-shutdown-impact-cps.htm"
+      "observation_date": "2026-09-01",
+      "source_url": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
+      "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
+      "status": "OK",
+      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率",
+      "error": ""
     },
     "m19": {
       "id": "m19",

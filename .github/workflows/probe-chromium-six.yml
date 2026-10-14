@@ -1,5 +1,7 @@
 name: V70.3 Chromium Six-Indicator Source Probe
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   push:
     paths:

@@ -20,7 +20,7 @@ jobs:
       - name: Validate 09h macro and 10h ChatGPT MMFI; build site
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
-          python scripts/build_daily_v703_site.py --out build/site
+          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-10.html" --out build/site
       - name: Upload QA package
         if: always()
         uses: actions/upload-artifact@v4

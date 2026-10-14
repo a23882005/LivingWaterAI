@@ -1,13 +1,13 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-14T09:35:55.204615+08:00",
+  "asOf": "2026-10-14T10:05:58.611468+08:00",
   "indicators": {
     "m07": {
-      "value": 15.27,
-      "dataDate": "2026-10-13",
-      "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "value": 15.21,
+      "dataDate": "2026-10-12",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
-      "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列"
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m01": {
       "value": 0.42,
@@ -26,9 +26,9 @@
     "m02": {
       "value": 3.11,
       "dataDate": "2026-10-12",
-      "source": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
-      "method": "FRED_CSV 官方或鏡像時間序列"
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m04": {
       "value": 54.5,
@@ -40,19 +40,19 @@
     "m05": {
       "value": 2.446163,
       "dataDate": "2026-08-01",
-      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 102.171997,
+      "value": 102.129997,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 95.25,
+      "value": 95.129997,
       "dataDate": "2026-10-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -103,14 +103,14 @@
     "m19": {
       "value": 4.2,
       "dataDate": "2026-09-01",
-      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
-      "method": "BLS_HISTORY_V2 官方或鏡像時間序列"
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m20": {
       "value": 50.666667,
       "dataDate": "2026-09-01",
-      "source": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "千人",
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人"
     }

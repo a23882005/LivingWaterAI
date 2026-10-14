@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-14T09:35:55.204615+08:00",
+  "generated_at": "2026-10-14T10:05:58.611468+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 18,
@@ -11,11 +11,11 @@
     "m07": {
       "id": "m07",
       "label": "VIX",
-      "value": 15.27,
+      "value": 15.21,
       "unit": "",
-      "observation_date": "2026-10-13",
-      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
-      "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
+      "observation_date": "2026-10-12",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
       "error": ""
@@ -63,10 +63,10 @@
       "unit": "",
       "observation_date": null,
       "source_url": "https://finance.yahoo.com/quote/QQQ/",
-      "method": "須人工核實或授權 API",
+      "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "估值數值可能可讀取，但 Yahoo ETF TTM P/E 快照沒有可靠 observation date/統一口徑"
+      "error": "QQQ Yahoo trailingPE candidate obtained but ETF valuation date/methodology unverified"
     },
     "m03_spy": {
       "id": "m03_spy",
@@ -75,10 +75,10 @@
       "unit": "",
       "observation_date": null,
       "source_url": "https://finance.yahoo.com/quote/SPY/",
-      "method": "須人工核實或授權 API",
+      "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "估值數值可能可讀取，但 Yahoo ETF TTM P/E 快照沒有可靠 observation date/統一口徑"
+      "error": "SPY Yahoo trailingPE candidate obtained but ETF valuation date/methodology unverified"
     },
     "m03_vt": {
       "id": "m03_vt",
@@ -87,10 +87,10 @@
       "unit": "",
       "observation_date": null,
       "source_url": "https://finance.yahoo.com/quote/VT/",
-      "method": "須人工核實或授權 API",
+      "method": "抓取失敗",
       "status": "MISSING",
       "detail": "",
-      "error": "估值數值可能可讀取，但 Yahoo ETF TTM P/E 快照沒有可靠 observation date/統一口徑"
+      "error": "VT Yahoo trailingPE candidate obtained but ETF valuation date/methodology unverified"
     },
     "m02": {
       "id": "m02",
@@ -98,8 +98,8 @@
       "value": 3.11,
       "unit": "%",
       "observation_date": "2026-10-12",
-      "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
-      "method": "FRED_CSV 官方或鏡像時間序列",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
       "error": ""
@@ -122,7 +122,7 @@
       "value": 2.446163,
       "unit": "%",
       "observation_date": "2026-08-01",
-      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED CPILFESL 同一數列 YoY",
       "status": "OK",
       "detail": "比較基期 2025-08-01",
@@ -131,7 +131,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.171997,
+      "value": 102.129997,
       "unit": "",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -143,7 +143,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 95.25,
+      "value": 95.129997,
       "unit": "USD/bbl",
       "observation_date": "2026-10-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -242,8 +242,8 @@
       "value": 4.2,
       "unit": "%",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      "method": "BLS_HISTORY_V2 官方或鏡像時間序列",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
       "error": ""
@@ -254,7 +254,7 @@
       "value": 50.666667,
       "unit": "千人",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
@@ -263,10 +263,10 @@
     "s03": {
       "id": "s03",
       "label": "VIX 短期",
-      "value": 15.27,
+      "value": 15.21,
       "unit": "",
-      "observation_date": "2026-10-13",
-      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "observation_date": "2026-10-12",
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",

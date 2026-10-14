@@ -1,0 +1,9 @@
+# Seed watchlist: TWSE/TPEx Yahoo suffixes; not a full IBKR contract list.
+0050.TW
+2330.TW
+00679B.TW
+00719B.TW
+00725B.TW
+00761B.TW
+00860B.TW
+00937B.TW

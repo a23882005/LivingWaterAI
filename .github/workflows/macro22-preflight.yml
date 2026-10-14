@@ -68,3 +68,5 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+
+# Manual full-chain trial requested 2026-10-14 (09h collector job)

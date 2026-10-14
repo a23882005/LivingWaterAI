@@ -1,5 +1,7 @@
 from datetime import datetime, timezone, timedelta
-from pf_external_start_guard import assess, REQUIRED
+import json
+import pytest
+from pf_external_start_guard import assess, REQUIRED, load_manifest, MAX_MANIFEST_BYTES
 
 def good():
     x = {key: "approved-" + key for key in REQUIRED}
@@ -116,3 +118,50 @@ def test_role_separation_across_operator_audit_review_and_governance():
         outcome = assess(x)
         assert outcome["external_test_start"] == "BLOCKED"
         assert "role_separation_violation" in outcome["errors"]
+
+@pytest.mark.parametrize("field, value", [
+    ("approved_scope_id", {"nested": "value"}),
+    ("audit_store_approval_id", ["unexpected"]),
+    ("budget_approval_id", 123),
+    ("idp_approval_id", "x" * 513),
+    ("environment_id", "clean\\nother"),
+    ("approved_scope_id", "  approved  "),
+])
+def test_manifest_type_length_and_controls_rejected(field, value):
+    x = good()
+    x[field] = value
+    assert assess(x)["external_test_start"] == "BLOCKED"
+
+@pytest.mark.parametrize("host", [
+    "https://*.example.org", "https://host.example.org.",
+    "https://-bad.example.org", "https://bad-.example.org",
+    "https://bad..example.org",
+])
+def test_malformed_dns_hostnames_fail_closed(host):
+    x = good()
+    x["endpoint_origin"] = host
+    assert "endpoint_must_be_public_https_origin" in assess(x)["errors"]
+
+def test_synthetic_tenant_names_case_insensitive():
+    x = good()
+    x["synthetic_tenant_b_id"] = x["synthetic_tenant_a_id"].upper()
+    assert "test_tenants_must_differ" in assess(x)["errors"]
+
+def test_duplicate_json_key_rejected(tmp_path):
+    p = tmp_path / "approval.json"
+    p.write_text('{"approval_for_live_test": true, "approval_for_live_test": false}')
+    with pytest.raises(ValueError, match="duplicate_manifest_key"):
+        load_manifest(p)
+
+def test_oversized_manifest_is_blocked_before_json_parse(tmp_path):
+    p = tmp_path / "big.json"
+    p.write_bytes(b" " * (MAX_MANIFEST_BYTES + 1))
+    with pytest.raises(ValueError, match="manifest_too_large"):
+        load_manifest(p)
+
+def test_valid_json_manifest_still_loads(tmp_path):
+    p = tmp_path / "approved.json"
+    x = good()
+    p.write_text(json.dumps(x), encoding="utf-8")
+    assert load_manifest(p) == x
+    assert assess(load_manifest(p))["external_test_start"] == "READY_FOR_AUTHORIZED_OPERATOR_REVIEW"

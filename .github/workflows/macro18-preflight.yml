@@ -71,3 +71,5 @@ jobs:
 
 
 # Re-run collector on 2026-10-15 for end-to-end verification
+
+# Manual rerun request 2026-10-15, preserve all workflow logic

@@ -511,6 +511,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm10':lambda:yahoo_price(f,'m10','CL=F'),
       'm12':lambda:yahoo_price(f,'m12','^MOVE'),
       's04':lambda:cnn(f),
+      's05':lambda:fetch_mmfi_market_breadth(f),
     }
     # Must not invent an HTTP scraper for a dynamic or terms-protected source.
     reasons={
@@ -674,6 +675,49 @@ def fetch_m06_cme(f):
                endpoint,'CME FedWatch EOD: final meeting '+meeting.isoformat()+
                '; probability-weighted target midpoint vs official FRED target midpoint',
                detail='FOMC '+meeting.isoformat()+'; current target '+str(cur_lo)+'-'+str(cur_hi)+'%; units=25bp')
+
+def fetch_mmfi_market_breadth(f):
+    """Read actual daily MMFI index close from Yahoo Chart if published.
+
+    Require dated observation AND instrument identity explicitly identifying
+    the NYSE percent-above-50-day breadth index; no proxy or arbitrary quote.
+    """
+    import requests
+    import datetime as datetime_module
+    failures=[]
+    for symbol in ('$MMFI','^MMFI','MMFI'):
+        try:
+            url='https://query1.finance.yahoo.com/v8/finance/chart/'+requests.utils.quote(symbol,safe='')
+            resp=f.s.get(url,params={'range':'10d','interval':'1d'},timeout=(5,f.timeout),
+                         headers={'User-Agent':'Mozilla/5.0'})
+            resp.raise_for_status()
+            data=resp.json()['chart']
+            if data.get('error') or not data.get('result'):
+                raise ValueError('Yahoo Chart has no result')
+            entry=data['result'][0];meta=entry.get('meta',{})
+            identity=' '.join(str(meta.get(k,'')) for k in ('shortName','longName','symbol'))
+            norm=identity.lower()
+            # A bare matching ticker is not proof of index identity.
+            if not (('nyse' in norm or 'new york stock exchange' in norm)
+                    and ('50' in norm or 'fifty' in norm)
+                    and ('percent' in norm or 'percentage' in norm or '%' in norm)):
+                raise ValueError('unverified instrument identity: '+identity[:100])
+            timestamps=entry.get('timestamp') or []
+            values=entry['indicators']['quote'][0]['close']
+            dated=[(datetime_module.datetime.fromtimestamp(int(t),datetime_module.timezone.utc).date(),
+                    float(v)) for t,v in zip(timestamps,values)
+                   if v is not None and math.isfinite(float(v))]
+            if not dated: raise ValueError('no dated close')
+            observed,value=dated[-1]
+            if value<0 or value>100: raise ValueError('MMFI not in percent range')
+            return row('s05',value,observed.isoformat(),
+                       'https://finance.yahoo.com/quote/'+requests.utils.quote(symbol,safe='')+'/',
+                       'Yahoo Chart NYSE percentage of stocks above 50-day moving average',
+                       detail='Provider confirmed instrument identity: '+identity[:140])
+        except Exception as exc:
+            failures.append(symbol+': '+str(exc)[:110])
+    raise ValueError('MMFI live source unavailable: '+' | '.join(failures))
+
 
 def fetch_etf_valuation_candidate(f, ticker, key):
     """Try live yfinance ETF TTM PE and require provider-stamped valuation date.

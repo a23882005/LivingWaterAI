@@ -8,6 +8,7 @@ on:
       - '.github/workflows/probe-m06-fedwatch-free.yml'
       - 'tests/test_m06_fedwatch_free.py'
       - 'tests/test_m06_official_snapshot_reference.py'
+      - 'tests/test_m06_batch_matrix.py'
 
 permissions:
   contents: read
@@ -27,6 +28,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_m06_fedwatch_free.py' -v
       - name: Offline CME screenshot reference math
         run: python -m unittest discover -s tests -p 'test_m06_official_snapshot_reference.py' -v
+      - name: Offline 125-case deterministic replay
+        run: python -m unittest discover -s tests -p 'test_m06_batch_matrix.py' -v
       - name: Explain external-data authorization gate
         if: ${{ vars.CME_DATA_AUTOMATION_AUTHORIZED != 'true' }}
         run: echo 'CME data retrieval SKIPPED pending permitted automated use; offline tests only.'

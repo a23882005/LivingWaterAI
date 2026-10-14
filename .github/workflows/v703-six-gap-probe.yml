@@ -1,0 +1,28 @@
+name: V70.3 Six Missing Source Probe
+on:
+  pull_request:
+    paths:
+      - 'scripts/probe_v703_six_gaps.py'
+      - '.github/workflows/v703-six-gap-probe.yml'
+  workflow_dispatch:
+jobs:
+  check-six:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests
+      - name: Test six missing sources
+        run: python scripts/probe_v703_six_gaps.py
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: six-gap-probe
+          path: build/macro24/six_gap_probe.json
+          if-no-files-found: warn

@@ -1,0 +1,196 @@
+name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
+
+on:
+  schedule:
+    # 03:00 UTC = 11:00 Asia/Taipei (GitHub can start late).
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/update-v70.yml'
+      - '系統工程/總經V70/總經爬蟲程式16項.py'
+      - '系統工程/總經V70/ChatGPT 總經爬蟲8項.md'
+      - '系統工程/總經V70/每天總經及html更新程序.md'
+      - '系統工程/總經V70/V70-3-10.html'
+      - 'scripts/build_v703_feed.py'
+      - 'scripts/probe_extra8.py'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'data/verified_overrides.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: livingwater-v70-update
+  cancel-in-progress: false
+
+jobs:
+  macro24:
+    # V70.3 daily macro 8+16: verify published data first; Hostinger deployment requires independently validated credentials and rollout gate.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Official FRED API availability check
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os,requests
+          key=os.environ.get('FRED_API_KEY','').strip()
+          if not key:
+              print('FRED_OFFICIAL_API: NO_KEY_CONFIGURED (official HY OAS / WALCL fallback unavailable)')
+          else:
+              for sid in ['BAMLH0A0HYM2','WALCL','WDTGAL','RRPONTSYD']:
+                  try:
+                      resp=requests.get('https://api.stlouisfed.org/fred/series/observations',
+                          params={'series_id':sid,'api_key':key,'file_type':'json',
+                                  'sort_order':'desc','limit':1},timeout=(5,18))
+                      print('FRED_OFFICIAL_API',sid,'HTTP',resp.status_code)
+                      if resp.ok:
+                          obs=resp.json().get('observations',[])
+                          print('FRED_OFFICIAL_API',sid,'observation_count',len(obs),
+                                'latest_date',obs[0].get('date') if obs else 'none',
+                                'numeric',bool(obs and obs[0].get('value') not in (None,'.','')))
+                  except Exception as exc:
+                      print('FRED_OFFICIAL_API',sid,'ERROR',type(exc).__name__)
+          PY
+      - name: Network diagnostic FRED and Yahoo
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import socket, urllib.request
+          urls = {
+            'FRED_CSV': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS',
+            'YAHOO_CHART': 'https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF',
+            'CBOE_VIX': 'https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv',
+            'BLS_API': 'https://api.bls.gov/publicAPI/v2/timeseries/data/LNS14000000',
+            'DBNOMICS': 'https://api.db.nomics.world/v22/series/FRED/VIXCLS?observations=1',
+          }
+          for label, url in urls.items():
+              host=urllib.request.urlparse(url).hostname
+              try:
+                  print(label, 'DNS', socket.getaddrinfo(host,443)[0][4][0])
+                  request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+                  with urllib.request.urlopen(request, timeout=12) as response:
+                      print(label, 'HTTP',response.status,'bytes_sample',len(response.read(100)))
+              except Exception as exc:
+                  print(label,'FAILED',type(exc).__name__,str(exc)[:250])
+          PY
+      - name: Run source probe before QA
+        continue-on-error: true
+        run: python scripts/probe_extra8.py
+      - name: QA 24-item collector and adapter
+        run: |
+          python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py
+          python "系統工程/總經V70/總經爬蟲程式16項.py" --self-test
+          python -m unittest discover -s tests -p "test_macro_regressions.py" -v
+          python -m unittest discover -s tests -p "test_v703_audit_integrity.py" -v
+          python -m unittest discover -s tests -p "test_lei_vintage_safety.py" -v
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, 'scripts')
+          from build_v703_feed import convert, NEEDED
+          sample=convert({'items':{}})
+          assert len(NEEDED)==21 and sample['verification']['ready'] is False
+          assert sample['verification']['valid']==0
+          print('FAIL-CLOSED QA PASS')
+          PY
+      - name: Collect audited macro observations
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          CME_FEDWATCH_BEARER: ${{ secrets.CME_FEDWATCH_BEARER }}
+          BARCHART_ONDEMAND_API_KEY: ${{ secrets.BARCHART_ONDEMAND_API_KEY }}
+        run: |
+          if [ ! -f data/verified_overrides.json ]; then
+            echo 'ERROR: verified_overrides.json missing; do not publish stale or fabricated HTML'
+            exit 1
+          fi
+          python "系統工程/總經V70/總經爬蟲程式16項.py" --out build/macro24 --cache data/24_macro_verification.json --overrides data/verified_overrides.json
+      - name: Download ETF daily market history (incremental and fail-safe)
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          from scripts.probe_extra8 import collect_market_history
+          report=collect_market_history(("VOO","SPY","VT","QQQ"))
+          for symbol,item in report["items"].items():
+              print("MARKET_SERIES",symbol,item["status"],item.get("observation_date"))
+          PY
+          mkdir -p build/macro24/market_history
+          cp data/market_history/*.csv build/macro24/market_history/ 2>/dev/null || true
+          cp data/market_history/manifest.json build/macro24/market_history/ 2>/dev/null || true
+      - name: Generate V70.3 feed contract
+        run: |
+          python scripts/build_v703_feed.py --input build/macro24/24_macro_verification.json --output build/macro24/V70_macro_latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          audit=json.loads(Path('build/macro24/24_macro_verification.json').read_text(encoding='utf-8'))
+          feed=json.loads(Path('build/macro24/V70_macro_latest.json').read_text(encoding='utf-8'))
+          assert len(audit['items'])==24
+          assert feed['verification']['totalRequired']==21
+          from pathlib import Path
+          candidates_path=Path('build/macro24/etf_pe_candidates_unverified.json')
+          assert candidates_path.is_file(), 'ETF real-value diagnostic artifact was not produced'
+          candidates=json.loads(candidates_path.read_text(encoding='utf-8'))
+          print('ETF PE REAL CANDIDATES (not verified holdings valuations):')
+          for symbol in ('QQQ','SPY','VT'):
+              datum=candidates.get('items',{}).get(symbol)
+              print(symbol,
+                    'trailingPE=', datum.get('candidate_trailing_pe') if datum else 'NO_DATA',
+                    'retrieved_utc=', datum.get('retrieved_at_utc') if datum else 'NO_DATA',
+                    'holdings_asof=',datum.get('fund_holdings_pe_asof') if datum else 'UNVERIFIED',
+                    'status=UNVERIFIED')
+          print('AUDIT: independent=', audit.get('independent_indicators',{}), 'transport_fields=',audit['summary'])
+          print('MISSING / STALE DIAGNOSTICS:')
+          for key,item in audit['items'].items():
+              if item.get('status')!='OK':
+                  print(key, item.get('status'), str(item.get('error') or item.get('detail') or '')[:200])
+          print('V70.3:',feed['verification']['valid'],'/21; ready=',feed['verification']['ready'])
+          PY
+      - name: Write diagnostic summary on failure
+        if: failure()
+        run: |
+          echo "Macro pipeline failed; download macro24-audit artifact or inspect preceding step logs." >> "$GITHUB_STEP_SUMMARY"
+          echo "No missing item may be represented as a verified market observation." >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish audit artifact (even when data incomplete)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macro24-audit-${{ github.run_id }}
+          path: build/macro24/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Commit research JSON and fail-closed V70.3 feed
+        run: |
+          mkdir -p data
+          cp build/macro24/24_macro_verification.json data/24_macro_verification.json
+          cp build/macro24/V70_macro_latest.json data/V70_macro_latest.json
+          # Keep same-name feed beside root V70.3 HTML when deployed from repository root.
+          cp build/macro24/V70_macro_latest.json V70_macro_latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/24_macro_verification.json data/V70_macro_latest.json V70_macro_latest.json
+          git add data/market_history/*.csv data/market_history/manifest.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Macro audit unchanged" >> "$GITHUB_STEP_SUMMARY"
+          else
+            git commit -m "data(macro): dated 24-item audit and V70.3 feed"
+            git pull --rebase origin main
+            git push
+          fi
+          echo "Canonical website source: 系統工程/總經V70/V70-3-10.html; Hostinger public_html/index.html upload/restore not yet implemented in this workflow." >> "$GITHUB_STEP_SUMMARY"
+
+# Manual 16-item GitHub Runner diagnostic trigger: 2026-10-14

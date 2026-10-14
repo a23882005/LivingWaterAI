@@ -31,7 +31,7 @@ def calculate(feed, today):
     if not 0 <= current_mid <= 25:
         raise ValueError("Current target out of range")
     candidates=[]
-    horizon=today + dt.timedelta(days=365)
+    horizon=trade_date + dt.timedelta(days=365)
     for m in feed.get("meetings", []):
         d=dt.date.fromisoformat(m["date"])
         if abs((d-horizon).days)>45:
@@ -63,6 +63,9 @@ def calculate(feed, today):
         "as_of_settlement":trade_date.isoformat(),
         "reference_date":today.isoformat(),
         "meeting_date":meeting.isoformat(),
+        "horizon_anchor":"settlement_date_plus_365_calendar_days",
+        "days_from_settlement_to_meeting":(meeting-trade_date).days,
+        "days_from_12m_target_to_meeting":(meeting-horizon).days,
         "current_target":current,
         "expected_target_mid_pct":round(expected,5),
         "current_target_mid_pct":round(current_mid,5),

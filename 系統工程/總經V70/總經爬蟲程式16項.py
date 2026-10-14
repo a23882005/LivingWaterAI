@@ -584,9 +584,12 @@ def run(outdir,overrides_path=None,cache_path=None):
     else:
         results['s03']=row('s03',src=SOURCES['m07'][0],method='與 m07 同步',error='m07 沒有可信值；禁止使用獨立 s03 備援')
     summary={s:sum(x['status']==s for x in results.values()) for s in ('OK','STALE','MISSING')}
+    independent_ids=[key for key in LABELS if key!='s03']
+    independent_summary={status:sum(results[key]['status']==status for key in independent_ids)
+                         for status in ('OK','STALE','MISSING')}
     report={'schema':'V70.2/24-macro-research-v1','generated_at':dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).isoformat(),
             'note':'僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算',
-            'summary':summary,'items':results}
+            'summary':summary,'independent_indicators':{'total':len(independent_ids), 'excluded_duplicate':'s03 (same VIX as m07)', 'summary':independent_summary},'items':results}
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
     # Expose actual Yahoo PE numeric candidates separately for engineering QA.
     # These are not approved inputs to V70.3 or risk decisions.
@@ -601,7 +604,7 @@ def run(outdir,overrides_path=None,cache_path=None):
         fieldnames=list(next(iter(results.values())).keys());wr=csv.DictWriter(w,fieldnames=fieldnames)
         wr.writeheader();wr.writerows(results.values())
     with (out/'24_macro_report.md').open('w',encoding='utf-8') as w:
-        w.write('# 24 項總經資料查核報告\n\n')
+        w.write('# 23 項獨立總經指標查核報告（24 欄資料交換契約）\n\n')
         w.write(f"產出時間：{report['generated_at']}；OK={summary['OK']}／STALE={summary['STALE']}／MISSING={summary['MISSING']}\n\n")
         w.write('| ID | 指標 | 值 | 真正觀測日 | 狀態 | 來源或卡點 |\n|---|---|---:|---|---|---|\n')
         for v in results.values():
@@ -610,7 +613,7 @@ def run(outdir,overrides_path=None,cache_path=None):
             desc=desc.replace('|',';').replace('\n',' ') 
             w.write(f"| {v['id']} | {v['label']} | {val} | {v['observation_date'] or '-'} | {v['status']} | {desc} |\n")
         w.write('\n未驗證項目請查看 CSV/JSON 的 error/detail；不得將 MISSING 或 STALE 冒充最新正式值。\n')
-    print('完成輸出:',out.resolve(),'統計:',summary)
+    print('完成輸出:',out.resolve(),'獨立指標統計 23 項:',independent_summary,'交換欄位統計:',summary)
     return report
 
 def fedwatch_expected_codes(distribution, current_mid):

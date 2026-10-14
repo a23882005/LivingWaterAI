@@ -242,6 +242,9 @@ class MacroRegression(unittest.TestCase):
             self.assertNotIn('s05_Market_Breadth (%)',result)
             self.assertTrue((result['Close']>0).all())
             self.assertTrue((pathlib.Path(tmp)/'manifest.json').is_file())
+            import json
+            manifest=json.loads((pathlib.Path(tmp)/'manifest.json').read_text(encoding='utf-8'))
+            self.assertEqual(manifest['items']['VOO']['status'],'OK')
 
 if __name__=="__main__":
     unittest.main()

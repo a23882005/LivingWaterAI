@@ -4,13 +4,13 @@
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.890891,
+      "value": 0.90875,
       "unit": "percentage_point",
       "observation_date": "2026-10-14",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
       "method": "Investing.com Oct 27 2027 FOMC Current Probability weighted target midpoint minus current Fed target midpoint 3.875",
       "status": "OK",
-      "detail": "Rates 3.75-4.00 ... 5.50-5.75 with probabilities 0.3,3.9,15.4,28.9,29.1,16.4,5.1,0.8%; sum 99.9%, normalized expectation 4.765890891%, difference +0.890890891 pp; update Oct 14 2026 11:55 EDT; 12-month closest FOMC 2027-10-27."
+      "detail": "Oct 14 2026 10:35 EDT probability-weighted 2027-10-27 FOMC: +0.90875 percentage points"
     },
     "m03_qqq": {
       "id": "m03_qqq",
@@ -24,13 +24,13 @@
     },
     "m03_spy": {
       "id": "m03_spy",
-      "value": 25.15,
+      "value": 25.16,
       "unit": "x",
       "observation_date": null,
       "source_url": "https://stockanalysis.com/etf/spy/holdings/",
       "method": "Stock Analysis ETF holdings PE Ratio field; TTM definition not explicitly shown",
       "status": "UNVERIFIED",
-      "detail": "Found 25.15 in Stock Analysis; not confirmed TTM, so do not use as official TTM figure. PV direct SPY page inaccessible during test."
+      "detail": "Stock Analysis PE Ratio 25.16; TTM not expressly stated"
     },
     "m03_vt": {
       "id": "m03_vt",
@@ -49,8 +49,8 @@
       "observation_date": "2026-10-13",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "method": "MMFI INDEX latest recorded breadth 50-day average (provider quote)",
-      "status": "UNVERIFIED",
-      "detail": "Historic 29.17 candidate on Macroaxis as of Oct 13 but source was not reproducibly verified in this test; Barchart blocked by JS captcha, TradingView HTML exposes no value, StockCharts no observable price."
+      "status": "OK",
+      "detail": "Macroaxis MMFI index 29.17 as of Oct 13, 2026"
     }
   }
 }

@@ -90,3 +90,15 @@ def test_window_must_be_future_bounded_utc():
         x["test_window_utc"] = value
         assert "test_window_must_be_future_utc_under_24h" in assess(x)["errors"]
         assert assess(x)["external_test_start"] == "BLOCKED"
+
+def test_unknown_manifest_fields_fail_closed():
+    x = good()
+    x["allow_production_data"] = True
+    result = assess(x)
+    assert result["external_test_start"] == "BLOCKED"
+    assert "unknown_manifest_fields" in result["errors"]
+
+def test_misnamed_approval_cannot_be_silently_accepted():
+    x = good()
+    x["approval_for_live_tests"] = True
+    assert "unknown_manifest_fields" in assess(x)["errors"]

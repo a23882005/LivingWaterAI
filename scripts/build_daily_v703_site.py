@@ -52,6 +52,12 @@ def _validate(key, item, today):
             elif key in MONTHLY:
                 if age > 46:
                     problems.append(f"{key}: monthly data over 46 days")
+            elif key in SLOW_MONTHLY:
+                if age > 90:
+                    problems.append(f"{key}: slow monthly data over 90 days")
+            elif key in WEEKLY:
+                if age > 14:
+                    problems.append(f"{key}: weekly data over 14 days")
             elif key in VALUATION_REFERENCE:
                 if age > 90:
                     problems.append(f"{key}: valuation reference over 90 days")

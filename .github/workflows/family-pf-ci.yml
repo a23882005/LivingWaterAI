@@ -13,12 +13,18 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: family-pf-synthetic-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   verify-pf-full-suite:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/family-pf-ci-20261012'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -121,11 +127,14 @@ jobs:
           retention-days: 7
           if-no-files-found: error
   verify-evidence-receipt:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/family-pf-ci-20261012'
     needs: verify-pf-full-suite
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

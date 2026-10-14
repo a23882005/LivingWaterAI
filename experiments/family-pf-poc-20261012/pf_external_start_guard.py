@@ -60,6 +60,11 @@ def assess(manifest):
         result["errors"].append("test_window_must_be_future_utc_under_24h")
     if manifest.get("synthetic_tenant_a_id") == manifest.get("synthetic_tenant_b_id"):
         result["errors"].append("test_tenants_must_differ")
+    # Separation of duties must cover all three operating roles, not just two.
+    roles = [manifest.get(k) for k in ("test_executor_id", "audit_custodian_id",
+                                      "independent_reviewer_id", "gate_governance_owner_id")]
+    if all(isinstance(v, str) and v.strip() for v in roles) and len({v.strip().casefold() for v in roles}) != len(roles):
+        result["errors"].append("role_separation_violation")
     if manifest.get("test_executor_id") == manifest.get("independent_reviewer_id"):
         result["errors"].append("reviewer_must_be_independent")
     origin = manifest.get("endpoint_origin")

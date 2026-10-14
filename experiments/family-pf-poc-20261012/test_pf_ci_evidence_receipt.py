@@ -21,7 +21,7 @@ def test_receipt_minimal_and_gate_hold(tmp_path):
     assert receipt["external_gate_a"] == "HOLD"
     assert receipt["work13_allowed"] is False
     assert verify(tmp_path / "receipt") == receipt
-    assert "synthetic" not in (tmp_path / "receipt" / "receipt.json").read_text()
+    assert "\"classname\"" not in (tmp_path / "receipt" / "receipt.json").read_text()\n    assert "\"name\": \"safe\"" not in (tmp_path / "receipt" / "receipt.json").read_text()
 
 def test_errors_and_failures_fail_closed(tmp_path):
     for kwargs in ({"failures":"1"}, {"errors":"1"}, {"tests":"0"}, {"tests":"bad"}):

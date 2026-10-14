@@ -39,3 +39,21 @@ def test_receipt_cannot_authorize_gate_or_production():
     assert "upload-artifact@v4" in content
     assert "deploy-pages" not in content
     assert "environment: production" not in content
+
+
+def test_workflow_does_not_grant_write_or_id_token_permissions():
+    content = WORKFLOW.read_text(encoding="utf-8")
+    assert "contents: read" in content
+    assert "contents: write" not in content
+    assert "id-token: write" not in content
+    assert "pull-requests: write" not in content
+
+
+def test_workflow_does_not_execute_deployment_actions():
+    content = WORKFLOW.read_text(encoding="utf-8")
+    forbidden = ("azure/webapps-deploy", "aws-actions/configure-aws-credentials",
+                 "cloudflare/pages-action", "actions/deploy-pages",
+                 "google-github-actions/deploy-cloudrun")
+    for action in forbidden:
+        assert action not in content
+    assert "environment: production" not in content

@@ -462,6 +462,12 @@ def freshen(r,today):
     # A successful live official time-series retrieval is the freshness evidence:
     # do not expire its latest available observation by an arbitrary day count.
     # Historical cache fallback remains STALE upstream in run().
+    if r['id']=='m16':
+        # User-approved August reference remains current until the announced
+        # October 22 LEI release, after which a new observation is mandatory.
+        if today > dt.date(2026,10,22):
+            r['status']='STALE'; r['detail']+='; 2026-10-22 release deadline passed'
+        return r
     if r['id']=='m05':
         if age<0:
             r['status']='MISSING';r['error']='觀測日期在未來，拒絕使用';r['value']=None
@@ -824,6 +830,8 @@ def selftest():
     r=lei_approved_baseline()
     assert r['status']=='OK' and abs(r['value']-1.015228)<0.00001
     assert r['observation_date']=='2026-08-01'
+    assert freshen(dict(r),dt.date(2026,10,14))['status']=='OK'
+    assert freshen(dict(r),dt.date(2026,10,23))['status']=='STALE'
     print('SELF-TEST PASS: 18 independent macros + s03 duplicate; LEI fixed baseline; five delegated IDs omitted')
 
 if __name__=='__main__':
@@ -834,4 +842,7 @@ if __name__=='__main__':
     ap.add_argument('--self-test',action='store_true')
     a=ap.parse_args()
     if a.self_test:selftest()
-    else:run(a.out,a.overrides,a.cache)
+    else:
+        default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
+        overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
+        run(a.out,overrides,a.cache)

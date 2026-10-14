@@ -6,7 +6,8 @@ from pf_ci_evidence_receipt import receipt_from_junit, emit, verify
 
 HEAD = "a" * 40
 def xml(tests="3", failures="0", errors="0", skipped="0"):
-    return f'<testsuites><testsuite tests="{tests}" failures="{failures}" errors="{errors}" skipped="{skipped}"><testcase classname="synthetic" name="safe"/></testsuite></testsuites>'
+    cases = "".join('<testcase classname="synthetic" name="safe{}"/>'.format(i) for i in range(int(tests))) if tests.isdigit() else ""
+    return '<testsuites><testsuite tests="{}" failures="{}" errors="{}" skipped="{}">{}</testsuite></testsuites>'.format(tests, failures, errors, skipped, cases)
 
 def write_xml(tmp_path, data):
     p = tmp_path / "results.xml"
@@ -76,3 +77,14 @@ def test_null_or_string_counts_rejected(tmp_path):
     (folder / "receipt.sha256").write_text(hashlib.sha256(payload).hexdigest() + "  receipt.json\n")
     with pytest.raises(ValueError, match="invalid_counts"):
         verify(folder)
+
+def test_expected_commit_must_match_even_with_valid_receipt(tmp_path):
+    emit(write_xml(tmp_path, xml()), HEAD, tmp_path / "receipt")
+    with pytest.raises(ValueError, match="receipt_commit_mismatch"):
+        verify(tmp_path / "receipt", "b" * 40)
+
+def test_skipped_and_inconsistent_junit_rejected(tmp_path):
+    bad = '<testsuites><testsuite tests="2" failures="0" errors="0" skipped="0"><testcase name="only"/></testsuite></testsuites>'
+    for raw in (xml(skipped="1"), bad):
+        with pytest.raises(ValueError, match="synthetic_suite_not_passed"):
+            receipt_from_junit(write_xml(tmp_path, raw), HEAD)

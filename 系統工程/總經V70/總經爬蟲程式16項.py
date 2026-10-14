@@ -593,6 +593,14 @@ def run(outdir,overrides_path=None,cache_path=None):
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
     # Expose actual Yahoo PE numeric candidates separately for engineering QA.
     # These are not approved inputs to V70.3 or risk decisions.
+    issuer_candidate={}
+    try:
+        issuer_candidate=probe_spy_issuer_index_pe(f)
+    except Exception as exc:
+        issuer_candidate={'error':str(exc)[:200]}
+    (out/'spy_issuer_index_pe_unverified.json').write_text(
+        json.dumps(issuer_candidate,ensure_ascii=False,indent=2),encoding='utf-8')
+    print('SPY_ISSUER_INDEX_PE_CANDIDATE',json.dumps(issuer_candidate,ensure_ascii=False),flush=True)
     (out/'etf_pe_candidates_unverified.json').write_text(
         json.dumps({'generated_at':report['generated_at'],
                     'items':getattr(f,'etf_candidates',{})},
@@ -771,6 +779,34 @@ def fetch_mmfi_market_breadth(f):
         except Exception as exc:
             failures.append(symbol+': '+str(exc)[:110])
     raise ValueError('MMFI live source unavailable: '+' | '.join(failures))
+
+
+def probe_spy_issuer_index_pe(f):
+    """Fetch dated S&P 500 *index* P/E from SPY issuer site for comparison.
+
+    Do not promote this index-level statistic to SPY holdings TTM P/E:
+    the provider does not explicitly establish that equivalence.
+    """
+    import re
+    from bs4 import BeautifulSoup
+    url='https://www.ssga.com/us/en/individual/etfs/state-street-spdr-sp-500-etf-trust-spy'
+    resp=f.s.get(url,timeout=(5,f.timeout),
+                 headers={'User-Agent':'Mozilla/5.0'})
+    resp.raise_for_status()
+    text=' '.join(BeautifulSoup(resp.text,'html.parser').stripped_strings)
+    m=re.search(r'Index Characteristics as of\\s+([A-Za-z]{3}\\s+\\d{1,2}\\s+\\d{4})',text,re.I)
+    if not m: raise ValueError('State Street dated Index Characteristics absent')
+    date=dt.datetime.strptime(m.group(1),'%b %d %Y').date()
+    segment=text[m.end():m.end()+1800]
+    pe=re.search(r'Price/Earnings(?!\\s+Ratio\\s+FY1)\\s+(\\d+(?:\\.\\d+)?)',segment,re.I)
+    if not pe: raise ValueError('State Street index PE field absent')
+    value=float(pe.group(1))
+    now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    if date>now or date<(now-dt.timedelta(days=75)) or not 1<value<200:
+        raise ValueError('SPY issuer index P/E date/value outside bounds')
+    return {'candidate_index_pe':value,'issuer_index_asof':date.isoformat(),
+            'source':url,'method':'SSGA Index Characteristics Price/Earnings',
+            'validation':'INDEX_PROXY_ONLY: not approved SPY holdings TTM PE'}
 
 
 def fetch_etf_valuation_candidate(f, ticker, key):

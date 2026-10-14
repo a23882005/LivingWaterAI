@@ -205,3 +205,62 @@ def test_loopback_invalid_rpc_envelope_fails_without_data(env):
         assert response.json()["error"]["code"] == -32600
         assert "synthetic-j" not in response.text
         assert len(scope.audit) == before
+
+def test_loopback_invalid_rpc_missing_request_id_fails_closed(env):
+    with live_server(env) as (base, sign, scope):
+        before = len(scope.audit)
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph")},
+            json={"jsonrpc": "2.0", "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "joseph", "resource_id": "r-j"}}},
+            timeout=5)
+        assert response.status_code == 200
+        assert response.json()["error"]["code"] == -32600
+        assert "synthetic-j" not in response.text
+        assert len(scope.audit) == before
+
+
+def test_loopback_wrong_rpc_version_fails_closed(env):
+    with live_server(env) as (base, sign, scope):
+        before = len(scope.audit)
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph")},
+            json={"jsonrpc": "2.1", "id": 410, "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "joseph", "resource_id": "r-j"}}},
+            timeout=5)
+        assert response.status_code == 200
+        assert response.json()["error"]["code"] == -32600
+        assert "synthetic-j" not in response.text
+        assert len(scope.audit) == before
+
+
+def test_loopback_wrong_resource_id_type_fails_closed(env):
+    with live_server(env) as (base, sign, scope):
+        before = len(scope.audit)
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph")},
+            json={"jsonrpc": "2.0", "id": 411, "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "joseph", "resource_id": ["r-j"]}}},
+            timeout=5)
+        assert response.status_code == 200
+        assert response.json()["error"]["code"] == -32602
+        assert "synthetic-j" not in response.text
+        assert len(scope.audit) == before
+
+
+def test_loopback_empty_tenant_identifier_fails_closed(env):
+    with live_server(env) as (base, sign, scope):
+        before = len(scope.audit)
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph")},
+            json={"jsonrpc": "2.0", "id": 412, "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "", "resource_id": "r-j"}}},
+            timeout=5)
+        assert response.status_code == 200
+        assert response.json()["error"]["code"] == -32602
+        assert "synthetic-j" not in response.text
+        assert len(scope.audit) == before

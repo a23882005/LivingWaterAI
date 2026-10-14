@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '.github/workflows/macro22-preflight.yml'
-      - '系統工程/總經V70/總經爬蟲22項.py'
+      - '.github/workflows/macro18-preflight.yml'
+      - '系統工程/總經V70/總經爬蟲18項.py'
       - 'scripts/probe_m06_fedwatch_free.py'
 permissions:
   contents: write
 concurrency:
-  group: livingwater-macro22-preflight
+  group: livingwater-macro18-preflight
   cancel-in-progress: false
 jobs:
   preflight22:
@@ -25,46 +25,46 @@ jobs:
       - name: Install and static QA
         run: |
           python -m pip install requests pandas yfinance
-          python -m py_compile "系統工程/總經V70/總經爬蟲22項.py" scripts/probe_m06_fedwatch_free.py
-          python "系統工程/總經V70/總經爬蟲22項.py" --self-test
-      - name: Fetch independent 22 macro indicators, preserve previous verified data
+          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py
+          python "系統工程/總經V70/總經爬蟲18項.py" --self-test
+      - name: Fetch independent 18 macro indicators, preserve previous verified data
         env:
           CME_DATA_AUTOMATION_AUTHORIZED: ${{ vars.CME_DATA_AUTOMATION_AUTHORIZED }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
-          mkdir -p build/macro22
-          args=(--out build/macro22)
-          test ! -f data/22_macro_verification.json || args+=(--cache data/22_macro_verification.json)
+          mkdir -p build/macro18
+          args=(--out build/macro18)
+          test ! -f data/18_macro_verification.json || args+=(--cache data/18_macro_verification.json)
           # Run without unvetted overrides; existing verified cache stays marked STALE.
-          python "系統工程/總經V70/總經爬蟲22項.py" "${args[@]}"
+          python "系統工程/總經V70/總經爬蟲18項.py" "${args[@]}"
       - name: Contract QA and copy for 10 AM Task
         run: |
           python - <<'PY'
           import json,pathlib
-          p=pathlib.Path('build/macro22/22_macro_verification.json')
+          p=pathlib.Path('build/macro18/18_macro_verification.json')
           d=json.loads(p.read_text(encoding='utf8'))
           items=d['items']
-          assert len(items)==23 and 's03' in items and 's05' not in items
-          assert len(set(items)-{'s03'})==22
-          assert items['m06']['value'] is None or items['m06']['unit']=='碼'
+          assert len(items)==19 and 's03' in items and all(k not in items for k in ('s05','m06','m03_qqq','m03_spy','m03_vt'))
+          assert len(set(items)-{'s03'})==18
+          assert d['independent_indicators']['total']==18
           pathlib.Path('data').mkdir(exist_ok=True)
-          pathlib.Path('data/22_macro_verification.json').write_text(
+          pathlib.Path('data/18_macro_verification.json').write_text(
               json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
           print('Preflight 22 contract OK; counts=',d.get('summary'))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: macro22-09h-${{ github.run_id }}
-          path: build/macro22/
+          name: macro18-09h-${{ github.run_id }}
+          path: build/macro18/
           if-no-files-found: warn
       - name: Publish 09h source for ChatGPT 10h Task
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/22_macro_verification.json
+          git add data/18_macro_verification.json
           if ! git diff --cached --quiet; then
-            git commit -m "data(macro22): 09h observed 22 indicator preflight"
+            git commit -m "data(macro22): 09h observed 18 indicator preflight"
             git pull --rebase origin main
             git push origin HEAD:main
           fi

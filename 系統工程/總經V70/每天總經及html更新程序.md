@@ -37,3 +37,11 @@ GitHub 對應目錄：`a23882005/LivingWaterAI/系統工程/總經V70/`
 讓資產在歲月裡生長；
 今日種下一方山水，
 來日收成人生的富足。
+
+
+## 2026/10/14｜s05 MMFI 改由每日10:00總經 Task 自行讀網頁（使用者最新指示）
+
+- **執行時機：** 先完成原定 Python 爬蟲工作與 Gmail 讀信，再由現有「總體經濟狀況」Task 自行使用網頁搜尋／開啟工具取得 s05；**不交由另一個工程對話繼續施工，也不新增 Task**。
+- **四站依序：** ① Barchart $MMFI：https://www.barchart.com/stocks/quotes/%24MMFI ② StockCharts $MMFI：https://stockcharts.com/h-sc/ui?s=%24MMFI ③ Market-In-Out：https://www.marketinout.com/stock-screener/above-50-day-moving-average （必須確認切換 NYSE 後口徑與 MMFI 相同）④ TradingView INDEX:MMFI：https://www.tradingview.com/symbols/INDEX-MMFI/ 。
+- **品質規則：** 必須實際讀頁面最新數值與觀測日期；驗證 NYSE 股票站上 MA50 比例、0–100、資料時間與來源。搜尋索引中的歷史數字、無日期的「29.17」或其他市場股票池的百分比，不能當作當日最新值；不能取得則標示 MISSING／STALE，不捏造。
+- **Gmail 角色：** Gemini 寄來的 s05 可作備援交叉核對；優先採 Task 當次自行查得且通過品質驗證的 s05。其餘原有 Task 章節、10:00 時間與 11:00 GitHub Actions 交接均維持。

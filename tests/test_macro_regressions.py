@@ -206,5 +206,20 @@ class MacroRegression(unittest.TestCase):
         # Neither output schema nor source VIX values are silently deleted.
         self.assertIn("s03",macro.LABELS)
 
+
+    def test_spy_issuer_index_pe_is_dated_but_not_promoted_to_fund_pe(self):
+        from unittest.mock import Mock
+        import datetime as dt
+        today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+        date=today.strftime("%b %d %Y")
+        response=Mock()
+        response.raise_for_status.return_value=None
+        response.text=("<h2>Index Characteristics as of "+date+"</h2>"
+                       "<div>Price/Earnings 25.21 Price/Earnings Ratio FY1 21.39</div>")
+        source=Mock(s=Mock(get=Mock(return_value=response)),timeout=12)
+        result=macro.probe_spy_issuer_index_pe(source)
+        self.assertEqual(result["candidate_index_pe"],25.21)
+        self.assertIn("INDEX_PROXY_ONLY",result["validation"])
+
 if __name__=="__main__":
     unittest.main()

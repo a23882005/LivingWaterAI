@@ -125,5 +125,40 @@ class MacroRegression(unittest.TestCase):
         future=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()+dt.timedelta(days=1)).isoformat()
         with self.assertRaises(ValueError):
             macro.row("m07",20,future,"https://cdn.cboe.com","test")
+
+    def test_mmfi_live_adapter_accepts_verified_dated_quote(self):
+        import datetime as dt
+        from unittest.mock import Mock
+        stamp=int(dt.datetime.now(dt.timezone.utc).timestamp())-86400
+        payload={"chart":{"error":None,"result":[{
+            "meta":{"symbol":"$MMFI","longName":"NYSE Percent of Stocks Above 50-Day Moving Average"},
+            "timestamp":[stamp],
+            "indicators":{"quote":[{"close":[56.4]}]}
+        }]}}
+        response=Mock()
+        response.raise_for_status.return_value=None
+        response.json.return_value=payload
+        session=Mock()
+        session.get.return_value=response
+        source=Mock(s=session,timeout=12)
+        observed=macro.fetch_mmfi_market_breadth(source)
+        self.assertEqual(observed["status"],"OK")
+        self.assertEqual(observed["value"],56.4)
+        self.assertIsNotNone(observed["observation_date"])
+
+    def test_mmfi_rejects_unverified_instrument(self):
+        import datetime as dt
+        from unittest.mock import Mock
+        stamp=int(dt.datetime.now(dt.timezone.utc).timestamp())-86400
+        response=Mock()
+        response.raise_for_status.return_value=None
+        response.json.return_value={"chart":{"result":[{
+            "meta":{"symbol":"MMFI","longName":"Generic Momentum Fund"},
+            "timestamp":[stamp],"indicators":{"quote":[{"close":[56.4]}]}
+        }]}}
+        source=Mock(s=Mock(get=Mock(return_value=response)),timeout=12)
+        with self.assertRaisesRegex(ValueError,"identity"):
+            macro.fetch_mmfi_market_breadth(source)
+
 if __name__=="__main__":
     unittest.main()

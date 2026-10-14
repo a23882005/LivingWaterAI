@@ -22,6 +22,22 @@ class M06BoundaryQA(unittest.TestCase):
         result=mod.calculate(sample(probabilities={"4.00%-4.25%":50.0,"4.25%-4.50%":49.9}),TODAY)
         self.assertAlmostEqual(result["m06_expected_rate_change_quarters"],1.4995,places=3)
         self.assertEqual(result["status"],"CANDIDATE_NEEDS_REVIEW")
+    def test_horizon_is_anchored_to_actual_settlement_date(self):
+        # If report date is five days after settlement, the closest meeting
+        # may differ; the settled market observation controls the horizon.
+        report=dt.date(2026,10,14)
+        feed={"target_source":"fred","trade_date":"2026-10-09",
+              "current_target":"3.75%-4.00%",
+              "meetings":[
+                  {"date":"2027-10-08","probabilities":{"3.75%-4.00%":100}},
+                  {"date":"2027-10-19","probabilities":{"4.00%-4.25%":100}}
+              ]}
+        result=mod.calculate(feed,report)
+        self.assertEqual(result["meeting_date"],"2027-10-08")
+        self.assertEqual(result["horizon_anchor"],"settlement_date_plus_365_calendar_days")
+        self.assertEqual(result["days_from_12m_target_to_meeting"],-1)
+        self.assertEqual(result["days_from_settlement_to_meeting"],364)
+
     def test_negative_quarters(self):
         result=mod.calculate(sample(probabilities={"3.25%-3.50%":100}),TODAY)
         self.assertAlmostEqual(result["m06_expected_rate_change_quarters"],-2)

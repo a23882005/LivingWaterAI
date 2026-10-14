@@ -135,3 +135,43 @@ def test_loopback_alternating_principals_stays_isolated(env):
         assert third.json()["result"]["isError"] is True
         assert fourth.json()["result"]["isError"] is True
         assert [event["decision"] for event in scope.audit[-4:]] == ["ALLOW", "ALLOW", "DENY", "DENY"]
+
+
+def test_loopback_browser_origin_is_rejected(env):
+    with live_server(env) as (base, sign, scope):
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph"),
+                     "Origin": "https://untrusted.example.test"},
+            json={"jsonrpc": "2.0", "id": 201, "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "joseph", "resource_id": "r-j"}}},
+            timeout=5)
+        assert response.status_code == 403
+        assert "synthetic-j" not in response.text
+        assert scope.audit[-1]["decision"] == "DENY"
+
+
+def test_loopback_non_bearer_auth_is_rejected(env):
+    with live_server(env) as (base, sign, scope):
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Basic dummy"},
+            json={"jsonrpc": "2.0", "id": 202, "method": "tools/list"},
+            timeout=5)
+        assert response.status_code == 401
+        assert "resource_metadata=" in response.headers["WWW-Authenticate"]
+        assert scope.audit[-1]["decision"] == "DENY"
+
+
+def test_loopback_tool_arguments_reject_unexpected_key(env):
+    with live_server(env) as (base, sign, scope):
+        response = httpx.post(base + "/mcp",
+            headers={"Authorization": "Bearer " + sign("joseph")},
+            json={"jsonrpc": "2.0", "id": 203, "method": "tools/call",
+                  "params": {"name": "pf_read_resource",
+                             "arguments": {"active_client_id": "joseph",
+                                           "resource_id": "r-j",
+                                           "unexpected": "mou"}}},
+            timeout=5)
+        assert response.status_code == 200
+        assert response.json()["error"]["code"] == -32602
+        assert "synthetic-j" not in response.text

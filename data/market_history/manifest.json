@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-14T04:01:05.742358+00:00",
+  "generated_at_utc": "2026-10-14T04:15:18.286405+00:00",
   "source": "yfinance (unofficial Yahoo Finance wrapper)",
   "price_basis": "Close=unadjusted; Adj Close=provider-adjusted; dividend cashflows separate",
   "warning": "Adjusted Close is not a tax-adjusted, investor-specific total return",
@@ -9,14 +9,14 @@
       "observation_date": "2026-10-13",
       "rows": 4048,
       "cache_file": "data/market_history/VOO.csv",
-      "adjusted_price_max_drawdown": -0.339930083814286
+      "adjusted_price_max_drawdown": -0.3399300838142859
     },
     "SPY": {
       "status": "OK",
       "observation_date": "2026-10-13",
       "rows": 4272,
       "cache_file": "data/market_history/SPY.csv",
-      "adjusted_price_max_drawdown": -0.33717249020383344
+      "adjusted_price_max_drawdown": -0.33717249020383333
     },
     "VT": {
       "status": "OK",

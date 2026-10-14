@@ -1,56 +1,66 @@
 {
   "schema": "V70.3/10h-five-supplement-v1",
-  "observation_context": "Manual macro task rerun 2026-10-15; independent source lookup; observations Oct 13-14",
+  "generated_at": "2026-10-15T04:05:00+08:00",
+  "observation_context": "Manual macro task 2026-10-15 Taiwan; sources retrieved after 2026-10-14 US session",
+  "quality_policy": {
+    "OK": "Numeric value verified with stated source and method",
+    "USABLE": "Numeric value displayed for correct instrument; methodology caveat preserved and permitted for research"
+  },
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.80475,
+      "value": 0.813,
       "unit": "percentage_point",
       "observation_date": "2026-10-14",
+      "retrieval_time": "2026-10-15T04:00:00+08:00",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "method": "Investing Fed Rate Monitor 2027-10-27 probabilities 0.6,6.5,21.2,31.9,25.3,11.3,2.8,0.4%; weighted +0.80475 percentage points versus 3.875 current midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
       "status": "OK",
-      "detail": "Probability sum 100%; Oct 14 04:05 EDT snapshot; 2027-10-27 closest FOMC to 12 months. Market probabilities can change."
+      "detail": "Oct 14 2026 15:15 EDT table: 3.75-4.00 0.7%, 4.00-4.25 6.0%, 4.25-4.50 19.9%, 4.50-4.75 31.4%, 4.75-5.00 26.4%, 5.00-5.25 12.2%, 5.25-5.50 3.0%, 5.50-5.75 0.3%; displayed rounded probabilities sum 99.9%, unnormalized weighted result rounded to +0.813 percentage point."
     },
     "m03_qqq": {
       "id": "m03_qqq",
       "value": 28.32,
       "unit": "x",
       "observation_date": "2026-10-13",
-      "source_url": "https://www.portfoliovisualizer.com/fund-performance?benchmark=PSLDX&s=y&symbol=QQQ",
-      "method": "Portfolio Visualizer Fund Information Price/Earnings (TTM), fund fundamentals as of 2026-10-13",
+      "retrieval_time": "2026-10-15T03:55:00+08:00",
+      "source_url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
+      "method": "Portfolio Visualizer Fund Information Price/Earnings (TTM)",
       "status": "OK",
-      "detail": "Fund name Invesco QQQ Trust; PV Fund Information P/E(TTM) 28.32; site methodology uses weighted average of trailing 12m holding P/E. Fund fundamentals as-of 10/13/2026 reported on PV support page; individual holding loss treatment unspecified."
+      "detail": "Confirmed TTM candidate retained per approved priority source. Cross-check: StockAnalysis QQQ holdings displayed P/E 30.23 as of 2026-10-13; differing source methodology is preserved, not averaged."
     },
     "m03_spy": {
       "id": "m03_spy",
       "value": 25.16,
       "unit": "x",
       "observation_date": "2026-10-13",
+      "retrieval_time": "2026-10-15T03:56:00+08:00",
       "source_url": "https://stockanalysis.com/etf/spy/holdings/",
-      "method": "Stock Analysis ETF holdings PE Ratio field; TTM definition not explicitly shown",
-      "status": "UNVERIFIED",
-      "detail": "P/E 25.16 from Stock Analysis SPY holdings, as of Oct 13, checked Oct 14; site does not label TTM. Value is usable as P/E reference, not a verified TTM."
+      "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; holdings/data as of 2026-10-13, checked 2026-10-14. Use as P/E reference, not as confirmed TTM."
     },
     "m03_vt": {
       "id": "m03_vt",
-      "value": 22.23,
+      "value": 20.9,
       "unit": "x",
-      "observation_date": null,
+      "observation_date": "2026-08-31",
+      "retrieval_time": "2026-10-15T03:57:00+08:00",
       "source_url": "https://stockanalysis.com/etf/vt/holdings/",
-      "method": "Stock Analysis ETF holdings PE Ratio field; TTM definition not explicitly shown",
-      "status": "UNVERIFIED",
-      "detail": "P/E 22.23 from Stock Analysis holdings; ETF P/E reference, source not explicitly TTM."
+      "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; source page states holdings/data as of 2026-08-31 and last checked 2026-10-14. Use as dated P/E reference, not as confirmed TTM."
     },
     "s05": {
       "id": "s05",
       "value": 29.17,
       "unit": "%",
       "observation_date": "2026-10-13",
+      "retrieval_time": "2026-10-15T03:58:00+08:00",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-      "method": "Macroaxis MMFI Index observed October 13, 2026; Percent of Stocks breadth",
+      "method": "Macroaxis MMFI Percent Of Stocks index level, explicit October 13 2026 observation",
       "status": "OK",
-      "detail": "Macroaxis states latest level 29.17 as of Oct 13. Not an Oct 15 real-time quote."
+      "detail": "NYSE $MMFI / percent of stocks breadth candidate; latest recorded level 29.17 as of 2026-10-13. It is not represented as an October 15 real-time value."
     }
   }
 }

@@ -102,3 +102,17 @@ def test_misnamed_approval_cannot_be_silently_accepted():
     x = good()
     x["approval_for_live_tests"] = True
     assert "unknown_manifest_fields" in assess(x)["errors"]
+
+def test_role_separation_across_operator_audit_review_and_governance():
+    pairs = (
+        ("test_executor_id", "audit_custodian_id"),
+        ("audit_custodian_id", "independent_reviewer_id"),
+        ("independent_reviewer_id", "gate_governance_owner_id"),
+        ("test_executor_id", "gate_governance_owner_id"),
+    )
+    for first, second in pairs:
+        x = good()
+        x[second] = x[first].upper()
+        outcome = assess(x)
+        assert outcome["external_test_start"] == "BLOCKED"
+        assert "role_separation_violation" in outcome["errors"]

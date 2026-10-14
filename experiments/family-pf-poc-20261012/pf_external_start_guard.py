@@ -26,6 +26,11 @@ def assess(manifest):
         return result
     if any(s in str(key).lower() for key in manifest for s in SECRET_MARKERS):
         result["errors"].append("secret_like_key_in_manifest")
+    # Fail closed on unrecognized manifest fields: prevent unreviewed controls or
+    # accidental credentials from being silently ignored by an operator.
+    permitted = set(REQUIRED) | {"environment_type", "test_data_class", "approval_for_live_test"}
+    if set(manifest) - permitted:
+        result["errors"].append("unknown_manifest_fields")
     for field in REQUIRED:
         val = manifest.get(field)
         if not isinstance(val, str) or not val.strip() or val.strip().lower() in {"pending", "tbd", "none", "blocked", "todo", "unknown"}:

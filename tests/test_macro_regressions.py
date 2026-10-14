@@ -160,5 +160,28 @@ class MacroRegression(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"identity"):
             macro.fetch_mmfi_market_breadth(source)
 
+
+    def test_mmfi_barchart_official_index(self):
+        from unittest.mock import Mock
+        import datetime as dt
+        date=(dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()-dt.timedelta(days=1)).isoformat()
+        response=Mock()
+        response.raise_for_status.return_value=None
+        response.json.return_value={"status":{"code":200},"results":[
+            {"symbol":"$MMFI","tradingDay":date,"close":62.5},
+            {"symbol":"$MOFI","tradingDay":date,"close":99.0}
+        ]}
+        source=Mock(s=Mock(get=Mock(return_value=response)),timeout=12)
+        with patch.dict("os.environ",{"BARCHART_ONDEMAND_API_KEY":"test-only"}):
+            result=macro.fetch_mmfi_barchart_history(source)
+        self.assertEqual(result["value"],62.5)
+        self.assertEqual(result["observation_date"],date)
+
+    def test_mmfi_barchart_requires_api_key(self):
+        from unittest.mock import Mock
+        with patch.dict("os.environ",{"BARCHART_ONDEMAND_API_KEY":""}):
+            with self.assertRaisesRegex(ValueError,"absent"):
+                macro.fetch_mmfi_barchart_history(Mock())
+
 if __name__=="__main__":
     unittest.main()

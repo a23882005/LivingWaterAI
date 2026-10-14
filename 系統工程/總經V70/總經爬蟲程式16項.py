@@ -676,6 +676,45 @@ def fetch_m06_cme(f):
                '; probability-weighted target midpoint vs official FRED target midpoint',
                detail='FOMC '+meeting.isoformat()+'; current target '+str(cur_lo)+'-'+str(cur_hi)+'%; units=25bp')
 
+def fetch_mmfi_barchart_history(f):
+    """Barchart licensed exact $MMFI daily index history, if credential exists.
+
+    Values come from the original index (not a S&P500 breadth proxy);
+    require matching identifier and explicit provider trading date.
+    """
+    import requests
+    key=os.environ.get('BARCHART_ONDEMAND_API_KEY','').strip()
+    if not key:
+        raise ValueError('BARCHART_ONDEMAND_API_KEY absent; $MMFI history requires approved Barchart access')
+    now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    url='https://ondemand.websol.barchart.com/getHistory.json'
+    resp=f.s.get(url,params={'apikey':key,'symbol':'$MMFI','type':'daily',
+                              'startDate':(now-dt.timedelta(days=15)).strftime('%Y%m%d'),
+                              'endDate':now.strftime('%Y%m%d')},
+                 timeout=(5,f.timeout))
+    resp.raise_for_status()
+    obj=resp.json()
+    if obj.get('status',{}).get('code') not in (None,200):
+        raise ValueError('Barchart history response non-success')
+    readings=[]
+    for entry in obj.get('results') or []:
+        if str(entry.get('symbol','')).upper()!='$MMFI':
+            continue
+        stamp=entry.get('tradingDay') or entry.get('timestamp')
+        if not stamp: continue
+        date=dt.date.fromisoformat(str(stamp)[:10])
+        value=float(entry['close'])
+        if 0<=value<=100 and math.isfinite(value) and date<=now:
+            readings.append((date,value))
+    if not readings:
+        raise ValueError('No dated $MMFI observation in Barchart response')
+    observed,value=max(readings,key=lambda pair:pair[0])
+    return row('s05',value,observed.isoformat(),
+               'https://www.barchart.com/stocks/quotes/%24MMFI/price-history',
+               'Barchart OnDemand original $MMFI daily closing breadth percent',
+               detail='Official $MMFI instrument, tradingDay validated')
+
+
 def fetch_mmfi_market_breadth(f):
     """Read actual daily MMFI index close from Yahoo Chart if published.
 
@@ -685,6 +724,10 @@ def fetch_mmfi_market_breadth(f):
     import requests
     import datetime as datetime_module
     failures=[]
+    try:
+        return fetch_mmfi_barchart_history(f)
+    except Exception as exc:
+        failures.append('BARCHART: '+str(exc)[:160])
     for symbol in ('$MMFI','^MMFI','MMFI'):
         try:
             url='https://query1.finance.yahoo.com/v8/finance/chart/'+requests.utils.quote(symbol,safe='')

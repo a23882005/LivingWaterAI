@@ -5,6 +5,8 @@ This checker never performs HTTP requests and never grants Gate A release author
 import argparse
 import json
 from pathlib import Path
+from urllib.parse import urlsplit
+import ipaddress
 
 REQUIRED = (
     "approved_scope_id", "environment_id", "endpoint_origin", "test_window_utc",
@@ -38,8 +40,28 @@ def assess(manifest):
     if manifest.get("test_executor_id") == manifest.get("independent_reviewer_id"):
         result["errors"].append("reviewer_must_be_independent")
     origin = manifest.get("endpoint_origin")
-    if not isinstance(origin, str) or not origin.startswith("https://") or any(c in origin for c in ("@", "?", "#")):
-        result["errors"].append("endpoint_must_be_https_origin_without_credentials")
+    try:
+        parsed = urlsplit(origin) if isinstance(origin, str) else None
+        valid_origin = (
+            parsed is not None and parsed.scheme == "https" and
+            bool(parsed.hostname) and not parsed.username and not parsed.password and
+            parsed.port in (None, 443) and parsed.path in ("", "/") and
+            not parsed.query and not parsed.fragment and "\\" not in origin and
+            not any(ch.isspace() for ch in origin) and
+            parsed.hostname.lower() not in {"localhost"} and
+            not parsed.hostname.lower().endswith((".localhost", ".test", ".invalid", ".example"))
+        )
+        if valid_origin:
+            try:
+                ip = ipaddress.ip_address(parsed.hostname)
+            except ValueError:
+                ip = None
+            if ip is not None and not ip.is_global:
+                valid_origin = False
+    except (ValueError, TypeError):
+        valid_origin = False
+    if not valid_origin:
+        result["errors"].append("endpoint_must_be_public_https_origin")
     if not result["errors"] and not result["missing_fields"]:
         result["external_test_start"] = "READY_FOR_AUTHORIZED_OPERATOR_REVIEW"
     return result

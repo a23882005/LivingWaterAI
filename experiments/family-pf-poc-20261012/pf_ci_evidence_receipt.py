@@ -16,7 +16,7 @@ def receipt_from_junit(path, head_sha):
     raw = Path(path).read_bytes()
     root = ElementTree.fromstring(raw)
     suites = [root] if root.tag == "testsuite" else list(root.findall("testsuite"))
-    if not suites:
+    if root.tag not in ("testsuites", "testsuite") or not suites:
         raise ValueError("no_junit_suites")
     total = {k: 0 for k in ("tests", "failures", "errors", "skipped")}
     for suite in suites:
@@ -25,7 +25,9 @@ def receipt_from_junit(path, head_sha):
             if not value.isdigit():
                 raise ValueError("invalid_junit_count")
             total[key] += int(value)
-    if total["tests"] <= 0 or total["failures"] or total["errors"]:
+    if total["tests"] <= 0 or total["failures"] or total["errors"] or total["skipped"]:
+        raise ValueError("synthetic_suite_not_passed")
+    if sum(len(suite.findall("testcase")) for suite in suites) != total["tests"]:
         raise ValueError("synthetic_suite_not_passed")
     return {
         "schema": SCHEMA, "evidence_class": "SYNTHETIC_CI_ONLY",
@@ -44,7 +46,7 @@ def emit(xml_path, head_sha, output_dir):
     (target / CHECKSUM_FILE).write_text(f"{digest}  {RECEIPT_FILE}\n", encoding="ascii")
     return receipt
 
-def verify(directory):
+def verify(directory, expected_commit=None):
     root = Path(directory)
     payload = (root / RECEIPT_FILE).read_bytes()
     line = (root / CHECKSUM_FILE).read_text(encoding="ascii")
@@ -66,12 +68,14 @@ def verify(directory):
         raise ValueError("invalid_counts")
     if any(type(counts[k]) is not int or counts[k] < 0 for k in counts):
         raise ValueError("invalid_counts")
-    if counts["tests"] < 1 or counts["failures"] or counts["errors"]:
+    if counts["tests"] < 1 or counts["failures"] or counts["errors"] or counts["skipped"]:
         raise ValueError("synthetic_suite_not_passed")
     for k in ("commit_sha", "junit_sha256"):
         v = receipt[k]
         if not isinstance(v, str) or len(v) != (40 if k == "commit_sha" else 64) or any(c not in "0123456789abcdef" for c in v):
             raise ValueError("invalid_digest")
+    if expected_commit is not None and receipt["commit_sha"] != expected_commit:
+        raise ValueError("receipt_commit_mismatch")
     return receipt
 
 if __name__ == "__main__":
@@ -79,6 +83,7 @@ if __name__ == "__main__":
     parser.add_argument("action", choices=("emit", "verify"))
     parser.add_argument("--junit")
     parser.add_argument("--commit")
+    parser.add_argument("--expected-commit")
     parser.add_argument("--directory", required=True)
     args = parser.parse_args()
     if args.action == "emit":
@@ -86,4 +91,4 @@ if __name__ == "__main__":
             parser.error("emit requires --junit and --commit")
         print(json.dumps(emit(args.junit, args.commit, args.directory), sort_keys=True))
     else:
-        print(json.dumps(verify(args.directory), sort_keys=True))
+        print(json.dumps(verify(args.directory, args.expected_commit), sort_keys=True))

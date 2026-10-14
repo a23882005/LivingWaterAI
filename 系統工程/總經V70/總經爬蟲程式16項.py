@@ -588,6 +588,14 @@ def run(outdir,overrides_path=None,cache_path=None):
             'note':'僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算',
             'summary':summary,'items':results}
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
+    # Expose actual Yahoo PE numeric candidates separately for engineering QA.
+    # These are not approved inputs to V70.3 or risk decisions.
+    (out/'etf_pe_candidates_unverified.json').write_text(
+        json.dumps({'generated_at':report['generated_at'],
+                    'items':getattr(f,'etf_candidates',{})},
+                   ensure_ascii=False,indent=2,default=str),encoding='utf-8')
+    print('ETF_PE_CANDIDATES_UNVERIFIED',
+          json.dumps(getattr(f,'etf_candidates',{}),ensure_ascii=False,default=str),flush=True)
     (out/'24_macro_verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     with (out/'24_macro_verification.csv').open('w',newline='',encoding='utf-8-sig') as w:
         fieldnames=list(next(iter(results.values())).keys());wr=csv.DictWriter(w,fieldnames=fieldnames)
@@ -773,6 +781,15 @@ def fetch_etf_valuation_candidate(f, ticker, key):
     if not isinstance(info,dict):
         raise ValueError('Yahoo ETF metadata unavailable')
     pe=info.get('trailingPE')
+    if pe is not None:
+        if not hasattr(f,'etf_candidates'): f.etf_candidates={}
+        f.etf_candidates[ticker]={
+            'candidate_trailing_pe':pe,
+            'retrieved_at_utc':dt.datetime.now(dt.timezone.utc).isoformat(),
+            'source':'https://finance.yahoo.com/quote/'+ticker+'/',
+            'fund_holdings_pe_asof':info.get('trailingPEAsOfDate'),
+            'methodology':info.get('trailingPEMethodology'),
+            'validation':'UNVERIFIED: retrieval time is not valuation date'}
     if pe is None or not math.isfinite(float(pe)) or float(pe)<=0:
         raise ValueError('Yahoo trailingPE absent for '+ticker)
     # ETF P/E must have an explicit dated holdings valuation and a compatible

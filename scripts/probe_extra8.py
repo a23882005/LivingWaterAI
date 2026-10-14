@@ -110,5 +110,108 @@ def main():
     out = pathlib.Path("build/macro24/extra8_probe.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+def collect_market_history(symbols=("VOO", "SPY", "VT", "QQQ"), directory="data/market_history"):
+    """Incremental verified OHLCV, dividends and adjusted close; never fabricate MMFI.
+
+    yfinance is an unofficial upstream. Retain verified cached files when down.
+    All daily bars are trading-session dates, not the download date.
+    """
+    import time
+    import random
+    import pandas as pd
+    import yfinance as yf
+    root = pathlib.Path(directory)
+    root.mkdir(parents=True, exist_ok=True)
+    now = dt.datetime.now(dt.timezone.utc).date()
+    report = {"generated_at_utc":dt.datetime.now(dt.timezone.utc).isoformat(),
+              "source":"yfinance (unofficial Yahoo Finance wrapper)",
+              "price_basis":"Close=unadjusted; Adj Close=provider-adjusted; dividend cashflows separate",
+              "warning":"Adjusted Close is not a tax-adjusted, investor-specific total return",
+              "items":{}}
+    for i in range(0,len(symbols),4):
+        group = symbols[i:i+4]
+        cache_by_symbol={}
+        earliest=now-dt.timedelta(days=365*17)
+        for symbol in group:
+            file=root/(symbol+".csv")
+            if file.is_file():
+                try:
+                    prior=pd.read_csv(file)
+                    if len(prior) and {'Date','Close','Adj Close','Volume'}.issubset(prior.columns):
+                        prior['Date']=pd.to_datetime(prior['Date'],errors='coerce').dt.date
+                        if prior['Date'].notna().all() and prior['Date'].is_unique:
+                            cache_by_symbol[symbol]=prior
+                            earliest=max(earliest,prior['Date'].max()-dt.timedelta(days=7))
+                except Exception as exc:
+                    print("CACHE_REJECTED",symbol,type(exc).__name__,flush=True)
+        time.sleep(random.uniform(.5,1.5))
+        last_error=""
+        downloaded=None
+        for attempt in range(3):
+            try:
+                downloaded=yf.download(list(group),start=earliest.isoformat(),
+                     end=(now+dt.timedelta(days=1)).isoformat(),
+                     auto_adjust=False,actions=True,group_by="ticker",threads=False,
+                     progress=False,timeout=20)
+                if downloaded is None or downloaded.empty:
+                    raise ValueError("Yahoo returned no daily bars")
+                break
+            except Exception as exc:
+                last_error=str(exc)[:180]
+                if "429" in last_error or "Too Many Requests" in last_error:
+                    print("RATE_LIMIT_STOP",last_error,flush=True)
+                    break
+                time.sleep(min(2**attempt+random.uniform(0,.5),5))
+        for symbol in group:
+            file=root/(symbol+".csv")
+            record={"status":"MISSING","observation_date":None,"error":last_error}
+            try:
+                if downloaded is None or downloaded.empty:
+                    raise ValueError(last_error or "No download data")
+                frame=downloaded[symbol].copy() if isinstance(downloaded.columns,pd.MultiIndex) else downloaded.copy()
+                frame=frame.reset_index()
+                if 'Date' not in frame: raise ValueError("Daily Date column missing")
+                frame['Date']=pd.to_datetime(frame['Date'],utc=True).dt.date
+                wanted=['Date','Open','High','Low','Close','Adj Close','Volume','Dividends','Stock Splits']
+                for col in ('Dividends','Stock Splits'):
+                    if col not in frame: frame[col]=0.0
+                frame=frame[wanted].dropna(subset=['Close','Adj Close'])
+                for col in ['Open','High','Low','Close','Adj Close','Volume','Dividends','Stock Splits']:
+                    frame[col]=pd.to_numeric(frame[col],errors='coerce')
+                if frame.empty or frame['Date'].isna().any() or frame['Date'].duplicated().any():
+                    raise ValueError("Invalid or duplicate trading dates")
+                if not frame['Date'].is_monotonic_increasing or frame['Date'].max()>now:
+                    raise ValueError("Nonmonotonic or future dates")
+                if (frame[['Close','Adj Close']]<=0).any().any() or (frame['Volume']<0).any():
+                    raise ValueError("Nonpositive prices or negative volumes")
+                if frame[['Open','High','Low','Close','Adj Close','Volume']].isna().any().any():
+                    raise ValueError("Missing OHLCV values")
+                prior=cache_by_symbol.get(symbol)
+                if prior is not None:
+                    frame=pd.concat([prior,frame],ignore_index=True)
+                    frame=frame.drop_duplicates(subset=['Date'],keep='last').sort_values('Date')
+                # The rolling price signal is for this *one ETF*; never MMFI market breadth.
+                frame['MA50_Close']=frame['Close'].rolling(50,min_periods=50).mean()
+                frame['Above_MA50_Individual']=frame['Close']>frame['MA50_Close']
+                frame['Adjusted_Price_Drawdown']=frame['Adj Close']/frame['Adj Close'].cummax()-1
+                tmp=file.with_suffix(".tmp")
+                frame.assign(Date=frame['Date'].astype(str)).to_csv(tmp,index=False)
+                tmp.replace(file)
+                record={"status":"OK","observation_date":str(frame['Date'].iloc[-1]),
+                        "rows":int(len(frame)),"cache_file":str(file),
+                        "adjusted_price_max_drawdown":float(frame['Adjusted_Price_Drawdown'].min())}
+            except Exception as exc:
+                record["error"]=str(exc)[:200]
+                if file.is_file():
+                    record["status"]="STALE"
+                    record["cache_file"]=str(file)
+                    if symbol in cache_by_symbol:
+                        record["observation_date"]=str(cache_by_symbol[symbol]['Date'].max())
+            report["items"][symbol]=record
+            print("MARKET_DOWNLOAD",symbol,record["status"],record.get("observation_date"),flush=True)
+    (root/"manifest.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    return report
+
 if __name__ == "__main__":
     main()

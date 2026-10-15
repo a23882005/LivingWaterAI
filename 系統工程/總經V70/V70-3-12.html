@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 03:18:50｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 03:31:14｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -2280,7 +2280,12 @@ if (recBlack) {
    if(embeddedNode){
      try{
        const doc=JSON.parse(embeddedNode.textContent||'');
-       if(doc.schema==='V70.3/macro-feed-v1')candidates.push({doc,source:'HTML內嵌快照'});
+       if(doc.schema==='V70.3/macro-feed-v1'){
+         // Android opens downloaded HTML as content://. Use its embedded snapshot directly;
+         // fetch() from an opaque content origin can reject even when this snapshot is valid.
+         if(location.protocol==='content:')return doc;
+         candidates.push({doc,source:'HTML內嵌快照'});
+       }
      }catch(err){}
    }
    const localUrl=new URL('V70_macro_latest.json',location.href).href;

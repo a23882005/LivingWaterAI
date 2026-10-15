@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-15T09:25:48.647865+08:00",
+  "generated_at": "2026-10-16T02:11:56.808262+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -22,9 +22,9 @@
     "m07": {
       "id": "m07",
       "label": "VIX",
-      "value": 15.27,
+      "value": 16.87,
       "unit": "",
-      "observation_date": "2026-10-13",
+      "observation_date": "2026-10-14",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -58,9 +58,9 @@
     "m02": {
       "id": "m02",
       "label": "HY OAS",
-      "value": 3.16,
+      "value": 3.25,
       "unit": "%",
-      "observation_date": "2026-10-13",
+      "observation_date": "2026-10-14",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -94,9 +94,9 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.073997,
+      "value": 101.996002,
       "unit": "",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
       "status": "OK",
@@ -106,9 +106,9 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 94.209999,
+      "value": 96.410004,
       "unit": "USD/bbl",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
       "status": "OK",
@@ -118,9 +118,9 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 99.064301,
+      "value": 102.559601,
       "unit": "",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
       "status": "OK",
@@ -226,9 +226,9 @@
     "s03": {
       "id": "s03",
       "label": "VIX 短期",
-      "value": 15.27,
+      "value": 16.87,
       "unit": "",
-      "observation_date": "2026-10-13",
+      "observation_date": "2026-10-14",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "與 m07 同步",
       "status": "OK",
@@ -238,9 +238,9 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 32.420276,
+      "value": 31.828571,
       "unit": "",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "method": "CNN 非官方可讀 JSON（可能變動）",
       "status": "OK",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T01:25:47.900239+00:00"
+      "retrieved_at": "2026-10-15T18:11:55.809989+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T01:25:47.993779+00:00"
+      "retrieved_at": "2026-10-15T18:11:56.004615+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T01:25:48.058966+00:00"
+      "retrieved_at": "2026-10-15T18:11:56.086523+00:00"
     }
   ]
 }

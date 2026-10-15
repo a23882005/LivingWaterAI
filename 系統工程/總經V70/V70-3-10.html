@@ -888,8 +888,9 @@ function renderCapControls() {
 
             const avg = (arr) => {
                 const vals = arr.map(getRisk);
-                if (vals.some(v => !Number.isFinite(v))) return null;
-                return vals.reduce((a,b)=>a+b,0) / vals.length;
+                const available=vals.filter(v=>Number.isFinite(v));
+                if(!available.length)return null;
+                return available.reduce((a,b)=>a+b,0) / available.length;
             };
 
             let weightedSum = 0, weightSum = 0;
@@ -899,8 +900,12 @@ function renderCapControls() {
                 groupRisk[g] = gr;
                 if (gr !== null) { weightedSum += gr * weights[g]; weightSum += weights[g]; }
             }
-            const avgRiskBase = (weightSum===100) ? (weightedSum/100) : NaN;
+            const avgRiskBase = weightSum>0 ? (weightedSum/weightSum) : NaN;
+            const coverageCount=macroConfig.filter(cfg=>Number.isFinite(getRisk(cfg.id))).length;
+            window.v703Coverage={available:coverageCount,total:macroConfig.length,ratio:coverageCount/macroConfig.length,groupWeight:weightSum,provisional:coverageCount<macroConfig.length};
             window.v703DataComplete = (weightSum === 100) && macroConfig.every(cfg=>{const el=document.getElementById('in_'+cfg.id);return el && el.value.trim()!=='' && Number.isFinite(Number(el.value));});
+            // Partial coverage is research-only until critical data and deployment policy have been checked server-side.
+            window.v703ProvisionalMacro = window.v703Coverage.provisional ? avgRiskBase : null;
             window.v703VerifiedDataDates = window.v703ValidateDates ? window.v703ValidateDates() : false;
             window.v703MissingGroups = Object.keys(groupRisk).filter(k=>groupRisk[k]===null);
 

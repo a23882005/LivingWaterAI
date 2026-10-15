@@ -113,6 +113,12 @@ def recover(output, state_dir):
     for candidate in snapshots(state_dir):
         try:
             raw = read_valid(candidate)
+            # A restored snapshot is historical, even if it was OK when first collected.
+            for item in raw["items"].values():
+                if item.get("value") is not None:
+                    item["status"] = "STALE"
+                    item["detail"] = (item.get("detail") or "") + "; D009 historical backup recovery"
+            raw["recovery"] = {"mode": "HISTORICAL_BACKUP", "snapshot": candidate.name}
             atomic_write(output, (json.dumps(raw, ensure_ascii=False, indent=2)+"\n").encode("utf-8"))
             print("D009 recovered HISTORICAL backup:", candidate.name)
             return candidate.name

@@ -114,7 +114,7 @@ def recover(output, state_dir):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("command", choices=("snapshot", "recover"))
+    p.add_argument("command", choices=("snapshot", "recover", "verify"))
     p.add_argument("--state-dir", required=True)
     p.add_argument("--input")
     p.add_argument("--output")
@@ -122,6 +122,10 @@ def main():
     if a.command == "snapshot":
         if not a.input: p.error("--input required")
         snapshot(a.input, a.state_dir)
+    elif a.command == "verify":
+        if not a.input: p.error("--input required")
+        read_valid(a.input)
+        print("D009 report validation PASS")
     else:
         if not a.output: p.error("--output required")
         recover(a.output, a.state_dir)

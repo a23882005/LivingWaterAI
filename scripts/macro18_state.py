@@ -86,7 +86,7 @@ def snapshot(source, state_dir):
     if existing:
         try:
             old = read_valid(existing[0])
-            if old.get("items") == raw.get("items") and old.get("lei_history") == raw.get("lei_history"):
+            if all(old["items"][k]["value"] == raw["items"][k]["value"] and old["items"][k]["observation_date"] == raw["items"][k]["observation_date"] for k in raw["items"]) and old.get("lei_history") == raw.get("lei_history"):
                 print("D009 snapshot unchanged; existing backups retained")
                 return False
         except (ValueError, OSError, TypeError, KeyError):

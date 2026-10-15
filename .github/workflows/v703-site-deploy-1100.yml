@@ -1,9 +1,12 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 02:08:10｜版本：V70.3.12 workflow｜檔案名稱：v703-site-deploy-1100.yml
+# 最後修改日期時間（台灣時間）：2026/10/16 04:47:57｜版本：V70.3.12 workflow｜檔案名稱：v703-site-deploy-1100.yml
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
   schedule:
     - cron: '0 3 * * *' # 11:00 Asia/Taipei
   workflow_dispatch:
+  push:
+    paths:
+      - '系統工程/總經V70/V70-3-12.html'
 permissions:
   contents: read
 concurrency:

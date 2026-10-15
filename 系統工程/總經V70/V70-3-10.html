@@ -377,7 +377,14 @@
                 }
                 if(!src?.value.trim()) {problems.push(cfg.id+':缺少資料來源');continue;}
                 const days=Math.floor((today-date)/86400000);
-                const stale=v703ObservationStale(cfg.id,date,today);
+                // ETF P/E uses its verified reference timestamp (<=7 days), not the
+                // historical holdings/valuation observation date as a freshness proxy.
+                const peReference=['m03_qqq','m03_spy','m03_vt'].includes(cfg.id);
+                if(peReference && window.v703PEReferenceVerified?.[cfg.id]!==true) {
+                    problems.push(cfg.id+':ETF本益比缺少7天內有效驗證');
+                    continue;
+                }
+                const stale=!peReference && v703ObservationStale(cfg.id,date,today);
                 if(stale) problems.push(cfg.id+':資料過期');
             }
             if(window.v703LEIHistoryVerified!==true)problems.push('LEI:缺少有效連續三月YoY資料');
@@ -2193,6 +2200,14 @@ if (recBlack) {
      window.v703SourceBatch=null;
      window.v703CreditGateBlocked=true;
      window.v703PEReferenceVerified=Object.create(null);
+     // Remove stale displayed values too; a failed new snapshot must not leave
+     // yesterday's values in controls that users can mistake for live readings.
+     for(const cfg of macroConfig){
+       for(const id of ['in_'+cfg.id,'v703-date-'+cfg.id,'v703-source-'+cfg.id]){
+         const el=document.getElementById(id);if(el)el.value='';
+       }
+       const score=document.getElementById('sc_'+cfg.id);if(score)score.textContent='NA';
+     }
      showBanner(null,'資料讀取失敗');
      window.v703ApplyLEIHistory([],null);
      // Never show synthetic midpoint data as if it were verified, including local file previews.

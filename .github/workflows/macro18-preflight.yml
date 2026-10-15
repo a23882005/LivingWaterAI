@@ -64,8 +64,10 @@ jobs:
           assert history[-1]['observation_date']==items['m16']['observation_date']
           assert abs(history[-1]['value']-items['m16']['value'])<0.000001
           pathlib.Path('data').mkdir(exist_ok=True)
-          pathlib.Path('data/18_macro_verification.json').write_text(
-              json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+          from scripts.macro18_state import atomic_write, validate
+          validate(d)
+          atomic_write('data/18_macro_verification.json',
+              (json.dumps(d,ensure_ascii=False,indent=2)+'\n').encode('utf8'))
           print('Preflight 18 contract OK; counts=',d.get('summary'))
           PY
       - name: Rotate three verified snapshots on automation-state
@@ -73,7 +75,7 @@ jobs:
           python scripts/macro18_state.py snapshot --input build/macro18/18_macro_verification.json --state-dir /tmp/livingwater-macro-state
           git -C /tmp/livingwater-macro-state config user.name "github-actions[bot]"
           git -C /tmp/livingwater-macro-state config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C /tmp/livingwater-macro-state add backups/
+          git -C /tmp/livingwater-macro-state add -A backups/
           if ! git -C /tmp/livingwater-macro-state diff --cached --quiet; then
             git -C /tmp/livingwater-macro-state commit -m "data(D009): rotate validated macro18 backups"
             for attempt in 1 2 3; do

@@ -41,6 +41,28 @@ class TestD009State(unittest.TestCase):
             recover(output, root)
             self.assertEqual(read_valid(output)["items"]["m07"]["value"], 4)
 
+    def test_corrupt_head_does_not_replace_three_valid_backups(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "input.json"
+            for value in (1, 2, 3):
+                source.write_text(json.dumps(report(value)), encoding="utf-8")
+                snapshot(source, root)
+            corrupt = root / "backups" / "macro18_99999999T999999999999Z_corrupt.json"
+            corrupt.write_text("{broken", encoding="utf-8")
+            source.write_text(json.dumps(report(4)), encoding="utf-8")
+            snapshot(source, root)
+            valid = []
+            for file in (root / "backups").glob("macro18_*.json"):
+                try:
+                    valid.append(read_valid(file)["items"]["m07"]["value"])
+                except ValueError:
+                    pass
+            self.assertEqual(sorted(valid), [2, 3, 4])
+            output = root / "recovered.json"
+            recover(output, root)
+            self.assertEqual(read_valid(output)["items"]["m07"]["value"], 4)
+
     def test_corrupt_report_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "invalid.json"

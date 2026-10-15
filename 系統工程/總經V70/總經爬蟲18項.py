@@ -17,6 +17,7 @@ import re
 import os
 import sys
 import time
+import tempfile
 from pathlib import Path
 
 try:
@@ -59,6 +60,47 @@ SOURCES['m20']=['https://fred.stlouisfed.org/series/PAYEMS']
 SOURCES['m05']=['https://fred.stlouisfed.org/series/CPILFESL']
 SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
+
+def load_source_config():
+    """Fail closed on incomplete D009 source configuration."""
+    path=Path(__file__).resolve().with_name('macro_source_config.json')
+    config=json.loads(path.read_text(encoding='utf-8'))
+    if config.get('schema')!='LivingWaterAI-D009-source-config-v1':
+        raise ValueError('D009 config schema mismatch')
+    indicators=config.get('indicators')
+    expected=set(LABELS)-{'s03'}
+    if not isinstance(indicators,dict) or set(indicators)!=expected:
+        raise ValueError('D009 config must contain exactly 18 independent indicators')
+    for key,entry in indicators.items():
+        if not isinstance(entry,dict) or not isinstance(entry.get('primary_source'),str) or not entry['primary_source']:
+            raise ValueError('D009 missing primary source: '+key)
+        if not isinstance(entry.get('backup_sources'),list) or not all(isinstance(x,str) and x for x in entry['backup_sources']):
+            raise ValueError('D009 invalid backup sources: '+key)
+        if type(entry.get('max_age_days')) is not int or not 1<=entry['max_age_days']<=366:
+            raise ValueError('D009 invalid freshness limit: '+key)
+        tolerance=entry.get('tolerance')
+        if not isinstance(tolerance,dict) or type(tolerance.get('absolute')) not in (int,float) or not 0<float(tolerance['absolute'])<100:
+            raise ValueError('D009 invalid tolerance: '+key)
+    return config
+
+
+def atomic_write_text(path, content):
+    """Replace validated UTF-8 output atomically, leaving prior file intact on failure."""
+    path=Path(path)
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temporary=None
+    try:
+        with tempfile.NamedTemporaryFile('w',encoding='utf-8',dir=path.parent,
+                                         prefix='.'+path.name+'.',suffix='.tmp',delete=False) as stream:
+            temporary=Path(stream.name)
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary,path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
 
 class Fetcher:
     def __init__(self, timeout=40):
@@ -620,6 +662,7 @@ def lei_verified_history(f, cache_path=None):
                detail=latest['detail']+'; supersedes mixed-vintage 99.5/98.5 baseline')
 
 def run(outdir,overrides_path=None,cache_path=None):
+    config=load_source_config()
     f=Fetcher()
     today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
     jobs={
@@ -701,6 +744,14 @@ def run(outdir,overrides_path=None,cache_path=None):
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)
         except (OSError,ValueError,TypeError) as e:print('忽略損壞快取',e,file=sys.stderr)
     for k in results: freshen(results[k],today)
+    # Preserve actual source observation dates and mark cached/old observations.
+    for k,r in results.items():
+        if k=='s03' or not r.get('observation_date'): continue
+        age=(today-dt.date.fromisoformat(r['observation_date'])).days
+        limit=config['indicators'][k]['max_age_days']
+        if age>limit and r['status'] in ('OK','USABLE'):
+            r['status']='STALE'
+            r['detail']+=(f'; D009 source config age {age} > {limit} days')
     # m07 和 s03 必須一致，不允許歷史快取、人工覆寫造成互相矛盾。
     a=results['m07']
     if a['value'] is not None:
@@ -716,7 +767,7 @@ def run(outdir,overrides_path=None,cache_path=None):
             'summary':summary,'independent_indicators':{'total':len(independent_ids), 'excluded_duplicate':'s03 (same VIX as m07)', 'summary':independent_summary},'items':results,
             'lei_history':getattr(f,'lei_history',[])}
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
-    (out/'18_macro_verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+    atomic_write_text(out/'18_macro_verification.json',json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     with (out/'18_macro_verification.csv').open('w',newline='',encoding='utf-8-sig') as w:
         fieldnames=list(next(iter(results.values())).keys());wr=csv.DictWriter(w,fieldnames=fieldnames)
         wr.writeheader();wr.writerows(results.values())
@@ -954,6 +1005,7 @@ def fetch_etf_valuation_candidate(f, ticker, key):
 
 
 def selftest():
+    assert len(load_source_config()['indicators'])==18
     assert len(LABELS)==19
     assert len([k for k in LABELS if k!='s03'])==18
     assert all(k not in LABELS for k in ["s05"])

@@ -1,86 +1,86 @@
 {
   "region": "global",
-  "generated_utc": "2026-10-14T23:17:42.843655+00:00",
+  "generated_utc": "2026-10-15T23:13:50.095033+00:00",
   "universe_source": "config/ib_global_symbols.txt",
   "data_source": "Yahoo Finance via yfinance",
   "items": {
     "VOO": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 4049,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 4050,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "VT": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 4604,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 4605,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "QQQ": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6736,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6737,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "SGOV": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 1602,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 1603,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "TLT": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6092,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6093,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "IEF": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6092,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6093,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "SPLB": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 4427,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 4428,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "SPSB": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 4221,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 4222,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "SOXX": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6351,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6352,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "PPH": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6716,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6717,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "NVDA": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6736,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6737,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "MSFT": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 6736,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 6737,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     },
     "GOOGL": {
       "status": "OK",
-      "latest_observation": "2026-10-14",
-      "rows": 5574,
-      "last_verified_utc": "2026-10-14T23:17:42.843655+00:00"
+      "latest_observation": "2026-10-15",
+      "rows": 5575,
+      "last_verified_utc": "2026-10-15T23:13:50.095033+00:00"
     }
   }
 }

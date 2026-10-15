@@ -1,66 +1,222 @@
 {
   "schema": "V70.3/10h-five-supplement-v1",
-  "generated_at": "2026-10-15T10:08:00+08:00",
-  "observation_context": "Official 10:00 macro task 2026-10-15 Taiwan; sources refreshed after the 2026-10-14 US session",
+  "generated_at": "2026-10-16T03:12:29+08:00",
+  "observation_context": "LivingWaterAI V70.3.12 supplemental refresh; source checks performed after the 2026-10-15 US session",
   "quality_policy": {
     "OK": "Numeric value verified with stated source and method",
-    "USABLE": "Numeric value displayed for correct instrument; methodology caveat preserved and permitted for research"
+    "USABLE": "Numeric value displayed for the correct instrument; methodology or dating caveat preserved and permitted for research"
   },
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.738,
+      "value": 0.75525,
       "unit": "percentage_point",
-      "observation_date": "2026-10-14",
-      "retrieval_time": "2026-10-15T10:05:00+08:00",
+      "observation_date": "2026-10-15",
+      "retrieval_time": "2026-10-16T03:12:29+08:00",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
       "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-14 21:05 EDT. Probabilities: 3.50-3.75 0.1%, 3.75-4.00 1.4%, 4.00-4.25 9.7%, 4.25-4.50 25.2%, 4.50-4.75 31.7%, 4.75-5.00 21.6%, 5.00-5.25 8.3%, 5.25-5.50 1.8%, 5.50-5.75 0.2%; sum 100.0%, weighted midpoint 4.613%, delta +0.738 percentage point."
+      "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures.",
+      "cross_checks": [
+        {
+          "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
+          "result": "DIRECT_SUCCESS_CURRENT_RANGE_3.75_4.00"
+        },
+        {
+          "source_url": "https://fred.stlouisfed.org/series/DFEDTARL",
+          "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+        },
+        {
+          "source_url": "https://fred.stlouisfed.org/series/DFEDTARU",
+          "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+        },
+        {
+          "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
+          "result": "DIRECT_SUCCESS_METHODOLOGY; embedded probability table not readable"
+        }
+      ]
     },
     "m03_qqq": {
       "id": "m03_qqq",
-      "value": 28.32,
+      "value": 29.78,
       "unit": "x",
-      "observation_date": null,
-      "retrieval_time": "2026-10-15T10:06:00+08:00",
-      "source_url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
-      "method": "Portfolio Visualizer Fund Information Price/Earnings (TTM)",
-      "status": "OK",
-      "detail": "Previously directly verified TTM value retained from the approved priority source; the source does not provide an exact valuation date. Current browser refresh was unavailable. Fresh cross-check: StockAnalysis displayed QQQ P/E 29.91 as of 2026-10-13, last checked 2026-10-14; differing methodology was not averaged."
+      "observation_date": "2026-10-13",
+      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "source_url": "https://stockanalysis.com/etf/qqq/holdings/",
+      "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM.",
+      "attempts": [
+        {
+          "priority": 1,
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
+          "result": "DIRECT_OPEN_INACCESSIBLE",
+          "value": null
+        },
+        {
+          "priority": 2,
+          "site": "Yahoo Finance Statistics",
+          "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
+          "result": "DIRECT_OPEN_INACCESSIBLE",
+          "value": null
+        },
+        {
+          "priority": 3,
+          "site": "Invesco official QQQ",
+          "url": "https://www.invesco.com/qqq-etf/en/home.html",
+          "result": "DIRECT_OPEN_SUCCESS_NO_PE_VALUE",
+          "value": null
+        },
+        {
+          "priority": 4,
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/qqq/holdings/",
+          "result": "DIRECT_OPEN_SUCCESS",
+          "value": 29.78,
+          "observation_date": "2026-10-13",
+          "label": "P/E (site does not explicitly state TTM)"
+        }
+      ]
     },
     "m03_spy": {
       "id": "m03_spy",
-      "value": 25.03,
+      "value": 24.99,
       "unit": "x",
-      "observation_date": "2026-10-13",
-      "retrieval_time": "2026-10-15T10:06:00+08:00",
+      "observation_date": "2026-10-14",
+      "retrieval_time": "2026-10-16T03:12:29+08:00",
       "source_url": "https://stockanalysis.com/etf/spy/holdings/",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-13, last checked 2026-10-14. Use as P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM.",
+      "attempts": [
+        {
+          "priority": 1,
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
+          "result": "DIRECT_OPEN_INACCESSIBLE",
+          "value": null
+        },
+        {
+          "priority": 2,
+          "site": "Yahoo Finance Statistics",
+          "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
+          "result": "HTTP_429",
+          "value": null
+        },
+        {
+          "priority": 3,
+          "site": "State Street official SPY",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/spdr-sp-500-etf-trust-spy",
+          "result": "DIRECT_OPEN_SUCCESS",
+          "candidates": [
+            {
+              "value": 24.83,
+              "label": "Index Price/Earnings; not explicitly TTM",
+              "observation_date": "2026-10-14"
+            },
+            {
+              "value": 20.53,
+              "label": "Fund Price/Earnings FY1; excluded from TTM",
+              "observation_date": "2026-10-14"
+            }
+          ]
+        },
+        {
+          "priority": 4,
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/spy/holdings/",
+          "result": "DIRECT_OPEN_SUCCESS",
+          "value": 24.99,
+          "observation_date": "2026-10-14",
+          "label": "P/E (site does not explicitly state TTM)"
+        }
+      ]
     },
     "m03_vt": {
       "id": "m03_vt",
-      "value": 20.9,
+      "value": 20.8,
       "unit": "x",
       "observation_date": "2026-08-31",
-      "retrieval_time": "2026-10-15T10:06:00+08:00",
+      "retrieval_time": "2026-10-16T03:12:29+08:00",
       "source_url": "https://stockanalysis.com/etf/vt/holdings/",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31, last checked 2026-10-14. Use as dated P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM.",
+      "attempts": [
+        {
+          "priority": 1,
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
+          "result": "DIRECT_OPEN_INACCESSIBLE",
+          "value": null
+        },
+        {
+          "priority": 2,
+          "site": "Yahoo Finance Statistics",
+          "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
+          "result": "HTTP_429",
+          "value": null
+        },
+        {
+          "priority": 3,
+          "site": "Vanguard official VT",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+          "result": "DIRECT_OPEN_SUCCESS_NO_READABLE_PE_VALUE",
+          "value": null
+        },
+        {
+          "priority": 4,
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/vt/holdings/",
+          "result": "DIRECT_OPEN_SUCCESS",
+          "value": 20.8,
+          "observation_date": "2026-08-31",
+          "label": "P/E (site does not explicitly state TTM)"
+        }
+      ]
     },
     "s05": {
       "id": "s05",
       "value": 29.17,
       "unit": "%",
       "observation_date": "2026-10-13",
-      "retrieval_time": "2026-10-15T10:07:00+08:00",
+      "retrieval_time": "2026-10-16T03:12:29+08:00",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-      "method": "Macroaxis MMFI Percent Of Stocks index level, explicit 2026-10-13 observation",
+      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "Explicit NYSE $MMFI / percent-of-stocks breadth value. It is not represented as an October 15 real-time observation."
+      "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed.",
+      "attempts": [
+        {
+          "priority": 1,
+          "site": "Barchart",
+          "url": "https://www.barchart.com/stocks/quotes/%24MMFI",
+          "result": "DIRECT_OPEN_JS_BOT_CHECK_NO_VALUE",
+          "value": null
+        },
+        {
+          "priority": 2,
+          "site": "TradingView Taiwan",
+          "url": "https://tw.tradingview.com/symbols/INDEX-MMFI/",
+          "result": "DIRECT_OPEN_SUCCESS_SYMBOL_VERIFIED_NO_VALUE",
+          "value": null
+        },
+        {
+          "priority": 3,
+          "site": "StockCharts",
+          "url": "https://stockcharts.com/sc3/ui/?s=%24MMFI",
+          "result": "DIRECT_OPEN_INACCESSIBLE",
+          "value": null
+        },
+        {
+          "priority": 4,
+          "site": "Macroaxis",
+          "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+          "result": "DIRECT_OPEN_SUCCESS",
+          "value": 29.17,
+          "observation_date": "2026-10-13"
+        }
+      ]
     }
   }
 }

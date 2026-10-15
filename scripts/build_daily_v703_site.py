@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 01:18:58｜版本：V70.3.11 build adapter｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/16 03:37:43｜版本：V70.3.12 build adapter｜檔案名稱：build_daily_v703_site.py
 """LivingWaterAI V70.3 11:00 site builder: verified 18+5 -> family feed v1."""
 import argparse
 import datetime as dt
@@ -131,7 +131,7 @@ def build(macro, supplement, html, dest):
     lei_history = _lei_history(src, items['m16'])
     template = Path(html).read_text(encoding="utf-8")
     if "V70_macro_latest.json" not in template or "V70.3/family-macro-feed-v1" not in template:
-        raise ValueError("V70-3-11.html does not support the expected family feed contract")
+        raise ValueError("V70-3-12.html does not support the expected family feed contract")
     indicators = {
         k: {"value": float(v["value"]), "dataDate": v["observation_date"],
             "source": v["source_url"], "unit": v.get("unit", ""),
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--macro", default="data/18_macro_verification.json")
     p.add_argument("--supplement", default="data/5_macro_verified.json")
-    p.add_argument("--html", default="系統工程/總經V70/V70-3-11.html")
+    p.add_argument("--html", default="系統工程/總經V70/V70-3-12.html")
     p.add_argument("--out", default="build/site")
     args = p.parse_args()
     try:

@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣）：2026/10/16 02:30｜版本：D009-v2｜檔案：test_d009_state.py
+# 最後修改日期時間（台灣）：2026/10/16 03:45｜版本：D009-v3｜檔案：test_d009_state.py
 import datetime as dt
 import json
 import sys
@@ -24,6 +24,30 @@ def report(value):
 
 
 class TestD009State(unittest.TestCase):
+    def test_dedupe_ignores_retrieval_time_but_keeps_new_lei_vintage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "input.json"
+            data = report(1)
+            for index, entry in enumerate(data["lei_history"]):
+                entry["publication_date"] = f"2026-0{index+1}-20"
+                entry["source_url"] = f"https://example.org/lei-{index+1}"
+                entry["method"] = "as-published monthly YoY"
+                entry["retrieved_at"] = f"2026-10-16T03:4{index}:00+00:00"
+            source.write_text(json.dumps(data), encoding="utf-8")
+            self.assertTrue(snapshot(source, root))
+
+            for entry in data["lei_history"]:
+                entry["retrieved_at"] = "2026-10-16T04:00:00+00:00"
+            source.write_text(json.dumps(data), encoding="utf-8")
+            self.assertFalse(snapshot(source, root))
+            self.assertEqual(len(list((root / "backups").glob("macro18_*.json"))), 1)
+
+            data["lei_history"][0]["value"] = 0.5
+            source.write_text(json.dumps(data), encoding="utf-8")
+            self.assertTrue(snapshot(source, root))
+            self.assertEqual(len(list((root / "backups").glob("macro18_*.json"))), 2)
+
     def test_rotate_dedupe_and_recover(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

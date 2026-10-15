@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 01:59:27｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 02:24:27｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -288,7 +288,7 @@
             // ====== Visible (原 12 大指標 UI 不變) ======
             { id: 'm07', label: 'VIX 恐慌指數', t0: 14, t5: 20, t10: 35, unit: '', gamma: 0.9, desc: '恐慌封頂：>=28 / >=35', url: "https://www.tradingview.com/chart/?symbol=VIX", val: 14.84 },
             { id: 'm01', label: '殖利率曲線 (10Y-2Y)', t0: 0.5, t5: 0.2, t10: -0.5, unit: '%', gamma: 1.0, desc: '曲線倒掛風險', url: "https://fred.stlouisfed.org/series/T10Y2Y", val: 0.45 },
-            { id: 'm06', label: 'Fed 降息預期', t0: -4, t5: 0, t10: 2, unit: '碼', gamma: 1.0, desc: '負=降息', manual: false, url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", val: 1.0 },
+            { id: 'm06', label: 'Fed 預期政策利率變動', t0: -1.0, t5: 0, t10: 0.5, unit: 'pp', gamma: 1.0, desc: '百分點；負=預期降息，正=預期升息', manual: false, url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", val: 0.25 },
 
 
             { id: 'm08', label: '10Y 實質利率 (Real 10Y)', t0: 1.0, t5: 1.8, t10: 2.5, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.5%', url: "https://fred.stlouisfed.org/series/DFII10", val: 'N/A' },
@@ -2426,4 +2426,3 @@ if (recBlack) {
 })();
 </script>
 </body>
-</html>

@@ -20,6 +20,9 @@ import time
 import tempfile
 from pathlib import Path
 
+D009_RUN_STARTED=time.monotonic()
+D009_FETCH_DEADLINE_SECONDS=18*60
+
 try:
     import requests
     import pandas as pd
@@ -692,6 +695,9 @@ def run(outdir,overrides_path=None,cache_path=None):
     results={}
     for k in LABELS:
         try:
+            # Reserve final two minutes of the 20-minute job for validation and publishing.
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('D009 18-minute fetch deadline reached; no new provider requests')
             if k=='s03':
                 orig=results.get('m07')
                 if not orig or orig['value'] is None: raise ValueError('m07 尚無有效值')

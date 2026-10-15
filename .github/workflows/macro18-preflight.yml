@@ -9,6 +9,7 @@ on:
       - '.github/workflows/macro18-preflight.yml'
       - '系統工程/總經V70/總經爬蟲18項.py'
       - '系統工程/總經V70/macro_source_config.json'
+      - 'scripts/macro18_state.py'
       - 'scripts/probe_m06_fedwatch_free.py'
 permissions:
   contents: write
@@ -28,8 +29,15 @@ jobs:
         run: |
           python -m pip install requests pandas yfinance pypdf
           python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
-          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py
+          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py scripts/macro18_state.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
+      - name: Mount dedicated persistent state branch and restore missing cache
+        run: |
+          git fetch origin automation-state
+          git worktree add --detach /tmp/livingwater-macro-state origin/automation-state
+          if [ ! -f data/18_macro_verification.json ]; then
+            python scripts/macro18_state.py recover --state-dir /tmp/livingwater-macro-state --output data/18_macro_verification.json || true
+          fi
       - name: Fetch independent 18 macro indicators, preserve previous verified data
         env:
           CME_DATA_AUTOMATION_AUTHORIZED: ${{ vars.CME_DATA_AUTOMATION_AUTHORIZED }}
@@ -59,6 +67,22 @@ jobs:
               json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
           print('Preflight 18 contract OK; counts=',d.get('summary'))
           PY
+      - name: Rotate three verified snapshots on automation-state
+        run: |
+          python scripts/macro18_state.py snapshot --input build/macro18/18_macro_verification.json --state-dir /tmp/livingwater-macro-state
+          git -C /tmp/livingwater-macro-state config user.name "github-actions[bot]"
+          git -C /tmp/livingwater-macro-state config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C /tmp/livingwater-macro-state add backups/
+          if ! git -C /tmp/livingwater-macro-state diff --cached --quiet; then
+            git -C /tmp/livingwater-macro-state commit -m "data(D009): rotate validated macro18 backups"
+            for attempt in 1 2 3; do
+              if git -C /tmp/livingwater-macro-state push origin HEAD:automation-state; then break; fi
+              if [ "$attempt" -eq 3 ]; then echo "State backup push failed" >&2; exit 1; fi
+              git -C /tmp/livingwater-macro-state fetch origin automation-state
+              git -C /tmp/livingwater-macro-state rebase origin/automation-state
+              sleep "$((attempt * 2))"
+            done
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

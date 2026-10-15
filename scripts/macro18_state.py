@@ -86,6 +86,14 @@ def snapshots(state_dir):
     return sorted((Path(state_dir) / "backups").glob("macro18_*.json"), reverse=True)
 
 
+def _is_valid_backup(path):
+    try:
+        read_valid(path)
+        return True
+    except (ValueError, OSError, TypeError, KeyError):
+        return False
+
+
 def snapshot(source, state_dir):
     raw = read_valid(source)
     payload = (json.dumps(raw, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
@@ -94,8 +102,9 @@ def snapshot(source, state_dir):
     # Don't rotate identical content. A stale report is not a new market observation.
     if existing:
         try:
-            old = read_valid(existing[0])
-            if all(old["items"][k]["value"] == raw["items"][k]["value"] and old["items"][k]["observation_date"] == raw["items"][k]["observation_date"] for k in raw["items"]) and old.get("lei_history") == raw.get("lei_history"):
+            newest_valid = next((p for p in existing if _is_valid_backup(p)), None)
+            old = read_valid(newest_valid) if newest_valid else None
+            if old is not None and all(old["items"][k]["value"] == raw["items"][k]["value"] and old["items"][k]["observation_date"] == raw["items"][k]["observation_date"] for k in raw["items"]) and old.get("lei_history") == raw.get("lei_history"):
                 print("D009 snapshot unchanged; existing backups retained")
                 return False
         except (ValueError, OSError, TypeError, KeyError):

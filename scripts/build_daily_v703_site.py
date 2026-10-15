@@ -153,7 +153,8 @@ def build(macro, supplement, html, dest):
         k: {"value": float(v["value"]), "dataDate": v["observation_date"],
             "source": v["source_url"], "unit": v.get("unit", ""),
             "method": v.get("method", ""), "status": v.get("status", "OK"),
-            "detail": v.get("detail", "")}
+            "detail": v.get("detail", ""),
+            "lastVerifiedAt": v.get("last_verified_at") or v.get("lastVerifiedAt") or (v.get("retrieval_time") if v.get("verified_this_run") is True else None)}
         for k, v in items.items()
     }
     feed = {"schema": "V70.3/family-macro-feed-v1",

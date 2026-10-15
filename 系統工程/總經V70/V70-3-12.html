@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 05:24:52｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 05:33:17｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -408,6 +408,17 @@
             return problems.length===0;
         };
 
+        // Defaults and test inputs are research-only until the complete feed
+        // passes the loader's schema, provenance, date, freshness and quality checks.
+        window.v703FeedVerified = false;
+        window.v703CanPublishFormalAllocation = function() {
+            return window.v703FeedVerified === true &&
+                window.v703DemoMode !== true &&
+                window.v703DataComplete === true &&
+                window.v703VerifiedDataDates === true &&
+                window.v703CreditGateBlocked !== true;
+        };
+
 
         function v703BuildDateControls() {
             const el=document.getElementById('v703-date-controls');
@@ -422,6 +433,7 @@
                     if(!el)continue;
                     try {el.value=localStorage.getItem(`v703-${field}-${cfg.id}`) || '';}catch(e){}
                     el.addEventListener('change',()=>{
+                        window.v703FeedVerified=false;
                         try{localStorage.setItem(`v703-${field}-${cfg.id}`,el.value);}catch(e){}
                         calcTotal();
                     });
@@ -901,6 +913,8 @@ function renderCapControls() {
         function handleInput(id, options = {}) {
         const item = macroConfig.find(c => c.id === id);
         if (!item) return;
+        // A hand-edited value can no longer inherit the loaded snapshot's approval.
+        window.v703FeedVerified=false;
 
 
         const inEl = document.getElementById(`in_${id}`);
@@ -998,7 +1012,7 @@ function renderCapControls() {
             }
             const avgRiskBase = weightSum>0 ? (weightedSum/weightSum) : NaN;
             const coverageCount=macroConfig.filter(cfg=>Number.isFinite(getRisk(cfg.id))).length;
-            window.v703Coverage={available:coverageCount,total:macroConfig.length,ratio:coverageCount/macroConfig.length,groupWeight:weightSum,provisional:coverageCount<macroConfig.length};
+            window.v703Coverage={available:coverageCount,total:macroConfig.length,ratio:coverageCount/macroConfig.length,groupWeight:weightSum,provisional:coverageCount<macroConfig.length || window.v703FeedVerified!==true || window.v703DemoMode===true};
             const coverageUI=document.getElementById('v703-coverage-banner');
             if(coverageUI){
                 const c=window.v703Coverage;
@@ -1256,7 +1270,7 @@ if (recBlack) {
                 cap_crisis,
                 cap_recession
             });
-            if (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final)) {
+            if (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final)) {
                 renderAlloc(alloc);
             } else {
                 const al=document.getElementById("allocation-list"); if(al) al.textContent="NA｜必要總經資料或日期未通過驗證，暫停發布新配置";
@@ -1269,7 +1283,7 @@ if (recBlack) {
               : '輸入日期／來源欄位與七群數值通過格式及時效檢查（來源真實性尚未獨立核實）；逐檔交易仍需 V82／V75 驗證。';
 
 
-            if (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) updateOrders(mSafe_final, bScore, isEmerg, alloc.meta);
+            if (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) updateOrders(mSafe_final, bScore, isEmerg, alloc.meta);
             else {for(const id of ["stock-action","bond-action"]) {const el=document.getElementById(id);if(el)el.textContent="資料未驗證，暫停新配置／交易建議";}}
 
 
@@ -1283,7 +1297,7 @@ if (recBlack) {
                     panicWhy, crisis, recWhy,
                     isEmerg, groupRisk, bScore,
                     macroZone: zEl ? zEl.innerText : '',
-                    allocation: (window.v703DataComplete && window.v703VerifiedDataDates && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) ? alloc.meta : null,
+                    allocation: (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) ? alloc.meta : null,
                     allocationItems: alloc.items
                 });
             }
@@ -1723,6 +1737,8 @@ if (recBlack) {
             if (!snapshotAsOf) incompleteReasons.push('缺少共用資料截止時間 As-of');
             if(window.v703DataComplete!==true) incompleteReasons.push('七群風險資料不完整');
             if(window.v703VerifiedDataDates!==true) incompleteReasons.push('必要指標資料日期缺失或過期');
+            if(window.v703FeedVerified!==true) incompleteReasons.push('完整總經快照尚未通過來源與品質驗證');
+            if(window.v703DemoMode===true) incompleteReasons.push('目前為測試示範資料');
             if (!news.length) incompleteReasons.push('缺少最近1～2日重大新聞');
             const incompleteNews = news.filter(n => {
                 if (!n || typeof n === 'string') return true;
@@ -2158,7 +2174,7 @@ if (recBlack) {
  window.v703Recompute=function(){
    const box=document.getElementById('v703-result');if(!box)return;
    const snap=window.v703MacroSnapshot;
-   const valid=window.v703DataComplete===true && window.v703VerifiedDataDates===true && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
+   const valid=window.v703CanPublishFormalAllocation() && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
    if(!valid){
      const rawScore=finite(snap?.mSafe_final)?snap.mSafe_final:null;
      const coverage=window.v703Coverage||{};
@@ -2166,7 +2182,7 @@ if (recBlack) {
      const safeIssue=issue.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
      box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式七類配置：暫停</div>'+
        (rawScore!==null?'<div>已載入總經數值 '+(coverage.available??'—')+'/'+(coverage.total??21)+' 項｜研究用安全分數：<b>'+rawScore.toFixed(1)+'/100</b></div>':'<div>總經數值尚未完整載入；目前沒有可計算的安全分數。</div>')+
-       '<div>日期／來源驗證未完成，因此暫不顯示正式配置比例。'+(issue?'<br>檢查訊息：'+safeIssue:'')+'</div>';
+       '<div>完整快照來源／品質、日期驗證未全部通過，因此暫不顯示正式配置比例。'+(issue?'<br>檢查訊息：'+safeIssue:'')+'</div>';
      window.v703Latest=null;return;
    }
    const a=snap.allocation;let s=a.sTot,b=a.bTot,c=a.cTot;
@@ -2202,7 +2218,7 @@ if (recBlack) {
     `<div class="text-xs text-amber-200">多風險連續加權之七類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;
    window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('life-stage-select')?.value,preference:document.getElementById('v703-risk-preference')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true};
  };
- window.v703Export=function(){window.v703Recompute();if(!window.v703Latest){alert('必要總經資料／日期未通過驗證，無法匯出新配置');return;}const blob=new Blob([JSON.stringify(window.v703Latest,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='V70-3-seven-class-allocation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ window.v703Export=function(){window.v703Recompute();if(!window.v703CanPublishFormalAllocation()||!window.v703Latest){alert('完整總經快照／日期未通過驗證，或目前為示範資料；無法匯出正式配置');return;}const blob=new Blob([JSON.stringify(window.v703Latest,null,2)],{type:'application/json'});const url=URL.createObjectURL(url);const a=document.createElement('a');a.href=url;a.download='V70-3-seven-class-allocation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  window.v703StartDemo=function(){
    window.v703DemoMode=true;
    const stamp=new Date().toISOString().slice(0,10);
@@ -2222,6 +2238,7 @@ if (recBlack) {
  };
  window.v703StopDemo=function(){
    window.v703DemoMode=false;
+   window.v703FeedVerified=false;
    const b=document.getElementById('v703-demo-banner');if(b)b.textContent='正式資料模式：缺資料時顯示 NA。';
    // 原始數值／日期重新載入，避免演示的中間數污染正式輸出。
    macroConfig.forEach(cfg=>{
@@ -2668,6 +2685,7 @@ if (recBlack) {
  // network/file fetch. A failed feed must never turn valid defaults into blanks.
  function seedHtmlDefaults(){
    let count=0;
+   window.v703FeedVerified=false;
    for(const cfg of macroConfig){
      const input=document.getElementById('in_'+cfg.id);
      const fallback=Number(cfg.val);
@@ -2805,6 +2823,7 @@ if (recBlack) {
      }
      window.v703ApplyLEIHistory(leiRows,data.m16);
      window.v703SourceBatch.verified=true;
+     window.v703FeedVerified=true;
      if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
@@ -2815,6 +2834,7 @@ if (recBlack) {
      newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
    }catch(err){
      sourceMode='hold';
+     window.v703FeedVerified=false;
      window.v703SourceBatch=null;
      window.v703CreditGateBlocked=true;
      window.v703PEReferenceVerified=Object.create(null);

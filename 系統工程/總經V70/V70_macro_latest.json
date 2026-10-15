@@ -1,4 +1,5 @@
-{
+{"_fileMeta": {"lastModifiedTaipei":"2026/10/16 07:58:40","version":"V70-3-12","fileName":"V70_macro_latest.json"},
+
   "schema": "V70.3/family-macro-feed-v1",
   "asOf": "2026-10-15T23:56:48.650579Z",
   "verification": {
@@ -144,7 +145,7 @@
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
     },
     "m18": {
-      "value": 0.0,
+      "value": 0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",

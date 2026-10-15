@@ -36,6 +36,7 @@ class TestD009State(unittest.TestCase):
             output = root / "restored.json"
             recover(output, root)
             self.assertEqual(read_valid(output)["items"]["m07"]["value"], 4)
+            self.assertEqual(read_valid(output)["items"]["m07"]["status"], "STALE")
             output.write_text("{invalid", encoding="utf-8")
             recover(output, root)
             self.assertEqual(read_valid(output)["items"]["m07"]["value"], 4)

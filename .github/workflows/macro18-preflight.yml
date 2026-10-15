@@ -12,6 +12,7 @@ on:
       - 'scripts/macro18_state.py'
       - 'scripts/macro18_alert.py'
       - 'tests/test_d009_alert.py'
+      - 'tests/test_d009_state.py'
       - 'scripts/probe_m06_fedwatch_free.py'
 permissions:
   contents: write
@@ -33,7 +34,7 @@ jobs:
           python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
           python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py scripts/macro18_state.py scripts/macro18_alert.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
-          python -m unittest discover -s tests -p "test_d009_alert.py" -v
+          python -m unittest discover -s tests -p "test_d009_*.py" -v
       - name: Mount dedicated persistent state branch and restore missing cache
         run: |
           git fetch origin automation-state

@@ -1,0 +1,361 @@
+{"artifactMetadata":{"taipei_timestamp":"2026/10/16 03:51:23","version":"V70-3-12","filename":"V70_macro_latest.json"},
+"schema": "V70.3/family-macro-feed-v1",
+  "asOf": "2026-10-15T19:49:59.411891Z",
+  "verification": {
+    "ready": true,
+    "valid": 24,
+    "totalRequired": 24,
+    "independentIndicators": 23,
+    "sources": [
+      "09:00/18",
+      "10:00/5"
+    ],
+    "usableWithCaveat": [
+      "m03_qqq",
+      "m03_spy",
+      "m03_vt"
+    ]
+  },
+  "indicators": {
+    "m07": {
+      "value": 16.87,
+      "dataDate": "2026-10-14",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
+      "status": "OK",
+      "detail": ""
+    },
+    "m01": {
+      "value": 0.33,
+      "dataDate": "2026-10-15",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury official daily_treasury_yield_curve daily CSV",
+      "status": "OK",
+      "detail": "Matched observation date for nominal 10Y minus 2Y"
+    },
+    "m08": {
+      "value": 2.78,
+      "dataDate": "2026-10-15",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
+      "status": "OK",
+      "detail": "10Y TIPS real yield"
+    },
+    "m02": {
+      "value": 3.25,
+      "dataDate": "2026-10-14",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
+      "status": "OK",
+      "detail": ""
+    },
+    "m04": {
+      "value": 54.5,
+      "dataDate": "2026-09-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+      "unit": "",
+      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
+      "status": "OK",
+      "detail": "統計月份2026-09；8月54.6"
+    },
+    "m05": {
+      "value": 2.565841,
+      "dataDate": "2026-09-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "FRED CPILFESL 同一數列 YoY",
+      "status": "OK",
+      "detail": "比較基期 2025-09-01"
+    },
+    "m09": {
+      "value": 102.082001,
+      "dataDate": "2026-10-15",
+      "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
+      "unit": "",
+      "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
+      "status": "OK",
+      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
+    },
+    "m10": {
+      "value": 96.209999,
+      "dataDate": "2026-10-15",
+      "source": "https://finance.yahoo.com/quote/CL=F/",
+      "unit": "USD/bbl",
+      "method": "yfinance Yahoo Finance CL=F 日K Close",
+      "status": "OK",
+      "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對"
+    },
+    "m12": {
+      "value": 102.503998,
+      "dataDate": "2026-10-15",
+      "source": "https://finance.yahoo.com/quote/%5EMOVE/",
+      "unit": "",
+      "method": "yfinance Yahoo Finance ^MOVE 日K Close",
+      "status": "OK",
+      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
+    },
+    "m13": {
+      "value": 2.33,
+      "dataDate": "2026-10-15",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
+      "status": "OK",
+      "detail": "5Y nominal minus 5Y TIPS real yield on same day"
+    },
+    "m17": {
+      "value": -0.08,
+      "dataDate": "2026-10-15",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "pp",
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
+      "status": "OK",
+      "detail": "5Y breakeven change from 2026-09-15"
+    },
+    "m14": {
+      "value": -123.579,
+      "dataDate": "2026-10-07",
+      "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
+      "unit": "USD bn",
+      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
+      "status": "OK",
+      "detail": "開始=2026-07-08, 結束=2026-10-07, 單位十億美元; Fed Δ=11.951000, TGA Δ=136.539000, RRP Δ=-1.009000; 淨流動性 Δ=-123.579000"
+    },
+    "m15": {
+      "value": 54.9,
+      "dataDate": "2026-09-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+      "unit": "",
+      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
+      "status": "OK",
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4"
+    },
+    "m16": {
+      "value": -0.7,
+      "dataDate": "2026-08-01",
+      "source": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
+      "unit": "%",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "status": "OK",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
+    },
+    "m18": {
+      "value": 0,
+      "dataDate": "2026-09-01",
+      "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
+      "unit": "",
+      "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
+      "status": "OK",
+      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率"
+    },
+    "m19": {
+      "value": 4.2,
+      "dataDate": "2026-09-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
+      "status": "OK",
+      "detail": ""
+    },
+    "m20": {
+      "value": 50.666667,
+      "dataDate": "2026-09-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "千人",
+      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
+      "status": "OK",
+      "detail": "注意歷史值可能修訂"
+    },
+    "s03": {
+      "value": 16.87,
+      "dataDate": "2026-10-14",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "",
+      "method": "與 m07 同步",
+      "status": "OK",
+      "detail": "同一 VIX 數列"
+    },
+    "s04": {
+      "value": 32.257143,
+      "dataDate": "2026-10-15",
+      "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "unit": "",
+      "method": "CNN 非官方可讀 JSON（可能變動）",
+      "status": "OK",
+      "detail": "來源為 CNN 非公開保證 API"
+    },
+    "m06": {
+      "value": 0.75525,
+      "dataDate": "2026-10-15",
+      "source": "https://www.investing.com/central-banks/fed-rate-monitor",
+      "unit": "percentage_point",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
+      "status": "OK",
+      "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures."
+    },
+    "m03_qqq": {
+      "value": 29.78,
+      "dataDate": "2026-10-13",
+      "source": "https://stockanalysis.com/etf/qqq/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
+    },
+    "m03_spy": {
+      "value": 24.99,
+      "dataDate": "2026-10-14",
+      "source": "https://stockanalysis.com/etf/spy/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
+    },
+    "m03_vt": {
+      "value": 20.8,
+      "dataDate": "2026-08-31",
+      "source": "https://stockanalysis.com/etf/vt/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
+    },
+    "s05": {
+      "value": 29.17,
+      "dataDate": "2026-10-13",
+      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "unit": "%",
+      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+      "status": "OK",
+      "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed."
+    }
+  },
+  "news": [],
+  "leiHistory": [
+    {
+      "observation_date": "2026-06-01",
+      "value": -1.4,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
+      "publication_date": "2026-07-20",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-15T19:48:04.291009+00:00"
+    },
+    {
+      "observation_date": "2026-07-01",
+      "value": -1.1,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
+      "publication_date": "2026-08-20",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-15T19:48:05.291414+00:00"
+    },
+    {
+      "observation_date": "2026-08-01",
+      "value": -0.7,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
+      "publication_date": "2026-09-18",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-15T19:48:06.257217+00:00"
+    }
+  ],
+  "derived": {
+    "m21": {
+      "value": 1,
+      "method": "All three consecutive published monthly LEI YoY values < 0",
+      "independentIndicator": false
+    }
+  },
+  "dataUpdatedAt": "2026-10-15T19:51:23.486Z",
+  "sourceSnapshot": {
+    "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
+    "macro5": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
+    "macro18GeneratedAt": "2026-10-16T03:48:07.518754+08:00",
+    "macro5GeneratedAt": "2026-10-16T03:12:29+08:00"
+  },
+  "updateSummary": {
+    "title": "V70-3-12 本輪總經資料更新摘要",
+    "generatedAtTaipei": "2026/10/16 03:51:23",
+    "versionRules": {
+      "version": "V70-3-12",
+      "gamma": {
+        "group1": 0.9,
+        "group2": 1,
+        "group3": 1,
+        "group4": null
+      },
+      "t5": 5,
+      "upperSegmentFloor": 5,
+      "valuationAlpha": 0.7
+    },
+    "github": {
+      "repository": "a23882005/LivingWaterAI",
+      "macro18Status": "VERIFIED_SOURCE_FILE",
+      "scraperGeneratedAt": "2026-10-16T03:48:07.518754+08:00",
+      "scraperCounts": {
+        "OK": 19,
+        "USABLE": 0,
+        "STALE": 0,
+        "MISSING": 0
+      },
+      "data18BlobSha": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
+      "deploymentStatus": "NOT_VERIFIED",
+      "detail": "09h 18指標來源及契約檢查已讀回；11h部署與公開網站讀回尚未驗證。"
+    },
+    "macroTask": {
+      "title": "總體經濟狀況",
+      "generatedAt": "2026-10-16T03:12:29+08:00",
+      "dataFile": "data/5_macro_verified.json",
+      "dataFileSha": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
+      "status": "5/5項已生成並讀回；10:00即時執行已請求，完整報告交付尚未核驗。"
+    },
+    "inserted": {
+      "crawlerTransportFields": 19,
+      "uniqueCrawlerIndicators": 18,
+      "taskSupplementaryFields": 5,
+      "totalTransportFields": 24,
+      "independentIndicators": 23,
+      "requiredScoringIndicators": 21,
+      "requiredScoringIndicatorsValidated": 21
+    },
+    "fiveValues": {
+      "m06": {
+        "value": 0.75525,
+        "dataDate": "2026-10-15",
+        "status": "OK"
+      },
+      "m03_qqq": {
+        "value": 29.78,
+        "dataDate": "2026-10-13",
+        "status": "USABLE"
+      },
+      "m03_spy": {
+        "value": 24.99,
+        "dataDate": "2026-10-14",
+        "status": "USABLE"
+      },
+      "m03_vt": {
+        "value": 20.8,
+        "dataDate": "2026-08-31",
+        "status": "USABLE"
+      },
+      "s05": {
+        "value": 29.17,
+        "dataDate": "2026-10-13",
+        "status": "OK"
+      }
+    },
+    "note": "QQQ/SPY/VT估值來源未明示TTM，標為USABLE；VT觀測日較早，須按日期解讀。s05是10/13 NYSE $MMFI觀測值。"
+  }
+}

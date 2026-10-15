@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-16T02:32:43.371167+08:00",
+  "generated_at": "2026-10-16T02:35:08.745434+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -94,7 +94,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.001999,
+      "value": 101.998001,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -106,7 +106,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 96.529999,
+      "value": 96.419998,
       "unit": "USD/bbl",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T18:32:42.571135+00:00"
+      "retrieved_at": "2026-10-15T18:35:06.590811+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T18:32:42.646216+00:00"
+      "retrieved_at": "2026-10-15T18:35:06.776878+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T18:32:42.694617+00:00"
+      "retrieved_at": "2026-10-15T18:35:06.885894+00:00"
     }
   ]
 }

@@ -1,10 +1,5 @@
-{
-  "artifactMetadata": {
-    "taipei_timestamp": "2026/10/16 03:51:23",
-    "version": "V70-3-12",
-    "filename": "V70_macro_latest.json"
-  },
-  "schema": "V70.3/family-macro-feed-v1",
+{"artifactMetadata":{"taipei_timestamp":"2026/10/16 03:51:23","version":"V70-3-12","filename":"V70_macro_latest.json"},
+"schema": "V70.3/family-macro-feed-v1",
   "asOf": "2026-10-15T19:49:59.411891Z",
   "verification": {
     "ready": true,
@@ -282,7 +277,7 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-15T19:51:23.000Z",
+  "dataUpdatedAt": "2026-10-15T19:51:23.486Z",
   "sourceSnapshot": {
     "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
     "macro5": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",

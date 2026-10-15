@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 05:33:17｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 06:18:26｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -2260,7 +2260,7 @@ if (recBlack) {
 </script>
 <script id="v70-embedded-feed" type="application/json">{
   "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-15T20:04:23Z",
+  "asOf": "2026-10-15T22:18:26.865Z",
   "verification": {
     "ready": true,
     "valid": 24,
@@ -2274,7 +2274,11 @@ if (recBlack) {
       "m03_qqq",
       "m03_spy",
       "m03_vt"
-    ]
+    ],
+    "transportFields": 24,
+    "requiredScoringIndicators": 21,
+    "requiredScoringIndicatorsValidated": 21,
+    "missing": []
   },
   "indicators": {
     "m07": {
@@ -2452,10 +2456,10 @@ if (recBlack) {
       "value": 0.762,
       "dataDate": "2026-10-15",
       "source": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "unit": "",
-      "method": "2027-10-27利率區間機率加權中點4.637%減現行區間中點3.875%",
+      "unit": "percentage_point",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
       "status": "OK",
-      "detail": "2026-10-15 15:15 EDT更新表；10個區間機率依序0.0%、1.0%、8.2%、23.9%、32.4%、23.2%、9.2%、1.9%、0.2%、0.0%，合計100.0%。GitHub補充JSON的14:35 EDT版本為+0.75525，HTML採較晚表。",
+      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525.",
       "lastVerifiedAt": "2026-10-16T03:15:00+08:00"
     },
     "m03_qqq": {
@@ -2465,8 +2469,8 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "觀測日2026-10-13；來源顯示P/E但未明示TTM，列為估值參考值，不標為已確認TTM。",
-      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
+      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "m03_spy": {
       "value": 24.99,
@@ -2475,8 +2479,8 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "觀測日2026-10-14；來源未明示TTM。官方同期指數P/E 24.83、FY1 20.53為不同口徑，均不替代本列參考值。",
-      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "m03_vt": {
       "value": 20.8,
@@ -2485,17 +2489,17 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "觀測日2026-08-31；來源未明示TTM，列為較早日期的估值參考值。",
-      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "s05": {
       "value": 25.58,
       "dataDate": "2026-10-14",
       "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "unit": "%",
-      "method": "Macroaxis NYSE MMFI Percent Of Stocks指數值",
+      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "10/14觀測值。舊GitHub補充JSON保留10/13值29.17%；兩筆日期不同，HTML採用10/14較新觀測值並在摘要保留舊值供追溯。",
+      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
       "lastVerifiedAt": "2026-10-16T03:15:00+08:00"
     }
   },
@@ -2542,18 +2546,18 @@ if (recBlack) {
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-16T04:04:23+08:00",
+  "dataUpdatedAt": "2026-10-16T06:18:26.865+08:00",
   "sourceSnapshot": {
     "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
-    "macro5": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
+    "macro5": "c7bf122854bc5f304472646a9012493020e4fd6a",
     "macro18GeneratedAt": "2026-10-16T03:48:07.518754+08:00",
-    "macro5GeneratedAt": "2026-10-16T03:12:29+08:00",
-    "htmlSupplementChecksAt": "2026-10-16T04:04:23+08:00",
-    "htmlSupplementStatus": "m06/s05採較晚來源查核；GitHub 5項JSON仍為03:12快照"
+    "macro5GeneratedAt": "2026-10-16T06:18:03.855+08:00",
+    "htmlSupplementChecksAt": "2026-10-16T06:18:26.865+08:00",
+    "htmlSupplementStatus": "data/5_macro_verified.json與HTML內嵌五項已同步一致"
   },
   "updateSummary": {
     "title": "V70-3-12 本輪總經資料更新摘要",
-    "generatedAtTaipei": "2026/10/16 04:04:23",
+    "generatedAtTaipei": "2026/10/16 06:18:26",
     "versionRules": {
       "version": "V70-3-12",
       "gamma": {
@@ -2577,15 +2581,20 @@ if (recBlack) {
         "MISSING": 0
       },
       "data18BlobSha": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
-      "deploymentStatus": "NOT_VERIFIED",
-      "detail": "09h爬蟲來源與欄位檢核已讀回；m04、m15、m18本輪抓取缺值而沿用前次人工核查；五項JSON仍是03:12版本。11h部署與公開網站讀回尚未驗證。"
+      "deploymentStatus": "RUN_9_PASS_CURRENT_SYNC_REVERIFY_PENDING",
+      "detail": "Run #9建置、GitHub同目錄feed、SFTP與Hostinger公開首頁/JSON讀回均成功；本次五項同步提交後由push工作流重新驗證。",
+      "lastVerifiedRun": {
+        "runId": 38811061577,
+        "status": "success",
+        "hostingerLivePassAsOf": "2026-10-15T21:35:45.645890Z"
+      }
     },
     "macroTask": {
       "title": "總體經濟狀況",
-      "generatedAt": "2026-10-16T03:12:29+08:00",
+      "generatedAt": "2026-10-16T06:18:03.855+08:00",
       "dataFile": "data/5_macro_verified.json",
-      "dataFileSha": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
-      "status": "GitHub五項JSON於03:12生成並讀回；03:43立即執行已請求，但該輪完整Task輸出尚未讀回核驗；HTML另記錄較晚m06與s05來源查核。"
+      "dataFileSha": "c7bf122854bc5f304472646a9012493020e4fd6a",
+      "status": "五項JSON已與HTML同步；m06採15:15 EDT表，s05採2026-10-14觀測"
     },
     "inserted": {
       "crawlerTransportFields": 19,
@@ -2600,43 +2609,277 @@ if (recBlack) {
       "m06": {
         "value": 0.762,
         "dataDate": "2026-10-15",
-        "status": "OK",
-        "source": "https://www.investing.com/central-banks/fed-rate-monitor",
-        "detail": "15:15 EDT機率表；較03:12 JSON的14:35 EDT版本更新"
+        "status": "OK"
       },
       "m03_qqq": {
         "value": 29.78,
         "dataDate": "2026-10-13",
-        "status": "USABLE",
-        "source": "https://stockanalysis.com/etf/qqq/holdings/",
-        "detail": "P/E；來源未明示TTM"
+        "status": "USABLE"
       },
       "m03_spy": {
         "value": 24.99,
         "dataDate": "2026-10-14",
-        "status": "USABLE",
-        "source": "https://stockanalysis.com/etf/spy/holdings/",
-        "detail": "P/E；來源未明示TTM"
+        "status": "USABLE"
       },
       "m03_vt": {
         "value": 20.8,
         "dataDate": "2026-08-31",
-        "status": "USABLE",
-        "source": "https://stockanalysis.com/etf/vt/holdings/",
-        "detail": "P/E；來源未明示TTM，觀測日較早"
+        "status": "USABLE"
       },
       "s05": {
         "value": 25.58,
         "dataDate": "2026-10-14",
-        "status": "OK",
-        "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-        "detail": "較舊GitHub JSON的10/13值29.17晚一個觀測日"
+        "status": "OK"
       }
     },
-    "note": "QQQ/SPY/VT為未明示TTM的P/E參考值；VT日期較早。HTML的m06 +0.762採15:15 EDT機率表（舊JSON +0.75525為14:35 EDT）；s05 25.58為10/14，舊JSON 29.17為10/13。Task完整報告輸出尚待讀回核驗。",
-    "supplementSnapshot": "data/5_macro_verified.json仍保留03:12快照；本HTML另外保存較晚的m06、s05值與來源差異。"
+    "note": "QQQ/SPY/VT為未明示TTM的P/E參考值；VT日期較早。m06與s05較早候選值保留在五項JSON previous_candidates供追溯。",
+    "supplementSnapshot": "data/5_macro_verified.json與HTML五項值、日期、來源、方法及品質狀態一致。"
   },
-  "batchDateTaipei": "2026-10-16"
+  "batchDateTaipei": "2026-10-16",
+  "taskSourceSnapshot": {
+    "schema": "V70.3/10h-five-supplement-v1",
+    "generated_at": "2026-10-16T06:18:03.855+08:00",
+    "observation_context": "LivingWaterAI V70.3.12 supplemental refresh; m06 and s05 synchronized to later same-session direct checks already embedded in official HTML",
+    "quality_policy": {
+      "OK": "Numeric value verified with stated source and method",
+      "USABLE": "Numeric value displayed for the correct instrument; methodology or dating caveat preserved and permitted for research"
+    },
+    "items": {
+      "m06": {
+        "id": "m06",
+        "value": 0.762,
+        "unit": "percentage_point",
+        "observation_date": "2026-10-15",
+        "retrieval_time": "2026-10-16T03:15:00+08:00",
+        "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
+        "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
+        "status": "OK",
+        "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525.",
+        "cross_checks": [
+          {
+            "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
+            "result": "DIRECT_SUCCESS_CURRENT_RANGE_3.75_4.00"
+          },
+          {
+            "source_url": "https://fred.stlouisfed.org/series/DFEDTARL",
+            "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+          },
+          {
+            "source_url": "https://fred.stlouisfed.org/series/DFEDTARU",
+            "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+          },
+          {
+            "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
+            "result": "DIRECT_SUCCESS_METHODOLOGY; embedded probability table not readable"
+          }
+        ],
+        "previous_candidates": [
+          {
+            "value": 0.75525,
+            "observation_date": "2026-10-15",
+            "retrieval_time": "2026-10-16T03:12:29+08:00",
+            "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
+            "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
+            "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures.",
+            "status": "OK"
+          }
+        ]
+      },
+      "m03_qqq": {
+        "id": "m03_qqq",
+        "value": 29.78,
+        "unit": "x",
+        "observation_date": "2026-10-13",
+        "retrieval_time": "2026-10-16T03:12:29+08:00",
+        "source_url": "https://stockanalysis.com/etf/qqq/holdings/",
+        "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
+        "status": "USABLE",
+        "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM.",
+        "attempts": [
+          {
+            "priority": 1,
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
+            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "value": null
+          },
+          {
+            "priority": 2,
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
+            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "value": null
+          },
+          {
+            "priority": 3,
+            "site": "Invesco official QQQ",
+            "url": "https://www.invesco.com/qqq-etf/en/home.html",
+            "result": "DIRECT_OPEN_SUCCESS_NO_PE_VALUE",
+            "value": null
+          },
+          {
+            "priority": 4,
+            "site": "StockAnalysis",
+            "url": "https://stockanalysis.com/etf/qqq/holdings/",
+            "result": "DIRECT_OPEN_SUCCESS",
+            "value": 29.78,
+            "observation_date": "2026-10-13",
+            "label": "P/E (site does not explicitly state TTM)"
+          }
+        ]
+      },
+      "m03_spy": {
+        "id": "m03_spy",
+        "value": 24.99,
+        "unit": "x",
+        "observation_date": "2026-10-14",
+        "retrieval_time": "2026-10-16T03:12:29+08:00",
+        "source_url": "https://stockanalysis.com/etf/spy/holdings/",
+        "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
+        "status": "USABLE",
+        "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM.",
+        "attempts": [
+          {
+            "priority": 1,
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
+            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "value": null
+          },
+          {
+            "priority": 2,
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
+            "result": "HTTP_429",
+            "value": null
+          },
+          {
+            "priority": 3,
+            "site": "State Street official SPY",
+            "url": "https://www.ssga.com/us/en/intermediary/etfs/spdr-sp-500-etf-trust-spy",
+            "result": "DIRECT_OPEN_SUCCESS",
+            "candidates": [
+              {
+                "value": 24.83,
+                "label": "Index Price/Earnings; not explicitly TTM",
+                "observation_date": "2026-10-14"
+              },
+              {
+                "value": 20.53,
+                "label": "Fund Price/Earnings FY1; excluded from TTM",
+                "observation_date": "2026-10-14"
+              }
+            ]
+          },
+          {
+            "priority": 4,
+            "site": "StockAnalysis",
+            "url": "https://stockanalysis.com/etf/spy/holdings/",
+            "result": "DIRECT_OPEN_SUCCESS",
+            "value": 24.99,
+            "observation_date": "2026-10-14",
+            "label": "P/E (site does not explicitly state TTM)"
+          }
+        ]
+      },
+      "m03_vt": {
+        "id": "m03_vt",
+        "value": 20.8,
+        "unit": "x",
+        "observation_date": "2026-08-31",
+        "retrieval_time": "2026-10-16T03:12:29+08:00",
+        "source_url": "https://stockanalysis.com/etf/vt/holdings/",
+        "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
+        "status": "USABLE",
+        "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM.",
+        "attempts": [
+          {
+            "priority": 1,
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
+            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "value": null
+          },
+          {
+            "priority": 2,
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
+            "result": "HTTP_429",
+            "value": null
+          },
+          {
+            "priority": 3,
+            "site": "Vanguard official VT",
+            "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+            "result": "DIRECT_OPEN_SUCCESS_NO_READABLE_PE_VALUE",
+            "value": null
+          },
+          {
+            "priority": 4,
+            "site": "StockAnalysis",
+            "url": "https://stockanalysis.com/etf/vt/holdings/",
+            "result": "DIRECT_OPEN_SUCCESS",
+            "value": 20.8,
+            "observation_date": "2026-08-31",
+            "label": "P/E (site does not explicitly state TTM)"
+          }
+        ]
+      },
+      "s05": {
+        "id": "s05",
+        "value": 25.58,
+        "unit": "%",
+        "observation_date": "2026-10-14",
+        "retrieval_time": "2026-10-16T03:15:00+08:00",
+        "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+        "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+        "status": "OK",
+        "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
+        "attempts": [
+          {
+            "priority": 1,
+            "site": "Barchart",
+            "url": "https://www.barchart.com/stocks/quotes/%24MMFI",
+            "result": "DIRECT_OPEN_JS_BOT_CHECK_NO_VALUE",
+            "value": null
+          },
+          {
+            "priority": 2,
+            "site": "TradingView Taiwan",
+            "url": "https://tw.tradingview.com/symbols/INDEX-MMFI/",
+            "result": "DIRECT_OPEN_SUCCESS_SYMBOL_VERIFIED_NO_VALUE",
+            "value": null
+          },
+          {
+            "priority": 3,
+            "site": "StockCharts",
+            "url": "https://stockcharts.com/sc3/ui/?s=%24MMFI",
+            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "value": null
+          },
+          {
+            "priority": 4,
+            "site": "Macroaxis",
+            "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+            "result": "DIRECT_OPEN_SUCCESS",
+            "value": 25.58,
+            "observation_date": "2026-10-14"
+          }
+        ],
+        "previous_candidates": [
+          {
+            "value": 29.17,
+            "observation_date": "2026-10-13",
+            "retrieval_time": "2026-10-16T03:12:29+08:00",
+            "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+            "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+            "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed.",
+            "status": "OK"
+          }
+        ]
+      }
+    }
+  }
 }</script>
 <script id="v703-render-raw-data">
 (function(){
@@ -2646,7 +2889,7 @@ if (recBlack) {
 })();
 </script>
 
-<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經資料更新摘要｜2026/10/16 04:04:23（台灣時間）</summary><p>正式版本：V70-3-12。Gamma前三群分別為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>本機檢查修正：三筆ETF P/E紀錄補上最後查核時間（2026/10/16 04:04:23台灣時間）；原始數值、觀測日期及來源沒有更動。舊快照亦可使用文件層級查核時間；若其餘驗證失敗，內嵌數值仍會載入並顯示研究分數，同時暫停正式七類配置，避免整頁欄位清空成NA。</p><p>18項爬蟲資料：2026-10-16 03:48:07（台灣時間），18項獨立資料及s03重複欄；來源檔SHA <code>fe19e25b9f1079253ed2bcb3c88ff8578a54d619</code>。m04、m15、m18為前次人工查證後沿用，本輪爬蟲沒有新抓到。</p><p>HTML內五項補充：m06 <b>+0.762</b>（10/15，15:15 EDT機率表）；QQQ P/E 29.78（10/13）、SPY P/E 24.99（10/14）、VT P/E 20.80（08/31；三者來源均未明示TTM）；NYSE MMFI s05 <b>25.58%</b>（10/14）。</p><p>版本差異保留：GitHub五項JSON SHA <code>2cf11ea5255f07d0f1ae9fa0984d85d529c0877f</code>仍是03:12快照，內有m06 +0.75525（14:35 EDT）及s05 29.17%（10/13）；本HTML改用較晚查核的m06與10/14 s05，兩組日期及來源說明均保留於逐項表格。</p><p>資料覆蓋：21/21必要計分欄、23項獨立指標／24個傳輸欄；LEI三期：2026-06 -1.4%、2026-07 -1.1%、2026-08 -0.7%。10:00 Task立即執行曾於03:43提出，但完整輸出尚未讀回核驗。此檔為更新候選，未部署。</p></details>
+<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經資料更新摘要｜2026/10/16 06:18:26（台灣時間）</summary><p>正式版本：V70-3-12。Gamma前三群為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>18項來源：2026-10-16T03:48:07.518754+08:00，SHA <code>fe19e25b9f1079253ed2bcb3c88ff8578a54d619</code>；19/19傳輸欄OK。五項JSON已同步，SHA <code>c7bf122854bc5f304472646a9012493020e4fd6a</code>：m06 +0.762 pp、QQQ 29.78、SPY 24.99、VT 20.80、NYSE MMFI 25.58%。三項ETF P/E均保留未明示TTM與USABLE註記。</p><p>覆蓋檢核：23項獨立指標、24個傳輸欄、21/21必要計分指標、LEI三期。GitHub Actions Run #9已確認建置、SFTP及Hostinger公開首頁／JSON讀回PASS；本次同步提交後由push工作流重新驗證。</p></details>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
  * Read V70_macro_latest.json beside the HTML first; when opened from Drive or file://,

@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 02:31:57｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 02:38:43｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -2233,10 +2233,9 @@ if (recBlack) {
 </script>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
- * Optional V70_macro_latest.json is published by a server job (p128.py pipeline),
- * NOT fetched from finance vendors directly by this standalone browser file.
- * Supported: {indicators:{m07:{value:23,dataDate:"YYYY-MM-DD",source:"..."},...},
- *              news:["..."],asOf:"..."}. 21 macroConfig IDs are required.
+ * Read V70_macro_latest.json beside the HTML first; when opened from Drive or file://,
+ * fall back to the published GitHub raw feed. Never fetch finance vendors directly here.
+ * Supported schema: V70.3/macro-feed-v1; missing or unverified observations stay fail-closed.
  */
 (function(){
  'use strict';
@@ -2273,19 +2272,33 @@ if (recBlack) {
  }
  familyLife.addEventListener('change',synchronize);
  familyStyle.addEventListener('change',synchronize);
+ async function fetchFeedDocument(){
+   const localUrl=new URL('V70_macro_latest.json',location.href).href;
+   const githubUrl='https://raw.githubusercontent.com/a23882005/LivingWaterAI/main/V70_macro_latest.json?ts='+Date.now();
+   const failures=[];
+   for(const url of [...new Set([localUrl,githubUrl])]){
+     try{
+       const response=await fetch(url,{cache:'no-store'});
+       if(!response.ok)throw new Error('HTTP '+response.status);
+       const doc=await response.json();
+       if(doc.schema!=='V70.3/macro-feed-v1')throw new Error('資料格式不相容：'+String(doc.schema||'缺少 schema'));
+       return doc;
+     }catch(err){
+       let host='本機';try{host=new URL(url).host||host}catch{}
+       failures.push(host+'：'+String(err?.message||err));
+     }
+   }
+   throw new Error('所有快照來源都讀取失敗（'+failures.join('；')+'）');
+ }
  async function loadFeed(){
    status.textContent='正在讀取最新總經快照…';
    try{
-     const url=new URL('V70_macro_latest.json',location.href);
-     const response=await fetch(url,{cache:'no-store'});
-     if(!response.ok)throw new Error('快照 HTTP '+response.status);
-     const doc=await response.json();
+     const doc=await fetchFeedDocument();
      // Python 24項蒐集器先執行，將已驗證資料轉為此資料契約；不得使用 MISSING/STALE 冒充正式數值。
      if(!doc.verification || doc.verification.ready!==true){
        const n=doc.verification.valid??0, total=doc.verification.totalRequired??21;
        throw new Error('24欄資料仍有缺項（配置必要欄位 '+n+'/'+total+' 項）');
      }
-     if(doc.schema!=='V70.3/family-macro-feed-v1')throw new Error('不支援的資料快照格式');
      // Reject yesterday's deployment once it exceeds the documented update window.
      // Old JSON must never masquerade as a current verified macro feed.
      const produced=Date.parse(String(doc.asOf||''));

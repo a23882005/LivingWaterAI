@@ -115,7 +115,26 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/18_macro_verification.json
+          python - <<'PY'
+          import json,os
+          from datetime import datetime,timezone
+          from pathlib import Path
+          from scripts.macro18_state import read_valid,atomic_write
+          d=read_valid('data/18_macro_verification.json')
+          proof={'schema':'D009-actions-proof-v1',
+                 'run_id':os.environ.get('GITHUB_RUN_ID'),
+                 'run_attempt':os.environ.get('GITHUB_RUN_ATTEMPT'),
+                 'commit_sha':os.environ.get('GITHUB_SHA'),
+                 'verified_at_utc':datetime.now(timezone.utc).isoformat(),
+                 'independent_indicators':18,
+                 'rows':len(d['items']),
+                 'statuses':{k:sum(v.get('status')==k for v in d['items'].values())
+                             for k in ('OK','USABLE','STALE','MISSING')},
+                 'checks':['static_qa','unittest','source_collection','contract_validation','alert_state','snapshot_rotation']}
+          atomic_write('data/d009_actions_proof.json',
+                       (json.dumps(proof,ensure_ascii=False,indent=2)+'\n').encode())
+          PY
+          git add data/18_macro_verification.json data/d009_actions_proof.json
           if ! git diff --cached --quiet; then
             git commit -m "data(macro18): 09h observed 18 indicator preflight"
             git pull --rebase origin main

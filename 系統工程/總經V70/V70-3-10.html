@@ -2074,7 +2074,7 @@ if (recBlack) {
    return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d):null;
  }
  function verifiedPE(id,r){
-   if(!peIds.has(id))return false;
+   if(!peIds.has(id)||!r||typeof r!=='object')return false;
    const stamp=r.lastVerifiedAt||r.last_verified_at||r.last_verified_time||null;
    const when=Date.parse(String(stamp||''));
    const age=Date.now()-when;
@@ -2131,6 +2131,7 @@ if (recBlack) {
        const obs=dateOK?new Date(String(r.dataDate)+'T00:00:00Z'):null;
        if(dateOK&&(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000)) throw new Error('日期錯誤 '+cfg.id);
        if(!/^https:\/\//.test(String(r.source||'')))throw new Error('資料來源不是HTTPS '+cfg.id);
+       if(peIds.has(cfg.id) && !peVerified)throw new Error('估值資料最後驗證超過7天或無可信證據 '+cfg.id);
        if(peIds.has(cfg.id)&&!peVerified)throw new Error('ETF本益比缺少有效的7天內來源驗證 '+cfg.id);
        if(!peIds.has(cfg.id)&&v703ObservationStale(cfg.id,obs,v703DateNowUTC()))throw new Error('總經觀測日已過期 '+cfg.id);
        const n=Number(r.value);

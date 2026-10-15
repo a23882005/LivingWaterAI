@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-16T03:09:49.884708+08:00",
+  "asOf": "2026-10-16T03:48:19.742759+08:00",
   "indicators": {
     "m07": {
       "value": 16.87,
@@ -10,15 +10,15 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m01": {
-      "value": 0.37,
-      "dataDate": "2026-10-14",
+      "value": 0.33,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV"
     },
     "m08": {
-      "value": 2.84,
-      "dataDate": "2026-10-14",
+      "value": 2.78,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
@@ -45,36 +45,36 @@
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 102.057999,
+      "value": 102.078003,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 96.449997,
+      "value": 96.199997,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 102.5765,
+      "value": 102.492897,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
     },
     "m13": {
-      "value": 2.36,
-      "dataDate": "2026-10-14",
+      "value": 2.33,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m17": {
-      "value": -0.04,
-      "dataDate": "2026-10-14",
+      "value": -0.08,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"

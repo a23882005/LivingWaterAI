@@ -1,0 +1,210 @@
+{
+  "schema": "LivingWaterAI-D009-source-config-v1",
+  "version": "2026-10-16",
+  "note": "Declared source preferences are not proof that each adapter is implemented. Never promote an unverified fallback.",
+  "indicators": {
+    "m07": {
+      "primary_source": "CBOE_OFFICIAL_VIX",
+      "backup_sources": [
+        "FRED_CSV",
+        "YAHOO_VIX_CHART"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 1
+      },
+      "unit": null
+    },
+    "m01": {
+      "primary_source": "FRED_OFFICIAL_API",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m08": {
+      "primary_source": "FRED_OFFICIAL_API",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m02": {
+      "primary_source": "FRED_OFFICIAL_API",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.1
+      },
+      "unit": "%"
+    },
+    "m04": {
+      "primary_source": "ISM_OFFICIAL",
+      "backup_sources": [
+        "VERIFIED_OVERRIDE"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m05": {
+      "primary_source": "BLS_HISTORY_V2",
+      "backup_sources": [
+        "BLS_HISTORY_V1",
+        "FRED_CSV"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m09": {
+      "primary_source": "YAHOO_DXY",
+      "backup_sources": [
+        "VERIFIED_OVERRIDE"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m10": {
+      "primary_source": "YAHOO_WTI_FUTURES",
+      "backup_sources": [
+        "VERIFIED_OVERRIDE"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m12": {
+      "primary_source": "YAHOO_MOVE",
+      "backup_sources": [
+        "VERIFIED_OVERRIDE"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m13": {
+      "primary_source": "US_TREASURY",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m14": {
+      "primary_source": "FRED_OFFICIAL_API",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m15": {
+      "primary_source": "ISM_OFFICIAL",
+      "backup_sources": [
+        "VERIFIED_OVERRIDE"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m16": {
+      "primary_source": "PNC_PUBLISHED_LEI",
+      "backup_sources": [
+        "CONFERENCE_BOARD",
+        "VERIFIED_CACHE"
+      ],
+      "max_age_days": 90,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m17": {
+      "primary_source": "US_TREASURY",
+      "backup_sources": [
+        "FRED_CSV"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m18": {
+      "primary_source": "FRED_CSV",
+      "backup_sources": [
+        "VERIFIED_CACHE"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m19": {
+      "primary_source": "BLS_HISTORY_V2",
+      "backup_sources": [
+        "BLS_HISTORY_V1",
+        "FRED_CSV"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "m20": {
+      "primary_source": "BLS_HISTORY_V2",
+      "backup_sources": [
+        "BLS_HISTORY_V1",
+        "FRED_CSV"
+      ],
+      "max_age_days": 65,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    },
+    "s04": {
+      "primary_source": "CNN_FEAR_GREED",
+      "backup_sources": [
+        "VERIFIED_CACHE"
+      ],
+      "max_age_days": 12,
+      "tolerance": {
+        "absolute": 0.5
+      },
+      "unit": null
+    }
+  }
+}

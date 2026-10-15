@@ -26,7 +26,7 @@ def evaluate(report, previous, today):
         before = old.get(key, {})
         count = int(before.get("consecutive_failures", 0)) + 1 if status in BAD else 0
         last_alert = before.get("last_alert_date")
-        should_alert = (count in (1, 3) or (count > 3 and last_alert != today)) if count else False
+        should_alert = bool(count and last_alert != today and (count in (1, 3) or count > 3))
         if key in CORE and status in BAD and last_alert != today:
             should_alert = True
         if should_alert:

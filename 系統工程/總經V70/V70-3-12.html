@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 03:51:23｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 04:40:34｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -102,7 +102,8 @@
 </head>
 <body class="min-h-screen pb-32">
 <div id="v703-coverage-banner" class="max-w-7xl mx-auto px-4 py-2 text-center text-xs font-semibold text-slate-300" aria-live="polite">總經資料覆蓋：等待資料驗證</div>
-<div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：讀取中｜資料日期以各指標為準</div>
+<div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：HTML已內嵌逐項資料｜觀測日依各指標</div>
+<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 23項獨立總經資料｜展開查看24個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">m04、m15、m18為前次人工查證後沿用值，本輪爬蟲未新抓到；QQQ／SPY／VT來源未明示TTM。GitHub五項JSON目前仍是較早快照，HTML已記錄較晚查核的m06、s05及兩版數字差異。</p></details>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -286,45 +287,45 @@
         // --- 1. 配置 (Config) [Updated V30.3 - Final Fixed] ---
                         const macroConfig = [
             // ====== Visible (原 12 大指標 UI 不變) ======
-            { id: 'm07', label: 'VIX 恐慌指數', t0: 14, t5: 20, t10: 35, unit: '', gamma: 0.9, desc: '恐慌封頂：>=28 / >=35', url: "https://www.tradingview.com/chart/?symbol=VIX", val: 14.84 },
-            { id: 'm01', label: '殖利率曲線 (10Y-2Y)', t0: 0.5, t5: 0.2, t10: -0.5, unit: '%', gamma: 1.0, desc: '曲線倒掛風險', url: "https://fred.stlouisfed.org/series/T10Y2Y", val: 0.45 },
-            { id: 'm06', label: 'Fed 預期政策利率變動', t0: -1.0, t5: 0, t10: 0.5, unit: 'pp', gamma: 1.0, desc: '百分點；負=預期降息，正=預期升息', manual: false, url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html", val: 0.25 },
+            { id: 'm07', label: 'VIX 恐慌指數', t0: 14, t5: 20, t10: 35, unit: '', gamma: 0.9, desc: '恐慌封頂：>=28 / >=35', url: "https://www.tradingview.com/chart/?symbol=VIX", val: 16.87},
+            { id: 'm01', label: '殖利率曲線 (10Y-2Y)', t0: 0.5, t5: 0.2, t10: -0.5, unit: '%', gamma: 1.0, desc: '曲線倒掛風險', url: "https://fred.stlouisfed.org/series/T10Y2Y", val: 0.33},
+            { id: 'm06', label: 'Fed 預期政策利率變動', t0: -1.0, t5: 0, t10: 0.5, unit: '', gamma: 1.0, desc: '負值代表預期降息，正值代表預期升息', manual: false, url: "https://www.investing.com/central-banks/fed-rate-monitor", val: 0.762},
 
 
-            { id: 'm08', label: '10Y 實質利率 (Real 10Y)', t0: 1.0, t5: 1.8, t10: 2.5, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.5%', url: "https://fred.stlouisfed.org/series/DFII10", val: 'N/A' },
+            { id: 'm08', label: '10Y 實質利率 (Real 10Y)', t0: 1.0, t5: 1.8, t10: 2.5, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.5%', url: "https://fred.stlouisfed.org/series/DFII10", val: 2.78},
 
 
-            { id: 'm03_qqq', label: 'QQQ 估值（TTM P/E，過去12個月本益比）', t0: 18, t5: 30, t10: 45, unit: 'x', gamma: 1.0, desc: '估值風險', calibrated: true, url: "https://tw.stock.yahoo.com/quote/QQQ", val: 29.62 },
-            { id: 'm03_spy', label: 'SPY 估值（TTM P/E，過去12個月本益比）', t0: 14, t5: 22, t10: 32, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://tw.stock.yahoo.com/quote/SPY", val: 25.15 },
-            { id: 'm03_vt', label: 'VT 估值（TTM P/E，過去12個月本益比）', t0: 12, t5: 18, t10: 28, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://finance.yahoo.com/quote/VT/", val: 22.23 },
+            { id: 'm03_qqq', label: 'QQQ估值參考P/E（來源未明示TTM）', t0: 18, t5: 30, t10: 45, unit: 'x', gamma: 1.0, desc: '估值風險', calibrated: true, url: "https://stockanalysis.com/etf/qqq/holdings/", val: 29.78},
+            { id: 'm03_spy', label: 'SPY估值參考P/E（來源未明示TTM）', t0: 14, t5: 22, t10: 32, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://stockanalysis.com/etf/spy/holdings/", val: 24.99},
+            { id: 'm03_vt', label: 'VT估值參考P/E（來源未明示TTM）', t0: 12, t5: 18, t10: 28, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://stockanalysis.com/etf/vt/holdings/", val: 20.8},
 
 
-            { id: 'm02', label: '信用利差 HY OAS', t0: 3.0, t5: 4.5, t10: 6.0, unit: '%', gamma: 0.9, desc: '危機觸發：>=6.0%', url: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", val: 'N/A' },
-            { id: 'm04', label: 'PMI 製造業', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.0, desc: '景氣', url: "https://tradingeconomics.com/united-states/business-confidence", val: 52.0 },
-            { id: 'm05', label: '核心通膨 Core CPI YoY', t0: 2.0, t5: 3.0, t10: 4.0, unit: '%', gamma: 1.0, desc: '通膨風險', url: "https://tradingeconomics.com/united-states/core-inflation-rate", val: 2.6 },
-            { id: 'm09', label: '美元 DXY', t0: 98, t5: 103, t10: 108, unit: '', gamma: 0.9, desc: '加速器：>=108/112', url: "https://www.tradingview.com/chart/?symbol=DXY", val: 102.231 },
-            { id: 'm10', label: '油價 WTI', t0: 75, t5: 90, t10: 110, unit: '$', gamma: 1.0, desc: '加速器：>=110/125 (需通膨AND)', url: "https://www.tradingview.com/chart/?symbol=USOIL", val: 91.66 },
+            { id: 'm02', label: '信用利差 HY OAS', t0: 3.0, t5: 4.5, t10: 6.0, unit: '%', gamma: 0.9, desc: '危機觸發：>=6.0%', url: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", val: 3.25},
+            { id: 'm04', label: 'PMI 製造業', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.0, desc: '景氣', url: "https://tradingeconomics.com/united-states/business-confidence", val: 54.5},
+            { id: 'm05', label: '核心通膨 Core CPI YoY', t0: 2.0, t5: 3.0, t10: 4.0, unit: '%', gamma: 1.0, desc: '通膨風險', url: "https://tradingeconomics.com/united-states/core-inflation-rate", val: 2.565841},
+            { id: 'm09', label: '美元 DXY', t0: 98, t5: 103, t10: 108, unit: '', gamma: 0.9, desc: '加速器：>=108/112', url: "https://www.tradingview.com/chart/?symbol=DXY", val: 102.082001},
+            { id: 'm10', label: '油價 WTI', t0: 75, t5: 90, t10: 110, unit: '$', gamma: 1.0, desc: '加速器：>=110/125 (需通膨AND)', url: "https://www.tradingview.com/chart/?symbol=USOIL", val: 96.209999},
 
 
             // ====== Hidden (V70.3 三層覆蓋 + 七大群權重 需要，但不顯示，避免破壞「12大指標」UI) ======
-            { id: 'm12', label: 'MOVE 債券波動 (hidden)', t0: 80, t5: 110, t10: 140, unit: '', gamma: 0.9, desc: '恐慌/危機封頂：>=160', url: "https://fred.stlouisfed.org/series/MOVE", val: 59.20, hidden: true },
+            { id: 'm12', label: 'MOVE 債券波動 (hidden)', t0: 80, t5: 110, t10: 140, unit: '', gamma: 0.9, desc: '恐慌/危機封頂：>=160', url: "https://fred.stlouisfed.org/series/MOVE", val: 102.503998, hidden: true },
 
 
-            { id: 'm13', label: '5Y Breakeven (5yBE) (hidden)', t0: 2.0, t5: 2.5, t10: 3.0, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.6%', url: "https://fred.stlouisfed.org/series/T5YIE", val: 2.53, hidden: true },
-            { id: 'm17', label: '5yBE 近1月上升 (Δ1M) (hidden)', t0: 0.0, t5: 0.15, t10: 0.30, unit: '%pt', desc: '危機觸發：>=0.25', url: "https://fred.stlouisfed.org/series/T5YIE", val: 0.05, hidden: true },
+            { id: 'm13', label: '5Y Breakeven (5yBE) (hidden)', t0: 2.0, t5: 2.5, t10: 3.0, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.6%', url: "https://fred.stlouisfed.org/series/T5YIE", val: 2.33, hidden: true },
+            { id: 'm17', label: '5yBE 近1月上升 (Δ1M) (hidden)', t0: 0.0, t5: 0.15, t10: 0.30, unit: '%pt', desc: '危機觸發：>=0.25', url: "https://fred.stlouisfed.org/series/T5YIE", val: -0.08, hidden: true },
 
 
-            { id: 'm14', label: '淨流動性 Δ13W (hidden)', t0: 300, t5: 0, t10: -300, unit: '$bn', gamma: 0.9, desc: '危機觸發：<=-500', url: "https://fred.stlouisfed.org/series/WALCL", val: -3.629, hidden: true },
+            { id: 'm14', label: '淨流動性 Δ13W (hidden)', t0: 300, t5: 0, t10: -300, unit: '$bn', gamma: 0.9, desc: '危機觸發：<=-500', url: "https://fred.stlouisfed.org/series/WALCL", val: -123.579, hidden: true },
 
 
-            { id: 'm15', label: 'PMI 服務業 (hidden)', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.0, desc: '景氣', url: "https://tradingeconomics.com/united-states/services-pmi", val: 52.0, hidden: true },
+            { id: 'm15', label: 'PMI 服務業 (hidden)', t0: 55, t5: 50, t10: 45, unit: '', gamma: 1.0, desc: '景氣', url: "https://tradingeconomics.com/united-states/services-pmi", val: 54.9, hidden: true },
             // 你指出 LEI 現在約 -3.74；這會觸發「衰退層 cap55」
-            { id: 'm16', label: 'LEI YoY (hidden)', t0: 2, t5: 0, t10: -4, unit: '%', gamma: 1.0, desc: '衰退封頂：Sahm≥0.4→cap55；或 LEI連3月<0 且（U3 失業率≥4.5% 或 NFP 3M Avg≤0）→cap55；更強：Sahm≥0.5 或 NFP 3M Avg≤0 或（LEI≤-4 且 U3≥4.5%）→cap45', url: "https://share.google/wKaNN0uj1v392N6bV", val: -3.74, hidden: true },
+            { id: 'm16', label: 'LEI YoY (hidden)', t0: 2, t5: 0, t10: -4, unit: '%', gamma: 1.0, desc: '衰退封頂：Sahm≥0.4→cap55；或 LEI連3月<0 且（U3 失業率≥4.5% 或 NFP 3M Avg≤0）→cap55；更強：Sahm≥0.5 或 NFP 3M Avg≤0 或（LEI≤-4 且 U3≥4.5%）→cap45', url: "https://share.google/wKaNN0uj1v392N6bV", val: -0.7, hidden: true },
 
 
-            { id: 'm18', label: 'Sahm Rule (hidden)', t0: 0.2, t5: 0.4, t10: 0.6, unit: '', desc: '衰退封頂：>=0.4/0.5', url: "https://fred.stlouisfed.org/series/SAHMCURRENT", val: 0.13, hidden: true },
-            { id: 'm19', label: 'U3 失業率 (hidden)', t0: 3.5, t5: 4.5, t10: 5.5, unit: '%', desc: '衰退封頂條件', url: "https://fred.stlouisfed.org/series/UNRATE", val: 4.4, hidden: true },
-            { id: 'm20', label: 'NFP 3M Avg (hidden)', t0: 200, t5: 50, t10: 0, unit: 'K', desc: '衰退封頂：<=0', url: "https://fred.stlouisfed.org/series/PAYEMS", val: -22, hidden: true }
+            { id: 'm18', label: 'Sahm Rule (hidden)', t0: 0.2, t5: 0.4, t10: 0.6, unit: '', desc: '衰退封頂：>=0.4/0.5', url: "https://fred.stlouisfed.org/series/SAHMCURRENT", val: 0, hidden: true },
+            { id: 'm19', label: 'U3 失業率 (hidden)', t0: 3.5, t5: 4.5, t10: 5.5, unit: '%', desc: '衰退封頂條件', url: "https://fred.stlouisfed.org/series/UNRATE", val: 4.2, hidden: true },
+            { id: 'm20', label: 'NFP 3M Avg (hidden)', t0: 200, t5: 50, t10: 0, unit: 'K', desc: '衰退封頂：<=0', url: "https://fred.stlouisfed.org/series/PAYEMS", val: 50.666667, hidden: true }
         ];
 
 
@@ -575,7 +576,7 @@
                         <div class="text-[10px] text-slate-500 font-mono">0:${c.t0} | 5:${c.t5} | 10:${c.t10}</div>
                     </div> 
                     <div class="flex gap-4 items-center"> 
-                        <input type="text" id="in_${c.id}" class="raw-input text-sm w-20 h-9" oninput="handleInput('${c.id}')" value="${c.val}"> 
+                        <input type="text" id="in_${c.id}" class="raw-input text-sm w-20 h-9" oninput="handleInput('${c.id}')" value="${c.val ?? ''}" data-default-value="${c.val ?? ''}"> 
                         <div class="flex-1 relative h-6 bg-slate-700/50 rounded overflow-hidden">
                             <div class="ruler-bg"></div>
                             <input type="range" id="sl_${c.id}" min="0" max="10" step="0.1" value="5" disabled class="w-full h-full absolute top-0 z-20 opacity-100">
@@ -2158,7 +2159,16 @@ if (recBlack) {
    const box=document.getElementById('v703-result');if(!box)return;
    const snap=window.v703MacroSnapshot;
    const valid=window.v703DataComplete===true && window.v703VerifiedDataDates===true && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
-   if(!valid){box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式建議：NA</div><div>必要總經資料、日期或配置尚未通過驗證；不發布新的七類百分比。請在上方核對資料日期及來源。</div>';window.v703Latest=null;return;}
+   if(!valid){
+     const rawScore=finite(snap?.mSafe_final)?snap.mSafe_final:null;
+     const coverage=window.v703Coverage||{};
+     const issue=(window.v703DateIssues||[]).join('；');
+     const safeIssue=issue.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+     box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式七類配置：暫停</div>'+
+       (rawScore!==null?'<div>已載入總經數值 '+(coverage.available??'—')+'/'+(coverage.total??21)+' 項｜研究用安全分數：<b>'+rawScore.toFixed(1)+'/100</b></div>':'<div>總經數值尚未完整載入；目前沒有可計算的安全分數。</div>')+
+       '<div>日期／來源驗證未完成，因此暫不顯示正式配置比例。'+(issue?'<br>檢查訊息：'+safeIssue:'')+'</div>';
+     window.v703Latest=null;return;
+   }
    const a=snap.allocation;let s=a.sTot,b=a.bTot,c=a.cTot;
    if([s,b,c].some(x=>x<0||x>100)||Math.abs(s+b+c-100)>0.051){box.innerHTML='<div class="text-red-300">配置計算異常，停止輸出。</div>';window.v703Latest=null;return;}
    // 各資產只顯示一位小數；現金/子彈池承接總數的尾差。
@@ -2233,7 +2243,7 @@ if (recBlack) {
 </script>
 <script id="v70-embedded-feed" type="application/json">{
   "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-15T19:49:59.411891Z",
+  "asOf": "2026-10-15T20:04:23Z",
   "verification": {
     "ready": true,
     "valid": 24,
@@ -2293,7 +2303,7 @@ if (recBlack) {
       "unit": "",
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
       "status": "OK",
-      "detail": "統計月份2026-09；8月54.6"
+      "detail": "統計月份2026-09；8月54.6；本輪爬蟲首次抓取未取得，沿用先前人工核查值，非本輪新抓。"
     },
     "m05": {
       "value": 2.565841,
@@ -2365,7 +2375,7 @@ if (recBlack) {
       "unit": "",
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
       "status": "OK",
-      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4"
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4；本輪爬蟲首次抓取未取得，沿用先前人工核查值，非本輪新抓。"
     },
     "m16": {
       "value": -0.7,
@@ -2383,7 +2393,7 @@ if (recBlack) {
       "unit": "",
       "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
       "status": "OK",
-      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率"
+      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率；本輪爬蟲首次抓取未取得，沿用先前人工核查值，非本輪新抓。"
     },
     "m19": {
       "value": 4.2,
@@ -2422,13 +2432,14 @@ if (recBlack) {
       "detail": "來源為 CNN 非公開保證 API"
     },
     "m06": {
-      "value": 0.75525,
+      "value": 0.762,
       "dataDate": "2026-10-15",
       "source": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "unit": "percentage_point",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
+      "unit": "",
+      "method": "2027-10-27利率區間機率加權中點4.637%減現行區間中點3.875%",
       "status": "OK",
-      "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures."
+      "detail": "2026-10-15 15:15 EDT更新表；10個區間機率依序0.0%、1.0%、8.2%、23.9%、32.4%、23.2%、9.2%、1.9%、0.2%、0.0%，合計100.0%。GitHub補充JSON的14:35 EDT版本為+0.75525，HTML採較晚表。",
+      "lastVerifiedAt": "2026-10-16T03:15:00+08:00"
     },
     "m03_qqq": {
       "value": 29.78,
@@ -2437,7 +2448,8 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
+      "detail": "觀測日2026-10-13；來源顯示P/E但未明示TTM，列為估值參考值，不標為已確認TTM。",
+      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
     },
     "m03_spy": {
       "value": 24.99,
@@ -2446,7 +2458,8 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
+      "detail": "觀測日2026-10-14；來源未明示TTM。官方同期指數P/E 24.83、FY1 20.53為不同口徑，均不替代本列參考值。",
+      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
     },
     "m03_vt": {
       "value": 20.8,
@@ -2455,16 +2468,18 @@ if (recBlack) {
       "unit": "x",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
+      "detail": "觀測日2026-08-31；來源未明示TTM，列為較早日期的估值參考值。",
+      "lastVerifiedAt": "2026-10-16T04:04:23+08:00"
     },
     "s05": {
-      "value": 29.17,
-      "dataDate": "2026-10-13",
+      "value": 25.58,
+      "dataDate": "2026-10-14",
       "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "unit": "%",
-      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+      "method": "Macroaxis NYSE MMFI Percent Of Stocks指數值",
       "status": "OK",
-      "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed."
+      "detail": "10/14觀測值。舊GitHub補充JSON保留10/13值29.17%；兩筆日期不同，HTML採用10/14較新觀測值並在摘要保留舊值供追溯。",
+      "lastVerifiedAt": "2026-10-16T03:15:00+08:00"
     }
   },
   "news": [],
@@ -2510,16 +2525,18 @@ if (recBlack) {
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-15T19:51:23.486Z",
+  "dataUpdatedAt": "2026-10-16T04:04:23+08:00",
   "sourceSnapshot": {
     "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
     "macro5": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
     "macro18GeneratedAt": "2026-10-16T03:48:07.518754+08:00",
-    "macro5GeneratedAt": "2026-10-16T03:12:29+08:00"
+    "macro5GeneratedAt": "2026-10-16T03:12:29+08:00",
+    "htmlSupplementChecksAt": "2026-10-16T04:04:23+08:00",
+    "htmlSupplementStatus": "m06/s05採較晚來源查核；GitHub 5項JSON仍為03:12快照"
   },
   "updateSummary": {
     "title": "V70-3-12 本輪總經資料更新摘要",
-    "generatedAtTaipei": "2026/10/16 03:51:23",
+    "generatedAtTaipei": "2026/10/16 04:04:23",
     "versionRules": {
       "version": "V70-3-12",
       "gamma": {
@@ -2544,14 +2561,14 @@ if (recBlack) {
       },
       "data18BlobSha": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
       "deploymentStatus": "NOT_VERIFIED",
-      "detail": "09h 18指標來源及契約檢查已讀回；11h部署與公開網站讀回尚未驗證。"
+      "detail": "09h爬蟲來源與欄位檢核已讀回；m04、m15、m18本輪抓取缺值而沿用前次人工核查；五項JSON仍是03:12版本。11h部署與公開網站讀回尚未驗證。"
     },
     "macroTask": {
       "title": "總體經濟狀況",
       "generatedAt": "2026-10-16T03:12:29+08:00",
       "dataFile": "data/5_macro_verified.json",
       "dataFileSha": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
-      "status": "5/5項已生成並讀回；10:00即時執行已請求，完整報告交付尚未核驗。"
+      "status": "GitHub五項JSON於03:12生成並讀回；03:43立即執行已請求，但該輪完整Task輸出尚未讀回核驗；HTML另記錄較晚m06與s05來源查核。"
     },
     "inserted": {
       "crawlerTransportFields": 19,
@@ -2564,35 +2581,55 @@ if (recBlack) {
     },
     "fiveValues": {
       "m06": {
-        "value": 0.75525,
+        "value": 0.762,
         "dataDate": "2026-10-15",
-        "status": "OK"
+        "status": "OK",
+        "source": "https://www.investing.com/central-banks/fed-rate-monitor",
+        "detail": "15:15 EDT機率表；較03:12 JSON的14:35 EDT版本更新"
       },
       "m03_qqq": {
         "value": 29.78,
         "dataDate": "2026-10-13",
-        "status": "USABLE"
+        "status": "USABLE",
+        "source": "https://stockanalysis.com/etf/qqq/holdings/",
+        "detail": "P/E；來源未明示TTM"
       },
       "m03_spy": {
         "value": 24.99,
         "dataDate": "2026-10-14",
-        "status": "USABLE"
+        "status": "USABLE",
+        "source": "https://stockanalysis.com/etf/spy/holdings/",
+        "detail": "P/E；來源未明示TTM"
       },
       "m03_vt": {
         "value": 20.8,
         "dataDate": "2026-08-31",
-        "status": "USABLE"
+        "status": "USABLE",
+        "source": "https://stockanalysis.com/etf/vt/holdings/",
+        "detail": "P/E；來源未明示TTM，觀測日較早"
       },
       "s05": {
-        "value": 29.17,
-        "dataDate": "2026-10-13",
-        "status": "OK"
+        "value": 25.58,
+        "dataDate": "2026-10-14",
+        "status": "OK",
+        "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+        "detail": "較舊GitHub JSON的10/13值29.17晚一個觀測日"
       }
     },
-    "note": "QQQ/SPY/VT估值來源未明示TTM，標為USABLE；VT觀測日較早，須按日期解讀。s05是10/13 NYSE $MMFI觀測值。"
-  }
+    "note": "QQQ/SPY/VT為未明示TTM的P/E參考值；VT日期較早。HTML的m06 +0.762採15:15 EDT機率表（舊JSON +0.75525為14:35 EDT）；s05 25.58為10/14，舊JSON 29.17為10/13。Task完整報告輸出尚待讀回核驗。",
+    "supplementSnapshot": "data/5_macro_verified.json仍保留03:12快照；本HTML另外保存較晚的m06、s05值與來源差異。"
+  },
+  "batchDateTaipei": "2026-10-16"
 }</script>
-<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經資料更新摘要｜2026/10/16 03:51:23（台灣時間）</summary><p>正式版本：V70-3-12。Gamma前三群分別為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>GitHub爬蟲資料：18項獨立指標、19個傳輸欄位，19/19來源狀態OK；生成時間 2026-10-16T03:48:07.518754+08:00；data/18_macro_verification.json blob SHA <code>fe19e25b9f1079253ed2bcb3c88ff8578a54d619</code>。</p><p>五項補充（data/5_macro_verified.json SHA <code>2cf11ea5255f07d0f1ae9fa0984d85d529c0877f</code>）：m06 +0.75525 pp（10/15）、QQQ P/E 29.78（10/13）、SPY P/E 24.99（10/14）、VT P/E 20.80（08/31）、NYSE $MMFI s05 29.17%（10/13）。三項P/E均標為USABLE，來源未明示TTM；VT觀測日較早，依日期解讀。</p><p>嵌入檢核：21/21必要計分指標、24個傳輸欄位、23個獨立指標；LEI三期歷史為2026-06 -1.4%、2026-07 -1.1%、2026-08 -0.7%。</p><p>10:00總經Task的立即執行已請求；完整報告交付尚未核驗。11:00部署與公開網站讀回仍待workflow log及公開讀回成功後再標示PASS。</p></details>
+<script id="v703-render-raw-data">
+(function(){
+ const node=document.getElementById('v70-embedded-feed'),body=document.getElementById('v703-raw-data-body');if(!node||!body)return;
+ const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'Fed未來利率預期變動',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
+ try{const feed=JSON.parse(node.textContent||'{}');for(const [id,r] of Object.entries(feed.indicators||{})){const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';const status=(['m04','m15','m18'].includes(id)?'沿用人工查證｜':'')+(r.status||'');const vals=[id+'｜'+(labels[id]||id),String(r.value)+(r.unit?' '+r.unit:''),r.dataDate||'未提供',status+(r.detail?'｜'+r.detail:''),r.method||''];for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}const td=document.createElement('td');td.className='p-2';const a=document.createElement('a');a.href=String(r.source||'').split(' | ')[0];a.target='_blank';a.rel='noopener noreferrer';a.className='text-blue-300 underline';a.textContent='開啟來源';td.appendChild(a);tr.appendChild(td);body.appendChild(tr);}}catch(err){body.textContent='內嵌資料讀取失敗：'+String(err.message||err);}
+})();
+</script>
+
+<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經資料更新摘要｜2026/10/16 04:04:23（台灣時間）</summary><p>正式版本：V70-3-12。Gamma前三群分別為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>本機檢查修正：三筆ETF P/E紀錄補上最後查核時間（2026/10/16 04:04:23台灣時間）；原始數值、觀測日期及來源沒有更動。舊快照亦可使用文件層級查核時間；若其餘驗證失敗，內嵌數值仍會載入並顯示研究分數，同時暫停正式七類配置，避免整頁欄位清空成NA。</p><p>18項爬蟲資料：2026-10-16 03:48:07（台灣時間），18項獨立資料及s03重複欄；來源檔SHA <code>fe19e25b9f1079253ed2bcb3c88ff8578a54d619</code>。m04、m15、m18為前次人工查證後沿用，本輪爬蟲沒有新抓到。</p><p>HTML內五項補充：m06 <b>+0.762</b>（10/15，15:15 EDT機率表）；QQQ P/E 29.78（10/13）、SPY P/E 24.99（10/14）、VT P/E 20.80（08/31；三者來源均未明示TTM）；NYSE MMFI s05 <b>25.58%</b>（10/14）。</p><p>版本差異保留：GitHub五項JSON SHA <code>2cf11ea5255f07d0f1ae9fa0984d85d529c0877f</code>仍是03:12快照，內有m06 +0.75525（14:35 EDT）及s05 29.17%（10/13）；本HTML改用較晚查核的m06與10/14 s05，兩組日期及來源說明均保留於逐項表格。</p><p>資料覆蓋：21/21必要計分欄、23項獨立指標／24個傳輸欄；LEI三期：2026-06 -1.4%、2026-07 -1.1%、2026-08 -0.7%。10:00 Task立即執行曾於03:43提出，但完整輸出尚未讀回核驗。此檔為更新候選，未部署。</p></details>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
  * Read V70_macro_latest.json beside the HTML first; when opened from Drive or file://,
@@ -2613,9 +2650,10 @@ if (recBlack) {
    const d=new Date(String(raw||''));
    return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d):null;
  }
- function verifiedPE(id,r){
+ function verifiedPE(id,r,doc){
    if(!peIds.has(id)||!r||typeof r!=='object')return false;
-   const stamp=r.lastVerifiedAt||r.last_verified_at||r.last_verified_time||null;
+   // Older embedded snapshots stored the supplement check at document level.
+   const stamp=r.lastVerifiedAt||r.last_verified_at||r.last_verified_time||doc?.sourceSnapshot?.htmlSupplementChecksAt||null;
    const when=Date.parse(String(stamp||''));
    const age=Date.now()-when;
    return Number.isFinite(when)&&age>=-5*60000&&age<=7*86400000&&['OK','USABLE'].includes(r.status)&&/^https:\/\//.test(String(r.source||''))&&String(r.method||'').trim().length>0&&String(r.detail||'').trim().length>0;
@@ -2625,6 +2663,33 @@ if (recBlack) {
    const stamp=taipeiStamp(doc?.dataUpdatedAt||doc?.asOf);
    banner.textContent=stamp?'📅 最後資料更新（台灣時間）：'+stamp+'｜'+mode:'⚠ 最後資料更新時間：無法驗證';
    banner.className='w-full border-b px-4 py-3 text-center text-sm font-semibold '+(mode==='已驗證'?'bg-slate-950 border-emerald-700 text-emerald-200':'bg-amber-950 border-amber-700 text-amber-100');
+ }
+ // Seed every scoring control from the values embedded in this HTML before any
+ // network/file fetch. A failed feed must never turn valid defaults into blanks.
+ function seedHtmlDefaults(){
+   let count=0;
+   for(const cfg of macroConfig){
+     const input=document.getElementById('in_'+cfg.id);
+     const fallback=Number(cfg.val);
+     if(!input||!Number.isFinite(fallback))continue;
+     // The executable defaults are the first visible values on every fresh load.
+     // A valid sidecar JSON may replace them after it has been read.
+     const value=fallback;
+     input.value=String(value);
+     input.setAttribute('value',String(value));
+     input.setAttribute('data-default-value',String(fallback));
+     const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=String(value);
+     let risk=mapToScore(value,cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
+     if(C_VALUATION_IDS.has(cfg.id)&&Number.isFinite(risk))risk=Math.round((5+C_VALUATION_ALPHA*(risk-5))*10)/10;
+     const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
+     if(slider&&Number.isFinite(risk))slider.value=String(risk);
+     if(score)score.textContent=Number.isFinite(risk)?risk.toFixed(1):'NA';
+     count++;
+   }
+   window.v703DataComplete=count===macroConfig.length;
+   window.v703VerifiedDataDates=false;
+   window.v703CreditGateBlocked=true;
+   return count;
  }
  function synchronize(){
    const l=document.getElementById('life-stage-select'),p=document.getElementById('v703-risk-preference');
@@ -2636,38 +2701,21 @@ if (recBlack) {
  familyLife.addEventListener('change',synchronize);
  familyStyle.addEventListener('change',synchronize);
  async function fetchFeedDocument(){
-   const candidates=[];
-   const embeddedNode=document.getElementById('v70-embedded-feed');
-   if(embeddedNode){
-     try{
-       const doc=JSON.parse(embeddedNode.textContent||'');
-       if(['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))candidates.push({doc,source:'HTML內嵌快照'});
-     }catch(err){}
-   }
-   const localUrl=new URL('V70_macro_latest.json',location.href).href;
-   const githubUrl='https://raw.githubusercontent.com/a23882005/LivingWaterAI/main/V70_macro_latest.json?ts='+Date.now();
-   const failures=[];
-   for(const url of [...new Set([localUrl,githubUrl])]){
-     try{
-       const response=await fetch(url,{cache:'no-store'});
-       if(!response.ok)throw new Error('HTTP '+response.status);
-       const doc=await response.json();
-       if(!['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))throw new Error('資料格式不相容：'+String(doc.schema||'缺少 schema'));
-       candidates.push({doc,source:url});
-     }catch(err){
-       let host='本機';try{host=new URL(url).host||host}catch{}
-       failures.push(host+'：'+String(err?.message||err));
-     }
-   }
-   if(candidates.length){
-     candidates.sort((a,b)=>{
-       const at=Date.parse(String(a.doc.asOf||'')),bt=Date.parse(String(b.doc.asOf||''));
-       const av=Number.isFinite(at)?at:-Infinity,bv=Number.isFinite(bt)?bt:-Infinity;
-       return av-bv;
-     });
-     return candidates[candidates.length-1].doc;
-   }
-   throw new Error('所有快照來源都讀取失敗（'+failures.join('；')+'）');
+   // Read only the JSON beside this HTML in the current environment.
+   // If it is absent or the browser cannot access it (common for file:// and
+   // Android content://), the caller keeps the embedded JavaScript defaults.
+   let localUrl;
+   try{localUrl=new URL('V70_macro_latest.json',location.href).href;}
+   catch(err){throw new Error('目前環境無法定位同資料夾 V70_macro_latest.json');}
+   let response;
+   try{response=await fetch(localUrl,{cache:'no-store'});}
+   catch(err){throw new Error('目前環境無法讀取 V70_macro_latest.json：'+String(err?.message||err));}
+   if(!response.ok)throw new Error('目前環境找不到 V70_macro_latest.json（HTTP '+response.status+'）');
+   let doc;
+   try{doc=await response.json();}
+   catch(err){throw new Error('V70_macro_latest.json 格式錯誤：'+String(err?.message||err));}
+   if(!['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))throw new Error('V70_macro_latest.json 格式不相容：'+String(doc.schema||'缺少 schema'));
+   return doc;
  }
  async function loadFeed(){
    status.textContent='正在讀取最新總經快照…';
@@ -2705,7 +2753,7 @@ if (recBlack) {
      // First validate all records; never partially import invalid source data.
      for(const cfg of macroConfig){
        const r=data[cfg.id];
-       const peVerified=verifiedPE(cfg.id,r);
+       const peVerified=verifiedPE(cfg.id,r,doc);
        if(peIds.has(cfg.id))window.v703PEReferenceVerified[cfg.id]=peVerified;
        const dateOK=/^(19|20)\d{2}-\d{2}-\d{2}$/.test(String(r?.dataDate||''));
        if(!r || r.value===null || String(r.value).trim()==='' || !Number.isFinite(Number(r.value)) || (!dateOK&&!peVerified) || !String(r.source||'').trim()) throw new Error('缺少有效 '+cfg.id+' 日期／數值／來源（估值備援須有7天內最後驗證時間）');
@@ -2751,32 +2799,40 @@ if (recBlack) {
      window.v703SourceBatch=null;
      window.v703CreditGateBlocked=true;
      window.v703PEReferenceVerified=Object.create(null);
-     // Remove stale displayed values too; a failed new snapshot must not leave
-     // yesterday's values in controls that users can mistake for live readings.
+     // Keep embedded observations visible if any metadata gate fails.
+     // Their scores are for research display; the formal allocation stays blocked.
+     window.v703DemoMode=false;
+     seedHtmlDefaults();
+     // A missing/unreadable/invalid sidecar always falls back to the
+     // executable defaults embedded in macroConfig, never to stale snapshots.
+     seedHtmlDefaults();
      for(const cfg of macroConfig){
-       for(const id of ['in_'+cfg.id,'v703-date-'+cfg.id,'v703-source-'+cfg.id]){
-         const el=document.getElementById(id);if(el)el.value='';
-       }
-       const score=document.getElementById('sc_'+cfg.id);if(score)score.textContent='NA';
+       const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
+       if(d)d.value='';if(src)src.value='';
      }
-     showBanner(null,'資料讀取失敗');
      window.v703ApplyLEIHistory([],null);
-     // Never show synthetic midpoint data as if it were verified, including local file previews.
-     if(false && ['file:','content:'].includes(location.protocol)){
-       if(typeof window.v703StartDemo==='function')window.v703StartDemo();
-       status.textContent='測試預覽';
-     }else{
-       window.v703DemoMode=false;
-       window.v703DataComplete=false;
-       window.v703VerifiedDataDates=false;
-       window.v703Latest=null;
-       if(typeof window.v703Recompute==='function')window.v703Recompute();
-       status.textContent='等待正式資料更新：'+String(err.message||err);
-     }
+     showBanner(null,'未找到可讀取的 JSON｜顯示程式預設值');
+     const inputCount=macroConfig.filter(cfg=>{const el=document.getElementById('in_'+cfg.id);return el&&el.value.trim()!==''&&Number.isFinite(Number(el.value));}).length;
+     window.v703DataComplete=inputCount===macroConfig.length;
+     window.v703VerifiedDataDates=false;
+     window.v703DateIssues=['快照驗證未完成：'+String(err.message||err)];
+     window.v703Latest=null;
+     if(typeof calcTotal==='function')calcTotal();
+     // calcTotal reruns date checks; keep the formal allocation gate closed.
+     window.v703CreditGateBlocked=true;
+     window.v703VerifiedDataDates=false;
+     window.v703DateIssues=['快照驗證未完成：'+String(err.message||err)];
+     window.v703Latest=null;
+     if(typeof window.v703Recompute==='function')window.v703Recompute();
+     status.textContent=inputCount
+       ? '目前環境的 V70_macro_latest.json 不存在、無法讀取或未通過驗證；已顯示程式內預設數值 '+inputCount+'/'+macroConfig.length+' 項並計分。正式七類配置暫停。'
+       : '等待正式資料更新：'+String(err.message||err);
      newsBox.textContent='';
    }
  }
- // 自動更新資料；本機 content:// 未能載入 feed 時自動展示測試中間值。
+ // Show embedded defaults immediately; validated feed values may replace them later.
+ seedHtmlDefaults();
+ // Load a same-environment JSON if available; otherwise keep program defaults.
  synchronize();loadFeed();
 })();
 </script>

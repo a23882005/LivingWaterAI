@@ -2128,8 +2128,11 @@ if (recBlack) {
      if(snapshotOld)throw new Error('正式快照超過26小時；保留歷史資料但停止當作當前配置依據');
      // An old published snapshot must remain visibly old, not masquerade as a fresh run.
      if(doc.verification.independentIndicators!==23 || Object.keys(doc.indicators||{}).length!==24)throw new Error('23獨立指標／24傳輸欄位不一致');
+     if(doc.batchDateTaipei && !/^\d{4}-\d{2}-\d{2}$/.test(doc.batchDateTaipei))throw new Error('批次日期格式錯誤');
+     if(doc.sourceSnapshot && (!doc.sourceSnapshot.macro18 || !doc.sourceSnapshot.macro5))throw new Error('來源SHA快照不完整');
      if(doc.indicators.s03?.value!==doc.indicators.m07?.value || doc.indicators.s03?.dataDate!==doc.indicators.m07?.dataDate)throw new Error('s03/m07 VIX重複資料不一致');
      window.v703PEReferenceVerified=Object.create(null);
+     window.v703SourceBatch={asOf:doc.asOf,batchDateTaipei:doc.batchDateTaipei||null,sourceSnapshot:doc.sourceSnapshot||null,verified:false};
 
      const data=doc.indicators||doc.macroIndicators||doc.macro;
      if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
@@ -2169,6 +2172,7 @@ if (recBlack) {
        if(slider)slider.value=val;if(score)score.textContent=val.toFixed(1);
      }
      window.v703ApplyLEIHistory(leiRows,data.m16);
+     window.v703SourceBatch.verified=true;
      if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
@@ -2179,6 +2183,8 @@ if (recBlack) {
      newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
    }catch(err){
      sourceMode='hold';
+     window.v703SourceBatch=null;
+     window.v703PEReferenceVerified=Object.create(null);
      showBanner(null,'資料讀取失敗');
      window.v703ApplyLEIHistory([],null);
      // Never show synthetic midpoint data as if it were verified, including local file previews.

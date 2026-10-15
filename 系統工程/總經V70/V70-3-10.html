@@ -99,6 +99,7 @@
 </style>
 </head>
 <body class="min-h-screen pb-32">
+<div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：讀取中｜資料日期以各指標為準</div>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -345,7 +346,8 @@
         function v703ObservationStale(id, date, today) {
             const days=Math.floor((today-date)/86400000);
             if(days<0)return true;
-            if(['m16','m03_qqq','m03_spy','m03_vt'].includes(id))return days>90;
+            if(['m03_qqq','m03_spy','m03_vt'].includes(id))return false; // PE reference age is checked against last verification time in the feed loader, not the observation month.
+            if(id==='m16')return days>90;
             if(id==='m14')return days>14;
             if(['m04','m05','m15','m18','m19','m20'].includes(id))return days>46;
             return v703TradingDaysBetween(date,today)>4;
@@ -368,7 +370,10 @@
                 const rawDate=dt?.value || '';
                 const date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? new Date(rawDate+'T00:00:00Z') : null;
                 if(!Number.isFinite(n)) {problems.push(cfg.id+':無有效數值');continue;}
-                if(!date || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==rawDate || date>today) {problems.push(cfg.id+':缺少／無效日期');continue;}
+                if(!date || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==rawDate || date>today) {
+                    if(['m03_qqq','m03_spy','m03_vt'].includes(cfg.id) && window.v703PEReferenceVerified?.[cfg.id]===true && src?.value.trim()) continue;
+                    problems.push(cfg.id+':缺少／無效日期');continue;
+                }
                 if(!src?.value.trim()) {problems.push(cfg.id+':缺少資料來源');continue;}
                 const days=Math.floor((today-date)/86400000);
                 const stale=v703ObservationStale(cfg.id,date,today);
@@ -2062,6 +2067,25 @@ if (recBlack) {
  const status=document.getElementById('family-data-status');
  const newsBox=document.getElementById('family-news');
  let sourceMode='';
+ const banner=document.getElementById('v703-update-banner');
+ const peIds=new Set(['m03_qqq','m03_spy','m03_vt']);
+ function taipeiStamp(raw){
+   const d=new Date(String(raw||''));
+   return Number.isFinite(d.getTime())?new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(d):null;
+ }
+ function verifiedPE(id,r){
+   if(!peIds.has(id))return false;
+   const stamp=r.lastVerifiedAt||r.last_verified_at||r.last_verified_time||null;
+   const when=Date.parse(String(stamp||''));
+   const age=Date.now()-when;
+   return Number.isFinite(when)&&age>=-5*60000&&age<=7*86400000&&r.status==='USABLE'&&/^https:\/\//.test(String(r.source||''))&&String(r.method||'').trim().length>0&&String(r.detail||'').trim().length>0;
+ }
+ function showBanner(doc,mode){
+   if(!banner)return;
+   const stamp=taipeiStamp(doc?.dataUpdatedAt||doc?.asOf);
+   banner.textContent=stamp?'📅 最後資料更新（台灣時間）：'+stamp+'｜'+mode:'⚠ 最後資料更新時間：無法驗證';
+   banner.className='w-full border-b px-4 py-3 text-center text-sm font-semibold '+(mode==='已驗證'?'bg-slate-950 border-emerald-700 text-emerald-200':'bg-amber-950 border-amber-700 text-amber-100');
+ }
  function synchronize(){
    const l=document.getElementById('life-stage-select'),p=document.getElementById('v703-risk-preference');
    if(!l||!p)return;
@@ -2087,7 +2111,12 @@ if (recBlack) {
      // Reject yesterday's deployment once it exceeds the documented update window.
      // Old JSON must never masquerade as a current verified macro feed.
      const produced=Date.parse(String(doc.asOf||''));
-     if(!Number.isFinite(produced)||produced>Date.now()+5*60*1000||Date.now()-produced>26*3600*1000)throw new Error('快照產出時間超過26小時／缺失；等待資料更新');
+     if(!Number.isFinite(produced)||produced>Date.now()+5*60*1000)throw new Error('快照產出時間缺失或位於未來');
+     const snapshotOld=Date.now()-produced>26*3600*1000;
+     // An old published snapshot must remain visibly old, not masquerade as a fresh run.
+     if(doc.verification.independentIndicators!==23 || Object.keys(doc.indicators||{}).length!==24)throw new Error('23獨立指標／24傳輸欄位不一致');
+     if(doc.indicators.s03?.value!==doc.indicators.m07?.value || doc.indicators.s03?.dataDate!==doc.indicators.m07?.dataDate)throw new Error('s03/m07 VIX重複資料不一致');
+     window.v703PEReferenceVerified=Object.create(null);
 
      const data=doc.indicators||doc.macroIndicators||doc.macro;
      if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
@@ -2095,12 +2124,15 @@ if (recBlack) {
      // First validate all records; never partially import invalid source data.
      for(const cfg of macroConfig){
        const r=data[cfg.id];
-       if(!r || r.value===null || String(r.value).trim()==='' || !Number.isFinite(Number(r.value)) || !/^(19|20)\d{2}-\d{2}-\d{2}$/.test(String(r.dataDate||'')) || !String(r.source||'').trim()) throw new Error('缺少有效 '+cfg.id+' 日期／數值／來源');
-       const obs = new Date(String(r.dataDate)+'T00:00:00Z');
-       if(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000) throw new Error('日期錯誤 '+cfg.id);
+       const peVerified=verifiedPE(cfg.id,r);
+       if(peIds.has(cfg.id))window.v703PEReferenceVerified[cfg.id]=peVerified;
+       const dateOK=/^(19|20)\d{2}-\d{2}-\d{2}$/.test(String(r?.dataDate||''));
+       if(!r || r.value===null || String(r.value).trim()==='' || !Number.isFinite(Number(r.value)) || (!dateOK&&!peVerified) || !String(r.source||'').trim()) throw new Error('缺少有效 '+cfg.id+' 日期／數值／來源（估值備援須有7天內最後驗證時間）');
+       const obs=dateOK?new Date(String(r.dataDate)+'T00:00:00Z'):null;
+       if(dateOK&&(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000)) throw new Error('日期錯誤 '+cfg.id);
        if(!/^https:\/\//.test(String(r.source||'')))throw new Error('資料來源不是HTTPS '+cfg.id);
-       const dayAge=Math.floor((Date.now()-obs.getTime())/86400000);
-       if(v703ObservationStale(cfg.id,obs,v703DateNowUTC()))throw new Error('總經觀測日已過期 '+cfg.id);
+       if(peIds.has(cfg.id)&&!peVerified)throw new Error('ETF本益比缺少有效的7天內來源驗證 '+cfg.id);
+       if(!peIds.has(cfg.id)&&v703ObservationStale(cfg.id,obs,v703DateNowUTC()))throw new Error('總經觀測日已過期 '+cfg.id);
        const n=Number(r.value);
        if(Math.abs(n)>1e9 || (cfg.id==='m07' && n<0) || (cfg.id==='m12' && n<0)) throw new Error('指標超出基本合理範圍 '+cfg.id);
      }
@@ -2111,7 +2143,10 @@ if (recBlack) {
        if(!input)throw new Error('缺少欄位 '+cfg.id);
        input.value=String(r.value);
        const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
-       if(d)d.value=r.dataDate;if(src)src.value=String(r.source);
+       if(d)d.value=r.dataDate||'';if(src)src.value=String(r.source);
+       if(d){d.title=peIds.has(cfg.id)?'實際觀測日：'+(r.dataDate||'來源未公布')+'；最後驗證：'+(taipeiStamp(r.lastVerifiedAt||r.last_verified_at)||'未提供'):'實際觀測日：'+r.dataDate;}
+       const note=document.getElementById('v703-reference-note-'+cfg.id);
+       if(note)note.textContent=peIds.has(cfg.id)?'觀測日：'+(r.dataDate||'未公布')+'｜最後驗證：'+(taipeiStamp(r.lastVerifiedAt||r.last_verified_at)||'缺少')+'｜歷史估值參考':'';
        const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=input.value;
        const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
        let val=mapToScore(Number(r.value),cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
@@ -2122,15 +2157,17 @@ if (recBlack) {
      if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
+     showBanner(doc,snapshotOld?'歷史已驗證快照（非今日更新）':'已驗證');
      const valid=window.v703Latest;
      status.textContent=valid?'✅ 已讀取總經快照（'+String(doc.asOf||'時間依各指標')+'），並完成資料日期驗證。':'⚠ 快照已讀取，但資料已過期或未通過完整驗證；正式配置顯示 NA。';
      const items=Array.isArray(doc.news)?doc.news.slice(0,5):[];
      newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
    }catch(err){
      sourceMode='hold';
+     showBanner(null,'資料讀取失敗');
      window.v703ApplyLEIHistory([],null);
-     // Only an explicitly local preview uses synthetic midpoint inputs.
-     if(['file:','content:'].includes(location.protocol)){
+     // Never show synthetic midpoint data as if it were verified, including local file previews.
+     if(false && ['file:','content:'].includes(location.protocol)){
        if(typeof window.v703StartDemo==='function')window.v703StartDemo();
        status.textContent='測試預覽';
      }else{

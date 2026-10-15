@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-five-supplement-v1",
-  "generated_at": "2026-10-16T03:12:29+08:00",
-  "observation_context": "LivingWaterAI V70.3.12 supplemental refresh; source checks performed after the 2026-10-15 US session",
+  "generated_at": "2026-10-16T06:18:03.855+08:00",
+  "observation_context": "LivingWaterAI V70.3.12 supplemental refresh; m06 and s05 synchronized to later same-session direct checks already embedded in official HTML",
   "quality_policy": {
     "OK": "Numeric value verified with stated source and method",
     "USABLE": "Numeric value displayed for the correct instrument; methodology or dating caveat preserved and permitted for research"
@@ -9,14 +9,14 @@
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.75525,
+      "value": 0.762,
       "unit": "percentage_point",
       "observation_date": "2026-10-15",
-      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "retrieval_time": "2026-10-16T03:15:00+08:00",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures.",
+      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525.",
       "cross_checks": [
         {
           "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
@@ -33,6 +33,17 @@
         {
           "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
           "result": "DIRECT_SUCCESS_METHODOLOGY; embedded probability table not readable"
+        }
+      ],
+      "previous_candidates": [
+        {
+          "value": 0.75525,
+          "observation_date": "2026-10-15",
+          "retrieval_time": "2026-10-16T03:12:29+08:00",
+          "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
+          "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
+          "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures.",
+          "status": "OK"
         }
       ]
     },
@@ -178,14 +189,14 @@
     },
     "s05": {
       "id": "s05",
-      "value": 29.17,
+      "value": 25.58,
       "unit": "%",
-      "observation_date": "2026-10-13",
-      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "observation_date": "2026-10-14",
+      "retrieval_time": "2026-10-16T03:15:00+08:00",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed.",
+      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
       "attempts": [
         {
           "priority": 1,
@@ -213,8 +224,19 @@
           "site": "Macroaxis",
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "result": "DIRECT_OPEN_SUCCESS",
+          "value": 25.58,
+          "observation_date": "2026-10-14"
+        }
+      ],
+      "previous_candidates": [
+        {
           "value": 29.17,
-          "observation_date": "2026-10-13"
+          "observation_date": "2026-10-13",
+          "retrieval_time": "2026-10-16T03:12:29+08:00",
+          "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+          "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+          "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed.",
+          "status": "OK"
         }
       ]
     }

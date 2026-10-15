@@ -126,6 +126,7 @@ class Fetcher:
         self.fredcache={}
         # D009: one-run HTTP cache; keep cached responses only after success.
         self._http_cache={}
+        self._host_last_request={}
         original_get=self.s.get
         def cached_get(url, **kwargs):
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
@@ -140,6 +141,16 @@ class Fetcher:
             key=(url,tuple(sorted((str(k),str(v)) for k,v in params.items())))
             if not sensitive and key in self._http_cache:
                 return self._http_cache[key]
+            from urllib.parse import urlsplit
+            host=urlsplit(url).netloc.lower()
+            previous=self._host_last_request.get(host)
+            if previous is not None:
+                wait=max(0.0, 1.0-(time.monotonic()-previous))
+                if wait:
+                    time.sleep(wait)
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('D009 fetch deadline reached during provider throttle')
+            self._host_last_request[host]=time.monotonic()
             response=original_get(url, **kwargs)
             response.raise_for_status()
             if not sensitive:

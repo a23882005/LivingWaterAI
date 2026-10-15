@@ -1,10 +1,10 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-15T04:56:58.136399+08:00",
+  "asOf": "2026-10-16T01:21:57.114637+08:00",
   "indicators": {
     "m07": {
-      "value": 15.27,
-      "dataDate": "2026-10-13",
+      "value": 16.87,
+      "dataDate": "2026-10-14",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
@@ -24,8 +24,8 @@
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m02": {
-      "value": 3.16,
-      "dataDate": "2026-10-13",
+      "value": 3.25,
+      "dataDate": "2026-10-14",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
@@ -45,22 +45,22 @@
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 102.540001,
-      "dataDate": "2026-10-14",
+      "value": 102.082001,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 95.099998,
-      "dataDate": "2026-10-14",
+      "value": 96.309998,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 99.064301,
-      "dataDate": "2026-10-14",
+      "value": 102.575699,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"

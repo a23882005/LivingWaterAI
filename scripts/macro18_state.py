@@ -41,6 +41,8 @@ def validate(raw):
                 raise ValueError("future observation: " + key)
             if not str(item.get("source_url", "")).startswith("https://"):
                 raise ValueError("missing verified source: " + key)
+    if any(k not in items for k in ("m07","m16")):
+        raise ValueError("required indicators missing")
     if items["s03"]["value"] != items["m07"]["value"]:
         raise ValueError("VIX duplicate mismatch")
     history = raw.get("lei_history")

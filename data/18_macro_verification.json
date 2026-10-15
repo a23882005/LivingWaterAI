@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-16T03:08:01.494508+08:00",
+  "generated_at": "2026-10-16T03:10:54.619467+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -94,7 +94,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.049004,
+      "value": 102.058998,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -106,7 +106,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 96.440002,
+      "value": 96.360001,
       "unit": "USD/bbl",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -238,7 +238,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 30.571429,
+      "value": 30.8,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:07:58.339288+00:00"
+      "retrieved_at": "2026-10-15T19:10:51.390253+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:07:59.299462+00:00"
+      "retrieved_at": "2026-10-15T19:10:52.407362+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:08:00.274983+00:00"
+      "retrieved_at": "2026-10-15T19:10:53.371233+00:00"
     }
   ]
 }

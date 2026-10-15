@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 01:18:58｜版本：V70.3.11 workflow｜檔案名稱：v703-site-deploy-1100.yml
+# 最後修改日期時間（台灣時間）：2026/10/16 02:08:10｜版本：V70.3.12 workflow｜檔案名稱：v703-site-deploy-1100.yml
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
   schedule:
@@ -23,12 +23,12 @@ jobs:
           python -m py_compile scripts/build_daily_v703_site.py
           test -s data/18_macro_verification.json
           test -s data/5_macro_verified.json
-          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-11.html" --out build/site
+          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-12.html" --out build/site
       - name: Upload QA package
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v703-11h-qa-${{ github.run_id }}
+          name: v703-12h-qa-${{ github.run_id }}
           path: build/site/
           if-no-files-found: warn
       - name: Check deployment configuration

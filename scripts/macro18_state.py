@@ -23,7 +23,9 @@ def validate(raw):
     if not isinstance(raw, dict) or not isinstance(raw.get("items"), dict):
         raise ValueError("invalid macro report schema")
     items = raw["items"]
-    if len(items) != 19 or "s03" not in items or any(k in items for k in EXCLUDED):
+    expected = {"m07","m01","m08","m02","m04","m05","m09","m10","m12",
+                "m13","m14","m15","m16","m17","m18","m19","m20","s04","s03"}
+    if set(items) != expected or any(k in items for k in EXCLUDED):
         raise ValueError("expected 18 independent indicators plus s03")
     if raw.get("independent_indicators", {}).get("total") != 18:
         raise ValueError("independent count mismatch")

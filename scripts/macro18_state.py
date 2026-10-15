@@ -103,7 +103,15 @@ def snapshot(source, state_dir):
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     target = Path(state_dir) / "backups" / f"macro18_{stamp}_{digest}.json"
     atomic_write(target, payload)
-    for old in snapshots(state_dir)[3:]:
+    # Preserve the three newest VALID backups; corrupt files must not displace them.
+    valid = []
+    for old in snapshots(state_dir):
+        try:
+            read_valid(old)
+            valid.append(old)
+        except (ValueError, OSError, TypeError, KeyError):
+            print("D009 invalid backup retained for investigation:", old.name)
+    for old in valid[3:]:
         old.unlink()
     print("D009 validated snapshot saved:", target.name)
     return True

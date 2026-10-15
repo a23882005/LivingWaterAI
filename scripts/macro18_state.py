@@ -1,5 +1,5 @@
+# 最後修改：2026/10/16 03:45（台灣時間）｜版本：D009-v2｜檔案：macro18_state.py
 #!/usr/bin/env python3
-# 最後修改：2026/10/16（台灣時間；精確時間未核實）｜版本：D009-v1｜檔案：macro18_state.py
 """Validate and rotate the last three distinct verified 18-macro JSON snapshots.
 
 Usage:
@@ -95,6 +95,20 @@ def _is_valid_backup(path):
         return False
 
 
+def _lei_fingerprint(history):
+    """Compare LEI observations, ignoring retrieval timestamps.
+
+    A fresh download of the same published monthly values is not a new
+    observation. Keep publication, source, method, status and value changes
+    significant so genuine vintage or provenance changes still rotate backups.
+    """
+    fields = ("observation_date", "publication_date", "value", "unit",
+              "status", "source_url", "method", "detail")
+    if not isinstance(history, list):
+        return history
+    return [tuple(entry.get(field) for field in fields) for entry in history]
+
+
 def snapshot(source, state_dir):
     raw = read_valid(source)
     payload = (json.dumps(raw, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
@@ -105,7 +119,7 @@ def snapshot(source, state_dir):
         try:
             newest_valid = next((p for p in existing if _is_valid_backup(p)), None)
             old = read_valid(newest_valid) if newest_valid else None
-            if old is not None and all(old["items"][k]["value"] == raw["items"][k]["value"] and old["items"][k]["observation_date"] == raw["items"][k]["observation_date"] for k in raw["items"]) and old.get("lei_history") == raw.get("lei_history"):
+            if old is not None and all(old["items"][k]["value"] == raw["items"][k]["value"] and old["items"][k]["observation_date"] == raw["items"][k]["observation_date"] for k in raw["items"]) and _lei_fingerprint(old.get("lei_history")) == _lei_fingerprint(raw.get("lei_history")):
                 print("D009 snapshot unchanged; existing backups retained")
                 return False
         except (ValueError, OSError, TypeError, KeyError):

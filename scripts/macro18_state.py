@@ -53,8 +53,9 @@ def validate(raw):
     dates = [dt.date.fromisoformat(h["observation_date"]) for h in history]
     if dates != sorted(dates) or len(set(dates)) != 3:
         raise ValueError("LEI history dates must be unique and ascending")
-    if any(not isinstance(h.get("value"), (int, float)) for h in history):
-        raise ValueError("LEI history contains nonnumeric value")
+    if any(not isinstance(h.get("value"), (int, float)) or
+           not __import__("math").isfinite(float(h["value"])) for h in history):
+        raise ValueError("LEI history contains nonfinite or nonnumeric value")
     if history[-1].get("observation_date") != items["m16"].get("observation_date"):
         raise ValueError("LEI history date mismatch")
     if history[-1].get("value") != items["m16"].get("value"):

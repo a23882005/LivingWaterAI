@@ -128,6 +128,8 @@ class Fetcher:
         self._http_cache={}
         original_get=self.s.get
         def cached_get(url, **kwargs):
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('D009 request budget exhausted; no new GET')
             from urllib.parse import urlencode
             params=kwargs.get('params') or {}
             key=(url,tuple(sorted((str(k),str(v)) for k,v in params.items())))

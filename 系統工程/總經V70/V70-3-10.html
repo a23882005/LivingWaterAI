@@ -2090,7 +2090,7 @@ if (recBlack) {
    const stamp=r.lastVerifiedAt||r.last_verified_at||r.last_verified_time||null;
    const when=Date.parse(String(stamp||''));
    const age=Date.now()-when;
-   return Number.isFinite(when)&&age>=-5*60000&&age<=7*86400000&&r.status==='USABLE'&&/^https:\/\//.test(String(r.source||''))&&String(r.method||'').trim().length>0&&String(r.detail||'').trim().length>0;
+   return Number.isFinite(when)&&age>=-5*60000&&age<=7*86400000&&['OK','USABLE'].includes(r.status)&&/^https:\/\//.test(String(r.source||''))&&String(r.method||'').trim().length>0&&String(r.detail||'').trim().length>0;
  }
  function showBanner(doc,mode){
    if(!banner)return;
@@ -2125,6 +2125,7 @@ if (recBlack) {
      const produced=Date.parse(String(doc.asOf||''));
      if(!Number.isFinite(produced)||produced>Date.now()+5*60*1000)throw new Error('快照產出時間缺失或位於未來');
      const snapshotOld=Date.now()-produced>26*3600*1000;
+     if(snapshotOld)throw new Error('正式快照超過26小時；保留歷史資料但停止當作當前配置依據');
      // An old published snapshot must remain visibly old, not masquerade as a fresh run.
      if(doc.verification.independentIndicators!==23 || Object.keys(doc.indicators||{}).length!==24)throw new Error('23獨立指標／24傳輸欄位不一致');
      if(doc.indicators.s03?.value!==doc.indicators.m07?.value || doc.indicators.s03?.dataDate!==doc.indicators.m07?.dataDate)throw new Error('s03/m07 VIX重複資料不一致');
@@ -2144,7 +2145,7 @@ if (recBlack) {
        if(dateOK&&(Number.isNaN(obs.getTime()) || obs.toISOString().slice(0,10)!==r.dataDate || obs.getTime()>Date.now()+86400000)) throw new Error('日期錯誤 '+cfg.id);
        if(!/^https:\/\//.test(String(r.source||'')))throw new Error('資料來源不是HTTPS '+cfg.id);
        if(peIds.has(cfg.id) && !peVerified)throw new Error('估值資料最後驗證超過7天或無可信證據 '+cfg.id);
-       if(peIds.has(cfg.id)&&!peVerified)throw new Error('ETF本益比缺少有效的7天內來源驗證 '+cfg.id);
+       // One fail-closed valuation provenance gate above is sufficient.
        if(!peIds.has(cfg.id)&&v703ObservationStale(cfg.id,obs,v703DateNowUTC()))throw new Error('總經觀測日已過期 '+cfg.id);
        const n=Number(r.value);
        if(Math.abs(n)>1e9 || (cfg.id==='m07' && n<0) || (cfg.id==='m12' && n<0)) throw new Error('指標超出基本合理範圍 '+cfg.id);
@@ -2157,6 +2158,7 @@ if (recBlack) {
        input.value=String(r.value);
        const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
        if(d)d.value=r.dataDate||'';if(src)src.value=String(r.source);
+       const dateRow=d?.closest('.grid');if(dateRow&&peIds.has(cfg.id)){dateRow.title='觀測日：'+(r.dataDate||'來源未公布')+'｜最後驗證：'+(taipeiStamp(r.lastVerifiedAt)||'未提供');}
        if(d){d.title=peIds.has(cfg.id)?'實際觀測日：'+(r.dataDate||'來源未公布')+'；最後驗證：'+(taipeiStamp(r.lastVerifiedAt||r.last_verified_at)||'未提供'):'實際觀測日：'+r.dataDate;}
        const note=document.getElementById('v703-reference-note-'+cfg.id);
        if(note)note.textContent=peIds.has(cfg.id)?'觀測日：'+(r.dataDate||'未公布')+'｜最後驗證：'+(taipeiStamp(r.lastVerifiedAt||r.last_verified_at)||'缺少')+'｜歷史估值參考':'';

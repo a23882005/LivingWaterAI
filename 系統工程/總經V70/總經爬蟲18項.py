@@ -142,6 +142,8 @@ class Fetcher:
         self.fredsources={}
 
     def fred(self, series):
+        if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+            raise TimeoutError('D009 fetch deadline: FRED request refused')
         if series in self.fredcache: return self.fredcache[series]
         if series in self.frederrors: raise RuntimeError(self.frederrors[series])
         from io import StringIO
@@ -171,6 +173,9 @@ class Fetcher:
                               'observation_start':earliest})
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
         for provider,url in providers:
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                errors.append('D009 fetch deadline reached')
+                break
             try:
                 if provider in ('BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     current_year=dt.datetime.now().year
@@ -251,6 +256,8 @@ class Fetcher:
         raise RuntimeError(message)
 
     def yahoo(self,ticker,info_key=None):
+        if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+            raise TimeoutError('D009 fetch deadline: Yahoo request refused')
         if info_key:
             raise ValueError('ETF valuation requires verified as-of date; use official source overrides')
         errors=[]

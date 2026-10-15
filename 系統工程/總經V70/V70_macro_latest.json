@@ -1,4 +1,9 @@
-{
+{"_fileMeta": {"lastModifiedTaipei": "2026/10/16 07:52:44", "version": "V70-3-12", "fileName": "V70_macro_latest.json"},
+  "_fileMeta": {
+    "lastModifiedTaipei": "2026/10/16 07:52:44",
+    "version": "V70-3-12",
+    "fileName": "V70_macro_latest.json"
+  },
   "schema": "V70.3/family-macro-feed-v1",
   "asOf": "2026-10-15T22:18:38.205122Z",
   "verification": {
@@ -204,7 +209,8 @@
       "unit": "x",
       "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "m03_spy": {
       "value": 24.99,
@@ -213,7 +219,8 @@
       "unit": "x",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "m03_vt": {
       "value": 20.8,
@@ -222,7 +229,8 @@
       "unit": "x",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM.",
+      "lastVerifiedAt": "2026-10-16T03:12:29+08:00"
     },
     "s05": {
       "value": 25.58,
@@ -276,5 +284,13 @@
       "method": "All three consecutive published monthly LEI YoY values < 0",
       "independentIndicator": false
     }
+  },
+  "sourceSnapshot": {
+    "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
+    "macro5": "c7bf122854bc5f304472646a9012493020e4fd6a",
+    "macro18GeneratedAt": "2026-10-16T03:48:07.518754+08:00",
+    "macro5GeneratedAt": "2026-10-16T06:18:03.855+08:00",
+    "htmlSupplementChecksAt": "2026-10-16T06:18:26.865+08:00",
+    "htmlSupplementStatus": "data/5_macro_verified.json與HTML內嵌五項已同步一致"
   }
 }

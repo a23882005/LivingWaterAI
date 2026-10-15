@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/macro18-preflight.yml'
       - '系統工程/總經V70/總經爬蟲18項.py'
+      - '系統工程/總經V70/macro_source_config.json'
       - 'scripts/probe_m06_fedwatch_free.py'
 permissions:
   contents: write
@@ -26,6 +27,7 @@ jobs:
       - name: Install and static QA
         run: |
           python -m pip install requests pandas yfinance pypdf
+          python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
           python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
       - name: Fetch independent 18 macro indicators, preserve previous verified data

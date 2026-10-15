@@ -135,6 +135,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
+        id: alert_artifact
+        continue-on-error: true
         with:
           name: macro18-09h-${{ github.run_id }}
           path: macro-alert
@@ -143,6 +145,10 @@ jobs:
           if [ -f macro-alert/needs_alert ]; then
             echo "::error::D009 first/third/persistent/core macro source failure. See alerts.json."
             cat macro-alert/alerts.json
+            exit 1
+          fi
+          if [ "${{ needs.preflight18.result }}" != "success" ]; then
+            echo "::error::D009 preflight failed before or during validation; inspect job logs."
             exit 1
           fi
           echo "No new D009 alert"

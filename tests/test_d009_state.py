@@ -63,6 +63,20 @@ class TestD009State(unittest.TestCase):
             recover(output, root)
             self.assertEqual(read_valid(output)["items"]["m07"]["value"], 4)
 
+    def test_exact_indicator_contract_rejects_unknown_key(self):
+        from macro18_state import validate
+        data = report(2)
+        data["items"]["unexpected"] = data["items"].pop("m02")
+        with self.assertRaises(ValueError):
+            validate(data)
+
+    def test_lei_history_rejects_duplicate_months(self):
+        from macro18_state import validate
+        data = report(2)
+        data["lei_history"][1]["observation_date"] = data["lei_history"][0]["observation_date"]
+        with self.assertRaises(ValueError):
+            validate(data)
+
     def test_corrupt_report_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "invalid.json"

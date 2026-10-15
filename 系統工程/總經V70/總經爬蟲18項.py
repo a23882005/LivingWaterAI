@@ -132,12 +132,18 @@ class Fetcher:
                 raise TimeoutError('D009 request budget exhausted; no new GET')
             from urllib.parse import urlencode
             params=kwargs.get('params') or {}
+            kwargs.setdefault('timeout',(5,self.timeout))
+            # Never share cached responses across authenticated requests.
+            sensitive=bool(kwargs.get('auth') or kwargs.get('cookies') or
+                           any(str(k).lower() in ('authorization','cookie','x-api-key')
+                               for k in (kwargs.get('headers') or {})))
             key=(url,tuple(sorted((str(k),str(v)) for k,v in params.items())))
-            if key in self._http_cache:
+            if not sensitive and key in self._http_cache:
                 return self._http_cache[key]
             response=original_get(url, **kwargs)
             response.raise_for_status()
-            self._http_cache[key]=response
+            if not sensitive:
+                self._http_cache[key]=response
             return response
         self.s.get=cached_get
         self.frederrors={}

@@ -3,6 +3,7 @@ import argparse
 import datetime as dt
 import json
 import math
+import hashlib
 import shutil
 from pathlib import Path
 
@@ -106,6 +107,23 @@ def build(macro, supplement, html, dest):
     if len(base) != 19 or set(base).intersection(SUPPLEMENT_IDS) or DUPLICATE_ID not in base:
         raise ValueError("09h contract requires exactly 18 independent + s03 = 19 transport fields")
     extra = _read(supplement)
+    # Reject a mismatched 09:00/10:00 data batch before combining any values.
+    tz = dt.timezone(dt.timedelta(hours=8))
+    try:
+        base_stamp = dt.datetime.fromisoformat(src['generated_at'])
+        extra_stamp = dt.datetime.fromisoformat(extra['generated_at'])
+        if base_stamp.tzinfo is None or extra_stamp.tzinfo is None:
+            raise ValueError('timezone missing')
+        base_day = base_stamp.astimezone(tz).date()
+        extra_day = extra_stamp.astimezone(tz).date()
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError('BATCH_GATE_BLOCKED: invalid generated_at') from exc
+    if base_day != extra_day:
+        raise ValueError(f'BATCH_GATE_BLOCKED: 09h={base_day}, 10h={extra_day}')
+    source_hashes = {
+        'macro18_sha256': hashlib.sha256(Path(macro).read_bytes()).hexdigest(),
+        'supplement5_sha256': hashlib.sha256(Path(supplement).read_bytes()).hexdigest(),
+    }
     records = extra.get("items", extra)
     if not isinstance(records, dict) or set(records) != SUPPLEMENT_IDS:
         raise ValueError("10h supplement requires precisely five keys: " + ",".join(sorted(SUPPLEMENT_IDS)))
@@ -140,6 +158,9 @@ def build(macro, supplement, html, dest):
     }
     feed = {"schema": "V70.3/family-macro-feed-v1",
             "asOf": now.isoformat().replace("+00:00", "Z"),
+            "dataUpdatedAt": max(base_stamp, extra_stamp).astimezone(tz).isoformat(),
+            "batchDateTaipei": str(base_day),
+            "sourceSnapshot": source_hashes,
             "verification": {"ready": True, "valid": EXPECTED_TRANSPORT,
                              "totalRequired": EXPECTED_TRANSPORT,
                              "independentIndicators": EXPECTED_INDEPENDENT,
@@ -152,6 +173,12 @@ def build(macro, supplement, html, dest):
                                 "independentIndicator": False}}}
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
+    (out / 'source_snapshot.json').write_text(json.dumps({
+        'batchDateTaipei': str(base_day),
+        'macro18GeneratedAt': src['generated_at'],
+        'supplement5GeneratedAt': extra['generated_at'],
+        **source_hashes,
+    }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     shutil.copyfile(html, out / "index.html")
     (out / "QA.json").write_text(json.dumps({"ready": True, "independent": 23, "transport": 24, "asOf": feed["asOf"], "usableWithCaveat": feed["verification"]["usableWithCaveat"], "leiHistoryReady": True, "leiHistory": lei_history, "m21": feed['derived']['m21']['value']}, indent=2) + "\n", encoding="utf-8")

@@ -8,6 +8,7 @@ on:
     paths:
       - '系統工程/總經V70/V70-3-12.html'
       - 'scripts/build_daily_v703_site.py'
+      - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/5_macro_verified.json'
 permissions:
   contents: write

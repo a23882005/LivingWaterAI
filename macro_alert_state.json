@@ -1,0 +1,96 @@
+{
+  "schema": "D009-alert-state-v1",
+  "updated_at": "2026-10-16",
+  "indicators": {
+    "m07": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m01": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m08": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m02": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m04": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m05": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m09": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m10": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m12": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m13": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m17": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m14": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m15": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m16": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m18": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m19": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "m20": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    },
+    "s04": {
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "OK"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 02:38:43｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 02:45:58｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -2231,6 +2231,7 @@ if (recBlack) {
  // Family auto loader runs after initialization.
 })();
 </script>
+<script type="application/json" id="v70-embedded-feed">{"schema":"V70.3/macro-feed-v1","asOf":"2026-10-16T02:41:32.585657+08:00","indicators":{"m07":{"value":16.87,"dataDate":"2026-10-14","source":"https://api.stlouisfed.org/fred/series/observations","unit":"","method":"FRED_OFFICIAL_API 官方或鏡像時間序列"},"m01":{"value":0.37,"dataDate":"2026-10-14","source":"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv","unit":"%","method":"Treasury official daily_treasury_yield_curve daily CSV"},"m08":{"value":2.84,"dataDate":"2026-10-14","source":"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv","unit":"%","method":"Treasury official daily_treasury_real_yield_curve daily CSV"},"m02":{"value":3.25,"dataDate":"2026-10-14","source":"https://api.stlouisfed.org/fred/series/observations","unit":"%","method":"FRED_OFFICIAL_API 官方或鏡像時間序列"},"m04":{"value":54.5,"dataDate":"2026-09-01","source":"https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/","unit":"","method":"人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"},"m05":{"value":2.565841,"dataDate":"2026-09-01","source":"https://api.stlouisfed.org/fred/series/observations","unit":"%","method":"FRED CPILFESL 同一數列 YoY"},"m09":{"value":101.988998,"dataDate":"2026-10-15","source":"https://finance.yahoo.com/quote/DX-Y.NYB/","unit":"","method":"yfinance Yahoo Finance DX-Y.NYB 日K Close"},"m10":{"value":96.449997,"dataDate":"2026-10-15","source":"https://finance.yahoo.com/quote/CL=F/","unit":"USD/bbl","method":"yfinance Yahoo Finance CL=F 日K Close"},"m12":{"value":102.554001,"dataDate":"2026-10-15","source":"https://finance.yahoo.com/quote/%5EMOVE/","unit":"","method":"yfinance Yahoo Finance ^MOVE 日K Close"},"m13":{"value":2.36,"dataDate":"2026-10-14","source":"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv","unit":"%","method":"Treasury derived five-year breakeven; not direct FRED T5YIE"},"m17":{"value":-0.04,"dataDate":"2026-10-14","source":"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv","unit":"pp","method":"Treasury derived five-year breakeven; not direct FRED T5YIE"},"m14":{"value":-123.579,"dataDate":"2026-10-07","source":"https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD","unit":"USD bn","method":"FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元"},"m15":{"value":54.9,"dataDate":"2026-09-01","source":"https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/","unit":"","method":"人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對"},"m18":{"value":0,"dataDate":"2026-09-01","source":"https://alfred.stlouisfed.org/series?seid=SAHMREALTIME","unit":"","method":"人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值"},"m19":{"value":4.2,"dataDate":"2026-09-01","source":"https://api.stlouisfed.org/fred/series/observations","unit":"%","method":"FRED_OFFICIAL_API 官方或鏡像時間序列"},"m20":{"value":50.666667,"dataDate":"2026-09-01","source":"https://api.stlouisfed.org/fred/series/observations","unit":"千人","method":"BLS/FRED 非農就業存量，近3個月月增平均，單位千人"}},"news":[],"verification":{"ready":false,"valid":16,"totalRequired":21,"missing":["m06: MISSING (not verified OK)","m03_qqq: MISSING (not verified OK)","m03_spy: MISSING (not verified OK)","m03_vt: MISSING (not verified OK)","m16: MISSING (not verified OK)"]}}</script>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
  * Read V70_macro_latest.json beside the HTML first; when opened from Drive or file://,
@@ -2273,6 +2274,14 @@ if (recBlack) {
  familyLife.addEventListener('change',synchronize);
  familyStyle.addEventListener('change',synchronize);
  async function fetchFeedDocument(){
+   const candidates=[];
+   const embeddedNode=document.getElementById('v70-embedded-feed');
+   if(embeddedNode){
+     try{
+       const doc=JSON.parse(embeddedNode.textContent||'');
+       if(doc.schema==='V70.3/macro-feed-v1')candidates.push({doc,source:'HTML內嵌快照'});
+     }catch(err){}
+   }
    const localUrl=new URL('V70_macro_latest.json',location.href).href;
    const githubUrl='https://raw.githubusercontent.com/a23882005/LivingWaterAI/main/V70_macro_latest.json?ts='+Date.now();
    const failures=[];
@@ -2282,11 +2291,19 @@ if (recBlack) {
        if(!response.ok)throw new Error('HTTP '+response.status);
        const doc=await response.json();
        if(doc.schema!=='V70.3/macro-feed-v1')throw new Error('資料格式不相容：'+String(doc.schema||'缺少 schema'));
-       return doc;
+       candidates.push({doc,source:url});
      }catch(err){
        let host='本機';try{host=new URL(url).host||host}catch{}
        failures.push(host+'：'+String(err?.message||err));
      }
+   }
+   if(candidates.length){
+     candidates.sort((a,b)=>{
+       const at=Date.parse(String(a.doc.asOf||'')),bt=Date.parse(String(b.doc.asOf||''));
+       const av=Number.isFinite(at)?at:-Infinity,bv=Number.isFinite(bt)?bt:-Infinity;
+       return av-bv;
+     });
+     return candidates[candidates.length-1].doc;
    }
    throw new Error('所有快照來源都讀取失敗（'+failures.join('；')+'）');
  }

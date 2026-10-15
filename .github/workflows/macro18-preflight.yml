@@ -1,3 +1,4 @@
+# 最後修改：2026/10/16（台灣時間；精確時間未核實）｜版本：D009-v1｜檔案：macro18-preflight.yml
 name: LivingWaterAI V70.3 09h Preflight 18 Macro
 on:
   schedule:
@@ -16,7 +17,7 @@ concurrency:
 jobs:
   preflight18:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

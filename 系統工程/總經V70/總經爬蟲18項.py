@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# 最後修改：2026/10/16（台灣時間；精確時間未核實）｜版本：D009-v1｜檔案：總經爬蟲18項.py
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Five ChatGPT-owned indicators (m06, m03_qqq, m03_spy, m03_vt, s05) are EXCLUDED.
@@ -60,12 +61,12 @@ SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
 
 class Fetcher:
-    def __init__(self, timeout=30):
+    def __init__(self, timeout=40):
         self.s=requests.Session()
         from requests.adapters import HTTPAdapter
         from urllib3.util.retry import Retry
-        retry=Retry(total=2, connect=2, read=2, backoff_factor=2.5,
-                    status_forcelist=[429,500,502,503,504],
+        retry=Retry(total=1, connect=1, read=1, backoff_factor=1.0,
+                    status_forcelist=[502,503,504],
                     allowed_methods=frozenset(['GET']), respect_retry_after_header=True)
         adapter=HTTPAdapter(max_retries=retry)
         self.s.mount('https://',adapter)
@@ -78,6 +79,20 @@ class Fetcher:
         })
         self.timeout=timeout
         self.fredcache={}
+        # D009: one-run HTTP cache; keep cached responses only after success.
+        self._http_cache={}
+        original_get=self.s.get
+        def cached_get(url, **kwargs):
+            from urllib.parse import urlencode
+            params=kwargs.get('params') or {}
+            key=(url,tuple(sorted((str(k),str(v)) for k,v in params.items())))
+            if key in self._http_cache:
+                return self._http_cache[key]
+            response=original_get(url, **kwargs)
+            response.raise_for_status()
+            self._http_cache[key]=response
+            return response
+        self.s.get=cached_get
         self.frederrors={}
         self.fredsources={}
 

@@ -36,7 +36,7 @@ def validate(raw):
             raise ValueError("invalid status: " + key)
         if item.get("value") is not None:
             import math
-            if not math.isfinite(float(item["value"])):
+            if type(item["value"]) not in (int, float) or not math.isfinite(float(item["value"])):
                 raise ValueError("nonfinite value: " + key)
             day = dt.date.fromisoformat(item["observation_date"])
             if day > dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date():

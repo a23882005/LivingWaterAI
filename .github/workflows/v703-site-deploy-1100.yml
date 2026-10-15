@@ -7,8 +7,10 @@ on:
   push:
     paths:
       - '系統工程/總經V70/V70-3-12.html'
+      - 'scripts/build_daily_v703_site.py'
+      - 'data/5_macro_verified.json'
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: lw-v703-site-deploy
   cancel-in-progress: false
@@ -27,6 +29,35 @@ jobs:
           test -s data/18_macro_verification.json
           test -s data/5_macro_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-12.html" --out build/site
+      - name: Publish matching JSON beside official GitHub HTML
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.macro18_state import atomic_write
+          source=Path('build/site/V70_macro_latest.json')
+          data=json.loads(source.read_text(encoding='utf-8'))
+          assert data['schema']=='V70.3/family-macro-feed-v1'
+          assert data['verification']['ready'] is True
+          assert data['verification']['independentIndicators']==23
+          assert len(data['indicators'])==24
+          target=Path('系統工程/總經V70/V70_macro_latest.json')
+          atomic_write(target, source.read_bytes())
+          assert json.loads(target.read_text(encoding='utf-8'))==data
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add "系統工程/總經V70/V70_macro_latest.json"
+            if ! git diff --cached --quiet; then
+              git commit -m "data(V70.3.12): sync verified 23-indicator feed beside official HTML"
+            fi
+            if git push origin HEAD:main; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo "GitHub colocated feed publish failed" >&2; exit 1; fi
+            sleep "$((attempt * 2))"
+          done
       - name: Upload QA package
         if: always()
         uses: actions/upload-artifact@v4

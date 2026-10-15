@@ -20,7 +20,7 @@ def report(value):
              for key in IDS}
     items["s03"] = dict(items["m07"], id="s03")
     return {"items": items, "independent_indicators": {"total": 18},
-            "lei_history": [{"observation_date": today, "value": value} for _ in range(3)]}
+            "lei_history": [{"observation_date": (dt.date.fromisoformat(today)-dt.timedelta(days=62)).isoformat(), "value": value}, {"observation_date": (dt.date.fromisoformat(today)-dt.timedelta(days=31)).isoformat(), "value": value}, {"observation_date": today, "value": value}]}
 
 
 class TestD009State(unittest.TestCase):

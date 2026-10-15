@@ -19,6 +19,15 @@ class TestD009Alerts(unittest.TestCase):
         self.assertEqual(alerts2, [])
         self.assertEqual(state2["indicators"]["m02"]["consecutive_failures"], 2)
 
+    def test_sixth_failure_realerts_but_fifth_does_not(self):
+        report = {"items": {"m09": {"status": "STALE", "observation_date": "2026-10-01"}}}
+        previous = {"indicators": {"m09": {"consecutive_failures": 4, "last_alert_date": "2026-10-14"}}}
+        state, alerts = evaluate(report, previous, "2026-10-16")
+        self.assertEqual(alerts, [])
+        state, alerts = evaluate(report, state, "2026-10-17")
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["count"], 6)
+
     def test_third_failure_and_recovery_reset(self):
         report = {"items": {"m09": {"status": "STALE", "observation_date": "2026-10-01"}}}
         prior = {"indicators": {"m09": {"consecutive_failures": 2, "last_alert_date": "2026-10-14"}}}

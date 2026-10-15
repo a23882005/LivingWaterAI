@@ -1,4 +1,4 @@
-# 最後修改：2026/10/16（台灣時間；精確時間未核實）｜版本：D009-v1｜檔案：macro18-preflight.yml
+# 最後修改：2026/10/16 03:36（台灣時間）｜版本：D009-v2｜檔案：macro18-preflight.yml
 name: LivingWaterAI V70.3 09h Preflight 18 Macro
 on:
   schedule:
@@ -134,12 +134,25 @@ jobs:
           atomic_write('data/d009_actions_proof.json',
                        (json.dumps(proof,ensure_ascii=False,indent=2)+'\n').encode())
           PY
-          git add data/18_macro_verification.json data/d009_actions_proof.json
-          if ! git diff --cached --quiet; then
-            git commit -m "data(macro18): 09h observed 18 indicator preflight"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
+          # Rebase races can conflict when another queued run publishes the same JSON.
+          # Reset the pending data commit onto the latest main while keeping this run's
+          # freshly validated payload staged, then retry a bounded fast-forward push.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/18_macro_verification.json data/d009_actions_proof.json
+            if ! git diff --cached --quiet; then
+              git commit -m "data(macro18): 09h observed 18 indicator preflight"
+            fi
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Could not publish verified macro18 data after 3 attempts" >&2
+              exit 1
+            fi
+            sleep "$((attempt * 2))"
+          done
 
 
 # Re-run collector on 2026-10-15 for end-to-end verification

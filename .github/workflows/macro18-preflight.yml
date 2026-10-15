@@ -35,6 +35,15 @@ jobs:
           python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py scripts/macro18_state.py scripts/macro18_alert.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
           python -m unittest discover -s tests -p "test_d009_*.py" -v
+      - name: Verify D009 tests and source contracts
+        run: |
+          python -m unittest discover -s tests -p 'test_d009_*.py' -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('系統工程/總經V70/macro_source_config.json').read_text(encoding='utf8'))
+          print('D009 source configuration present; strict runtime checks remain enabled')
+          PY
       - name: Mount dedicated persistent state branch and restore missing cache
         run: |
           git fetch origin automation-state

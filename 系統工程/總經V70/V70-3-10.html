@@ -914,6 +914,7 @@ function renderCapControls() {
             // Partial coverage is research-only until critical data and deployment policy have been checked server-side.
             window.v703ProvisionalMacro = window.v703Coverage.provisional ? avgRiskBase : null;
             window.v703VerifiedDataDates = window.v703ValidateDates ? window.v703ValidateDates() : false;
+            if(window.v703CreditGateBlocked===true)window.v703VerifiedDataDates=false;
             window.v703MissingGroups = Object.keys(groupRisk).filter(k=>groupRisk[k]===null);
 
             // --- 加速器（加在 avgRisk 上） ---
@@ -2137,6 +2138,12 @@ if (recBlack) {
      const data=doc.indicators||doc.macroIndicators||doc.macro;
      if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
      if(typeof macroConfig==='undefined')throw new Error('找不到原始總經模型');
+     // Critical credit safety gate: never publish a new actionable allocation if HY OAS is missing, stale or unverified.
+     const credit=data.m02;
+     if(!credit||!Number.isFinite(Number(credit.value))||Number(credit.value)<0||Number(credit.value)>100||!/^https:\/\//.test(String(credit.source||''))||!/^\d{4}-\d{2}-\d{2}$/.test(String(credit.dataDate||'')))throw new Error('信用安全閘門：HY OAS數值、日期或來源不合格');
+     const creditDate=new Date(credit.dataDate+'T00:00:00Z');
+     if(!Number.isFinite(creditDate.getTime())||v703ObservationStale('m02',creditDate,v703DateNowUTC()))throw new Error('信用安全閘門：HY OAS已過期，禁止發布新配置');
+     window.v703CreditGateBlocked=false;
      // First validate all records; never partially import invalid source data.
      for(const cfg of macroConfig){
        const r=data[cfg.id];
@@ -2184,6 +2191,7 @@ if (recBlack) {
    }catch(err){
      sourceMode='hold';
      window.v703SourceBatch=null;
+     window.v703CreditGateBlocked=true;
      window.v703PEReferenceVerified=Object.create(null);
      showBanner(null,'資料讀取失敗');
      window.v703ApplyLEIHistory([],null);

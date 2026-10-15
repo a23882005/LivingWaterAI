@@ -1,6 +1,6 @@
-{"artifactMetadata":{"taipei_timestamp":"2026/10/16 03:51:23","version":"V70-3-12","filename":"V70_macro_latest.json"},
-"schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-15T19:49:59.411891Z",
+{
+  "schema": "V70.3/family-macro-feed-v1",
+  "asOf": "2026-10-15T21:26:08.910913Z",
   "verification": {
     "ready": true,
     "valid": 24,
@@ -144,7 +144,7 @@
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
     },
     "m18": {
-      "value": 0,
+      "value": 0.0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",
@@ -276,86 +276,5 @@
       "method": "All three consecutive published monthly LEI YoY values < 0",
       "independentIndicator": false
     }
-  },
-  "dataUpdatedAt": "2026-10-15T19:51:23.486Z",
-  "sourceSnapshot": {
-    "macro18": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
-    "macro5": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
-    "macro18GeneratedAt": "2026-10-16T03:48:07.518754+08:00",
-    "macro5GeneratedAt": "2026-10-16T03:12:29+08:00"
-  },
-  "updateSummary": {
-    "title": "V70-3-12 本輪總經資料更新摘要",
-    "generatedAtTaipei": "2026/10/16 03:51:23",
-    "versionRules": {
-      "version": "V70-3-12",
-      "gamma": {
-        "group1": 0.9,
-        "group2": 1,
-        "group3": 1,
-        "group4": null
-      },
-      "t5": 5,
-      "upperSegmentFloor": 5,
-      "valuationAlpha": 0.7
-    },
-    "github": {
-      "repository": "a23882005/LivingWaterAI",
-      "macro18Status": "VERIFIED_SOURCE_FILE",
-      "scraperGeneratedAt": "2026-10-16T03:48:07.518754+08:00",
-      "scraperCounts": {
-        "OK": 19,
-        "USABLE": 0,
-        "STALE": 0,
-        "MISSING": 0
-      },
-      "data18BlobSha": "fe19e25b9f1079253ed2bcb3c88ff8578a54d619",
-      "deploymentStatus": "NOT_VERIFIED",
-      "detail": "09h 18指標來源及契約檢查已讀回；11h部署與公開網站讀回尚未驗證。"
-    },
-    "macroTask": {
-      "title": "總體經濟狀況",
-      "generatedAt": "2026-10-16T03:12:29+08:00",
-      "dataFile": "data/5_macro_verified.json",
-      "dataFileSha": "2cf11ea5255f07d0f1ae9fa0984d85d529c0877f",
-      "status": "5/5項已生成並讀回；10:00即時執行已請求，完整報告交付尚未核驗。"
-    },
-    "inserted": {
-      "crawlerTransportFields": 19,
-      "uniqueCrawlerIndicators": 18,
-      "taskSupplementaryFields": 5,
-      "totalTransportFields": 24,
-      "independentIndicators": 23,
-      "requiredScoringIndicators": 21,
-      "requiredScoringIndicatorsValidated": 21
-    },
-    "fiveValues": {
-      "m06": {
-        "value": 0.75525,
-        "dataDate": "2026-10-15",
-        "status": "OK"
-      },
-      "m03_qqq": {
-        "value": 29.78,
-        "dataDate": "2026-10-13",
-        "status": "USABLE"
-      },
-      "m03_spy": {
-        "value": 24.99,
-        "dataDate": "2026-10-14",
-        "status": "USABLE"
-      },
-      "m03_vt": {
-        "value": 20.8,
-        "dataDate": "2026-08-31",
-        "status": "USABLE"
-      },
-      "s05": {
-        "value": 29.17,
-        "dataDate": "2026-10-13",
-        "status": "OK"
-      }
-    },
-    "note": "QQQ/SPY/VT估值來源未明示TTM，標為USABLE；VT觀測日較早，須按日期解讀。s05是10/13 NYSE $MMFI觀測值。"
   }
 }

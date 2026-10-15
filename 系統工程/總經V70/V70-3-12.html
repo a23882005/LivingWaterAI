@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 04:47:57｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/16 05:24:52｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -2672,9 +2672,9 @@ if (recBlack) {
      const input=document.getElementById('in_'+cfg.id);
      const fallback=Number(cfg.val);
      if(!input||!Number.isFinite(fallback))continue;
-     // The executable defaults are the first visible values on every fresh load.
-     // A valid sidecar JSON may replace them after it has been read.
-     const value=fallback;
+     const current=String(input.value??'').trim();
+     const currentNumber=current===''?NaN:Number(current);
+     const value=Number.isFinite(currentNumber)?currentNumber:fallback;
      input.value=String(value);
      input.setAttribute('value',String(value));
      input.setAttribute('data-default-value',String(fallback));
@@ -2701,21 +2701,40 @@ if (recBlack) {
  familyLife.addEventListener('change',synchronize);
  familyStyle.addEventListener('change',synchronize);
  async function fetchFeedDocument(){
-   // Read only the JSON beside this HTML in the current environment.
-   // If it is absent or the browser cannot access it (common for file:// and
-   // Android content://), the caller keeps the embedded JavaScript defaults.
-   let localUrl;
-   try{localUrl=new URL('V70_macro_latest.json',location.href).href;}
-   catch(err){throw new Error('目前環境無法定位同資料夾 V70_macro_latest.json');}
-   let response;
-   try{response=await fetch(localUrl,{cache:'no-store'});}
-   catch(err){throw new Error('目前環境無法讀取 V70_macro_latest.json：'+String(err?.message||err));}
-   if(!response.ok)throw new Error('目前環境找不到 V70_macro_latest.json（HTTP '+response.status+'）');
-   let doc;
-   try{doc=await response.json();}
-   catch(err){throw new Error('V70_macro_latest.json 格式錯誤：'+String(err?.message||err));}
-   if(!['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))throw new Error('V70_macro_latest.json 格式不相容：'+String(doc.schema||'缺少 schema'));
-   return doc;
+   const candidates=[];
+   const embeddedNode=document.getElementById('v70-embedded-feed');
+   if(embeddedNode){
+     try{
+       const doc=JSON.parse(embeddedNode.textContent||'');
+       if(['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))candidates.push({doc,source:'HTML內嵌快照'});
+     }catch(err){}
+   }
+   // Android content:// and local file:// previews must immediately use embedded values.
+   if(candidates.length && ['content:','file:'].includes(location.protocol))return candidates[0].doc;
+   const localUrl=new URL('V70_macro_latest.json',location.href).href;
+   const githubUrl='https://raw.githubusercontent.com/a23882005/LivingWaterAI/main/V70_macro_latest.json?ts='+Date.now();
+   const failures=[];
+   for(const url of [...new Set([localUrl,githubUrl])]){
+     try{
+       const response=await fetch(url,{cache:'no-store'});
+       if(!response.ok)throw new Error('HTTP '+response.status);
+       const doc=await response.json();
+       if(!['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'].includes(doc.schema))throw new Error('資料格式不相容：'+String(doc.schema||'缺少 schema'));
+       candidates.push({doc,source:url});
+     }catch(err){
+       let host='本機';try{host=new URL(url).host||host}catch{}
+       failures.push(host+'：'+String(err?.message||err));
+     }
+   }
+   if(candidates.length){
+     candidates.sort((a,b)=>{
+       const at=Date.parse(String(a.doc.asOf||'')),bt=Date.parse(String(b.doc.asOf||''));
+       const av=Number.isFinite(at)?at:-Infinity,bv=Number.isFinite(bt)?bt:-Infinity;
+       return av-bv;
+     });
+     return candidates[candidates.length-1].doc;
+   }
+   throw new Error('所有快照來源都讀取失敗（'+failures.join('；')+'）');
  }
  async function loadFeed(){
    status.textContent='正在讀取最新總經快照…';
@@ -2803,15 +2822,42 @@ if (recBlack) {
      // Their scores are for research display; the formal allocation stays blocked.
      window.v703DemoMode=false;
      seedHtmlDefaults();
-     // A missing/unreadable/invalid sidecar always falls back to the
-     // executable defaults embedded in macroConfig, never to stale snapshots.
-     seedHtmlDefaults();
-     for(const cfg of macroConfig){
-       const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
-       if(d)d.value='';if(src)src.value='';
+     let recovered=0,doc=null,data=null;
+     try{
+       const node=document.getElementById('v70-embedded-feed');
+       doc=node?JSON.parse(node.textContent||'{}'):null;
+       data=doc?.indicators||doc?.macroIndicators||doc?.macro||null;
+     }catch(e){}
+     if(data&&typeof data==='object'){
+       // Keep HTML defaults intact; refresh each field from the embedded snapshot when numeric.
+       for(const cfg of macroConfig){
+         const r=data[cfg.id],input=document.getElementById('in_'+cfg.id);
+         const n=r&&r.value!==null&&String(r.value).trim()!==''?Number(r.value):NaN;
+         if(!input||!Number.isFinite(n))continue;
+         input.value=String(r.value);recovered++;
+         const d=document.getElementById('v703-date-'+cfg.id),src=document.getElementById('v703-source-'+cfg.id);
+         if(d)d.value=String(r.dataDate||'');if(src)src.value=String(r.source||'');
+         const cap=document.getElementById('cap_in_'+cfg.id);if(cap)cap.value=input.value;
+         const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
+         let risk=mapToScore(n,cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
+         if(C_VALUATION_IDS.has(cfg.id)&&Number.isFinite(risk))risk=Math.round((5+C_VALUATION_ALPHA*(risk-5))*10)/10;
+         if(slider&&Number.isFinite(risk))slider.value=risk;
+         if(score)score.textContent=Number.isFinite(risk)?risk.toFixed(1):'NA';
+       }
+       if(doc?.leiHistory&&data.m16&&typeof window.v703ApplyLEIHistory==='function')window.v703ApplyLEIHistory(doc.leiHistory,data.m16);
+       showBanner(doc,'資料待驗證');
+     }else{
+       for(const cfg of macroConfig){
+         const input=document.getElementById('in_'+cfg.id);
+         const n=input&&String(input.value).trim()!==''?Number(input.value):NaN;
+         const slider=document.getElementById('sl_'+cfg.id),score=document.getElementById('sc_'+cfg.id);
+         let risk=Number.isFinite(n)?mapToScore(n,cfg.t0,cfg.t5,cfg.t10,cfg.gamma):NaN;
+         if(C_VALUATION_IDS.has(cfg.id)&&Number.isFinite(risk))risk=Math.round((5+C_VALUATION_ALPHA*(risk-5))*10)/10;
+         if(slider&&Number.isFinite(risk))slider.value=risk;
+         if(score)score.textContent=Number.isFinite(risk)?risk.toFixed(1):'NA';
+       }
+       showBanner(null,'資料讀取失敗');
      }
-     window.v703ApplyLEIHistory([],null);
-     showBanner(null,'未找到可讀取的 JSON｜顯示程式預設值');
      const inputCount=macroConfig.filter(cfg=>{const el=document.getElementById('in_'+cfg.id);return el&&el.value.trim()!==''&&Number.isFinite(Number(el.value));}).length;
      window.v703DataComplete=inputCount===macroConfig.length;
      window.v703VerifiedDataDates=false;
@@ -2825,14 +2871,14 @@ if (recBlack) {
      window.v703Latest=null;
      if(typeof window.v703Recompute==='function')window.v703Recompute();
      status.textContent=inputCount
-       ? '目前環境的 V70_macro_latest.json 不存在、無法讀取或未通過驗證；已顯示程式內預設數值 '+inputCount+'/'+macroConfig.length+' 項並計分。正式七類配置暫停。'
+       ? '已保留／載入 HTML 預設總經數值 '+inputCount+'/'+macroConfig.length+' 項；快照驗證未完成（'+String(err.message||err)+'），目前僅顯示研究分數，正式七類配置暫停。'
        : '等待正式資料更新：'+String(err.message||err);
      newsBox.textContent='';
    }
  }
  // Show embedded defaults immediately; validated feed values may replace them later.
  seedHtmlDefaults();
- // Load a same-environment JSON if available; otherwise keep program defaults.
+ // 自動更新資料；本機 content:// 未能載入 feed 時自動展示測試中間值。
  synchronize();loadFeed();
 })();
 </script>

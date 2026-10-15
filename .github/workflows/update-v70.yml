@@ -1,3 +1,4 @@
+# 最後修改日期時間（台灣時間）：2026/10/16 01:18:58｜版本：V70.3.11 workflow｜檔案名稱：update-v70.yml
 name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
 
 on:
@@ -9,7 +10,7 @@ on:
       - '系統工程/總經V70/總經爬蟲程式16項.py'
       - '系統工程/總經V70/ChatGPT 總經爬蟲8項.md'
       - '系統工程/總經V70/每天總經及html更新程序.md'
-      - '系統工程/總經V70/V70-3-10.html'
+      - '系統工程/總經V70/V70-3-11.html'
       - 'scripts/build_v703_feed.py'
       - 'scripts/probe_extra8.py'
       - 'tests/**'
@@ -189,6 +190,6 @@ jobs:
             git pull --rebase origin main
             git push
           fi
-          echo "Canonical website source: 系統工程/總經V70/V70-3-10.html; Hostinger public_html/index.html upload/restore not yet implemented in this workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "Canonical website source: 系統工程/總經V70/V70-3-11.html; Hostinger public_html/index.html upload/restore not yet implemented in this workflow." >> "$GITHUB_STEP_SUMMARY"
 
 # Manual 16-item GitHub Runner diagnostic trigger: 2026-10-14

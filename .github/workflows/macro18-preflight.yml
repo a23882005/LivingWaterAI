@@ -35,7 +35,8 @@ jobs:
         run: |
           git fetch origin automation-state
           git worktree add --detach /tmp/livingwater-macro-state origin/automation-state
-          if [ ! -f data/18_macro_verification.json ]; then
+          if ! python scripts/macro18_state.py verify --state-dir /tmp/livingwater-macro-state --input data/18_macro_verification.json; then
+            echo "Primary cache missing or invalid; attempt verified historical recovery"
             python scripts/macro18_state.py recover --state-dir /tmp/livingwater-macro-state --output data/18_macro_verification.json || true
           fi
       - name: Fetch independent 18 macro indicators, preserve previous verified data

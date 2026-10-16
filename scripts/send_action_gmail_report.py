@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 08:14:56｜版本：V70-3-12 Gmail 通知 v1｜檔案名稱：send_action_gmail_report.py
+# 最後修改日期時間（台灣時間）：2026/10/16 08:16:15｜版本：V70-3-12 Gmail 通知 v1.1｜檔案名稱：send_action_gmail_report.py
 """Email successful LivingWaterAI Action run results and attach its actual data artifact."""
 import argparse
 import csv
@@ -106,23 +106,27 @@ def main():
     run_url = os.environ.get("SOURCE_RUN_URL", "")
     conclusion = os.environ.get("SOURCE_RUN_CONCLUSION", "success")
     created = os.environ.get("SOURCE_RUN_CREATED_AT", "")
-    try:
-        local_time = datetime.fromisoformat(created.replace("Z", "+00:00")).astimezone(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
-    except (ValueError, TypeError):
-        local_time = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
+    updated = os.environ.get("SOURCE_RUN_UPDATED_AT", "")
+    def taipei_stamp(value):
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
+        except (ValueError, TypeError):
+            return "未提供"
+    start_time = taipei_stamp(created)
+    end_time = taipei_stamp(updated)
     lines = [
         "LivingWaterAI GitHub Actions 實際執行摘要",
         f"任務：{run_name}",
         f"執行結果：{conclusion}",
-        f"台灣時間：{local_time}",
+        f"開始時間（台灣）：{start_time}",
+        f"完成時間（台灣）：{end_time}",
         f"Run ID：{run_id}",
         f"執行紀錄：{run_url or '未提供'}",
-        "",
-        "實際資料與答案：",
-        *make_summary(root, run_name),
-        "",
-        "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。",
     ]
+    if "11h Verified V70.3 Site Deploy" in run_name:
+        lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
+    lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "",
+                  "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
     msg = EmailMessage()
     msg["From"] = "a23882005@gmail.com"
     msg["To"] = "a23882005@gmail.com"

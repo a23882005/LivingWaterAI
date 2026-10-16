@@ -1,0 +1,54 @@
+# 最後修改日期時間（台灣時間）：2026/10/16 08:14:56｜版本：V70-3-12 Gmail 通知 v1｜檔案名稱：email-action-results.yml
+name: LivingWaterAI Gmail Action result reports
+
+on:
+  workflow_run:
+    workflows:
+      - LivingWaterAI 07h IB global market history
+      - LivingWaterAI V70.3 09h Preflight 18 Macro
+      - LivingWaterAI 11h Verified V70.3 Site Deploy
+      - LivingWaterAI 14h30 IB Taiwan market history
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  email-success-report:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout report sender
+        uses: actions/checkout@v4
+      - name: Select the source run artifact
+        id: artifact
+        env:
+          SOURCE_RUN_NAME: ${{ github.event.workflow_run.name }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          case "$SOURCE_RUN_NAME" in
+            "LivingWaterAI 07h IB global market history") name="ib-global-history-$SOURCE_RUN_ID" ;;
+            "LivingWaterAI V70.3 09h Preflight 18 Macro") name="macro18-09h-$SOURCE_RUN_ID" ;;
+            "LivingWaterAI 11h Verified V70.3 Site Deploy") name="v703-12h-qa-$SOURCE_RUN_ID" ;;
+            "LivingWaterAI 14h30 IB Taiwan market history") name="ib-taiwan-history-$SOURCE_RUN_ID" ;;
+            *) echo "::error::Unrecognized source workflow: $SOURCE_RUN_NAME"; exit 1 ;;
+          esac
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - name: Download actual output artifact from the successful run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: run-artifact
+      - name: Send results and attached data through Gmail
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SOURCE_RUN_NAME: ${{ github.event.workflow_run.name }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          SOURCE_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          SOURCE_RUN_CREATED_AT: ${{ github.event.workflow_run.created_at }}
+        run: python scripts/send_action_gmail_report.py --artifact-dir run-artifact

@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 08:16:15｜版本：V70-3-12 Gmail 通知 v1.1｜檔案名稱：send_action_gmail_report.py
+# 最後修改日期時間（台灣時間）：2026/10/16 08:16:47｜版本：V70-3-12 Gmail 通知 v1.2｜檔案名稱：send_action_gmail_report.py
 """Email successful LivingWaterAI Action run results and attach its actual data artifact."""
 import argparse
 import csv
@@ -127,6 +127,12 @@ def main():
         lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
     lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "",
                   "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
+    report_text = "\\n".join(lines)
+    print(report_text)
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        with open(summary_path, "a", encoding="utf-8") as summary_file:
+            summary_file.write("# LivingWaterAI 實際執行報告\\n\\n" + report_text + "\\n")
     msg = EmailMessage()
     msg["From"] = "a23882005@gmail.com"
     msg["To"] = "a23882005@gmail.com"

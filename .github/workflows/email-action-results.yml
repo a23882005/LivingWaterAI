@@ -2,6 +2,7 @@
 name: LivingWaterAI Gmail Action result reports
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows:
       - LivingWaterAI 07h IB global market history
@@ -16,7 +17,7 @@ permissions:
 
 jobs:
   email-success-report:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout report sender
@@ -53,3 +54,33 @@ jobs:
           SOURCE_RUN_CREATED_AT: ${{ github.event.workflow_run.created_at }}
           SOURCE_RUN_UPDATED_AT: ${{ github.event.workflow_run.updated_at }}
         run: python scripts/send_action_gmail_report.py --artifact-dir run-artifact
+
+  email-connection-test:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send a test email through Gmail
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          from email.message import EmailMessage
+
+          password = os.environ.get("GMAIL_APP_PASSWORD", "").replace(" ", "")
+          if not password:
+              raise RuntimeError("GitHub Actions secret GMAIL_APP_PASSWORD is missing.")
+          message = EmailMessage()
+          message["From"] = "a23882005@gmail.com"
+          message["To"] = "a23882005@gmail.com"
+          message["Subject"] = "[LivingWaterAI] Gmail Action 連線測試"
+          message.set_content(
+              "這是 LivingWaterAI GitHub Actions 的 Gmail 連線測試信。\n"
+              "若你收到此信，代表 GitHub Secret 與 Gmail 寄送授權已成功。"
+          )
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+              smtp.login("a23882005@gmail.com", password)
+              smtp.send_message(message)
+          print("GMAIL_TEST_SENT to=a23882005@gmail.com")
+          PY

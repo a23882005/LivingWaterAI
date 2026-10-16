@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-five-supplement-v1",
-  "generated_at": "2026-10-16T06:18:03.855+08:00",
-  "observation_context": "LivingWaterAI V70.3.12 supplemental refresh; m06 and s05 synchronized to later same-session direct checks already embedded in official HTML",
+  "generated_at": "2026-10-16T10:06:23+08:00",
+  "observation_context": "LivingWaterAI V70.3.12 daily 10:00 supplement; all five rechecked in this run",
   "quality_policy": {
     "OK": "Numeric value verified with stated source and method",
     "USABLE": "Numeric value displayed for the correct instrument; methodology or dating caveat preserved and permitted for research"
@@ -9,14 +9,14 @@
   "items": {
     "m06": {
       "id": "m06",
-      "value": 0.762,
+      "value": 0.7867,
       "unit": "percentage_point",
       "observation_date": "2026-10-15",
-      "retrieval_time": "2026-10-16T03:15:00+08:00",
+      "retrieval_time": "2026-10-16T10:06:23+08:00",
       "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; normalize displayed rounded probabilities (sum 100.1%) then weight target-range midpoints; subtract current 3.875% target midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525.",
+      "detail": "Table updated 2026-10-15 21:35 EDT. Displayed probabilities by target range 3.50-3.75 through 5.75-6.00: 0.0%, 0.8%, 7.0%, 22.3%, 32.4%, 24.7%, 10.3%, 2.3%, 0.3%, 0.0%. Displayed sum 100.1%; normalized weighted midpoint 4.661713%; delta +0.7867 percentage point.",
       "cross_checks": [
         {
           "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
@@ -24,39 +24,28 @@
         },
         {
           "source_url": "https://fred.stlouisfed.org/series/DFEDTARL",
-          "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+          "result": "NOT_RETRIEVED_THIS_ROUND"
         },
         {
           "source_url": "https://fred.stlouisfed.org/series/DFEDTARU",
-          "result": "DIRECT_DATA_UNAVAILABLE_IN_RETRIEVAL_TOOL"
+          "result": "NOT_RETRIEVED_THIS_ROUND"
         },
         {
           "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
-          "result": "DIRECT_SUCCESS_METHODOLOGY; embedded probability table not readable"
-        }
-      ],
-      "previous_candidates": [
-        {
-          "value": 0.75525,
-          "observation_date": "2026-10-15",
-          "retrieval_time": "2026-10-16T03:12:29+08:00",
-          "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-          "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints minus current 3.875% midpoint",
-          "detail": "Table updated 2026-10-15 14:35 EDT. Probabilities: 3.50-3.75 0.0%, 3.75-4.00 1.1%, 4.00-4.25 8.6%, 4.25-4.50 24.4%, 4.50-4.75 32.2%, 4.75-5.00 22.7%, 5.00-5.25 8.9%, 5.25-5.50 1.9%, 5.50-5.75 0.2%, 5.75-6.00 0.0%; sum 100.0%, weighted midpoint 4.63025%, delta +0.75525 percentage point. Fed 2026-09-16 statement confirms current 3.75-4.00% target range; CME FedWatch methodology page confirms probabilities are implied by 30-day Fed Funds futures.",
-          "status": "OK"
+          "result": "METHODOLOGY_CROSS_CHECK_VIA_INVESTING_PAGE; no separate probability table used"
         }
       ]
     },
     "m03_qqq": {
       "id": "m03_qqq",
-      "value": 29.78,
+      "value": 29.74,
       "unit": "x",
       "observation_date": "2026-10-13",
-      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "retrieval_time": "2026-10-16T10:06:23+08:00",
       "source_url": "https://stockanalysis.com/etf/qqq/holdings/",
       "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM.",
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-13. Use as P/E reference, not confirmed TTM.",
       "attempts": [
         {
           "priority": 1,
@@ -84,7 +73,7 @@
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/qqq/holdings/",
           "result": "DIRECT_OPEN_SUCCESS",
-          "value": 29.78,
+          "value": 29.74,
           "observation_date": "2026-10-13",
           "label": "P/E (site does not explicitly state TTM)"
         }
@@ -92,14 +81,14 @@
     },
     "m03_spy": {
       "id": "m03_spy",
-      "value": 24.99,
+      "value": 25.04,
       "unit": "x",
       "observation_date": "2026-10-14",
-      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "retrieval_time": "2026-10-16T10:06:23+08:00",
       "source_url": "https://stockanalysis.com/etf/spy/holdings/",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM.",
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-14. State Street cross-check: Index P/E 24.83 and Fund P/E FY1 20.53 as of 2026-10-14; FY1 excluded from TTM.",
       "attempts": [
         {
           "priority": 1,
@@ -118,7 +107,7 @@
         {
           "priority": 3,
           "site": "State Street official SPY",
-          "url": "https://www.ssga.com/us/en/intermediary/etfs/spdr-sp-500-etf-trust-spy",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
           "result": "DIRECT_OPEN_SUCCESS",
           "candidates": [
             {
@@ -138,7 +127,7 @@
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/spy/holdings/",
           "result": "DIRECT_OPEN_SUCCESS",
-          "value": 24.99,
+          "value": 25.04,
           "observation_date": "2026-10-14",
           "label": "P/E (site does not explicitly state TTM)"
         }
@@ -146,14 +135,14 @@
     },
     "m03_vt": {
       "id": "m03_vt",
-      "value": 20.8,
+      "value": 20.67,
       "unit": "x",
       "observation_date": "2026-08-31",
-      "retrieval_time": "2026-10-16T03:12:29+08:00",
+      "retrieval_time": "2026-10-16T10:06:23+08:00",
       "source_url": "https://stockanalysis.com/etf/vt/holdings/",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM.",
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-08-31. Use as dated P/E reference, not confirmed TTM.",
       "attempts": [
         {
           "priority": 1,
@@ -181,7 +170,7 @@
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/vt/holdings/",
           "result": "DIRECT_OPEN_SUCCESS",
-          "value": 20.8,
+          "value": 20.67,
           "observation_date": "2026-08-31",
           "label": "P/E (site does not explicitly state TTM)"
         }
@@ -189,14 +178,14 @@
     },
     "s05": {
       "id": "s05",
-      "value": 25.58,
+      "value": 30.2,
       "unit": "%",
-      "observation_date": "2026-10-14",
-      "retrieval_time": "2026-10-16T03:15:00+08:00",
+      "observation_date": "2026-10-15",
+      "retrieval_time": "2026-10-16T10:06:23+08:00",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
+      "detail": "Explicit NYSE $MMFI Percent Of Stocks Above 50-Day Average level 30.20, updated 2026-10-15. Not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
       "attempts": [
         {
           "priority": 1,
@@ -224,19 +213,8 @@
           "site": "Macroaxis",
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "result": "DIRECT_OPEN_SUCCESS",
-          "value": 25.58,
-          "observation_date": "2026-10-14"
-        }
-      ],
-      "previous_candidates": [
-        {
-          "value": 29.17,
-          "observation_date": "2026-10-13",
-          "retrieval_time": "2026-10-16T03:12:29+08:00",
-          "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-          "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
-          "detail": "Explicit $MMFI Percent Of Stocks level, updated 2026-10-13. Barchart direct page required JavaScript/bot verification; TradingView direct page identified INDEX:MMFI but exposed no level; StockCharts direct page was inaccessible. Not represented as an October 15 real-time observation and not reconstructed.",
-          "status": "OK"
+          "value": 30.2,
+          "observation_date": "2026-10-15"
         }
       ]
     }

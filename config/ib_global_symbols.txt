@@ -1,4 +1,4 @@
-# Seed watchlist; expand only with a verified IBKR-tradable universe.
+# Global watchlist plus Joseph/MOU holdings required for daily close and change reports.
 VOO
 VT
 QQQ
@@ -12,3 +12,11 @@ PPH
 NVDA
 MSFT
 GOOGL
+VALL.L
+VWRA.L
+NATO.CN
+DRAM
+GOOG
+SMH
+ZTS
+IBKR

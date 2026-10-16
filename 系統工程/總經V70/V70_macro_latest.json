@@ -1,7 +1,6 @@
-{"_fileMeta": {"lastModifiedTaipei":"2026/10/16 07:58:40","version":"V70-3-12","fileName":"V70_macro_latest.json"},
-
+{
   "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-15T23:56:48.650579Z",
+  "asOf": "2026-10-16T02:07:08.439683Z",
   "verification": {
     "ready": true,
     "valid": 24,
@@ -73,7 +72,7 @@
       "detail": "比較基期 2025-09-01"
     },
     "m09": {
-      "value": 102.082001,
+      "value": 102.038002,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
@@ -82,7 +81,7 @@
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
     },
     "m10": {
-      "value": 96.209999,
+      "value": 95.809998,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -91,7 +90,7 @@
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對"
     },
     "m12": {
-      "value": 102.503998,
+      "value": 102.487099,
       "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
@@ -118,13 +117,13 @@
       "detail": "5Y breakeven change from 2026-09-15"
     },
     "m14": {
-      "value": -123.579,
-      "dataDate": "2026-10-07",
+      "value": -77.286,
+      "dataDate": "2026-10-14",
       "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "unit": "USD bn",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
-      "detail": "開始=2026-07-08, 結束=2026-10-07, 單位十億美元; Fed Δ=11.951000, TGA Δ=136.539000, RRP Δ=-1.009000; 淨流動性 Δ=-123.579000"
+      "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000"
     },
     "m15": {
       "value": 54.9,
@@ -145,7 +144,7 @@
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
     },
     "m18": {
-      "value": 0,
+      "value": 0.0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",
@@ -181,7 +180,7 @@
       "detail": "同一 VIX 數列"
     },
     "s04": {
-      "value": 32.257143,
+      "value": 31.542857,
       "dataDate": "2026-10-15",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
@@ -190,49 +189,49 @@
       "detail": "來源為 CNN 非公開保證 API"
     },
     "m06": {
-      "value": 0.762,
+      "value": 0.7867,
       "dataDate": "2026-10-15",
       "source": "https://www.investing.com/central-banks/fed-rate-monitor",
       "unit": "percentage_point",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; normalize displayed rounded probabilities (sum 100.1%) then weight target-range midpoints; subtract current 3.875% target midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525."
+      "detail": "Table updated 2026-10-15 21:35 EDT. Displayed probabilities by target range 3.50-3.75 through 5.75-6.00: 0.0%, 0.8%, 7.0%, 22.3%, 32.4%, 24.7%, 10.3%, 2.3%, 0.3%, 0.0%. Displayed sum 100.1%; normalized weighted midpoint 4.661713%; delta +0.7867 percentage point."
     },
     "m03_qqq": {
-      "value": 29.78,
+      "value": 29.74,
       "dataDate": "2026-10-13",
       "source": "https://stockanalysis.com/etf/qqq/holdings/",
       "unit": "x",
       "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-13. Use as P/E reference, not confirmed TTM."
     },
     "m03_spy": {
-      "value": 24.99,
+      "value": 25.04,
       "dataDate": "2026-10-14",
       "source": "https://stockanalysis.com/etf/spy/holdings/",
       "unit": "x",
       "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-14. State Street cross-check: Index P/E 24.83 and Fund P/E FY1 20.53 as of 2026-10-14; FY1 excluded from TTM."
     },
     "m03_vt": {
-      "value": 20.8,
+      "value": 20.67,
       "dataDate": "2026-08-31",
       "source": "https://stockanalysis.com/etf/vt/holdings/",
       "unit": "x",
       "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
       "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
+      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-08-31. Use as dated P/E reference, not confirmed TTM."
     },
     "s05": {
-      "value": 25.58,
-      "dataDate": "2026-10-14",
+      "value": 30.2,
+      "dataDate": "2026-10-15",
       "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "unit": "%",
       "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth."
+      "detail": "Explicit NYSE $MMFI Percent Of Stocks Above 50-Day Average level 30.20, updated 2026-10-15. Not reconstructed and not substituted with S&P 500 or Nasdaq breadth."
     }
   },
   "news": [],
@@ -246,7 +245,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:04.291009+00:00"
+      "retrieved_at": "2026-10-16T01:23:47.548762+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -257,7 +256,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:05.291414+00:00"
+      "retrieved_at": "2026-10-16T01:23:48.497700+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -268,7 +267,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:06.257217+00:00"
+      "retrieved_at": "2026-10-16T01:23:49.484669+00:00"
     }
   ],
   "derived": {

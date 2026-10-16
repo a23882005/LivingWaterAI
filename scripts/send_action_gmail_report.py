@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 08:17:05｜版本：V70-3-12 Gmail 通知 v1.3｜檔案名稱：send_action_gmail_report.py
+# 最後修改日期時間（台灣時間）：2026/10/16 09:07｜版本：V70-3-12 Gmail 通知 v1.4｜檔案名稱：send_action_gmail_report.py
 """Email successful LivingWaterAI Action run results and attach its actual data artifact."""
 import argparse
 import csv
@@ -136,7 +136,7 @@ def main():
     msg = EmailMessage()
     msg["From"] = "a23882005@gmail.com"
     msg["To"] = "a23882005@gmail.com"
-    msg["Subject"] = f"[LivingWaterAI] {local_time[:10]} {run_name} 執行摘要"
+    msg["Subject"] = f"[LivingWaterAI] {start_time[:10]} {run_name} 執行摘要"
     msg.set_content("\n".join(lines))
     archive = Path("action-result-artifact.zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:

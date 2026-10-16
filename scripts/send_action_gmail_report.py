@@ -43,6 +43,36 @@ def macro_lines(data, label):
     lines.insert(1, "狀態統計：" + (", ".join(f"{k}={v}" for k, v in sorted(counts.items())) or "無"))
     return lines
 
+FAMILY_WATCHLIST = {
+    "Joseph": ["VALL.L", "VWRA.L", "VT", "SOXX", "QQQ", "NVDA", "PPH", "NATO.CN", "IBKR", "SGOV"],
+    "MOU": ["SGOV", "VT", "NVDA", "QQQ", "SOXX", "DRAM", "GOOG", "SMH", "MSFT", "ZTS", "IBKR", "0050.TW"],
+}
+
+def read_latest_close(root, symbol):
+    csv_path = next(iter(root.rglob(symbol.replace("/", "_") + ".csv")), None)
+    if not csv_path:
+        return None, None, None
+    try:
+        with csv_path.open(newline="", encoding="utf-8-sig") as f:
+            records = list(csv.DictReader(f))
+        if not records:
+            return None, None, None
+        last = records[-1]
+        prior = records[-2] if len(records) >= 2 else None
+        date = last.get("Date") or last.get("date") or "日期未標示"
+        close = float(last.get("Close", ""))
+        previous_close = float(prior.get("Close", "")) if prior and prior.get("Close") else None
+        pct = ((close / previous_close) - 1) * 100 if previous_close else None
+        return date, close, pct
+    except (OSError, csv.Error, ValueError, TypeError):
+        return None, None, None
+
+def fmt_close(value):
+    return "NA" if value is None else f"{value:,.2f}"
+
+def fmt_pct(value):
+    return "NA" if value is None else f"{value:+.2f}%"
+
 def history_lines(root, region):
     manifests = list(root.rglob("manifest.json"))
     report = next((load_json(p) for p in manifests if load_json(p)), None)
@@ -54,24 +84,29 @@ def history_lines(root, region):
     for symbol, row in items.items():
         status = row.get("status", "未標示")
         counts[status] = counts.get(status, 0) + 1
-        csv_path = next((p for p in root.rglob(symbol.replace("/", "_") + ".csv")), None)
-        close = "NA"
-        if csv_path:
-            try:
-                with csv_path.open(newline="", encoding="utf-8-sig") as f:
-                    records = list(csv.DictReader(f))
-                if records:
-                    last = records[-1]
-                    date = last.get("Date") or last.get("date") or row.get("latest_observation", "日期未標示")
-                    close = last.get("Close", "NA")
-                else:
-                    date = row.get("latest_observation", "日期未標示")
-            except (OSError, csv.Error):
-                date = row.get("latest_observation", "日期未標示")
-        else:
-            date = row.get("latest_observation", "日期未標示")
-        lines.append(f"- {symbol}: {status} | 最新觀測 {date} | 收盤 {close} | 歷史筆數 {row.get('rows','NA')}")
+        date, close, pct = read_latest_close(root, symbol)
+        date = date or row.get("latest_observation", "日期未標示")
+        lines.append(f"- {symbol}: {status} | 收盤日期 {date} | 收盤 {fmt_close(close)} | 日漲跌幅 {fmt_pct(pct)} | 歷史筆數 {row.get('rows','NA')}")
     lines.insert(1, "狀態統計：" + (", ".join(f"{k}={v}" for k, v in sorted(counts.items())) or "無"))
+    return lines
+
+def family_market_lines(cache_root=Path("data/market_history")):
+    owners = {}
+    for client, symbols in FAMILY_WATCHLIST.items():
+        for symbol in symbols:
+            owners.setdefault(symbol, []).append(client)
+    lines = ["Joseph／MOU 全部已記錄標的：最新有效收盤價與相對前一交易日漲跌幅"]
+    for symbol, clients in owners.items():
+        region = "taiwan" if symbol.endswith((".TW", ".TWO")) else "global"
+        root = cache_root / region
+        report = load_json(root / "manifest.json") or {}
+        row = (report.get("items") or {}).get(symbol, {})
+        status = row.get("status", "NO_DATA")
+        date, close, pct = read_latest_close(root, symbol)
+        date = date or row.get("latest_observation", "無資料")
+        if close is None and status == "OK":
+            status = "CSV缺少有效收盤資料"
+        lines.append(f"- {symbol}｜{'、'.join(clients)}｜資料日期 {date}｜收盤 {fmt_close(close)}｜日漲跌幅 {fmt_pct(pct)}｜狀態 {status}")
     return lines
 
 def make_summary(root, name):
@@ -125,7 +160,7 @@ def main():
     ]
     if "11h Verified V70.3 Site Deploy" in run_name:
         lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
-    lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "",
+    lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "", *family_market_lines(), "",
                   "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
     report_text = "\n".join(lines)
     print(report_text)

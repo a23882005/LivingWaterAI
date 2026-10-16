@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-16T03:48:07.518754+08:00",
+  "generated_at": "2026-10-16T09:23:50.906865+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -94,7 +94,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.082001,
+      "value": 102.038002,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -106,7 +106,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 96.209999,
+      "value": 95.809998,
       "unit": "USD/bbl",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -118,7 +118,7 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 102.503998,
+      "value": 102.487099,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
@@ -154,13 +154,13 @@
     "m14": {
       "id": "m14",
       "label": "淨流動性 13週變化（$bn）",
-      "value": -123.579,
+      "value": -77.286,
       "unit": "USD bn",
-      "observation_date": "2026-10-07",
+      "observation_date": "2026-10-14",
       "source_url": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
-      "detail": "開始=2026-07-08, 結束=2026-10-07, 單位十億美元; Fed Δ=11.951000, TGA Δ=136.539000, RRP Δ=-1.009000; 淨流動性 Δ=-123.579000",
+      "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000",
       "error": ""
     },
     "m15": {
@@ -238,7 +238,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 32.257143,
+      "value": 31.542857,
       "unit": "",
       "observation_date": "2026-10-15",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:04.291009+00:00"
+      "retrieved_at": "2026-10-16T01:23:47.548762+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:05.291414+00:00"
+      "retrieved_at": "2026-10-16T01:23:48.497700+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:06.257217+00:00"
+      "retrieved_at": "2026-10-16T01:23:49.484669+00:00"
     }
   ]
 }

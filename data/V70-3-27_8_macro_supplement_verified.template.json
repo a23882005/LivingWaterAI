@@ -483,11 +483,10 @@
   },
   "notes": [
     "本檔是資料格式範本，不是已抓取或已驗證的市場資料。",
-    "items 必須恰為九個補充變數；每個 candidate_checks 必須恰有四個候選來源查核紀錄。",
+    "items 必須恰為八個補充變數；每個 candidate_checks 必須恰有四個候選來源查核紀錄。",
     "候選來源的 NOT_CHECKED 不得轉成正式數值；只有查核成功且口徑符合才可填 value/source_url。",
     "Forward P/E 只接受明確 Forward/FY1；TTM 或期間未標示一律 MISSING。",
     "s05 只採 NYSE $MMFI 市場廣度，不可拿 S&P 500 或 Nasdaq 代替。",
     "m06_rstar 的正式值只採 NY Fed HLW 即時 vintage；其他來源只供方法或最新值交叉核對。",
-    "m06_taylor_infl 定義未經 Owner 鎖定前須維持 MISSING，不得自行選 CPI/PCE 或混用。"
   ]
 }

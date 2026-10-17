@@ -1,8 +1,8 @@
-# 最後修改：2026/10/17 10:31（台灣時間）｜版本：D009-v3｜檔案：macro18-preflight.yml
-name: LivingWaterAI V70.3 One-time Test Preflight 18 Macro
+# 2026/10/17｜Restore daily 09:00 TWT (18 macro)｜macro18-preflight.yml
+name: LivingWaterAI V70.3 09h Preflight 18 Macro
 on:
   schedule:
-    - cron: '26 4 17 10 *' # TEST 12:26 Asia/Taipei on Oct 17 only; restore 09:00 after test
+    - cron: '0 1 * * *' # Daily 09:00 Asia/Taipei (UTC 01:00)
   workflow_dispatch:
   push:
     paths:

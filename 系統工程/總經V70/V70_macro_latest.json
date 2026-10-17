@@ -1,8 +1,13 @@
 {
+  "_fileMeta": {
+    "lastModifiedTaipei": "2026/10/16 07:58:40",
+    "version": "V70-3-12",
+    "fileName": "V70_macro_latest.json"
+  },
   "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-17T02:09:35.485973Z",
+  "asOf": "2026-10-15T23:56:48.650579Z",
   "verification": {
-    "ready": true,
+    "ready": false,
     "valid": 24,
     "totalRequired": 24,
     "independentIndicators": 23,
@@ -10,12 +15,22 @@
       "09:00/18",
       "10:00/5"
     ],
-    "usableWithCaveat": []
+    "usableWithCaveat": [
+      "m03_qqq",
+      "m03_spy",
+      "m03_vt"
+    ],
+    "migrationBlockers": [
+      "此檔是舊 V70.3/family-macro-feed-v1（23獨立/24傳輸），不符合 V70-3-27 的 26/29/22 驗證契約。",
+      "m06 仍是舊 Fed 升降幅度；缺少 V70-3-27 五輸入 V2 衍生驗證。",
+      "三項PE未能證明為明確 Forward/FY1，需重新查核；TTM或未標明口徑不可計分。",
+      "尚未有含 macro18 + macro9 來源快照的新 JSON。"
+    ]
   },
   "indicators": {
     "m07": {
-      "value": 16.46,
-      "dataDate": "2026-10-15",
+      "value": 16.87,
+      "dataDate": "2026-10-14",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
@@ -23,8 +38,8 @@
       "detail": ""
     },
     "m01": {
-      "value": 0.35,
-      "dataDate": "2026-10-16",
+      "value": 0.33,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
@@ -32,8 +47,8 @@
       "detail": "Matched observation date for nominal 10Y minus 2Y"
     },
     "m08": {
-      "value": 2.74,
-      "dataDate": "2026-10-16",
+      "value": 2.78,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
@@ -41,8 +56,8 @@
       "detail": "10Y TIPS real yield"
     },
     "m02": {
-      "value": 3.23,
-      "dataDate": "2026-10-15",
+      "value": 3.25,
+      "dataDate": "2026-10-14",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
@@ -68,8 +83,8 @@
       "detail": "比較基期 2025-09-01"
     },
     "m09": {
-      "value": 101.778999,
-      "dataDate": "2026-10-16",
+      "value": 102.082001,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
@@ -77,8 +92,8 @@
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
     },
     "m10": {
-      "value": 99.040001,
-      "dataDate": "2026-10-16",
+      "value": 96.209999,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
@@ -86,8 +101,8 @@
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對"
     },
     "m12": {
-      "value": 101.102898,
-      "dataDate": "2026-10-16",
+      "value": 102.503998,
+      "dataDate": "2026-10-15",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
@@ -95,8 +110,8 @@
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
     },
     "m13": {
-      "value": 2.37,
-      "dataDate": "2026-10-16",
+      "value": 2.33,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
@@ -104,22 +119,22 @@
       "detail": "5Y nominal minus 5Y TIPS real yield on same day"
     },
     "m17": {
-      "value": 0.02,
-      "dataDate": "2026-10-16",
+      "value": -0.08,
+      "dataDate": "2026-10-15",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
-      "detail": "5Y breakeven change from 2026-09-16"
+      "detail": "5Y breakeven change from 2026-09-15"
     },
     "m14": {
-      "value": -77.286,
-      "dataDate": "2026-10-14",
+      "value": -123.579,
+      "dataDate": "2026-10-07",
       "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "unit": "USD bn",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
-      "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000"
+      "detail": "開始=2026-07-08, 結束=2026-10-07, 單位十億美元; Fed Δ=11.951000, TGA Δ=136.539000, RRP Δ=-1.009000; 淨流動性 Δ=-123.579000"
     },
     "m15": {
       "value": 54.9,
@@ -140,7 +155,7 @@
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
     },
     "m18": {
-      "value": 0.0,
+      "value": 0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",
@@ -167,8 +182,8 @@
       "detail": "注意歷史值可能修訂"
     },
     "s03": {
-      "value": 16.46,
-      "dataDate": "2026-10-15",
+      "value": 16.87,
+      "dataDate": "2026-10-14",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "與 m07 同步",
@@ -176,8 +191,8 @@
       "detail": "同一 VIX 數列"
     },
     "s04": {
-      "value": 17.938322,
-      "dataDate": "2026-10-16",
+      "value": 32.257143,
+      "dataDate": "2026-10-15",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
       "method": "CNN 非官方可讀 JSON（可能變動）",
@@ -185,49 +200,49 @@
       "detail": "來源為 CNN 非公開保證 API"
     },
     "m06": {
-      "value": 0.74025,
-      "dataDate": "2026-10-16",
+      "value": 0.762,
+      "dataDate": "2026-10-15",
       "source": "https://www.investing.com/central-banks/fed-rate-monitor",
       "unit": "percentage_point",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; weight target-range midpoints and subtract current 3.875% target midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-16 21:15 EDT. Probabilities for 3.75-4.00 through 5.75-6.00: 0.9%, 8.7%, 25.8%, 33.4%, 22.0%, 7.7%, 1.4%, 0.1%, 0.0% (sum 100.0%). Weighted midpoint 4.61525%; delta +0.74025 percentage point (about +2.96 quarter-point moves)."
+      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525."
     },
     "m03_qqq": {
-      "value": 22.28,
-      "dataDate": "2026-10-16",
-      "source": "https://stockanalysis.com/etf/qqq/",
-      "unit": "倍 Forward",
-      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
-      "status": "OK",
-      "detail": "Stock Analysis directly displayed QQQ Forward PE 22.28 at the 2026-10-16 close. Yahoo and Invesco did not expose an eligible Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM 27.18/29.74 was excluded."
+      "value": 29.78,
+      "dataDate": "2026-10-13",
+      "source": "https://stockanalysis.com/etf/qqq/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
     },
     "m03_spy": {
-      "value": 20.59,
-      "dataDate": "2026-10-15",
-      "source": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
-      "unit": "倍 Forward",
-      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected State Street official Fund Price/Earnings Ratio FY1",
-      "status": "OK",
-      "detail": "State Street directly displayed Fund Price/Earnings Ratio FY1 20.59, Fund Characteristics as of 2026-10-15. Yahoo displayed only TTM 24.23. Lower-priority sites were not needed after an official FY1 value was verified."
+      "value": 24.99,
+      "dataDate": "2026-10-14",
+      "source": "https://stockanalysis.com/etf/spy/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
     },
     "m03_vt": {
-      "value": 16.27,
-      "dataDate": "2026-10-16",
-      "source": "https://stockanalysis.com/etf/vt/",
-      "unit": "倍 Forward",
-      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
-      "status": "OK",
-      "detail": "Stock Analysis directly displayed VT Forward PE 16.27 at the 2026-10-16 close. Yahoo displayed only TTM 20.26; Vanguard exposed no readable Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM was excluded."
+      "value": 20.8,
+      "dataDate": "2026-08-31",
+      "source": "https://stockanalysis.com/etf/vt/holdings/",
+      "unit": "x",
+      "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
+      "status": "USABLE",
+      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
     },
     "s05": {
-      "value": 28.32,
-      "dataDate": "2026-10-16",
-      "source": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
+      "value": 25.58,
+      "dataDate": "2026-10-14",
+      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
       "unit": "%",
-      "method": "EODData INDEX:MMFI Percent of Stocks Above 50-Day Average daily close; same MMFI definition, not reconstructed",
+      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
       "status": "OK",
-      "detail": "Explicit INDEX:MMFI close 28.32 on 2026-10-16. Barchart direct page returned no readable value; TradingView verified the MMFI definition but returned dashes. Not substituted with S&P 500 or Nasdaq breadth."
+      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth."
     }
   },
   "news": [],
@@ -241,7 +256,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:01.575095+00:00"
+      "retrieved_at": "2026-10-15T19:48:04.291009+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -252,7 +267,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:02.751132+00:00"
+      "retrieved_at": "2026-10-15T19:48:05.291414+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -263,7 +278,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:03.464585+00:00"
+      "retrieved_at": "2026-10-15T19:48:06.257217+00:00"
     }
   ],
   "derived": {
@@ -272,5 +287,10 @@
       "method": "All three consecutive published monthly LEI YoY values < 0",
       "independentIndicator": false
     }
+  },
+  "migrationStatus": {
+    "status": "BLOCKED_LEGACY_FEED",
+    "canonicalHtml": "V70-3-27.html",
+    "doNotUseForFormalAllocation": true
   }
 }

@@ -1,4 +1,4 @@
-# 2026/10/17 14:xx TWT｜one-time manual-request deploy of verified five-bank table; restore manual-only after success
+# 2026/10/17｜one-time approved five-bank deployment; restore manual-only after success
 name: LivingWaterAI One-time Test V70-3-27 V3 Site Deploy
 on:
   schedule:
@@ -18,7 +18,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-and-deploy:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'deploy(v703): one-time five-bank publish 20261017')
+    if: >-
+      github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+       github.event.head_commit.message == 'deploy(v703): one-time five-bank publish 20261017')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

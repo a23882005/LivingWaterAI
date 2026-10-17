@@ -30,6 +30,14 @@ jobs:
           for k in ('m03_qqq','m03_spy','m03_vt'):
               assert p['indicators'][k]['lastVerifiedAt'], k
               assert p['indicators'][k]['sourceEvidence'], k
+          firms=p.get('wallStreetFive',{}).get('forecasts',[])
+          assert [(x['firm_id'],x['target']) for x in firms] == [
+              ('goldman',8000),('jpm',8000),('morgan',8000),('bofa',7400),('ubs',8100)
+          ]
+          built=Path('build/site/index.html').read_text(encoding='utf-8')
+          assert '資料查核日：等待建置' not in built
+          assert built.count('公開數字／自寫摘要／來源連結；全文未授權')==5
+          print('WALLSTREET5_FEED_AND_HTML_PASS',len(firms),flush=True)
           print('FEED_PROVENANCE_PASS',p['asOf'],flush=True)
           PY
       - name: Install real browser
@@ -71,6 +79,11 @@ jobs:
                       finalStock:document.querySelector('#final-stock')?.textContent,
                       finalBond:document.querySelector('#final-bond')?.textContent,
                       canPublish:window.v703CanPublishFormalAllocation?.(),
+                      wallstreet:[...document.querySelectorAll('#v703-wallstreet-rows tr')].map(tr=>({
+                          firm:tr.cells[0]?.textContent,
+                          target:tr.cells[3]?.textContent,
+                          source:tr.cells[5]?.querySelector('a')?.href
+                      })),
                       v703Latest:!!window.v703Latest
                   })""")
                   print('V703_BROWSER_SNAPSHOT',json.dumps(snapshot,ensure_ascii=False),flush=True)
@@ -83,6 +96,11 @@ jobs:
                   assert len(set(snapshot['scores'].values()))>2,'All score sliders are stuck at one value'
                   assert snapshot['finalStock'] and '計算中' not in snapshot['finalStock']
                   assert snapshot['finalBond'] and '計算中' not in snapshot['finalBond']
+                  assert [x['target'].strip() for x in snapshot['wallstreet']] == [
+                      '8,000','8,000','8,000','7,400','8,100'
+                  ],('Missing/inaccurate five-bank row values',snapshot['wallstreet'])
+                  assert all(x['source'].startswith('https://') for x in snapshot['wallstreet'])
+                  print('WALLSTREET5_BROWSER_E2E_PASS',flush=True)
                   assert not errors,('JS runtime errors',errors)
                   print('V703_BROWSER_E2E_PASS',flush=True)
                   browser.close()

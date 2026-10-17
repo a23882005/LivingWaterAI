@@ -1,20 +1,67 @@
-# 10:00「總體經濟狀況」Task｜爬蟲缺值自動補抓（2026-10-14）
+# V70-3-27｜10:00「總體經濟狀況」Task 補充資料交接規格
 
-**新增強制規則：凡09:00 GitHub Actions《總經爬蟲18項.py》結果狀態為 MISSING、STALE、UNVERIFIED 的指標，10:00 ChatGPT Task 一律自行開網頁搜尋、讀取、計算、查核。不限四項。s05 MMFI 固定自行查。保留原Task全部分析內容與章節，不新增Task。**
+**最後修改：2026-10-17（台灣時間）**  
+**適用版本：V70-3-27**  
+**用途：規定 10:00 總經 Task 如何查核並產生 9 項補充原始資料，供 11:00 GitHub Action 合併。本文取代本檔先前所有舊版抓取規則。**
 
-1. 讀 `a23882005/LivingWaterAI/data/18_macro_verification.json`，核對 generated_at、18項每筆 value / observation_date / source_url / status。若當日09:00未成功產檔，逐項補查，舊數據不得充新。
-2. **m06**：先讀 https://www.investing.com/central-banks/fed-rate-monitor 完整約12個月後FOMC利率機率表（Target Rate / Current Probability）；參照 https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html 及FRED https://fred.stlouisfed.org/series/DFEDTARL 、 https://fred.stlouisfed.org/series/DFEDTARU 查目前政策區間。令 expected_rate = Σ[(lower+upper)/2 × p] / Σp；current_mid=(current_lower+current_upper)/2；**m06=(expected_rate-current_mid)/0.25**，傳給V70 value 為純數字碼數，例如利率差+0.75個百分點→value=3。保留會議日、機率表更新時間/時區，拒絕只用期貨價格或舊分布猜值。
-3. **m03_qqq** 第一優先 Portfolio Visualizer https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=QQQ ，確認主基金為QQQ，讀 Fund Information → Price/Earnings (TTM)。依序備援/比對 Yahoo https://finance.yahoo.com/quote/QQQ/ 、Invesco https://www.invesco.com/qqq-etf/en/about.html 、Stock Analysis https://stockanalysis.com/etf/qqq/ 。
-4. **m03_spy** 第一優先 Portfolio Visualizer https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=SPY ，確認主基金為SPY，讀 Price/Earnings (TTM)。備援/比對 Yahoo https://finance.yahoo.com/quote/SPY/ 、State Street https://www.ssga.com/us/en/individual/etfs/state-street-spdr-sp-500-etf-trust-spy 、Stock Analysis https://stockanalysis.com/etf/spy/ 。已知24.20倍（2026-10-08）僅可作歷史參考，需當次核對。
-5. **m03_vt** 第一優先 Portfolio Visualizer https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=VT ，確認主基金為VT，讀 Price/Earnings (TTM)。備援/比對 Yahoo https://finance.yahoo.com/quote/VT/ 、Vanguard https://investor.vanguard.com/investment-products/etfs/profile/vt 、Stock Analysis https://stockanalysis.com/etf/vt/ 。Vanguard歷史20.8倍（2026-07-31）不可冒充當日PV TTM。
-6. **s05 MMFI** 依序：https://www.barchart.com/stocks/quotes/%24MMFI/comparison → https://stockcharts.com/h-sc/ui?s=%24MMFI → https://www.marketinout.com/stock-screener/above-50-day-moving-average → https://www.tradingview.com/symbols/INDEX-MMFI/ 。需驗證NYSE市場股票站上MA50比例、原始日線觀測日、0～100；Barchart Last 無可核對日期時僅記候選，不當今日值。
-7. **其他任何缺項**：優先查原始來源與正式指標字典；官方入口 FRED https://fred.stlouisfed.org/ 、BLS https://www.bls.gov/ 、BEA https://www.bea.gov/ 、Treasury https://home.treasury.gov/ 、Fed https://www.federalreserve.gov/ 、ISM https://www.ismworld.org/ 、Conference Board https://www.conference-board.org/ 。按原指標公式重算，禁止為填數而變更定義。
-8. 每項保留 id/value/unit/observation_date/retrieved_at/source_url/method/status/error；只有同口徑且有日期來源證據才OK，否則MISSING/STALE/UNVERIFIED。合併22+s05=23獨立項，另s03=m07形成24欄。向使用者交付**原完整總經報告**，並實際用已連接GitHub工具回寫整合JSON再讀回確認，交給11:00 Actions；未能回寫要明示阻礙，不得假稱交接/部署完成。
+## 一、工作範圍與交接
 
+1. 先讀取 GitHub 主分支 `data/18_macro_verification.json`，核對 09:00 核心資料的生成時間、每筆日期、來源與狀態。核心爬蟲負責 18 個獨立指標及重複欄位 `s03`；10:00 Task 負責以下 9 個補充原始輸入。
+2. 產出正式檔案 `data/9_macro_supplement_verified.json`，供 `scripts/build_daily_v703_site.py` 及 `.github/workflows/v703-site-deploy-1100.yml` 使用。
+3. 九個資料鍵必須恰好為：`m06_rate`、`m06_inf`、`m06_rstar`、`m06_taylor_infl`、`m06_output_gap`、`s05`、`m03_qqq`、`m03_spy`、`m03_vt`。不得自行增加、刪除或改名。
+4. 每一筆都要查核四個候選來源並留下紀錄。候選來源是查核清單，不代表四個網站的數字可混平均；正式值須採同一口徑且日期可追溯的來源。資料不符、無法確認、日期過期或定義未定時，標示 `MISSING`／`STALE`／`UNVERIFIED`，不可猜值或以舊值充新。
+5. 補充檔缺失、格式不合、候選查核未完成或必需資料無效時，11:00 Action 的品質閘門會阻擋發布，保留既有網站版本。
 
-## 2026-10-14｜QQQ／SPY／VT 三檔PE一致採用 Portfolio Visualizer
-三檔均以 Portfolio Visualizer 的 **Fund Information → Price/Earnings (TTM)** 為第一來源，先確認頁面主標的是正確ETF（不可把 Benchmark 的資料讀錯），**直接讀數值，不自行算PE**。m03_qqq URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=QQQ`；m03_spy URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=SPY`；m03_vt URL `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=VT`。已知歷史參考 QQQ 28.32、SPY 24.20；不硬編碼為每日最新值。VT PV 最新值未核對，不以發行商不同日期值冒充。失敗時由10:00總經Task依相同方法讀網頁並紀錄 value、TTM口徑、來源、觀測日期與抓取時間；其餘備援依原規則。
+## 二、m06：五個原始輸入與推導方式
 
+Task 提供以下五個有日期、有來源的原始輸入；**m06 衍生值由新版 builder 計算，不由 Task 手動填入或另行計分**：
 
-## 2026-10-14 最新優先正式規則（覆蓋上方22項與m06舊說明）
-09:00 來源改為 `總經爬蟲18項.py` → `data/18_macro_verification.json`。10:00 Task固定負責 **5項**：m06、m03_qqq、m03_spy、m03_vt、s05；另外補抓任何18項缺失。m06 **先保存 raw_rate_change_pp = 一年後最接近12個月FOMC完整機率分布加權中點 − 現行Fed目標利率中點**，例如 +0.80475 個百分點；**rate_change_quarters = raw_rate_change_pp / 0.25**，例如 +3.219碼。兩者不得混成同欄；V70原欄位m06的口徑須與HTML計分公式一致，禁止重複除以0.25。保留完整各檔機率、會議日期、資料觀測時間、來源、CME交叉核對及品質狀態。QQQ/SPY/VT一律Portfolio Visualizer的Fund Information Price/Earnings (TTM) 優先。最後23項需確實回寫GitHub並讀回驗收。
+- `m06_rate`：目前 Fed 目標利率區間中點（百分比）。候選來源：Federal Reserve；FRED DFEDTARL；FRED DFEDTARU；ALFRED DFEDTARU。以官方區間上下限計算中點，不可用有效聯邦基金利率替代。
+- `m06_inf`：未來 12 個月通膨預期（百分比）。候選來源：Cleveland Fed 1 年期預期；NY Fed SCE 1 年期中位數；University of Michigan 1 年期預期；Philadelphia Fed SPF。必須標明實際採用的來源及期限；不同期限不可直接替代。
+- `m06_rstar`：NY Fed Holston–Laubach–Williams（HLW）實質自然利率 r*（百分比）。候選來源：NY Fed r-star 方法頁；HLW real-time estimates；HLW current estimates；NY Fed Staff Report 1063。歷史回測須保留當時可得的即時版本；current estimates 僅作最新值交叉核對，不得冒充歷史即時版本。
+- `m06_taylor_infl`：Taylor 規則使用的通膨輸入（百分比）。候選來源：BEA 核心 PCE；FRED PCEPILFE；BLS CPI；FRED CPILFESL。**CPI 或 PCE 的正式口徑尚待確認；未確認前保持 MISSING，不得在 CPI/PCE 間自行切換。**
+- `m06_output_gap`：實際 GDP 相對潛在 GDP 的產出缺口（百分比）。候選來源：CBO 經濟資料；BEA NIPA；FRED GDPC1；ALFRED GDPC1。必須使用一致的實際 GDP／潛在 GDP 定義及可查證日期；只拿實際 GDP 水準不能冒充產出缺口。
+
+新版 builder 使用下式推導 m06，輸出單位為百分點：
+
+`實際實質利率缺口 = m06_rate − m06_inf − m06_rstar`  
+`Taylor 缺口 = 0.5 × (m06_taylor_infl − 2.0) + 0.5 × m06_output_gap`  
+`m06 = 實際實質利率缺口 − Taylor 缺口`
+
+五項原始輸入任一缺漏、未驗證或無有效日期／來源，衍生 m06 即為 MISSING；不得用範本預設值補算。
+
+## 三、s05：NYSE 市場廣度
+
+指標定義固定為 **NYSE 全市場站上 50 日移動平均線股票百分比（$MMFI）**，單位百分比、範圍 0–100。不得以 S&P 500 或 Nasdaq 廣度代替。
+
+四個候選來源：Macroaxis MMFI；Barchart $MMFI；EODData MMFI；TradingView INDEX:MMFI。查明標的範圍、50 日均線口徑及原始觀測日；只有報價而無可核日期時不得當作當日值。四個來源只作查核紀錄，不作數值平均。
+
+## 四、m03：三檔 ETF Forward P/E／FY1
+
+`m03_qqq`、`m03_spy`、`m03_vt` 一律查 **未來 12 個月 Forward P/E 或明確標示的 FY1 預估本益比**，單位「倍」。四個候選來源依序為：
+
+| 指標 | 候選來源（依查核順序） |
+|---|---|
+| m03_qqq | Yahoo Finance QQQ；Invesco QQQ；Portfolio Visualizer；StockAnalysis QQQ |
+| m03_spy | Yahoo Finance SPY；State Street SPY；Portfolio Visualizer；StockAnalysis SPY |
+| m03_vt | Yahoo Finance VT；Vanguard VT；Portfolio Visualizer；StockAnalysis VT |
+
+只接受頁面明確標示 Forward P/E、Forward、FY1 或相同意思的 12 個月預估欄位。**TTM 是落後 12 個月，不得作為 Forward/FY1，也不得填入正式值。** 找不到符合口徑的資料時，該 ETF 設為 MISSING，不可拿 TTM 或其他 ETF 代填。每一站都記錄實際查核結果及時間。
+
+## 五、正式 JSON 格式
+
+頂層至少包含 `schema`、`generated_at`、`as_of_taipei`、`items`。正式 `items` 僅含上述九個鍵。每個項目包含：
+
+- `label`、`value`、`unit`
+- `observation_date`、`source_url`、`method`、`status`、`detail`
+- `retrieval_time`、`publication_date`、`vintage`
+- `candidate_checks`：恰好四筆，每筆包含 `site`、`url`、`metric_or_horizon`、`status`、`checked_at`、`value`、`unit`、`observation_date`、`notes`
+
+`candidate_checks.status` 使用 `FOUND`、`NOT_FOUND`、`BLOCKED` 或 `METRIC_MISMATCH`，每筆都填實際查核時間。正式資料 `status` 依證據填 `OK`、`USABLE`、`MISSING`、`STALE` 或 `UNVERIFIED`；只有 `OK`／`USABLE` 才代表有可供 builder 驗證的數值。不得把候選查核狀態誤填為正式資料狀態。
+
+## 六、完成檢查
+
+1. 九個資料鍵完整且無多餘鍵；每筆四個候選來源查核都有結果與時間。
+2. 數值、單位、觀測日、發布日、抓取時間、來源及計算方法彼此一致；不得使用未標示期間的估值或跨口徑拼接。
+3. 生成並提交 `data/9_macro_supplement_verified.json` 後，回讀 GitHub 主分支檔案確認內容。
+4. 11:00 Action 會執行新版 builder，檢查核心與補充資料、m06 衍生值、22 個計分指標、估值 Forward/FY1 口徑及來源紀錄；全部通過後才發布 HTML／JSON。Task 不得宣稱 Action 已成功或網站已更新，除非已看到該次 Action 與線上驗證結果。

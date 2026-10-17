@@ -1,0 +1,51 @@
+# One-time audited diagnostic: official NY Fed HLW real-time XLSX only; no production writes.
+name: LivingWaterAI HLW Real-Time XLSX Source Inspection
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hlw-realtime-rstar-check.yml'
+permissions:
+  contents: read
+jobs:
+  inspect-official-hlw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'openpyxl>=3.1,<4'
+      - name: Download and inspect OFFICIAL NY Fed HLW real-time xlsx; no data change
+        run: |
+          python -u - <<'PY'
+          import io, json, time, urllib.request, hashlib
+          from openpyxl import load_workbook
+          url='https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx'
+          payload=None
+          for attempt in range(3):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (compatible; LivingWaterAI/1.0)','Accept':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*'})
+                  with urllib.request.urlopen(req,timeout=25) as resp:
+                      payload=resp.read(12000000)
+                      print('HTTP',resp.status,'CONTENT_TYPE',resp.headers.get('content-type'),'BYTES',len(payload),flush=True)
+                  if payload[:2]!=b'PK': raise ValueError('Not an xlsx ZIP: '+repr(payload[:100]))
+                  break
+              except Exception as e:
+                  print('DOWNLOAD_FAILURE',attempt+1,repr(e),flush=True)
+                  if attempt==2: raise
+                  time.sleep(3)
+          print('OFFICIAL_FILE_SHA256',hashlib.sha256(payload).hexdigest(),flush=True)
+          wb=load_workbook(io.BytesIO(payload),read_only=True,data_only=True)
+          print('SHEETS',repr(wb.sheetnames),flush=True)
+          for ws in wb:
+              print('SHEET_INFO',ws.title,'rows',ws.max_row,'cols',ws.max_column,flush=True)
+              rows=iter(ws.iter_rows(values_only=True))
+              for i,row in enumerate(rows):
+                  if i>=9:break
+                  print('TOP',ws.title,i+1,repr(tuple(row[:18])),flush=True)
+              tail=list(ws.iter_rows(min_row=max(1,ws.max_row-8),values_only=True))
+              for j,row in enumerate(tail):
+                  print('BOTTOM',ws.title,ws.max_row-len(tail)+j+1,repr(tuple(row[:18])),flush=True)
+          PY

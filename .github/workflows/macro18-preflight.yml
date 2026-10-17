@@ -139,6 +139,7 @@ jobs:
           # freshly validated payload staged, then retry a bounded fast-forward push.
           for attempt in 1 2 3; do
             git fetch origin main
+            # Isolate the JSON commit from concurrent edits to workflow files.
             git reset --mixed origin/main
             git add data/18_macro_verification.json data/d009_actions_proof.json
             if ! git diff --cached --quiet; then

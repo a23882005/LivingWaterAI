@@ -1,67 +1,63 @@
-# V70-3-27｜10:00「總體經濟狀況」Task 補充資料交接規格
+# V70-3-27 V3｜10:00「總體經濟狀況」Task 補充資料交接規格
 
 **最後修改：2026-10-17（台灣時間）**  
-**適用版本：V70-3-27**  
-**用途：規定 10:00 總經 Task 如何查核並產生 9 項補充原始資料，供 11:00 GitHub Action 合併。本文取代本檔先前所有舊版抓取規則。**
+**適用版本：V70-3-27 V3**  
+**用途：規範10:00總經Task查核八項補充資料，供11:00 GitHub Action建置。**
 
-## 一、工作範圍與交接
+## 一、工作分工與輸出
 
-1. 先讀取 GitHub 主分支 `data/18_macro_verification.json`，核對 09:00 核心資料的生成時間、每筆日期、來源與狀態。核心爬蟲負責 18 個獨立指標及重複欄位 `s03`；10:00 Task 負責以下 9 個補充原始輸入。
-2. 產出正式檔案 `data/9_macro_supplement_verified.json`，供 `scripts/build_daily_v703_site.py` 及 `.github/workflows/v703-site-deploy-1100.yml` 使用。
-3. 九個資料鍵必須恰好為：`m06_rate`、`m06_inf`、`m06_rstar`、`m06_taylor_infl`、`m06_output_gap`、`s05`、`m03_qqq`、`m03_spy`、`m03_vt`。不得自行增加、刪除或改名。
-4. 每一筆都要查核四個候選來源並留下紀錄。候選來源是查核清單，不代表四個網站的數字可混平均；正式值須採同一口徑且日期可追溯的來源。資料不符、無法確認、日期過期或定義未定時，標示 `MISSING`／`STALE`／`UNVERIFIED`，不可猜值或以舊值充新。
-5. 補充檔缺失、格式不合、候選查核未完成或必需資料無效時，11:00 Action 的品質閘門會阻擋發布，保留既有網站版本。
+1. 先讀取主分支 `data/18_macro_verification.json`，核對09:00核心資料的生成時間、日期、來源及狀態。核心爬蟲提供18個獨立指標及重複欄位s03。
+2. 本Task查核並產出 `data/8_macro_supplement_verified.json`，items必須恰好包含八個鍵：`m06_rate`、`m06_inf`、`m06_rstar`、`m06_output_gap`、`s05`、`m03_qqq`、`m03_spy`、`m03_vt`。
+3. 每個變數查核四個候選網站並逐站記錄URL、查核時間、期間／定義、數值及結果。候選網站是交叉查核清單，不可把不同口徑的數字混合或平均。
+4. Task負責查核、八欄JSON、總經研究及報告；不直接改HTML，也不宣稱Action或線上發布成功。缺值或證據不足須如實標MISSING／STALE／UNVERIFIED。
 
-## 二、m06：五個原始輸入與推導方式
+## 二、八項資料與候選網站
 
-Task 提供以下五個有日期、有來源的原始輸入；**m06 衍生值由新版 builder 計算，不由 Task 手動填入或另行計分**：
+### m06_rate｜Fed目前目標區間中點（%）
+候選：Federal Reserve政策頁 https://www.federalreserve.gov/monetarypolicy/openmarket.htm；FRED DFEDTARL https://fred.stlouisfed.org/series/DFEDTARL；FRED DFEDTARU https://fred.stlouisfed.org/series/DFEDTARU；ALFRED DFEDTARU https://alfred.stlouisfed.org/series?seid=DFEDTARU。  
+使用同一有效日期的官方目標區間上下限求中點，不可用有效聯邦基金利率代替。
 
-- `m06_rate`：目前 Fed 目標利率區間中點（百分比）。候選來源：Federal Reserve；FRED DFEDTARL；FRED DFEDTARU；ALFRED DFEDTARU。以官方區間上下限計算中點，不可用有效聯邦基金利率替代。
-- `m06_inf`：未來 12 個月通膨預期（百分比）。候選來源：Cleveland Fed 1 年期預期；NY Fed SCE 1 年期中位數；University of Michigan 1 年期預期；Philadelphia Fed SPF。必須標明實際採用的來源及期限；不同期限不可直接替代。
-- `m06_rstar`：NY Fed Holston–Laubach–Williams（HLW）實質自然利率 r*（百分比）。候選來源：NY Fed r-star 方法頁；HLW real-time estimates；HLW current estimates；NY Fed Staff Report 1063。歷史回測須保留當時可得的即時版本；current estimates 僅作最新值交叉核對，不得冒充歷史即時版本。
-- `m06_taylor_infl`：固定採用 **Core PCE（核心 PCE）年增率／過去 12 個月變化**，單位百分比。依季節調整月指數計算 `(本月指數 ÷ 去年同月指數 − 1) × 100`。正式數值來源為 BEA 核心 PCE 頁面及 FRED PCEPILFE；四來源查核另記錄 BLS CPI、FRED CPILFESL 作比較，但 CPI 數值不得代填此欄。Fed 的正式 2% 長期目標以整體 PCE 年增率衡量；Fed 公布的政策規則實作使用 Core PCE 四季通膨率，因核心通膨較能反映中期整體 PCE 走勢。即時值記錄觀測月、BEA 發布日及抓取時間；歷史回測保留當時可得 vintage。
-- `m06_output_gap`：實際 GDP 相對潛在 GDP 的產出缺口（百分比）。候選來源：CBO 經濟資料；BEA NIPA；FRED GDPC1；ALFRED GDPC1。必須使用一致的實際 GDP／潛在 GDP 定義及可查證日期；只拿實際 GDP 水準不能冒充產出缺口。
+### m06_inf｜未來12個月通膨預期（%）
+候選：Cleveland Fed https://www.clevelandfed.org/indicators-and-data/inflation-expectations；NY Fed SCE https://www.newyorkfed.org/microeconomics/sce；University of Michigan https://www.sca.isr.umich.edu/；Philadelphia Fed SPF https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/inflation-forecasts。  
+主來源Cleveland Fed；備援依序NY Fed SCE、Michigan。Philadelphia SPF作交叉核對，除非預測期限確實相同且有記錄，不得冒充滾動12個月預期。5年損益平衡通膨率不得代替此值。
 
-新版 builder 使用下式推導 m06，輸出單位為百分點：
+### m06_rstar｜NY Fed HLW實質自然利率r*（%）
+候選：NY Fed r-star https://www.newyorkfed.org/research/policy/rstar；HLW real-time estimates https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx；HLW current estimates https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx；NY Fed Staff Report 1063 https://www.newyorkfed.org/research/staff_reports/sr1063。  
+正式值採HLW即時版本；current estimates及報告作最新值／方法交叉核對。歷史研究保留當時可得vintage，不以今天修訂值回填。
 
-`實際實質利率缺口 = m06_rate − m06_inf − m06_rstar`  
-`Taylor 缺口 = 0.5 × (m06_taylor_infl − 2.0) + 0.5 × m06_output_gap`  
-`m06 = 實際實質利率缺口 − Taylor 缺口`
+### m06_output_gap｜實際GDP相對潛在GDP產出缺口（%）
+候選：CBO經濟資料 https://www.cbo.gov/data/budget-economic-data；BEA NIPA https://www.bea.gov/itable/national-gdp-and-personal-income；FRED GDPC1 https://fred.stlouisfed.org/series/GDPC1；ALFRED GDPC1 https://alfred.stlouisfed.org/series?seid=GDPC1。  
+必須有一致定義的實際GDP與潛在GDP、觀測期、發布日及vintage；不可用ISM、NFP或GDP單獨水準冒充產出缺口。
 
-五項原始輸入任一缺漏、未驗證或無有效日期／來源，衍生 m06 即為 MISSING；不得用範本預設值補算。
+### s05｜NYSE全市場站上50日均線股票百分比（$MMFI，%）
+候選：Macroaxis https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks；Barchart https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis；EODData https://www.eoddata.com/stockquote/NYSE/MMFI.htm；TradingView https://www.tradingview.com/symbols/INDEX-MMFI/。  
+確認NYSE母體、50日均線定義、0–100百分比和觀測日；不得以S&P 500或Nasdaq廣度代替。
 
-## 三、s05：NYSE 市場廣度
+### m03_qqq、m03_spy、m03_vt｜ETF Forward P/E或FY1（倍）
+每檔四個候選來源如下：
 
-指標定義固定為 **NYSE 全市場站上 50 日移動平均線股票百分比（$MMFI）**，單位百分比、範圍 0–100。不得以 S&P 500 或 Nasdaq 廣度代替。
-
-四個候選來源：Macroaxis MMFI；Barchart $MMFI；EODData MMFI；TradingView INDEX:MMFI。查明標的範圍、50 日均線口徑及原始觀測日；只有報價而無可核日期時不得當作當日值。四個來源只作查核紀錄，不作數值平均。
-
-## 四、m03：三檔 ETF Forward P/E／FY1
-
-`m03_qqq`、`m03_spy`、`m03_vt` 一律查 **未來 12 個月 Forward P/E 或明確標示的 FY1 預估本益比**，單位「倍」。四個候選來源依序為：
-
-| 指標 | 候選來源（依查核順序） |
+| 指標 | 候選來源（依序） |
 |---|---|
 | m03_qqq | Yahoo Finance QQQ；Invesco QQQ；Portfolio Visualizer；StockAnalysis QQQ |
 | m03_spy | Yahoo Finance SPY；State Street SPY；Portfolio Visualizer；StockAnalysis SPY |
 | m03_vt | Yahoo Finance VT；Vanguard VT；Portfolio Visualizer；StockAnalysis VT |
 
-只接受頁面明確標示 Forward P/E、Forward、FY1 或相同意思的 12 個月預估欄位。**TTM 是落後 12 個月，不得作為 Forward/FY1，也不得填入正式值。** 找不到符合口徑的資料時，該 ETF 設為 MISSING，不可拿 TTM 或其他 ETF 代填。每一站都記錄實際查核結果及時間。
+只接受頁面明確標示Forward P/E、Forward或FY1的未來預估值。TTM或未標明期間的P/E不得冒充Forward；找不到可驗證值時設MISSING。
 
-## 五、正式 JSON 格式
+## 三、m06 V3衍生公式
 
-頂層至少包含 `schema`、`generated_at`、`as_of_taipei`、`items`。正式 `items` 僅含上述九個鍵。每個項目包含：
+Task提供四個有日期、有來源的原始值，不手填衍生m06。建置器按下式計算，單位為百分點：
 
-- `label`、`value`、`unit`
-- `observation_date`、`source_url`、`method`、`status`、`detail`
-- `retrieval_time`、`publication_date`、`vintage`
-- `candidate_checks`：恰好四筆，每筆包含 `site`、`url`、`metric_or_horizon`、`status`、`checked_at`、`value`、`unit`、`observation_date`、`notes`
+`實際實質利率缺口 = m06_rate − m06_inf − m06_rstar`  
+`Taylor基準缺口 = 0.5 × (同一個m06_inf − 2.0) + 0.5 × m06_output_gap`  
+`m06 = 實際實質利率缺口 − Taylor基準缺口`
 
-`candidate_checks.status` 使用 `FOUND`、`NOT_FOUND`、`BLOCKED` 或 `METRIC_MISMATCH`，每筆都填實際查核時間。正式資料 `status` 依證據填 `OK`、`USABLE`、`MISSING`、`STALE` 或 `UNVERIFIED`；只有 `OK`／`USABLE` 才代表有可供 builder 驗證的數值。不得把候選查核狀態誤填為正式資料狀態。
+兩處使用同一個未來12個月通膨預期m06_inf，不再另抓Taylor通膨欄。四個原始輸入任一缺漏、未驗證或日期／來源無效，衍生m06即MISSING。分數門檻以正式HTML為準。
 
-## 六、完成檢查
+## 四、JSON欄位與品質檢查
 
-1. 九個資料鍵完整且無多餘鍵；每筆四個候選來源查核都有結果與時間。
-2. 數值、單位、觀測日、發布日、抓取時間、來源及計算方法彼此一致；不得使用未標示期間的估值或跨口徑拼接。
-3. 生成並提交 `data/9_macro_supplement_verified.json` 後，回讀 GitHub 主分支檔案確認內容。
-4. 11:00 Action 會執行新版 builder，檢查核心與補充資料、m06 衍生值、22 個計分指標、估值 Forward/FY1 口徑及來源紀錄；全部通過後才發布 HTML／JSON。Task 不得宣稱 Action 已成功或網站已更新，除非已看到該次 Action 與線上驗證結果。
+頂層包含`schema`、`generated_at`、`as_of_taipei`、`items`。八筆資料各包含`label`、`value`、`unit`、`observation_date`、`source_url`、`method`、`status`、`detail`、`retrieval_time`、`publication_date`、`vintage`及`candidate_checks`。每筆`candidate_checks`恰好四筆，欄位為`site`、`url`、`metric_or_horizon`、`status`、`checked_at`、`value`、`unit`、`observation_date`、`notes`。
+
+候選查核狀態使用FOUND、NOT_FOUND、BLOCKED或METRIC_MISMATCH；正式資料狀態依證據使用OK、USABLE、MISSING、STALE或UNVERIFIED。缺值的value設null並解釋原因；不可猜值、沿用舊值或用範本值冒充觀測值。
+
+提交後讀回GitHub主分支，確認八個鍵與內容。11:00 Action需驗證25個獨立指標、28個傳輸指標、26個必要資料項及22/22計分欄位。全部通過才發布；未看到Action run及線上讀回證據，不得宣稱已部署。

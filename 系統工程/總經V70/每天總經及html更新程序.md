@@ -1,34 +1,33 @@
-# LivingWaterAI V70.3｜每日五階段自動化正式工序（2026-10-14）
-> 唯一現行總經分工：**09:00 Python 18項 + 10:00 ChatGPT 5項 = 23個獨立總經指標**。另外 s03=m07 VIX 重複傳輸，共24欄。舊版「爬蟲22項」「8+16」不是現行分工。
-> 所有時間均為 Asia/Taipei。排程設定與實際成功執行是兩回事；要看 Actions run／log／資料回讀方能標示PASS。
+# LivingWaterAI V70.3｜每日五階段正式工作程序
+文件日期：2026/10/17｜時區：Asia/Taipei
+正式目錄：GitHub 與 Google Drive 的「系統工程/總經V70」
 
-| 時間 | 執行者 | 執行內容與交付 |
+## 正式版本與資料契約
+唯一正式 HTML 母版為 `V70-3-27.html`，配對 JSON 為同目錄的 `V70_macro_latest.json`。舊 HTML/JSON 只作歷史查閱，不可當作新版計算輸入。
+
+V70-3-27 驗證契約：26 個獨立指標、29 個傳輸指標、27 個必要資料值、22 個必要計分指標。10:00 補充檔包含九個原始欄位：`m06_rate`、`m06_inf`、`m06_rstar`、`m06_taylor_infl`、`m06_output_gap`、`s05`、`m03_qqq`、`m03_spy`、`m03_vt`。m06 本身由 HTML/建置器依五項子資料計算，不再採用舊的 Fed 升降幾碼定義。
+
+`m06 = (Fed目前利率中點 - 未來12個月通膨預期 - HLW即時r*) - [0.5 × (Taylor通膨 - 2%) + 0.5 × 實際GDP相對潛在GDP缺口]`。各輸入必須附數值、單位、觀測日、來源、方法、狀態及適用時的發布日／資料 vintage。Fed利率中點取官方目標區間中點；未來12M通膨以 Cleveland Fed 1Y 為主，NY Fed SCE 1Y及密西根1Y依序備援並標明實際來源；r*取NY Fed HLW即時版本；產出缺口不得拿ISM或NFP代替。
+
+三檔估值只收明確標示 Forward/FY1/forwardPE 的未來12個月預估值；TTM、未標明口徑或無法驗證的數值一律 MISSING。s05 固定為 NYSE MMFI 全市場站上50日均線比例，不以 S&P 500 或 Nasdaq 廣度代替。
+
+目前 3-27 內嵌資料為 `ready=false`、計分欄位19/22，三檔 Forward P/E 均 MISSING。資料未補齊前，總經體質分與正式配置維持 NA/暫停，不可把舊 23/24 JSON 標成新版。11:00 Action 只在來源快照、日期、29傳輸欄和22/22計分項全通過時才部署。
+
+## 每日五階段
+| 台灣時間 | 執行者 | 工作 |
 |---|---|---|
-| **07:00** | GitHub Actions 任務1 | IBKR上可交易國外股票、債券與ETF歷史價格／股息／還原價格增量下載，附資料日期與品質驗證 |
-| **09:00** | GitHub Actions 任務2 | 跑 **`系統工程/總經V70/總經爬蟲18項.py`**，輸出並提交 **`data/18_macro_verification.json`** |
-| **10:00** | 既有 ChatGPT「總體經濟狀況」Task | 先讀09:00 JSON；固定自行抓 **m06、m03_qqq、m03_spy、m03_vt、s05**；Python其餘18項若 MISSING/STALE/UNVERIFIED，也自行查原始網站補抓；完成23項分析與完整總經報告，**實際回寫** GitHub 合併JSON並read-back |
-| **11:00** | GitHub Actions 任務3 | 只讀10:00驗證整合資料，重建 `V70-3-10.html` 對應的 `index.html`，部署 Hostinger 並回讀正式網站驗收；缺資料則 fail closed 不覆蓋 |
-| **14:30** | GitHub Actions 任務4 | IBKR上可交易台灣股票、債券與ETF歷史資料增量下載；未收盤確認的日K標未完成 |
+| 07:00 | GitHub Actions | 更新國外股票、債券、ETF歷史資料 |
+| 09:00 | GitHub Actions | 執行 `總經爬蟲18項.py`，輸出 `data/18_macro_verification.json`（18個指標及 s03=m07 的VIX重複欄） |
+| 10:00 | ChatGPT「總體經濟狀況」Task | 驗證09:00資料並查九個補充原始欄位，輸出 `data/9_macro_supplement_verified.json`，讀回核對；缺資料照實標MISSING/STALE |
+| 11:00 | GitHub Actions | 以 `V70-3-27.html` 建置29傳輸欄 JSON/網站；需22/22計分通過才更新GitHub配對JSON並部署Hostinger |
+| 14:30 | GitHub Actions | 更新台灣股票、債券、ETF歷史資料 |
 
-## 09:00 正式檔案與來源
-- Actions：`.github/workflows/macro18-preflight.yml`，原 macro22-preflight.yml 已退役。
-- 主程式：`系統工程/總經V70/總經爬蟲18項.py`，原「總經爬蟲22項.py」已退役。
-- 原始資料：`data/18_macro_verification.json`（18個獨立指標＋s03複用VIX，實際19筆）。
-- 每筆皆保存 `value`、`unit`、`observation_date`、`source_url`、`method`、`status`、`error`；資料過期不得冒充今日。
+## 10:00 輸出格式
+九個 key 必須完整且不可多欄；每筆包含 `value`、`unit`、`observation_date`、`source_url`、`method`、`status`、`detail`。m06五項子欄另存來源、發布日/vintage及抓取時間。前向本益比只接受明確Forward/FY1，保存各站查核紀錄；抓不到時保留 MISSING，不准以TTM補值。Task 不可只寫 HTML 而漏掉 JSON 輸入檔。
 
-## 10:00 固定五項由 ChatGPT 處理
-1. **m06｜未來約12個月 Fed 政策利率期望變動**：Investing.com `https://www.investing.com/central-banks/fed-rate-monitor` 讀最接近一年後FOMC的全部機率與利率區間，交叉查CME及FRED現行Fed目標區間。計算 `expected_rate = Σ[各區間中點×機率]/Σ機率`；`raw_change_pp = expected_rate - current_policy_midpoint`，**原始value採百分點**（例如 +0.80475），`change_quarters = raw_change_pp / 0.25` 為碼數（+3.219）。前端不可重複換算，兩欄口徑須明定。保留會議日期、時間、機率表及CME交叉核對結果。
-2. **m03_qqq／m03_spy／m03_vt**：優先 Portfolio Visualizer `https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=QQQ`（另將 symbol 改SPY、VT），確認ETF本身標的，直接讀 `Fund Information → Price/Earnings (TTM)`，不自行算TTM PE。估值日期不明須標UNVERIFIED並查備援。
-3. **s05｜NYSE MMFI**：Barchart `https://www.barchart.com/stocks/quotes/%24MMFI/comparison` → StockCharts `https://stockcharts.com/h-sc/ui?s=%24MMFI` → Market-In-Out → TradingView；需確認NYSE股票站上50日均線比例及觀測日期，禁止無日期的搜尋摘要冒充當日值。
-4. **其餘18項任何缺值**：Task按原指標定義逐一補查，官方網站如FRED/BLS/Treasury/ISM/Conference Board為優先，不把舊快取當新值。
-5. **合併寫回**：23個獨立指標（18+5），再加入 s03=m07 的重複傳輸欄，總計24欄；可追溯原始來源、日期與品質狀態。10:00 Task 必須實際寫GitHub並read-back；寫不進去應報錯，不能宣稱11:00已拿到資料。
+## 11:00 部署驗收
+建置器 `scripts/build_daily_v703_site.py` 讀取18項主檔與9項補充檔，產生 `V70.3/family-macro-feed-v2`。只有同時滿足 `independentIndicators=26`、`transportIndicators=29`、`valid=27/27`、`requiredScoringIndicatorsValidated=22/22`、三檔PE明確Forward/FY1、m06五項來源快照齊全時才發布。任何缺值或舊schema均停止部署並保留網站最後一次有效版本。GitHub Action成功不等於實站通過，須讀回首頁與JSON核對版本、asOf及指標。
 
-詳見 [總經Task_爬蟲缺值補抓規則.md](./總經Task_爬蟲缺值補抓規則.md)。
+## 一般可靠性
+所有資料保留來源、觀測日、抓取時間與品質狀態。過期值標STALE，缺值標MISSING；不以預設值或歷史值冒充最新值。07:00/14:30市場資料維持原排程與品質驗證流程。
 
-## 11:00 部署驗收與已知限制
-- 現有 `.github/workflows/update-v70.yml` 目前仍有舊16項爬蟲與未完成 Hostinger 自動部署路徑，**需另行改寫與實際驗收**；這份程序文件不等於已部署。
-- 10:00的整合JSON必須來源可靠、口徑一致、日期確認；若缺值可提供標註版報告，但不可把缺失充作OK。
-- 只有確實建立index.html、上傳Hostinger、網址讀回顯示新版時，才標示網站部署成功。
-
-## 通用六項可靠性
-分批抓取、節流、有限退避重試、增量快取、可靠備援、資料日期/交易時區/完整性/異常/配息口徑品質驗證；失敗保留前次有效資料、標示STALE和失敗原因。

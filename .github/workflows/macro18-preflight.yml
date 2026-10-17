@@ -139,7 +139,7 @@ jobs:
           # freshly validated payload staged, then retry a bounded fast-forward push.
           for attempt in 1 2 3; do
             git fetch origin main
-            git reset --soft origin/main
+            git reset --mixed origin/main
             git add data/18_macro_verification.json data/d009_actions_proof.json
             if ! git diff --cached --quiet; then
               git commit -m "data(macro18): 09h observed 18 indicator preflight"

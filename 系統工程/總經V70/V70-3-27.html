@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/17 10:06:00｜版本：V70-3-27｜檔案名稱：V70-3-27.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/17 10:31:00｜版本：V70-3-27｜檔案名稱：V70-3-27.html -->
 <!DOCTYPE html>
 
 
@@ -3033,7 +3033,7 @@ if (recBlack) {
  * Read V70_macro_latest.json beside the HTML first; if sibling access is blocked,
  * use the embedded snapshot, then numeric defaults in macroConfig. Never fetch
  * finance vendors directly here.
- * Supported schemas: V70.3/family-macro-feed-v1 and legacy V70.3/macro-feed-v1;
+ * Supported schemas: V70.3/family-macro-feed-v2, V70.3/family-macro-feed-v1 and legacy V70.3/macro-feed-v1;
  * missing or unverified observations stay fail-closed.
  */
 (function(){
@@ -3171,7 +3171,7 @@ if (recBlack) {
  if(familyLife)familyLife.addEventListener('change',synchronize);
  if(familyStyle)familyStyle.addEventListener('change',synchronize);
  async function fetchFeedDocument(){
-   const accepted=['V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'];
+   const accepted=['V70.3/family-macro-feed-v2','V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'];
    const embeddedNode=document.getElementById('v70-embedded-feed');
    let embedded=null,embeddedError='';
    if(embeddedNode){
@@ -3224,7 +3224,7 @@ if (recBlack) {
    status.textContent='正在讀取最新總經快照…';
    try{
      const doc=await fetchFeedDocument();
-     // Python 24項蒐集器先執行，將已驗證資料轉為此資料契約；不得使用 MISSING/STALE 冒充正式數值。
+    // V70-3-27 feed v2：18項主資料＋9個補充原始欄＋m06衍生值；不得使用 MISSING/STALE 冒充正式數值。
      if(!doc.verification || doc.verification.ready!==true){
        const n=doc?.verification?.valid??0, total=doc?.verification?.totalRequired??22;
        const missing=Array.isArray(doc?.verification?.missing)?doc.verification.missing.join('、'):'';
@@ -3244,7 +3244,7 @@ if (recBlack) {
      // An old published snapshot must remain visibly old, not masquerade as a fresh run.
      if(doc.verification.independentIndicators!==26 || Object.keys(data).length < 27)throw new Error('獨立原始欄／傳輸欄數量不符（預期26項原始欄、至少27欄）');
      if(doc.batchDateTaipei && !/^\d{4}-\d{2}-\d{2}$/.test(doc.batchDateTaipei))throw new Error('批次日期格式錯誤');
-     if(doc.sourceSnapshot && (!doc.sourceSnapshot.macro18 || !doc.sourceSnapshot.macro5))throw new Error('來源SHA快照不完整');
+     if(doc.sourceSnapshot && (!doc.sourceSnapshot.macro18 || !doc.sourceSnapshot.macro9))throw new Error('來源SHA快照不完整（需 macro18 與 macro9）');
      if(data.s03?.value!==data.m07?.value || data.s03?.dataDate!==data.m07?.dataDate)throw new Error('s03/m07 VIX重複資料不一致');
      window.v703PEReferenceVerified=Object.create(null);
      window.v703SourceBatch={asOf:doc.asOf,batchDateTaipei:doc.batchDateTaipei||null,sourceSnapshot:doc.sourceSnapshot||null,verified:false};

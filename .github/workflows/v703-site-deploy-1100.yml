@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 15:50｜版本：V70-3-27 V3 workflow｜檔案名稱：v703-site-deploy-1100.yml
+# 2026/10/17 14:xx TWT｜one-time manual-request deploy of verified five-bank table; restore manual-only after success
 name: LivingWaterAI One-time Test V70-3-27 V3 Site Deploy
 on:
   schedule:
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-and-deploy:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'deploy(v703): one-time five-bank publish 20261017')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -54,6 +54,19 @@ jobs:
           taylor_gap = 0.5 * (inflation - 2.0) + 0.5 * output_gap
           assert abs(float(feed['indicators']['m06']['value']) - (actual_gap - taylor_gap)) < 0.001
           assert 'm06_taylor_infl' not in feed['indicators']
+          # Five public dated forecasts are display-only, not part of 22 macro scoring indicators.
+          five=feed['wallStreetFive']
+          assert five['schema']=='V70.3/wallstreet-five-forecast-v1'
+          assert [(row['firm_id'],row['target'],row['horizon_end_date']) for row in five['forecasts']]==[
+              ('goldman',8000,'2026-12-31'),('jpm',8000,'2026-12-31'),
+              ('morgan',8000,'2026-12-31'),('bofa',7400,'2026-12-31'),
+              ('ubs',8100,'2026-12-31')
+          ]
+          assert feed['sourceSnapshot']['wallstreet5']
+          content=Path('build/site/index.html').read_text(encoding='utf-8')
+          assert content.count('公開數字／自寫摘要／來源連結；全文未授權')==5
+          assert '待總經 Task 抓取' not in content
+          print('V703_WALLSTREET5_PUBLICATION_GATE_PASS',len(five['forecasts']))
           for key in ('m03_qqq','m03_spy','m03_vt'):
               row=feed['indicators'][key]
               assert row['status'] in ('OK','USABLE') and row['value'] is not None
@@ -144,6 +157,11 @@ jobs:
                   assert len(live["indicators"])==28
                   assert "V70_macro_latest.json" in page
                   assert "V70-3-27" in page
+                  assert live['wallStreetFive']['forecasts']==expected['wallStreetFive']['forecasts']
+                  assert live['sourceSnapshot']['wallstreet5']==expected['sourceSnapshot']['wallstreet5']
+                  assert page.count('公開數字／自寫摘要／來源連結；全文未授權')==5
+                  assert all(('>'+format(x,',')+'<') in page for x in (8000,7400,8100))
+                  print('HOSTINGER_WALLSTREET5_LIVE_PASS',len(live['wallStreetFive']['forecasts']))
                   print("HOSTINGER_LIVE_PASS",base,expected["asOf"])
                   break
               except Exception as exc:

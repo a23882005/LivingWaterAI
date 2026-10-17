@@ -1,15 +1,16 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 04:47:57｜版本：V70.3.12 workflow｜檔案名稱：v703-site-deploy-1100.yml
-name: LivingWaterAI 11h Verified V70.3 Site Deploy
+# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：V70-3-27 workflow｜檔案名稱：v703-site-deploy-1100.yml
+name: LivingWaterAI 11h Verified V70-3-27 Site Deploy
 on:
   schedule:
     - cron: '0 3 * * *' # 11:00 Asia/Taipei
   workflow_dispatch:
   push:
     paths:
-      - '系統工程/總經V70/V70-3-12.html'
+      - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
-      - 'data/5_macro_verified.json'
+      - 'data/18_macro_verification.json'
+      - 'data/9_macro_supplement_verified.json'
 permissions:
   contents: write
 concurrency:
@@ -24,12 +25,34 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Validate 09h 18 and 10h 5 verified metrics; build site
+      - name: Validate 18 core plus 9 supplement inputs; build V70-3-27
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
           test -s data/18_macro_verification.json
-          test -s data/5_macro_verified.json
-          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-12.html" --out build/site
+          test -s data/9_macro_supplement_verified.json
+          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
+      - name: Require complete 22 of 22 scoring inputs before publishing
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          feed=json.loads(Path('build/site/V70_macro_latest.json').read_text(encoding='utf-8'))
+          v=feed['verification']
+          assert feed['schema']=='V70.3/family-macro-feed-v2', 'wrong V70 feed schema'
+          assert v['ready'] is True, 'V70-3-27 data incomplete; preserve existing published site'
+          assert v['independentIndicators']==26
+          assert v['transportIndicators']==29 and len(feed['indicators'])==29
+          assert v['totalRequired']==27 and v['valid']==27
+          assert v['requiredScoringIndicators']==22 and v['requiredScoringIndicatorsValidated']==22
+          assert feed.get('sourceSnapshot',{}).get('macro18') and feed.get('sourceSnapshot',{}).get('macro9')
+          assert feed['indicators']['m06']['status'] in ('OK','USABLE')
+          for key in ('m03_qqq','m03_spy','m03_vt'):
+              row=feed['indicators'][key]
+              assert row['status'] in ('OK','USABLE') and row['value'] is not None
+              assert 'forward' in row['method'].lower() or 'fy1' in row['method'].lower()
+              assert 'ttm' not in row['method'].lower()
+          print('V70_3_27_QA_PASS',feed['asOf'])
+          PY
       - name: Publish matching JSON beside official GitHub HTML
         run: |
           python - <<'PY'
@@ -38,10 +61,6 @@ jobs:
           from scripts.macro18_state import atomic_write
           source=Path('build/site/V70_macro_latest.json')
           data=json.loads(source.read_text(encoding='utf-8'))
-          assert data['schema']=='V70.3/family-macro-feed-v1'
-          assert data['verification']['ready'] is True
-          assert data['verification']['independentIndicators']==23
-          assert len(data['indicators'])==24
           target=Path('系統工程/總經V70/V70_macro_latest.json')
           atomic_write(target, source.read_bytes())
           assert json.loads(target.read_text(encoding='utf-8'))==data
@@ -53,7 +72,7 @@ jobs:
             git reset --soft origin/main
             git add "系統工程/總經V70/V70_macro_latest.json"
             if ! git diff --cached --quiet; then
-              git commit -m "data(V70.3.12): sync verified 23-indicator feed beside official HTML"
+              git commit -m "data(V70-3-27): publish verified 29-indicator feed"
             fi
             if git push origin HEAD:main; then break; fi
             if [ "$attempt" -eq 3 ]; then echo "GitHub colocated feed publish failed" >&2; exit 1; fi
@@ -63,7 +82,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v703-12h-qa-${{ github.run_id }}
+          name: v70-3-27-qa-${{ github.run_id }}
           path: build/site/
           if-no-files-found: warn
       - name: Check deployment configuration
@@ -80,7 +99,7 @@ jobs:
             public_html|*/public_html|*/public_html/) ;;
             *) echo "::error::Site directory must end in public_html"; exit 1 ;;
           esac
-      - name: Deploy validated index.html and JSON via Hostinger SSH
+      - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -93,7 +112,6 @@ jobs:
           overwrite: true
           timeout: 90s
           command_timeout: 90s
-
       - name: Verify Hostinger homepage and live JSON
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
@@ -113,8 +131,11 @@ jobs:
                   assert live["schema"]==expected["schema"]
                   assert live["asOf"]==expected["asOf"]
                   assert live["verification"]["ready"] is True
-                  assert len(live["indicators"])==24
+                  assert live["verification"]["independentIndicators"]==26
+                  assert live["verification"]["requiredScoringIndicatorsValidated"]==22
+                  assert len(live["indicators"])==29
                   assert "V70_macro_latest.json" in page
+                  assert "V70-3-27" in page
                   print("HOSTINGER_LIVE_PASS",base,expected["asOf"])
                   break
               except Exception as exc:

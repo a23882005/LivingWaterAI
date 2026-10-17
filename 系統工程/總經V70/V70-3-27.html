@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/17 10:31:00｜版本：V70-3-27｜檔案名稱：V70-3-27.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/17 15:30:00｜版本：V70-3-27 m06 V3｜檔案名稱：V70-3-27.html -->
 <!DOCTYPE html>
 
 
@@ -103,7 +103,7 @@
 <body class="min-h-screen pb-32">
 <div id="v703-coverage-banner" class="max-w-7xl mx-auto px-4 py-2 text-center text-xs font-semibold text-slate-300" aria-live="polite">總經資料覆蓋：等待資料驗證</div>
 <div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：HTML已內嵌逐項資料｜觀測日依各指標</div>
-<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 26項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入5項)+1項衍生m06 V2偏離+2項重複傳輸(s03/s04)=29傳輸欄，必要計分22項｜展開查看29個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">資料檢核：29個傳輸欄中，19/22必要計分欄位有可用資料；QQQ／SPY／VT 的 Forward/FY1來源證據與所選數值不一致，已標MISSING，正式配置停止發布。m06由五項原始輸入重算；NYSE $MMFI 觀測值30.2%（2026-10-15）。</p></details>
+<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 25項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入4項)+1項衍生m06 V3偏離+2項重複傳輸(s03/s04)=28傳輸欄，必要計分22項｜展開查看28個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">資料檢核：28個傳輸欄中，19/22必要計分欄位有可用資料；QQQ／SPY／VT 的 Forward/FY1來源證據與所選數值不一致，已標MISSING，正式配置停止發布。m06由四項原始輸入重算；NYSE $MMFI 觀測值30.2%（2026-10-15）。</p></details>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -289,12 +289,11 @@
             // ====== Visible (原 12 大指標 UI 不變) ======
             { id: 'm07', label: 'VIX 恐慌指數', t0: 14, t5: 20, t10: 35, unit: '', gamma: 0.9, desc: '恐慌封頂：>=28 / >=35', url: "https://www.tradingview.com/chart/?symbol=VIX", val: 16.87},
             { id: 'm01', label: '殖利率曲線 (10Y-2Y)', t0: 0.5, t5: 0.2, t10: -0.5, unit: '%', gamma: 1.0, desc: '曲線倒掛風險', url: "https://fred.stlouisfed.org/series/T10Y2Y", val: 0.33},
-            { id: 'm06', label: 'V2偏離值 = 實際實質利率缺口 - Taylor基準缺口 (預測版Taylor延伸)', unit: '%pt', val: 0.325, t0: -1.0, t5: 1.5, t10: 2.5, gamma: 1.0, group: 'rates_curve', method: 'V2正式方向：實際=(Fed中點-未來12m通膨預期)-r*；Taylor基準=0.5*(通膨-2%)+0.5*產出缺口；V2=實際-Taylor。預測版Taylor延伸，非原版也非聯準會唯一政策答案，官方原則見 https://www.federalreserve.gov/monetarypolicy/principles-for-the-conduct-of-monetary-policy.htm。產出缺口主版本用實際實質GDP vs 潛在GDP vintage版，失業率缺口為獨立實驗版。必要資料缺漏標V2暫缺，不用V1補。', desc: 'V2正式方向，三變數：實質利率、通膨、經濟鬆緊' },
+            { id: 'm06', label: 'V3政策偏離 = 實際實質利率缺口 - Taylor基準缺口', unit: '%pt', val: 0.395, t0: -1.0, t5: 1.5, t10: 2.5, gamma: 1.0, group: 'rates_curve', method: 'V3使用同一未來12個月通膨預期：m06=(Fed目前利率中點−m06_inf−HLW r*)−[0.5×(m06_inf−2%)+0.5×實際GDP/潛在GDP產出缺口]。本公式為模型假設，不代表聯準會官方唯一規則。', desc: 'V3：實際政策利率缺口與含通膨、產出缺口之基準差' },
 
             { id: 'm06_rate', label: 'Fed目前利率中點 (m06子項)', t0: 0, t5: 5, t10: 10, unit: '%', gamma: null, desc: 'Fed Funds目前區間中點，m06缺口計算子項，主來源Fed', url: "https://www.federalreserve.gov/monetarypolicy/openmarket.htm", val: 4.375, hidden: true },
             { id: 'm06_inf', label: '未來12M通膨預期 (m06子項 Cleveland Fed 1Y主)', t0: 2.0, t5: 2.5, t10: 3.5, unit: '%', gamma: null, desc: 'Cleveland Fed 1Y通膨預期主來源，備援NY Fed SCE 1Y中位數、密西根1Y，5Y BE不當備援，需標來源', url: "https://www.clevelandfed.org/indicators-and-data/inflation-expectations", val: 2.42, hidden: true },
             { id: 'm06_rstar', label: '中性實質利率 r* HLW即時版 (m06子項)', t0: 0.5, t5: 1.0, t10: 1.5, unit: '%', gamma: null, desc: 'NY Fed HLW美國實質自然利率即時版，模型估計非官方預測，缺漏標MISSING/STALE', url: "https://www.newyorkfed.org/research/policy/rstar", val: 1.1, hidden: true },
-            { id: 'm06_taylor_infl', label: 'Taylor基準用通膨率 (如Core CPI/PCE)', unit: '%', val: 2.56, t0: 0, t5: 3, t10: 5, gamma: 1.0, group: 'rates_curve', method: 'Taylor基準用通膨率，主版本用當時可取得 vintage，來源保留公布日期版本', desc: '通膨-2% 用', url: "https://www.bls.gov/cpi/", isSubItem: true, hidden: true },
             { id: 'm06_output_gap', label: '產出缺口 (實際實質GDP vs 潛在GDP)', unit: '%pt', val: 0.5, t0: -2, t5: 0, t10: 2, gamma: 1.0, group: 'rates_curve', method: '主版本：實際實質GDP相對潛在GDP差距，vintage版；失業率缺口為獨立實驗版，不要用ISM/NFP直接當產出缺口', desc: 'Taylor基準用', url: "https://www.cbo.gov/data/budget-economic-data", isSubItem: true, hidden: true },
 
 
@@ -993,7 +992,7 @@ function renderCapControls() {
                 return isFinite(v) ? v : NaN;
             };
 
-function v703ScoreM06V2(dev){
+function v703ScoreM06V3(dev){
   const g = Number(dev);
   if(!Number.isFinite(g)) return NaN;
   if(g <= -2.5) return 10;
@@ -1010,29 +1009,29 @@ function v703ScoreM06V2(dev){
 
 function v703RiskForConfig(cfg,value){
   if(!cfg) return NaN;
-  let risk=cfg.id==='m06' ? v703ScoreM06V2(value) : mapToScore(value,cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
+  let risk=cfg.id==='m06' ? v703ScoreM06V3(value) : mapToScore(value,cfg.t0,cfg.t5,cfg.t10,cfg.gamma);
   if(C_VALUATION_IDS.has(cfg.id) && Number.isFinite(risk))
     risk=Math.round((5+C_VALUATION_ALPHA*(risk-5))*10)/10;
   return risk;
 }
 function v703ApplyM06Derived(){
-  const result=v703CalcM06V2();
+  const result=v703CalcM06V3();
   const input=document.getElementById('in_m06');
   const slider=document.getElementById('sl_m06');
   const score=document.getElementById('sc_m06');
-  if(!Number.isFinite(result.v2)){
+  if(!Number.isFinite(result.v3)){
     if(input)input.value='';
     if(slider)slider.value='0';
     if(score)score.textContent='NA';
     return result;
   }
-  if(input)input.value=String(result.v2);
-  const risk=v703RiskForConfig(macroConfig.find(x=>x.id==='m06'),result.v2);
+  if(input)input.value=String(result.v3);
+  const risk=v703RiskForConfig(macroConfig.find(x=>x.id==='m06'),result.v3);
   if(slider)slider.value=String(risk);
   if(score)score.textContent=Number.isFinite(risk)?risk.toFixed(1):'NA';
   return result;
 }
-function v703CalcM06V2(){
+function v703CalcM06V3(){
   const getValById = (id) => {
     const el = document.getElementById('input-'+id) || document.querySelector('[data-id='+id+']') || document.getElementById('in_'+id);
     if(el && el.value!=='' && isFinite(Number(el.value))) return Number(el.value);
@@ -1041,20 +1040,19 @@ function v703CalcM06V2(){
   const r = getValById('m06_rate');
   const ie = getValById('m06_inf');
   const rs = getValById('m06_rstar');
-  const ti = getValById('m06_taylor_infl');
   const og = getValById('m06_output_gap');
-  if(![r,ie,rs,ti,og].every(Number.isFinite)){
-    return { actualGap: NaN, taylorBaseline: NaN, v2: NaN, missing:true };
+  if(![r,ie,rs,og].every(Number.isFinite)){
+    return { actualGap: NaN, taylorBaseline: NaN, v3: NaN, missing:true };
   }
   const actualGap = (r - ie) - rs;
-  const taylorBaseline = 0.5*(ti - 2.0) + 0.5*og;
-  const v2 = actualGap - taylorBaseline;
-  return { actualGap, taylorBaseline, v2, missing:false };
+  const taylorBaseline = 0.5*(ie - 2.0) + 0.5*og;
+  const v3 = actualGap - taylorBaseline;
+  return { actualGap, taylorBaseline, v3, missing:false };
 }
 function v703CalcM06Gap(){
   try{
-    const res = v703CalcM06V2();
-    return res.v2;
+    const res = v703CalcM06V3();
+    return res.v3;
   }catch(e){ return NaN; }
 }
 
@@ -2345,19 +2343,19 @@ if (recBlack) {
 </script>
 <script id="v70-embedded-feed" type="application/json">
 {
-  "schema": "V70.3/family-macro-feed-v1",
+  "schema": "V70.3/family-macro-feed-v3",
   "asOf": "2026-10-17T02:00:00Z",
   "verification": {
     "ready": false,
-    "valid": 24,
-    "totalRequired": 27,
-    "independentIndicators": 26,
+    "valid": 23,
+    "totalRequired": 26,
+    "independentIndicators": 25,
     "sources": [
       "09:00/18",
-      "10:00/5"
+      "10:00/8"
     ],
     "usableWithCaveat": [],
-    "transportFields": 27,
+    "transportFields": 26,
     "requiredScoringIndicators": 22,
     "requiredScoringIndicatorsValidated": 19,
     "missing": [
@@ -2365,7 +2363,7 @@ if (recBlack) {
       "m03_spy",
       "m03_vt"
     ],
-    "transportIndicators": 29
+    "transportIndicators": 28
   },
   "indicators": {
     "m07": {
@@ -2559,13 +2557,13 @@ if (recBlack) {
       "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
     },
     "m06": {
-      "value": 0.325,
+      "value": 0.395,
       "dataDate": "2026-10-15",
       "source": "https://www.federalreserve.gov/monetarypolicy/principles-for-the-conduct-of-monetary-policy.htm",
       "unit": "%pt",
-      "method": "V2正式方向：實際=(Fed中點-未來12m通膨預期)-r*；Taylor基準=0.5*(通膨-2%)+0.5*產出缺口；V2=實際-Taylor。預測版Taylor延伸，官方原則見 https://www.federalreserve.gov/monetarypolicy/principles-for-the-conduct-of-monetary-policy.htm。",
+      "method": "V3: (Fed中點−未來12M通膨預期−HLW r*)−[0.5×(同一未來12M通膨預期−2)+0.5×GDP產出缺口]",
       "status": "OK",
-      "detail": "V2=0.325 (0.855實際-0.53基準)，U型計分0分",
+      "detail": "V3=0.395 (0.855實際−0.460基準)，U型計分0分",
       "lastVerifiedAt": "2026-10-17T10:00:00+08:00"
     },
     "m03_qqq": {
@@ -2636,16 +2634,6 @@ if (recBlack) {
       "method": "NY Fed HLW即時版實質自然利率",
       "status": "OK",
       "detail": "r* 1.1%",
-      "lastVerifiedAt": "2026-10-17T10:00:00+08:00"
-    },
-    "m06_taylor_infl": {
-      "value": 2.56,
-      "dataDate": "2026-10-17",
-      "source": "https://www.bls.gov/cpi/",
-      "unit": "%",
-      "method": "Taylor基準用通膨率，主版本用當時可取得 vintage，Core CPI/PCE",
-      "status": "OK",
-      "detail": "Taylor基準用通膨率2.56%",
       "lastVerifiedAt": "2026-10-17T10:00:00+08:00"
     },
     "m06_output_gap": {
@@ -3016,24 +3004,24 @@ if (recBlack) {
       }
     }
   },
-  "note": "QQQ/SPY/VT目前均缺少可核對的Forward/FY1來源欄位證據，已標MISSING且不以TTM替代；m06須與五項原始輸入核對一致；s05為NYSE $MMFI。"
+  "note": "QQQ/SPY/VT目前均缺少可核對的Forward/FY1來源欄位證據，已標MISSING且不以TTM替代；m06須與四項原始輸入核對一致；s05為NYSE $MMFI。"
 }
 </script>
 <script id="v703-render-raw-data">
 (function(){
  const node=document.getElementById('v70-embedded-feed'),body=document.getElementById('v703-raw-data-body');if(!node||!body)return;
- const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'實質政策利率缺口 (V2正式計分)',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
+ const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'實質政策利率缺口 (V3正式計分)',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
  try{const feed=JSON.parse(node.textContent||'{}');for(const [id,r] of Object.entries(feed.indicators||{})){const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';const status=(['m04','m15','m18'].includes(id)?'沿用人工查證｜':'')+(r.status||'');const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'MISSING':String(r.value)+(r.unit?' '+r.unit:'');const vals=[id+'｜'+(labels[id]||id),shownValue,r.dataDate||'未提供',status+(r.detail?'｜'+r.detail:''),r.method||''];for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}const td=document.createElement('td');td.className='p-2';const a=document.createElement('a');a.href=String(r.source||'').split(' | ')[0];a.target='_blank';a.rel='noopener noreferrer';a.className='text-blue-300 underline';a.textContent='開啟來源';td.appendChild(a);tr.appendChild(td);body.appendChild(tr);}}catch(err){body.textContent='內嵌資料讀取失敗：'+String(err.message||err);}
 })();
 </script>
 
-<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪程式複核摘要｜2026/10/17 10:06（台灣時間）</summary><p>版本：V70-3-27（以 V70-3-26 為基線）。Gamma前三群為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>目前內嵌資料有19/22項必要計分欄位可用；QQQ／SPY／VT缺少可核對的Forward/FY1來源證據，已標記MISSING，正式配置停止發布。m06由五項輸入重算，結果為+0.325個百分點。NYSE MMFI為30.2%，觀測日2026-10-15。</p><p>本輪複核涵蓋26項獨立原始欄位、29個傳輸欄及LEI三期。這是本機HTML與內嵌資料的靜態複核；未在本輪執行GitHub Actions、SFTP或線上部署驗證。</p></details>
+<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪程式複核摘要｜2026/10/17 10:06（台灣時間）</summary><p>版本：V70-3-27（以 V70-3-26 為基線）。Gamma前三群為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>目前內嵌資料有19/22項必要計分欄位可用；QQQ／SPY／VT缺少可核對的Forward/FY1來源證據，已標記MISSING，正式配置停止發布。m06由四項輸入重算，結果為+0.395個百分點。NYSE MMFI為30.2%，觀測日2026-10-15。</p><p>本輪複核涵蓋25項獨立原始欄位、28個傳輸欄及LEI三期。這是本機HTML與內嵌資料的靜態複核；未在本輪執行GitHub Actions、SFTP或線上部署驗證。</p></details>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
  * Read V70_macro_latest.json beside the HTML first; if sibling access is blocked,
  * use the embedded snapshot, then numeric defaults in macroConfig. Never fetch
  * finance vendors directly here.
- * Supported schemas: V70.3/family-macro-feed-v2, V70.3/family-macro-feed-v1 and legacy V70.3/macro-feed-v1;
+ * Supported schemas: V70.3/family-macro-feed-v3 and legacy V70.3/macro-feed-v1;
  * missing or unverified observations stay fail-closed.
  */
 (function(){
@@ -3094,7 +3082,7 @@ if (recBlack) {
  // Seed every scoring control from the values embedded in this HTML before any
  // network/file fetch. A failed feed must never turn valid defaults into blanks.
  function seedHtmlDefaults(){
-   const scoringForComplete=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_taylor_infl','m06_output_gap','s03','s04'].includes(cfg.id));
+   const scoringForComplete=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_output_gap','s03','s04'].includes(cfg.id));
    let count=0;
    window.v703FeedVerified=false;
    for(const cfg of scoringForComplete){
@@ -3132,7 +3120,7 @@ if (recBlack) {
  // fields, preserving any valid JSON/embedded observation already shown.
  function ensureResearchDefaults(){
    if(window.v703FeedVerified===true)return;
-   const scoringForComplete=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_taylor_infl','m06_output_gap','s03','s04'].includes(cfg.id));
+   const scoringForComplete=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_output_gap','s03','s04'].includes(cfg.id));
    let count=0;
    for(const cfg of scoringForComplete){
      const input=document.getElementById('in_'+cfg.id),fallback=Number(cfg.val);
@@ -3171,7 +3159,7 @@ if (recBlack) {
  if(familyLife)familyLife.addEventListener('change',synchronize);
  if(familyStyle)familyStyle.addEventListener('change',synchronize);
  async function fetchFeedDocument(){
-   const accepted=['V70.3/family-macro-feed-v2','V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'];
+   const accepted=['V70.3/family-macro-feed-v3','V70.3/family-macro-feed-v1','V70.3/macro-feed-v1'];
    const embeddedNode=document.getElementById('v70-embedded-feed');
    let embedded=null,embeddedError='';
    if(embeddedNode){
@@ -3224,14 +3212,14 @@ if (recBlack) {
    status.textContent='正在讀取最新總經快照…';
    try{
      const doc=await fetchFeedDocument();
-    // V70-3-27 feed v2：18項主資料＋9個補充原始欄＋m06衍生值；不得使用 MISSING/STALE 冒充正式數值。
+    // V70-3-27 feed v3：18項主資料＋8個補充原始欄＋m06衍生值；不得使用 MISSING/STALE 冒充正式數值。
      if(!doc.verification || doc.verification.ready!==true){
        const n=doc?.verification?.valid??0, total=doc?.verification?.totalRequired??22;
        const missing=Array.isArray(doc?.verification?.missing)?doc.verification.missing.join('、'):'';
        throw new Error('資料仍有缺項（必要欄位 '+n+'/'+total+' 項'+(missing?'；缺少 '+missing:'')+'）');
      }
-     if(doc.verification.requiredScoringIndicators!==22 || doc.verification.requiredScoringIndicatorsValidated!==22 || doc.verification.transportIndicators!==29)
-       throw new Error('快照驗證計數不一致（必要計分22、傳輸29）');
+     if(doc.verification.requiredScoringIndicators!==22 || doc.verification.requiredScoringIndicatorsValidated!==22 || doc.verification.transportIndicators!==28)
+       throw new Error('快照驗證計數不一致（必要計分22、傳輸28）');
      const data=doc.indicators||doc.macroIndicators||doc.macro;
      if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
      if(typeof macroConfig==='undefined')throw new Error('找不到原始總經模型');
@@ -3242,15 +3230,15 @@ if (recBlack) {
      const snapshotOld=Date.now()-produced>26*3600*1000;
      if(snapshotOld)throw new Error('正式快照超過26小時；保留歷史資料但停止當作當前配置依據');
      // An old published snapshot must remain visibly old, not masquerade as a fresh run.
-     if(doc.verification.independentIndicators!==26 || Object.keys(data).length < 27)throw new Error('獨立原始欄／傳輸欄數量不符（預期26項原始欄、至少27欄）');
+     if(doc.verification.independentIndicators!==25 || Object.keys(data).length < 28)throw new Error('獨立原始欄／傳輸欄數量不符（預期25項獨立原始欄、至少28欄）');
      if(doc.batchDateTaipei && !/^\d{4}-\d{2}-\d{2}$/.test(doc.batchDateTaipei))throw new Error('批次日期格式錯誤');
-     if(doc.sourceSnapshot && (!doc.sourceSnapshot.macro18 || !doc.sourceSnapshot.macro9))throw new Error('來源SHA快照不完整（需 macro18 與 macro9）');
+     if(doc.sourceSnapshot && (!doc.sourceSnapshot.macro18 || !doc.sourceSnapshot.macro8))throw new Error('來源SHA快照不完整（需 macro18 與 macro8）');
      if(data.s03?.value!==data.m07?.value || data.s03?.dataDate!==data.m07?.dataDate)throw new Error('s03/m07 VIX重複資料不一致');
      window.v703PEReferenceVerified=Object.create(null);
      window.v703SourceBatch={asOf:doc.asOf,batchDateTaipei:doc.batchDateTaipei||null,sourceSnapshot:doc.sourceSnapshot||null,verified:false};
 
 
-     const m06RawIds=['m06_rate','m06_inf','m06_rstar','m06_taylor_infl','m06_output_gap'];
+     const m06RawIds=['m06_rate','m06_inf','m06_rstar','m06_output_gap'];
      for(const id of m06RawIds){
        const row=data[id];
        if(!row||row.value===null||String(row.value).trim()===''||!['OK','USABLE'].includes(row.status))
@@ -3259,10 +3247,10 @@ if (recBlack) {
      const m06Raw=m06RawIds.map(id=>Number(data[id].value));
      if(!m06Raw.every(Number.isFinite))throw new Error('m06計算輸入缺漏，停止使用內嵌m06分數');
      const m06Actual=(m06Raw[0]-m06Raw[1])-m06Raw[2];
-     const m06Taylor=0.5*(m06Raw[3]-2.0)+0.5*m06Raw[4];
+     const m06Taylor=0.5*(m06Raw[1]-2.0)+0.5*m06Raw[3];
      const m06Computed=m06Actual-m06Taylor;
      if(!Number.isFinite(Number(data.m06?.value))||Math.abs(Number(data.m06.value)-m06Computed)>0.001)
-       throw new Error('m06衍生值與五個原始輸入不一致，停止載入');
+       throw new Error('m06衍生值與四個原始輸入不一致，停止載入');
      // Critical credit safety gate: never publish a new actionable allocation if HY OAS is missing, stale or unverified.
      const credit=data.m02;
      if(!credit||!Number.isFinite(Number(credit.value))||Number(credit.value)<0||Number(credit.value)>100||!/^https:\/\//.test(String(credit.source||''))||!/^\d{4}-\d{2}-\d{2}$/.test(String(credit.dataDate||'')))throw new Error('信用安全閘門：HY OAS數值、日期或來源不合格');
@@ -3361,7 +3349,7 @@ if (recBlack) {
        }
        showBanner(null,'資料讀取失敗');
      }
-     const scoringForComplete2=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_taylor_infl','m06_output_gap','s03','s04'].includes(cfg.id));
+     const scoringForComplete2=macroConfig.filter(cfg=>!['m06_rate','m06_inf','m06_rstar','m06_output_gap','s03','s04'].includes(cfg.id));
      const inputCount=scoringForComplete2.filter(cfg=>{const el=document.getElementById('in_'+cfg.id);return el&&el.value.trim()!==''&&Number.isFinite(Number(el.value));}).length;
             window.v703DataComplete=inputCount===scoringForComplete2.length;
      window.v703VerifiedDataDates=false;

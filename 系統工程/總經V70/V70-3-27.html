@@ -374,7 +374,7 @@
             if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150; // quarterly HLW/output-gap, quarter-end date
             if(id==='m16')return days>90;
             if(id==='m14')return days>14;
-            if(['m04','m05','m15','m18','m19','m20'].includes(id))return days>46;
+            if(['m04','m05','m15','m18','m19','m20','m06_inf'].includes(id))return days>46;
             return v703TradingDaysBetween(date,today)>4;
         }
         window.v703ValidateDates = function() {

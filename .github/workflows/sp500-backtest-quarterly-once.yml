@@ -1,0 +1,112 @@
+name: Backtest S&P 500 quarterly verified CSV
+on:
+  push:
+    paths:
+      - '.github/workflows/sp500-backtest-quarterly-once.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fred-sp500-quarterly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download authoritative FRED index series and reconstruct dates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request, urllib.parse, csv, io, datetime, pathlib, json, os
+          from datetime import date,timedelta
+          base='https://fred.stlouisfed.org/graph/fredgraph.csv'
+          urls=[
+            base+'?'+urllib.parse.urlencode({'id':'SP500','cosd':'2020-01-01','coed':'2026-10-16'}),
+            base+'?id=SP500',
+          ]
+          prices={}
+          errors=[]
+          used=''
+          for url in urls:
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 LivingWaterAI Research'})
+                  with urllib.request.urlopen(req,timeout=40) as f:
+                      content=f.read().decode('utf-8-sig')
+                  rows=list(csv.DictReader(io.StringIO(content)))
+                  if not rows: raise ValueError('FRED returned no data rows')
+                  for row in rows:
+                      day=(row.get('observation_date') or row.get('DATE') or row.get('Date'))
+                      raw=row.get('SP500')
+                      if day and raw and raw not in ('.',''):
+                          prices[date.fromisoformat(day)]=float(raw)
+                  if len(prices)<1600 or date(2020,1,2) not in prices or date(2026,10,1) not in prices:
+                      raise ValueError(f'not enough observations: {len(prices)}')
+                  used='FRED SP500 (S&P Dow Jones Indices LLC): '+url
+                  break
+              except Exception as e:
+                  errors.append(url+' '+repr(e))
+                  prices={}
+          if not used:
+              raise RuntimeError('FRED unavailable. Do not publish unverified data: '+'; '.join(errors))
+          # Friday Oct 16, 2026 is separately corroborated by AP, if FRED is delayed.
+          ap='https://apnews.com/article/c27809783ae3230b44c26e5ee4bea056'
+          if date(2026,10,16) not in prices:
+              prices[date(2026,10,16)]=7659.44
+          assert abs(prices[date(2026,10,16)]-7659.44)<0.1,prices[date(2026,10,16)]
+          anchors=[date(y,q,1) for y in range(2020,2027) for q in (1,4,7,10) if date(y,q,1)<=date(2026,10,16)]
+          anchors.append(date(2026,10,16))
+          def after(d):
+              matches=[k for k in prices if d<=k<=min(d+timedelta(days=7),date(2026,10,16))]
+              if not matches:return (None,None)
+              actual=min(matches)
+              return actual,prices[actual]
+          output=[]
+          for anchor in anchors:
+              trading,close=after(anchor)
+              if trading is None:raise RuntimeError('Missing quarterly actual trade date '+str(anchor))
+              y=anchor.year+(anchor.month+2)//12
+              month=(anchor.month+2)%12+1
+              future_anchor=date(y,month,anchor.day) if anchor!=date(2026,10,16) else None
+              if future_anchor and future_anchor<=date(2026,10,16):
+                  future_day,future_close=after(future_anchor)
+                  if future_day is None:raise RuntimeError('Missing future price '+str(future_anchor))
+                  pct=round((future_close/close-1)*100,6)
+              else:future_day=future_close=pct=None
+              output.append({
+                'quarter_anchor':anchor.isoformat(),'trade_date':trading.isoformat(),
+                'sp500_close':f'{close:.2f}',
+                'future_3m_target_date':future_anchor.isoformat() if future_anchor else '',
+                'future_3m_trade_date':future_day.isoformat() if future_day else '',
+                'future_3m_sp500_close':f'{future_close:.2f}' if future_close is not None else '',
+                'future_3m_return_pct':f'{pct:.6f}' if pct is not None else '',
+                'sp500_source':(ap if trading==date(2026,10,16) and date(2026,10,16) not in prices else used),
+                'sp500_source_status':'FRED_OR_AP_VERIFIED',
+              })
+          assert len(output)==29
+          assert sum(bool(x['future_3m_return_pct']) for x in output)==27
+          assert output[0]['trade_date']=='2020-01-02'
+          assert output[-1]['sp500_close']=='7659.44'
+          pathlib.Path('data/backtests').mkdir(parents=True,exist_ok=True)
+          out=pathlib.Path('data/backtests/sp500_2020_2026_quarterly_verified.csv')
+          with out.open('w',newline='',encoding='utf-8-sig') as f:
+              w=csv.DictWriter(f,fieldnames=list(output[0]));w.writeheader();w.writerows(output)
+          print('SP500_QUARTERLY_CSV_PASS rows='+str(len(output))+' actual_3m='+str(sum(bool(x['future_3m_return_pct']) for x in output))+' prices='+str(len(prices)))
+          print('SOURCE',used)
+          print('FIRST',output[0]);print('LAST',output[-1])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sp500-quarterly-verified-${{ github.run_id }}
+          path: data/backtests/sp500_2020_2026_quarterly_verified.csv
+      - name: Publish verified 29-point CSV
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/backtests/sp500_2020_2026_quarterly_verified.csv
+          if ! git diff --cached --quiet; then
+            git commit -m 'data(backtest): FRED verified 29 quarterly S&P500 observations'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

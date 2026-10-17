@@ -19,7 +19,7 @@ Task 提供以下五個有日期、有來源的原始輸入；**m06 衍生值由
 - `m06_rate`：目前 Fed 目標利率區間中點（百分比）。候選來源：Federal Reserve；FRED DFEDTARL；FRED DFEDTARU；ALFRED DFEDTARU。以官方區間上下限計算中點，不可用有效聯邦基金利率替代。
 - `m06_inf`：未來 12 個月通膨預期（百分比）。候選來源：Cleveland Fed 1 年期預期；NY Fed SCE 1 年期中位數；University of Michigan 1 年期預期；Philadelphia Fed SPF。必須標明實際採用的來源及期限；不同期限不可直接替代。
 - `m06_rstar`：NY Fed Holston–Laubach–Williams（HLW）實質自然利率 r*（百分比）。候選來源：NY Fed r-star 方法頁；HLW real-time estimates；HLW current estimates；NY Fed Staff Report 1063。歷史回測須保留當時可得的即時版本；current estimates 僅作最新值交叉核對，不得冒充歷史即時版本。
-- `m06_taylor_infl`：Taylor 規則使用的通膨輸入（百分比）。候選來源：BEA 核心 PCE；FRED PCEPILFE；BLS CPI；FRED CPILFESL。**CPI 或 PCE 的正式口徑尚待確認；未確認前保持 MISSING，不得在 CPI/PCE 間自行切換。**
+- `m06_taylor_infl`：固定採用 **Core PCE（核心 PCE）年增率／過去 12 個月變化**，單位百分比。依季節調整月指數計算 `(本月指數 ÷ 去年同月指數 − 1) × 100`。正式數值來源為 BEA 核心 PCE 頁面及 FRED PCEPILFE；四來源查核另記錄 BLS CPI、FRED CPILFESL 作比較，但 CPI 數值不得代填此欄。Fed 的正式 2% 長期目標以整體 PCE 年增率衡量；Fed 公布的政策規則實作使用 Core PCE 四季通膨率，因核心通膨較能反映中期整體 PCE 走勢。即時值記錄觀測月、BEA 發布日及抓取時間；歷史回測保留當時可得 vintage。
 - `m06_output_gap`：實際 GDP 相對潛在 GDP 的產出缺口（百分比）。候選來源：CBO 經濟資料；BEA NIPA；FRED GDPC1；ALFRED GDPC1。必須使用一致的實際 GDP／潛在 GDP 定義及可查證日期；只拿實際 GDP 水準不能冒充產出缺口。
 
 新版 builder 使用下式推導 m06，輸出單位為百分點：

@@ -2,7 +2,7 @@
 name: LivingWaterAI V70.3 One-time Test Preflight 18 Macro
 on:
   schedule:
-    - cron: '10 4 * * *' # ONE-TIME TEST 12:10 Asia/Taipei on 2026-10-17; restore 09:00 after test
+    - cron: '10 4 17 10 *' # TEST 12:10 Asia/Taipei on Oct 17 only; restore 09:00 after test
   workflow_dispatch:
   push:
     paths:

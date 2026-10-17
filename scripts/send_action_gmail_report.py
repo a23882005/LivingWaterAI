@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 09:36｜版本：V70-3-12 Gmail 通知 v1.5｜檔案名稱：send_action_gmail_report.py
+# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：V70-3-27 Gmail 通知 v1.6｜檔案名稱：send_action_gmail_report.py
 """Email successful LivingWaterAI Action run results and attach its actual data artifact."""
 import argparse
 import csv

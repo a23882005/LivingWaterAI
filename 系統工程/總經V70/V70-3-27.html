@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/17 15:30:00｜版本：V70-3-27 m06 V3｜檔案名稱：V70-3-27.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/17｜版本：V70-3-27 m06 V3｜前端作用域＋季度時效修補｜檔案名稱：V70-3-27.html -->
 <!DOCTYPE html>
 
 
@@ -371,6 +371,7 @@
             const days=Math.floor((today-date)/86400000);
             if(days<0)return true;
             if(['m03_qqq','m03_spy','m03_vt'].includes(id))return false; // PE reference age is checked against last verification time in the feed loader, not the observation month.
+            if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150; // quarterly HLW/output-gap, quarter-end date
             if(id==='m16')return days>90;
             if(id==='m14')return days>14;
             if(['m04','m05','m15','m18','m19','m20'].includes(id))return days>46;
@@ -973,25 +974,6 @@ function renderCapControls() {
     }
 
 
-                function calcTotal() {
-            // =========================
-            // V70.3 Macro (mSafe_raw + 加速器 + 三層封頂)
-            // 注意：UI 不改；只替換計算核心
-            // =========================
-
-
-            // --- 讀取「風險分數」(0~10) ---
-            const getRisk = (id) => {
-                const el = document.getElementById(`sc_${id}`);
-                const v = parseFloat(el ? el.innerText : NaN);
-                return isFinite(v) ? v : NaN;
-            };
-            const getRaw = (id) => {
-                const el = document.getElementById(`in_${id}`);
-                const v = parseFloat(el ? el.value : NaN);
-                return isFinite(v) ? v : NaN;
-            };
-
 function v703ScoreM06V3(dev){
   const g = Number(dev);
   if(!Number.isFinite(g)) return NaN;
@@ -1055,6 +1037,26 @@ function v703CalcM06Gap(){
     return res.v3;
   }catch(e){ return NaN; }
 }
+
+
+                function calcTotal() {
+            // =========================
+            // V70.3 Macro (mSafe_raw + 加速器 + 三層封頂)
+            // 注意：UI 不改；只替換計算核心
+            // =========================
+
+
+            // --- 讀取「風險分數」(0~10) ---
+            const getRisk = (id) => {
+                const el = document.getElementById(`sc_${id}`);
+                const v = parseFloat(el ? el.innerText : NaN);
+                return isFinite(v) ? v : NaN;
+            };
+            const getRaw = (id) => {
+                const el = document.getElementById(`in_${id}`);
+                const v = parseFloat(el ? el.value : NaN);
+                return isFinite(v) ? v : NaN;
+            };
 
             // --- 八大群風險（群內平均） ---
             const groups = {

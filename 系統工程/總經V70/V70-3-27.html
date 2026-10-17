@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/17｜版本：V70-3-27 m06 V3｜前端作用域＋季度時效修補｜檔案名稱：V70-3-27.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/17 13:56｜版本：V70-3-27（五大機構由SOT建置填入）｜檔案名稱：V70-3-27.html -->
 <!DOCTYPE html>
 
 
@@ -3381,12 +3381,13 @@ if (recBlack) {
 })();
 </script>
 
-    <!-- 華爾街五大機構 S&P 500 展望觀察 (家人版) - 位置預留，資料由 ChatGPT 總經 Task 填充 -->
+    <!-- 華爾街五大機構 S&P 500 展望：由 data/wallstreet5_forecasts.json 於 GitHub 建置時填入；不同於風控計分 -->
     <div class="max-w-5xl mx-auto px-6 py-6 mt-6 bg-slate-800/50 rounded-xl border border-slate-700" id="v703-wallstreet-observation">
         <h3 class="text-lg font-bold text-cyan-200 mb-2">🌿 華爾街五大機構 S&P 500 展望觀察 (家人版，純文字，非投資建議)</h3>
         <p class="text-xs text-slate-400 mb-3">免責聲明：以下為公開事實整理與自寫摘要，僅供教學觀察市場分歧，不代表本產品立場。目標數字為事實，摘要為我們自寫，不複製機構報告段落。來源若為付費研究或條款不允許商用，僅顯示機構名稱與官方連結。</p>
+        <div id="v703-wallstreet-asof" class="text-xs text-emerald-200 mb-2">資料查核日：等待建置｜統一比較 2026 年底目標；各機構原始發布日不同。</div>
         <div class="text-xs text-slate-300 mb-2">觀察名單：高盛 Goldman Sachs｜摩根大通 J.P. Morgan｜摩根士丹利 Morgan Stanley｜美國銀行 BofA｜瑞銀 UBS</div>
-        <table class="w-full text-xs text-slate-300 border-collapse">
+        <div class="overflow-x-auto"><table class="min-w-[900px] w-full text-xs text-slate-300 border-collapse">
             <thead>
                 <tr class="bg-slate-700 text-slate-200">
                     <th class="border border-slate-600 p-2">機構</th>
@@ -3395,17 +3396,11 @@ if (recBlack) {
                     <th class="border border-slate-600 p-2">S&P500 目標</th>
                     <th class="border border-slate-600 p-2">自寫摘要</th>
                     <th class="border border-slate-600 p-2">來源</th>
-                    <th class="border border-slate-600 p-2">商用允許</th>
+                    <th class="border border-slate-600 p-2">公開呈現範圍</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr><td class="border border-slate-600 p-2">Goldman Sachs</td><td class="border p-2">待填</td><td class="border p-2">年底2026 / 12M</td><td class="border p-2">待總經 Task 抓取</td><td class="border p-2">待生成</td><td class="border p-2">待填</td><td class="border p-2">待判斷</td></tr>
-                <tr><td class="border border-slate-600 p-2">J.P. Morgan</td><td class="border p-2">待填</td><td class="border p-2">年底2026 / 12M</td><td class="border p-2">待抓取</td><td class="border p-2">待生成</td><td class="border p-2">待填</td><td class="border p-2">待判斷</td></tr>
-                <tr><td class="border border-slate-600 p-2">Morgan Stanley</td><td class="border p-2">待填</td><td class="border p-2">年底2026 / 12M</td><td class="border p-2">待抓取</td><td class="border p-2">待生成</td><td class="border p-2">待填</td><td class="border p-2">待判斷</td></tr>
-                <tr><td class="border border-slate-600 p-2">BofA</td><td class="border p-2">待填</td><td class="border p-2">年底2026 / 12M</td><td class="border p-2">待抓取</td><td class="border p-2">待生成</td><td class="border p-2">待填</td><td class="border p-2">待判斷</td></tr>
-                <tr><td class="border border-slate-600 p-2">UBS</td><td class="border p-2">待填</td><td class="border p-2">年底2026 / 12M / 2027年中</td><td class="border p-2">待抓取</td><td class="border p-2">待生成</td><td class="border p-2">待填</td><td class="border p-2">待判斷</td></tr>
-            </tbody>
-        </table>
+            <tbody id="v703-wallstreet-rows"><tr><td colspan="7" class="border border-slate-600 p-3 text-amber-200">等待 GitHub 建置程序填入已驗證的五家機構目標；尚未填入時不顯示猜測數字。</td></tr></tbody>
+        </table></div>
     </div>
 
 <section class="max-w-5xl mx-auto my-4 px-6 text-xs text-slate-300" aria-label="活水書院｜詩在遠方"><div class="text-slate-400 font-semibold px-4 pt-3">🖼️ 活水書院｜詩在遠方</div><div class="whitespace-pre-line p-4">一脈活水，流過歲月，

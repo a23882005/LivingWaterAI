@@ -1,0 +1,73 @@
+{
+  "schema": "V70.3/wallstreet-five-forecast-v1",
+  "as_of_date": "2026-10-17",
+  "cross_check_date": "2026-10-06",
+  "cross_check_source": "https://www.marketscreener.com/news/major-brokerages-forecasts-for-s-p-500-index-in-2026-ce7859dad18dfe26",
+  "index": "S&P 500",
+  "units": "index points",
+  "horizon_end_date": "2026-12-31",
+  "licensing": "僅展示可公開核實的預測數字、事實性自行撰寫摘要及公開來源連結；不重製研究報告全文，研究內容授權未取得。",
+  "notes": "每列 publication_date 是該筆目標公開可核對的原始公布日，非 2026-10-17 重新發布；全數截至路透社 2026-10-06 彙整交叉核對。使用者如更新此檔，建置器會自動更新網頁，不改總經風控分數。",
+  "forecasts": [
+    {
+      "firm_id": "goldman",
+      "firm_name": "高盛 Goldman Sachs",
+      "publisher": "Goldman Sachs Research",
+      "publication_date": "2026-05-28",
+      "horizon": "2026年年底",
+      "horizon_end_date": "2026-12-31",
+      "target": 8000,
+      "summary": "預估企業獲利持續帶動美股；AI 基礎建設仍是成長來源，但利率與估值可能限制漲幅。",
+      "source_url": "https://www.goldmansachs.com/insights/articles/s-and-p-500-forecast-to-climb-as-earnings-growth-powers-stocks-higher",
+      "source_type": "官方公開文章"
+    },
+    {
+      "firm_id": "jpm",
+      "firm_name": "摩根大通 J.P. Morgan",
+      "publisher": "J.P. Morgan Global Research",
+      "publication_date": "2026-08-10",
+      "horizon": "2026年年底",
+      "horizon_end_date": "2026-12-31",
+      "target": 8000,
+      "summary": "將年底目標由7,800調升至8,000；主要依據是企業獲利與大型科技公司AI投資帶來的營收成長。",
+      "source_url": "https://www.reuters.com/business/jp-morgan-lifts-2026-end-target-sp-500-8000-ai-earnings-strength-2026-08-10/",
+      "source_type": "Reuters 公開新聞"
+    },
+    {
+      "firm_id": "morgan",
+      "firm_name": "摩根士丹利 Morgan Stanley",
+      "publisher": "Morgan Stanley Research",
+      "publication_date": "2026-05-15",
+      "horizon": "2026年年底",
+      "horizon_end_date": "2026-12-31",
+      "target": 8000,
+      "summary": "企業獲利與AI支出支持美股；同時提醒通膨再升及融資成本上升可能壓縮估值。",
+      "source_url": "https://www.morganstanley.com/insights/articles/investment-outlook-midyear-2026",
+      "source_type": "官方公開文章"
+    },
+    {
+      "firm_id": "bofa",
+      "firm_name": "美國銀行 BofA Global Research",
+      "publisher": "BofA Global Research",
+      "publication_date": "2026-09-14",
+      "horizon": "2026年年底",
+      "horizon_end_date": "2026-12-31",
+      "target": 7400,
+      "summary": "年底目標由7,100調升至7,400，但仍提醒股市可能先回檔；其12個月7,800目標屬不同期限。",
+      "source_url": "https://www.thestreet.com/investing/stocks/bank-of-america-resets-its-sp-500-price-target-with-a-clause",
+      "source_type": "公開財經媒體"
+    },
+    {
+      "firm_id": "ubs",
+      "firm_name": "瑞銀 UBS Global Wealth Management",
+      "publisher": "UBS Global Wealth Management",
+      "publication_date": "2026-08-21",
+      "horizon": "2026年年底",
+      "horizon_end_date": "2026-12-31",
+      "target": 8100,
+      "summary": "企業獲利預估上調，加上AI應用與景氣韌性支撐美股；瑞銀另有不同部門展望，這裡只列財富管理部門。",
+      "source_url": "https://www.investing.com/news/economy-news/ubs-global-wealth-management-lifts-sp-500-yearend-target-to-8100-4871173",
+      "source_type": "Reuters 轉載"
+    }
+  ]
+}

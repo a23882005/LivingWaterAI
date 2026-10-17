@@ -2,7 +2,7 @@
 name: LivingWaterAI One-time Test V70-3-27 V3 Site Deploy
 on:
   schedule:
-    - cron: '19 4 17 10 *' # TEST 12:19 Asia/Taipei on Oct 17 only; restore 11:00 after test
+    - cron: '37 4 17 10 *' # TEST 12:37 Asia/Taipei on Oct 17 only; restore 11:00 after test
   workflow_dispatch:
   push:
     paths:

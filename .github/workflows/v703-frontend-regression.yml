@@ -1,0 +1,90 @@
+# Diagnostic acceptance test: requires browser JS to consume the verified V70 feed.
+name: LivingWaterAI V70-3-27 Browser Regression
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/v703-frontend-regression.yml'
+permissions:
+  contents: read
+jobs:
+  v703-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build complete feed
+        run: |
+          python -m py_compile scripts/build_daily_v703_site.py
+          python scripts/build_daily_v703_site.py --html '系統工程/總經V70/V70-3-27.html' --out build/site
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('build/site/V70_macro_latest.json').read_text())
+          assert p['verification']['ready'] is True
+          for k in ('m03_qqq','m03_spy','m03_vt'):
+              assert p['indicators'][k]['lastVerifiedAt'], k
+              assert p['indicators'][k]['sourceEvidence'], k
+          print('FEED_PROVENANCE_PASS',p['asOf'],flush=True)
+          PY
+      - name: Install real browser
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install chromium --with-deps
+      - name: Browser test complete client calculation; never deploy
+        run: |
+          python -u - <<'PY'
+          import contextlib,json,subprocess,time,urllib.request
+          from playwright.sync_api import sync_playwright
+          server=subprocess.Popen(['python','-m','http.server','8765','--bind','127.0.0.1','--directory','build/site'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+          try:
+              for n in range(30):
+                  try:
+                      with urllib.request.urlopen('http://127.0.0.1:8765/V70_macro_latest.json',timeout=2) as u: assert u.status==200
+                      break
+                  except Exception:
+                      time.sleep(.2)
+              with sync_playwright() as p:
+                  browser=p.chromium.launch(headless=True)
+                  page=browser.new_page(viewport={'width':420,'height':850},locale='zh-TW',timezone_id='Asia/Taipei')
+                  errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.route('**/cdn.tailwindcss.com/**',lambda route:route.abort())
+                  page.route('**/fonts.googleapis.com/**',lambda route:route.abort())
+                  page.goto('http://127.0.0.1:8765/',wait_until='domcontentloaded',timeout=30000)
+                  try:page.wait_for_function("window.v703FeedVerified===true",timeout=18000)
+                  except Exception as e: print('VERIFICATION_WAIT_FAILED',repr(e),flush=True)
+                  snapshot=page.evaluate("""() => ({
+                      verified:window.v703FeedVerified,
+                      complete:window.v703DataComplete,
+                      dates:window.v703VerifiedDataDates,
+                      creditBlocked:window.v703CreditGateBlocked,
+                      issues:window.v703DateIssues,
+                      status:document.querySelector('#family-data-status')?.textContent,
+                      values:Object.fromEntries(['m03_qqq','m03_spy','m03_vt','m10','m06','s05'].map(x=>[x,document.getElementById('in_'+x)?.value])),
+                      scores:Object.fromEntries(['m03_qqq','m03_spy','m10','m06','s05'].map(x=>[x,document.getElementById('sc_'+x)?.textContent])),
+                      finalStock:document.querySelector('#final-stock')?.textContent,
+                      finalBond:document.querySelector('#final-bond')?.textContent,
+                      canPublish:window.v703CanPublishFormalAllocation?.(),
+                      v703Latest:!!window.v703Latest
+                  })""")
+                  print('V703_BROWSER_SNAPSHOT',json.dumps(snapshot,ensure_ascii=False),flush=True)
+                  print('V703_BROWSER_ERRORS',json.dumps(errors,ensure_ascii=False),flush=True)
+                  assert snapshot['verified'] is True,('Browser failed to consume verified feed',snapshot,errors)
+                  assert abs(float(snapshot['values']['m03_qqq'])-22.28)<1e-6
+                  assert abs(float(snapshot['values']['m03_spy'])-20.59)<1e-6
+                  assert abs(float(snapshot['values']['m10'])-101.410004)<1e-5
+                  assert abs(float(snapshot['values']['s05'])-30.2)<1e-6
+                  assert len(set(snapshot['scores'].values()))>2,'All score sliders are stuck at one value'
+                  assert snapshot['finalStock'] and '計算中' not in snapshot['finalStock']
+                  assert snapshot['finalBond'] and '計算中' not in snapshot['finalBond']
+                  assert not errors,('JS runtime errors',errors)
+                  print('V703_BROWSER_E2E_PASS',flush=True)
+                  browser.close()
+          finally:
+              server.terminate()
+              with contextlib.suppress(Exception):server.wait(timeout=3)
+          PY

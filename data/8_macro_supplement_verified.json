@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-10-17T13:03:19+08:00",
-  "as_of_taipei": "2026-10-17 13:03:19",
+  "generated_at": "2026-10-17T13:14:30+08:00",
+  "as_of_taipei": "2026-10-17 13:14:30",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -123,16 +123,16 @@
     },
     "m06_rstar": {
       "label": "NY Fed HLW 即時版本實質自然利率 r*",
-      "value": null,
+      "value": 1.00864835850403,
       "unit": "%",
       "observation_date": "2026-06-30",
       "source_url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
-      "method": "僅接受NY Fed HLW real-time vintage工作簿中最新美國r*；本輪未能從原檔直接讀出數值",
-      "status": "MISSING",
-      "detail": "NY Fed官方頁確認HLW即時與current工作簿、最新發布批次截至2026-08-27/28；但下載原檔在工具環境被阻擋，未把current estimate 1.00865%或第三方解析/四捨五入值冒充real-time正式值。；資料原始觀測期間=2026Q2，YYYY-MM-DD使用季度末日僅為標準化日期，不代表季度資料有每日更新。；2026-10-17檢索官方NY Fed HLW real-time Excel連結仍回傳不支援下載/解析；第三方對2026Q2值有互相矛盾資料，維持MISSING。",
-      "retrieval_time": "2026-10-17T13:03:19+08:00",
+      "method": "NY Fed official Holston-Laubach-Williams REAL-TIME vintage workbook; sheet 2026Q2; US Natural Rate (r*) K268; official xlsx SHA256 189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9",
+      "status": "OK",
+      "detail": "Official NY Fed Real-time estimates, not retrospective Current model estimates. Latest vintage 2026Q2, final US r-star K268, verified direct download, sha256 189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9. Quarter-end normalized for YYYY-MM-DD contract.",
+      "retrieval_time": "2026-10-17T13:14:30+08:00",
       "publication_date": "2026-08-28",
-      "vintage": "2026Q2 real-time vintage expected; numeric cell unverified | observation quarter 2026-Q2",
+      "vintage": "2026Q2 real-time as-released, not current revised model",
       "candidate_checks": [
         {
           "site": "NY Fed r-star page",
@@ -148,13 +148,13 @@
         {
           "site": "NY Fed HLW real-time estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
-          "metric_or_horizon": "最新美國HLW real-time r*",
-          "status": "BLOCKED",
-          "checked_at": "2026-10-17T13:03:19+08:00",
-          "value": null,
+          "metric_or_horizon": "US HLW real-time r* 2026Q2",
+          "status": "FOUND",
+          "checked_at": "2026-10-17T13:14:30+08:00",
+          "value": 1.00864835850403,
           "unit": "%",
-          "observation_date": "2026-Q2",
-          "notes": "原始XLSX連結存在，但瀏覽器下載/解析逾時且直接URL受限制，未能驗證數值。；13:03從官方頁點擊原始XLSX，工具回傳unsupported content-type；未讀到儲存格。"
+          "observation_date": "2026-06-30",
+          "notes": "Verified directly against the official workbook SHA256 189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9 sheet 2026Q2, K268."
         },
         {
           "site": "NY Fed current estimates",

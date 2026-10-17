@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-16T09:23:50.906865+08:00",
+  "generated_at": "2026-10-17T09:25:04.940897+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -22,9 +22,9 @@
     "m07": {
       "id": "m07",
       "label": "VIX",
-      "value": 16.87,
+      "value": 16.46,
       "unit": "",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -34,9 +34,9 @@
     "m01": {
       "id": "m01",
       "label": "10Y−2Y 殖利率曲線",
-      "value": 0.33,
+      "value": 0.35,
       "unit": "%",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
       "status": "OK",
@@ -46,9 +46,9 @@
     "m08": {
       "id": "m08",
       "label": "10Y 實質殖利率",
-      "value": 2.78,
+      "value": 2.74,
       "unit": "%",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
       "status": "OK",
@@ -58,9 +58,9 @@
     "m02": {
       "id": "m02",
       "label": "HY OAS",
-      "value": 3.25,
+      "value": 3.23,
       "unit": "%",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -94,9 +94,9 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 102.038002,
+      "value": 101.778999,
       "unit": "",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
       "status": "OK",
@@ -106,9 +106,9 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 95.809998,
+      "value": 99.040001,
       "unit": "USD/bbl",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
       "status": "OK",
@@ -118,9 +118,9 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 102.487099,
+      "value": 101.102898,
       "unit": "",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
       "status": "OK",
@@ -130,9 +130,9 @@
     "m13": {
       "id": "m13",
       "label": "5Y Breakeven",
-      "value": 2.33,
+      "value": 2.37,
       "unit": "%",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
@@ -142,13 +142,13 @@
     "m17": {
       "id": "m17",
       "label": "5Y Breakeven 近1月變化（pp）",
-      "value": -0.08,
+      "value": 0.02,
       "unit": "pp",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
-      "detail": "5Y breakeven change from 2026-09-15",
+      "detail": "5Y breakeven change from 2026-09-16",
       "error": ""
     },
     "m14": {
@@ -226,9 +226,9 @@
     "s03": {
       "id": "s03",
       "label": "VIX 短期",
-      "value": 16.87,
+      "value": 16.46,
       "unit": "",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "與 m07 同步",
       "status": "OK",
@@ -238,9 +238,9 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 31.542857,
+      "value": 17.938322,
       "unit": "",
-      "observation_date": "2026-10-15",
+      "observation_date": "2026-10-16",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "method": "CNN 非官方可讀 JSON（可能變動）",
       "status": "OK",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:47.548762+00:00"
+      "retrieved_at": "2026-10-17T01:25:01.575095+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:48.497700+00:00"
+      "retrieved_at": "2026-10-17T01:25:02.751132+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:49.484669+00:00"
+      "retrieved_at": "2026-10-17T01:25:03.464585+00:00"
     }
   ]
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# 最後修改：2026/10/16（台灣時間；精確時間未核實）｜版本：D009-v1｜檔案：總經爬蟲18項.py
+# 最後修改：2026/10/17 10:31（台灣時間）｜版本：D009-v2｜檔案：總經爬蟲18項.py
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
-Five ChatGPT-owned indicators (m06, m03_qqq, m03_spy, m03_vt, s05) are EXCLUDED.
+Nine supplementary raw inputs (five m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
 17 series use the prior official/live sourcing and verified overrides; m16 reads
 published LEI YoY and carries three-month auxiliary history, refreshed monthly.
 The s03 VIX transport duplicate is included but excluded from independent count.
@@ -44,7 +44,7 @@ BOUNDS = {'m07':(0,150),'s03':(0,150),'m01':(-10,15),'m08':(-10,20),
           'm09':(30,250),'m10':(-50,400),'m12':(0,400),'m13':(-10,20),
           'm17':(-10,10),'m18':(-5,15),'m19':(0,40),'s04':(0,100),'s05':(0,100)}
 # BOUNDS are broad sanity limits, not economic grading thresholds.
-UNITS = {'m01':'%','m06':'碼','m08':'%','m02':'%','m05':'%','m10':'USD/bbl',
+UNITS = {'m01':'%','m08':'%','m02':'%','m05':'%','m10':'USD/bbl',
          'm13':'%','m17':'pp','m14':'USD bn','m16':'%','m19':'%','m20':'千人','s05':'%'}
 SOURCES = {
  'm04':['https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/'],
@@ -531,7 +531,7 @@ def validate_manual(k,v):
     if k in ('m03_qqq','m03_spy','m03_vt') and value<=0:raise ValueError('本益比必須為正數；虧損/無意義時須標示缺值')
     if k in ('m04','m15') and not 0<=value<=100:raise ValueError('PMI 必須介於0與100')
     if k in ('s04','s05') and not 0<=value<=100:raise ValueError('指數/廣度必須介於0與100')
-    if k=='m06' and v.get('unit')!='碼': raise ValueError('m06 必須填碼，例如 −3 = 預期降息三碼')
+    if k=='m06': raise ValueError('m06 is derived from five V70-3-27 inputs; do not enter Fed rate-change codes')
     if k=='m14' and v.get('unit')!='USD bn': raise ValueError('m14 必須填 USD bn，不得用億美元')
     if k=='m10' and not v.get('detail'):
         raise ValueError('m10 必須註明現貨/近月期貨及合約月份等價格口徑')
@@ -567,6 +567,8 @@ def freshen(r,today):
         r['status']='STALE';r['detail']+=(f'; 距今 {age} 天 > {limit} 天')
     return r
 
+# Legacy research-only helper. The active run() never calls this old rate-change method;
+# V70-3-27 m06 is derived from five separately sourced inputs by the 10:00 Task.
 def fetch_m06_from_authorized_cme():
     """FRED + CME futures data via independently authorized data channel.
     Fail closed when access/use rights are not configured or data is unavailable.
@@ -841,6 +843,7 @@ def fedwatch_expected_codes(distribution, current_mid):
     return (expectation/total-float(current_mid))/0.25
 
 
+# Legacy helper retained for history only. It is not part of the active 18-item run.
 def fetch_m06_cme(f):
     """Use CME's authenticated FedWatch EOD REST API; fail closed without access."""
     from urllib.parse import urlparse
@@ -1053,7 +1056,7 @@ def selftest():
     except ValueError:
         pass
     assert all(k not in LABELS for k in ('m06','m03_qqq','m03_spy','m03_vt'))
-    print('SELF-TEST PASS: 18 independent macros + s03 duplicate; explicitly published LEI YoY; s05 delegated')
+    print('SELF-TEST PASS: 18 core indicators + s03 duplicate; nine V70-3-27 supplement inputs delegated')
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser(description='V70.3 18 項自動抓取與已核定LEI基準')
@@ -1067,4 +1070,5 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
+
 

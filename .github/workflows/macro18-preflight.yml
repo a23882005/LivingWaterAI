@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight18:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'manual-test: crawler fallback'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -164,7 +164,7 @@ jobs:
 
   notify-on-critical:
     needs: preflight18
-    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'manual-test: crawler fallback')))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

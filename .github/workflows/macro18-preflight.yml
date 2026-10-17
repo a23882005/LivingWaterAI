@@ -1,4 +1,4 @@
-# 最後修改：2026/10/16 03:36（台灣時間）｜版本：D009-v2｜檔案：macro18-preflight.yml
+# 最後修改：2026/10/17 10:31（台灣時間）｜版本：D009-v3｜檔案：macro18-preflight.yml
 name: LivingWaterAI V70.3 09h Preflight 18 Macro
 on:
   schedule:
@@ -13,7 +13,6 @@ on:
       - 'scripts/macro18_alert.py'
       - 'tests/test_d009_alert.py'
       - 'tests/test_d009_state.py'
-      - 'scripts/probe_m06_fedwatch_free.py'
 permissions:
   contents: write
 concurrency:
@@ -32,7 +31,7 @@ jobs:
         run: |
           python -m pip install requests pandas yfinance pypdf
           python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
-          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/probe_m06_fedwatch_free.py scripts/macro18_state.py scripts/macro18_alert.py
+          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/macro18_state.py scripts/macro18_alert.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
           python -m unittest discover -s tests -p "test_d009_*.py" -v
       - name: Mount dedicated persistent state branch and restore missing cache

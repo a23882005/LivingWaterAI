@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17｜版本：V70-3-27 build adapter v3.2（forward evidence）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/17 13:55｜版本：V70-3-27 build adapter v3.3（wallstreet-five typed data）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
@@ -195,6 +195,36 @@ def _normalize(item, indicator_id=None):
     return normalized
 
 
+
+def _wallstreet_five_verified(path, today):
+    """Validate same-horizon, source-traced factual forecasts; not a scoring input."""
+    forecast = _read(path)
+    if forecast.get("schema") != "V70.3/wallstreet-five-forecast-v1":
+        raise ValueError("WALLSTREET5: wrong source schema")
+    ids = ("goldman", "jpm", "morgan", "bofa", "ubs")
+    rows = forecast.get("forecasts")
+    if not isinstance(rows, list) or [r.get("firm_id") for r in rows] != list(ids):
+        raise ValueError("WALLSTREET5: must have exactly five fixed, ordered firms")
+    checked = dt.date.fromisoformat(forecast["as_of_date"])
+    if checked > today or checked < dt.date(2026, 1, 1):
+        raise ValueError("WALLSTREET5: invalid verification date")
+    cross = dt.date.fromisoformat(forecast["cross_check_date"])
+    if cross > checked or not str(forecast.get("cross_check_source", "")).startswith("https://"):
+        raise ValueError("WALLSTREET5: cross-check source/date invalid")
+    for row in rows:
+        if not isinstance(row.get("target"), int) or isinstance(row["target"], bool) or not 1000 <= row["target"] <= 20000:
+            raise ValueError("WALLSTREET5: nonnumeric or implausible target " + row["firm_id"])
+        when = dt.date.fromisoformat(row["publication_date"])
+        horizon = dt.date.fromisoformat(row["horizon_end_date"])
+        if when > checked or horizon < when or row["horizon_end_date"] != forecast["horizon_end_date"]:
+            raise ValueError("WALLSTREET5: date/horizon mismatch " + row["firm_id"])
+        if not str(row.get("source_url", "")).startswith("https://"):
+            raise ValueError("WALLSTREET5: missing public source " + row["firm_id"])
+        if not 10 <= len(str(row.get("summary") or "")) <= 280:
+            raise ValueError("WALLSTREET5: requires original concise summary " + row["firm_id"])
+    return forecast
+
+
 def build(macro_path, supplement_path, html_path, dest):
     src = _read(macro_path)
     base = src.get("items")
@@ -295,6 +325,7 @@ def build(macro_path, supplement_path, html_path, dest):
             "transportIndicators": len(indicators),
         },
         "indicators": indicators, "news": [], "leiHistory": lei_history,
+        "wallStreetFive": _wallstreet_five_verified("data/wallstreet5_forecasts.json", today),
         "derived": {"m21": {
             "value": int(all(row["value"] < 0 for row in lei_history)),
             "method": "All three consecutive published monthly LEI YoY values < 0",
@@ -303,9 +334,12 @@ def build(macro_path, supplement_path, html_path, dest):
         "dataUpdatedAt": now.astimezone(taipei).isoformat(timespec="seconds"),
         "sourceSnapshot": {
             "macro18": _git_blob_sha(macro_path), "macro8": _git_blob_sha(supplement_path),
+            "wallstreet5": _git_blob_sha("data/wallstreet5_forecasts.json"),
             "macro18GeneratedAt": src.get("generated_at"), "macro8GeneratedAt": extra.get("generated_at"),
         },
     }
+    if len(feed["wallStreetFive"]["forecasts"]) != 5:
+        raise ValueError("WALLSTREET5: five firms absent before HTML build")
     template = Path(html_path).read_text(encoding="utf-8")
     if "V70-3-27" not in template or "v70-embedded-feed" not in template:
         raise ValueError("HTML is not the canonical V70-3-27 template")

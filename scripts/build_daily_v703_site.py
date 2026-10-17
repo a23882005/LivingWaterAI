@@ -1,8 +1,9 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 13:55｜版本：V70-3-27 build adapter v3.3（wallstreet-five typed data）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/17 13:56｜版本：V70-3-27 build adapter v3.4（HTML五機構SSR）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
 import hashlib
+import html
 import json
 import math
 import re
@@ -350,6 +351,40 @@ def build(macro_path, supplement_path, html_path, dest):
     )
     if count != 1:
         raise ValueError("Could not replace the embedded feed")
+    # Render forecast facts server-side so even mobile browsers with no JavaScript
+    # show the same five audited year-end values as the JSON build artifact.
+    bank_rows = feed["wallStreetFive"]["forecasts"]
+    lines = []
+    for row in bank_rows:
+        def cell(value):
+            return '<td class="border border-slate-600 p-2 align-top">' + html.escape(str(value)) + '</td>'
+        source_url = html.escape(row["source_url"], quote=True)
+        source = (
+            '<td class="border border-slate-600 p-2 align-top"><a rel="noopener noreferrer" '
+            'target="_blank" class="text-cyan-200 underline" href="' + source_url + '">'
+            + html.escape(row["source_type"]) + '</a></td>'
+        )
+        lines.append('<tr>' + ''.join([
+            cell(row["firm_name"]), cell(row["publication_date"]),
+            cell(row["horizon"]), cell(f'{row["target"]:,}'),
+            cell(row["summary"]), source,
+            cell('公開數字／自寫摘要／來源連結；全文未授權'),
+        ]) + '</tr>')
+    updated_html, bank_count = re.subn(
+        r'(<tbody id="v703-wallstreet-rows">).*?(</tbody>)',
+        lambda m: m.group(1) + '\n' + '\n'.join(lines) + '\n' + m.group(2),
+        updated_html, count=1, flags=re.S,
+    )
+    if bank_count != 1 or updated_html.count('公開數字／自寫摘要／來源連結；全文未授權') != 5:
+        raise ValueError("WALLSTREET5: HTML table render failed")
+    updated_html = updated_html.replace(
+        "資料查核日：等待建置｜統一比較 2026 年底目標；各機構原始發布日不同。",
+        "資料查核日：" + html.escape(feed["wallStreetFive"]["as_of_date"])
+        + "｜路透社彙整交叉核對：" + html.escape(feed["wallStreetFive"]["cross_check_date"])
+        + "｜統一比較 2026 年底目標（不同機構原始發布日不同）。",
+    )
+    if "資料查核日：等待建置" in updated_html or 'id="v703-wallstreet-rows"' not in updated_html:
+        raise ValueError("WALLSTREET5: placeholder still present after build")
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

@@ -191,6 +191,13 @@ def build(macro_path, supplement_path, html_path, dest):
         valid_config.add(key)
         if key in SCORING_IDS:
             scoring_valid.add(key)
+    # The non-scoring transport rows still need provenance and freshness QA.
+    for key, row in inputs.items():
+        if key in MACRO_CONFIG_IDS:
+            continue
+        issues = _validate(key, row, today)
+        if issues:
+            calc_problems.extend(issues)
     s05_value = inputs["s05"].get("value")
     if s05_value is None or not 0 <= float(s05_value) <= 100:
         calc_problems.append("s05: outside 0-100 or missing percentage")

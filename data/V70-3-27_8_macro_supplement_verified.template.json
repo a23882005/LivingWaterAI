@@ -1,0 +1,493 @@
+{
+  "_fileMeta": {
+    "lastModifiedTaipei": "2026/10/17 15:30",
+    "version": "V70-3-27 supplement template V3",
+    "fileName": "V70-3-27_8_macro_supplement_verified.template.json"
+  },
+  "schema": "V70.3/10h-eight-supplement-v3",
+  "generated_at": null,
+  "as_of_taipei": null,
+  "items": {
+    "m06_rate": {
+      "label": "Fed目前目標利率區間中點",
+      "value": null,
+      "unit": "%",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed目前目標利率區間中點",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "正式目標區間上下限中點；不得以有效聯邦基金利率代替"
+        },
+        {
+          "site": "FRED DFEDTARL",
+          "url": "https://fred.stlouisfed.org/series/DFEDTARL",
+          "metric_or_horizon": "Fed目前目標利率區間中點",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "官方目標區間下限交叉核對"
+        },
+        {
+          "site": "FRED DFEDTARU",
+          "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+          "metric_or_horizon": "Fed目前目標利率區間中點",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "官方目標區間上限交叉核對"
+        },
+        {
+          "site": "ALFRED DFEDTARU",
+          "url": "https://alfred.stlouisfed.org/series?seid=DFEDTARU",
+          "metric_or_horizon": "Fed目前目標利率區間中點",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "歷史即時版本核對"
+        }
+      ]
+    },
+    "m06_inf": {
+      "label": "未來12個月通膨預期",
+      "value": null,
+      "unit": "%",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Cleveland Fed",
+          "url": "https://www.clevelandfed.org/indicators-and-data/inflation-expectations",
+          "metric_or_horizon": "未來12個月通膨預期",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "主來源：1年期通膨預期"
+        },
+        {
+          "site": "NY Fed SCE",
+          "url": "https://www.newyorkfed.org/microeconomics/sce",
+          "metric_or_horizon": "未來12個月通膨預期",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "備援：消費者1年期通膨預期中位數"
+        },
+        {
+          "site": "University of Michigan",
+          "url": "https://data.sca.isr.umich.edu/",
+          "metric_or_horizon": "未來12個月通膨預期",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "備援：消費者1年期通膨預期"
+        },
+        {
+          "site": "Philadelphia Fed SPF",
+          "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/survey-of-professional-forecasters",
+          "metric_or_horizon": "未來12個月通膨預期",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "交叉核對；期間不同時不可直接替代"
+        }
+      ]
+    },
+    "m06_rstar": {
+      "label": "NY Fed HLW 即時版本實質自然利率 r*",
+      "value": null,
+      "unit": "%",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "NY Fed r-star page",
+          "url": "https://www.newyorkfed.org/research/policy/rstar",
+          "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "定義及方法入口"
+        },
+        {
+          "site": "NY Fed HLW real-time estimates",
+          "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
+          "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "唯一正式輸入候選：即時版本"
+        },
+        {
+          "site": "NY Fed current estimates",
+          "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx",
+          "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "最新值交叉核對，不替代歷史即時版本"
+        },
+        {
+          "site": "NY Fed Staff Report 1063",
+          "url": "https://www.newyorkfed.org/research/staff_reports/sr1063",
+          "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "方法交叉核對，不直接替代數值"
+        }
+      ]
+    },
+    "m06_output_gap": {
+      "label": "實際 GDP 相對 CBO 潛在 GDP 產出缺口",
+      "value": null,
+      "unit": "%",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "CBO Key Budget and Economic Data",
+          "url": "https://www.cbo.gov/data/budget-economic-data",
+          "metric_or_horizon": "實際 GDP 相對 CBO 潛在 GDP 產出缺口",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "潛在 GDP 主候選來源"
+        },
+        {
+          "site": "BEA NIPA",
+          "url": "https://www.bea.gov/itable/national-gdp-and-personal-income",
+          "metric_or_horizon": "實際 GDP 相對 CBO 潛在 GDP 產出缺口",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "實際 GDP 官方候選來源"
+        },
+        {
+          "site": "FRED GDPC1",
+          "url": "https://fred.stlouisfed.org/series/GDPC1",
+          "metric_or_horizon": "實際 GDP 相對 CBO 潛在 GDP 產出缺口",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "實質 GDP 序列交叉核對"
+        },
+        {
+          "site": "ALFRED GDPC1",
+          "url": "https://alfred.stlouisfed.org/series?seid=GDPC1",
+          "metric_or_horizon": "實際 GDP 相對 CBO 潛在 GDP 產出缺口",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "保留歷史發布 vintage"
+        }
+      ]
+    },
+    "s05": {
+      "label": "NYSE 全市場站上50日移動平均線股票百分比（$MMFI）",
+      "value": null,
+      "unit": "%",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Macroaxis MMFI",
+          "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+          "metric_or_horizon": "NYSE 全市場站上50日移動平均線股票百分比（$MMFI）",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "核對 NYSE $MMFI 及 50日定義"
+        },
+        {
+          "site": "Barchart $MMFI",
+          "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
+          "metric_or_horizon": "NYSE 全市場站上50日移動平均線股票百分比（$MMFI）",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "同口徑候選；須核實標的範圍"
+        },
+        {
+          "site": "EODData MMFI",
+          "url": "https://www.eoddata.com/stockquote/NYSE/MMFI.htm",
+          "metric_or_horizon": "NYSE 全市場站上50日移動平均線股票百分比（$MMFI）",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "同口徑交叉核對"
+        },
+        {
+          "site": "TradingView INDEX:MMFI",
+          "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
+          "metric_or_horizon": "NYSE 全市場站上50日移動平均線股票百分比（$MMFI）",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "同口徑候選；不得用 S&P 500/Nasdaq 替代"
+        }
+      ]
+    },
+    "m03_qqq": {
+      "label": "QQQ 未來12個月 Forward P/E 或 FY1",
+      "value": null,
+      "unit": "倍",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Yahoo Finance QQQ",
+          "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
+          "metric_or_horizon": "QQQ 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward P/E 欄位"
+        },
+        {
+          "site": "Invesco QQQ",
+          "url": "https://www.invesco.com/qqq-etf/en/about.html",
+          "metric_or_horizon": "QQQ 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "發行商 FY1/Forward 候選；須有明確期間標示"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "QQQ 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確標示 Forward/FY1 的數值"
+        },
+        {
+          "site": "StockAnalysis QQQ",
+          "url": "https://stockanalysis.com/etf/qqq/",
+          "metric_or_horizon": "QQQ 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward/FY1 欄位"
+        }
+      ]
+    },
+    "m03_spy": {
+      "label": "SPY 未來12個月 Forward P/E 或 FY1",
+      "value": null,
+      "unit": "倍",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Yahoo Finance SPY",
+          "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
+          "metric_or_horizon": "SPY 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward P/E 欄位"
+        },
+        {
+          "site": "State Street SPY",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+          "metric_or_horizon": "SPY 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "發行商 FY1/Forward 候選；須有明確期間標示"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "SPY 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確標示 Forward/FY1 的數值"
+        },
+        {
+          "site": "StockAnalysis SPY",
+          "url": "https://stockanalysis.com/etf/spy/",
+          "metric_or_horizon": "SPY 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward/FY1 欄位"
+        }
+      ]
+    },
+    "m03_vt": {
+      "label": "VT 未來12個月 Forward P/E 或 FY1",
+      "value": null,
+      "unit": "倍",
+      "observation_date": null,
+      "source_url": null,
+      "method": "尚未查核；由總經 Task 擷取並填入實際口徑",
+      "status": "MISSING",
+      "detail": "範本；不可視為已驗證資料。四個候選來源查核完成後，填正式值與來源。",
+      "retrieval_time": null,
+      "publication_date": null,
+      "vintage": null,
+      "candidate_checks": [
+        {
+          "site": "Yahoo Finance VT",
+          "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
+          "metric_or_horizon": "VT 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward P/E 欄位"
+        },
+        {
+          "site": "Vanguard VT",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+          "metric_or_horizon": "VT 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "發行商 FY1/Forward 候選；須有明確期間標示"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "VT 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確標示 Forward/FY1 的數值"
+        },
+        {
+          "site": "StockAnalysis VT",
+          "url": "https://stockanalysis.com/etf/vt/",
+          "metric_or_horizon": "VT 未來12個月 Forward P/E 或 FY1",
+          "status": "NOT_CHECKED",
+          "checked_at": null,
+          "value": null,
+          "unit": "倍",
+          "observation_date": null,
+          "notes": "只接受明確 Forward/FY1 欄位"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "本檔是資料格式範本，不是已抓取或已驗證的市場資料。",
+    "items 必須恰為九個補充變數；每個 candidate_checks 必須恰有四個候選來源查核紀錄。",
+    "候選來源的 NOT_CHECKED 不得轉成正式數值；只有查核成功且口徑符合才可填 value/source_url。",
+    "Forward P/E 只接受明確 Forward/FY1；TTM 或期間未標示一律 MISSING。",
+    "s05 只採 NYSE $MMFI 市場廣度，不可拿 S&P 500 或 Nasdaq 代替。",
+    "m06_rstar 的正式值只採 NY Fed HLW 即時 vintage；其他來源只供方法或最新值交叉核對。",
+    "m06_taylor_infl 定義未經 Owner 鎖定前須維持 MISSING，不得自行選 CPI/PCE 或混用。"
+  ]
+}

@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：V70-3-27 build adapter v2｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/17 11:17｜版本：V70-3-27 build adapter v3｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 9 supplement inputs."""
 import argparse
 import datetime as dt
@@ -28,6 +28,7 @@ SLOW_MONTHLY = frozenset(("m16", "m06_rstar"))
 WEEKLY = frozenset(("m14",))
 VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
+CANDIDATE_STATUSES = frozenset(("FOUND", "NOT_FOUND", "BLOCKED", "METRIC_MISMATCH"))
 
 
 def _read(path):
@@ -89,6 +90,30 @@ def _validate(key, item, today):
     return problems
 
 
+def _validate_candidate_checks(key, item):
+    """Require four completed candidate-source checks on every 10:00 supplement row."""
+    problems = []
+    checks = item.get("candidate_checks") if isinstance(item, dict) else None
+    if not isinstance(checks, list) or len(checks) != 4:
+        return [f"{key}: candidate_checks must contain exactly four source checks"]
+    for index, check in enumerate(checks, start=1):
+        prefix = f"{key}: candidate_checks[{index}]"
+        if not isinstance(check, dict):
+            problems.append(f"{prefix} must be an object")
+            continue
+        if not str(check.get("site") or "").strip():
+            problems.append(f"{prefix} missing site")
+        if not str(check.get("url") or "").startswith("https://"):
+            problems.append(f"{prefix} missing HTTPS URL")
+        if not str(check.get("metric_or_horizon") or "").strip():
+            problems.append(f"{prefix} missing metric_or_horizon")
+        if check.get("status") not in CANDIDATE_STATUSES:
+            problems.append(f"{prefix} status must be a completed candidate check")
+        if not str(check.get("checked_at") or "").strip():
+            problems.append(f"{prefix} missing checked_at")
+    return problems
+
+
 def _lei_history(src, latest):
     records = src.get("lei_history", [])
     if not isinstance(records, list) or len(records) != 3:
@@ -116,12 +141,22 @@ def _git_blob_sha(path):
 
 
 def _normalize(item):
-    return {
+    normalized = {
         "value": item.get("value"), "dataDate": item.get("observation_date"),
         "source": item.get("source_url", ""), "unit": item.get("unit", ""),
         "method": item.get("method", ""), "status": item.get("status", "MISSING"),
         "detail": item.get("detail", ""),
     }
+    if isinstance(item.get("candidate_checks"), list):
+        normalized["candidateChecks"] = [dict(check) if isinstance(check, dict) else check
+                                         for check in item["candidate_checks"]]
+    if item.get("retrieval_time") is not None:
+        normalized["retrievalTime"] = item["retrieval_time"]
+    if item.get("publication_date") is not None:
+        normalized["publicationDate"] = item["publication_date"]
+    if item.get("vintage") is not None:
+        normalized["vintage"] = item["vintage"]
+    return normalized
 
 
 def build(macro_path, supplement_path, html_path, dest):
@@ -176,6 +211,8 @@ def build(macro_path, supplement_path, html_path, dest):
         raise ValueError("LEI_HISTORY_BLOCKED: m16 must be verified before deriving m21")
     lei_history = _lei_history(src, inputs["m16"])
     calc_problems = []
+    for key in SUPPLEMENT_IDS:
+        calc_problems.extend(_validate_candidate_checks(key, inputs[key]))
     missing = []
     valid_config = set()
     scoring_valid = set()

@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 11:17｜版本：V70-3-27 build adapter v3｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/17 13:13｜版本：V70-3-27 build adapter v3.1（quarterly freshness only）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
@@ -23,8 +23,9 @@ MACRO_CONFIG_IDS = (
 M06_COMPONENTS = ("m06_rate", "m06_inf", "m06_rstar", "m06_output_gap")
 M06_SUPPORT_ONLY = frozenset(M06_COMPONENTS)
 SCORING_IDS = frozenset(set(MACRO_CONFIG_IDS) - M06_SUPPORT_ONLY)
-MONTHLY = frozenset(("m04", "m05", "m15", "m18", "m19", "m20", "m06_inf", "m06_output_gap"))
-SLOW_MONTHLY = frozenset(("m16", "m06_rstar"))
+MONTHLY = frozenset(("m04", "m05", "m15", "m18", "m19", "m20", "m06_inf"))
+QUARTERLY = frozenset(("m06_rstar", "m06_output_gap", "m06"))
+SLOW_MONTHLY = frozenset(("m16",))
 WEEKLY = frozenset(("m14",))
 VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
@@ -63,6 +64,11 @@ def _validate(key, item, today):
             age, obs = _days_old(date, today)
             if age < 0:
                 problems.append(f"{key}: future observation")
+            elif key in QUARTERLY:
+                if obs.month not in (3, 6, 9, 12) or obs != dt.date(obs.year, obs.month, (dt.date(obs.year + (obs.month == 12), obs.month % 12 + 1, 1) - dt.timedelta(days=1)).day):
+                    problems.append(f"{key}: quarterly observation must use quarter-end date")
+                if age > 150:
+                    problems.append(f"{key}: quarterly data over 150 days")
             elif key in MONTHLY:
                 if age > 46:
                     problems.append(f"{key}: monthly data over 46 days")

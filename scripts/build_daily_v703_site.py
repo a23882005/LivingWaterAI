@@ -1,5 +1,5 @@
 # 最後修改日期時間（台灣時間）：2026/10/17 11:17｜版本：V70-3-27 build adapter v3｜檔案名稱：build_daily_v703_site.py
-"""Build the V70-3-27 feed from 18 core records and 9 supplement inputs."""
+"""Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
 import hashlib
@@ -10,20 +10,20 @@ import shutil
 from pathlib import Path
 
 SUPPLEMENT_IDS = frozenset((
-    "s05", "m06_rate", "m06_inf", "m06_rstar", "m06_taylor_infl",
+    "s05", "m06_rate", "m06_inf", "m06_rstar",
     "m06_output_gap", "m03_qqq", "m03_spy", "m03_vt",
 ))
 DUPLICATE_ID = "s03"
 MACRO_CONFIG_IDS = (
     "m07", "m01", "m06", "m06_rate", "m06_inf", "m06_rstar",
-    "m06_taylor_infl", "m06_output_gap", "m08", "m03_qqq", "m03_spy",
+    "m06_output_gap", "m08", "m03_qqq", "m03_spy",
     "m03_vt", "m02", "m04", "m05", "m09", "m10", "s05", "m12",
     "m13", "m17", "m14", "m15", "m16", "m18", "m19", "m20",
 )
-M06_COMPONENTS = ("m06_rate", "m06_inf", "m06_rstar", "m06_taylor_infl", "m06_output_gap")
+M06_COMPONENTS = ("m06_rate", "m06_inf", "m06_rstar", "m06_output_gap")
 M06_SUPPORT_ONLY = frozenset(M06_COMPONENTS)
 SCORING_IDS = frozenset(set(MACRO_CONFIG_IDS) - M06_SUPPORT_ONLY)
-MONTHLY = frozenset(("m04", "m05", "m15", "m18", "m19", "m20", "m06_inf", "m06_taylor_infl", "m06_output_gap"))
+MONTHLY = frozenset(("m04", "m05", "m15", "m18", "m19", "m20", "m06_inf", "m06_output_gap"))
 SLOW_MONTHLY = frozenset(("m16", "m06_rstar"))
 WEEKLY = frozenset(("m14",))
 VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
@@ -169,7 +169,7 @@ def build(macro_path, supplement_path, html_path, dest):
     extra = _read(supplement_path)
     records = extra.get("items", extra)
     if not isinstance(records, dict) or set(records) != SUPPLEMENT_IDS:
-        raise ValueError("10h contract requires precisely nine raw supplement keys: " + ",".join(sorted(SUPPLEMENT_IDS)))
+        raise ValueError("10h contract requires precisely eight raw supplement keys: " + ",".join(sorted(SUPPLEMENT_IDS)))
     if base["s03"].get("value") != base["m07"].get("value") or base["s03"].get("observation_date") != base["m07"].get("observation_date"):
         raise ValueError("s03 and m07 VIX value/date mismatch")
 
@@ -187,23 +187,23 @@ def build(macro_path, supplement_path, html_path, dest):
         for row in m06_children
     )
     if m06_ready:
-        fed, inflation, rstar, taylor_inflation, output_gap = (float(row["value"]) for row in m06_children)
+        fed, inflation, rstar, output_gap = (float(row["value"]) for row in m06_children)
         actual_gap = (fed - inflation) - rstar
-        taylor_gap = 0.5 * (taylor_inflation - 2.0) + 0.5 * output_gap
+        taylor_gap = 0.5 * (inflation - 2.0) + 0.5 * output_gap
         m06_value = actual_gap - taylor_gap
         m06_status = "USABLE" if any(row.get("status") == "USABLE" for row in m06_children) else "OK"
         m06_date = min(row["observation_date"] for row in m06_children)
         m06_source = " | ".join(dict.fromkeys(row["source_url"] for row in m06_children))
-        m06_detail = "V2=(Fed中點−未來12M通膨預期−HLW r*)−[0.5×(Taylor通膨−2)+0.5×實際GDP/潛在GDP缺口]；" + "; ".join(
+        m06_detail = "V3=(Fed中點−未來12M通膨預期−HLW r*)−[0.5×(同一未來12M通膨預期−2)+0.5×實際GDP/潛在GDP缺口]；" + "; ".join(
             f"{key}={inputs[key]['value']}@{inputs[key]['observation_date']}" for key in M06_COMPONENTS
         )
     else:
         m06_value, m06_status, m06_date = None, "MISSING", None
         m06_source = " | ".join(dict.fromkeys(str(row.get("source_url", "")) for row in m06_children if isinstance(row, dict)))
-        m06_detail = "m06 requires all five verified raw inputs; missing/invalid component"
+        m06_detail = "m06 requires all four verified raw inputs; missing/invalid component"
     inputs["m06"] = {
         "value": m06_value, "observation_date": m06_date, "source_url": m06_source,
-        "unit": "%pt", "method": "V70-3-27 m06 V2 derived from five dated inputs",
+        "unit": "%pt", "method": "V70-3-27 m06 V3 derived from four dated inputs",
         "status": m06_status, "detail": m06_detail,
     }
 
@@ -241,15 +241,15 @@ def build(macro_path, supplement_path, html_path, dest):
 
     indicators = {key: _normalize(row) for key, row in inputs.items()}
     feed = {
-        "schema": "V70.3/family-macro-feed-v2",
+        "schema": "V70.3/family-macro-feed-v3",
         "asOf": now.isoformat().replace("+00:00", "Z"),
         "verification": {
-            "ready": not calc_problems and not missing and len(valid_config) == 27 and len(scoring_valid) == 22,
-            "valid": len(valid_config), "totalRequired": 27,
-            "independentIndicators": 26,
-            "sources": ["09:00/18", "10:00/9"],
+            "ready": not calc_problems and not missing and len(valid_config) == 26 and len(scoring_valid) == 22,
+            "valid": len(valid_config), "totalRequired": 26,
+            "independentIndicators": 25,
+            "sources": ["09:00/18", "10:00/8"],
             "usableWithCaveat": sorted(key for key, row in inputs.items() if row.get("status") == "USABLE"),
-            "transportFields": 27, "requiredScoringIndicators": 22,
+            "transportFields": 26, "requiredScoringIndicators": 22,
             "requiredScoringIndicatorsValidated": len(scoring_valid),
             "missing": sorted(missing), "problems": calc_problems,
             "transportIndicators": len(indicators),
@@ -262,8 +262,8 @@ def build(macro_path, supplement_path, html_path, dest):
         }},
         "dataUpdatedAt": now.astimezone(taipei).isoformat(timespec="seconds"),
         "sourceSnapshot": {
-            "macro18": _git_blob_sha(macro_path), "macro9": _git_blob_sha(supplement_path),
-            "macro18GeneratedAt": src.get("generated_at"), "macro9GeneratedAt": extra.get("generated_at"),
+            "macro18": _git_blob_sha(macro_path), "macro8": _git_blob_sha(supplement_path),
+            "macro18GeneratedAt": src.get("generated_at"), "macro8GeneratedAt": extra.get("generated_at"),
         },
     }
     template = Path(html_path).read_text(encoding="utf-8")
@@ -280,7 +280,7 @@ def build(macro_path, supplement_path, html_path, dest):
     out.mkdir(parents=True, exist_ok=True)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
-    qa = {"ready": feed["verification"]["ready"], "independent": 26, "transport": 29,
+    qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,
           "requiredScoring": 22, "requiredScoringValidated": len(scoring_valid),
           "asOf": feed["asOf"], "missing": sorted(missing), "problems": calc_problems}
     (out / "QA.json").write_text(json.dumps(qa, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -291,7 +291,7 @@ def build(macro_path, supplement_path, html_path, dest):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--macro", default="data/18_macro_verification.json")
-    parser.add_argument("--supplement", default="data/9_macro_supplement_verified.json")
+    parser.add_argument("--supplement", default="data/8_macro_supplement_verified.json")
     parser.add_argument("--html", default="系統工程/總經V70/V70-3-27.html")
     parser.add_argument("--out", default="build/site")
     args = parser.parse_args()

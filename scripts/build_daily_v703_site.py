@@ -166,9 +166,9 @@ def _normalize(item, indicator_id=None):
                     or check.get("url") != item.get("source_url")):
                 continue
             label = str(check.get("metric_or_horizon") or "")
-            if not re.search(r"forward|fy\\s?1|next\\s?12\\s?months|未來12m|預估本益比", label, re.I):
+            if not re.search(r"forward|fy\s?1|next\s?12\s?months|未來12m|預估本益比", label, re.I):
                 continue
-            if re.search(r"\\bTTM\\b", label, re.I):
+            if re.search(r"\bTTM\b", label, re.I):
                 continue
             try:
                 same_value = math.isfinite(float(check["value"])) and abs(

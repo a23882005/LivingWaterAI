@@ -10,7 +10,7 @@ on:
       - 'scripts/build_daily_v703_site.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
-      - 'data/9_macro_supplement_verified.json'
+      - 'data/8_macro_supplement_verified.json'
 permissions:
   contents: write
 concurrency:
@@ -25,11 +25,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Validate 18 core plus 9 supplement inputs; build V70-3-27
+      - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
           test -s data/18_macro_verification.json
-          test -s data/9_macro_supplement_verified.json
+          test -s data/8_macro_supplement_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -38,14 +38,21 @@ jobs:
           from pathlib import Path
           feed=json.loads(Path('build/site/V70_macro_latest.json').read_text(encoding='utf-8'))
           v=feed['verification']
-          assert feed['schema']=='V70.3/family-macro-feed-v2', 'wrong V70 feed schema'
+          assert feed['schema']=='V70.3/family-macro-feed-v3', 'wrong V70 feed schema'
           assert v['ready'] is True, 'V70-3-27 data incomplete; preserve existing published site'
-          assert v['independentIndicators']==26
-          assert v['transportIndicators']==29 and len(feed['indicators'])==29
-          assert v['totalRequired']==27 and v['valid']==27
+          assert v['independentIndicators']==25
+          assert v['transportIndicators']==28 and len(feed['indicators'])==28
+          assert v['totalRequired']==26 and v['valid']==26
           assert v['requiredScoringIndicators']==22 and v['requiredScoringIndicatorsValidated']==22
-          assert feed.get('sourceSnapshot',{}).get('macro18') and feed.get('sourceSnapshot',{}).get('macro9')
+          assert feed.get('sourceSnapshot',{}).get('macro18') and feed.get('sourceSnapshot',{}).get('macro8')
           assert feed['indicators']['m06']['status'] in ('OK','USABLE')
+          m06_raw = [feed['indicators'][key] for key in ('m06_rate','m06_inf','m06_rstar','m06_output_gap')]
+          assert all(row['status'] in ('OK','USABLE') and row['value'] is not None for row in m06_raw)
+          rate, inflation, rstar, output_gap = [float(row['value']) for row in m06_raw]
+          actual_gap = (rate - inflation) - rstar
+          taylor_gap = 0.5 * (inflation - 2.0) + 0.5 * output_gap
+          assert abs(float(feed['indicators']['m06']['value']) - (actual_gap - taylor_gap)) < 0.001
+          assert 'm06_taylor_infl' not in feed['indicators']
           for key in ('m03_qqq','m03_spy','m03_vt'):
               row=feed['indicators'][key]
               assert row['status'] in ('OK','USABLE') and row['value'] is not None
@@ -72,7 +79,7 @@ jobs:
             git reset --soft origin/main
             git add "系統工程/總經V70/V70_macro_latest.json"
             if ! git diff --cached --quiet; then
-              git commit -m "data(V70-3-27): publish verified 29-indicator feed"
+              git commit -m "data(V70-3-27): publish verified 28-indicator feed"
             fi
             if git push origin HEAD:main; then break; fi
             if [ "$attempt" -eq 3 ]; then echo "GitHub colocated feed publish failed" >&2; exit 1; fi
@@ -131,9 +138,9 @@ jobs:
                   assert live["schema"]==expected["schema"]
                   assert live["asOf"]==expected["asOf"]
                   assert live["verification"]["ready"] is True
-                  assert live["verification"]["independentIndicators"]==26
+                  assert live["verification"]["independentIndicators"]==25
                   assert live["verification"]["requiredScoringIndicatorsValidated"]==22
-                  assert len(live["indicators"])==29
+                  assert len(live["indicators"])==28
                   assert "V70_macro_latest.json" in page
                   assert "V70-3-27" in page
                   print("HOSTINGER_LIVE_PASS",base,expected["asOf"])

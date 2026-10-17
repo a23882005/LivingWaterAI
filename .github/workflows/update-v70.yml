@@ -1,8 +1,21 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：retired V70 workflow｜檔案名稱：update-v70.yml
-name: Retired LivingWaterAI V70 legacy 8+16 validation (manual only)
+# 最後修改日期時間（台灣時間）：2026/10/16 01:18:58｜版本：V70.3.11 workflow｜檔案名稱：update-v70.yml
+name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
 
 on:
+  # Legacy 11h cron migrated to v703-site-deploy-1100.yml; manual dispatch retained.
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/update-v70.yml'
+      - '系統工程/總經V70/總經爬蟲程式16項.py'
+      - '系統工程/總經V70/ChatGPT 總經爬蟲8項.md'
+      - '系統工程/總經V70/每天總經及html更新程序.md'
+      - '系統工程/總經V70/V70-3-11.html'
+      - 'scripts/build_v703_feed.py'
+      - 'scripts/probe_extra8.py'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'data/verified_overrides.json'
 
 permissions:
   contents: write
@@ -13,7 +26,6 @@ concurrency:
 
 jobs:
   macro24:
-    if: ${{ false }} # Retired: do not run the old 8+16 pipeline
     # V70.3 daily macro 8+16: verify published data first; Hostinger deployment requires independently validated credentials and rollout gate.
     runs-on: ubuntu-latest
     timeout-minutes: 45

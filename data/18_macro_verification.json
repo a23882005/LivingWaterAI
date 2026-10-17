@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-17T09:25:04.940897+08:00",
+  "generated_at": "2026-10-17T10:35:10.742797+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:01.575095+00:00"
+      "retrieved_at": "2026-10-17T02:35:08.215173+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:02.751132+00:00"
+      "retrieved_at": "2026-10-17T02:35:08.439357+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-17T01:25:03.464585+00:00"
+      "retrieved_at": "2026-10-17T02:35:09.359748+00:00"
     }
   ]
 }

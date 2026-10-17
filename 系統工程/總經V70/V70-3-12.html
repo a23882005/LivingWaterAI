@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間（台灣時間）：2026/10/16 10:16:20｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
+<!-- 最後修改日期時間（台灣時間）：2026/10/17 10:07:13｜版本：V70-3-12｜檔案名稱：V70-3-12.html -->
 <!DOCTYPE html>
 
 
@@ -103,7 +103,7 @@
 <body class="min-h-screen pb-32">
 <div id="v703-coverage-banner" class="max-w-7xl mx-auto px-4 py-2 text-center text-xs font-semibold text-slate-300" aria-live="polite">總經資料覆蓋：等待資料驗證</div>
 <div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：HTML已內嵌逐項資料｜觀測日依各指標</div>
-<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 23項獨立總經資料｜展開查看24個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">本輪18+5已完成：23項獨立指標／24個傳輸欄，21/21必要計分指標通過。五項：m06 +0.7867pp；QQQ 29.74x、SPY 25.04x、VT 20.67x（來源未明示TTM）；NYSE $MMFI 30.2%（2026-10-15）。GitHub push Run #14 attempt 2 已完成SFTP與公開網站讀回PASS；台灣11:00排程尚未發生。</p></details>
+<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 23項獨立總經資料｜展開查看24個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">本輪18+5已完成：23項獨立指標／24個傳輸欄，21/21必要計分指標通過。五項：m06 +0.74025pp；QQQ 22.28x Forward、SPY 20.59x FY1、VT 16.27x Forward；NYSE $MMFI 28.32%（2026-10-16）。09:00 Actions Run #53（38990682557）成功；11:00部署尚待實際驗收。</p></details>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -295,9 +295,9 @@
             { id: 'm08', label: '10Y 實質利率 (Real 10Y)', t0: 1.0, t5: 1.8, t10: 2.5, unit: '%', gamma: 0.9, desc: '危機觸發：>=2.5%', url: "https://fred.stlouisfed.org/series/DFII10", val: 2.78},
 
 
-            { id: 'm03_qqq', label: 'QQQ估值參考P/E（來源未明示TTM）', t0: 18, t5: 30, t10: 45, unit: 'x', gamma: 1.0, desc: '估值風險', calibrated: true, url: "https://stockanalysis.com/etf/qqq/holdings/", val: 29.74},
-            { id: 'm03_spy', label: 'SPY估值參考P/E（來源未明示TTM）', t0: 14, t5: 22, t10: 32, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://stockanalysis.com/etf/spy/holdings/", val: 25.04},
-            { id: 'm03_vt', label: 'VT估值參考P/E（來源未明示TTM）', t0: 12, t5: 18, t10: 28, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://stockanalysis.com/etf/vt/holdings/", val: 20.67},
+            { id: 'm03_qqq', label: 'QQQ估值Forward P/E（FY1／未來12個月）', t0: 18, t5: 30, t10: 45, unit: 'x', gamma: 1.0, desc: '估值風險', calibrated: true, url: "https://stockanalysis.com/etf/qqq/", val: 22.28},
+            { id: 'm03_spy', label: 'SPY估值Forward P/E（FY1／未來12個月）', t0: 14, t5: 22, t10: 32, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy", val: 20.59},
+            { id: 'm03_vt', label: 'VT估值Forward P/E（FY1／未來12個月）', t0: 12, t5: 18, t10: 28, unit: 'x', gamma: 1.0, desc: '估值風險', url: "https://stockanalysis.com/etf/vt/", val: 16.27},
 
 
             { id: 'm02', label: '信用利差 HY OAS', t0: 3.0, t5: 4.5, t10: 6.0, unit: '%', gamma: 0.9, desc: '危機觸發：>=6.0%', url: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2", val: 3.25},
@@ -2269,7 +2269,7 @@ if (recBlack) {
 </script>
 <script id="v70-embedded-feed" type="application/json">{
   "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-16T02:06:23Z",
+  "asOf": "2026-10-17T02:07:13Z",
   "verification": {
     "ready": true,
     "valid": 24,
@@ -2279,11 +2279,7 @@ if (recBlack) {
       "09:00/18",
       "10:00/5"
     ],
-    "usableWithCaveat": [
-      "m03_qqq",
-      "m03_spy",
-      "m03_vt"
-    ],
+    "usableWithCaveat": [],
     "transportFields": 24,
     "requiredScoringIndicators": 21,
     "requiredScoringIndicatorsValidated": 21,
@@ -2291,44 +2287,44 @@ if (recBlack) {
   },
   "indicators": {
     "m07": {
-      "value": 16.87,
-      "dataDate": "2026-10-14",
+      "value": 16.46,
+      "dataDate": "2026-10-15",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m01": {
-      "value": 0.33,
-      "dataDate": "2026-10-15",
+      "value": 0.35,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
       "status": "OK",
       "detail": "Matched observation date for nominal 10Y minus 2Y",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m08": {
-      "value": 2.78,
-      "dataDate": "2026-10-15",
+      "value": 2.74,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
       "status": "OK",
       "detail": "10Y TIPS real yield",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m02": {
-      "value": 3.25,
-      "dataDate": "2026-10-14",
+      "value": 3.23,
+      "dataDate": "2026-10-15",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m04": {
       "value": 54.5,
@@ -2338,7 +2334,7 @@ if (recBlack) {
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
       "status": "OK",
       "detail": "統計月份2026-09；8月54.6",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m05": {
       "value": 2.565841,
@@ -2348,57 +2344,57 @@ if (recBlack) {
       "method": "FRED CPILFESL 同一數列 YoY",
       "status": "OK",
       "detail": "比較基期 2025-09-01",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m09": {
-      "value": 102.038002,
-      "dataDate": "2026-10-15",
+      "value": 101.778999,
+      "dataDate": "2026-10-16",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
       "status": "OK",
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m10": {
-      "value": 95.809998,
-      "dataDate": "2026-10-15",
+      "value": 99.040001,
+      "dataDate": "2026-10-16",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
       "status": "OK",
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m12": {
-      "value": 102.487099,
-      "dataDate": "2026-10-15",
+      "value": 101.102898,
+      "dataDate": "2026-10-16",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
       "status": "OK",
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m13": {
-      "value": 2.33,
-      "dataDate": "2026-10-15",
+      "value": 2.37,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
       "detail": "5Y nominal minus 5Y TIPS real yield on same day",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m17": {
-      "value": -0.08,
-      "dataDate": "2026-10-15",
+      "value": 0.02,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
-      "detail": "5Y breakeven change from 2026-09-15",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "detail": "5Y breakeven change from 2026-09-16",
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m14": {
       "value": -77.286,
@@ -2408,7 +2404,7 @@ if (recBlack) {
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
       "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m15": {
       "value": 54.9,
@@ -2418,7 +2414,7 @@ if (recBlack) {
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
       "status": "OK",
       "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m16": {
       "value": -0.7,
@@ -2428,17 +2424,17 @@ if (recBlack) {
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "status": "OK",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m18": {
-      "value": 0,
+      "value": 0.0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",
       "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
       "status": "OK",
       "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m19": {
       "value": 4.2,
@@ -2448,7 +2444,7 @@ if (recBlack) {
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m20": {
       "value": 50.666667,
@@ -2458,77 +2454,77 @@ if (recBlack) {
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "s03": {
-      "value": 16.87,
-      "dataDate": "2026-10-14",
+      "value": 16.46,
+      "dataDate": "2026-10-15",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "s04": {
-      "value": 31.542857,
-      "dataDate": "2026-10-15",
+      "value": 17.938322,
+      "dataDate": "2026-10-16",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
       "method": "CNN 非官方可讀 JSON（可能變動）",
       "status": "OK",
       "detail": "來源為 CNN 非公開保證 API",
-      "lastVerifiedAt": "2026-10-16T09:23:50.906865+08:00"
+      "lastVerifiedAt": "2026-10-17T09:25:04.940897+08:00"
     },
     "m06": {
-      "value": 0.7867,
-      "dataDate": "2026-10-15",
+      "value": 0.74025,
+      "dataDate": "2026-10-16",
       "source": "https://www.investing.com/central-banks/fed-rate-monitor",
       "unit": "percentage_point",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; normalize displayed rounded probabilities (sum 100.1%) then weight target-range midpoints; subtract current 3.875% target midpoint",
+      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; weight target-range midpoints and subtract current 3.875% target midpoint",
       "status": "OK",
-      "detail": "Table updated 2026-10-15 21:35 EDT. Displayed probabilities by target range 3.50-3.75 through 5.75-6.00: 0.0%, 0.8%, 7.0%, 22.3%, 32.4%, 24.7%, 10.3%, 2.3%, 0.3%, 0.0%. Displayed sum 100.1%; normalized weighted midpoint 4.661713%; delta +0.7867 percentage point.",
-      "lastVerifiedAt": "2026-10-16T10:06:23+08:00"
+      "detail": "Table updated 2026-10-16 21:15 EDT. Probabilities for 3.75-4.00 through 5.75-6.00: 0.9%, 8.7%, 25.8%, 33.4%, 22.0%, 7.7%, 1.4%, 0.1%, 0.0% (sum 100.0%). Weighted midpoint 4.61525%; delta +0.74025 percentage point (about +2.96 quarter-point moves).",
+      "lastVerifiedAt": "2026-10-17T10:07:13+08:00"
     },
     "m03_qqq": {
-      "value": 29.74,
-      "dataDate": "2026-10-13",
-      "source": "https://stockanalysis.com/etf/qqq/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-13. Use as P/E reference, not confirmed TTM.",
-      "lastVerifiedAt": "2026-10-16T10:06:23+08:00"
+      "value": 22.28,
+      "dataDate": "2026-10-16",
+      "source": "https://stockanalysis.com/etf/qqq/",
+      "unit": "倍 Forward",
+      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
+      "status": "OK",
+      "detail": "Stock Analysis directly displayed QQQ Forward PE 22.28 at the 2026-10-16 close. Yahoo and Invesco did not expose an eligible Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM 27.18/29.74 was excluded.",
+      "lastVerifiedAt": "2026-10-17T10:07:13+08:00"
     },
     "m03_spy": {
-      "value": 25.04,
-      "dataDate": "2026-10-14",
-      "source": "https://stockanalysis.com/etf/spy/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-14. State Street cross-check: Index P/E 24.83 and Fund P/E FY1 20.53 as of 2026-10-14; FY1 excluded from TTM.",
-      "lastVerifiedAt": "2026-10-16T10:06:23+08:00"
+      "value": 20.59,
+      "dataDate": "2026-10-15",
+      "source": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+      "unit": "倍 Forward",
+      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected State Street official Fund Price/Earnings Ratio FY1",
+      "status": "OK",
+      "detail": "State Street directly displayed Fund Price/Earnings Ratio FY1 20.59, Fund Characteristics as of 2026-10-15. Yahoo displayed only TTM 24.23. Lower-priority sites were not needed after an official FY1 value was verified.",
+      "lastVerifiedAt": "2026-10-17T10:07:13+08:00"
     },
     "m03_vt": {
-      "value": 20.67,
-      "dataDate": "2026-08-31",
-      "source": "https://stockanalysis.com/etf/vt/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-08-31. Use as dated P/E reference, not confirmed TTM.",
-      "lastVerifiedAt": "2026-10-16T10:06:23+08:00"
+      "value": 16.27,
+      "dataDate": "2026-10-16",
+      "source": "https://stockanalysis.com/etf/vt/",
+      "unit": "倍 Forward",
+      "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
+      "status": "OK",
+      "detail": "Stock Analysis directly displayed VT Forward PE 16.27 at the 2026-10-16 close. Yahoo displayed only TTM 20.26; Vanguard exposed no readable Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM was excluded.",
+      "lastVerifiedAt": "2026-10-17T10:07:13+08:00"
     },
     "s05": {
-      "value": 30.2,
-      "dataDate": "2026-10-15",
-      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "value": 28.32,
+      "dataDate": "2026-10-16",
+      "source": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "unit": "%",
-      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+      "method": "EODData INDEX:MMFI Percent of Stocks Above 50-Day Average daily close; same MMFI definition, not reconstructed",
       "status": "OK",
-      "detail": "Explicit NYSE $MMFI Percent Of Stocks Above 50-Day Average level 30.20, updated 2026-10-15. Not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
-      "lastVerifiedAt": "2026-10-16T10:06:23+08:00"
+      "detail": "Explicit INDEX:MMFI close 28.32 on 2026-10-16. Barchart direct page returned no readable value; TradingView verified the MMFI definition but returned dashes. Not substituted with S&P 500 or Nasdaq breadth.",
+      "lastVerifiedAt": "2026-10-17T10:07:13+08:00"
     }
   },
   "news": [],
@@ -2542,7 +2538,7 @@ if (recBlack) {
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:47.548762+00:00"
+      "retrieved_at": "2026-10-17T01:25:01.575095+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -2553,7 +2549,7 @@ if (recBlack) {
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:48.497700+00:00"
+      "retrieved_at": "2026-10-17T01:25:02.751132+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -2564,7 +2560,7 @@ if (recBlack) {
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-16T01:23:49.484669+00:00"
+      "retrieved_at": "2026-10-17T01:25:03.464585+00:00"
     }
   ],
   "derived": {
@@ -2574,24 +2570,26 @@ if (recBlack) {
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-16T10:16:20+08:00",
+  "dataUpdatedAt": "2026-10-17T10:07:13+08:00",
   "sourceSnapshot": {
-    "macro18": "58ce24b0eccfdf33ef990ed8357065a0e34bd544",
-    "macro5": "3656706848336d07afb8d5ef5f94316fea808cae",
-    "macro18GeneratedAt": "2026-10-16T09:23:50.906865+08:00",
-    "macro5GeneratedAt": "2026-10-16T10:06:23+08:00",
-    "htmlSupplementChecksAt": "2026-10-16T10:16:20+08:00",
-    "htmlSupplementStatus": "data/5_macro_verified.json與HTML內嵌五項已同步一致"
+    "macro18": "cd93bf7a7864cf6321b95d2b37337c5618e5f3f4",
+    "macro5": "e6b66694f8c2c33664bfd2e47337806d8e8f9ef5",
+    "macro18GeneratedAt": "2026-10-17T09:25:04.940897+08:00",
+    "macro5GeneratedAt": "2026-10-17T10:07:13+08:00",
+    "htmlSupplementChecksAt": "2026-10-17T10:07:13+08:00",
+    "htmlSupplementStatus": "data/5_macro_verified.json與HTML內嵌Forward五項已同步一致；GitHub SHA待寫回後補登"
   },
   "updateSummary": {
-    "title": "V70-3-12 本輪總經資料更新摘要",
-    "generatedAtTaipei": "2026/10/16 10:16:20",
+    "title": "V70-3-12 本輪總經體質分資料更新摘要",
+    "generatedAtTaipei": "2026/10/17 10:07:13",
     "versionRules": {
       "version": "V70-3-12",
+      "name": "總經體質分",
+      "valuationBasis": "Forward/FY1",
       "gamma": {
         "group1": 0.9,
-        "group2": 1,
-        "group3": 1,
+        "group2": 1.0,
+        "group3": 1.0,
         "group4": null
       },
       "t5": 5,
@@ -2600,31 +2598,26 @@ if (recBlack) {
     },
     "github": {
       "repository": "a23882005/LivingWaterAI",
-      "macro18Status": "VERIFIED_SOURCE_FILE",
-      "scraperGeneratedAt": "2026-10-16T09:23:50.906865+08:00",
+      "macro18Status": "ACTIONS_RUN_53_SUCCESS_AND_SOURCE_FILE_VERIFIED",
+      "scraperGeneratedAt": "2026-10-17T09:25:04.940897+08:00",
       "scraperCounts": {
         "OK": 19,
         "USABLE": 0,
         "STALE": 0,
         "MISSING": 0
       },
-      "data18BlobSha": "58ce24b0eccfdf33ef990ed8357065a0e34bd544",
-      "deploymentStatus": "RUN_14_ATTEMPT_2_PASS; SCHEDULED_11_00_RUN_PENDING",
-      "detail": "Run #14 attempt 1於Hostinger SFTP連線逾時；attempt 2建置、同目錄feed、SFTP與Hostinger公開首頁/JSON讀回全部成功。台灣11:00排程尚未發生。",
-      "lastVerifiedRun": {
-        "runId": 38838894168,
-        "attempt": 2,
-        "status": "success",
-        "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/38838894168",
-        "hostingerLivePassAsOf": "2026-10-16T02:12:21.432152Z"
-      }
+      "data18BlobSha": "cd93bf7a7864cf6321b95d2b37337c5618e5f3f4",
+      "actionsRunId": 38990682557,
+      "actionsRunUrl": "https://github.com/a23882005/LivingWaterAI/actions/runs/38990682557",
+      "deploymentStatus": "SCHEDULED_11_00_RUN_PENDING",
+      "detail": "10:00當輪完成時，11:00部署尚未發生；不得稱PASS。"
     },
     "macroTask": {
-      "title": "總體經濟狀況",
-      "generatedAt": "2026-10-16T10:06:23+08:00",
+      "title": "總經體質分",
+      "generatedAt": "2026-10-17T10:07:13+08:00",
       "dataFile": "data/5_macro_verified.json",
-      "dataFileSha": "3656706848336d07afb8d5ef5f94316fea808cae",
-      "status": "五項已於本輪直接查核；三檔ETF為未明示TTM的P/E參考"
+      "dataFileSha": "e6b66694f8c2c33664bfd2e47337806d8e8f9ef5",
+      "status": "五項已於本輪直接查核；ETF估值全部採Forward/FY1，TTM排除"
     },
     "inserted": {
       "crawlerTransportFields": 19,
@@ -2637,252 +2630,258 @@ if (recBlack) {
     },
     "fiveValues": {
       "m06": {
-        "value": 0.7867,
-        "dataDate": "2026-10-15",
-        "status": "OK"
+        "value": 0.74025,
+        "dataDate": "2026-10-16",
+        "status": "OK",
+        "unit": "percentage_point"
       },
       "m03_qqq": {
-        "value": 29.74,
-        "dataDate": "2026-10-13",
-        "status": "USABLE"
+        "value": 22.28,
+        "dataDate": "2026-10-16",
+        "status": "OK",
+        "unit": "倍 Forward"
       },
       "m03_spy": {
-        "value": 25.04,
-        "dataDate": "2026-10-14",
-        "status": "USABLE"
+        "value": 20.59,
+        "dataDate": "2026-10-15",
+        "status": "OK",
+        "unit": "倍 Forward"
       },
       "m03_vt": {
-        "value": 20.67,
-        "dataDate": "2026-08-31",
-        "status": "USABLE"
+        "value": 16.27,
+        "dataDate": "2026-10-16",
+        "status": "OK",
+        "unit": "倍 Forward"
       },
       "s05": {
-        "value": 30.2,
-        "dataDate": "2026-10-15",
-        "status": "OK"
+        "value": 28.32,
+        "dataDate": "2026-10-16",
+        "status": "OK",
+        "unit": "%"
       }
     },
-    "note": "QQQ/SPY/VT為來源未明示TTM的P/E參考值；VT資料日較早。m06以頁面顯示機率總和100.1%正規化後計算；s05為明確NYSE $MMFI。",
+    "note": "本日總經體質分為今日體質，Forward估值為市場對未來12個月預期。QQQ 22.28、SPY 20.59、VT 16.27均為明示Forward/FY1；TTM未混用。",
     "supplementSnapshot": "data/5_macro_verified.json與HTML五項值、日期、來源、方法及品質狀態一致。"
   },
-  "batchDateTaipei": "2026-10-16",
+  "batchDateTaipei": "2026-10-17",
   "taskSourceSnapshot": {
-    "schema": "V70.3/10h-five-supplement-v1",
-    "generated_at": "2026-10-16T10:06:23+08:00",
-    "observation_context": "LivingWaterAI V70.3.12 daily 10:00 supplement; all five rechecked in this run",
+    "schema": "V70.3/10h-five-supplement-forward-v2",
+    "generated_at": "2026-10-17T10:07:13+08:00",
+    "observation_context": "LivingWaterAI V70.3.12 daily 10:00 supplement; ETF valuation fields use Forward/FY1 only; all five rechecked in this run",
     "quality_policy": {
       "OK": "Numeric value verified with stated source and method",
-      "USABLE": "Numeric value displayed for the correct instrument; methodology or dating caveat preserved and permitted for research"
+      "USABLE": "Numeric Forward/FY1 value directly displayed for the correct instrument; dating or methodology caveat preserved",
+      "MISSING": "No eligible Forward/FY1 value after the required source sequence; TTM is never substituted"
     },
     "items": {
       "m06": {
         "id": "m06",
-        "value": 0.7867,
+        "value": 0.74025,
         "unit": "percentage_point",
-        "observation_date": "2026-10-15",
-        "retrieval_time": "2026-10-16T10:06:23+08:00",
+        "observation_date": "2026-10-16",
+        "retrieval_time": "2026-10-17T10:07:13+08:00",
         "source_url": "https://www.investing.com/central-banks/fed-rate-monitor",
-        "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; normalize displayed rounded probabilities (sum 100.1%) then weight target-range midpoints; subtract current 3.875% target midpoint",
+        "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability; weight target-range midpoints and subtract current 3.875% target midpoint",
         "status": "OK",
-        "detail": "Table updated 2026-10-15 21:35 EDT. Displayed probabilities by target range 3.50-3.75 through 5.75-6.00: 0.0%, 0.8%, 7.0%, 22.3%, 32.4%, 24.7%, 10.3%, 2.3%, 0.3%, 0.0%. Displayed sum 100.1%; normalized weighted midpoint 4.661713%; delta +0.7867 percentage point.",
+        "detail": "Table updated 2026-10-16 21:15 EDT. Probabilities for 3.75-4.00 through 5.75-6.00: 0.9%, 8.7%, 25.8%, 33.4%, 22.0%, 7.7%, 1.4%, 0.1%, 0.0% (sum 100.0%). Weighted midpoint 4.61525%; delta +0.74025 percentage point (about +2.96 quarter-point moves).",
         "cross_checks": [
           {
-            "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
-            "result": "DIRECT_SUCCESS_CURRENT_RANGE_3.75_4.00"
-          },
-          {
             "source_url": "https://fred.stlouisfed.org/series/DFEDTARL",
-            "result": "NOT_RETRIEVED_THIS_ROUND"
+            "result": "DIRECT_VERIFIED_2026-10-16_3.75"
           },
           {
             "source_url": "https://fred.stlouisfed.org/series/DFEDTARU",
-            "result": "NOT_RETRIEVED_THIS_ROUND"
+            "result": "DIRECT_VERIFIED_2026-10-16_4.00"
+          },
+          {
+            "source_url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+            "result": "OFFICIAL_CALENDAR_CROSS_CHECK"
           },
           {
             "source_url": "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
-            "result": "METHODOLOGY_CROSS_CHECK_VIA_INVESTING_PAGE; no separate probability table used"
+            "result": "CME_METHOD_AND_NEAR_TERM_PROBABILITY_CROSS_CHECK; no 12-month table substituted"
           }
         ]
       },
       "m03_qqq": {
         "id": "m03_qqq",
-        "value": 29.74,
-        "unit": "x",
-        "observation_date": "2026-10-13",
-        "retrieval_time": "2026-10-16T10:06:23+08:00",
-        "source_url": "https://stockanalysis.com/etf/qqq/holdings/",
-        "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
-        "status": "USABLE",
-        "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-13. Use as P/E reference, not confirmed TTM.",
+        "value": 22.28,
+        "unit": "倍 Forward",
+        "observation_date": "2026-10-16",
+        "retrieval_time": "2026-10-17T10:07:13+08:00",
+        "source_url": "https://stockanalysis.com/etf/qqq/",
+        "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
+        "status": "OK",
+        "detail": "Stock Analysis directly displayed QQQ Forward PE 22.28 at the 2026-10-16 close. Yahoo and Invesco did not expose an eligible Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM 27.18/29.74 was excluded.",
         "attempts": [
           {
             "priority": 1,
-            "site": "Portfolio Visualizer",
-            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
-            "result": "DIRECT_OPEN_INACCESSIBLE",
-            "value": null
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/QQQ/key-statistics",
+            "result": "DIRECT_OPEN_SUCCESS_ONLY_TTM_NO_FORWARD",
+            "value": null,
+            "displayed_ttm": 27.18
           },
           {
             "priority": 2,
-            "site": "Yahoo Finance Statistics",
-            "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
-            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "site": "Invesco official QQQ",
+            "url": "https://www.invesco.com/qqq-etf/en/about.html",
+            "result": "DIRECT_OPEN_SUCCESS_NO_FORWARD_OR_FY1",
             "value": null
           },
           {
             "priority": 3,
-            "site": "Invesco official QQQ",
-            "url": "https://www.invesco.com/qqq-etf/en/home.html",
-            "result": "DIRECT_OPEN_SUCCESS_NO_PE_VALUE",
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
+            "result": "DIRECT_OPEN_USER_AGREEMENT_DATA_BLOCKED_NO_FORWARD_READ",
             "value": null
           },
           {
             "priority": 4,
-            "site": "StockAnalysis",
-            "url": "https://stockanalysis.com/etf/qqq/holdings/",
-            "result": "DIRECT_OPEN_SUCCESS",
-            "value": 29.74,
-            "observation_date": "2026-10-13",
-            "label": "P/E (site does not explicitly state TTM)"
+            "site": "Stock Analysis",
+            "url": "https://stockanalysis.com/etf/qqq/",
+            "result": "DIRECT_OPEN_SUCCESS_EXPLICIT_FORWARD_PE",
+            "value": 22.28,
+            "observation_date": "2026-10-16",
+            "label": "Forward PE"
           }
         ]
       },
       "m03_spy": {
         "id": "m03_spy",
-        "value": 25.04,
-        "unit": "x",
-        "observation_date": "2026-10-14",
-        "retrieval_time": "2026-10-16T10:06:23+08:00",
-        "source_url": "https://stockanalysis.com/etf/spy/holdings/",
-        "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
-        "status": "USABLE",
-        "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-10-14. State Street cross-check: Index P/E 24.83 and Fund P/E FY1 20.53 as of 2026-10-14; FY1 excluded from TTM.",
+        "value": 20.59,
+        "unit": "倍 Forward",
+        "observation_date": "2026-10-15",
+        "retrieval_time": "2026-10-17T10:07:13+08:00",
+        "source_url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+        "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected State Street official Fund Price/Earnings Ratio FY1",
+        "status": "OK",
+        "detail": "State Street directly displayed Fund Price/Earnings Ratio FY1 20.59, Fund Characteristics as of 2026-10-15. Yahoo displayed only TTM 24.23. Lower-priority sites were not needed after an official FY1 value was verified.",
         "attempts": [
           {
             "priority": 1,
-            "site": "Portfolio Visualizer",
-            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
-            "result": "DIRECT_OPEN_INACCESSIBLE",
-            "value": null
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/SPY/key-statistics",
+            "result": "DIRECT_OPEN_SUCCESS_ONLY_TTM_NO_FORWARD",
+            "value": null,
+            "displayed_ttm": 24.23
           },
           {
             "priority": 2,
-            "site": "Yahoo Finance Statistics",
-            "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
-            "result": "HTTP_429",
-            "value": null
+            "site": "State Street official SPY",
+            "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+            "result": "DIRECT_OPEN_SUCCESS_EXPLICIT_FY1",
+            "value": 20.59,
+            "observation_date": "2026-10-15",
+            "label": "Fund Price/Earnings Ratio FY1"
           },
           {
             "priority": 3,
-            "site": "State Street official SPY",
-            "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
-            "result": "DIRECT_OPEN_SUCCESS",
-            "candidates": [
-              {
-                "value": 24.83,
-                "label": "Index Price/Earnings; not explicitly TTM",
-                "observation_date": "2026-10-14"
-              },
-              {
-                "value": 20.53,
-                "label": "Fund Price/Earnings FY1; excluded from TTM",
-                "observation_date": "2026-10-14"
-              }
-            ]
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
+            "result": "NOT_TESTED_AFTER_HIGHER_PRIORITY_OFFICIAL_FY1_FOUND",
+            "value": null
           },
           {
             "priority": 4,
-            "site": "StockAnalysis",
-            "url": "https://stockanalysis.com/etf/spy/holdings/",
-            "result": "DIRECT_OPEN_SUCCESS",
-            "value": 25.04,
-            "observation_date": "2026-10-14",
-            "label": "P/E (site does not explicitly state TTM)"
+            "site": "Stock Analysis",
+            "url": "https://stockanalysis.com/etf/spy/",
+            "result": "NOT_TESTED_AFTER_HIGHER_PRIORITY_OFFICIAL_FY1_FOUND",
+            "value": null
           }
         ]
       },
       "m03_vt": {
         "id": "m03_vt",
-        "value": 20.67,
-        "unit": "x",
-        "observation_date": "2026-08-31",
-        "retrieval_time": "2026-10-16T10:06:23+08:00",
-        "source_url": "https://stockanalysis.com/etf/vt/holdings/",
-        "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
-        "status": "USABLE",
-        "detail": "Correct ETF and numeric P/E displayed; holdings updated 2026-08-31. Use as dated P/E reference, not confirmed TTM.",
+        "value": 16.27,
+        "unit": "倍 Forward",
+        "observation_date": "2026-10-16",
+        "retrieval_time": "2026-10-17T10:07:13+08:00",
+        "source_url": "https://stockanalysis.com/etf/vt/",
+        "method": "Forward PE FY1 / forwardPE from Yahoo Finance first; selected Stock Analysis explicit Forward PE after higher-priority sources lacked eligible Forward value",
+        "status": "OK",
+        "detail": "Stock Analysis directly displayed VT Forward PE 16.27 at the 2026-10-16 close. Yahoo displayed only TTM 20.26; Vanguard exposed no readable Forward/FY1 value; PV was blocked by its user-agreement/data gate. TTM was excluded.",
         "attempts": [
           {
             "priority": 1,
-            "site": "Portfolio Visualizer",
-            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
-            "result": "DIRECT_OPEN_INACCESSIBLE",
-            "value": null
+            "site": "Yahoo Finance Statistics",
+            "url": "https://finance.yahoo.com/quote/VT/key-statistics",
+            "result": "DIRECT_OPEN_SUCCESS_ONLY_TTM_NO_FORWARD",
+            "value": null,
+            "displayed_ttm": 20.26
           },
           {
             "priority": 2,
-            "site": "Yahoo Finance Statistics",
-            "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
-            "result": "HTTP_429",
+            "site": "Vanguard official VT",
+            "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+            "result": "DIRECT_OPEN_SUCCESS_NO_READABLE_FORWARD_OR_FY1",
             "value": null
           },
           {
             "priority": 3,
-            "site": "Vanguard official VT",
-            "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
-            "result": "DIRECT_OPEN_SUCCESS_NO_READABLE_PE_VALUE",
+            "site": "Portfolio Visualizer",
+            "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
+            "result": "DIRECT_OPEN_USER_AGREEMENT_DATA_BLOCKED_NO_FORWARD_READ",
             "value": null
           },
           {
             "priority": 4,
-            "site": "StockAnalysis",
-            "url": "https://stockanalysis.com/etf/vt/holdings/",
-            "result": "DIRECT_OPEN_SUCCESS",
-            "value": 20.67,
-            "observation_date": "2026-08-31",
-            "label": "P/E (site does not explicitly state TTM)"
+            "site": "Stock Analysis",
+            "url": "https://stockanalysis.com/etf/vt/",
+            "result": "DIRECT_OPEN_SUCCESS_EXPLICIT_FORWARD_PE",
+            "value": 16.27,
+            "observation_date": "2026-10-16",
+            "label": "Forward PE"
           }
         ]
       },
       "s05": {
         "id": "s05",
-        "value": 30.2,
+        "value": 28.32,
         "unit": "%",
-        "observation_date": "2026-10-15",
-        "retrieval_time": "2026-10-16T10:06:23+08:00",
-        "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-        "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
+        "observation_date": "2026-10-16",
+        "retrieval_time": "2026-10-17T10:07:13+08:00",
+        "source_url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
+        "method": "EODData INDEX:MMFI Percent of Stocks Above 50-Day Average daily close; same MMFI definition, not reconstructed",
         "status": "OK",
-        "detail": "Explicit NYSE $MMFI Percent Of Stocks Above 50-Day Average level 30.20, updated 2026-10-15. Not reconstructed and not substituted with S&P 500 or Nasdaq breadth.",
+        "detail": "Explicit INDEX:MMFI close 28.32 on 2026-10-16. Barchart direct page returned no readable value; TradingView verified the MMFI definition but returned dashes. Not substituted with S&P 500 or Nasdaq breadth.",
         "attempts": [
           {
             "priority": 1,
             "site": "Barchart",
             "url": "https://www.barchart.com/stocks/quotes/%24MMFI",
-            "result": "DIRECT_OPEN_JS_BOT_CHECK_NO_VALUE",
+            "result": "DIRECT_OPEN_NO_READABLE_VALUE",
             "value": null
           },
           {
             "priority": 2,
             "site": "TradingView Taiwan",
             "url": "https://tw.tradingview.com/symbols/INDEX-MMFI/",
-            "result": "DIRECT_OPEN_SUCCESS_SYMBOL_VERIFIED_NO_VALUE",
+            "result": "DIRECT_OPEN_SUCCESS_SYMBOL_VERIFIED_VALUE_DASH",
             "value": null
           },
           {
             "priority": 3,
             "site": "StockCharts",
             "url": "https://stockcharts.com/sc3/ui/?s=%24MMFI",
-            "result": "DIRECT_OPEN_INACCESSIBLE",
+            "result": "NO_CURRENT_VALUE_VERIFIED_THIS_ROUND",
             "value": null
           },
           {
             "priority": 4,
             "site": "Macroaxis",
             "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-            "result": "DIRECT_OPEN_SUCCESS",
-            "value": 30.2,
-            "observation_date": "2026-10-15"
+            "result": "NO_CURRENT_VALUE_VERIFIED_THIS_ROUND",
+            "value": null
+          },
+          {
+            "priority": 5,
+            "site": "EODData",
+            "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
+            "result": "DIRECT_SEARCH_RESULT_SUCCESS_EXPLICIT_DATE_AND_CLOSE",
+            "value": 28.32,
+            "observation_date": "2026-10-16",
+            "label": "INDEX:MMFI close"
           }
         ]
       }
@@ -2892,12 +2891,12 @@ if (recBlack) {
 <script id="v703-render-raw-data">
 (function(){
  const node=document.getElementById('v70-embedded-feed'),body=document.getElementById('v703-raw-data-body');if(!node||!body)return;
- const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'Fed未來利率預期變動',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
+ const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'Fed未來利率預期變動',m08:'10Y實質殖利率',m03_qqq:'QQQ估值Forward P/E',m03_spy:'SPY估值Forward P/E',m03_vt:'VT估值Forward P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
  try{const feed=JSON.parse(node.textContent||'{}');for(const [id,r] of Object.entries(feed.indicators||{})){const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';const status=(['m04','m15','m18'].includes(id)?'沿用人工查證｜':'')+(r.status||'');const vals=[id+'｜'+(labels[id]||id),String(r.value)+(r.unit?' '+r.unit:''),r.dataDate||'未提供',status+(r.detail?'｜'+r.detail:''),r.method||''];for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}const td=document.createElement('td');td.className='p-2';const a=document.createElement('a');a.href=String(r.source||'').split(' | ')[0];a.target='_blank';a.rel='noopener noreferrer';a.className='text-blue-300 underline';a.textContent='開啟來源';td.appendChild(a);tr.appendChild(td);body.appendChild(tr);}}catch(err){body.textContent='內嵌資料讀取失敗：'+String(err.message||err);}
 })();
 </script>
 
-<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經資料更新摘要｜2026/10/16 06:18:26（台灣時間）</summary><p>正式版本：V70-3-12。Gamma前三群為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>18項來源：2026-10-16T03:48:07.518754+08:00，SHA <code>fe19e25b9f1079253ed2bcb3c88ff8578a54d619</code>；19/19傳輸欄OK。五項JSON已同步，SHA <code>c7bf122854bc5f304472646a9012493020e4fd6a</code>：m06 +0.762 pp、QQQ 29.78、SPY 24.99、VT 20.80、NYSE MMFI 25.58%。三項ETF P/E均保留未明示TTM與USABLE註記。</p><p>覆蓋檢核：23項獨立指標、24個傳輸欄、21/21必要計分指標、LEI三期。GitHub Actions Run #9已確認建置、SFTP及Hostinger公開首頁／JSON讀回PASS；本次同步提交後由push工作流重新驗證。</p></details>
+<details id="v70-update-summary" open style="max-width:72rem;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #475569;border-radius:.75rem;background:#0f172a;color:#e2e8f0;font:14px/1.65 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">本輪總經體質分資料更新摘要｜2026/10/17 10:07:13（台灣時間）</summary><p>本日總經體質分為今日體質，Forward估值為市場對未來12個月預期。正式版本：V70-3-12；Gamma前三群為0.9／1.0／1.0，第四群不使用Gamma；t5固定5分、5–10段不得低於5分；估值群α=0.7向5分收斂。</p><p>18項來源：2026-10-17T09:25:04.940897+08:00，SHA <code>cd93bf7a7864cf6321b95d2b37337c5618e5f3f4</code>；19/19傳輸欄OK。Forward五項：m06 +0.74025 pp、QQQ 22.28、SPY 20.59、VT 16.27、NYSE MMFI 28.32%。三檔ETF均為明示Forward／FY1；TTM已排除。</p><p>覆蓋檢核：23項獨立指標、24個傳輸欄、21/21必要計分指標、LEI三期。09:00 Actions Run #53（ID 38990682557）成功；10:00 JSON與HTML已同步；11:00建置、SFTP及Hostinger公開首頁／JSON尚待實際驗收。</p></details>
 <script>
 /* Family-only display: all source controls stay as internal calculation adapter.
  * Read V70_macro_latest.json beside the HTML first; if sibling access is blocked,

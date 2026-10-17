@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：V70-3-27 Gmail 通知 v1.2｜檔案名稱：email-action-results.yml
+# 2026/10/17｜Gmail success report v1.3; match formal workflow names and actual artifact names
 name: LivingWaterAI Gmail Action result reports
 
 on:
@@ -31,7 +31,7 @@ jobs:
           case "$SOURCE_RUN_NAME" in
             "LivingWaterAI 07h IB global market history") name="ib-global-history-$SOURCE_RUN_ID" ;;
             "LivingWaterAI V70.3 09h Preflight 18 Macro") name="macro18-09h-$SOURCE_RUN_ID" ;;
-            "LivingWaterAI 11h Verified V70.3 Site Deploy") name="v703-12h-qa-$SOURCE_RUN_ID" ;;
+            "LivingWaterAI 11h Verified V70.3 Site Deploy") name="v70-3-27-qa-$SOURCE_RUN_ID" ;;
             "LivingWaterAI 14h30 IB Taiwan market history") name="ib-taiwan-history-$SOURCE_RUN_ID" ;;
             *) echo "::error::Unrecognized source workflow: $SOURCE_RUN_NAME"; exit 1 ;;
           esac

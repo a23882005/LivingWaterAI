@@ -1,8 +1,8 @@
 # 最後修改日期時間（台灣時間）：2026/10/17 15:50｜版本：V70-3-27 V3 workflow｜檔案名稱：v703-site-deploy-1100.yml
-name: LivingWaterAI 11h Verified V70-3-27 V3 Site Deploy
+name: LivingWaterAI One-time Test V70-3-27 V3 Site Deploy
 on:
   schedule:
-    - cron: '0 3 * * *' # 11:00 Asia/Taipei
+    - cron: '10 5 * * *' # ONE-TIME TEST 13:10 Asia/Taipei on 2026-10-17; restore 11:00 after test
   workflow_dispatch:
   push:
     paths:
@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-and-deploy:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-10-17T12:08:47+08:00",
-  "as_of_taipei": "2026-10-17 12:08:47",
+  "generated_at": "2026-10-17T13:03:19+08:00",
+  "as_of_taipei": "2026-10-17 13:03:19",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -125,36 +125,36 @@
       "label": "NY Fed HLW 即時版本實質自然利率 r*",
       "value": null,
       "unit": "%",
-      "observation_date": "2026-Q2",
+      "observation_date": "2026-06-30",
       "source_url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
       "method": "僅接受NY Fed HLW real-time vintage工作簿中最新美國r*；本輪未能從原檔直接讀出數值",
       "status": "MISSING",
-      "detail": "NY Fed官方頁確認HLW即時與current工作簿、最新發布批次截至2026-08-27/28；但下載原檔在工具環境被阻擋，未把current estimate 1.00865%或第三方解析/四捨五入值冒充real-time正式值。",
-      "retrieval_time": "2026-10-17T12:08:47+08:00",
+      "detail": "NY Fed官方頁確認HLW即時與current工作簿、最新發布批次截至2026-08-27/28；但下載原檔在工具環境被阻擋，未把current estimate 1.00865%或第三方解析/四捨五入值冒充real-time正式值。；資料原始觀測期間=2026Q2，YYYY-MM-DD使用季度末日僅為標準化日期，不代表季度資料有每日更新。；2026-10-17檢索官方NY Fed HLW real-time Excel連結仍回傳不支援下載/解析；第三方對2026Q2值有互相矛盾資料，維持MISSING。",
+      "retrieval_time": "2026-10-17T13:03:19+08:00",
       "publication_date": "2026-08-28",
-      "vintage": "2026Q2 real-time vintage expected; numeric cell unverified",
+      "vintage": "2026Q2 real-time vintage expected; numeric cell unverified | observation quarter 2026-Q2",
       "candidate_checks": [
         {
           "site": "NY Fed r-star page",
           "url": "https://www.newyorkfed.org/research/policy/rstar",
           "metric_or_horizon": "HLW real-time定義與發布批次",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": null,
           "unit": "%",
           "observation_date": "2026-Q2",
-          "notes": "官方頁可讀，確認real-time/current兩種工作簿及2026-08-27/28發布，但頁面未顯示最新美國r*數值。"
+          "notes": "官方頁可讀，確認real-time/current兩種工作簿及2026-08-27/28發布，但頁面未顯示最新美國r*數值。；13:03重新確認官方rstar頁面列出HLW real-time/current連結，未提供最新實際數值。"
         },
         {
           "site": "NY Fed HLW real-time estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
           "metric_or_horizon": "最新美國HLW real-time r*",
           "status": "BLOCKED",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": null,
           "unit": "%",
           "observation_date": "2026-Q2",
-          "notes": "原始XLSX連結存在，但瀏覽器下載/解析逾時且直接URL受限制，未能驗證數值。"
+          "notes": "原始XLSX連結存在，但瀏覽器下載/解析逾時且直接URL受限制，未能驗證數值。；13:03從官方頁點擊原始XLSX，工具回傳unsupported content-type；未讀到儲存格。"
         },
         {
           "site": "NY Fed current estimates",
@@ -184,14 +184,14 @@
       "label": "實際GDP相對CBO潛在GDP產出缺口",
       "value": 1.4005,
       "unit": "%",
-      "observation_date": "2026-Q2",
+      "observation_date": "2026-06-30",
       "source_url": "https://fred.stlouisfed.org/series/GDPC1",
       "method": "(BEA/FRED實際實質GDP 24,408.011 ÷ CBO 2026Q2實質潛在GDP 24,070.9 − 1) × 100",
       "status": "USABLE",
-      "detail": "實際GDP為BEA/FRED 2026Q2第三次估計、2017鏈價美元SAAR，2026-09-30發布；潛在GDP取CBO 2026-02經濟預測同單位。兩者定義/單位一致但發布vintage不同，故標USABLE而非OK；CBO同檔當時的projected output gap為1.1%，未冒充最新實際缺口。",
-      "retrieval_time": "2026-10-17T12:08:47+08:00",
+      "detail": "實際GDP為BEA/FRED 2026Q2第三次估計、2017鏈價美元SAAR，2026-09-30發布；潛在GDP取CBO 2026-02經濟預測同單位。兩者定義/單位一致但發布vintage不同，故標USABLE而非OK；CBO同檔當時的projected output gap為1.1%，未冒充最新實際缺口。；資料原始觀測期間=2026Q2，YYYY-MM-DD使用季度末日僅為標準化日期，不代表季度資料有每日更新。",
+      "retrieval_time": "2026-10-17T13:03:19+08:00",
       "publication_date": "2026-09-30",
-      "vintage": "BEA 2026-09-30 actual GDP + CBO 2026-02 potential GDP",
+      "vintage": "BEA 2026-09-30 actual GDP + CBO 2026-02 potential GDP | observation quarter 2026-Q2",
       "candidate_checks": [
         {
           "site": "CBO Key Budget and Economic Data",
@@ -220,11 +220,11 @@
           "url": "https://fred.stlouisfed.org/series/GDPC1",
           "metric_or_horizon": "2026Q2實際實質GDP",
           "status": "FOUND",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": 24408.011,
           "unit": "十億2017鏈價美元SAAR",
-          "observation_date": "2026-Q2",
-          "notes": "FRED頁直接顯示Q2 2026=24,408.011，更新2026-09-30。"
+          "observation_date": "2026-06-30",
+          "notes": "FRED頁直接顯示Q2 2026=24,408.011，更新2026-09-30。；13:03 FRED GDPC1頁重新確認2026Q2 24,408.011與2026-09-30更新日。"
         },
         {
           "site": "ALFRED GDPC1",
@@ -241,60 +241,60 @@
     },
     "s05": {
       "label": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
-      "value": 25.58,
+      "value": 30.2,
       "unit": "%",
-      "observation_date": "2026-10-14",
+      "observation_date": "2026-10-15",
       "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-      "method": "Macroaxis明確標示Percent Of Stocks / MMFI指數之最新記錄值；TradingView核對定義為NYSE股票收盤高於自身50日SMA百分比",
-      "status": "STALE",
-      "detail": "Macroaxis直接顯示2026-10-14為25.58；TradingView確認INDEX:MMFI及NYSE/50日SMA定義但當輪不顯示數值。相較最近交易日落後兩日，因此標STALE，不拿S&P 500或Nasdaq廣度替代。",
-      "retrieval_time": "2026-10-17T12:08:47+08:00",
-      "publication_date": "2026-10-14",
-      "vintage": "Macroaxis page updated 2026-10-14",
+      "method": "Macroaxis MMFI 指數明確顯示2026-10-15數值30.20；比最新美股2026-10-16收盤落後1個交易日，僅作帶時差之USABLE",
+      "status": "USABLE",
+      "detail": "13:03重新查核Macroaxis為2026-10-15值30.20，上一版2026-10-14值25.58已被更新；比最新交易日落後一日，註明不作2026-10-16即時廣度。Barchart及EODData目前僅查到較舊資料，TradingView頁無數字；未用SPX或Nasdaq代替NYSE。",
+      "retrieval_time": "2026-10-17T13:03:19+08:00",
+      "publication_date": "2026-10-15",
+      "vintage": "Macroaxis MMFI last published observation 2026-10-15",
       "candidate_checks": [
         {
           "site": "Macroaxis MMFI",
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "metric_or_horizon": "Percent Of Stocks / MMFI",
           "status": "FOUND",
-          "checked_at": "2026-10-17T12:08:47+08:00",
-          "value": 25.58,
+          "checked_at": "2026-10-17T13:03:19+08:00",
+          "value": 30.2,
           "unit": "%",
-          "observation_date": "2026-10-14",
-          "notes": "頁面直接顯示Updated Oct 14, 2026及25.58。"
+          "observation_date": "2026-10-15",
+          "notes": "2026-10-17 13:03查核頁面明確顯示Updated Oct 15, 2026 / 30.20。"
         },
         {
           "site": "Barchart $MMFI",
           "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
           "metric_or_horizon": "NYSE $MMFI 50日廣度",
-          "status": "BLOCKED",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "頁面要求JavaScript/機器人驗證，無可讀數值。"
+          "notes": "2026-10-17重新搜尋Barchart MMFI：檢索頁為舊報價(約2026-08-31)，查無可核對的2026-10-15或10-16最新值。"
         },
         {
           "site": "EODData MMFI",
-          "url": "https://www.eoddata.com/stockquote/NYSE/MMFI.htm",
+          "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE MMFI",
-          "status": "BLOCKED",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "當輪URL無法由查核工具直接存取。"
+          "notes": "2026-10-17查得EODData INDEX/MMFI資料，最新可讀僅2026-09-10，已過期，未採用。"
         },
         {
           "site": "TradingView INDEX:MMFI",
           "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
           "metric_or_horizon": "NYSE全市場高於50日SMA百分比",
           "status": "NOT_FOUND",
-          "checked_at": "2026-10-17T12:08:47+08:00",
+          "checked_at": "2026-10-17T13:03:19+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "頁面明確標示Percent of Stocks Above 50-Day Average，社群說明其為所有NYSE股票；頁面本身顯示No trades且未提供當輪數值。"
+          "notes": "2026-10-17 TradingView INDEX:MMFI 頁可驗證指標名稱與定義，但查無可靠當日數值。"
         }
       ]
     },

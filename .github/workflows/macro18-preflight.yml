@@ -1,8 +1,8 @@
 # 最後修改：2026/10/17 10:31（台灣時間）｜版本：D009-v3｜檔案：macro18-preflight.yml
-name: LivingWaterAI V70.3 09h Preflight 18 Macro
+name: LivingWaterAI V70.3 One-time Test Preflight 18 Macro
 on:
   schedule:
-    - cron: '0 1 * * *' # 09:00 Asia/Taipei
+    - cron: '10 4 * * *' # ONE-TIME TEST 12:10 Asia/Taipei on 2026-10-17; restore 09:00 after test
   workflow_dispatch:
   push:
     paths:
@@ -20,6 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight18:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -163,7 +164,7 @@ jobs:
 
   notify-on-critical:
     needs: preflight18
-    if: always()
+    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

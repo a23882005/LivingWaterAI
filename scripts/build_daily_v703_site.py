@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 13:13｜版本：V70-3-27 build adapter v3.1（quarterly freshness only）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/17｜版本：V70-3-27 build adapter v3.2（forward evidence）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
@@ -146,7 +146,7 @@ def _git_blob_sha(path):
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 
-def _normalize(item):
+def _normalize(item, indicator_id=None):
     normalized = {
         "value": item.get("value"), "dataDate": item.get("observation_date"),
         "source": item.get("source_url", ""), "unit": item.get("unit", ""),
@@ -156,6 +156,36 @@ def _normalize(item):
     if isinstance(item.get("candidate_checks"), list):
         normalized["candidateChecks"] = [dict(check) if isinstance(check, dict) else check
                                          for check in item["candidate_checks"]]
+    if indicator_id in VALUATION_REFERENCE:
+        # Carry independently checked quoted Forward/FY1 evidence from the eight-item
+        # audit into the public feed. Keep the original check timestamp; do not
+        # invent a new "verified now" time merely because a page was rebuilt.
+        hits = []
+        for check in item.get("candidate_checks", []):
+            if (not isinstance(check, dict) or check.get("status") != "FOUND"
+                    or check.get("url") != item.get("source_url")):
+                continue
+            label = str(check.get("metric_or_horizon") or "")
+            if not re.search(r"forward|fy\\s?1|next\\s?12\\s?months|未來12m|預估本益比", label, re.I):
+                continue
+            if re.search(r"\\bTTM\\b", label, re.I):
+                continue
+            try:
+                same_value = math.isfinite(float(check["value"])) and abs(
+                    float(check["value"]) - float(item["value"])) < 1e-9
+                dt.datetime.fromisoformat(str(check["checked_at"]))
+            except (KeyError, ValueError, TypeError):
+                continue
+            if same_value:
+                hits.append(check)
+        if hits:
+            selected = max(hits, key=lambda r: r["checked_at"])
+            normalized["lastVerifiedAt"] = selected["checked_at"]
+            normalized["sourceEvidence"] = {
+                "label": selected["metric_or_horizon"],
+                "value": selected["value"],
+                "source_url": selected["url"],
+            }
     if item.get("retrieval_time") is not None:
         normalized["retrievalTime"] = item["retrieval_time"]
     if item.get("publication_date") is not None:
@@ -245,7 +275,11 @@ def build(macro_path, supplement_path, html_path, dest):
     if s05_value is None or not 0 <= float(s05_value) <= 100:
         calc_problems.append("s05: outside 0-100 or missing percentage")
 
-    indicators = {key: _normalize(row) for key, row in inputs.items()}
+    indicators = {key: _normalize(row, key) for key, row in inputs.items()}
+    for key in VALUATION_REFERENCE:
+        row = indicators.get(key, {})
+        if not row.get("lastVerifiedAt") or not row.get("sourceEvidence"):
+            calc_problems.append(key + ": Forward/FY1 evidence does not match verified candidate source/value")
     feed = {
         "schema": "V70.3/family-macro-feed-v3",
         "asOf": now.isoformat().replace("+00:00", "Z"),

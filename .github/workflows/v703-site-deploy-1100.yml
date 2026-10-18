@@ -1,4 +1,4 @@
-# 2026/10/17｜Restore daily 11:00 TWT (V70-3-27 deployment)｜v703-site-deploy-1100.yml
+# 2026/10/18｜Official monthly release QA + controlled repair deploy + verified receipt
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
   schedule:
@@ -11,6 +11,7 @@ on:
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
+      - 'data/v703_official_monthly_release_calendar.json'
 permissions:
   contents: write
 concurrency:
@@ -18,7 +19,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-and-deploy:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    # Exact one-off verified repair merge may trigger deployment; unrelated pushes remain skipped.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'fix(v703): deploy'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -31,6 +33,8 @@ jobs:
           python -m py_compile scripts/build_daily_v703_site.py
           test -s data/18_macro_verification.json
           test -s data/8_macro_supplement_verified.json
+          test -s data/v703_official_monthly_release_calendar.json
+          python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -45,6 +49,9 @@ jobs:
           assert v['transportIndicators']==28 and len(feed['indicators'])==28
           assert v['totalRequired']==26 and v['valid']==26
           assert v['requiredScoringIndicators']==22 and v['requiredScoringIndicatorsValidated']==22
+          assert feed['monthlyReleaseCalendar']['schema']=='V70.3/monthly-official-release-calendar-v1'
+          assert len(feed['monthlyReleaseCalendar']['items'])==6
+          assert feed['sourceSnapshot']['officialReleaseCalendar']
           assert feed.get('sourceSnapshot',{}).get('macro18') and feed.get('sourceSnapshot',{}).get('macro8')
           assert feed['indicators']['m06']['status'] in ('OK','USABLE')
           m06_raw = [feed['indicators'][key] for key in ('m06_rate','m06_inf','m06_rstar','m06_output_gap')]
@@ -167,4 +174,56 @@ jobs:
               except Exception as exc:
                   if attempt==3: raise SystemExit("HOSTINGER_LIVE_VERIFY_FAILED: "+repr(exc))
                   time.sleep(12)
+          PY
+
+      - name: Record deployment receipt only after verified live HTML and JSON
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import datetime,json,os
+          from pathlib import Path
+          data=json.loads(Path('build/site/V70_macro_latest.json').read_text(encoding='utf8'))
+          receipt={'schema':'V70.3/verified-deployment-receipt-v1',
+                   'status':'LIVE_VERIFIED',
+                   'asOf':data['asOf'],
+                   'verifiedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                   'githubRunId':os.environ['GITHUB_RUN_ID'],
+                   'githubSha':os.environ['GITHUB_SHA']}
+          Path('build/site/v703_deployment_receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\\n',encoding='utf8')
+          print('LIVE_RECEIPT_PREPARED',receipt['asOf'],receipt['githubRunId'])
+          PY
+      - name: Upload verified receipt after successful online readback
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/v703_deployment_receipt.json
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+      - name: Verify live deployment receipt matches the verified feed
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+        run: |
+          python - <<'PY'
+          import json,os,time,urllib.request
+          from pathlib import Path
+          expected=json.loads(Path('build/site/v703_deployment_receipt.json').read_text())
+          base=(os.environ.get('SITE_BASE_URL') or 'https://www.happihelp.com').rstrip('/')
+          for attempt in range(4):
+              try:
+                  with urllib.request.urlopen(base+'/v703_deployment_receipt.json?v='+str(time.time_ns()),timeout=20) as response:
+                      live=json.load(response)
+                  assert live==expected, 'receipt not matching current deployment'
+                  print('V703_DEPLOYMENT_RECEIPT_PASS',live['verifiedAtUtc'])
+                  break
+              except Exception as e:
+                  if attempt==3: raise SystemExit('V703_DEPLOYMENT_RECEIPT_FAILED: '+repr(e))
+                  time.sleep(10)
           PY

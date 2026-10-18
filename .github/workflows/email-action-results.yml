@@ -1,4 +1,4 @@
-# 2026/10/17｜Gmail success report v1.3; match formal workflow names and actual artifact names
+# 2026/10/18｜Gmail Action success/failure reports; include QA failures and preserve successful artifact flow
 name: LivingWaterAI Gmail Action result reports
 
 on:
@@ -16,8 +16,8 @@ permissions:
   contents: read
 
 jobs:
-  email-success-report:
-    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' }}
+  email-result-report:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'skipped' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout report sender
@@ -36,8 +36,9 @@ jobs:
             *) echo "::error::Unrecognized source workflow: $SOURCE_RUN_NAME"; exit 1 ;;
           esac
           echo "name=$name" >> "$GITHUB_OUTPUT"
-      - name: Download actual output artifact from the successful run
+      - name: Download actual output artifact when available (failure may have none)
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: ${{ steps.artifact.outputs.name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,5 +1,5 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 10:31｜版本：V70-3-27 Gmail 通知 v1.6｜檔案名稱：send_action_gmail_report.py
-"""Email successful LivingWaterAI Action run results and attach its actual data artifact."""
+# 最後修改日期時間（台灣時間）：2026/10/18 16:46｜版本：V70-3-27 Gmail 通知 v1.7（成功及失敗）｜檔案名稱：send_action_gmail_report.py
+"""Email LivingWaterAI Action outcomes, including failures with QA diagnostics."""
 import argparse
 import csv
 import json
@@ -158,10 +158,23 @@ def main():
         f"Run ID：{run_id}",
         f"執行紀錄：{run_url or '未提供'}",
     ]
-    if "11h Verified V70.3 Site Deploy" in run_name:
-        lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
-    lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "", *family_market_lines(), "",
-                  "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
+    failed = conclusion != "success"
+    if failed:
+        lines.append("🚨 本次工作流程失敗；正式網站保留最後成功版本。")
+        qa_files = list(root.rglob("QA.json"))
+        if qa_files:
+            qa = load_json(qa_files[0]) or {}
+            lines.append("品質驗證：必要計分 "+str(qa.get("requiredScoringValidated","NA"))+"/22")
+            lines.append("缺失："+("、".join(map(str, qa.get("missing") or [])) or "無"))
+            lines.extend(["錯誤："+str(x) for x in (qa.get("problems") or [])[:30]])
+        else:
+            lines.append("未取得 QA.json；請查看 GitHub Actions 執行連結及失敗步驟。")
+        lines.extend(["", "修復方向：依失敗步驟排查資料來源／月資料發布日／Hostinger上傳／線上驗證。"])
+    else:
+        if "11h Verified V70.3 Site Deploy" in run_name:
+            lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
+        lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "", *family_market_lines(), "",
+                      "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
     report_text = "\n".join(lines)
     print(report_text)
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -171,7 +184,7 @@ def main():
     msg = EmailMessage()
     msg["From"] = "a23882005@gmail.com"
     msg["To"] = "a23882005@gmail.com"
-    msg["Subject"] = f"[LivingWaterAI] {start_time[:10]} {run_name} 執行摘要"
+    msg["Subject"] = f"[LivingWaterAI] {'🚨失敗警報' if failed else '成功摘要'} {start_time[:10]} {run_name}"
     msg.set_content("\n".join(lines))
     archive = Path("action-result-artifact.zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:

@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/17 13:56｜版本：V70-3-27 build adapter v3.4（HTML五機構SSR）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/18 16:40｜版本：V70-3-27 build adapter v3.5（官方月資料發布日校驗）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
@@ -9,6 +9,7 @@ import math
 import re
 import shutil
 from pathlib import Path
+from urllib.parse import urlparse
 
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
@@ -29,6 +30,8 @@ QUARTERLY = frozenset(("m06_rstar", "m06_output_gap", "m06"))
 SLOW_MONTHLY = frozenset(("m16",))
 WEEKLY = frozenset(("m14",))
 VALUATION_REFERENCE = frozenset(("m03_qqq", "m03_spy", "m03_vt"))
+OFFICIAL_RELEASE_CALENDAR_PATH = "data/v703_official_monthly_release_calendar.json"
+OFFICIAL_CALENDAR_DOMAINS = frozenset(("www.bls.gov", "www.ismworld.org", "fred.stlouisfed.org"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
 CANDIDATE_STATUSES = frozenset(("FOUND", "NOT_FOUND", "BLOCKED", "METRIC_MISMATCH"))
 
@@ -42,7 +45,38 @@ def _days_old(observation, today):
     return (today - d).days, d
 
 
-def _validate(key, item, today):
+def _official_release_calendar(path, today):
+    """Check source-backed next-release timestamps; reject stale or invented calendar overrides."""
+    raw = _read(path)
+    if raw.get("schema") != "V70.3/monthly-official-release-calendar-v1":
+        raise ValueError("Monthly release calendar: wrong schema")
+    checked = dt.datetime.fromisoformat(raw["checked_at_utc"].replace("Z", "+00:00"))
+    # Historical verified calendars remain auditable, but may only certify the
+    # exact observation month while now < the official next-release timestamp.
+    # An old calendar must never block a *newer* current observation month.
+    if checked.tzinfo is None or checked.date() > today:
+        raise ValueError("Monthly release calendar: verification date outside valid window")
+    result = {}
+    for key, info in raw.get("items", {}).items():
+        if key not in MONTHLY - {"m06_inf"}:
+            raise ValueError(f"Monthly release calendar: unexpected key {key}")
+        month = info["observation_month"]
+        if not re.fullmatch(r"20\d{2}-(0[1-9]|1[0-2])", month):
+            raise ValueError(f"{key}: invalid observation month")
+        observed = dt.date.fromisoformat(month + "-01")
+        published = dt.date.fromisoformat(info["publication_date"])
+        upcoming = dt.datetime.fromisoformat(info["next_release_at_utc"].replace("Z", "+00:00"))
+        if (upcoming.tzinfo is None or not observed <= published <= today
+                or not published < upcoming.date() <= observed + dt.timedelta(days=105)):
+            raise ValueError(f"{key}: implausible release schedule")
+        parsed = urlparse(info["calendar_source_url"])
+        if parsed.scheme != "https" or parsed.hostname not in OFFICIAL_CALENDAR_DOMAINS:
+            raise ValueError(f"{key}: untrusted release calendar source")
+        result[key] = dict(info)
+    return result
+
+
+def _validate(key, item, today, releases=None, now_utc=None):
     problems = []
     if not isinstance(item, dict):
         return [f"{key}: record not object"]
@@ -71,8 +105,16 @@ def _validate(key, item, today):
                 if age > 150:
                     problems.append(f"{key}: quarterly data over 150 days")
             elif key in MONTHLY:
+                # Observation dates denote the reference month, not the report date.
+                # Permit >46 days only when a verified official calendar confirms
+                # that the NEXT release has not yet occurred.
                 if age > 46:
-                    problems.append(f"{key}: monthly data over 46 days")
+                    release = (releases or {}).get(key)
+                    next_at = (dt.datetime.fromisoformat(release["next_release_at_utc"].replace("Z", "+00:00"))
+                               if release else None)
+                    if (release is None or release["observation_month"] != obs.strftime("%Y-%m")
+                            or now_utc is None or now_utc >= next_at):
+                        problems.append(f"{key}: monthly data stale; no valid upcoming official release")
             elif key in SLOW_MONTHLY:
                 if age > 90:
                     problems.append(f"{key}: slow monthly data over 90 days")
@@ -243,6 +285,7 @@ def build(macro_path, supplement_path, html_path, dest):
     now = dt.datetime.now(dt.timezone.utc)
     taipei = dt.timezone(dt.timedelta(hours=8))
     today = now.astimezone(taipei).date()
+    official_releases = _official_release_calendar(OFFICIAL_RELEASE_CALENDAR_PATH, today)
     inputs = dict(base)
     inputs.update(records)
     m06_children = [inputs[key] for key in M06_COMPONENTS]
@@ -288,7 +331,7 @@ def build(macro_path, supplement_path, html_path, dest):
         if key in VALUATION_REFERENCE and isinstance(row, dict) and row.get("status") == "MISSING" and row.get("value") is None:
             missing.append(key)
             continue
-        issues = _validate(key, row, today)
+        issues = _validate(key, row, today, official_releases, now)
         if issues:
             calc_problems.extend(issues)
             continue
@@ -299,7 +342,7 @@ def build(macro_path, supplement_path, html_path, dest):
     for key, row in inputs.items():
         if key in MACRO_CONFIG_IDS:
             continue
-        issues = _validate(key, row, today)
+        issues = _validate(key, row, today, official_releases, now)
         if issues:
             calc_problems.extend(issues)
     s05_value = inputs["s05"].get("value")
@@ -326,6 +369,10 @@ def build(macro_path, supplement_path, html_path, dest):
             "transportIndicators": len(indicators),
         },
         "indicators": indicators, "news": [], "leiHistory": lei_history,
+        "monthlyReleaseCalendar": {
+            "schema": "V70.3/monthly-official-release-calendar-v1",
+            "items": official_releases,
+        },
         "wallStreetFive": _wallstreet_five_verified("data/wallstreet5_forecasts.json", today),
         "derived": {"m21": {
             "value": int(all(row["value"] < 0 for row in lei_history)),
@@ -335,6 +382,7 @@ def build(macro_path, supplement_path, html_path, dest):
         "dataUpdatedAt": now.astimezone(taipei).isoformat(timespec="seconds"),
         "sourceSnapshot": {
             "macro18": _git_blob_sha(macro_path), "macro8": _git_blob_sha(supplement_path),
+            "officialReleaseCalendar": _git_blob_sha(OFFICIAL_RELEASE_CALENDAR_PATH),
             "wallstreet5": _git_blob_sha("data/wallstreet5_forecasts.json"),
             "macro18GeneratedAt": src.get("generated_at"), "macro8GeneratedAt": extra.get("generated_at"),
         },

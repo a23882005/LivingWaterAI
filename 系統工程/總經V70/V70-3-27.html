@@ -374,7 +374,15 @@
             if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150; // quarterly HLW/output-gap, quarter-end date
             if(id==='m16')return days>90;
             if(id==='m14')return days>14;
-            if(['m04','m05','m15','m18','m19','m20','m06_inf'].includes(id))return days>46;
+            if(['m04','m05','m15','m18','m19','m20','m06_inf'].includes(id)){
+                if(days<=46)return false;
+                const publication=window.v703MonthlyReleaseCalendar?.[id];
+                const deadline=Date.parse(String(publication?.next_release_at_utc||''));
+                const month=date.toISOString().slice(0,7);
+                const official=/^https:\/\/(www\.bls\.gov|www\.ismworld\.org|fred\.stlouisfed\.org)\//.test(String(publication?.calendar_source_url||''));
+                return !(publication?.observation_month===month && official &&
+                    Number.isFinite(deadline) && Date.now()<deadline);
+            }
             return v703TradingDaysBetween(date,today)>4;
         }
         window.v703ValidateDates = function() {
@@ -3078,8 +3086,25 @@ if (recBlack) {
  function showBanner(doc,mode){
    if(!banner)return;
    const stamp=taipeiStamp(doc?.dataUpdatedAt||doc?.asOf);
-   banner.textContent=stamp?'📅 最後資料更新（台灣時間）：'+stamp+'｜'+mode:'⚠ 最後資料更新時間：無法驗證';
+   const v=doc?.verification||{};
+   const verifiedCount=Number.isFinite(Number(v.requiredScoringIndicatorsValidated))?
+     '｜必要計分 '+v.requiredScoringIndicatorsValidated+'/'+(v.requiredScoringIndicators??22):'';
+   banner.textContent=stamp?'📅 最後資料更新（台灣時間）：'+stamp+'｜'+mode+verifiedCount:
+     '⚠ 最後資料更新時間：無法驗證'+verifiedCount;
    banner.className='w-full border-b px-4 py-3 text-center text-sm font-semibold '+(mode==='已驗證'?'bg-slate-950 border-emerald-700 text-emerald-200':'bg-amber-950 border-amber-700 text-amber-100');
+ }
+ async function showLastSuccessfulDeployment(doc){
+   if(!banner || !doc?.asOf)return;
+   try{
+     const url=new URL('./v703_deployment_receipt.json',document.baseURI);
+     const response=await fetch(url.href,{cache:'no-store'});
+     if(!response.ok)throw Error('no verified deployment receipt');
+     const receipt=await response.json();
+     const when=Date.parse(String(receipt.verifiedAtUtc||''));
+     if(receipt.status!=='LIVE_VERIFIED'||receipt.asOf!==doc.asOf||
+        !Number.isFinite(when)||when>Date.now()+300000)throw Error('receipt/feed mismatch');
+     banner.textContent+='｜線上部署驗收：'+(taipeiStamp(receipt.verifiedAtUtc)||'日期未提供');
+   }catch(error){banner.textContent+='｜線上部署驗收紀錄待確認';}
  }
  // Seed every scoring control from the values embedded in this HTML before any
  // network/file fetch. A failed feed must never turn valid defaults into blanks.
@@ -3224,6 +3249,9 @@ if (recBlack) {
        throw new Error('快照驗證計數不一致（必要計分22、傳輸28）');
      const data=doc.indicators||doc.macroIndicators||doc.macro;
      if(!data||typeof data!=='object')throw new Error('缺少 indicators 物件');
+     if(doc.monthlyReleaseCalendar?.schema!=='V70.3/monthly-official-release-calendar-v1' ||
+        !doc.sourceSnapshot?.officialReleaseCalendar)throw new Error('缺少官方月資料發布日證據');
+     window.v703MonthlyReleaseCalendar=doc.monthlyReleaseCalendar.items||{};
      if(typeof macroConfig==='undefined')throw new Error('找不到原始總經模型');
      // Reject yesterday's deployment once it exceeds the documented update window.
      // Old JSON must never masquerade as a current verified macro feed.
@@ -3301,6 +3329,7 @@ if (recBlack) {
      synchronize();
      sourceMode='feed';
      showBanner(doc,snapshotOld?'歷史已驗證快照（非今日更新）':'已驗證');
+     void showLastSuccessfulDeployment(doc);
      const valid=window.v703Latest;
      status.textContent=valid?'✅ 已讀取總經快照（'+String(doc.asOf||'時間依各指標')+'），並完成資料日期驗證。':'⚠ 快照已讀取，但資料已過期或未通過完整驗證；正式配置顯示 NA。';
      const items=Array.isArray(doc.news)?doc.news.slice(0,5):[];
@@ -3311,6 +3340,7 @@ if (recBlack) {
      window.v703SourceBatch=null;
      window.v703CreditGateBlocked=true;
      window.v703PEReferenceVerified=Object.create(null);
+     window.v703MonthlyReleaseCalendar=null;
      // Keep embedded observations visible if any metadata gate fails.
      // Their scores are for research display; the formal allocation stays blocked.
      window.v703DemoMode=false;

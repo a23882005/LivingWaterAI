@@ -1,0 +1,55 @@
+# 最後修改日期時間：2026/10/18 22:51（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
+"""Regression tests for V70-3-27 macro-health UI preparation.
+
+Run: python -m unittest tests/test_v703_outlook_ui.py -v
+This checks source invariants, not browser behavior or deployed output.
+"""
+from pathlib import Path
+import re
+import unittest
+
+HTML = Path(__file__).resolve().parents[1] / "系統工程/總經V70/V70-3-27.html"
+
+
+class V703OutlookUITest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source = HTML.read_text(encoding="utf-8")
+
+    def test_four_health_thresholds(self):
+        s = self.source
+        expected = (
+            ('if (mSafe_final >= 70) zoneText = "🟢 體質良好 (≥70)"',),
+            ('else if (mSafe_final >= 55) zoneText = "🟡 體質尚穩 (55–<70)"',),
+            ('else if (mSafe_final >= 40) zoneText = "🟠 體質偏弱 (40–<55)"',),
+            ('"🔴 體質不佳 (<40)" : "⚠ 資料不足（NA）"',),
+        )
+        for (fragment,) in expected:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, s)
+
+    def test_outlook_is_explicitly_unvalidated(self):
+        s = self.source
+        self.assertEqual(s.count('id="v70-three-month-outlook"'), 1)
+        self.assertIn("研究驗證中，尚未發布正式展望", s)
+        self.assertIn("不是S&amp;P 500報酬預測或買賣指示", s)
+
+    def test_original_data_and_risk_gates_remain(self):
+        s = self.source
+        self.assertEqual(s.count('id="v70-embedded-feed"'), 1)
+        self.assertEqual(s.count('id="v703-wallstreet-rows"'), 1)
+        self.assertIn("const mSafe_final = Math.min(mSafe_raw, capMin);", s)
+        self.assertIn("v703CanPublishFormalAllocation", s)
+        self.assertIn("calcAlloc(", s)
+
+    def test_html_document_and_unique_ids(self):
+        s = self.source
+        for tag in ("html", "body"):
+            self.assertEqual(len(re.findall(r"<" + tag + r"\b", s, re.I)), 1)
+            self.assertEqual(len(re.findall(r"</" + tag + r">", s, re.I)), 1)
+        ids = re.findall(r'\bid="([^"]+)"', s)
+        self.assertEqual(len(ids), len(set(ids)))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 正式版 -->
+<!-- 最後修改日期時間：2026/10/18 20:46（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 展望介面準備版 -->
 <!DOCTYPE html>
 
 
@@ -187,9 +187,15 @@
 <div class="lg:col-span-5 space-y-6">
 <div class="lg:sticky lg:top-24 space-y-6">
 <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl relative overflow-hidden">
-<div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總倉位)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">0.0</div></div>
+<div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總經體質)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">0.0</div></div>
 <div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width: 50%"></div></div>
 <div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">...</div>
+<div id="v70-three-month-outlook" class="mt-4 rounded-lg border border-slate-600 bg-slate-900/70 p-4 text-sm text-slate-200" aria-label="未來三個月總經體質展望">
+  <div class="font-bold text-white mb-2">未來3個月總經體質展望</div>
+  <div class="text-amber-300 font-semibold">研究驗證中，尚未發布正式展望</div>
+  <div class="text-xs text-slate-400 mt-2">五方向與判斷信心：待正式驗證後提供。三項主要依據及兩項主要風險：待資料驗證後顯示。</div>
+  <div class="text-xs text-slate-400 mt-2">本區描述未來總經體質可能方向，不是S&amp;P 500報酬預測或買賣指示。</div>
+</div>
 <div class="hidden absolute inset-0 bg-red-900/95 flex flex-col items-center justify-center text-white z-20 backdrop-blur-md" id="circuit-breaker-overlay">
 <i class="fas fa-radiation text-6xl mb-4 animate-pulse text-yellow-400"></i>
 <div class="text-2xl font-bold uppercase tracking-widest border-b-2 border-white pb-2 mb-2">系統熔斷</div>
@@ -1329,10 +1335,10 @@ if (recBlack) {
 
 
                 let zoneText = "";
-                if (mSafe_final >= 70) zoneText = "🟢 進攻 (≥70)";
-                else if (mSafe_final >= 55) zoneText = "🟡 穩健 (55–70)";
-                else if (mSafe_final >= 40) zoneText = "🟠 防守 (40–55)";
-                else zoneText = Number.isFinite(mSafe_final) ? "🔴 停車 (<40)" : "⚠ 資料不足（NA）";
+                if (mSafe_final >= 70) zoneText = "🟢 體質良好 (≥70)";
+                else if (mSafe_final >= 55) zoneText = "🟡 體質尚穩 (55–<70)";
+                else if (mSafe_final >= 40) zoneText = "🟠 體質偏弱 (40–<55)";
+                else zoneText = Number.isFinite(mSafe_final) ? "🔴 體質不佳 (<40)" : "⚠ 資料不足（NA）";
 
 
                 zEl.innerText = zoneText;

@@ -1,3 +1,4 @@
+# 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：test_v703_failure_mail.py｜版本：Gmail 失敗通知測試
 """Offline Gmail failure-notification acceptance test; SMTP is mocked."""
 import importlib.util
 import json

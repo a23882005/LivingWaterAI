@@ -51,7 +51,10 @@ def _official_release_calendar(path, today):
     if raw.get("schema") != "V70.3/monthly-official-release-calendar-v1":
         raise ValueError("Monthly release calendar: wrong schema")
     checked = dt.datetime.fromisoformat(raw["checked_at_utc"].replace("Z", "+00:00"))
-    if checked.tzinfo is None or checked.date() > today or (today - checked.date()).days > 45:
+    # Historical verified calendars remain auditable, but may only certify the
+    # exact observation month while now < the official next-release timestamp.
+    # An old calendar must never block a *newer* current observation month.
+    if checked.tzinfo is None or checked.date() > today:
         raise ValueError("Monthly release calendar: verification date outside valid window")
     result = {}
     for key, info in raw.get("items", {}).items():

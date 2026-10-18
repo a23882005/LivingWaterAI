@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/19 01:42（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 五類股票原位文字呈現 -->
+<!-- 最後修改日期時間：2026/10/19 03:09（台灣時間）｜檔案名稱：V70-3-27.html｜版本：S1長期核心修正＋債券四類文字建議 -->
 <!DOCTYPE html>
 
 
@@ -2254,9 +2254,9 @@ if (recBlack) {
   ];
   return fiveGroups.map((g,i)=>{
    const v=raw[i];let idx=v>=.9?4:v>=.25?3:v>-.25?2:v>-.9?1:0;
-   if(risk>=.65&&i<4)idx=Math.min(idx,2);
+   if(risk>=.65&&i>0&&i<4)idx=Math.min(idx,2);
    if(i===4&&(credit>=.8||liq>=.8))idx=Math.min(idx,2);
-   return {id:g[0],name:g[1],examples:g[2],advice:words[idx],reason:reasons[i]};
+   return {id:g[0],name:g[1],examples:g[2],advice:i===0?(risk>=.65?'維持核心配置，暫緩加碼並檢查信用流動性':score<55?'維持核心配置，回檔依V82分批增持':words[Math.max(2,idx)]):words[idx],reason:i===0?'長期核心不因總經分數轉弱機械減碼；回檔買點、估值與安全閘門由V82核實':reasons[i]};
   });
  }
  const finite=v=>typeof v==='number'&&Number.isFinite(v);
@@ -2319,6 +2319,15 @@ if (recBlack) {
    const rule=dynamicWeights(snap);
    if(!rule){box.textContent='⚠ 八群風險資料或 CAP 不完整，停止輸出。';window.v703Latest=null;return;}
    const fiveAdvice=fiveClassAdvice(snap,rule);
+   const zB=rule.stress.strengths||{};
+   const bn=k=>Math.max(0,Math.min(1,Number.isFinite(+zB[k])?+zB[k]:0));
+   const bc=bn('credit'),bl=bn('liquidity_fc'),bi=Math.max(bn('inflation'),bn('rates_curve')),bg=bn('growth'),danger=bc>=.8||bl>=.8;
+   const bondAdvice=[
+    ['B1',danger?'續抱高品質短債，檢查流動性':'維持短債，依債券V75評估合理買點','Fed與2Y、流動性、短債收益'],
+    ['B2',danger?'暫緩加碼，檢查投資級信用風險':bc>=.5?'續抱領息，等待信用利差改善':'續抱領息，回檔可評估分批增持','2Y／5Y、IG信用利差、降評與配息品質'],
+    ['B3',bi>=.65?'長端利率壓力偏高，續抱觀察':bg>=.6&&!danger?'景氣轉弱，評估分批配置長債':'續抱觀察，依殖利率與價格地圖評估買點','10Y／30Y、通膨、期限溢價與Fed'],
+    ['B4',danger?'信用警戒，評估是否降低風險':bc>=.5?'續抱審慎觀察，不急於加碼':'續抱領息，信用安全時評估合理買點','HY／BBB利差、降評、違約與配息品質']
+   ];
    const ss=amounts(s,rule.s,['S1','S2','S3']);
    const bb=amounts(b,rule.b,['B1','B2','B3','B4']);
    const pct={...ss,...bb,C0:c};
@@ -2336,10 +2345,10 @@ if (recBlack) {
     `<div><strong>總經安全分數：</strong>${snap.mSafe_final.toFixed(1)}／100 <strong>風險模式：</strong>${rule.summary||"一般市場"}</div>`+
     `<div class="text-xs text-slate-300">S0/B0：${a.S0.toFixed(1)}%／${a.B0.toFixed(1)}%；總經 T：${a.T>0?'+':''}${a.T} 點；子彈池 C：${c.toFixed(1)}%</div>`+
     `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%｜五大股票類別總經方向</div>`+(fiveAdvice?fiveAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-semibold">${x.id}｜${x.name}：<span class="text-cyan-300">${x.advice}</span></div><div class="text-xs text-slate-300 mt-1">代表標的：${x.examples}</div><div class="text-xs text-slate-400">總經依據：${x.reason}</div></div>`).join(''):'<div class="text-amber-200">資料不足，暫不判斷。</div>')+
-    `<div class="font-bold text-green-300 mt-2">債券池 ${b.toFixed(1)}%</div>`+['B1','B2','B3','B4'].map(line).join('')+
+    `<div class="font-bold text-green-300 mt-2">債券四類｜總經文字建議</div>`+bondAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-bold text-green-100">${x[0]}｜${labels[x[0]]}：${x[1]}</div><div class="text-xs text-slate-400">總經依據：${x[2]}</div></div>`).join('')+
     `<div class="font-bold text-yellow-300 mt-2">${labels.C0} ${c.toFixed(1)}%</div>`+
     `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計 ${total.toFixed(1)}%</div>`+
-    `<div class="text-xs text-slate-300 mt-2">股票五類只顯示總經文字方向，不代表固定增減比例；債券比例保留原有計算，並非交易指令。</div>`+
+    `<div class="text-xs text-slate-300 mt-2">股票五類與債券四類均顯示總經文字方向，不是交易指令；內部百分比仍供原配置對帳，逐檔股票交V82、逐檔債券交債券V75。</div>`+
     `<div class="text-xs text-amber-200">多風險連續加權之八類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;
    window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('family-life')?.value,preference:document.getElementById('family-style')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true,fiveClassMacroAdvice:fiveAdvice};
  };

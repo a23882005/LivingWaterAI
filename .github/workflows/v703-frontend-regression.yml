@@ -1,4 +1,4 @@
-# 2026/10/18 Browser regression: compare against this run's verified feed (not hard-coded past prices).
+# 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：v703-frontend-regression.yml｜版本：V70-3-27 瀏覽器回歸測試
 name: LivingWaterAI V70-3-27 Browser Regression
 on:
   workflow_dispatch:

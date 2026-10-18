@@ -20,7 +20,9 @@ concurrency:
 jobs:
   build-and-deploy:
     # Exact one-off verified repair merge may trigger deployment; unrelated pushes remain skipped.
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'fix(v703): deploy'))
+    if: >-
+      github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'fix(v703): deploy'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -191,7 +193,7 @@ jobs:
                    'verifiedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
                    'githubRunId':os.environ['GITHUB_RUN_ID'],
                    'githubSha':os.environ['GITHUB_SHA']}
-          Path('build/site/v703_deployment_receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\\n',encoding='utf8')
+          Path('build/site/v703_deployment_receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
           print('LIVE_RECEIPT_PREPARED',receipt['asOf'],receipt['githubRunId'])
           PY
       - name: Upload verified receipt after successful online readback

@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/19 00:32（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 體質Range說明版 -->
+<!-- 最後修改日期時間：2026/10/19 01:00（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 五類股票文字總經建議版 -->
 <!DOCTYPE html>
 
 
@@ -2217,15 +2217,20 @@ if (recBlack) {
 <section class="max-w-5xl mx-auto px-4 py-8 v703-bluegold" id="v703-section">
  <div class="rounded-2xl border border-cyan-700 bg-slate-900/70 p-5 space-y-4 v703-bluegold-card">
   <h2 class="text-2xl font-bold text-cyan-300">🍎 活水AI｜家人版資產配置戰情室</h2>
-  <p class="text-sm text-slate-300">家人版：選擇人生情境與投資風格，總經資料由背景快照載入，自動產生股票三類、債券四類及 SGOV 子彈池比例、增加／持有／減少與原因。<strong>無須輸入持倉、金額或新增資金。</strong></p>
+  <p class="text-sm text-slate-300">家人版：選擇人生情境與投資風格，總經資料由背景快照載入；新增五大股票類別的五級文字方向，原股票三類、債券四類及 SGOV 子彈池的既有比例計算維持不變。<strong>無須輸入持倉、金額或新增資金。</strong></p>
   <details hidden class="border border-slate-700 rounded p-3"><summary class="cursor-pointer text-sm font-semibold">系統背景資料日期與來源</summary><p class="text-xs text-amber-300 my-2">每日超過3交易日、每週14日、每月45日判定過期。日期指觀測日；若能取得公布日，應另行保留。</p><div id="v703-date-controls" class="max-h-96 overflow-y-auto"></div></details>
   <p class="text-xs text-slate-400 mb-3">人生情境與投資風格已於頁面最上方選擇；以下顯示同一組設定的計算結果。</p>
   <div id="family-data-status" role="status" aria-live="polite" class="sr-only">正在載入資料…</div>
+  <div id="v703-five-stock-advice" class="rounded-xl border border-cyan-700 bg-slate-800/70 p-4 my-4" aria-live="polite">
+ <h3 class="font-bold text-cyan-300 text-lg mb-2">🌿 五大股票類別｜總經配置方向</h3>
+ <p class="text-xs text-slate-300 mb-3">僅依V70總經環境提供類別層級的文字方向，不提供固定增減比例或個股買賣指令；個別標的交由V82評估。此為待歷史驗證的輔助訊號。</p>
+ <div id="v703-five-stock-advice-body" class="text-amber-200 text-sm">總經資料檢查中，暫不判斷。</div>
+</div>
   <div id="family-news" class="text-sm text-slate-300 mb-3" aria-live="polite"></div>
   <div aria-live="polite" class="rounded-lg bg-slate-800 p-4 text-sm space-y-3" id="v703-result">正在讀取總經資料…</div>
 
 
-  <p class="text-xs text-slate-400">S1／S2／S3、B1／B2／B3／B4 是資產風險類別；B1 的正式債券配置與 SGOV 子彈池用途分帳，總和只計一次。個別 ETF 的買賣價格仍由 V82／債券V75 判斷。</p>
+  <p class="text-xs text-slate-400">上方五類股票是新增的文字總經方向；下方S1／S2／S3及B1／B2／B3／B4是原有數值配置分類，兩套分類不可混用；B1 的正式債券配置與 SGOV 子彈池用途分帳，總和只計一次。個別 ETF 的買賣價格仍由 V82／債券V75 判斷。</p>
  </div>
 </section>
 <script>
@@ -2242,6 +2247,52 @@ if (recBlack) {
    liquidity:{name:'流動性緊縮',s:[85,14,1],b:[70,25,5,0]},
    panic:{name:'恐慌／價格折價',s:[75,23,2],b:[45,35,17,3]}
  };
+
+ // V70五類文字總經方向：與舊S1-S3數值配置引擎分離，絕不修改原股票總額。
+ const v703FiveGroups=[
+  ['S1','大盤與多元化核心型','VT、VOO、VTI、VALL、0050、VWRA、BRK.B（波克夏）'],
+  ['S2','大型成長型','QQQ、QQQM、MSFT、AAPL、GOOGL、META、AMZN'],
+  ['S3','產業集中與主題型','SOXX、SMH、XLK、XLF、KBE、XLI、AVGO（博通）、NATO（國防）、ZTS、IDXX、PAWZ（寵物醫療／產業）'],
+  ['S4','高波動與槓桿投機型','TQQQ、SOXL、UPRO、SQQQ、TRUP（寵物保險）'],
+  ['S5','防禦與民生必要型','PPH、XLV、XLP、XLU、WMT、COST、KR、PG、KO（可口可樂）']
+ ];
+ function v703FiveAdvice(snap,rule){
+  const root=document.getElementById('v703-five-stock-advice-body');if(!root)return null;
+  if(!snap||!rule||!rule.stress||!window.v703CanPublishFormalAllocation()||!Number.isFinite(snap.mSafe_final)){
+   root.textContent='資料不足，暫不判斷。';return null;
+  }
+  const z=rule.stress.strengths||{};
+  const n=k=>Math.max(0,Math.min(1,Number.isFinite(+z[k])?+z[k]:0));
+  const credit=n('credit'),growth=n('growth'),inflation=Math.max(n('inflation'),n('rates_curve')),liq=n('liquidity_fc'),panic=n('panic_vol');
+  const score=snap.mSafe_final;
+  // 各類的總經敏感度僅為方向性候選規則；不得據此推斷個股漲跌。
+  const risk=Math.max(credit,liq),stress=Math.max(credit,growth,liq,inflation,panic);
+  const raw=[
+   (score-55)/32 -credit*.9-growth*.5-liq*.7-inflation*.35,
+   (score-55)/35 -credit*.8-growth*.6-liq*.8-inflation*.8,
+   (score-55)/40 -credit*1.0-growth*.8-liq*.8-inflation*.55,
+   (score-55)/48 -credit*1.25-growth*.8-liq*1.2-inflation*.8-panic*.65,
+   (55-score)/65 +growth*.25+credit*.15+liq*.12-inflation*.12
+  ];
+  // 嚴重信用或流動性壓力時，禁止輸出積極增持；防禦股也不能視為避險現金。
+  const words=['積極減持','適度減持','維持配置','適度增持','積極增持'];
+  const reasons=[
+   '整體景氣、信用與股票風險承受環境',
+   '成長預期、實質利率與估值壓力',
+   '景氣、信用、利率與產業集中風險（各產業反應仍不同）',
+   '槓桿、流動性與市場波動壓力',
+   '民生需求韌性與防禦性配置（仍有股票下跌風險）'
+  ];
+  const advice=v703FiveGroups.map((g,i)=>{
+   const v=raw[i];let idx=v>=.9?4:v>=.25?3:v>-.25?2:v>-.9?1:0;
+   if(risk>=.65 && i<4)idx=Math.min(idx,2);
+   if(i===4 && (credit>=.8||liq>=.8))idx=Math.min(idx,2);
+   return {id:g[0],name:g[1],examples:g[2],advice:words[idx],reason:reasons[i]};
+  });
+  const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  root.innerHTML='<div class="space-y-3">'+advice.map(a=>'<div class="border-b border-slate-600 pb-2"><div class="font-semibold">'+esc(a.id+' '+a.name)+'｜<span class="text-cyan-300">'+esc(a.advice)+'</span></div><div class="text-xs text-slate-300 mt-1">例如：'+esc(a.examples)+'</div><div class="text-xs text-slate-400">總經依據：'+esc(a.reason)+'</div></div>').join('')+'</div><p class="text-xs text-amber-200 mt-2">以上為V70總經概括方向，並非立即交易指示；類別內個股差異由V82處理。</p>';
+  return advice;
+ }
  const finite=v=>typeof v==='number'&&Number.isFinite(v);
  function dynamicWeights(snap){
    const g=snap.groupRisk||{};
@@ -2290,6 +2341,7 @@ if (recBlack) {
      box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式八類配置：暫停</div>'+
        (rawScore!==null?'<div>已載入總經數值 '+(coverage.available??'—')+'/'+(coverage.total??21)+' 項｜研究用安全分數：<b>'+rawScore.toFixed(1)+'/100</b></div>':'<div>總經數值尚未完整載入；目前沒有可計算的安全分數。</div>')+
        '<div>完整快照來源／品質、日期驗證未全部通過，因此暫不顯示正式配置比例。'+(issue?'<br>檢查訊息：'+safeIssue:'')+'</div>';
+     v703FiveAdvice(null,null);
      window.v703Latest=null;return;
    }
    const a=snap.allocation;let s=a.sTot,b=a.bTot,c=a.cTot;
@@ -2301,6 +2353,7 @@ if (recBlack) {
    s=s10/10;b=b10/10;c=(1000-s10-b10)/10;
    const rule=dynamicWeights(snap);
    if(!rule){box.textContent='⚠ 八群風險資料或 CAP 不完整，停止輸出。';window.v703Latest=null;return;}
+   const fiveAdvice=v703FiveAdvice(snap,rule);
    const ss=amounts(s,rule.s,['S1','S2','S3']);
    const bb=amounts(b,rule.b,['B1','B2','B3','B4']);
    const pct={...ss,...bb,C0:c};
@@ -2323,7 +2376,7 @@ if (recBlack) {
     `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計 ${total.toFixed(1)}%</div>`+
     `<div class="text-xs text-slate-300 mt-2">增／減表示占總資產配置比重的變化：例如原本10%，調整為12%，就是增加2%；此處僅為配置比較，尚未進行實際交易。</div>`+
     `<div class="text-xs text-amber-200">多風險連續加權之八類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;
-   window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('family-life')?.value,preference:document.getElementById('family-style')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true};
+   window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('family-life')?.value,preference:document.getElementById('family-style')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true,fiveClassMacroAdvice:fiveAdvice};
  };
  window.v703Export=function(){window.v703Recompute();if(!window.v703CanPublishFormalAllocation()||!window.v703Latest){alert('完整總經快照／日期未通過驗證，或目前為示範資料；無法匯出正式配置');return;}const blob=new Blob([JSON.stringify(window.v703Latest,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='V70-3-seven-class-allocation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  window.v703StartDemo=function(){

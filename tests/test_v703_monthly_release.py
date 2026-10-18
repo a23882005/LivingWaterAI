@@ -1,3 +1,4 @@
+# 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：test_v703_monthly_release.py｜版本：官方月資料發布日測試
 """V70-3-27 official monthly release-calendar gate acceptance tests (2026-10-18)."""
 import datetime as dt
 import importlib.util

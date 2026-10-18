@@ -1,0 +1,43 @@
+{
+  "schema": "V70.3/monthly-official-release-calendar-v1",
+  "checked_at_utc": "2026-10-18T08:00:00Z",
+  "explanation": "Official next data publication, not observation month age. Never use a past date to certify freshness. Fail closed when record's observation month mismatches.",
+  "items": {
+    "m04": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-01",
+      "next_release_at_utc": "2026-11-02T15:00:00Z",
+      "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    "m05": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-14",
+      "next_release_at_utc": "2026-11-10T13:30:00Z",
+      "calendar_source_url": "https://www.bls.gov/schedule/news_release/cpi.htm"
+    },
+    "m15": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-05",
+      "next_release_at_utc": "2026-11-04T15:00:00Z",
+      "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+    },
+    "m18": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-02",
+      "next_release_at_utc": "2026-11-06T13:30:00Z",
+      "calendar_source_url": "https://fred.stlouisfed.org/releases/calendar?rid=456&y=2026"
+    },
+    "m19": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-02",
+      "next_release_at_utc": "2026-11-06T13:30:00Z",
+      "calendar_source_url": "https://www.bls.gov/schedule/news_release/empsit.htm"
+    },
+    "m20": {
+      "observation_month": "2026-09",
+      "publication_date": "2026-10-02",
+      "next_release_at_utc": "2026-11-06T13:30:00Z",
+      "calendar_source_url": "https://www.bls.gov/schedule/news_release/empsit.htm"
+    }
+  }
+}

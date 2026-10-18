@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/19 03:09（台灣時間）｜檔案名稱：V70-3-27.html｜版本：S1長期核心修正＋債券四類文字建議 -->
+<!-- 最後修改日期時間：2026/10/19 04:20（台灣時間）｜檔案名稱：V70-3-27.html｜版本：債券文字可讀性修正 -->
 <!DOCTYPE html>
 
 
@@ -2345,7 +2345,7 @@ if (recBlack) {
     `<div><strong>總經安全分數：</strong>${snap.mSafe_final.toFixed(1)}／100 <strong>風險模式：</strong>${rule.summary||"一般市場"}</div>`+
     `<div class="text-xs text-slate-300">S0/B0：${a.S0.toFixed(1)}%／${a.B0.toFixed(1)}%；總經 T：${a.T>0?'+':''}${a.T} 點；子彈池 C：${c.toFixed(1)}%</div>`+
     `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%｜五大股票類別總經方向</div>`+(fiveAdvice?fiveAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-semibold">${x.id}｜${x.name}：<span class="text-cyan-300">${x.advice}</span></div><div class="text-xs text-slate-300 mt-1">代表標的：${x.examples}</div><div class="text-xs text-slate-400">總經依據：${x.reason}</div></div>`).join(''):'<div class="text-amber-200">資料不足，暫不判斷。</div>')+
-    `<div class="font-bold text-green-300 mt-2">債券四類｜總經文字建議</div>`+bondAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-bold text-green-100">${x[0]}｜${labels[x[0]]}：${x[1]}</div><div class="text-xs text-slate-400">總經依據：${x[2]}</div></div>`).join('')+
+    `<div class="font-bold mt-2" style="color:#14532d">債券四類｜總經文字建議</div>`+bondAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-bold" style="color:#14532d;font-weight:800">${x[0]}｜${labels[x[0]]}：${x[1]}</div><div class="text-xs text-slate-400">總經依據：${x[2]}</div></div>`).join('')+
     `<div class="font-bold text-yellow-300 mt-2">${labels.C0} ${c.toFixed(1)}%</div>`+
     `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計 ${total.toFixed(1)}%</div>`+
     `<div class="text-xs text-slate-300 mt-2">股票五類與債券四類均顯示總經文字方向，不是交易指令；內部百分比仍供原配置對帳，逐檔股票交V82、逐檔債券交債券V75。</div>`+

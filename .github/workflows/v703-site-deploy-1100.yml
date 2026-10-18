@@ -22,7 +22,7 @@ jobs:
     # Exact one-off verified repair merge may trigger deployment; unrelated pushes remain skipped.
     if: >-
       github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'fix(v703): deploy'))
+      (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'fix(v703): deploy') || startsWith(github.event.head_commit.message, 'fix(v703): synchronize canonical')))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

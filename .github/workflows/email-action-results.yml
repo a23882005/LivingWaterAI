@@ -1,4 +1,4 @@
-# 2026/10/18｜Gmail Action success/failure reports; include QA failures and preserve successful artifact flow
+# 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：email-action-results.yml｜版本：Gmail 成功／失敗執行結果通知
 name: LivingWaterAI Gmail Action result reports
 
 on:

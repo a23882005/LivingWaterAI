@@ -2217,20 +2217,15 @@ if (recBlack) {
 <section class="max-w-5xl mx-auto px-4 py-8 v703-bluegold" id="v703-section">
  <div class="rounded-2xl border border-cyan-700 bg-slate-900/70 p-5 space-y-4 v703-bluegold-card">
   <h2 class="text-2xl font-bold text-cyan-300">🍎 活水AI｜家人版資產配置戰情室</h2>
-  <p class="text-sm text-slate-300">家人版：選擇人生情境與投資風格，總經資料由背景快照載入；新增五大股票類別的五級文字方向，原股票三類、債券四類及 SGOV 子彈池的既有比例計算維持不變。<strong>無須輸入持倉、金額或新增資金。</strong></p>
+  <p class="text-sm text-slate-300">家人版：依總經資料呈現五大股票類別的五級文字方向；股票池總額、債券四類及 SGOV 子彈池比例維持原有計算。<strong>無須輸入持倉、金額或新增資金。</strong></p>
   <details hidden class="border border-slate-700 rounded p-3"><summary class="cursor-pointer text-sm font-semibold">系統背景資料日期與來源</summary><p class="text-xs text-amber-300 my-2">每日超過3交易日、每週14日、每月45日判定過期。日期指觀測日；若能取得公布日，應另行保留。</p><div id="v703-date-controls" class="max-h-96 overflow-y-auto"></div></details>
   <p class="text-xs text-slate-400 mb-3">人生情境與投資風格已於頁面最上方選擇；以下顯示同一組設定的計算結果。</p>
   <div id="family-data-status" role="status" aria-live="polite" class="sr-only">正在載入資料…</div>
-  <div id="v703-five-stock-advice" class="rounded-xl border border-cyan-700 bg-slate-800/70 p-4 my-4" aria-live="polite">
- <h3 class="font-bold text-cyan-300 text-lg mb-2">🌿 五大股票類別｜總經配置方向</h3>
- <p class="text-xs text-slate-300 mb-3">僅依V70總經環境提供類別層級的文字方向，不提供固定增減比例或個股買賣指令；個別標的交由V82評估。此為待歷史驗證的輔助訊號。</p>
- <div id="v703-five-stock-advice-body" class="text-amber-200 text-sm">總經資料檢查中，暫不判斷。</div>
-</div>
-  <div id="family-news" class="text-sm text-slate-300 mb-3" aria-live="polite"></div>
+    <div id="family-news" class="text-sm text-slate-300 mb-3" aria-live="polite"></div>
   <div aria-live="polite" class="rounded-lg bg-slate-800 p-4 text-sm space-y-3" id="v703-result">正在讀取總經資料…</div>
 
 
-  <p class="text-xs text-slate-400">上方五類股票是新增的文字總經方向；下方S1／S2／S3及B1／B2／B3／B4是原有數值配置分類，兩套分類不可混用；B1 的正式債券配置與 SGOV 子彈池用途分帳，總和只計一次。個別 ETF 的買賣價格仍由 V82／債券V75 判斷。</p>
+  <p class="text-xs text-slate-400">股票S1～S5只顯示文字總經方向；原有S1～S3數值分配僅留作內部相容計算，不顯示；B1～B4維持債券比例；B1 的正式債券配置與 SGOV 子彈池用途分帳，總和只計一次。個別 ETF 的買賣價格仍由 V82／債券V75 判斷。</p>
  </div>
 </section>
 <script>
@@ -2257,9 +2252,9 @@ if (recBlack) {
   ['S5','防禦與民生必要型','PPH、XLV、XLP、XLU、WMT、COST、KR、PG、KO（可口可樂）']
  ];
  function v703FiveAdvice(snap,rule){
-  const root=document.getElementById('v703-five-stock-advice-body');if(!root)return null;
+
   if(!snap||!rule||!rule.stress||!window.v703CanPublishFormalAllocation()||!Number.isFinite(snap.mSafe_final)){
-   root.textContent='資料不足，暫不判斷。';return null;
+   return null;
   }
   const z=rule.stress.strengths||{};
   const n=k=>Math.max(0,Math.min(1,Number.isFinite(+z[k])?+z[k]:0));
@@ -2289,8 +2284,6 @@ if (recBlack) {
    if(i===4 && (credit>=.8||liq>=.8))idx=Math.min(idx,2);
    return {id:g[0],name:g[1],examples:g[2],advice:words[idx],reason:reasons[i]};
   });
-  const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  root.innerHTML='<div class="space-y-3">'+advice.map(a=>'<div class="border-b border-slate-600 pb-2"><div class="font-semibold">'+esc(a.id+' '+a.name)+'｜<span class="text-cyan-300">'+esc(a.advice)+'</span></div><div class="text-xs text-slate-300 mt-1">例如：'+esc(a.examples)+'</div><div class="text-xs text-slate-400">總經依據：'+esc(a.reason)+'</div></div>').join('')+'</div><p class="text-xs text-amber-200 mt-2">以上為V70總經概括方向，並非立即交易指示；類別內個股差異由V82處理。</p>';
   return advice;
  }
  const finite=v=>typeof v==='number'&&Number.isFinite(v);
@@ -2370,11 +2363,11 @@ if (recBlack) {
    box.innerHTML=(window.v703DemoMode?'<div class="text-xs text-slate-400 mb-2">測試預覽</div>':'')+`<div class="rounded border border-amber-700 p-2 mb-2 text-amber-200">${window.v703StrategyKind==='APPROVED_MATRIX'?'已載入核准10×4矩陣':'⚠ 10×4採候選示範配置，非正式核准值'}｜人生：${document.getElementById('life-stage-select')?.selectedOptions[0]?.textContent||''}；風格：${document.getElementById('v703-risk-preference')?.selectedOptions[0]?.textContent||''}</div>`+
     `<div><strong>總經安全分數：</strong>${snap.mSafe_final.toFixed(1)}／100 <strong>風險模式：</strong>${rule.summary||"一般市場"}</div>`+
     `<div class="text-xs text-slate-300">S0/B0：${a.S0.toFixed(1)}%／${a.B0.toFixed(1)}%；總經 T：${a.T>0?'+':''}${a.T} 點；子彈池 C：${c.toFixed(1)}%</div>`+
-    `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%</div>`+['S1','S2','S3'].map(line).join('')+
+    `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%｜五大股票類別總經方向</div>`+(fiveAdvice?fiveAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-semibold">${x.id}｜${x.name}：<span class="text-cyan-300">${x.advice}</span></div><div class="text-xs text-slate-300 mt-1">代表標的：${x.examples}</div><div class="text-xs text-slate-400">總經依據：${x.reason}</div></div>`).join(''):'<div class="text-amber-200">資料不足，暫不判斷。</div>')+
     `<div class="font-bold text-green-300 mt-2">債券池 ${b.toFixed(1)}%</div>`+['B1','B2','B3','B4'].map(line).join('')+
     `<div class="font-bold text-yellow-300 mt-2">${labels.C0} ${c.toFixed(1)}%</div>`+
     `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計 ${total.toFixed(1)}%</div>`+
-    `<div class="text-xs text-slate-300 mt-2">增／減表示占總資產配置比重的變化：例如原本10%，調整為12%，就是增加2%；此處僅為配置比較，尚未進行實際交易。</div>`+
+    `<div class="text-xs text-slate-300 mt-2">股票五類為文字總經方向，沒有固定增減比例；債券的百分比為原有配置計算，並非立即交易指示。</div>`+
     `<div class="text-xs text-amber-200">多風險連續加權之八類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;
    window.v703Latest={ruleVersion:'V70.3-MULTI-RISK-20261013',calculatedAt:new Date().toISOString(),macroSafety:snap.mSafe_final,scenarioWeights:rule.weights,stress:rule.stress,strategic:{stock:a.S0,bond:a.B0},tacticalTilt:a.T,percentages:pct,totals:{stock:s,bond:b,dryPowder:c,all:total},dataValidation:{allMacroValuesPresent:window.v703DataComplete,allDatesAndSourcesValid:window.v703VerifiedDataDates,issues:window.v703DateIssues||[]},strategicMatrixLoaded:!!window.v703ApprovedMatrix,strategyKind:window.v703StrategyKind,lifeStage:document.getElementById('family-life')?.value,preference:document.getElementById('family-style')?.value,neutralBaseline:ref,deltaPercentagePoints:delta,advice:action,status:window.v703DemoMode?'DEMO_SYNTHETIC_MIDPOINT_NO_INVESTMENT_USE':'AUTO_ALLOCATION_CANDIDATE_PENDING_BACKTEST',syntheticInputs:window.v703DemoMode===true,fiveClassMacroAdvice:fiveAdvice};
  };

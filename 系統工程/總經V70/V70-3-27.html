@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/18 23:39（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 展望介面準備版 -->
+<!-- 最後修改日期時間：2026/10/19 00:32（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27 體質Range說明版 -->
 <!DOCTYPE html>
 
 
@@ -190,6 +190,17 @@
 <div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總經體質)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">0.0</div></div>
 <div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width: 50%"></div></div>
 <div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">...</div>
+<div id="macro-health-range-guide" class="mt-4 rounded-lg border border-slate-600 bg-slate-900/70 p-3 text-sm text-slate-200" aria-label="總經體質分數區間與意義">
+  <div class="font-bold text-white mb-2">總經體質分數 Range 與意義</div>
+  <div class="overflow-x-auto"><table class="w-full text-left text-xs sm:text-sm border-collapse"><thead><tr class="text-slate-300 border-b border-slate-600"><th class="py-2 pr-2">分數</th><th class="py-2 pr-2">分級</th><th class="py-2">代表意義</th></tr></thead><tbody>
+    <tr class="border-b border-slate-700"><td class="py-2 pr-2 whitespace-nowrap">70–100</td><td class="py-2 pr-2 whitespace-nowrap">🟢 體質良好</td><td class="py-2">總經環境較健康，風險承受能力較強</td></tr>
+    <tr class="border-b border-slate-700"><td class="py-2 pr-2 whitespace-nowrap">55–未滿70</td><td class="py-2 pr-2 whitespace-nowrap">🟡 體質尚穩</td><td class="py-2">整體尚可，但部分風險仍須注意</td></tr>
+    <tr class="border-b border-slate-700"><td class="py-2 pr-2 whitespace-nowrap">40–未滿55</td><td class="py-2 pr-2 whitespace-nowrap">🟠 體質偏弱</td><td class="py-2">多項風險升高，宜降低積極程度</td></tr>
+    <tr class="border-b border-slate-700"><td class="py-2 pr-2 whitespace-nowrap">0–未滿40</td><td class="py-2 pr-2 whitespace-nowrap">🔴 體質不佳</td><td class="py-2">總經壓力明顯，應優先控制風險</td></tr>
+    <tr><td class="py-2 pr-2 whitespace-nowrap">資料不足</td><td class="py-2 pr-2 whitespace-nowrap">⚪ NA</td><td class="py-2">無法可靠評分，暫停正式判定</td></tr>
+  </tbody></table></div>
+  <p class="mt-2 text-xs text-slate-400">分級描述總經體質及風險狀態，不代表未來股市報酬率或直接買賣指示；分數仍依原V70計算與風控上限。</p>
+</div>
 <div id="v70-three-month-outlook" class="mt-4 rounded-lg border border-slate-600 bg-slate-900/70 p-4 text-sm text-slate-200" aria-label="未來三個月總經體質展望">
   <div class="font-bold text-white mb-2">未來3個月總經體質展望</div>
   <div class="text-amber-300 font-semibold">研究驗證中，尚未發布正式展望</div>

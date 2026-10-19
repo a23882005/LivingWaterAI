@@ -24,13 +24,16 @@ BANK_REQUIRED = {
 MONTHLY_REQUIRED = {
     "snapshot_month", "snapshot_date", "health_score", "score_status",
     "previous_snapshot_date", "previous_health_score", "slope_points_per_month",
+    "sp500_start_date", "sp500_start_close",
     "sp500_forward_3m_return_pct", "return_status",
 }
 FIELDS = [
     "snapshot_month", "snapshot_date", "institution", "forecast_id",
     "forecast_target_index", "forecast_target_date", "forecast_value",
     "forecast_evidence_date", "forecast_publication_date",
-    "forecast_horizon_days", "forecast_status", "source_url",
+    "forecast_horizon_days", "forecast_implied_return_pct",
+    "sp500_snapshot_date", "sp500_snapshot_close",
+    "forecast_status", "source_url",
     "macro_health_score", "macro_score_status", "previous_macro_snapshot_date",
     "previous_macro_health_score", "macro_slope_points_per_month",
     "macro_sp500_forward_3m_return_pct", "macro_return_status",
@@ -59,6 +62,18 @@ def _na(value):
     if value is None or str(value).strip() == "":
         return "NA"
     return str(value).strip()
+
+
+def _implied_return(target_value: str, snapshot_close: str) -> str:
+    """Calculate forecast target upside only when a licensed snapshot close exists."""
+    try:
+        target = float(target_value)
+        close = float(snapshot_close)
+    except (TypeError, ValueError):
+        return "NA"
+    if target <= 0 or close <= 0:
+        return "NA"
+    return f"{(target / close - 1) * 100:.6f}".rstrip("0").rstrip(".")
 
 
 def build_rows(bank_rows: list[dict[str, str]], monthly_rows: list[dict[str, str]]):
@@ -105,6 +120,11 @@ def build_rows(bank_rows: list[dict[str, str]], monthly_rows: list[dict[str, str
                 "forecast_target_index": _na(forecast.get("forecast_target_index")),
                 "forecast_target_date": _na(forecast.get("forecast_target_date")),
                 "forecast_value": _na(forecast.get("forecast_value")),
+                "forecast_implied_return_pct": _implied_return(
+                    forecast.get("forecast_value"), month.get("sp500_start_close")
+                ),
+                "sp500_snapshot_date": _na(month.get("sp500_start_date")),
+                "sp500_snapshot_close": _na(month.get("sp500_start_close")),
                 "forecast_evidence_date": _na(forecast.get("evidence_date")),
                 "forecast_publication_date": _na(forecast.get("publication_date")),
                 "forecast_horizon_days": _na(forecast.get("forecast_horizon_days")),

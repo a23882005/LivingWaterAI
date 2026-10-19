@@ -27,6 +27,7 @@ class BankMacroMonthlyTests(unittest.TestCase):
         monthly = [{"snapshot_month": "2026-10", "snapshot_date": "2026-10-19",
                     "health_score": "56.934", "score_status": "FORMAL_VALID",
                     "previous_snapshot_date": "", "previous_health_score": "",
+                    "sp500_start_date": "2026-10-16", "sp500_start_close": "5000",
                     "slope_points_per_month": "", "sp500_forward_3m_return_pct": "",
                     "return_status": "SOURCE_PENDING"}]
         rows = bm.build_rows(banks, monthly)
@@ -34,6 +35,8 @@ class BankMacroMonthlyTests(unittest.TestCase):
         self.assertEqual({r["institution"] for r in rows}, set(bm.INSTITUTIONS))
         self.assertTrue(all(r["forecast_id"].startswith("new-") for r in rows))
         self.assertTrue(all(r["macro_health_score"] == "56.934" for r in rows))
+        self.assertTrue(all(r["forecast_implied_return_pct"] == "20" for r in rows))
+        self.assertTrue(all(r["sp500_snapshot_date"] == "2026-10-16" for r in rows))
         self.assertTrue(all(r["forecast_publication_date"] != "NA" for r in rows))
         self.assertTrue(all(r["macro_slope_points_per_month"] == "NA" for r in rows))
         self.assertTrue(all(r["macro_return_status"] == "SOURCE_PENDING" for r in rows))
@@ -47,12 +50,21 @@ class BankMacroMonthlyTests(unittest.TestCase):
         monthly = [{"snapshot_month": "2026-10", "snapshot_date": "2026-10-19",
                     "health_score": "56.934", "score_status": "FORMAL_VALID",
                     "previous_snapshot_date": "", "previous_health_score": "",
+                    "sp500_start_date": "", "sp500_start_close": "",
                     "slope_points_per_month": "", "sp500_forward_3m_return_pct": "",
                     "return_status": "SOURCE_PENDING"}]
         rows = bm.build_rows(banks, monthly)
         self.assertEqual(len(rows), 5)
         self.assertEqual(rows[0]["forecast_id"], "NA")
         self.assertEqual(rows[0]["forecast_value"], "NA")
+        self.assertEqual(rows[0]["forecast_implied_return_pct"], "NA")
+        self.assertEqual(rows[0]["sp500_snapshot_close"], "NA")
+
+
+    def test_implied_return_rejects_invalid_or_nonpositive_prices(self):
+        self.assertEqual(bm._implied_return("8100", "7200"), "12.5")
+        self.assertEqual(bm._implied_return("8100", ""), "NA")
+        self.assertEqual(bm._implied_return("8100", "0"), "NA")
 
 
 if __name__ == "__main__":

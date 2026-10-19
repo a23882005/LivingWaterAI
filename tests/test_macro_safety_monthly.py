@@ -100,6 +100,13 @@ class MonthlyResearchTests(unittest.TestCase):
         self.assertEqual(refreshed[0]["return_status"], "REALIZED")
         self.assertEqual(refreshed[0]["sp500_forward_3m_return_pct"], "20")
 
+    def test_monthly_scores_and_slopes_collect_without_publishing_unlicensed_prices(self):
+        rows = msm.build_monthly(self.daily(), [], 5, date(2026, 4, 7), "2026-04-07T12:00:00Z")
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(rows[1]["slope_points_per_month"], "4")
+        self.assertEqual(rows[1]["return_status"], "SOURCE_PENDING")
+        self.assertEqual(rows[1]["sp500_start_close"], "")
+
     def test_calendar_month_elapsed_duration(self):
         self.assertEqual(msm._elapsed_calendar_months(date(2026, 1, 5), date(2026, 2, 5)), 1.0)
         self.assertEqual(msm._elapsed_calendar_months(date(2026, 1, 5), date(2026, 3, 5)), 2.0)

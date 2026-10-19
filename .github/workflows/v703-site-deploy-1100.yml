@@ -11,9 +11,7 @@ on:
       - 'scripts/build_daily_v703_site.py'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
-      - 'scripts/monthly_research/update_sp500_daily.py'
       - 'tests/test_macro_safety_monthly.py'
-      - 'tests/test_update_sp500_daily.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
@@ -45,7 +43,6 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
-          python -m unittest discover -s tests -p 'test_update_sp500_daily.py' -v
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -261,22 +258,8 @@ jobs:
             --site-url "${SITE_BASE_URL:-https://www.happihelp.com}" \
             --archive data/macro_safety_daily.csv \
             --source-commit "$SOURCE_COMMIT"
-      - name: Refresh verified S&P 500 close history from FRED
-        id: sp500
-        continue-on-error: true
-        run: |
-          python scripts/monthly_research/update_sp500_daily.py \
-            --output data/sp500_daily.csv \
-            --manifest data/sp500_daily_manifest.json \
-            --as-of "$(TZ=Asia/Taipei date +%F)"
       - name: Build monthly Macro Safety series from real observations
-        if: steps.sp500.outcome == 'success'
         run: |
-          FRED_STATUS=$(python -c "import json; print(json.load(open('data/sp500_daily_manifest.json'))['status'])")
-          if [ "$FRED_STATUS" != "FRESH" ]; then
-            echo "Monthly series not refreshed; preserving the last verified FRED price cache."
-            exit 0
-          fi
           MONTH_ARGS=$(python - <<'PY'
           import csv
           from pathlib import Path
@@ -319,7 +302,6 @@ jobs:
           fi
           python scripts/monthly_research/macro_safety_monthly.py \
             --daily data/macro_safety_daily.csv \
-            --sp500 data/sp500_daily.csv \
             --output data/macro_safety_monthly.csv \
             --cutoff-day 5 \
             --as-of "$(TZ=Asia/Taipei date +%F)" \
@@ -330,9 +312,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/macro_safety_daily.csv
-          for file in data/sp500_daily.csv data/sp500_daily_manifest.json data/macro_safety_monthly.csv; do
-            if [ -s "$file" ]; then git add "$file"; fi
-          done
+          if [ -s data/macro_safety_monthly.csv ]; then git add data/macro_safety_monthly.csv; fi
           if git diff --cached --quiet; then
             echo "Daily and monthly Macro Safety research archives already current"
             exit 0

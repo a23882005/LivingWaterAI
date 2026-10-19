@@ -153,11 +153,17 @@ def build_monthly(daily, prices, cutoff_day: int, as_of: date, run_timestamp_utc
     prev = None
     for row in chosen:
         snap = date.fromisoformat(row["_date"])
-        start_date, start_close = _price_at_or_before(prices, snap)
-        target = _add_months(snap, 3)
-        end_date, end_close = _price_at_or_after(prices, target)
-        matured = target <= as_of and end_date is not None and end_date <= as_of
-        ret = (end_close / start_close - 1) * 100 if matured and start_close else None
+        if prices:
+            start_date, start_close = _price_at_or_before(prices, snap)
+            target = _add_months(snap, 3)
+            end_date, end_close = _price_at_or_after(prices, target)
+            matured = target <= as_of and end_date is not None and end_date <= as_of
+            ret = (end_close / start_close - 1) * 100 if matured and start_close else None
+            return_status = "REALIZED" if matured and ret is not None else "PENDING"
+        else:
+            start_date = start_close = end_date = end_close = ret = None
+            matured = False
+            return_status = "SOURCE_PENDING"
         elapsed = delta = slope = None
         prev_date = prev_score = ""
         if prev:
@@ -179,7 +185,7 @@ def build_monthly(daily, prices, cutoff_day: int, as_of: date, run_timestamp_utc
             "sp500_forward_end_date": end_date.isoformat() if matured and end_date else "",
             "sp500_forward_end_close": _fmt(end_close) if matured else "",
             "sp500_forward_3m_return_pct": _fmt(ret),
-            "return_status": "REALIZED" if matured and ret is not None else "PENDING",
+            "return_status": return_status,
             "score_status": row["score_status"],
             "neutral_imputed_items": row["neutral_imputed_items"],
             "run_timestamp_utc": run_timestamp_utc,
@@ -273,7 +279,7 @@ def refresh_existing_returns(existing_rows: list[dict[str, str]], prices,
     refreshed = []
     for old in existing_rows:
         row = dict(old)
-        if row.get("return_status") != "REALIZED":
+        if prices and row.get("return_status") != "REALIZED":
             snap = date.fromisoformat(row["snapshot_date"])
             start_date, start_close = _price_at_or_before(prices, snap)
             target = _add_months(snap, 3)
@@ -295,7 +301,7 @@ def refresh_existing_returns(existing_rows: list[dict[str, str]], prices,
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--daily", required=True, type=Path, help="verified daily archive CSV")
-    p.add_argument("--sp500", required=True, type=Path, help="verified S&P 500 daily close CSV")
+    p.add_argument("--sp500", type=Path, help="licensed S&P 500 daily close CSV; omit until a publishable source is configured")
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--cutoff-day", required=True, type=int,
                    help="explicit monthly observation cutoff (no default; schedule is unconfirmed)")
@@ -310,7 +316,8 @@ def main(argv=None):
         ts = datetime.fromisoformat(args.run_timestamp_utc.replace("Z", "+00:00"))
         if ts.tzinfo is None or ts.utcoffset().total_seconds() != 0:
             raise DataError("run timestamp must be timezone-aware UTC (Z or +00:00)")
-        daily, prices = read_daily(args.daily), read_prices(args.sp500)
+        daily = read_daily(args.daily)
+        prices = read_prices(args.sp500) if args.sp500 else []
         if args.retry_month and (len(args.retry_month) != 7 or args.retry_month[4] != "-" or
                                  not args.retry_month[:4].isdigit() or not args.retry_month[5:].isdigit() or
                                  not 1 <= int(args.retry_month[5:]) <= 12):

@@ -18,6 +18,7 @@ class ResearchChartMarkup(HTMLParser):
         super().__init__()
         self.in_section = False
         self.images = []
+        self.alts = []
         self.figures = 0
 
     def handle_starttag(self, tag, attrs):
@@ -28,6 +29,7 @@ class ResearchChartMarkup(HTMLParser):
             self.figures += 1
         elif self.in_section and tag == "img":
             self.images.append(attrs.get("src"))
+            self.alts.append(attrs.get("alt", ""))
 
     def handle_endtag(self, tag):
         if tag == "section" and self.in_section:
@@ -48,6 +50,8 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertNotIn("真實月斜率（分數點／月）", html)
         self.assertIn("七線總覽", html)
         self.assertIn("本頁研究圖固定呈現逐季資料", html)
+        self.assertTrue(all("季度研究圖" in alt for alt in parser.alts[:5]))
+        self.assertFalse(any("月度候選研究圖" in alt for alt in parser.alts))
         self.assertIn("macro_slope_candidate.png", parser.images[-2])
         self.assertIn("overview_7lines.png", parser.images[-1])
 

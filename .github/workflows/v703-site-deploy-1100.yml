@@ -11,7 +11,10 @@ on:
       - 'scripts/build_daily_v703_site.py'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
+      - 'scripts/monthly_research/build_bank_macro_monthly.py'
+      - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'tests/test_macro_safety_monthly.py'
+      - 'tests/test_bank_macro_monthly.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
@@ -43,6 +46,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
+          python -m unittest discover -s tests -p 'test_bank_macro_monthly.py' -v
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -307,17 +311,24 @@ jobs:
             --as-of "$(TZ=Asia/Taipei date +%F)" \
             --run-timestamp-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             "${MONTH_ARGS_ARRAY[@]}"
+      - name: Build monthly bank forecast and Macro Safety comparison CSV
+        run: |
+          python scripts/monthly_research/build_bank_macro_monthly.py \
+            --bank-register experiments/macro-safety-monthly-research/bank_forecast_register_research.csv \
+            --macro-monthly data/macro_safety_monthly.csv \
+            --output experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
       - name: Publish immutable daily Macro Safety archive row
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/macro_safety_daily.csv
           if [ -s data/macro_safety_monthly.csv ]; then git add data/macro_safety_monthly.csv; fi
+          git add experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
           if git diff --cached --quiet; then
-            echo "Daily and monthly Macro Safety research archives already current"
+            echo "Daily Macro Safety and five-institution monthly research archives already current"
             exit 0
           fi
-          git commit -m "data(V70): archive verified Macro Safety research history"
+          git commit -m "data(V70): archive Macro Safety and institution monthly snapshots"
           for attempt in 1 2 3; do
             git fetch origin main
             git rebase origin/main

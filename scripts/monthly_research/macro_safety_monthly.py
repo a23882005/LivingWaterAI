@@ -129,7 +129,8 @@ def _price_at_or_after(prices: list[tuple[date, float]], day: date):
 
 
 def build_monthly(daily, prices, cutoff_day: int, as_of: date, run_timestamp_utc: str,
-                  retry_month: str | None = None):
+                  retry_month: str | None = None,
+                  pinned_snapshot_dates: dict[str, date] | None = None):
     if not 1 <= cutoff_day <= 31:
         raise DataError("cutoff_day must be 1..31")
     by_month: dict[str, list[dict[str, str]]] = {}
@@ -137,9 +138,13 @@ def build_monthly(daily, prices, cutoff_day: int, as_of: date, run_timestamp_utc
         d = date.fromisoformat(row["_date"])
         month = d.strftime("%Y-%m")
         month_cutoff = _cutoff(d.year, d.month, cutoff_day)
-        # A delayed retry may use the real successful daily observation after
-        # the planned day, but only for the explicitly named month.
-        if retry_month == month and as_of > month_cutoff:
+        # Keep a delayed bootstrap observation on its original date. A later
+        # same-day formal score correction may refresh the value, but a later
+        # observation date must not move the monthly point.
+        if pinned_snapshot_dates and month in pinned_snapshot_dates:
+            month_cutoff = pinned_snapshot_dates[month]
+        # The first delayed retry uses the actual successful observation date.
+        elif retry_month == month and as_of > month_cutoff:
             month_cutoff = as_of
         if d <= as_of and d <= month_cutoff:
             by_month.setdefault(d.strftime("%Y-%m"), []).append(row)
@@ -298,6 +303,14 @@ def refresh_existing_returns(existing_rows: list[dict[str, str]], prices,
     return refreshed
 
 
+def merge_and_refresh_monthly(new_rows: list[dict[str, str]],
+                              existing_rows: list[dict[str, str]], prices,
+                              as_of: date) -> list[dict[str, str]]:
+    """Apply new score snapshots first, then refresh outcomes on the merged archive."""
+    merged = merge_monthly(new_rows, existing_rows)
+    return refresh_existing_returns(merged, prices, as_of)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--daily", required=True, type=Path, help="verified daily archive CSV")
@@ -323,12 +336,23 @@ def main(argv=None):
                                  not 1 <= int(args.retry_month[5:]) <= 12):
             raise DataError("retry_month must have YYYY-MM format")
         existing_rows = read_existing_monthly(args.output)
-        rows = build_monthly(daily, prices, args.cutoff_day, args.as_of,
-                             args.run_timestamp_utc, args.retry_month)
-        rows.extend(refresh_existing_returns(existing_rows, prices, args.as_of))
+        pinned_snapshot_dates = {}
+        for old in existing_rows:
+            snap = date.fromisoformat(old["snapshot_date"])
+            month = old["snapshot_month"]
+            cutoff = _cutoff(snap.year, snap.month, args.cutoff_day)
+            has_cutoff_observation = any(
+                row["_date"][:7] == month and date.fromisoformat(row["_date"]) <= cutoff
+                for row in daily
+            )
+            if snap > cutoff and snap <= args.as_of and not has_cutoff_observation:
+                pinned_snapshot_dates[month] = snap
+        new_rows = build_monthly(daily, prices, args.cutoff_day, args.as_of,
+                                 args.run_timestamp_utc, args.retry_month,
+                                 pinned_snapshot_dates)
+        rows = merge_and_refresh_monthly(new_rows, existing_rows, prices, args.as_of)
         if not rows:
             raise DataError("No eligible daily Macro Safety observations for the selected cutoff")
-        rows = merge_monthly(rows, existing_rows)
         write_atomic(args.output, rows)
     except (DataError, OSError) as exc:
         p.error(str(exc))

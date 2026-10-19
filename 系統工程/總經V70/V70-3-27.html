@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/19 23:51（台灣時間）｜檔案名稱：V70-3-27.html｜版本：五大機構加 Macro Safety 候選微分七圖展示＋m06子項即時重算／歷史摘要標示修正 -->
+<!-- 最後修改日期時間：2026/10/19 23:52（台灣時間）｜檔案名稱：V70-3-27.html｜版本：V70-3-27五大機構與Macro Safety七圖＋m06即時重算＋資料檢核動態呈現 -->
 <!DOCTYPE html>
 
 
@@ -103,8 +103,8 @@
 <body class="min-h-screen pb-32">
 <div id="v703-coverage-banner" class="max-w-7xl mx-auto px-4 py-2 text-center text-xs font-semibold text-slate-300" aria-live="polite">總經資料覆蓋：等待資料驗證</div>
 <div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：HTML已內嵌逐項資料｜觀測日依各指標</div>
-<div id="v703-program-update-banner" class="w-full bg-slate-900 border-b border-sky-800/70 px-4 py-2 text-center text-xs sm:text-sm font-semibold text-sky-200">🛠️ 最後程式更新（台灣時間）：2026/10/19 23:51</div>
-<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 25項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入4項)+1項衍生m06 V3偏離+2項重複傳輸(s03/s04)=28傳輸欄，必要計分22項｜展開查看28個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p class="mt-2 text-xs leading-relaxed text-amber-200">資料檢核：28個傳輸欄中，19/22必要計分欄位有可用資料；QQQ／SPY／VT 的 Forward/FY1來源證據與所選數值不一致，已標MISSING，正式配置停止發布。m06由四項原始輸入重算；NYSE $MMFI 觀測值30.2%（2026-10-15）。</p></details>
+<div id="v703-program-update-banner" class="w-full bg-slate-900 border-b border-sky-800/70 px-4 py-2 text-center text-xs sm:text-sm font-semibold text-sky-200">🛠️ 最後程式更新（台灣時間）：2026/10/19 23:52</div>
+<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 25項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入4項)+1項衍生m06 V3偏離+2項重複傳輸(s03/s04)=28傳輸欄，必要計分22項｜展開查看28個傳輸欄的數值、觀測日、狀態與來源</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[920px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th><th class="p-2">方法</th><th class="p-2">來源</th></tr></thead><tbody id="v703-raw-data-body"></tbody></table></div><p id="v703-raw-data-status" class="mt-2 text-xs leading-relaxed text-amber-200" aria-live="polite">資料檢核狀態由內嵌資料驗證結果更新。</p></details>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -3264,9 +3264,40 @@ if (recBlack) {
 </script>
 <script id="v703-render-raw-data">
 (function(){
- const node=document.getElementById('v70-embedded-feed'),body=document.getElementById('v703-raw-data-body');if(!node||!body)return;
+ const node=document.getElementById('v70-embedded-feed');
+ const body=document.getElementById('v703-raw-data-body');
+ const summary=document.getElementById('v703-raw-data-status');
+ if(!node||!body)return;
  const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'實質政策利率缺口 (V3正式計分)',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
- try{const feed=JSON.parse(node.textContent||'{}');for(const [id,r] of Object.entries(feed.indicators||{})){const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';const status=(['m04','m15','m18'].includes(id)?'沿用人工查證｜':'')+(r.status||'');const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'MISSING':String(r.value)+(r.unit?' '+r.unit:'');const vals=[id+'｜'+(labels[id]||id),shownValue,r.dataDate||'未提供',status+(r.detail?'｜'+r.detail:''),r.method||''];for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}const td=document.createElement('td');td.className='p-2';const a=document.createElement('a');a.href=String(r.source||'').split(' | ')[0];a.target='_blank';a.rel='noopener noreferrer';a.className='text-blue-300 underline';a.textContent='開啟來源';td.appendChild(a);tr.appendChild(td);body.appendChild(tr);}}catch(err){body.textContent='內嵌資料讀取失敗：'+String(err.message||err);}
+ try{
+  const feed=JSON.parse(node.textContent||'{}');
+  const verification=feed.verification||{};
+  if(summary){
+   const total=verification.transportIndicators??verification.transportFields??'—';
+   const validated=verification.requiredScoringIndicatorsValidated;
+   const required=verification.requiredScoringIndicators;
+   let message='資料檢核：'+total+'個傳輸欄；';
+   if(Number.isFinite(validated)&&Number.isFinite(required)) message+=validated+'/'+required+'必要計分欄通過；';
+   else message+='必要計分欄狀態未提供；';
+   if(verification.ready===true) message+='本批次通過資料檢核。m06由四項原始輸入依 V3 公式重算。';
+   else {
+    const reasons=[...(verification.missing||[]),...(verification.problems||[])];
+    message+='本批次未通過正式資料閘門'+(reasons.length?'：'+reasons.slice(0,4).join('；'):'。');
+   }
+   summary.textContent=message;
+  }
+  for(const [id,r] of Object.entries(feed.indicators||{})){
+   const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';
+   const status=(['m04','m15','m18'].includes(id)?'沿用人工查證｜':'')+(r.status||'');
+   const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'MISSING':String(r.value)+(r.unit?' '+r.unit:'');
+   const vals=[id+'｜'+(labels[id]||id),shownValue,r.dataDate||'未提供',status+(r.detail?'｜'+r.detail:''),r.method||''];
+   for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}
+   const td=document.createElement('td');td.className='p-2';const a=document.createElement('a');a.href=String(r.source||'').split(' | ')[0];a.target='_blank';a.rel='noopener noreferrer';a.className='text-blue-300 underline';a.textContent='開啟來源';td.appendChild(a);tr.appendChild(td);body.appendChild(tr);
+  }
+ }catch(err){
+  if(summary) summary.textContent='資料檢核：內嵌資料讀取失敗，正式資料狀態待確認。';
+  body.textContent='內嵌資料讀取失敗：'+String(err.message||err);
+ }
 })();
 </script>
 

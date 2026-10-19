@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import tempfile
 import unittest
 from html.parser import HTMLParser

@@ -28,6 +28,22 @@ class V703OutlookUITest(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, s)
 
+    def test_missing_score_starts_as_na_and_four_bands_stay_visible(self):
+        s = self.source
+        self.assertIn('id="macro-safety-val">NA</div>', s)
+        self.assertIn('id="macro-bar" style="width: 0%"', s)
+        self.assertIn('id="macro-zone-text">⚠ 資料不足（NA）</div>', s)
+        self.assertIn('"🔴 體質不佳 (<40)" : "⚠ 資料不足（NA）"', s)
+        explainer = re.search(
+            r'<div class="([^"]+)" aria-label="Macro-SaFe 體質分四段說明">',
+            s,
+        )
+        self.assertIsNotNone(explainer)
+        self.assertNotIn("hidden", explainer.group(1))
+        for label in ("體質不佳｜停車", "體質偏弱｜防守", "體質尚穩｜穩健", "體質良好｜進攻"):
+            with self.subTest(label=label):
+                self.assertIn(label, s)
+
     def test_outlook_is_explicitly_unvalidated(self):
         s = self.source
         self.assertEqual(s.count('id="v70-three-month-outlook"'), 1)

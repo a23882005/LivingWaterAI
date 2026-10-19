@@ -110,6 +110,16 @@ class V703ResearchChartsTests(unittest.TestCase):
             for name, source in builder.RESEARCH_CHARTS.items():
                 self.assertEqual((output / name).read_bytes(), (quarterly / source).read_bytes())
 
+            (monthly / "ubs.png").write_bytes(signature + b"ubs")
+            license_info["valid_through"] = "2000-01-01"
+            license_path.write_text(json.dumps(license_info), encoding="utf-8")
+            output, ready = builder.copy_research_charts(
+                root / "out3", quarterly, monthly, license_path
+            )
+            self.assertFalse(ready)
+            for name, source in builder.RESEARCH_CHARTS.items():
+                self.assertEqual((output / name).read_bytes(), (quarterly / source).read_bytes())
+
     def test_monthly_markup_drops_quarterly_candidate_language(self):
         html = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
         monthly = builder._monthly_chart_markup(html)

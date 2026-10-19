@@ -110,6 +110,29 @@ class MonthlyResearchTests(unittest.TestCase):
         self.assertEqual(merged[0]["health_score"], "62")
         self.assertEqual(merged[0]["source_commit"], "corrected")
 
+    def test_merge_refresh_keeps_corrected_delayed_snapshot(self):
+        original = msm.build_monthly(self.daily(), [], 5, date(2026, 1, 6),
+                                     "2026-01-06T12:00:00Z", retry_month="2026-01")
+        corrected_rows = [
+            {"observation_date": "2026-01-06", "run_timestamp_utc": "2026-01-06T13:00:00Z",
+             "v70_version": "V70-formal", "source_commit": "corrected",
+             "health_score": "62", "score_status": "VALID", "neutral_imputed_items": ""},
+            {"observation_date": "2026-01-07", "run_timestamp_utc": "2026-01-07T12:00:00Z",
+             "v70_version": "V70-formal", "source_commit": "later",
+             "health_score": "70", "score_status": "VALID", "neutral_imputed_items": ""},
+        ]
+        daily = msm.read_daily_from_rows(self.daily() + corrected_rows)
+        refreshed_snapshot = msm.build_monthly(
+            daily, [], 5, date(2026, 1, 7), "2026-01-07T13:00:00Z",
+            pinned_snapshot_dates={"2026-01": date(2026, 1, 6)})
+        merged = msm.merge_and_refresh_monthly(
+            refreshed_snapshot, original, self.prices(), date(2026, 4, 7))
+        self.assertEqual(merged[0]["snapshot_date"], "2026-01-06")
+        self.assertEqual(merged[0]["health_score"], "62")
+        self.assertEqual(merged[0]["source_commit"], "corrected")
+        self.assertEqual(merged[0]["return_status"], "REALIZED")
+        self.assertEqual(merged[0]["sp500_forward_3m_return_pct"], "20")
+
     def test_existing_delayed_snapshot_keeps_date_and_matures_return(self):
         original = msm.build_monthly(self.daily(), self.prices(), 5, date(2026, 1, 6),
                                      "2026-01-06T12:00:00Z", retry_month="2026-01")

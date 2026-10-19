@@ -93,6 +93,7 @@ def _quarterly_chart_markup(template):
         "七線總覽：五大機構比較、Macro Safety 真實月斜率和標普後三個月實際報酬",
         "七線總覽：五大機構比較、Macro Safety 候選季度斜率和標普後三個月實際報酬",
     )
+    section = section.replace("月度候選研究圖", "季度研究圖")
     return before + section + after
 
 

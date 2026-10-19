@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/18-macro-collector-v1",
-  "generated_at": "2026-10-18T09:31:26.557288+08:00",
+  "generated_at": "2026-10-19T09:35:04.305433+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 19,
@@ -94,9 +94,9 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 101.839996,
+      "value": 101.848999,
       "unit": "",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-18",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
       "status": "OK",
@@ -106,9 +106,9 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 101.410004,
+      "value": 97.809998,
       "unit": "USD/bbl",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-18",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
       "status": "OK",
@@ -258,7 +258,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-18T01:31:23.102550+00:00"
+      "retrieved_at": "2026-10-19T01:35:01.034588+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -269,7 +269,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-18T01:31:24.112766+00:00"
+      "retrieved_at": "2026-10-19T01:35:02.039472+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -280,7 +280,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-18T01:31:25.040566+00:00"
+      "retrieved_at": "2026-10-19T01:35:03.008174+00:00"
     }
   ]
 }

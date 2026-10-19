@@ -63,7 +63,7 @@ class V703ResearchChartsTests(unittest.TestCase):
             for target, source in builder.RESEARCH_CHARTS.items():
                 (source_dir / source).write_bytes((original_dir / source).read_bytes())
             output, monthly_ready = builder.copy_research_charts(
-                root / "out", source_dir, monthly_dir, root / "missing-license.json"
+                root / "out", source_dir
             )
             self.assertFalse(monthly_ready)
             self.assertEqual({path.name for path in output.iterdir()}, set(builder.RESEARCH_CHARTS))
@@ -81,7 +81,7 @@ class V703ResearchChartsTests(unittest.TestCase):
                 (quarterly / source_name).write_bytes(signature + b"quarterly")
                 (monthly / output_name).write_bytes(signature + b"monthly")
             output, monthly_ready = builder.copy_research_charts(
-                root / "out", quarterly, monthly, root / "license.json"
+                root / "out", quarterly
             )
             self.assertFalse(monthly_ready)
             for output_name, source_name in builder.RESEARCH_CHARTS.items():

@@ -303,6 +303,14 @@ def refresh_existing_returns(existing_rows: list[dict[str, str]], prices,
     return refreshed
 
 
+def merge_and_refresh_monthly(new_rows: list[dict[str, str]],
+                              existing_rows: list[dict[str, str]], prices,
+                              as_of: date) -> list[dict[str, str]]:
+    """Apply new score snapshots first, then refresh outcomes on the merged archive."""
+    merged = merge_monthly(new_rows, existing_rows)
+    return refresh_existing_returns(merged, prices, as_of)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--daily", required=True, type=Path, help="verified daily archive CSV")
@@ -339,13 +347,12 @@ def main(argv=None):
             )
             if snap > cutoff and snap <= args.as_of and not has_cutoff_observation:
                 pinned_snapshot_dates[month] = snap
-        rows = build_monthly(daily, prices, args.cutoff_day, args.as_of,
-                             args.run_timestamp_utc, args.retry_month,
-                             pinned_snapshot_dates)
-        rows.extend(refresh_existing_returns(existing_rows, prices, args.as_of))
+        new_rows = build_monthly(daily, prices, args.cutoff_day, args.as_of,
+                                 args.run_timestamp_utc, args.retry_month,
+                                 pinned_snapshot_dates)
+        rows = merge_and_refresh_monthly(new_rows, existing_rows, prices, args.as_of)
         if not rows:
             raise DataError("No eligible daily Macro Safety observations for the selected cutoff")
-        rows = merge_monthly(rows, existing_rows)
         write_atomic(args.output, rows)
     except (DataError, OSError) as exc:
         p.error(str(exc))

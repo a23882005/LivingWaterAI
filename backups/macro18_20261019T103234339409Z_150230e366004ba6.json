@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T12:23:16.660542+08:00",
+  "generated_at": "2026-10-19T18:32:34.074914+08:00",
   "independent_indicators": {
     "excluded_duplicate": "s03 (same VIX as m07)",
     "summary": {
@@ -89,11 +89,11 @@
       "id": "m09",
       "label": "DXY",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-19",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "status": "OK",
       "unit": "",
-      "value": 101.839996
+      "value": 101.940002
     },
     "m10": {
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
@@ -101,11 +101,11 @@
       "id": "m10",
       "label": "WTI",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-19",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "status": "OK",
       "unit": "USD/bbl",
-      "value": 101.410004
+      "value": 98.43
     },
     "m12": {
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
@@ -233,11 +233,11 @@
       "id": "s04",
       "label": "CNN Fear & Greed",
       "method": "CNN 非官方可讀 JSON（可能變動）",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-19",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "status": "OK",
       "unit": "",
-      "value": 17.938322
+      "value": 19.938393
     }
   },
   "lei_history": [
@@ -246,7 +246,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-06-01",
       "publication_date": "2026-07-20",
-      "retrieved_at": "2026-10-17T04:23:13.319609+00:00",
+      "retrieved_at": "2026-10-19T10:32:30.844670+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
       "status": "OK",
       "unit": "%",
@@ -257,7 +257,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-07-01",
       "publication_date": "2026-08-20",
-      "retrieved_at": "2026-10-17T04:23:14.339768+00:00",
+      "retrieved_at": "2026-10-19T10:32:31.859764+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
       "status": "OK",
       "unit": "%",
@@ -268,7 +268,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-08-01",
       "publication_date": "2026-09-18",
-      "retrieved_at": "2026-10-17T04:23:15.284496+00:00",
+      "retrieved_at": "2026-10-19T10:32:32.823654+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
       "status": "OK",
       "unit": "%",

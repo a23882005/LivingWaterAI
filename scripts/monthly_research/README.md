@@ -37,7 +37,7 @@ python scripts/monthly_research/macro_safety_monthly.py \
   --run-timestamp-utc 2026-10-18T23:00:00Z
 ```
 
-目前倉庫沒有正式每日 Macro Safety 歷史 CSV，因此不得用交接 ZIP 的季度研究資料冒充正式月度輸入。測試中的合成資料僅驗證程式行為，不是研究結果。
+正式每日 Macro Safety 快照封存在 `data/macro_safety_daily.csv`，月度序列輸出至 `data/macro_safety_monthly.csv`；兩者由每日 Actions 流程更新。交接 ZIP 的季度研究資料不得冒充正式月度輸入。測試中的合成資料僅驗證程式行為，不是研究結果。
 
 ## 五大機構研究圖表乾跑
 

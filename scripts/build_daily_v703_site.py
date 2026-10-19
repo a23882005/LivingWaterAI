@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/18 16:40｜版本：V70-3-27 build adapter v3.5（官方月資料發布日校驗）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/19 08:03｜版本：V70-3-27 build adapter v3.7（七圖含總經候選微分）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import datetime as dt
@@ -34,6 +34,31 @@ OFFICIAL_RELEASE_CALENDAR_PATH = "data/v703_official_monthly_release_calendar.js
 OFFICIAL_CALENDAR_DOMAINS = frozenset(("www.bls.gov", "www.ismworld.org", "fred.stlouisfed.org"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
 CANDIDATE_STATUSES = frozenset(("FOUND", "NOT_FOUND", "BLOCKED", "METRIC_MISMATCH"))
+RESEARCH_CHARTS = {
+    "goldman.png": "高盛_年底目標_vs_SP500後3M_季度研究.png",
+    "jpm.png": "摩根大通_年底目標_vs_SP500後3M_季度研究.png",
+    "morgan_stanley.png": "摩根士丹利_年底目標_vs_SP500後3M_季度研究.png",
+    "bofa.png": "美國銀行_年底目標_vs_SP500後3M_季度研究.png",
+    "ubs.png": "瑞銀_年底目標_vs_SP500後3M_季度研究.png",
+    "macro_slope_candidate.png": "MacroSafety_candidate_quarterly_slope_vs_SP500_3M.png",
+    "overview_7lines.png": "seven_line_overview_candidate_quarterly.png",
+}
+
+
+def copy_research_charts(dest):
+    """Copy five bank charts, the macro slope candidate, and seven-line overview."""
+    source_dir = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
+    output_dir = Path(dest) / "v70-research-charts"
+    missing = [name for name in RESEARCH_CHARTS.values() if not (source_dir / name).is_file()]
+    if missing:
+        raise ValueError("Research chart assets missing: " + ", ".join(missing))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for output_name, source_name in RESEARCH_CHARTS.items():
+        source = source_dir / source_name
+        if source.stat().st_size < 8 or source.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
+            raise ValueError("Research chart is not a valid PNG: " + source_name)
+        shutil.copyfile(source, output_dir / output_name)
+    return output_dir
 
 
 def _read(path):
@@ -435,6 +460,7 @@ def build(macro_path, supplement_path, html_path, dest):
         raise ValueError("WALLSTREET5: placeholder still present after build")
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
+    copy_research_charts(out)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,

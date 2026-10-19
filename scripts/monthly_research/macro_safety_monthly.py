@@ -267,6 +267,31 @@ def merge_monthly(new_rows: list[dict[str, str]], existing_rows: list[dict[str, 
     return [merged[key] for key in sorted(merged)]
 
 
+def refresh_existing_returns(existing_rows: list[dict[str, str]], prices,
+                             as_of: date) -> list[dict[str, str]]:
+    """Recheck matured S&P 500 outcomes without changing archived score snapshots."""
+    refreshed = []
+    for old in existing_rows:
+        row = dict(old)
+        if row.get("return_status") != "REALIZED":
+            snap = date.fromisoformat(row["snapshot_date"])
+            start_date, start_close = _price_at_or_before(prices, snap)
+            target = _add_months(snap, 3)
+            end_date, end_close = _price_at_or_after(prices, target)
+            matured = target <= as_of and end_date is not None and end_date <= as_of
+            if matured and start_close:
+                row.update({
+                    "sp500_start_date": start_date.isoformat(),
+                    "sp500_start_close": _fmt(start_close),
+                    "sp500_forward_end_date": end_date.isoformat(),
+                    "sp500_forward_end_close": _fmt(end_close),
+                    "sp500_forward_3m_return_pct": _fmt((end_close / start_close - 1) * 100),
+                    "return_status": "REALIZED",
+                })
+        refreshed.append(row)
+    return refreshed
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--daily", required=True, type=Path, help="verified daily archive CSV")
@@ -290,11 +315,13 @@ def main(argv=None):
                                  not args.retry_month[:4].isdigit() or not args.retry_month[5:].isdigit() or
                                  not 1 <= int(args.retry_month[5:]) <= 12):
             raise DataError("retry_month must have YYYY-MM format")
+        existing_rows = read_existing_monthly(args.output)
         rows = build_monthly(daily, prices, args.cutoff_day, args.as_of,
                              args.run_timestamp_utc, args.retry_month)
+        rows.extend(refresh_existing_returns(existing_rows, prices, args.as_of))
         if not rows:
             raise DataError("No eligible daily Macro Safety observations for the selected cutoff")
-        rows = merge_monthly(rows, read_existing_monthly(args.output))
+        rows = merge_monthly(rows, existing_rows)
         write_atomic(args.output, rows)
     except (DataError, OSError) as exc:
         p.error(str(exc))

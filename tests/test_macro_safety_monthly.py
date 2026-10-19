@@ -90,6 +90,16 @@ class MonthlyResearchTests(unittest.TestCase):
         self.assertEqual(rows[0]["snapshot_date"], "2026-01-06")
         self.assertEqual(rows[0]["health_score"], "61")
 
+    def test_existing_delayed_snapshot_keeps_date_and_matures_return(self):
+        original = msm.build_monthly(self.daily(), self.prices(), 5, date(2026, 1, 6),
+                                     "2026-01-06T12:00:00Z", retry_month="2026-01")
+        self.assertEqual(original[0]["return_status"], "PENDING")
+        refreshed = msm.refresh_existing_returns(original, self.prices(), date(2026, 4, 7))
+        self.assertEqual(refreshed[0]["snapshot_date"], "2026-01-06")
+        self.assertEqual(refreshed[0]["health_score"], "61")
+        self.assertEqual(refreshed[0]["return_status"], "REALIZED")
+        self.assertEqual(refreshed[0]["sp500_forward_3m_return_pct"], "20")
+
     def test_calendar_month_elapsed_duration(self):
         self.assertEqual(msm._elapsed_calendar_months(date(2026, 1, 5), date(2026, 2, 5)), 1.0)
         self.assertEqual(msm._elapsed_calendar_months(date(2026, 1, 5), date(2026, 3, 5)), 2.0)

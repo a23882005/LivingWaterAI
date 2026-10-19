@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/19 08:03（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：部署驗證七張研究圖並記錄 Macro Safety 日分數
+# 最後修改日期時間：2026/10/19 08:19（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：部署驗證七張研究圖、封存每日與月度 Macro Safety 資料
 # 2026/10/19 V70 正式版通知：唯一來源 系統工程/總經V70/V70-3-27.html；債券 B1-B4 深墨綠可讀性修正；部署必須通過 25/28/26/22 品質閘門與線上讀回。
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
@@ -10,6 +10,10 @@ on:
       - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
       - 'scripts/capture_v703_daily_snapshot.py'
+      - 'scripts/monthly_research/macro_safety_monthly.py'
+      - 'scripts/monthly_research/update_sp500_daily.py'
+      - 'tests/test_macro_safety_monthly.py'
+      - 'tests/test_update_sp500_daily.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
@@ -40,6 +44,8 @@ jobs:
           test -s data/v703_official_monthly_release_calendar.json
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
+          python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
+          python -m unittest discover -s tests -p 'test_update_sp500_daily.py' -v
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -255,16 +261,83 @@ jobs:
             --site-url "${SITE_BASE_URL:-https://www.happihelp.com}" \
             --archive data/macro_safety_daily.csv \
             --source-commit "$SOURCE_COMMIT"
+      - name: Refresh verified S&P 500 close history from FRED
+        id: sp500
+        continue-on-error: true
+        run: |
+          python scripts/monthly_research/update_sp500_daily.py \
+            --output data/sp500_daily.csv \
+            --manifest data/sp500_daily_manifest.json \
+            --as-of "$(TZ=Asia/Taipei date +%F)"
+      - name: Build monthly Macro Safety series from real observations
+        if: steps.sp500.outcome == 'success'
+        run: |
+          FRED_STATUS=$(python -c "import json; print(json.load(open('data/sp500_daily_manifest.json'))['status'])")
+          if [ "$FRED_STATUS" != "FRESH" ]; then
+            echo "Monthly series not refreshed; preserving the last verified FRED price cache."
+            exit 0
+          fi
+          MONTH_ARGS=$(python - <<'PY'
+          import csv
+          from pathlib import Path
+          from datetime import date, datetime
+          from zoneinfo import ZoneInfo
+          today=datetime.now(ZoneInfo('Asia/Taipei')).date()
+          cutoff=date(today.year, today.month, 5)
+          if today < cutoff:
+              print('WAIT')
+              raise SystemExit(0)
+          with open('data/macro_safety_daily.csv', newline='', encoding='utf-8-sig') as f:
+              valid=[r for r in csv.DictReader(f)
+                     if r.get('score_status','').upper() in ('VALID','FORMAL_VALID')
+                     and date.fromisoformat(r['observation_date']) <= today
+                     and r['observation_date'][:7] == cutoff.strftime('%Y-%m')]
+          existing=Path('data/macro_safety_monthly.csv')
+          has_month=False
+          if existing.exists():
+              with existing.open(newline='',encoding='utf-8-sig') as f:
+                  has_month=any(row.get('snapshot_month') == cutoff.strftime('%Y-%m')
+                                for row in csv.DictReader(f))
+          if any(date.fromisoformat(r['observation_date']) <= cutoff for r in valid):
+              print('BUILD')
+          elif valid and not has_month:
+              print('--retry-month '+cutoff.strftime('%Y-%m'))
+          elif has_month:
+              print('BUILD')
+          else:
+              print('WAIT')
+          PY
+          )
+          if [ "$MONTH_ARGS" = "WAIT" ]; then
+            echo "No eligible verified score for this month yet; no monthly row added."
+            exit 0
+          fi
+          if [ "$MONTH_ARGS" = "BUILD" ]; then
+            MONTH_ARGS_ARRAY=()
+          else
+            read -r -a MONTH_ARGS_ARRAY <<< "$MONTH_ARGS"
+          fi
+          python scripts/monthly_research/macro_safety_monthly.py \
+            --daily data/macro_safety_daily.csv \
+            --sp500 data/sp500_daily.csv \
+            --output data/macro_safety_monthly.csv \
+            --cutoff-day 5 \
+            --as-of "$(TZ=Asia/Taipei date +%F)" \
+            --run-timestamp-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "${MONTH_ARGS_ARRAY[@]}"
       - name: Publish immutable daily Macro Safety archive row
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/macro_safety_daily.csv
+          for file in data/sp500_daily.csv data/sp500_daily_manifest.json data/macro_safety_monthly.csv; do
+            if [ -s "$file" ]; then git add "$file"; fi
+          done
           if git diff --cached --quiet; then
-            echo "Daily Macro Safety record already exists; no duplicate row added"
+            echo "Daily and monthly Macro Safety research archives already current"
             exit 0
           fi
-          git commit -m "data(V70): archive daily Macro Safety score"
+          git commit -m "data(V70): archive verified Macro Safety research history"
           for attempt in 1 2 3; do
             git fetch origin main
             git rebase origin/main

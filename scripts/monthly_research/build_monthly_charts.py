@@ -6,6 +6,7 @@ import argparse
 import csv
 import json
 import math
+import importlib.util
 from datetime import date
 from pathlib import Path
 
@@ -220,13 +221,31 @@ def build(monthly_csv, output_dir, license_manifest, today=None):
     )
 
 
+def sync_canonical_html(template_path, monthly_ready):
+    """Keep the original V70-3-27 HTML source aligned with the chart set."""
+    builder_path = Path(__file__).resolve().parents[1] / "build_daily_v703_site.py"
+    spec = importlib.util.spec_from_file_location("v703_site_builder_for_chart_sync", builder_path)
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    template_path = Path(template_path)
+    current = template_path.read_text(encoding="utf-8")
+    updated = (builder._monthly_chart_markup(current) if monthly_ready
+               else builder._quarterly_chart_markup(current))
+    if updated != current:
+        template_path.write_text(updated, encoding="utf-8")
+
+
 def main(argv=None):
+    root = Path(__file__).resolve().parents[2]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bank-monthly", required=True, type=Path)
     parser.add_argument("--license-manifest", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument("--html-template", type=Path,
+                        default=root / "系統工程" / "總經V70" / "V70-3-27.html")
     args = parser.parse_args(argv)
     status = build(args.bank_monthly, args.output_dir, args.license_manifest)
+    sync_canonical_html(args.html_template, status["status"] == "READY")
     print(json.dumps(status, ensure_ascii=False))
     return 0
 

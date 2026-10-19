@@ -50,15 +50,24 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("macro_slope_candidate.png", parser.images[-2])
         self.assertIn("overview_7lines.png", parser.images[-1])
 
-    def test_build_copies_verified_pngs_with_stable_names(self):
+    def test_build_copies_verified_quarterly_pngs_when_monthly_gate_is_closed(self):
         with tempfile.TemporaryDirectory() as tmp:
-            output, monthly_ready = builder.copy_research_charts(tmp)
+            root = Path(tmp)
+            source_dir = root / "quarterly"
+            monthly_dir = root / "monthly"
+            source_dir.mkdir()
+            monthly_dir.mkdir()
+            original_dir = (Path(builder.__file__).resolve().parents[1]
+                            / "experiments" / "macro-safety-monthly-research" / "charts")
+            for target, source in builder.RESEARCH_CHARTS.items():
+                (source_dir / source).write_bytes((original_dir / source).read_bytes())
+            output, monthly_ready = builder.copy_research_charts(
+                root / "out", source_dir, monthly_dir, root / "missing-license.json"
+            )
             self.assertFalse(monthly_ready)
             self.assertEqual({path.name for path in output.iterdir()}, set(builder.RESEARCH_CHARTS))
             for target, source in builder.RESEARCH_CHARTS.items():
-                expected = (builder.Path(builder.__file__).resolve().parents[1]
-                            / "experiments" / "macro-safety-monthly-research" / "charts" / source)
-                self.assertEqual((output / target).read_bytes(), expected.read_bytes())
+                self.assertEqual((output / target).read_bytes(), (source_dir / source).read_bytes())
 
     def test_build_switches_only_when_all_seven_monthly_pngs_are_valid(self):
         signature = bytes([137]) + b"PNG" + bytes([13, 10, 26, 10])

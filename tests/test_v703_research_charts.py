@@ -47,7 +47,7 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("候選季度體質方向斜率", html)
         self.assertNotIn("真實月斜率（分數點／月）", html)
         self.assertIn("七線總覽", html)
-        self.assertIn("正式月度圖", html) if False else self.assertIn("本頁研究圖固定呈現逐季資料", html)
+        self.assertIn("本頁研究圖固定呈現逐季資料", html)
         self.assertIn("macro_slope_candidate.png", parser.images[-2])
         self.assertIn("overview_7lines.png", parser.images[-1])
 

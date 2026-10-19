@@ -1,4 +1,4 @@
-<!-- 最後修改日期時間：2026/10/19 08:03（台灣時間）｜檔案名稱：V70-3-27.html｜版本：五大機構加 Macro Safety 候選微分七圖展示 -->
+<!-- 最後修改日期時間：2026/10/19 11:35（台灣時間）｜檔案名稱：V70-3-27.html｜版本：五大機構加 Macro Safety 候選微分七圖展示＋m06子項即時重算修正 -->
 <!DOCTYPE html>
 
 
@@ -956,6 +956,7 @@ function renderCapControls() {
                 inEl.setAttribute('data-default-value',String(fallback));
             }else{
                 scEl.textContent='NA'; slEl.value=0;
+                refreshM06DerivedForInput(id);
                 try { calcTotal(); } catch(e){}
                 console.warn('[handleInput] non-numeric value without default', { id, value: inEl.value });
                 return;
@@ -978,8 +979,17 @@ function renderCapControls() {
         }
 
 
+        // m06 的四個來源子項是衍生主指標的輸入；修改後先更新 m06，再重算總分。
+        refreshM06DerivedForInput(id);
         try { calcTotal(); } catch (e) { console.warn('[handleInput] calcTotal failed', e); }
     }
+
+function refreshM06DerivedForInput(id) {
+    const m06InputIds = ['m06_rate','m06_inf','m06_rstar','m06_output_gap'];
+    if (!m06InputIds.includes(id) || typeof v703ApplyM06Derived !== 'function') return;
+    try { v703ApplyM06Derived(); }
+    catch (e) { console.warn('[handleInput] m06 derived recalculation failed', e); }
+}
 
 
 function v703ScoreM06V3(dev){

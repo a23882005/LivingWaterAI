@@ -49,7 +49,40 @@ def _valid_png(path):
     return path.is_file() and path.stat().st_size >= 8 and path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
 
 
-def copy_research_charts(dest, source_dir=None, monthly_dir=None):
+def _monthly_chart_authorized(monthly_dir, license_manifest=None):
+    root = Path(__file__).resolve().parents[1]
+    status_path = Path(monthly_dir) / "monthly_chart_status.json"
+    license_path = Path(license_manifest) if license_manifest else root / "data" / "sp500_public_display_license.json"
+    try:
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+        license_info = json.loads(license_path.read_text(encoding="utf-8"))
+        today = dt.datetime.now(dt.timezone.utc).astimezone(
+            dt.timezone(dt.timedelta(hours=8))
+        ).date()
+        valid_through = license_info.get("valid_through")
+        expiry_ok = not valid_through or dt.date.fromisoformat(valid_through) >= today
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return False
+    required_uses = {"historical_index_values", "derived_forward_3m_returns", "public_static_charts"}
+    return (
+        status.get("schema") == "V70.3/monthly-research-chart-status-v1"
+        and status.get("status") == "READY"
+        and status.get("charts") == list(RESEARCH_CHARTS)
+        and license_info.get("schema") == "V70.3/SP500-public-display-license-v1"
+        and license_info.get("status") == "AUTHORIZED"
+        and license_info.get("benchmark") == "S&P 500"
+        and required_uses.issubset(set(license_info.get("allowed_uses", [])))
+        and bool(license_info.get("license_id"))
+        and str(license_info.get("source_url", "")).startswith("https://")
+        and str(license_info.get("license_evidence_url", "")).startswith("https://")
+        and expiry_ok
+        and status.get("license_id") == license_info.get("license_id")
+        and status.get("benchmark_source_url") == license_info.get("source_url")
+        and status.get("license_evidence_url") == license_info.get("license_evidence_url")
+    )
+
+
+def copy_research_charts(dest, source_dir=None, monthly_dir=None, license_manifest=None):
     """Copy one complete seven-chart set; never mix monthly and quarterly figures."""
     root = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
     source_dir = Path(source_dir) if source_dir else root
@@ -58,15 +91,16 @@ def copy_research_charts(dest, source_dir=None, monthly_dir=None):
     missing = [name for name in RESEARCH_CHARTS.values() if not _valid_png(source_dir / name)]
     if missing:
         raise ValueError("Research chart assets missing or invalid: " + ", ".join(missing))
-
-    monthly_ready = all(_valid_png(monthly_dir / name) for name in RESEARCH_CHARTS)
+    monthly_ready = (
+        _monthly_chart_authorized(monthly_dir, license_manifest)
+        and all(_valid_png(monthly_dir / name) for name in RESEARCH_CHARTS)
+    )
     selected = ({name: name for name in RESEARCH_CHARTS} if monthly_ready else RESEARCH_CHARTS)
     selected_dir = monthly_dir if monthly_ready else source_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     for output_name, source_name in selected.items():
         shutil.copyfile(selected_dir / source_name, output_dir / output_name)
     return output_dir, monthly_ready
-
 
 def _monthly_chart_markup(template):
     """Replace quarterly-candidate copy only after a complete monthly chart set exists."""
@@ -99,6 +133,40 @@ def _monthly_chart_markup(template):
         "七線總覽：五大機構比較、Macro Safety 真實月斜率和標普後三個月實際報酬",
     )
     return before + section + after
+
+
+def _quarterly_chart_markup(template):
+    """Restore candidate-quarterly chart copy when monthly readiness is lost."""
+    section_start = template.find('<section id="v703-research-charts"')
+    section_end = template.find("</section>", section_start)
+    if section_start < 0 or section_end < 0:
+        raise ValueError("Canonical HTML is missing the seven-chart section")
+    before, section, after = template[:section_start], template[section_start:section_end], template[section_end:]
+    section = re.sub(
+        r'(<p class="text-sm leading-7 text-slate-300 mb-2">).*?(</p>)',
+        r'\1共七張：五家機構各一張、Macro Safety 候選季度體質方向斜率一張，以及納入五家機構、總經斜率和 S&amp;P 500 後三個月實際報酬的七線總覽一張。機構圖比較年底目標隱含報酬與觀察日之後三個月的實際報酬，兩者期間不同，供研究觀察，不代表預測命中率或投資指示。\2',
+        section, count=1, flags=re.S,
+    )
+    section = re.sub(
+        r'(<p class="text-xs leading-6 text-amber-200 mb-5">).*?(</p>)',
+        r'\1來源發布日與當時可得性仍有逐筆待核資料；請搭配研究 CSV 的來源、查核狀態及工作簿 SHA-256 閱讀。Macro Safety 圖是候選季度方向斜率，單位為分數點／季；目前沒有足夠真實月度分數計算正式月斜率，也沒有把季度值插值成月資料。七線總覽中的總經線同樣是候選季度序列。正式月度圖將在真實月度資料累積後另行替換。\2',
+        section, count=1, flags=re.S,
+    )
+    section = section.replace(
+        "Macro Safety｜真實月斜率與標普後三個月實際報酬",
+        "Macro Safety｜候選季度體質方向斜率與標普後三個月",
+    ).replace(
+        "Macro Safety 真實月斜率（分數點／月）與標普後三個月實際報酬",
+        "Macro Safety 候選季度體質方向斜率（分數點每季）與標普後三個月實際報酬",
+    ).replace(
+        "七線總覽｜五大機構、Macro Safety 月斜率與標普",
+        "七線總覽｜五大機構、Macro Safety 候選季度斜率與標普",
+    ).replace(
+        "七線總覽：五大機構比較、Macro Safety 真實月斜率和標普後三個月實際報酬",
+        "七線總覽：五大機構比較、Macro Safety 候選季度斜率和標普後三個月實際報酬",
+    )
+    return before + section + after
+
 
 def _read(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))

@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-19T13:57:57.337240Z",
+  "asOf": "2026-10-19T15:52:02.644847Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -25,8 +25,8 @@
   },
   "indicators": {
     "m07": {
-      "value": 16.46,
-      "dataDate": "2026-10-15",
+      "value": 19.99,
+      "dataDate": "2026-10-16",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
@@ -52,8 +52,8 @@
       "detail": "10Y TIPS real yield"
     },
     "m02": {
-      "value": 3.23,
-      "dataDate": "2026-10-15",
+      "value": 3.31,
+      "dataDate": "2026-10-16",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
@@ -79,7 +79,7 @@
       "detail": "比較基期 2025-09-01"
     },
     "m09": {
-      "value": 101.940002,
+      "value": 101.917,
       "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
@@ -88,7 +88,7 @@
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
     },
     "m10": {
-      "value": 98.43,
+      "value": 97.760002,
       "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -97,8 +97,8 @@
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對"
     },
     "m12": {
-      "value": 101.099998,
-      "dataDate": "2026-10-16",
+      "value": 102.885201,
+      "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
@@ -178,8 +178,8 @@
       "detail": "注意歷史值可能修訂"
     },
     "s03": {
-      "value": 16.46,
-      "dataDate": "2026-10-15",
+      "value": 19.99,
+      "dataDate": "2026-10-16",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "與 m07 同步",
@@ -187,7 +187,7 @@
       "detail": "同一 VIX 數列"
     },
     "s04": {
-      "value": 19.938393,
+      "value": 25.269643,
       "dataDate": "2026-10-19",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
@@ -698,7 +698,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T10:32:30.844670+00:00"
+      "retrieved_at": "2026-10-19T15:08:40.115623+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -709,7 +709,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T10:32:31.859764+00:00"
+      "retrieved_at": "2026-10-19T15:08:41.100146+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -720,7 +720,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T10:32:32.823654+00:00"
+      "retrieved_at": "2026-10-19T15:08:42.044586+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -844,13 +844,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-19T21:57:57+08:00",
+  "dataUpdatedAt": "2026-10-19T23:52:02+08:00",
   "sourceSnapshot": {
-    "macro18": "16d677cf14d3f3566942e0dca2737bbfd837758b",
+    "macro18": "d9a137249ea6d3b38151371fe5fcb4d8e06a4ff0",
     "macro8": "0afccea68dcaf4e70c631fea02033047d49f2cd6",
     "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-10-19T18:32:34.074914+08:00",
+    "macro18GeneratedAt": "2026-10-19T23:08:43.578869+08:00",
     "macro8GeneratedAt": "2026-10-19T10:00:00+08:00"
   }
 }

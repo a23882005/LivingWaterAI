@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 最後修改日期時間（台灣時間）：2026/10/19 10:03｜檔案名稱：build_bank_macro_monthly.py｜版本：五機構與Macro月度合併
+# 最後修改日期時間（台灣時間）：2026/10/19 18:15｜檔案名稱：build_bank_macro_monthly.py｜版本：月快照加入授權基準下的預測隱含報酬欄位
 """Join monthly Macro Safety snapshots to each institution's latest known S&P 500 target.
 
 The output is a research series. Bank source records retain their verification

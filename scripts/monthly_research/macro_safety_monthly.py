@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 最後修改日期時間（台灣時間）：2026/10/19 08:03｜檔案名稱：macro_safety_monthly.py｜版本：真實月快照與月斜率乾跑
+# 最後修改日期時間（台灣時間）：2026/10/19 08:24｜檔案名稱：macro_safety_monthly.py｜版本：真實月快照與月斜率乾跑
 """Build a research-only monthly Macro Safety slope/backtest CSV.
 
 This tool consumes an already computed health score from a verified daily V70

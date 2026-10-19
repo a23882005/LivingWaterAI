@@ -1,4 +1,4 @@
-# 2026/10/17｜Restore daily 09:00 TWT (18 macro)｜macro18-preflight.yml
+# 2026/10/19｜Run preflight on crawler source changes｜macro18-preflight.yml
 name: LivingWaterAI V70.3 09h Preflight 18 Macro
 on:
   schedule:
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight18:
-    if: "${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'manual-test: crawler fallback')) }}"
+    if: "${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-19T03:23:51.184017Z",
+  "asOf": "2026-10-19T03:50:37.528178Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -844,7 +844,7 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-19T11:23:51+08:00",
+  "dataUpdatedAt": "2026-10-19T11:50:37+08:00",
   "sourceSnapshot": {
     "macro18": "f003dd2a2b1cefd35713ea806292d93e4f1d19d8",
     "macro8": "0afccea68dcaf4e70c631fea02033047d49f2cd6",

@@ -44,11 +44,12 @@ class V703OutlookUITest(unittest.TestCase):
             with self.subTest(label=label):
                 self.assertIn(label, s)
 
-    def test_outlook_is_explicitly_unvalidated(self):
+    def test_five_bank_outlook_is_display_only_and_source_scoped(self):
         s = self.source
-        self.assertEqual(s.count('id="v70-three-month-outlook"'), 1)
-        self.assertIn("研究驗證中，尚未發布正式展望", s)
-        self.assertIn("不是S&amp;P 500報酬預測或買賣指示", s)
+        self.assertEqual(s.count('id="v703-wallstreet-observation"'), 1)
+        self.assertEqual(s.count('id="v703-wallstreet-rows"'), 1)
+        self.assertIn("華爾街五大機構 S&P 500 展望觀察", s)
+        self.assertIn("公開數字／自寫摘要／來源連結；全文未授權", s)
 
     def test_original_data_and_risk_gates_remain(self):
         s = self.source
@@ -57,6 +58,14 @@ class V703OutlookUITest(unittest.TestCase):
         self.assertIn("const mSafe_final = Math.min(mSafe_raw, capMin);", s)
         self.assertIn("v703CanPublishFormalAllocation", s)
         self.assertIn("calcAlloc(", s)
+
+    def test_raw_data_panel_keeps_explanation_visible_when_values_are_missing(self):
+        s = self.source
+        self.assertIn('id="v703-raw-data-placeholder"', s)
+        self.assertIn("圖表與季度／月度口徑說明仍可查看", s)
+        self.assertIn("缺值維持 MISSING／NA，不補值", s)
+        self.assertIn("if(entries.length===0)", s)
+        self.assertIn("body.replaceChildren()", s)
 
     def test_html_document_and_unique_ids(self):
         s = self.source

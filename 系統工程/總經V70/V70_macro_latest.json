@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-19T03:50:37.528178Z",
+  "asOf": "2026-10-19T13:57:57.337240Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -79,8 +79,8 @@
       "detail": "比較基期 2025-09-01"
     },
     "m09": {
-      "value": 101.848999,
-      "dataDate": "2026-10-18",
+      "value": 101.940002,
+      "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
@@ -88,8 +88,8 @@
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
     },
     "m10": {
-      "value": 97.809998,
-      "dataDate": "2026-10-18",
+      "value": 98.43,
+      "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
@@ -187,8 +187,8 @@
       "detail": "同一 VIX 數列"
     },
     "s04": {
-      "value": 17.938322,
-      "dataDate": "2026-10-16",
+      "value": 19.938393,
+      "dataDate": "2026-10-19",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
       "method": "CNN 非官方可讀 JSON（可能變動）",
@@ -698,7 +698,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T01:35:01.034588+00:00"
+      "retrieved_at": "2026-10-19T10:32:30.844670+00:00"
     },
     {
       "observation_date": "2026-07-01",
@@ -709,7 +709,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T01:35:02.039472+00:00"
+      "retrieved_at": "2026-10-19T10:32:31.859764+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -720,7 +720,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-19T01:35:03.008174+00:00"
+      "retrieved_at": "2026-10-19T10:32:32.823654+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -844,13 +844,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-19T11:50:37+08:00",
+  "dataUpdatedAt": "2026-10-19T21:57:57+08:00",
   "sourceSnapshot": {
-    "macro18": "f003dd2a2b1cefd35713ea806292d93e4f1d19d8",
+    "macro18": "16d677cf14d3f3566942e0dca2737bbfd837758b",
     "macro8": "0afccea68dcaf4e70c631fea02033047d49f2cd6",
     "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-10-19T09:35:04.305433+08:00",
+    "macro18GeneratedAt": "2026-10-19T18:32:34.074914+08:00",
     "macro8GeneratedAt": "2026-10-19T10:00:00+08:00"
   }
 }

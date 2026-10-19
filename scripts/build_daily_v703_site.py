@@ -49,7 +49,7 @@ def _valid_png(path):
     return path.is_file() and path.stat().st_size >= 8 and path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
 
 
-def copy_research_charts(dest, source_dir=None, monthly_dir=None, license_manifest=None):
+def copy_research_charts(dest, source_dir=None):
     """Copy the fixed seven-chart quarterly research set into the deploy artifact."""
     root = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
     source_dir = Path(source_dir) if source_dir else root

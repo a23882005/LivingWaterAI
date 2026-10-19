@@ -182,7 +182,7 @@ def build(monthly_csv, output_dir, license_manifest, today=None):
 
     fig, left = plt.subplots(figsize=(13, 7))
     right = left.twinx()
-    for institution, (filename, color) in INSTITUTIONS.items():
+    for institution, (filename, color, english_name) in INSTITUTIONS.items():
         values = [_number(item[2][institution]["forecast_implied_return_pct"]) for item in common]
         left.plot(dates, values, marker="o", linewidth=1.8, color=color, label=f"{english_name} forecast")
     left.plot(dates, realized, marker="s", linewidth=2.7, color="#202020",

@@ -328,7 +328,8 @@ jobs:
           python scripts/monthly_research/build_monthly_charts.py \
             --bank-monthly experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv \
             --license-manifest data/sp500_public_display_license.json \
-            --output-dir experiments/macro-safety-monthly-research/charts/monthly
+            --output-dir experiments/macro-safety-monthly-research/charts/monthly \
+            --html-template "系統工程/總經V70/V70-3-27.html"
       - name: Publish immutable daily Macro Safety archive row
         run: |
           git config user.name "github-actions[bot]"
@@ -337,6 +338,7 @@ jobs:
           if [ -s data/macro_safety_monthly.csv ]; then git add data/macro_safety_monthly.csv; fi
           git add experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
           git add -A experiments/macro-safety-monthly-research/charts/monthly/
+          git add "系統工程/總經V70/V70-3-27.html"
           if git diff --cached --quiet; then
             echo "Daily Macro Safety and five-institution monthly research archives already current"
             exit 0

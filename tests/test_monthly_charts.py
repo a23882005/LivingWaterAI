@@ -73,6 +73,19 @@ class MonthlyResearchChartTests(unittest.TestCase):
             for name in charts.CHARTS:
                 self.assertEqual((out / name).read_bytes()[:8], charts.PNG)
 
+    def test_canonical_html_source_switches_and_reverts(self):
+        repo = Path(__file__).parents[1]
+        source = repo / "系統工程" / "總經V70" / "V70-3-27.html"
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "V70-3-27.html"
+            target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            charts.sync_canonical_html(target, True)
+            self.assertIn("真實月斜率（分數點／月）", target.read_text(encoding="utf-8"))
+            charts.sync_canonical_html(target, False)
+            restored = target.read_text(encoding="utf-8")
+            self.assertIn("候選季度體質方向斜率", restored)
+            self.assertNotIn("真實月斜率（分數點／月）", restored)
+
     def test_not_enough_common_months_remains_blocked(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

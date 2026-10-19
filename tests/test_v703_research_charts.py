@@ -51,12 +51,42 @@ class V703ResearchChartsTests(unittest.TestCase):
 
     def test_build_copies_verified_pngs_with_stable_names(self):
         with tempfile.TemporaryDirectory() as tmp:
-            output = builder.copy_research_charts(tmp)
+            output, monthly_ready = builder.copy_research_charts(tmp)
+            self.assertFalse(monthly_ready)
             self.assertEqual({path.name for path in output.iterdir()}, set(builder.RESEARCH_CHARTS))
             for target, source in builder.RESEARCH_CHARTS.items():
                 expected = (builder.Path(builder.__file__).resolve().parents[1]
                             / "experiments" / "macro-safety-monthly-research" / "charts" / source)
                 self.assertEqual((output / target).read_bytes(), expected.read_bytes())
+
+    def test_build_switches_only_when_all_seven_monthly_pngs_are_valid(self):
+        signature = bytes([137]) + b"PNG" + bytes([13, 10, 26, 10])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            quarterly, monthly = root / "quarterly", root / "monthly"
+            quarterly.mkdir()
+            monthly.mkdir()
+            for output_name, source_name in builder.RESEARCH_CHARTS.items():
+                (quarterly / source_name).write_bytes(signature + b"quarterly")
+                (monthly / output_name).write_bytes(signature + output_name.encode())
+            output, ready = builder.copy_research_charts(root / "out", quarterly, monthly)
+            self.assertTrue(ready)
+            for name in builder.RESEARCH_CHARTS:
+                self.assertEqual((output / name).read_bytes(), (monthly / name).read_bytes())
+
+            (monthly / "ubs.png").unlink()
+            output, ready = builder.copy_research_charts(root / "out2", quarterly, monthly)
+            self.assertFalse(ready)
+            for name, source in builder.RESEARCH_CHARTS.items():
+                self.assertEqual((output / name).read_bytes(), (quarterly / source).read_bytes())
+
+    def test_monthly_markup_drops_quarterly_candidate_language(self):
+        html = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
+        monthly = builder._monthly_chart_markup(html)
+        self.assertIn("真實月斜率（分數點／月）", monthly)
+        self.assertIn("具公開展示授權", monthly)
+        self.assertNotIn("候選季度體質方向斜率", monthly)
+        self.assertNotIn("正式月度圖將在真實月度資料累積後另行替換", monthly)
 
     def test_deployment_upload_includes_chart_assets(self):
         workflow = (ROOT / ".github" / "workflows" / "v703-site-deploy-1100.yml").read_text(encoding="utf-8")

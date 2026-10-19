@@ -1,0 +1,12 @@
+{
+  "schema": "V70.3/SP500-public-display-license-v1",
+  "benchmark": "S&P 500",
+  "status": "PENDING",
+  "source_url": null,
+  "license_id": null,
+  "license_evidence_url": null,
+  "allowed_uses": [],
+  "valid_through": null,
+  "checked_on": "2026-10-19",
+  "note": "No public-display authorization has been obtained. Do not populate as AUTHORIZED until the written license covers historical index values, derived forward three-month returns, and static public charts."
+}

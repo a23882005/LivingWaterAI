@@ -63,6 +63,9 @@ def _monthly_chart_authorized(monthly_dir, license_manifest=None):
         expiry_ok = not valid_through or dt.date.fromisoformat(valid_through) >= today
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return False
+    allowed_uses = license_info.get("allowed_uses", [])
+    if not isinstance(allowed_uses, list):
+        return False
     required_uses = {"historical_index_values", "derived_forward_3m_returns", "public_static_charts"}
     return (
         status.get("schema") == "V70.3/monthly-research-chart-status-v1"
@@ -71,7 +74,7 @@ def _monthly_chart_authorized(monthly_dir, license_manifest=None):
         and license_info.get("schema") == "V70.3/SP500-public-display-license-v1"
         and license_info.get("status") == "AUTHORIZED"
         and license_info.get("benchmark") == "S&P 500"
-        and required_uses.issubset(set(license_info.get("allowed_uses", [])))
+        and required_uses.issubset(set(allowed_uses))
         and bool(license_info.get("license_id"))
         and str(license_info.get("source_url", "")).startswith("https://")
         and str(license_info.get("license_evidence_url", "")).startswith("https://")

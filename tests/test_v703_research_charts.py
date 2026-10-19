@@ -101,7 +101,8 @@ class V703ResearchChartsTests(unittest.TestCase):
         for name in builder.RESEARCH_CHARTS:
             self.assertIn(name, workflow)
         self.assertIn("HOSTINGER_RESEARCH_CHARTS_LIVE_PASS", workflow)
-        self.assertIn("--html-template", workflow)
+        self.assertIn('--html "系統工程/總經V70/V70-3-27.html"', workflow)
+        self.assertNotIn("build_monthly_charts.py", workflow)
         self.assertIn('git add "系統工程/總經V70/V70-3-27.html"', workflow)
 
 

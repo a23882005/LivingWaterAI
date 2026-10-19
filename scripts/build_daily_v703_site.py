@@ -570,6 +570,8 @@ def build(macro_path, supplement_path, html_path, dest):
     _, monthly_charts_ready = copy_research_charts(out)
     if monthly_charts_ready:
         updated_html = _monthly_chart_markup(updated_html)
+    else:
+        updated_html = _quarterly_chart_markup(updated_html)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,

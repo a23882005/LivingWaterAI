@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/20 06:30（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：每日部署固定七張季度研究圖並封存 Macro Safety 資料
+# 最後修改日期時間：2026/10/20 06:37（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：每日部署固定七張季度研究圖並封存 Macro Safety 資料
 # 2026/10/19 V70 正式版通知：唯一來源 系統工程/總經V70/V70-3-27.html；債券 B1-B4 深墨綠可讀性修正；部署必須通過 25/28/26/22 品質閘門與線上讀回。
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
@@ -15,6 +15,7 @@ on:
       - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'tests/test_macro_safety_monthly.py'
       - 'tests/test_bank_macro_monthly.py'
+      - 'tests/test_v703_research_charts.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'

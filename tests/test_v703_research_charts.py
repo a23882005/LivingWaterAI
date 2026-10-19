@@ -60,7 +60,7 @@ class V703ResearchChartsTests(unittest.TestCase):
                 self.assertEqual((output / target).read_bytes(), expected.read_bytes())
 
     def test_build_switches_only_when_all_seven_monthly_pngs_are_valid(self):
-        signature = b"\\x89PNG\\r\\n\\x1a\\n"
+        signature = bytes([137]) + b"PNG" + bytes([13, 10, 26, 10])
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             quarterly, monthly = root / "quarterly", root / "monthly"

@@ -45,21 +45,60 @@ RESEARCH_CHARTS = {
 }
 
 
-def copy_research_charts(dest):
-    """Copy five bank charts, the macro slope candidate, and seven-line overview."""
-    source_dir = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
-    output_dir = Path(dest) / "v70-research-charts"
-    missing = [name for name in RESEARCH_CHARTS.values() if not (source_dir / name).is_file()]
-    if missing:
-        raise ValueError("Research chart assets missing: " + ", ".join(missing))
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for output_name, source_name in RESEARCH_CHARTS.items():
-        source = source_dir / source_name
-        if source.stat().st_size < 8 or source.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
-            raise ValueError("Research chart is not a valid PNG: " + source_name)
-        shutil.copyfile(source, output_dir / output_name)
-    return output_dir
+def _valid_png(path):
+    return path.is_file() and path.stat().st_size >= 8 and path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
 
+
+def copy_research_charts(dest, source_dir=None, monthly_dir=None):
+    """Copy one complete seven-chart set; never mix monthly and quarterly figures."""
+    root = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
+    source_dir = Path(source_dir) if source_dir else root
+    monthly_dir = Path(monthly_dir) if monthly_dir else root / "monthly"
+    output_dir = Path(dest) / "v70-research-charts"
+    missing = [name for name in RESEARCH_CHARTS.values() if not _valid_png(source_dir / name)]
+    if missing:
+        raise ValueError("Research chart assets missing or invalid: " + ", ".join(missing))
+
+    monthly_ready = all(_valid_png(monthly_dir / name) for name in RESEARCH_CHARTS)
+    selected = ({name: name for name in RESEARCH_CHARTS} if monthly_ready else RESEARCH_CHARTS)
+    selected_dir = monthly_dir if monthly_ready else source_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for output_name, source_name in selected.items():
+        shutil.copyfile(selected_dir / source_name, output_dir / output_name)
+    return output_dir, monthly_ready
+
+
+def _monthly_chart_markup(template):
+    """Replace quarterly-candidate copy only after a complete monthly chart set exists."""
+    section_start = template.find('<section id="v703-research-charts"')
+    section_end = template.find("</section>", section_start)
+    if section_start < 0 or section_end < 0:
+        raise ValueError("Canonical HTML is missing the seven-chart section")
+    before, section, after = template[:section_start], template[section_start:section_end], template[section_end:]
+    section = re.sub(
+        r'(<p class="text-sm leading-7 text-slate-300 mb-2">).*?(</p>)',
+        r'\1七張月度研究圖：五大機構的當時可得年底目標隱含報酬、自家 Macro Safety 真實月斜率，以及 S&amp;P 500 後三個月實際報酬總覽。機構年底目標與後三個月實報期限不同，僅供研究觀察，不代表命中率或投資指示。\2',
+        section, count=1, flags=re.S,
+    )
+    section = re.sub(
+        r'(<p class="text-xs leading-6 text-amber-200 mb-5">).*?(</p>)',
+        r'\1圖表只採 CSV 中真實月度觀察；Macro 斜率按實際日曆月計算，單位為分數點／月。沒有把季度資料插值成月資料。報酬線只顯示已成熟且具公開展示授權的 S&amp;P 500 實際報酬；機構目標發布日仍須參照 CSV 查核狀態。\2',
+        section, count=1, flags=re.S,
+    )
+    section = section.replace(
+        "Macro Safety｜候選季度體質方向斜率與標普後三個月",
+        "Macro Safety｜真實月斜率與標普後三個月實際報酬",
+    ).replace(
+        "Macro Safety 候選季度體質方向斜率（分數點每季）與標普後三個月實際報酬",
+        "Macro Safety 真實月斜率（分數點／月）與標普後三個月實際報酬",
+    ).replace(
+        "七線總覽｜五大機構、Macro Safety 候選季度斜率與標普",
+        "七線總覽｜五大機構、Macro Safety 月斜率與標普",
+    ).replace(
+        "七線總覽：五大機構比較、Macro Safety 候選季度斜率和標普後三個月實際報酬",
+        "七線總覽：五大機構比較、Macro Safety 真實月斜率和標普後三個月實際報酬",
+    )
+    return before + section + after
 
 def _read(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
@@ -460,7 +499,9 @@ def build(macro_path, supplement_path, html_path, dest):
         raise ValueError("WALLSTREET5: placeholder still present after build")
     out = Path(dest)
     out.mkdir(parents=True, exist_ok=True)
-    copy_research_charts(out)
+    _, monthly_charts_ready = copy_research_charts(out)
+    if monthly_charts_ready:
+        updated_html = _monthly_chart_markup(updated_html)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,

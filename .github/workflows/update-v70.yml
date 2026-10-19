@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/16 01:18:58｜版本：V70.3.11 workflow｜檔案名稱：update-v70.yml
+# 最後修改日期時間（台灣時間）：2026/10/19 18:20:29｜版本：V70.3.12 workflow｜檔案名稱：update-v70.yml
 name: LivingWaterAI V70.3 Daily (11:00 Taiwan) / 8+16 Macro Verification
 
 on:
@@ -96,7 +96,6 @@ jobs:
           python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py
           python "系統工程/總經V70/總經爬蟲程式16項.py" --self-test
           python -m unittest discover -s tests -p "test_macro_regressions.py" -v
-          python -m unittest discover -s tests -p "test_v703_audit_integrity.py" -v
           python -m unittest discover -s tests -p "test_lei_vintage_safety.py" -v
           python - <<'PY'
           import sys
@@ -159,6 +158,11 @@ jobs:
                   print(key, item.get('status'), str(item.get('error') or item.get('detail') or '')[:200])
           print('V70.3:',feed['verification']['valid'],'/21; ready=',feed['verification']['ready'])
           PY
+      - name: QA generated audit and feed snapshots
+        env:
+          V703_AUDIT_PATH: build/macro24/24_macro_verification.json
+          V703_FEED_PATH: build/macro24/V70_macro_latest.json
+        run: python -m unittest discover -s tests -p "test_v703_audit_integrity.py" -v
       - name: Write diagnostic summary on failure
         if: failure()
         run: |

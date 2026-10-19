@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# 最後修改：2026/10/17 10:31（台灣時間）｜版本：D009-v2｜檔案：總經爬蟲18項.py
+# 最後修改：2026/10/19 18:14（台灣時間）｜版本：D009-v3｜檔案：總經爬蟲18項.py
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
-Nine supplementary raw inputs (five m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
+Eight supplementary raw inputs (four m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
 17 series use the prior official/live sourcing and verified overrides; m16 reads
 published LEI YoY and carries three-month auxiliary history, refreshed monthly.
 The s03 VIX transport duplicate is included but excluded from independent count.

@@ -191,6 +191,16 @@
 <div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總倉位)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">0.0</div></div>
 <div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width: 50%"></div></div>
 <div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">...</div>
+<div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/60 p-3" aria-label="Macro-SaFe 體質分四段說明">
+<div class="mb-2 text-xs font-bold text-slate-200">Macro-SaFe 體質分怎麼看（0–100 分）</div>
+<div class="grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-1.5 text-[11px] leading-relaxed">
+<div class="font-bold text-red-300">低於 40</div><div class="text-slate-300"><b class="text-red-200">體質不佳｜停車</b>：提高防守與等待資金，避免積極加碼。</div>
+<div class="font-bold text-orange-300">40–&lt;55</div><div class="text-slate-300"><b class="text-orange-200">體質偏弱｜防守</b>：提高防守比重，審慎部署。</div>
+<div class="font-bold text-yellow-300">55–&lt;70</div><div class="text-slate-300"><b class="text-yellow-200">體質尚穩｜穩健</b>：按核准的長期配置穩健部署。</div>
+<div class="font-bold text-emerald-300">70 以上</div><div class="text-slate-300"><b class="text-emerald-200">體質良好｜進攻</b>：可按核准配置正常部署，仍保留基本機動資金。</div>
+</div>
+<p class="mt-2 text-[10px] leading-relaxed text-slate-500">這四段是 Macro-SaFe 體質分的解讀區間；CAP 恐慌／危機／衰退封頂仍會另外限制最終分數與執行風險。</p>
+</div>
 <div class="hidden absolute inset-0 bg-red-900/95 flex flex-col items-center justify-center text-white z-20 backdrop-blur-md" id="circuit-breaker-overlay">
 <i class="fas fa-radiation text-6xl mb-4 animate-pulse text-yellow-400"></i>
 <div class="text-2xl font-bold uppercase tracking-widest border-b-2 border-white pb-2 mb-2">系統熔斷</div>
@@ -1339,10 +1349,10 @@ if (recBlack) {
 
 
                 let zoneText = "";
-                if (mSafe_final >= 70) zoneText = "🟢 進攻 (≥70)";
-                else if (mSafe_final >= 55) zoneText = "🟡 穩健 (55–70)";
-                else if (mSafe_final >= 40) zoneText = "🟠 防守 (40–55)";
-                else zoneText = Number.isFinite(mSafe_final) ? "🔴 停車 (<40)" : "⚠ 資料不足（NA）";
+                if (mSafe_final >= 70) zoneText = "🟢 體質良好 (≥70)";
+                else if (mSafe_final >= 55) zoneText = "🟡 體質尚穩 (55–<70)";
+                else if (mSafe_final >= 40) zoneText = "🟠 體質偏弱 (40–<55)";
+                else zoneText = Number.isFinite(mSafe_final) ? "🔴 體質不佳 (<40)" : "⚠ 資料不足（NA）";
 
 
                 zEl.innerText = zoneText;

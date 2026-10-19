@@ -73,4 +73,15 @@ python scripts/monthly_research/bank_forecast_research.py \
   --output-dir experiments/macro-safety-monthly-research
 ```
 
+## 五大機構與 Macro 月表
+
+`build_bank_macro_monthly.py` 將每個正式 Macro 月快照配對至觀察日當時已發布、且目標日尚未到期的五大機構最新預測，輸出五列／月。若 Macro 月表含有已授權的 `sp500_start_close`，程式計算 `forecast_implied_return_pct = (forecast_value / sp500_start_close - 1) × 100`，並一併輸出基準收盤日與收盤值；基準收盤缺漏或尚未取得公開使用授權時，價格與隱含報酬欄以字面 `NA` 保存。Macro 三個月實際報酬狀態沿用月表，不把年底目標期限誤標成三個月預測。
+
+```sh
+python scripts/monthly_research/build_bank_macro_monthly.py \\
+  --bank-register experiments/macro-safety-monthly-research/bank_forecast_register_research.csv \\
+  --macro-monthly data/macro_safety_monthly.csv \\
+  --output experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
+```
+
 本次工作簿乾跑轉錄 52 筆來源紀錄（高盛12、摩根大通7、摩根士丹利11、美國銀行14、瑞銀8），形成 117 筆可比對的季度×機構資料及六張 PNG。29 個觀察點中 27 個有已實現報酬，待成熟為 2026-10-01 與 2026-10-16。交接工作簿「閱讀說明」有一處把 2026-07-01 列為未成熟，但同工作簿逐列資料已有該日三個月報酬；乾跑按逐列資料處理並保留這項查核註記。

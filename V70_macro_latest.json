@@ -1,296 +1,131 @@
 {
-  "_fileMeta": {
-    "lastModifiedTaipei": "2026/10/16 07:58:40",
-    "version": "V70-3-12",
-    "fileName": "V70_macro_latest.json"
-  },
-  "schema": "V70.3/family-macro-feed-v1",
-  "asOf": "2026-10-15T23:56:48.650579Z",
-  "verification": {
-    "ready": false,
-    "valid": 24,
-    "totalRequired": 24,
-    "independentIndicators": 23,
-    "sources": [
-      "09:00/18",
-      "10:00/5"
-    ],
-    "usableWithCaveat": [
-      "m03_qqq",
-      "m03_spy",
-      "m03_vt"
-    ],
-    "migrationBlockers": [
-      "此檔是舊 V70.3/family-macro-feed-v1（23獨立/24傳輸），不符合 V70-3-27 的 26/29/22 驗證契約。",
-      "m06 仍是舊 Fed 升降幅度；缺少 V70-3-27 五輸入 V2 衍生驗證。",
-      "三項PE未能證明為明確 Forward/FY1，需重新查核；TTM或未標明口徑不可計分。",
-      "尚未有含 macro18 + macro9 來源快照的新 JSON。"
-    ]
-  },
+  "schema": "V70.3/macro-feed-v1",
+  "asOf": "2026-10-19T18:26:14.377185+08:00",
   "indicators": {
     "m07": {
-      "value": 16.87,
-      "dataDate": "2026-10-14",
+      "value": 16.46,
+      "dataDate": "2026-10-15",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "status": "OK",
-      "detail": ""
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m01": {
-      "value": 0.33,
-      "dataDate": "2026-10-15",
+      "value": 0.35,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
-      "method": "Treasury official daily_treasury_yield_curve daily CSV",
-      "status": "OK",
-      "detail": "Matched observation date for nominal 10Y minus 2Y"
+      "method": "Treasury official daily_treasury_yield_curve daily CSV"
     },
     "m08": {
-      "value": 2.78,
-      "dataDate": "2026-10-15",
+      "value": 2.74,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
-      "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
-      "status": "OK",
-      "detail": "10Y TIPS real yield"
+      "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m02": {
-      "value": 3.25,
-      "dataDate": "2026-10-14",
+      "value": 3.23,
+      "dataDate": "2026-10-15",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "status": "OK",
-      "detail": ""
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m04": {
       "value": 54.5,
       "dataDate": "2026-09-01",
       "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
       "unit": "",
-      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
-      "status": "OK",
-      "detail": "統計月份2026-09；8月54.6"
+      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m05": {
       "value": 2.565841,
       "dataDate": "2026-09-01",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
-      "method": "FRED CPILFESL 同一數列 YoY",
-      "status": "OK",
-      "detail": "比較基期 2025-09-01"
+      "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 102.082001,
-      "dataDate": "2026-10-15",
+      "value": 101.946999,
+      "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
-      "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
-      "status": "OK",
-      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
+      "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 96.209999,
-      "dataDate": "2026-10-15",
+      "value": 98.440002,
+      "dataDate": "2026-10-19",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
-      "method": "yfinance Yahoo Finance CL=F 日K Close",
-      "status": "OK",
-      "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對"
+      "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 102.503998,
-      "dataDate": "2026-10-15",
+      "value": 101.099998,
+      "dataDate": "2026-10-16",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
-      "method": "yfinance Yahoo Finance ^MOVE 日K Close",
-      "status": "OK",
-      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
+      "method": "yfinance Yahoo Finance ^MOVE 日K Close"
     },
     "m13": {
-      "value": 2.33,
-      "dataDate": "2026-10-15",
+      "value": 2.37,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
-      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "status": "OK",
-      "detail": "5Y nominal minus 5Y TIPS real yield on same day"
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m17": {
-      "value": -0.08,
-      "dataDate": "2026-10-15",
+      "value": 0.02,
+      "dataDate": "2026-10-16",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
-      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "status": "OK",
-      "detail": "5Y breakeven change from 2026-09-15"
+      "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m14": {
-      "value": -123.579,
-      "dataDate": "2026-10-07",
+      "value": -77.286,
+      "dataDate": "2026-10-14",
       "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "unit": "USD bn",
-      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
-      "status": "OK",
-      "detail": "開始=2026-07-08, 結束=2026-10-07, 單位十億美元; Fed Δ=11.951000, TGA Δ=136.539000, RRP Δ=-1.009000; 淨流動性 Δ=-123.579000"
+      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元"
     },
     "m15": {
       "value": 54.9,
       "dataDate": "2026-09-01",
       "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
       "unit": "",
-      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
-      "status": "OK",
-      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4"
-    },
-    "m16": {
-      "value": -0.7,
-      "dataDate": "2026-08-01",
-      "source": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
-      "unit": "%",
-      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "status": "OK",
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline"
+      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對"
     },
     "m18": {
-      "value": 0,
+      "value": 0.0,
       "dataDate": "2026-09-01",
       "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "unit": "",
-      "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
-      "status": "OK",
-      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率"
+      "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值"
     },
     "m19": {
       "value": 4.2,
       "dataDate": "2026-09-01",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "status": "OK",
-      "detail": ""
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m20": {
       "value": 50.666667,
       "dataDate": "2026-09-01",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "千人",
-      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
-      "status": "OK",
-      "detail": "注意歷史值可能修訂"
-    },
-    "s03": {
-      "value": 16.87,
-      "dataDate": "2026-10-14",
-      "source": "https://api.stlouisfed.org/fred/series/observations",
-      "unit": "",
-      "method": "與 m07 同步",
-      "status": "OK",
-      "detail": "同一 VIX 數列"
-    },
-    "s04": {
-      "value": 32.257143,
-      "dataDate": "2026-10-15",
-      "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
-      "unit": "",
-      "method": "CNN 非官方可讀 JSON（可能變動）",
-      "status": "OK",
-      "detail": "來源為 CNN 非公開保證 API"
-    },
-    "m06": {
-      "value": 0.762,
-      "dataDate": "2026-10-15",
-      "source": "https://www.investing.com/central-banks/fed-rate-monitor",
-      "unit": "percentage_point",
-      "method": "Investing Fed Rate Monitor 2027-10-27 Current Probability weighted target-range midpoints (4.637%) minus current 3.875% midpoint",
-      "status": "OK",
-      "detail": "Table updated 2026-10-15 15:15 EDT. Probabilities across 10 target ranges: 0.0%, 1.0%, 8.2%, 23.9%, 32.4%, 23.2%, 9.2%, 1.9%, 0.2%, 0.0%; sum 100.0%, weighted midpoint 4.637%, delta +0.762 percentage point. Supersedes the earlier same-day 14:35 EDT candidate +0.75525."
-    },
-    "m03_qqq": {
-      "value": 29.78,
-      "dataDate": "2026-10-13",
-      "source": "https://stockanalysis.com/etf/qqq/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis QQQ Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; holdings data as of 2026-10-13 and page last checked 2026-10-15. Use as P/E reference, not as confirmed TTM."
-    },
-    "m03_spy": {
-      "value": 24.99,
-      "dataDate": "2026-10-14",
-      "source": "https://stockanalysis.com/etf/spy/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis SPY Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-10-14 and page last checked 2026-10-15. Issuer cross-check showed index P/E 24.83 and FY1 20.53 as of 2026-10-14; FY1 was not used as TTM."
-    },
-    "m03_vt": {
-      "value": 20.8,
-      "dataDate": "2026-08-31",
-      "source": "https://stockanalysis.com/etf/vt/holdings/",
-      "unit": "x",
-      "method": "StockAnalysis VT Holdings Information PE Ratio; source does not explicitly label TTM",
-      "status": "USABLE",
-      "detail": "Correct ETF and numeric P/E displayed; data as of 2026-08-31 and page last checked 2026-10-15. Use as dated P/E reference, not as confirmed TTM."
-    },
-    "s05": {
-      "value": 25.58,
-      "dataDate": "2026-10-14",
-      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
-      "unit": "%",
-      "method": "Macroaxis MMFI Percent Of Stocks index level; explicit observation date",
-      "status": "OK",
-      "detail": "Explicit NYSE $MMFI Percent Of Stocks level 25.58, observation date 2026-10-14. Supersedes the prior 29.17 observation dated 2026-10-13; not reconstructed and not substituted with S&P 500 or Nasdaq breadth."
+      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人"
     }
   },
   "news": [],
-  "leiHistory": [
-    {
-      "observation_date": "2026-06-01",
-      "value": -1.4,
-      "unit": "%",
-      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
-      "publication_date": "2026-07-20",
-      "status": "OK",
-      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:04.291009+00:00"
-    },
-    {
-      "observation_date": "2026-07-01",
-      "value": -1.1,
-      "unit": "%",
-      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
-      "publication_date": "2026-08-20",
-      "status": "OK",
-      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:05.291414+00:00"
-    },
-    {
-      "observation_date": "2026-08-01",
-      "value": -0.7,
-      "unit": "%",
-      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
-      "publication_date": "2026-09-18",
-      "status": "OK",
-      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-15T19:48:06.257217+00:00"
-    }
-  ],
-  "derived": {
-    "m21": {
-      "value": 1,
-      "method": "All three consecutive published monthly LEI YoY values < 0",
-      "independentIndicator": false
-    }
-  },
-  "migrationStatus": {
-    "status": "BLOCKED_LEGACY_FEED",
-    "canonicalHtml": "V70-3-27.html",
-    "doNotUseForFormalAllocation": true
+  "verification": {
+    "ready": false,
+    "valid": 16,
+    "totalRequired": 21,
+    "missing": [
+      "m06: MISSING (not verified OK)",
+      "m03_qqq: MISSING (not verified OK)",
+      "m03_spy: MISSING (not verified OK)",
+      "m03_vt: MISSING (not verified OK)",
+      "m16: MISSING (not verified OK)"
+    ]
   }
 }

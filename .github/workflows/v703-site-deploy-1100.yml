@@ -12,9 +12,13 @@ on:
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
       - 'scripts/monthly_research/build_bank_macro_monthly.py'
+      - 'scripts/monthly_research/build_monthly_charts.py'
+      - 'data/sp500_public_display_license.json'
+      - 'experiments/macro-safety-monthly-research/charts/monthly/*.png'
       - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'tests/test_macro_safety_monthly.py'
       - 'tests/test_bank_macro_monthly.py'
+      - 'tests/test_monthly_charts.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
@@ -39,6 +43,7 @@ jobs:
           python-version: '3.11'
       - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |
+          python -m pip install 'matplotlib>=3.9,<4'
           python -m py_compile scripts/build_daily_v703_site.py
           test -s data/18_macro_verification.json
           test -s data/8_macro_supplement_verified.json
@@ -47,6 +52,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
           python -m unittest discover -s tests -p 'test_bank_macro_monthly.py' -v
+          python -m unittest discover -s tests -p 'test_monthly_charts.py' -v
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -317,6 +323,12 @@ jobs:
             --bank-register experiments/macro-safety-monthly-research/bank_forecast_register_research.csv \
             --macro-monthly data/macro_safety_monthly.csv \
             --output experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
+      - name: Render seven licensed monthly charts when data is ready
+        run: |
+          python scripts/monthly_research/build_monthly_charts.py \
+            --bank-monthly experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv \
+            --license-manifest data/sp500_public_display_license.json \
+            --output-dir experiments/macro-safety-monthly-research/charts/monthly
       - name: Publish immutable daily Macro Safety archive row
         run: |
           git config user.name "github-actions[bot]"
@@ -324,6 +336,7 @@ jobs:
           git add data/macro_safety_daily.csv
           if [ -s data/macro_safety_monthly.csv ]; then git add data/macro_safety_monthly.csv; fi
           git add experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
+          git add -A experiments/macro-safety-monthly-research/charts/monthly/
           if git diff --cached --quiet; then
             echo "Daily Macro Safety and five-institution monthly research archives already current"
             exit 0

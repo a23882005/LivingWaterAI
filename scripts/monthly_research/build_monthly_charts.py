@@ -10,11 +10,11 @@ from datetime import date
 from pathlib import Path
 
 INSTITUTIONS = {
-    "高盛": ("goldman.png", "#c0392b"),
-    "摩根大通": ("jpm.png", "#2874a6"),
-    "摩根士丹利": ("morgan_stanley.png", "#7d3c98"),
-    "美國銀行": ("bofa.png", "#d68910"),
-    "瑞銀": ("ubs.png", "#148f77"),
+    "高盛": ("goldman.png", "#c0392b", "Goldman Sachs"),
+    "摩根大通": ("jpm.png", "#2874a6", "JPMorgan"),
+    "摩根士丹利": ("morgan_stanley.png", "#7d3c98", "Morgan Stanley"),
+    "美國銀行": ("bofa.png", "#d68910", "Bank of America"),
+    "瑞銀": ("ubs.png", "#148f77", "UBS"),
 }
 LICENSE_SCHEMA = "V70.3/SP500-public-display-license-v1"
 CHARTS = tuple(item[0] for item in INSTITUTIONS.values()) + (
@@ -147,13 +147,13 @@ def build(monthly_csv, output_dir, license_manifest, today=None):
     output_dir.mkdir(parents=True, exist_ok=True)
     dates = [date.fromisoformat(item[1]["snapshot_date"]) for item in common]
     realized = [item[4] for item in common]
-    for institution, (filename, color) in INSTITUTIONS.items():
+    for institution, (filename, color, english_name) in INSTITUTIONS.items():
         forecast = [_number(item[2][institution]["forecast_implied_return_pct"]) for item in common]
         fig, ax = plt.subplots(figsize=(11, 6))
         ax.plot(dates, forecast, marker="o", color=color, linewidth=2.4, label="Institution forecast implied return")
         ax.plot(dates, realized, marker="s", color="#202020", linewidth=2.2, label="S&P 500 realized forward 3M return")
         ax.axhline(0, color="#777777", linewidth=.8)
-        ax.set_title(f"{institution} | monthly snapshot comparison (n={len(common)})")
+        ax.set_title(f"{english_name} | monthly snapshot comparison (n={len(common)})")
         ax.set_ylabel("Return (%)")
         ax.grid(True, alpha=.25)
         ax.legend(loc="best")
@@ -184,7 +184,7 @@ def build(monthly_csv, output_dir, license_manifest, today=None):
     right = left.twinx()
     for institution, (filename, color) in INSTITUTIONS.items():
         values = [_number(item[2][institution]["forecast_implied_return_pct"]) for item in common]
-        left.plot(dates, values, marker="o", linewidth=1.8, color=color, label=f"{institution} forecast")
+        left.plot(dates, values, marker="o", linewidth=1.8, color=color, label=f"{english_name} forecast")
     left.plot(dates, realized, marker="s", linewidth=2.7, color="#202020",
               label="S&P 500 realized forward 3M return")
     right.plot(dates, [item[3] for item in common], marker="D", linewidth=2,

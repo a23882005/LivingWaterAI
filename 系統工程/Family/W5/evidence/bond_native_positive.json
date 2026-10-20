@@ -1,0 +1,1516 @@
+{
+  "input_digest": "35227e05776f6cd8ff5bc6e1c15258a8b2e65caa6392001782ead4d2d30ecda6",
+  "built_input": {
+    "v75_runtime_input": {
+      "client_ref": "CLIENT-W5-QA",
+      "run_id": "w5-run-001",
+      "analysis_timestamp": "2026-09-26T14:05:00+08:00",
+      "expected_rule_version": "債券V75.md v2.7.0",
+      "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+      "deployment_parameter_version": "P0-02-FROZEN",
+      "broker_account_id": "QA_ACCOUNT",
+      "broker_domain_type": "US_BROKER",
+      "currency": "USD",
+      "bond_executable_budget": {
+        "amount": 350.0,
+        "currency": "USD"
+      },
+      "broker_cash_total": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 1000.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_available": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 800.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_unsettled": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 100.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_reserved": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 100.0,
+          "currency": "USD"
+        }
+      },
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "funding_settlement_status": "SETTLED",
+      "life_stage_code": "ACCUMULATION",
+      "strategic_bond_weight_b0": {
+        "value": "30",
+        "unit": "PERCENT"
+      },
+      "existing_bond_holdings": [
+        {
+          "asset_id": "SGOV",
+          "amount": {
+            "amount": "40.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        },
+        {
+          "asset_id": "SPSB",
+          "amount": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        }
+      ],
+      "target_bond_holdings": [
+        {
+          "asset_id": "SGOV",
+          "target_amount": {
+            "amount": "245.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        },
+        {
+          "asset_id": "SPSB",
+          "target_amount": {
+            "amount": "105.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        }
+      ],
+      "authorized_universe": [
+        "SGOV",
+        "SPSB"
+      ],
+      "market_snapshot": {
+        "data_timestamp": "2026-09-26T14:01:00+08:00",
+        "data_source": "C8C9_WORK3_SHARED_MARKET",
+        "freshness_state": "FRESH",
+        "payload": {
+          "snapshot_id": "market-W5"
+        },
+        "source_lineage": [
+          "market-ref"
+        ]
+      },
+      "v70_snapshot": {
+        "data_timestamp": "2026-09-26T13:55:00+08:00",
+        "data_source": "V70.RUNTIME_CONTEXT",
+        "freshness_state": "FRESH",
+        "payload": {
+          "run_id": "w5-run-001",
+          "stock_tactical_amount": "450.00",
+          "bond_tactical_amount": "350.00",
+          "v70_original_dry_powder_amount": "200.00",
+          "value_state": "KNOWN",
+          "data_quality": "OK",
+          "issue_codes": []
+        },
+        "source_lineage": [
+          "V70-ref"
+        ]
+      },
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "V75-source-W5",
+        "client-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+        "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68"
+      ]
+    },
+    "integration_binding": {
+      "run_id": "w5-run-001",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "currency": "USD",
+      "work3_context_handoff_id": "C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+      "upstream_v70_snapshot_id": "v70-snap-W5",
+      "shared_context_id": "loop2-context-W5",
+      "shared_context_digest_sha256": "0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+      "v75_source_context_digest_sha256": "8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+      "bond_executable_budget": {
+        "amount": 350.0,
+        "currency": "USD",
+        "cash_basis": "AVAILABLE",
+        "owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "source_pointer": "/funding_context/executable_budget/bond"
+      },
+      "remaining_target_gap_pointer": "/funding_context/remaining_target_gap/v75",
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_context_access": "READ_ONLY_BOUNDARY_CONTEXT"
+    }
+  },
+  "call_trace": [
+    "C8C9.Work5.build_v75_runtime_input",
+    "V75.validate_v75_run_input",
+    "V75.build_work3_state",
+    "V75.predicates.PRED-001..010:SGOV",
+    "V75.evaluate_step10:SGOV",
+    "V75.build_decision:SGOV",
+    "V75.predicates.PRED-001..010:SPSB",
+    "V75.evaluate_step10:SPSB",
+    "V75.build_decision:SPSB",
+    "V75.proportional_scale_decisions",
+    "V75.calculate_v75_undeployed_to_sgov",
+    "V75.assemble_final_snapshot",
+    "V75.evaluate_runtime_ready",
+    "C8C9.Work5.consume_v75_runtime_ready"
+  ],
+  "predicate_results": {
+    "SGOV": [
+      {
+        "predicate_id": "PRED-001",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "EXTREME",
+        "sub_states": [
+          "EXTREME",
+          "HIGH"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-002",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NO_HAWKISH_REPRICING",
+        "sub_states": [
+          "NO_HAWKISH_REPRICING"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-003",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMALIZING",
+        "sub_states": [
+          "NORMALIZING"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-004",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "HY_NORMAL",
+        "sub_states": [
+          "HY_NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-005",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMAL",
+        "sub_states": [
+          "NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-006",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NO_INFLATION_ALERT",
+        "sub_states": [
+          "NO_INFLATION_ALERT"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-007",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMAL",
+        "sub_states": [
+          "NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-008",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "VERY_ATTRACTIVE",
+        "sub_states": [
+          "VERY_ATTRACTIVE"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-009",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "RIGHT_CONFIRM",
+        "sub_states": [
+          "RIGHT_CONFIRM",
+          "LEFT_MATURE"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-010",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "ETF_QUALITY_NORMAL",
+        "sub_states": [
+          "ETF_QUALITY_NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SGOV"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      }
+    ],
+    "SPSB": [
+      {
+        "predicate_id": "PRED-001",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "EXTREME",
+        "sub_states": [
+          "EXTREME",
+          "HIGH"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-002",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NO_HAWKISH_REPRICING",
+        "sub_states": [
+          "NO_HAWKISH_REPRICING"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-003",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMALIZING",
+        "sub_states": [
+          "NORMALIZING"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-004",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "HY_NORMAL",
+        "sub_states": [
+          "HY_NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-005",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMAL",
+        "sub_states": [
+          "NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-006",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NO_INFLATION_ALERT",
+        "sub_states": [
+          "NO_INFLATION_ALERT"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-007",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "NORMAL",
+        "sub_states": [
+          "NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-008",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "VERY_ATTRACTIVE",
+        "sub_states": [
+          "VERY_ATTRACTIVE"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-009",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "RIGHT_CONFIRM",
+        "sub_states": [
+          "RIGHT_CONFIRM",
+          "LEFT_MATURE"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      },
+      {
+        "predicate_id": "PRED-010",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "aggregate_state": "ETF_QUALITY_NORMAL",
+        "sub_states": [
+          "ETF_QUALITY_NORMAL"
+        ],
+        "assessment_status": "VALID",
+        "as_of": "2026-09-26T13:55:00+08:00",
+        "source_lineage": [
+          "SYNTHETIC:SPSB"
+        ],
+        "input_freshness_state": "FRESH",
+        "reason_codes": [],
+        "required_input_missing": []
+      }
+    ]
+  },
+  "native_step10_traces": {
+    "SGOV": {
+      "deployment_state": "RIGHT_COMPLETE",
+      "deployment_pct": "100",
+      "rule_ids": [
+        "A10_NORMAL",
+        "A07_NORMAL",
+        "A06_NO_ALERT",
+        "A05_NORMAL",
+        "A04_TSY_HY_NORMAL",
+        "B1_CONTINUE",
+        "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+      ]
+    },
+    "SPSB": {
+      "deployment_state": "RIGHT_COMPLETE",
+      "deployment_pct": "100",
+      "rule_ids": [
+        "A10_NORMAL",
+        "A07_NORMAL",
+        "A06_NO_ALERT",
+        "A05_NORMAL",
+        "A04_HY_NORMAL",
+        "B2_CONTINUE",
+        "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+      ]
+    }
+  },
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "work3_state": {
+    "run_id": "w5-run-001",
+    "broker_account_id": "QA_ACCOUNT",
+    "broker_domain_type": "US_BROKER",
+    "currency": "USD",
+    "rule_version": "債券V75.md v2.7.0",
+    "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+    "life_stage_code_passthrough": "ACCUMULATION",
+    "evaluation_state": "COMPLETE",
+    "work3_complete": true,
+    "bond_long_term_target": {
+      "amount": "350.00",
+      "currency": "USD"
+    },
+    "eligibility_assessments": [
+      {
+        "asset_id": "SGOV",
+        "eligibility_state": "ELIGIBLE",
+        "bucket_class": "US_GENERIC_CORE",
+        "new_long_term_target_allowed": true,
+        "existing_position_management_allowed": true,
+        "authorized": true,
+        "reason_codes": [
+          "AUTHORIZED_US_GENERIC_CORE"
+        ]
+      },
+      {
+        "asset_id": "SPSB",
+        "eligibility_state": "ELIGIBLE",
+        "bucket_class": "US_GENERIC_CORE",
+        "new_long_term_target_allowed": true,
+        "existing_position_management_allowed": true,
+        "authorized": true,
+        "reason_codes": [
+          "AUTHORIZED_US_GENERIC_CORE"
+        ]
+      }
+    ],
+    "long_term_bucket_lines": [
+      {
+        "asset_id": "SGOV",
+        "bucket_class": "US_GENERIC_CORE",
+        "target_amount": {
+          "amount": "245.00",
+          "currency": "USD"
+        },
+        "template_weight_pct": {
+          "value": "70",
+          "unit": "PERCENT"
+        }
+      },
+      {
+        "asset_id": "SPSB",
+        "bucket_class": "US_GENERIC_CORE",
+        "target_amount": {
+          "amount": "105.00",
+          "currency": "USD"
+        },
+        "template_weight_pct": {
+          "value": "30",
+          "unit": "PERCENT"
+        }
+      }
+    ],
+    "gap_calculations": [
+      {
+        "asset_id": "SGOV",
+        "target_amount": {
+          "amount": "245.00",
+          "currency": "USD"
+        },
+        "eligible_existing_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "40.00",
+            "currency": "USD"
+          }
+        },
+        "remaining_target_gap_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "205.00",
+            "currency": "USD"
+          }
+        },
+        "eligibility_state": "ELIGIBLE",
+        "reason_codes": [
+          "SGOV_GAP_USES_BOND_BUCKET_ONLY"
+        ]
+      },
+      {
+        "asset_id": "SPSB",
+        "target_amount": {
+          "amount": "105.00",
+          "currency": "USD"
+        },
+        "eligible_existing_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "0",
+            "currency": "USD"
+          }
+        },
+        "remaining_target_gap_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "105.00",
+            "currency": "USD"
+          }
+        },
+        "eligibility_state": "ELIGIBLE",
+        "reason_codes": [
+          "SAME_ACCOUNT_EXISTING_HOLDINGS_ONLY"
+        ]
+      }
+    ],
+    "per_asset_inputs": [
+      {
+        "asset_id": "SGOV",
+        "remaining_target_gap_amount": {
+          "amount": "205.00",
+          "currency": "USD"
+        },
+        "eligibility_state": "ELIGIBLE",
+        "existing_position_amount": {
+          "amount": "40.00",
+          "currency": "USD"
+        },
+        "currency": "USD",
+        "broker_account_id": "QA_ACCOUNT"
+      },
+      {
+        "asset_id": "SPSB",
+        "remaining_target_gap_amount": {
+          "amount": "105.00",
+          "currency": "USD"
+        },
+        "eligibility_state": "ELIGIBLE",
+        "existing_position_amount": {
+          "amount": "0",
+          "currency": "USD"
+        },
+        "currency": "USD",
+        "broker_account_id": "QA_ACCOUNT"
+      }
+    ],
+    "bucket_reconciliation": {
+      "bond_long_term_target": {
+        "amount": "350.00",
+        "currency": "USD"
+      },
+      "us_generic_long_term_target": {
+        "amount": "350.00",
+        "currency": "USD"
+      },
+      "tw_generic_long_term_target": {
+        "amount": "0",
+        "currency": "USD"
+      },
+      "non_core_long_term_target": {
+        "amount": "0",
+        "currency": "USD"
+      },
+      "us_core_ratio_valid": true,
+      "tw_core_ratio_valid": null,
+      "target_sum_reconciled": true,
+      "reason_codes": [
+        "TARGET_SUM_RECONCILED",
+        "CROSS_ACCOUNT_US_TW_LIFE_STAGE_SPLIT_NOT_RECOMPUTED_IN_SINGLE_ACCOUNT_RUN"
+      ]
+    },
+    "sgov_reconciliation": {
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "observed_role_total_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "100.00",
+          "currency": "USD"
+        }
+      },
+      "roles_kept_separate": true,
+      "dry_powder_is_read_only_context": true,
+      "reason_codes": [
+        "SGOV_BOND_AND_DRY_POWDER_ROLES_SEPARATE",
+        "DRY_POWDER_INPUT_READ_ONLY",
+        "OBSERVED_ROLE_TOTAL_RECONCILED"
+      ]
+    },
+    "missing_required_fields": [],
+    "reason_codes": [
+      "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+      "LIFE_STAGE_CODE_PASSTHROUGH_NO_UNFROZEN_MACHINE_MAPPING"
+    ],
+    "issues": [],
+    "source_lineage": [
+      "C7-ref",
+      "V70-ref",
+      "market-ref",
+      "macro-ref",
+      "news-ref",
+      "V75-source-W5",
+      "client-ref",
+      "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+      "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+      "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+      "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+      "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1"
+    ]
+  },
+  "status": "COMPLETE",
+  "runtime_ready": {
+    "run_id": "w5-run-001",
+    "broker_account_id": "QA_ACCOUNT",
+    "currency": "USD",
+    "cutover_state": "READY",
+    "runtime_ready": true,
+    "gate_state": "PASS",
+    "evaluation_state": "COMPLETE",
+    "final_classification": "ACTIONABLE",
+    "output": {
+      "run_id": "w5-run-001",
+      "rule_version": "債券V75.md v2.7.0",
+      "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+      "deployment_parameter_version": "P0-02-FROZEN",
+      "broker_account_id": "QA_ACCOUNT",
+      "broker_domain_type": "US_BROKER",
+      "currency": "USD",
+      "bond_long_term_target": {
+        "amount": "350.00",
+        "currency": "USD"
+      },
+      "bond_allocation_final": {
+        "contract_id": "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+        "account_scope": {
+          "broker_account_id": "QA_ACCOUNT",
+          "broker_domain_type": "US_BROKER",
+          "currency": "USD"
+        },
+        "bond_long_term_target": {
+          "amount": "350.00",
+          "currency": "USD"
+        },
+        "per_asset": [
+          {
+            "asset_id": "SGOV",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": "100",
+            "deploy_amount": {
+              "amount": "205.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:HOLD",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_TSY_HY_NORMAL",
+              "B1_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ]
+          },
+          {
+            "asset_id": "SPSB",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": "100",
+            "deploy_amount": {
+              "amount": "105.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "NOT_APPLICABLE",
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:NOT_APPLICABLE",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_HY_NORMAL",
+              "B2_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ]
+          }
+        ],
+        "v75_undeployed_to_sgov": {
+          "amount": "40.00",
+          "currency": "USD"
+        },
+        "semantic_guards": [
+          "SGOV_BOND_BUCKET_PRESERVED",
+          "SGOV_DRY_POWDER_INPUT_NOT_AGGREGATED_IN_OUTPUT",
+          "SAME_ACCOUNT_NO_CROSS_FUNDING",
+          "NO_WORK5_RECOMPUTE_OF_TARGET_GAP_PREDICATE_OR_DEPLOYMENT"
+        ]
+      },
+      "per_asset_decisions": [
+        {
+          "asset_id": "SGOV",
+          "deployment_state": "RIGHT_COMPLETE",
+          "deployment_pct": {
+            "value": "100",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "205.00",
+            "currency": "USD"
+          },
+          "new_money_action": "RIGHT_COMPLETE",
+          "existing_position_action": "HOLD",
+          "existing_reduction_pct": null,
+          "classification": [
+            "DEPLOYMENT:RIGHT_COMPLETE",
+            "NEW_MONEY:RIGHT_COMPLETE",
+            "EXISTING:HOLD",
+            "GATE:PASS",
+            "EVALUATION:COMPLETE"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "A10_NORMAL",
+            "A07_NORMAL",
+            "A06_NO_ALERT",
+            "A05_NORMAL",
+            "A04_TSY_HY_NORMAL",
+            "B1_CONTINUE",
+            "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+          ],
+          "source_lineage": [
+            "SYNTHETIC:SGOV",
+            "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+          ]
+        },
+        {
+          "asset_id": "SPSB",
+          "deployment_state": "RIGHT_COMPLETE",
+          "deployment_pct": {
+            "value": "100",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "105.00",
+            "currency": "USD"
+          },
+          "new_money_action": "RIGHT_COMPLETE",
+          "existing_position_action": "NOT_APPLICABLE",
+          "existing_reduction_pct": null,
+          "classification": [
+            "DEPLOYMENT:RIGHT_COMPLETE",
+            "NEW_MONEY:RIGHT_COMPLETE",
+            "EXISTING:NOT_APPLICABLE",
+            "GATE:PASS",
+            "EVALUATION:COMPLETE"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "A10_NORMAL",
+            "A07_NORMAL",
+            "A06_NO_ALERT",
+            "A05_NORMAL",
+            "A04_HY_NORMAL",
+            "B2_CONTINUE",
+            "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+          ],
+          "source_lineage": [
+            "SYNTHETIC:SPSB",
+            "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+          ]
+        }
+      ],
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "v75_undeployed_to_sgov": {
+        "amount": "40.00",
+        "currency": "USD"
+      },
+      "formal_output_eligible": true,
+      "evaluation_state": "COMPLETE",
+      "missing_required_fields": [],
+      "reason_codes": [
+        "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+        "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+        "WORK1_TO_WORK4_RESULTS_PRESERVED_NO_RECOMPUTE"
+      ],
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "V75-source-W5",
+        "client-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+        "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+        "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+        "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+      ]
+    },
+    "blocking_reason_codes": [],
+    "source_lineage": [
+      "C7-ref",
+      "V70-ref",
+      "market-ref",
+      "macro-ref",
+      "news-ref",
+      "V75-source-W5",
+      "client-ref",
+      "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+      "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+      "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+      "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+      "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+      "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+      "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+      "V75_WORK6_RUNTIME_READY_CONTRACT_v1.0.0",
+      "V75_WORK6_CUTOVER_RUNTIME_READY_v1.0.0"
+    ]
+  },
+  "canonical": {
+    "contract_name": "LivingWaterAI.C8C9.Work5.V75IntegrationResult",
+    "contract_version": "C8C9-W5-V75AO-v1.0.1-RECHECK1",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w5-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "work3_context_handoff_id": "C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+    "upstream_v70_snapshot_id": "v70-snap-W5",
+    "shared_context_id": "loop2-context-W5",
+    "shared_context_digest_sha256": "0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+    "v75_source_context_digest_sha256": "8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+    "consumed_bond_executable_budget": {
+      "amount": 350.0,
+      "currency": "USD",
+      "cash_basis": "AVAILABLE",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "source_pointer": "/funding_context/executable_budget/bond"
+    },
+    "sgov_semantics": {
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "v75_undeployed_to_sgov": {
+        "amount": "40.00",
+        "currency": "USD"
+      },
+      "roles_kept_separate": true,
+      "dry_powder_input_read_only": true,
+      "adapter_created_undeployed_route": false,
+      "same_account_usd_route_guard_enforced": true
+    },
+    "canonical_v75_runtime_ready_snapshot": {
+      "run_id": "w5-run-001",
+      "broker_account_id": "QA_ACCOUNT",
+      "currency": "USD",
+      "cutover_state": "READY",
+      "runtime_ready": true,
+      "gate_state": "PASS",
+      "evaluation_state": "COMPLETE",
+      "final_classification": "ACTIONABLE",
+      "output": {
+        "run_id": "w5-run-001",
+        "rule_version": "債券V75.md v2.7.0",
+        "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+        "deployment_parameter_version": "P0-02-FROZEN",
+        "broker_account_id": "QA_ACCOUNT",
+        "broker_domain_type": "US_BROKER",
+        "currency": "USD",
+        "bond_long_term_target": {
+          "amount": "350.00",
+          "currency": "USD"
+        },
+        "bond_allocation_final": {
+          "contract_id": "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+          "account_scope": {
+            "broker_account_id": "QA_ACCOUNT",
+            "broker_domain_type": "US_BROKER",
+            "currency": "USD"
+          },
+          "bond_long_term_target": {
+            "amount": "350.00",
+            "currency": "USD"
+          },
+          "per_asset": [
+            {
+              "asset_id": "SGOV",
+              "deployment_state": "RIGHT_COMPLETE",
+              "deployment_pct": "100",
+              "deploy_amount": {
+                "amount": "205.00",
+                "currency": "USD"
+              },
+              "new_money_action": "RIGHT_COMPLETE",
+              "existing_position_action": "HOLD",
+              "classification": [
+                "DEPLOYMENT:RIGHT_COMPLETE",
+                "NEW_MONEY:RIGHT_COMPLETE",
+                "EXISTING:HOLD",
+                "GATE:PASS",
+                "EVALUATION:COMPLETE"
+              ],
+              "gate_state": "PASS",
+              "evaluation_state": "COMPLETE",
+              "reason_codes": [
+                "A10_NORMAL",
+                "A07_NORMAL",
+                "A06_NO_ALERT",
+                "A05_NORMAL",
+                "A04_TSY_HY_NORMAL",
+                "B1_CONTINUE",
+                "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+              ]
+            },
+            {
+              "asset_id": "SPSB",
+              "deployment_state": "RIGHT_COMPLETE",
+              "deployment_pct": "100",
+              "deploy_amount": {
+                "amount": "105.00",
+                "currency": "USD"
+              },
+              "new_money_action": "RIGHT_COMPLETE",
+              "existing_position_action": "NOT_APPLICABLE",
+              "classification": [
+                "DEPLOYMENT:RIGHT_COMPLETE",
+                "NEW_MONEY:RIGHT_COMPLETE",
+                "EXISTING:NOT_APPLICABLE",
+                "GATE:PASS",
+                "EVALUATION:COMPLETE"
+              ],
+              "gate_state": "PASS",
+              "evaluation_state": "COMPLETE",
+              "reason_codes": [
+                "A10_NORMAL",
+                "A07_NORMAL",
+                "A06_NO_ALERT",
+                "A05_NORMAL",
+                "A04_HY_NORMAL",
+                "B2_CONTINUE",
+                "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+              ]
+            }
+          ],
+          "v75_undeployed_to_sgov": {
+            "amount": "40.00",
+            "currency": "USD"
+          },
+          "semantic_guards": [
+            "SGOV_BOND_BUCKET_PRESERVED",
+            "SGOV_DRY_POWDER_INPUT_NOT_AGGREGATED_IN_OUTPUT",
+            "SAME_ACCOUNT_NO_CROSS_FUNDING",
+            "NO_WORK5_RECOMPUTE_OF_TARGET_GAP_PREDICATE_OR_DEPLOYMENT"
+          ]
+        },
+        "per_asset_decisions": [
+          {
+            "asset_id": "SGOV",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": {
+              "value": "100",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "205.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "HOLD",
+            "existing_reduction_pct": null,
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:HOLD",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_TSY_HY_NORMAL",
+              "B1_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ],
+            "source_lineage": [
+              "SYNTHETIC:SGOV",
+              "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+            ]
+          },
+          {
+            "asset_id": "SPSB",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": {
+              "value": "100",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "105.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "NOT_APPLICABLE",
+            "existing_reduction_pct": null,
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:NOT_APPLICABLE",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_HY_NORMAL",
+              "B2_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ],
+            "source_lineage": [
+              "SYNTHETIC:SPSB",
+              "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+            ]
+          }
+        ],
+        "sgov_bond_bucket_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "40.00",
+            "currency": "USD"
+          }
+        },
+        "v75_undeployed_to_sgov": {
+          "amount": "40.00",
+          "currency": "USD"
+        },
+        "formal_output_eligible": true,
+        "evaluation_state": "COMPLETE",
+        "missing_required_fields": [],
+        "reason_codes": [
+          "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+          "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+          "WORK1_TO_WORK4_RESULTS_PRESERVED_NO_RECOMPUTE"
+        ],
+        "source_lineage": [
+          "C7-ref",
+          "V70-ref",
+          "market-ref",
+          "macro-ref",
+          "news-ref",
+          "V75-source-W5",
+          "client-ref",
+          "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+          "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+          "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+          "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+          "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+          "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+        ]
+      },
+      "blocking_reason_codes": [],
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "V75-source-W5",
+        "client-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+        "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+        "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+        "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+        "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+        "V75_WORK6_RUNTIME_READY_CONTRACT_v1.0.0",
+        "V75_WORK6_CUTOVER_RUNTIME_READY_v1.0.0"
+      ]
+    },
+    "canonical_v75_output": {
+      "run_id": "w5-run-001",
+      "rule_version": "債券V75.md v2.7.0",
+      "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+      "deployment_parameter_version": "P0-02-FROZEN",
+      "broker_account_id": "QA_ACCOUNT",
+      "broker_domain_type": "US_BROKER",
+      "currency": "USD",
+      "bond_long_term_target": {
+        "amount": "350.00",
+        "currency": "USD"
+      },
+      "bond_allocation_final": {
+        "contract_id": "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+        "account_scope": {
+          "broker_account_id": "QA_ACCOUNT",
+          "broker_domain_type": "US_BROKER",
+          "currency": "USD"
+        },
+        "bond_long_term_target": {
+          "amount": "350.00",
+          "currency": "USD"
+        },
+        "per_asset": [
+          {
+            "asset_id": "SGOV",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": "100",
+            "deploy_amount": {
+              "amount": "205.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:HOLD",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_TSY_HY_NORMAL",
+              "B1_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ]
+          },
+          {
+            "asset_id": "SPSB",
+            "deployment_state": "RIGHT_COMPLETE",
+            "deployment_pct": "100",
+            "deploy_amount": {
+              "amount": "105.00",
+              "currency": "USD"
+            },
+            "new_money_action": "RIGHT_COMPLETE",
+            "existing_position_action": "NOT_APPLICABLE",
+            "classification": [
+              "DEPLOYMENT:RIGHT_COMPLETE",
+              "NEW_MONEY:RIGHT_COMPLETE",
+              "EXISTING:NOT_APPLICABLE",
+              "GATE:PASS",
+              "EVALUATION:COMPLETE"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "A10_NORMAL",
+              "A07_NORMAL",
+              "A06_NO_ALERT",
+              "A05_NORMAL",
+              "A04_HY_NORMAL",
+              "B2_CONTINUE",
+              "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+            ]
+          }
+        ],
+        "v75_undeployed_to_sgov": {
+          "amount": "40.00",
+          "currency": "USD"
+        },
+        "semantic_guards": [
+          "SGOV_BOND_BUCKET_PRESERVED",
+          "SGOV_DRY_POWDER_INPUT_NOT_AGGREGATED_IN_OUTPUT",
+          "SAME_ACCOUNT_NO_CROSS_FUNDING",
+          "NO_WORK5_RECOMPUTE_OF_TARGET_GAP_PREDICATE_OR_DEPLOYMENT"
+        ]
+      },
+      "per_asset_decisions": [
+        {
+          "asset_id": "SGOV",
+          "deployment_state": "RIGHT_COMPLETE",
+          "deployment_pct": {
+            "value": "100",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "205.00",
+            "currency": "USD"
+          },
+          "new_money_action": "RIGHT_COMPLETE",
+          "existing_position_action": "HOLD",
+          "existing_reduction_pct": null,
+          "classification": [
+            "DEPLOYMENT:RIGHT_COMPLETE",
+            "NEW_MONEY:RIGHT_COMPLETE",
+            "EXISTING:HOLD",
+            "GATE:PASS",
+            "EVALUATION:COMPLETE"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "A10_NORMAL",
+            "A07_NORMAL",
+            "A06_NO_ALERT",
+            "A05_NORMAL",
+            "A04_TSY_HY_NORMAL",
+            "B1_CONTINUE",
+            "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+          ],
+          "source_lineage": [
+            "SYNTHETIC:SGOV",
+            "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+          ]
+        },
+        {
+          "asset_id": "SPSB",
+          "deployment_state": "RIGHT_COMPLETE",
+          "deployment_pct": {
+            "value": "100",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "105.00",
+            "currency": "USD"
+          },
+          "new_money_action": "RIGHT_COMPLETE",
+          "existing_position_action": "NOT_APPLICABLE",
+          "existing_reduction_pct": null,
+          "classification": [
+            "DEPLOYMENT:RIGHT_COMPLETE",
+            "NEW_MONEY:RIGHT_COMPLETE",
+            "EXISTING:NOT_APPLICABLE",
+            "GATE:PASS",
+            "EVALUATION:COMPLETE"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "A10_NORMAL",
+            "A07_NORMAL",
+            "A06_NO_ALERT",
+            "A05_NORMAL",
+            "A04_HY_NORMAL",
+            "B2_CONTINUE",
+            "C_RIGHT_CONFIRM_VERY_ATTRACTIVE"
+          ],
+          "source_lineage": [
+            "SYNTHETIC:SPSB",
+            "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+          ]
+        }
+      ],
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "v75_undeployed_to_sgov": {
+        "amount": "40.00",
+        "currency": "USD"
+      },
+      "formal_output_eligible": true,
+      "evaluation_state": "COMPLETE",
+      "missing_required_fields": [],
+      "reason_codes": [
+        "V75_WORK5_LIVINGWATERAI_INTEGRATION_OUTPUT_v1.0.0",
+        "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0",
+        "WORK1_TO_WORK4_RESULTS_PRESERVED_NO_RECOMPUTE"
+      ],
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "V75-source-W5",
+        "client-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-a92568adff63a108480ccbd6d65d9c6b",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W5",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:0a6e5e4d0fb7c014868457ccff0a34341f4b66893db8ef9a0fd702d9b18d43ea",
+        "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:8389d560d5c7478058cc5a07f0ebc4ec36ac343511371d50c452a731b1878e68",
+        "V75_WORK3_ELIGIBILITY_BUCKET_SGOV_v1.0.1",
+        "V75_WORK5_FINAL_CLASSIFICATION_SNAPSHOT_v1.0.0"
+      ]
+    },
+    "source_semantics_policy": "PRESERVE_FROZEN_V75_NO_BUSINESS_RECOMPUTE",
+    "integration_diagnostics": []
+  }
+}

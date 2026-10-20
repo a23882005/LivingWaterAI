@@ -11,12 +11,12 @@
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-family-bridges",
+    "backup_ref": "backup/w5-20261020-bond-native",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "3795534bf7f3ab5c111e40fed3011cda200f6c97",
+    "previous_work_commit": "486219ff9995e36b90f15c04ae245fb0f1cac53f",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -24,7 +24,7 @@
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
     }
   },
-  "validation_scope": "W3讀取器10項接收檢查PASS、GitHub/Drive逐位元組一致；W5引擎整合測試仍未執行",
+  "validation_scope": "W3讀取器接收PASS；W5本線87項PASS含合成資料的原生V75計算。Family整線、Actions及最終部署尚未執行。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -128,10 +128,20 @@
       "status": "PENDING"
     },
     "W5-12": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "C8C9 Work5→V75原生PRED001..010→Step10→預算縮放→Work5/6→C8C9 consume，10項新測試PASS。",
+      "remaining": "正式來源市場context、V70 tactical上限綁定、Family調度及完整12棒驗收尚未完成。",
+      "evidence": [
+        "bond_engine.py",
+        "tests/test_bond_engine.py",
+        "evidence/bond_native_positive.json",
+        "evidence/bond_native_tests.log"
+      ]
     },
     "W5-13": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "保留原始RuntimeReady與account/per-asset狀態；空陣列INVALID_INPUT保留實測PASS。",
+      "remaining": "Work9正式canonical動作映射及完整13棒驗收尚未完成。"
     },
     "W5-14": {
       "status": "PENDING"
@@ -265,5 +275,17 @@
     "source_tables": 29,
     "w2_confirmation_record": "Original W2-17/18 synthetic golden output; no private target confirmation created",
     "evidence": "evidence/family_bridges_tests.log"
+  },
+  "bond_native": {
+    "data_kind": "SYNTHETIC",
+    "new_tests_passed": 10,
+    "w5_tests_passed": 87,
+    "native_strategy_modifications": 0,
+    "family_e2e": false,
+    "backup_drive_ids": {
+      "zip": "1qnoBrbzbAm1hxuIXl53mj5DCAdkrMbRo",
+      "checkpoint": "1T-boO-a-axgcGdmm68PH3sB-8HeYtERW",
+      "index": "1a2S6feFxCbmrIyMNNRL9E2kVhqdF0AB8"
+    }
   }
 }

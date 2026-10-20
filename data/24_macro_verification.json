@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-10-20T10:36:45.901419+08:00",
+  "generated_at": "2026-10-20T10:40:09.586524+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 18,
@@ -140,7 +140,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 101.900002,
+      "value": 101.882004,
       "unit": "",
       "observation_date": "2026-10-19",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -152,7 +152,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 98.449997,
+      "value": 98.440002,
       "unit": "USD/bbl",
       "observation_date": "2026-10-19",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",

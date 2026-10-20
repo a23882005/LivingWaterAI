@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/20 08:34（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
+# 最後修改日期時間：2026/10/20 08:37（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
 """Regression tests for V70-3-27 macro-health UI preparation.
 
 Run: python -m unittest tests/test_v703_outlook_ui.py -v
@@ -73,7 +73,7 @@ class V703OutlookUITest(unittest.TestCase):
         self.assertIsNotNone(panel)
         markup = panel.group(0)
         self.assertEqual(re.findall(r'<th class="p-2">([^<]+)</th>', markup), [
-            "代碼／指標", "原始值", "觀測日", "狀態／口徑"
+            "指標", "數值", "日期", "狀態"
         ])
         self.assertIn('colspan="4"', markup)
         renderer = re.search(r'<script id="v703-render-raw-data">(.*?)</script>', s, re.S)
@@ -83,7 +83,14 @@ class V703OutlookUITest(unittest.TestCase):
         self.assertNotIn("開啟來源", renderer.group(1))
         self.assertNotIn("r.detail", renderer.group(1))
         self.assertNotIn("沿用人工查證", renderer.group(1))
-        self.assertIn("const status=String(r.status||'未提供')", renderer.group(1))
+        self.assertNotIn("r.detail", renderer.group(1))
+        self.assertNotIn("r.method", renderer.group(1))
+        self.assertNotIn("r.source", renderer.group(1))
+        self.assertNotIn("verification", renderer.group(1))
+        self.assertIn("const familyStatus=(r)=>", renderer.group(1))
+        for state in ("正常", "過期", "缺資料"):
+            self.assertIn(state, renderer.group(1))
+        self.assertIn("指標狀態：正常 ", renderer.group(1))
 
     def test_html_document_and_unique_ids(self):
         s = self.source

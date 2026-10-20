@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/20 08:34｜V70-3-27 正式部署版｜移除原始資料表方法、來源及狀態欄內來源說明
+# 最後修改日期時間（台灣時間）：2026/10/20 08:37｜V70-3-27 正式部署版｜移除原始資料表方法、來源及狀態欄內來源說明
 <!DOCTYPE html>
 
 
@@ -104,7 +104,7 @@
 <div id="v703-coverage-banner" class="max-w-7xl mx-auto px-4 py-2 text-center text-xs font-semibold text-slate-300" aria-live="polite">總經資料覆蓋：等待資料驗證</div>
 <div id="v703-update-banner" role="status" aria-live="polite" class="w-full bg-slate-950 border-b border-amber-700/70 px-4 py-3 text-center text-sm font-semibold text-amber-200">📅 最後資料更新（台灣時間）：HTML已內嵌逐項資料｜觀測日依各指標</div>
 <div id="v703-program-update-banner" class="w-full bg-slate-900 border-b border-sky-800/70 px-4 py-2 text-center text-xs sm:text-sm font-semibold text-sky-200">🛠️ 最後程式更新（台灣時間）：2026/10/19 23:52</div>
-<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 25項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入4項)+1項衍生m06 V3偏離+2項重複傳輸(s03/s04)=28傳輸欄，必要計分22項｜展開查看28個傳輸欄的數值、觀測日與狀態</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[640px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">代碼／指標</th><th class="p-2">原始值</th><th class="p-2">觀測日</th><th class="p-2">狀態／口徑</th></tr></thead><tbody id="v703-raw-data-body"><tr id="v703-raw-data-placeholder"><td colspan="4" class="p-3 text-center text-amber-200">目前沒有可用的逐項數值；圖表與季度／月度口徑說明仍可查看。資料恢復後會顯示數值、日期與狀態；缺值維持 MISSING／NA，不補值。</td></tr></tbody></table></div><p id="v703-raw-data-status" class="mt-2 text-xs leading-relaxed text-amber-200" aria-live="polite">資料檢核狀態由內嵌資料驗證結果更新。</p></details>
+<details id="v703-raw-data-panel" open class="max-w-7xl mx-auto my-3 px-4"><summary class="cursor-pointer rounded-xl border border-cyan-700 bg-slate-900 px-4 py-3 text-sm font-bold text-cyan-200">📊 25項獨立原始指標(加權計分17項+CAP觸發4項+m06計算輸入4項)+1項衍生m06 V3偏離+2項重複傳輸(s03/s04)=28傳輸欄，必要計分22項｜展開查看28個傳輸欄的數值、觀測日與狀態</summary><div class="mt-2 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900 p-3"><table class="w-full min-w-[640px] text-xs text-slate-200"><thead><tr class="border-b border-slate-600 text-left text-slate-400"><th class="p-2">指標</th><th class="p-2">數值</th><th class="p-2">日期</th><th class="p-2">狀態</th></tr></thead><tbody id="v703-raw-data-body"><tr id="v703-raw-data-placeholder"><td colspan="4" class="p-3 text-center text-amber-200">目前沒有可用的逐項數值；圖表與季度／月度口徑說明仍可查看。資料恢復後會顯示數值、日期與狀態；缺值維持 MISSING／NA，不補值。</td></tr></tbody></table></div><p id="v703-raw-data-status" class="mt-2 text-xs leading-relaxed text-amber-200" aria-live="polite">指標狀態：等待資料。</p></details>
 <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -3278,44 +3278,37 @@ if (recBlack) {
  const body=document.getElementById('v703-raw-data-body');
  const summary=document.getElementById('v703-raw-data-status');
  if(!node||!body)return;
- const labels={m07:'VIX',m01:'10Y−2Y殖利率曲線',m06:'實質政策利率缺口 (V3正式計分)',m08:'10Y實質殖利率',m03_qqq:'QQQ估值參考P/E',m03_spy:'SPY估值參考P/E',m03_vt:'VT估值參考P/E',m02:'HY OAS信用利差',m04:'ISM製造業PMI',m05:'核心CPI YoY',m09:'美元DXY',m10:'WTI近月期貨',m12:'MOVE債券波動指數',m13:'5Y損益兩平通膨率',m17:'5Y損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'LEI YoY',m18:'Sahm Rule',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'VIX短期（重複m07）',s04:'CNN Fear & Greed',s05:'NYSE MMFI高於50日均線比例'};
+ const labels={m07:'VIX（市場波動）',m01:'10年期減2年期公債殖利率',m06:'實質政策利率缺口',m06_rate:'名目政策利率',m06_inf:'通膨率輸入',m06_rstar:'中性利率估計',m06_output_gap:'產出缺口',m08:'10年期實質公債殖利率',m03_qqq:'QQQ估值參考本益比',m03_spy:'SPY估值參考本益比',m03_vt:'VT估值參考本益比',m02:'高收益債信用利差',m04:'ISM製造業PMI',m05:'核心CPI年增率',m09:'美元指數DXY',m10:'WTI近月期貨價格',m12:'MOVE債券波動指數',m13:'5年期損益兩平通膨率',m17:'5年期損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'領先經濟指標年增率',m18:'Sahm Rule失業率指標',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'短期VIX（與VIX重複）',s04:'CNN Fear & Greed市場情緒',s05:'NYSE股票高於50日均線比例'};
+ const familyStatus=(r)=>{
+  if(!r||r.value===null||r.value===undefined||String(r.value).trim()===''||!r.dataDate)return '缺資料';
+  const flag=String(r.status||'').toUpperCase();
+  if(/EXPIRED|STALE/.test(flag))return '過期';
+  if(['OK','USABLE'].includes(flag))return '正常';
+  return '缺資料';
+ };
  try{
   const feed=JSON.parse(node.textContent||'{}');
-  const verification=feed.verification||{};
-  if(summary){
-   const total=verification.transportIndicators??verification.transportFields??'—';
-   const validated=verification.requiredScoringIndicatorsValidated;
-   const required=verification.requiredScoringIndicators;
-   let message='資料檢核：'+total+'個傳輸欄；';
-   if(Number.isFinite(validated)&&Number.isFinite(required)) message+=validated+'/'+required+'必要計分欄通過；';
-   else message+='必要計分欄狀態未提供；';
-   if(verification.ready===true) message+='本批次通過資料檢核。m06由四項原始輸入依 V3 公式重算。';
-   else {
-    const reasons=[...(verification.missing||[]),...(verification.problems||[])];
-    message+='本批次未通過正式資料閘門'+(reasons.length?'：'+reasons.slice(0,4).join('；'):'。');
-   }
-   summary.textContent=message;
-  }
   const entries=Object.entries(feed.indicators||{});
   if(entries.length===0){
-   if(summary) summary.textContent='資料檢核：目前沒有可用的指標數值；圖表與口徑說明仍可查看。';
+   if(summary) summary.textContent='目前沒有可用數值；資料狀態：缺資料。';
    return;
   }
+  const counts={'正常':0,'過期':0,'缺資料':0};
+  for(const [,r] of entries)counts[familyStatus(r)]++;
+  if(summary)summary.textContent='指標狀態：正常 '+counts['正常']+'｜過期 '+counts['過期']+'｜缺資料 '+counts['缺資料'];
   body.replaceChildren();
   for(const [id,r] of entries){
    const tr=document.createElement('tr');tr.className='border-b border-slate-800 align-top';
-   const status=String(r.status||'未提供');
-   const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'MISSING':String(r.value)+(r.unit?' '+r.unit:'');
-   // Keep the visible status cell limited to the status label. Source and methodology
-   // details remain internal validation inputs and are not shown in this table.
-   const vals=[id+'｜'+(labels[id]||id),shownValue,r.dataDate||'未提供',status];
+   const status=familyStatus(r);
+   const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'—':String(r.value)+(r.unit?' '+r.unit:'');
+   const vals=[labels[id]||'其他指標',shownValue,r.dataDate||'—',status];
    for(const value of vals){const td=document.createElement('td');td.className='p-2';td.textContent=value;tr.appendChild(td);}
    body.appendChild(tr);
   }
  }catch(err){
-  if(summary) summary.textContent='資料檢核：內嵌資料讀取失敗，正式資料狀態待確認。';
+  if(summary) summary.textContent='指標狀態：缺資料。';
   const placeholder=document.getElementById('v703-raw-data-placeholder');
-  if(placeholder) placeholder.textContent='內嵌數值讀取失敗；圖表與口徑說明仍可查看，正式資料狀態待確認。';
+  if(placeholder) placeholder.textContent='目前無法顯示數值；圖表與指標定義仍可查看。';
  }
 })();
 </script>

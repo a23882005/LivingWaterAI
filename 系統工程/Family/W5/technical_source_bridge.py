@@ -96,6 +96,13 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
     if not dates or any(not isinstance(x,str) for x in dates) or dates!=sorted(set(dates)):
         raise ValueError('HISTORY_SESSION_ORDER')
     issues=[]
+    snapshot_mode=meta.get('evaluation_mode')=='SNAPSHOT_AFTER_ACQUISITION'
+    snapshot_at=None
+    if snapshot_mode:
+        approved_times={'global':'2026-10-19T23:20:09Z','taiwan':'2026-10-20T07:14:26Z'}
+        snapshot_at=approved_times.get(meta.get('market_region'))
+        if meta.get('data_provenance')=='SYNTHETIC':snapshot_at=meta.get('artifact_written_at')
+        if snapshot_at is None or _time(snapshot_at)>now:issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
     required=('asset_id','symbol','exchange','currency','instrument_reference','source_reference','receipt_reference','calendar_reference','session_timezone','provider_price_basis','source_run')
     if any(not meta.get(k) for k in required):issues.append('SOURCE_METADATA_REQUIRED')
     if meta.get('producer_version')!=VERSION:issues.append('PRODUCER_VERSION_MISMATCH')
@@ -104,7 +111,7 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
     if meta.get('auto_adjust') is not False or meta.get('split_basis_verified') is not True:
         issues.append('PRICE_BASIS_UNVERIFIED')
     if meta.get('calendar_sessions')!=dates:issues.append('SESSION_CONTINUITY_UNVERIFIED')
-    receipts=meta.get('bar_receipts',[])
+    receipts=deepcopy(meta.get('bar_receipts',[]))
     if len(receipts)!=len(rows) or [r.get('session') for r in receipts]!=dates:
         issues.append('BAR_RECEIPTS_REQUIRED');receipts=[]
     count=0;last_close=None;last_available=None;incomplete=False
@@ -112,6 +119,10 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
         if rec.get('completed') is not True or rec.get('formal_close_available') is not True:
             incomplete=True;continue
         if incomplete:issues.append('NONCONTIGUOUS_COMPLETED_BARS');break
+        if snapshot_mode:
+            rec['available_at']=snapshot_at
+            count+=1
+            continue
         try:
             close=_time(rec['close_at']);available=_time(rec['available_at'])
             if close>available or available>now or (last_close is not None and close<=last_close) or (last_available is not None and available<last_available):raise ValueError()
@@ -188,6 +199,7 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
         if len(ids)!=len(set(ids)):raise ValueError('DUPLICATE_EVENT_VOTE')
     aggregation=_aggregate(repo_path,signals)
     return {'schema_version':'Family.W5.PartialTechnical.v1','status':'PARTIAL_KNOWN' if approved else 'DATA_UNAVAILABLE',
+        'evaluation_mode':meta.get('evaluation_mode','HISTORICAL_RECEIPTS'),'snapshot_available_at':snapshot_at,'historical_pit_verified':False if snapshot_mode else None,
         'source_metadata':meta,'history_digest':digest(rows),'source_history':rows,
         'evaluated_at':evaluated_at,'completed_bar_count':count,'sample_state':'COMPLETE' if approved and all(_number(r.get('Close')) and float(r['Close'])>0 for r in base) else 'UNKNOWN',
         'td9':td,'swings':swings,'raw_numeric':raw,'base_facts':known,'signals':signals,

@@ -50,6 +50,9 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         if digest(funding_snapshot[name])!=digest(c7[name]):
             raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
     stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
+    if stock.get('execution') is None:
+        return {'status':'DATA_UNAVAILABLE','unified_result':None,'trade_action':'NO_TRADE',
+                'issue_codes':['NATIVE_TECHNICAL_DEPLOYMENT_UNRESOLVED'],'call_trace':stock['call_trace']}
     stock_output=assemble_stock_output(repo_path,stock,data['stock_source_fields'],c7_computation)
     target_projection=None
     if c7_computation is not None:
@@ -61,7 +64,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
             or not bond['runtime_ready']['output'].get('formal_output_eligible')):
         return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
                 'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
-    trace=[*stock['call_trace'],*bond['call_trace']]
+    trace=[*data.get('technical_intake',{}).get('call_trace',[]),*stock['call_trace'],*bond['call_trace']]
     if c7_computation is not None:
         trace=c7_computation['call_trace']+trace
     def request(module,**payload):

@@ -22,6 +22,7 @@ from target_source_bridge import bind_target_source
 from bond_target_bridge import bind_bond_targets
 from v70_source_bridge import bind_v70_source
 from c7_engine import bind_c7_source
+from family_technical_bridge import bind_technical_source,apply_technical_source
 
 
 class FamilyRunner:
@@ -57,6 +58,7 @@ class FamilyRunner:
             require(all(proof.get(k)==evidence.get(k) for k in ('confirmed_at','confirmed_by')),
                     'NATIVE_CONFIRMATION_PROOF_MISMATCH',branch)
         require(bundle['stock_evidence']['evaluated_at']==request['evaluation_at'],'NATIVE_EVALUATION_TIME_MISMATCH','stock_evidence.evaluated_at')
+        prepared.payload['technical_intake']=bind_technical_source(self.repo_path,request,ctx) if ctx.get('technical_source') is not None else None
         prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
         prepared.payload['family_sources']={'funding':bind_funding_source(request,ctx),
             'macro':validate_macro_consumers(request),'bond':bind_bond_sources(request,prepared,binding)}
@@ -67,11 +69,12 @@ class FamilyRunner:
         prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding)
         prepared.payload['family_sources']['v70']=bind_v70_source(request,ctx)
         prepared.payload['family_sources']['c7']=bind_c7_source(self.repo_path,request,ctx)
+        if ctx.get('technical_source') is None:bind_technical_source(self.repo_path,request,ctx)
         return prepared,ctx
 
     def _compute(self,request):
         prepared,ctx=self._validate(request)
-        native=run_native_pipeline(self.repo_path,deepcopy(request['native_bundle']),
+        native=run_native_pipeline(self.repo_path,apply_technical_source(request['native_bundle'],prepared.payload['technical_intake']),
             prepared.payload['stock_source'],prepared.payload['family_sources'])
         require(native.get('status')=='NATIVE_PIPELINE_COMPLETE','NATIVE_RESULT_INCOMPLETE','native.status',status='DATA_UNAVAILABLE')
         u=native['unified_result']
@@ -86,7 +89,7 @@ class FamilyRunner:
             'input_digest':input_digest(request),'target_binding':deepcopy(prepared.payload['target_binding']),
             'expected_versions':deepcopy(request['expected_versions']),'evaluation_at':request['evaluation_at'],
             'runtime_mode':'REAL_DETERMINISTIC','data_provenance':ctx['native_binding']['data_provenance'],
-            'native_result':native,'mentor':mentor,'call_trace':native['call_trace'],
+            'technical_intake':prepared.payload['technical_intake'],'native_result':native,'mentor':mentor,'call_trace':native['call_trace'],
             'storage_scope':'ISOLATED_TEST_STAGING','production':'HOLD','trade_action':'NO_TRADE'}
 
     def analyze(self,request,*,timeout_seconds=30):

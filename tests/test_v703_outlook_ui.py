@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/18 22:51（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
+# 最後修改日期時間：2026/10/20 08:27（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
 """Regression tests for V70-3-27 macro-health UI preparation.
 
 Run: python -m unittest tests/test_v703_outlook_ui.py -v
@@ -66,6 +66,20 @@ class V703OutlookUITest(unittest.TestCase):
         self.assertIn("缺值維持 MISSING／NA，不補值", s)
         self.assertIn("if(entries.length===0)", s)
         self.assertIn("body.replaceChildren()", s)
+
+    def test_raw_data_table_hides_method_column_and_keeps_source_column(self):
+        s = self.source
+        panel = re.search(r'<details id="v703-raw-data-panel".*?</details>', s, re.S)
+        self.assertIsNotNone(panel)
+        markup = panel.group(0)
+        self.assertEqual(re.findall(r'<th class="p-2">([^<]+)</th>', markup), [
+            "代碼／指標", "原始值", "觀測日", "狀態／口徑", "來源"
+        ])
+        self.assertIn('colspan="5"', markup)
+        renderer = re.search(r'<script id="v703-render-raw-data">(.*?)</script>', s, re.S)
+        self.assertIsNotNone(renderer)
+        self.assertNotIn("r.method", renderer.group(1))
+        self.assertIn("r.source", renderer.group(1))
 
     def test_html_document_and_unique_ids(self):
         s = self.source

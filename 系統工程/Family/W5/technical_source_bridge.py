@@ -204,5 +204,5 @@ if __name__=='__main__':
     parser.add_argument('--output',required=True);args=parser.parse_args()
     rows=read_history(args.history,args.history_sha256)
     result=build_partial_technical(rows,metadata=json.loads(Path(args.metadata).read_text()),
-        evaluated_at=args.evaluated_at,repo_path=os.environ.get('W5_SOURCE_ROOT',str(HOME.parents[3])) )
+        evaluated_at=args.evaluated_at,repo_path=os.environ.get('W5_SOURCE_ROOT',str(HOME.parents[2])) )
     Path(args.output).write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n')

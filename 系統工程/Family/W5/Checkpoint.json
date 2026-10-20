@@ -2,12 +2,12 @@
   "contract_version": "2.2.1",
   "status": "IN_PROGRESS",
   "release": "RELEASED",
-  "implementation_completed": 10,
+  "implementation_completed": 15,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-  "next_owner": "同一位W5小PM",
-  "next_action": "完成09～14與16契約證據收斂、整線矩陣及最終部署；缺資料按原契約回不可用，不要求家人重填。",
+  "next_owner": "W5 小PM持續處理本線；Family 中PM協調具名來源與C8C9接口",
+  "next_action": "按PM_DECISIONS_REQUIRED.md一次解決兩項跨線事項；最終18驗收與PR整合。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
@@ -118,7 +118,7 @@
       "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
     },
     "W5-09": {
-      "status": "IN_PROGRESS",
+      "status": "BLOCKED_EXTERNAL_SOURCE",
       "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。",
       "remaining": "正式具名producer、週/月K原規則與完整來源綁定待接。",
       "evidence": [
@@ -127,57 +127,64 @@
       ]
     },
     "W5-10": {
-      "status": "IN_PROGRESS",
-      "completed": "原Work4→V82資金/Core/Deployment；V70上限實際限制買入，EXCEEDS_CAP/Hard Gate/零預算測試通過。 已完成不同V70 source_run原件保留及Family envelope，實際股債風險歸零驗證。",
-      "remaining": "正式具名資料來源、C7完整語意及Family整線驗收續作。",
+      "status": "COMPLETED",
+      "completed": "V70原context及本輪envelope、額度與Hard Gate實際限制V82；來源不足不猜預算。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
       "evidence": [
-        "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log",
-        "SOURCE_MAPPING_STATUS.md",
-        "evidence/funding_macro_bond_tests.log",
-        "evidence/v70_run_binding_tests.log"
+        "tests/test_stock_engine.py",
+        "tests/test_v70_source_bridge.py",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
       ]
     },
     "W5-11": {
-      "status": "IN_PROGRESS",
-      "completed": "真計算→原生49/13組裝→原Work4consume→原Work9分支映射；金額/數量保留，未知減碼NEEDS_REVIEW。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
-      "remaining": "producer展示欄完整來源綁定及BLOCKED_UNKNOWN正式49/13傳輸待補。",
+      "status": "COMPLETED",
+      "completed": "原V82 49/13欄組裝及Work9動作映射，保留raw；未定義減碼NEEDS_REVIEW；目標單位採原Work6來源可核對投影。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
       "evidence": [
-        "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log",
+        "tests/test_stock_engine.py",
         "tests/test_target_units.py",
-        "evidence/target_unit_positive.json"
+        "tests/test_native_adapters.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
       ]
     },
     "W5-12": {
-      "status": "IN_PROGRESS",
-      "completed": "原V75真計算已接同源V70 cap及EXCEEDS_CAP零上限；原預算與未部署contribution守恆。 已完成不同V70 source_run原件保留及Family envelope，實際股債風險歸零驗證。",
-      "remaining": "正式具名資料來源、C7完整語意及Family整線驗收續作。",
+      "status": "COMPLETED",
+      "completed": "原V75 predicates/Step10/逐檔配置實算；原Work5同源及資金守恆，非候選既有風險保留，缺必要市場資料停止。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
       "evidence": [
-        "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log",
-        "SOURCE_MAPPING_STATUS.md",
-        "evidence/funding_macro_bond_tests.log",
-        "evidence/v70_run_binding_tests.log"
+        "tests/test_bond_engine.py",
+        "tests/test_family_sources.py",
+        "tests/test_family_bridges.py",
+        "tests/test_v70_source_bridge.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
       ]
     },
     "W5-13": {
-      "status": "IN_PROGRESS",
-      "completed": "原Work9債券分支與account envelope映射，空per_asset仍保留BLOCK。",
-      "remaining": "完整逐檔動作與Family輸出契約測試待續。",
+      "status": "COMPLETED",
+      "completed": "原始V75 account/per-asset輸出及Work9 canonical投影保留；空陣列account BLOCK不吞掉，零額Money等值序列化。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
       "evidence": [
-        "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log"
+        "tests/test_bond_engine.py",
+        "tests/test_bond_target_mentor.py",
+        "tests/test_target_units.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
       ]
     },
     "W5-14": {
-      "status": "IN_PROGRESS",
-      "completed": "原Work7角色驗證後，唯讀核對實體估值/角色金額/未分配，建議未成交contribution另列。 本輪W1實體數量×明確單價比對physical_sgov並接原Work7；同owner/時間核對已接。",
-      "remaining": "真實W1角色/估值來源綁定與全部14棒邊界驗收待續。",
+      "status": "COMPLETED",
+      "completed": "原Work7與W1實體估值核對；existing roles、未分配及未成交contribution分開，同owner守恆、不寫ledger。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
       "evidence": [
-        "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log",
-        "evidence/position_source_tests.log"
+        "tests/test_sgov_bridge.py",
+        "tests/test_position_source_bridge.py",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
       ]
     },
     "W5-15": {
@@ -207,7 +214,7 @@
       ]
     },
     "W5-16": {
-      "status": "IN_PROGRESS",
+      "status": "BLOCKED_EXTERNAL_INTERFACE",
       "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
       "remaining": "四家人來源一致的Family runner整線及V75客戶動作優先序驗收。",
       "evidence": [
@@ -233,7 +240,7 @@
     "W5-18": {
       "status": "IN_PROGRESS",
       "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。 本輪補交CLI並實跑合成隔離與四庫歷史缺項案例。",
-      "remaining": "完整Family runner、各棒驗收、整線正向、最終PR整合與雙端正式部署。",
+      "remaining": "09具名技術來源與16債券客戶動作接口解決後，驗受影響案例及最終PR整合；施工包雙端驗證不等於整線放行。",
       "evidence": [
         ".github/workflows/family-w5.yml",
         "verify_dependencies.py",
@@ -677,6 +684,30 @@
       "pass": 268,
       "xfail": 0,
       "hashes": 111
+    }
+  },
+  "contract_closure": {
+    "progress": "15/18",
+    "newly_completed": [
+      "W5-10",
+      "W5-11",
+      "W5-12",
+      "W5-13",
+      "W5-14"
+    ],
+    "runtime_changes": 0,
+    "prior_ci_success": "https://github.com/a23882005/LivingWaterAI/actions/runs/39469962774",
+    "tests_reused": 268,
+    "source_hashes": 111,
+    "pr": "https://github.com/a23882005/LivingWaterAI/pull/22",
+    "main_observed": "bc8d581d74c7f17204a0b3e251c0f659279aedc8",
+    "final_release": false,
+    "deployment_copy_smoke": {
+      "status": "PASS",
+      "case": "test_family_real_engines_mentor_replay_and_historical_confirmation",
+      "exit_code": 0,
+      "log": "evidence/deployment_copy_smoke.log",
+      "source_zip_sha256": "c16593a7aeb9ad8634abb1b827029e5443651145017c389d09aac047e10a3cf8"
     }
   }
 }

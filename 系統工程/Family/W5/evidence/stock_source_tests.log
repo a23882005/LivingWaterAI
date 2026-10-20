@@ -1,0 +1,6 @@
+........................................................................ [ 43%]
+............................................x........................... [ 87%]
+....................                                                     [100%]
+=========================== short test summary info ============================
+XFAIL repo/系統工程/Family/W5/tests/test_native_pipeline.py::test_actual_engines_to_full_work9_and_mentor - OPEN W5-C8C9-TARGET-UNIT: native Work8 compares money to weight
+163 passed, 1 xfailed in 31.64s

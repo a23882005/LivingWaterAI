@@ -1,0 +1,1883 @@
+{
+  "contract_name": "LivingWaterAI.C8C9.Work9.UnifiedDeploymentInput",
+  "contract_version": "C8C9-W9-UDI-v1.0.0",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "run_id": "w8-run-001",
+  "work4_v82_integration_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work4.V82IntegrationResult",
+    "contract_version": "C8C9-W4-V82AO-v1.0.0",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "asset_id": "TSM.US",
+    "work3_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+    "upstream_v70_snapshot_id": "v70-w8-snap-001",
+    "shared_context_id": "shared-w8-001",
+    "shared_context_digest_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "authorization_reference": "C-W6-FINAL-97c157148ba5cccf73dfe332",
+    "consumed_equity_executable_budget": {
+      "amount": "450.00",
+      "currency": "USD",
+      "cash_basis": "AVAILABLE",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "source_pointer": "/funding_context/executable_budget/equity"
+    },
+    "canonical_v82_output": {
+      "contract_name": "LivingWaterAI.V82.RuntimeOutput",
+      "contract_version": "V82-OUTPUT-v1.0.1-W2-RECHECK2",
+      "run_id": "w8-run-001",
+      "v82_snapshot_id": "v82-w8-snap-001",
+      "upstream_v70_snapshot_id": "v70-w8-snap-001",
+      "asset_id": "TSM.US",
+      "rule_version": "V82-v1.21.0",
+      "data_as_of": {
+        "shared": "2026-09-28T01:20:00+08:00"
+      },
+      "evaluated_at": "2026-09-28T01:29:00+08:00",
+      "source_lineage": [
+        "work3-w8",
+        "c7-w8",
+        "v70-w8"
+      ],
+      "output_status": "OK",
+      "canonical_analysis": {
+        "latest_price": {
+          "field_name": "latest_price",
+          "value": {
+            "amount": 200.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "market_data_as_of": {
+          "field_name": "market_data_as_of",
+          "value": "2026-09-28T01:20:00+08:00",
+          "data_type": "DateTime",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "asset_behavior_classification": {
+          "field_name": "asset_behavior_classification",
+          "value": "INDIVIDUAL_COMPANY_STOCK",
+          "data_type": "EnumRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "primary_framework": {
+          "field_name": "primary_framework",
+          "value": "V82",
+          "data_type": "RuleRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "secondary_framework": {
+          "field_name": "secondary_framework",
+          "value": "NONE",
+          "data_type": "RuleRef/List",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "fundamental_state": {
+          "field_name": "fundamental_state",
+          "value": {
+            "state": "RISK_REVIEW",
+            "source_owned": true
+          },
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "valuation_state": {
+          "field_name": "valuation_state",
+          "value": "EXPENSIVE",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "td9_high_state": {
+          "field_name": "td9_high_state",
+          "value": "HIGH_9",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "td9_low_state": {
+          "field_name": "td9_low_state",
+          "value": "NONE",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "kd_state": {
+          "field_name": "kd_state",
+          "value": "WEAKENING",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "macd_state": {
+          "field_name": "macd_state",
+          "value": "WEAKENING",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "ma_state": {
+          "field_name": "ma_state",
+          "value": "BELOW_MA20",
+          "data_type": "StructuredSignal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "emv_state": {
+          "field_name": "emv_state",
+          "value": "WEAK",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "rsi_state": {
+          "field_name": "rsi_state",
+          "value": "NEUTRAL",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "volume_price_state": {
+          "field_name": "volume_price_state",
+          "value": "SELL_PRESSURE",
+          "data_type": "StructuredSignal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "daily_timeframe_state": {
+          "field_name": "daily_timeframe_state",
+          "value": "WEAK",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "weekly_timeframe_state": {
+          "field_name": "weekly_timeframe_state",
+          "value": "NEUTRAL",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "monthly_timeframe_state": {
+          "field_name": "monthly_timeframe_state",
+          "value": "UPTREND",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "atr_value": {
+          "field_name": "atr_value",
+          "value": 8.0,
+          "data_type": "Decimal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "drawdown_from_reference_high": {
+          "field_name": "drawdown_from_reference_high",
+          "value": 0.12,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_1": {
+          "field_name": "previous_swing_low_1",
+          "value": {
+            "amount": 180.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_2": {
+          "field_name": "previous_swing_low_2",
+          "value": {
+            "amount": 170.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_3": {
+          "field_name": "previous_swing_low_3",
+          "value": {
+            "amount": 160.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "price_map": {
+          "field_name": "price_map",
+          "value": {
+            "state": "KNOWN"
+          },
+          "data_type": "StructuredPriceMap",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "first_buy_zone": {
+          "field_name": "first_buy_zone",
+          "value": null,
+          "data_type": "PriceZoneRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "second_price_zone": {
+          "field_name": "second_price_zone",
+          "value": null,
+          "data_type": "PriceZoneRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "deep_extreme_discount_zone": {
+          "field_name": "deep_extreme_discount_zone",
+          "value": null,
+          "data_type": "PriceZoneRef/List",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "left_buy_point_state": {
+          "field_name": "left_buy_point_state",
+          "value": "FALSE",
+          "data_type": "TriState/Structured",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "right_confirmation_state": {
+          "field_name": "right_confirmation_state",
+          "value": "FALSE",
+          "data_type": "TriState/Structured",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "runaway_state": {
+          "field_name": "runaway_state",
+          "value": {
+            "up": "FALSE",
+            "down": "FALSE"
+          },
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "macro_state": {
+          "field_name": "macro_state",
+          "value": "CAUTION",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "credit_liquidity_state": {
+          "field_name": "credit_liquidity_state",
+          "value": "OK",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "material_news_policy_state": {
+          "field_name": "material_news_policy_state",
+          "value": "RISK_EVENT",
+          "data_type": "StructuredEventState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "exposure_overlap": {
+          "field_name": "exposure_overlap",
+          "value": 0.0,
+          "data_type": "StructuredExposure",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "position_cap": {
+          "field_name": "position_cap",
+          "value": 0.05,
+          "data_type": "Money/Rate Constraint",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "project_target_position": {
+          "field_name": "project_target_position",
+          "value": 0.05,
+          "data_type": "Money/Rate Target",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "confirmed_position": {
+          "field_name": "confirmed_position",
+          "value": 0.05,
+          "data_type": "PositionFact",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "actual_completion_rate": {
+          "field_name": "actual_completion_rate",
+          "value": 1.0,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "normal_deployment_mode": {
+          "field_name": "normal_deployment_mode",
+          "value": "Base Deployment",
+          "data_type": "Enum",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "primary_special_classification": {
+          "field_name": "primary_special_classification",
+          "value": "真正降低風險",
+          "data_type": "Enum/Display",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_action": {
+          "field_name": "execution_action",
+          "value": "REDUCE_RISK",
+          "data_type": "ActionState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [
+            "V82_SOURCE_RISK_ACTION"
+          ],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "canonical_deployment_target_rate": {
+          "field_name": "canonical_deployment_target_rate",
+          "value": 10,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_amount": {
+          "field_name": "execution_amount",
+          "value": {
+            "amount": 0.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "Money",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_quantity": {
+          "field_name": "execution_quantity",
+          "value": 0.0,
+          "data_type": "Quantity",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_price": {
+          "field_name": "execution_price",
+          "value": "NOT_APPLICABLE",
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "projected_post_fill_completion_rate": {
+          "field_name": "projected_post_fill_completion_rate",
+          "value": 1.0,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "order_submission_plan": {
+          "field_name": "order_submission_plan",
+          "value": {
+            "should_place_order": false,
+            "order_type": "NONE",
+            "limit_price": null,
+            "quantity": 0.0,
+            "time_in_force": "NONE",
+            "scheduling_mode": "MANUAL",
+            "broker_or_adapter_constraints": null,
+            "order_intent_id": null
+          },
+          "data_type": "StructuredOrderPlan",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "cancel_conditions": {
+          "field_name": "cancel_conditions",
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ],
+          "data_type": "ConditionSet",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "reevaluation_conditions": {
+          "field_name": "reevaluation_conditions",
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ],
+          "data_type": "ConditionSet",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        }
+      },
+      "fields_1_to_13": [
+        {
+          "ordinal": 1,
+          "display_label": "今日特殊分類",
+          "canonical_mapping": "#40 `primary_special_classification`",
+          "value": "真正降低風險"
+        },
+        {
+          "ordinal": 2,
+          "display_label": "目前部署階段",
+          "canonical_mapping": "#39 `normal_deployment_mode`＋#41 Context",
+          "value": {
+            "mode": "Base Deployment",
+            "execution_context": "REDUCE_RISK"
+          }
+        },
+        {
+          "ordinal": 3,
+          "display_label": "目標與完成率",
+          "canonical_mapping": "#36 `project_target_position`＋#37 `confirmed_position`＋#38 `actual_completion_rate`",
+          "value": {
+            "project_target_position": 0.05,
+            "confirmed_position": 0.05,
+            "actual_completion_rate": 1.0
+          }
+        },
+        {
+          "ordinal": 4,
+          "display_label": "今日動作",
+          "canonical_mapping": "#41 `execution_action`",
+          "value": "REDUCE_RISK"
+        },
+        {
+          "ordinal": 5,
+          "display_label": "執行比例",
+          "canonical_mapping": "#42 `canonical_deployment_target_rate`",
+          "value": 10
+        },
+        {
+          "ordinal": 6,
+          "display_label": "執行金額",
+          "canonical_mapping": "#43 `execution_amount`",
+          "value": {
+            "amount": 0.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          }
+        },
+        {
+          "ordinal": 7,
+          "display_label": "執行股數",
+          "canonical_mapping": "#44 `execution_quantity`",
+          "value": 0.0
+        },
+        {
+          "ordinal": 8,
+          "display_label": "執行價格",
+          "canonical_mapping": "#45 `execution_price`",
+          "value": "NOT_APPLICABLE"
+        },
+        {
+          "ordinal": 9,
+          "display_label": "成交後完成率",
+          "canonical_mapping": "#46 `projected_post_fill_completion_rate`",
+          "value": 1.0
+        },
+        {
+          "ordinal": 10,
+          "display_label": "是否掛單",
+          "canonical_mapping": "#47 `order_submission_plan.should_place_order`",
+          "value": false
+        },
+        {
+          "ordinal": 11,
+          "display_label": "掛單方式",
+          "canonical_mapping": "#47 `order_submission_plan.{order_type,time_in_force,scheduling_mode}`",
+          "value": {
+            "order_type": "NONE",
+            "time_in_force": "NONE",
+            "scheduling_mode": "MANUAL"
+          }
+        },
+        {
+          "ordinal": 12,
+          "display_label": "取消條件",
+          "canonical_mapping": "#48 `cancel_conditions`",
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ]
+        },
+        {
+          "ordinal": 13,
+          "display_label": "下一次重新評估條件",
+          "canonical_mapping": "#49 `reevaluation_conditions`",
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ]
+        }
+      ]
+    },
+    "source_semantics_policy": "PRESERVE_V82_CANONICAL_OUTPUT_NO_LOSSY_TRANSLATION",
+    "integration_diagnostics": []
+  },
+  "work5_v75_integration_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work5.V75IntegrationResult",
+    "contract_version": "C8C9-W5-V75AO-v1.0.1-RECHECK1",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "work3_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+    "upstream_v70_snapshot_id": "v70-w8-snap-001",
+    "shared_context_id": "shared-w8-001",
+    "shared_context_digest_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "v75_source_context_digest_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "consumed_bond_executable_budget": {
+      "amount": "350.00",
+      "currency": "USD",
+      "cash_basis": "AVAILABLE",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "source_pointer": "/funding_context/executable_budget/bond"
+    },
+    "sgov_semantics": {
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "v75_undeployed_to_sgov": {
+        "amount": "280.00",
+        "currency": "USD"
+      },
+      "roles_kept_separate": true,
+      "dry_powder_input_read_only": true,
+      "adapter_created_undeployed_route": false,
+      "same_account_usd_route_guard_enforced": true
+    },
+    "canonical_v75_runtime_ready_snapshot": {
+      "run_id": "w8-run-001",
+      "broker_account_id": "QA_ACCOUNT",
+      "currency": "USD",
+      "cutover_state": "READY",
+      "runtime_ready": true,
+      "gate_state": "PASS",
+      "evaluation_state": "COMPLETE",
+      "final_classification": "ACTIONABLE",
+      "output": {
+        "run_id": "w8-run-001",
+        "rule_version": "V75-vQA",
+        "predicate_version": "V75-PRED-vQA",
+        "deployment_parameter_version": "V75-DP-vQA",
+        "broker_account_id": "QA_ACCOUNT",
+        "broker_domain_type": "US_BROKER",
+        "currency": "USD",
+        "per_asset_decisions": [
+          {
+            "asset_id": "BNDW",
+            "deployment_state": "SMALL_BUY",
+            "deployment_pct": {
+              "value": "20",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "70.00",
+              "currency": "USD"
+            },
+            "new_money_action": "SMALL_BUY",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "QA"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "V75_QA_BUY"
+            ],
+            "source_lineage": [
+              "V75-QA-BNDW"
+            ]
+          },
+          {
+            "asset_id": "SGOV",
+            "deployment_state": "PAUSE",
+            "deployment_pct": {
+              "value": "0",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "0",
+              "currency": "USD"
+            },
+            "new_money_action": "PAUSE",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "QA"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "V75_QA_PAUSE"
+            ],
+            "source_lineage": [
+              "V75-QA-SGOV"
+            ]
+          }
+        ],
+        "sgov_bond_bucket_amount": {
+          "status": "KNOWN",
+          "value": {
+            "amount": "40.00",
+            "currency": "USD"
+          }
+        },
+        "v75_undeployed_to_sgov": {
+          "amount": "280.00",
+          "currency": "USD"
+        },
+        "formal_output_eligible": true,
+        "evaluation_state": "COMPLETE",
+        "missing_required_fields": [],
+        "reason_codes": [
+          "V75_QA"
+        ],
+        "source_lineage": [
+          "V75-OUTPUT-QA"
+        ]
+      },
+      "blocking_reason_codes": [],
+      "source_lineage": [
+        "V75-READY-QA"
+      ]
+    },
+    "canonical_v75_output": {
+      "run_id": "w8-run-001",
+      "rule_version": "V75-vQA",
+      "predicate_version": "V75-PRED-vQA",
+      "deployment_parameter_version": "V75-DP-vQA",
+      "broker_account_id": "QA_ACCOUNT",
+      "broker_domain_type": "US_BROKER",
+      "currency": "USD",
+      "per_asset_decisions": [
+        {
+          "asset_id": "BNDW",
+          "deployment_state": "SMALL_BUY",
+          "deployment_pct": {
+            "value": "20",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "70.00",
+            "currency": "USD"
+          },
+          "new_money_action": "SMALL_BUY",
+          "existing_position_action": "HOLD",
+          "classification": [
+            "QA"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "V75_QA_BUY"
+          ],
+          "source_lineage": [
+            "V75-QA-BNDW"
+          ]
+        },
+        {
+          "asset_id": "SGOV",
+          "deployment_state": "PAUSE",
+          "deployment_pct": {
+            "value": "0",
+            "unit": "PERCENT"
+          },
+          "deploy_amount": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "new_money_action": "PAUSE",
+          "existing_position_action": "HOLD",
+          "classification": [
+            "QA"
+          ],
+          "gate_state": "PASS",
+          "evaluation_state": "COMPLETE",
+          "reason_codes": [
+            "V75_QA_PAUSE"
+          ],
+          "source_lineage": [
+            "V75-QA-SGOV"
+          ]
+        }
+      ],
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "v75_undeployed_to_sgov": {
+        "amount": "280.00",
+        "currency": "USD"
+      },
+      "formal_output_eligible": true,
+      "evaluation_state": "COMPLETE",
+      "missing_required_fields": [],
+      "reason_codes": [
+        "V75_QA"
+      ],
+      "source_lineage": [
+        "V75-OUTPUT-QA"
+      ]
+    },
+    "source_semantics_policy": "PRESERVE_FROZEN_V75_NO_BUSINESS_RECOMPUTE",
+    "integration_diagnostics": []
+  },
+  "work6_funding_account_isolation_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationResult",
+    "contract_version": "C8C9-W6-FAIO-v1.0.0",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "work3_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+    "c7_funding_context_digest_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "funding_event_reconciliation": {
+      "total_new_investment_amount": "800.00",
+      "three_domain_bucket_sum": "800.00",
+      "exact_three_domains": true,
+      "duplicate_broker_account_context": false
+    },
+    "cash_eligibility": {
+      "cash_basis": "AVAILABLE",
+      "total": "1000.00",
+      "available": "800.00",
+      "unsettled": "100.00",
+      "reserved": "100.00",
+      "equity_executable_budget": "450.00",
+      "bond_executable_budget": "350.00",
+      "combined_executable_budget": "800.00",
+      "within_available": true,
+      "within_owner_bucket": true,
+      "unsettled_reserved_consumed": false,
+      "available_formula_inferred": false
+    },
+    "adapter_binding_evidence": {
+      "work4_v82_serialized_owner_matches": true,
+      "work5_v75_serialized_owner_matches": true,
+      "work4_equity_budget_exact": true,
+      "work5_bond_budget_exact": true,
+      "cross_account_funding_forbidden": true,
+      "cross_broker_funding_forbidden": true,
+      "cross_domain_funding_forbidden": true,
+      "wrong_owner_forbidden": true
+    },
+    "source_semantics_policy": "VALIDATE_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE_NO_FX",
+    "integration_diagnostics": []
+  },
+  "work7_sgov_runtime_role_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work7.SGOVRuntimeRoleResult",
+    "contract_version": "C8C9-W7-SGOVO-v1.0.0",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "work3_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+    "source_digests": {
+      "work4_v82_adapter_binding_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+      "work5_v75_integration_sha256": "78b4f47588db8ca76ef5304ea9233b719ccf938bee6747dd2bfd92fbd934ae74",
+      "work6_funding_isolation_sha256": "181502f7672de23a95b17af91ce215f67f416cdc16f6c2609212fa6ed079eda8"
+    },
+    "sgov_roles": {
+      "sgov_bond_bucket": {
+        "role": "SGOV_BOND_BUCKET",
+        "source": "V75_BOND_ROLE_CONTEXT",
+        "amount": "40.00",
+        "currency": "USD",
+        "aggregation_performed": false
+      },
+      "sgov_dry_powder_bucket": {
+        "role": "SGOV_DRY_POWDER_BUCKET",
+        "source": "READ_ONLY_UPSTREAM_CONTEXT",
+        "amount": "60.00",
+        "currency": "USD",
+        "aggregation_performed": false
+      },
+      "v75_undeployed_to_sgov": {
+        "role": "V75_UNDEPLOYED_TO_SGOV",
+        "source": "FROZEN_V75_OUTPUT",
+        "contribution": {
+          "amount": "280.00",
+          "currency": "USD"
+        },
+        "destination_role": "SGOV_DRY_POWDER_BUCKET",
+        "contribution_applied_to_aggregate": false
+      }
+    },
+    "route_safety": {
+      "roles_kept_separate": true,
+      "same_us_broker_account_guard_enforced": true,
+      "v82_equity_budget_auto_route_forbidden": true,
+      "idle_usd_auto_route_forbidden": true,
+      "reserved_cash_auto_route_forbidden": true,
+      "unsettled_cash_auto_route_forbidden": true,
+      "same_run_double_count_forbidden": true,
+      "final_dry_powder_aggregate_computed": false,
+      "family_physical_subledger_created": false
+    },
+    "funding_evidence": {
+      "cash_basis": "AVAILABLE",
+      "equity_executable_budget": "450.00",
+      "bond_executable_budget": "350.00",
+      "unsettled": "100.00",
+      "reserved": "100.00",
+      "v75_undeployed_contribution": "280.00"
+    },
+    "source_semantics_policy": "PRESERVE_ROLES_VALIDATE_ROUTE_NO_AGGREGATE_NO_SECOND_FUNDING_ENGINE_NO_FX",
+    "integration_diagnostics": []
+  },
+  "work8_protected_holding_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work8.ProtectedHoldingProtectionResult",
+    "contract_version": "C8C9-W8-PHPO-v1.0.1",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "asset_id": "TSM.US",
+    "source_binding": {
+      "c_work7_snapshot_id": "C-W7-18004d963f0826ffbd871f3233145ffe",
+      "c_work6_snapshot_id": "C-W6-9dbc99d0088bb01c583d263785828a23",
+      "final_target_allocation_id": "C-W6-FINAL-97c157148ba5cccf73dfe332",
+      "final_target_confirmed_at": "2026-09-24T11:45:00+08:00",
+      "final_target_confirmed_by": "CLIENT-DEMO",
+      "work4_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+      "work4_v82_snapshot_id": "v82-w8-snap-001",
+      "c_work7_sha256": "e4e84eb4ed09cd7bdd5b0f43363d30a9e6408903573903227f07e3fa57501443",
+      "work4_v82_integration_sha256": "970c7d9cd3f2899aeb8998b29848d30b3c2eb5457ba4c9bcdd1b78adb71df13f",
+      "canonical_v82_output_sha256": "80f0c3af593744e73832aef5aedddf85c38c456e65d3ebcaf1f2c929b21d25de"
+    },
+    "protected_holding": {
+      "protection_applied": true,
+      "current_weight": 0.05,
+      "final_target_weight": 0.05,
+      "drift": 0.0,
+      "allocation_rule": "LOCKED_CURRENT_WEIGHT",
+      "client_facing_action": "HOLD_PROTECTED",
+      "target_change_authorized": false,
+      "explicit_client_unlock_required_before_target_change": true
+    },
+    "v82_signal_visibility": {
+      "raw_execution_action": "REDUCE_RISK",
+      "fundamental_state": {
+        "source_owned": true,
+        "state": "RISK_REVIEW"
+      },
+      "valuation_state": "EXPENSIVE",
+      "primary_special_classification": "真正降低風險",
+      "technical_macro_signal_values": {
+        "td9_high_state": "HIGH_9",
+        "td9_low_state": "NONE",
+        "kd_state": "WEAKENING",
+        "macd_state": "WEAKENING",
+        "ma_state": "BELOW_MA20",
+        "emv_state": "WEAK",
+        "rsi_state": "NEUTRAL",
+        "volume_price_state": "SELL_PRESSURE",
+        "daily_timeframe_state": "WEAK",
+        "weekly_timeframe_state": "NEUTRAL",
+        "monthly_timeframe_state": "UPTREND",
+        "runaway_state": {
+          "down": "FALSE",
+          "up": "FALSE"
+        },
+        "macro_state": "CAUTION",
+        "credit_liquidity_state": "OK",
+        "material_news_policy_state": "RISK_EVENT"
+      },
+      "source_issue_codes": [
+        "V82_SOURCE_RISK_ACTION"
+      ],
+      "canonical_v82_output_preserved": true,
+      "canonical_v82_output_sha256": "80f0c3af593744e73832aef5aedddf85c38c456e65d3ebcaf1f2c929b21d25de",
+      "hard_gate_signal_recomputed": false,
+      "risk_signal_rewritten": false
+    },
+    "client_action_protection": {
+      "client_facing_action": "HOLD_PROTECTED",
+      "client_action_source": "C_WORK6_7_DRIFT_CONTRACT",
+      "risk_disclosure_channel_available": true,
+      "risk_warning_is_not_sell_instruction": true,
+      "v82_risk_signal_exposed_without_rewrite": true,
+      "silent_preference_mutation_forbidden": true,
+      "sell_all_reduce_to_zero_from_allocation_optimization_forbidden": true,
+      "v82_risk_action_not_reclassified_as_allocation_action": true
+    },
+    "canonical_v82_output": {
+      "asset_id": "TSM.US",
+      "canonical_analysis": {
+        "actual_completion_rate": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Rate",
+          "field_name": "actual_completion_rate",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 1.0
+        },
+        "asset_behavior_classification": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "EnumRef",
+          "field_name": "asset_behavior_classification",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "INDIVIDUAL_COMPANY_STOCK"
+        },
+        "atr_value": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Decimal",
+          "field_name": "atr_value",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 8.0
+        },
+        "cancel_conditions": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "ConditionSet",
+          "field_name": "cancel_conditions",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ]
+        },
+        "canonical_deployment_target_rate": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Rate",
+          "field_name": "canonical_deployment_target_rate",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 10
+        },
+        "confirmed_position": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "PositionFact",
+          "field_name": "confirmed_position",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.05
+        },
+        "credit_liquidity_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredState",
+          "field_name": "credit_liquidity_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "OK"
+        },
+        "daily_timeframe_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "TimeframeState",
+          "field_name": "daily_timeframe_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "WEAK"
+        },
+        "deep_extreme_discount_zone": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "PriceZoneRef/List",
+          "field_name": "deep_extreme_discount_zone",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": null
+        },
+        "drawdown_from_reference_high": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Rate",
+          "field_name": "drawdown_from_reference_high",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.12
+        },
+        "emv_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "emv_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "WEAK"
+        },
+        "execution_action": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "ActionState",
+          "field_name": "execution_action",
+          "issue_codes": [
+            "V82_SOURCE_RISK_ACTION"
+          ],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "REDUCE_RISK"
+        },
+        "execution_amount": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Money",
+          "field_name": "execution_amount",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "amount": 0.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        "execution_price": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "MoneyPerUnit",
+          "field_name": "execution_price",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "NOT_APPLICABLE"
+        },
+        "execution_quantity": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Quantity",
+          "field_name": "execution_quantity",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.0
+        },
+        "exposure_overlap": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredExposure",
+          "field_name": "exposure_overlap",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.0
+        },
+        "first_buy_zone": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "PriceZoneRef",
+          "field_name": "first_buy_zone",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": null
+        },
+        "fundamental_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredState",
+          "field_name": "fundamental_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "source_owned": true,
+            "state": "RISK_REVIEW"
+          }
+        },
+        "kd_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "kd_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "WEAKENING"
+        },
+        "latest_price": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "MoneyPerUnit",
+          "field_name": "latest_price",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "amount": 200.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        "left_buy_point_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "TriState/Structured",
+          "field_name": "left_buy_point_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "FALSE"
+        },
+        "ma_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredSignal",
+          "field_name": "ma_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "BELOW_MA20"
+        },
+        "macd_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "macd_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "WEAKENING"
+        },
+        "macro_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredState",
+          "field_name": "macro_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "CAUTION"
+        },
+        "market_data_as_of": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "DateTime",
+          "field_name": "market_data_as_of",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "2026-09-28T01:20:00+08:00"
+        },
+        "material_news_policy_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredEventState",
+          "field_name": "material_news_policy_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "RISK_EVENT"
+        },
+        "monthly_timeframe_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "TimeframeState",
+          "field_name": "monthly_timeframe_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "UPTREND"
+        },
+        "normal_deployment_mode": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Enum",
+          "field_name": "normal_deployment_mode",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "Base Deployment"
+        },
+        "order_submission_plan": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredOrderPlan",
+          "field_name": "order_submission_plan",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "broker_or_adapter_constraints": null,
+            "limit_price": null,
+            "order_intent_id": null,
+            "order_type": "NONE",
+            "quantity": 0.0,
+            "scheduling_mode": "MANUAL",
+            "should_place_order": false,
+            "time_in_force": "NONE"
+          }
+        },
+        "position_cap": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Money/Rate Constraint",
+          "field_name": "position_cap",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.05
+        },
+        "previous_swing_low_1": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "MoneyPerUnit",
+          "field_name": "previous_swing_low_1",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "amount": 180.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        "previous_swing_low_2": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "MoneyPerUnit",
+          "field_name": "previous_swing_low_2",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "amount": 170.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        "previous_swing_low_3": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "MoneyPerUnit",
+          "field_name": "previous_swing_low_3",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "amount": 160.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        "price_map": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredPriceMap",
+          "field_name": "price_map",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "state": "KNOWN"
+          }
+        },
+        "primary_framework": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "RuleRef",
+          "field_name": "primary_framework",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "V82"
+        },
+        "primary_special_classification": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Enum/Display",
+          "field_name": "primary_special_classification",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "真正降低風險"
+        },
+        "project_target_position": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Money/Rate Target",
+          "field_name": "project_target_position",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 0.05
+        },
+        "projected_post_fill_completion_rate": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "Rate",
+          "field_name": "projected_post_fill_completion_rate",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": 1.0
+        },
+        "reevaluation_conditions": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "ConditionSet",
+          "field_name": "reevaluation_conditions",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ]
+        },
+        "right_confirmation_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "TriState/Structured",
+          "field_name": "right_confirmation_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "FALSE"
+        },
+        "rsi_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "rsi_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "NEUTRAL"
+        },
+        "runaway_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredState",
+          "field_name": "runaway_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": {
+            "down": "FALSE",
+            "up": "FALSE"
+          }
+        },
+        "second_price_zone": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "PriceZoneRef",
+          "field_name": "second_price_zone",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": null
+        },
+        "secondary_framework": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "RuleRef/List",
+          "field_name": "secondary_framework",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "NONE"
+        },
+        "td9_high_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "td9_high_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "HIGH_9"
+        },
+        "td9_low_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "SignalState",
+          "field_name": "td9_low_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "NONE"
+        },
+        "valuation_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredState",
+          "field_name": "valuation_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "EXPENSIVE"
+        },
+        "volume_price_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "StructuredSignal",
+          "field_name": "volume_price_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "SELL_PRESSURE"
+        },
+        "weekly_timeframe_state": {
+          "data_as_of": null,
+          "data_quality": "OK",
+          "data_type": "TimeframeState",
+          "field_name": "weekly_timeframe_state",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001",
+          "source_reference": null,
+          "value": "NEUTRAL"
+        }
+      },
+      "contract_name": "LivingWaterAI.V82.RuntimeOutput",
+      "contract_version": "V82-OUTPUT-v1.0.1-W2-RECHECK2",
+      "data_as_of": {
+        "shared": "2026-09-28T01:20:00+08:00"
+      },
+      "evaluated_at": "2026-09-28T01:29:00+08:00",
+      "fields_1_to_13": [
+        {
+          "canonical_mapping": "#40 `primary_special_classification`",
+          "display_label": "今日特殊分類",
+          "ordinal": 1,
+          "value": "真正降低風險"
+        },
+        {
+          "canonical_mapping": "#39 `normal_deployment_mode`＋#41 Context",
+          "display_label": "目前部署階段",
+          "ordinal": 2,
+          "value": {
+            "execution_context": "REDUCE_RISK",
+            "mode": "Base Deployment"
+          }
+        },
+        {
+          "canonical_mapping": "#36 `project_target_position`＋#37 `confirmed_position`＋#38 `actual_completion_rate`",
+          "display_label": "目標與完成率",
+          "ordinal": 3,
+          "value": {
+            "actual_completion_rate": 1.0,
+            "confirmed_position": 0.05,
+            "project_target_position": 0.05
+          }
+        },
+        {
+          "canonical_mapping": "#41 `execution_action`",
+          "display_label": "今日動作",
+          "ordinal": 4,
+          "value": "REDUCE_RISK"
+        },
+        {
+          "canonical_mapping": "#42 `canonical_deployment_target_rate`",
+          "display_label": "執行比例",
+          "ordinal": 5,
+          "value": 10
+        },
+        {
+          "canonical_mapping": "#43 `execution_amount`",
+          "display_label": "執行金額",
+          "ordinal": 6,
+          "value": {
+            "amount": 0.0,
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "status": "KNOWN"
+          }
+        },
+        {
+          "canonical_mapping": "#44 `execution_quantity`",
+          "display_label": "執行股數",
+          "ordinal": 7,
+          "value": 0.0
+        },
+        {
+          "canonical_mapping": "#45 `execution_price`",
+          "display_label": "執行價格",
+          "ordinal": 8,
+          "value": "NOT_APPLICABLE"
+        },
+        {
+          "canonical_mapping": "#46 `projected_post_fill_completion_rate`",
+          "display_label": "成交後完成率",
+          "ordinal": 9,
+          "value": 1.0
+        },
+        {
+          "canonical_mapping": "#47 `order_submission_plan.should_place_order`",
+          "display_label": "是否掛單",
+          "ordinal": 10,
+          "value": false
+        },
+        {
+          "canonical_mapping": "#47 `order_submission_plan.{order_type,time_in_force,scheduling_mode}`",
+          "display_label": "掛單方式",
+          "ordinal": 11,
+          "value": {
+            "order_type": "NONE",
+            "scheduling_mode": "MANUAL",
+            "time_in_force": "NONE"
+          }
+        },
+        {
+          "canonical_mapping": "#48 `cancel_conditions`",
+          "display_label": "取消條件",
+          "ordinal": 12,
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ]
+        },
+        {
+          "canonical_mapping": "#49 `reevaluation_conditions`",
+          "display_label": "下一次重新評估條件",
+          "ordinal": 13,
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ]
+        }
+      ],
+      "output_status": "OK",
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w8-run-001",
+      "source_lineage": [
+        "work3-w8",
+        "c7-w8",
+        "v70-w8"
+      ],
+      "upstream_v70_snapshot_id": "v70-w8-snap-001",
+      "v82_snapshot_id": "v82-w8-snap-001"
+    },
+    "source_semantics_policy": "PRESERVE_V82_RISK_SIGNAL_AND_C_PROTECTED_PREFERENCE_AS_PARALLEL_SOURCE_OWNED_FACTS",
+    "integration_diagnostics": []
+  }
+}

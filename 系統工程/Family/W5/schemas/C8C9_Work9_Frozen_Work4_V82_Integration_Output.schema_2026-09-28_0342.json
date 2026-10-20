@@ -1,0 +1,5415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work4_V82_Integration_Result.schema.json",
+  "title": "C8C9 Work4 V82 Integration Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "baseline_id",
+    "run_id",
+    "owner",
+    "currency",
+    "asset_id",
+    "work3_context_handoff_id",
+    "upstream_v70_snapshot_id",
+    "shared_context_id",
+    "shared_context_digest_sha256",
+    "authorization_reference",
+    "consumed_equity_executable_budget",
+    "canonical_v82_output",
+    "source_semantics_policy",
+    "integration_diagnostics"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C8C9.Work4.V82IntegrationResult"
+    },
+    "contract_version": {
+      "const": "C8C9-W4-V82AO-v1.0.0"
+    },
+    "baseline_id": {
+      "const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "funding_domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "funding_domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work3_context_handoff_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "upstream_v70_snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "shared_context_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "shared_context_digest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "authorization_reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consumed_equity_executable_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "cash_basis",
+        "owner",
+        "source_pointer"
+      ],
+      "properties": {
+        "amount": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "funding_domain",
+            "broker",
+            "account"
+          ],
+          "properties": {
+            "funding_domain": {
+              "enum": [
+                "TW_LOCAL_BROKER",
+                "TW_SUB_BROKERAGE",
+                "US_BROKER"
+              ]
+            },
+            "broker": {
+              "type": "string",
+              "minLength": 1
+            },
+            "account": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "source_pointer": {
+          "const": "/funding_context/executable_budget/equity"
+        }
+      }
+    },
+    "canonical_v82_output": {
+      "title": "LivingWaterAI V82 Runtime Output Contract — W2 Blueprint",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "run_id",
+        "v82_snapshot_id",
+        "upstream_v70_snapshot_id",
+        "asset_id",
+        "rule_version",
+        "data_as_of",
+        "evaluated_at",
+        "source_lineage",
+        "output_status",
+        "canonical_analysis",
+        "fields_1_to_13"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.V82.RuntimeOutput"
+        },
+        "contract_version": {
+          "const": "V82-OUTPUT-v1.0.1-W2-RECHECK2"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v82_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Engineering 67-A lineage identity for the V70 snapshot actually consumed by this run."
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_as_of": {
+          "type": "object"
+        },
+        "evaluated_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_lineage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "output_status": {
+          "type": "string",
+          "description": "Completeness status only; not an investment state. Exact executable semantics are W3."
+        },
+        "canonical_analysis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "latest_price",
+            "market_data_as_of",
+            "asset_behavior_classification",
+            "primary_framework",
+            "secondary_framework",
+            "fundamental_state",
+            "valuation_state",
+            "td9_high_state",
+            "td9_low_state",
+            "kd_state",
+            "macd_state",
+            "ma_state",
+            "emv_state",
+            "rsi_state",
+            "volume_price_state",
+            "daily_timeframe_state",
+            "weekly_timeframe_state",
+            "monthly_timeframe_state",
+            "atr_value",
+            "drawdown_from_reference_high",
+            "previous_swing_low_1",
+            "previous_swing_low_2",
+            "previous_swing_low_3",
+            "price_map",
+            "first_buy_zone",
+            "second_price_zone",
+            "deep_extreme_discount_zone",
+            "left_buy_point_state",
+            "right_confirmation_state",
+            "runaway_state",
+            "macro_state",
+            "credit_liquidity_state",
+            "material_news_policy_state",
+            "exposure_overlap",
+            "position_cap",
+            "project_target_position",
+            "confirmed_position",
+            "actual_completion_rate",
+            "normal_deployment_mode",
+            "primary_special_classification",
+            "execution_action",
+            "canonical_deployment_target_rate",
+            "execution_amount",
+            "execution_quantity",
+            "execution_price",
+            "projected_post_fill_completion_rate",
+            "order_submission_plan",
+            "cancel_conditions",
+            "reevaluation_conditions"
+          ],
+          "minProperties": 49,
+          "maxProperties": 49,
+          "properties": {
+            "latest_price": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "latest_price"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "MoneyPerUnit"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#1 最新價 | MoneyPerUnit | `>0`或UNKNOWN | UNKNOWN: 無可靠可交易價→UNKNOWN"
+            },
+            "market_data_as_of": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "market_data_as_of"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    }
+                  ],
+                  "description": "Engineering 65-B: legal timezone-aware time or UNKNOWN; evaluated_at must not substitute for it. W3 may tighten executable freshness semantics without changing this identity."
+                },
+                "data_type": {
+                  "const": "DateTime"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#2 資料日期／行情截至時間 | DateTime | 合法時區時間 | UNKNOWN: 未知→UNKNOWN；不得用evaluated_at代替"
+            },
+            "asset_behavior_classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "asset_behavior_classification"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "EnumRef"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#3 股性分類 | EnumRef | Existing Contract | UNKNOWN: 無法分類→UNKNOWN"
+            },
+            "primary_framework": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "primary_framework"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "RuleRef"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#4 主框架／專屬框架 | RuleRef | Existing Framework Ref | UNKNOWN: 無可用Framework→UNKNOWN"
+            },
+            "secondary_framework": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "secondary_framework"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "RuleRef/List"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#5 副框架／交叉驗證層 | RuleRef/List | Existing Framework Ref | UNKNOWN: 不適用→NULL；資料不足→UNKNOWN"
+            },
+            "fundamental_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "fundamental_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#6 基本面 | StructuredState | Existing Contract | UNKNOWN: Required基本面缺口→UNKNOWN"
+            },
+            "valuation_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "valuation_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#7 估值 | StructuredState | Existing Waterfall | UNKNOWN: 無合法估值法／資料不足→UNKNOWN"
+            },
+            "td9_high_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "td9_high_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#8 高TD9 | SignalState | Existing TD9 Contract | UNKNOWN: 不可靠→UNKNOWN；不捏造"
+            },
+            "td9_low_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "td9_low_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#9 低TD9 | SignalState | Existing TD9 Contract | UNKNOWN: 不可靠→UNKNOWN；不捏造"
+            },
+            "kd_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "kd_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#10 KD | SignalState | Existing Contract | UNKNOWN: 不可靠→UNKNOWN"
+            },
+            "macd_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "macd_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#11 MACD | SignalState | Existing Contract | UNKNOWN: 不可靠→UNKNOWN"
+            },
+            "ma_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "ma_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "StructuredSignal"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#12 MA | StructuredSignal | Existing MA Contract | UNKNOWN: 缺必要均線→受影響子欄UNKNOWN"
+            },
+            "emv_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "emv_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#13 EMV | SignalState | Existing Contract | UNKNOWN: 不可靠→UNKNOWN"
+            },
+            "rsi_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "rsi_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "SignalState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#14 RSI | SignalState | Existing Contract | UNKNOWN: 不可靠→UNKNOWN"
+            },
+            "volume_price_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "volume_price_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "StructuredSignal"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#15 成交量／量價 | StructuredSignal | Existing Contract | UNKNOWN: Volume缺失只污染相依欄"
+            },
+            "daily_timeframe_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "daily_timeframe_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "TimeframeState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#16 日線 | TimeframeState | Existing Contract | UNKNOWN: Completed Bar不足→UNKNOWN"
+            },
+            "weekly_timeframe_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "weekly_timeframe_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "TimeframeState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#17 週線 | TimeframeState | Existing Contract | UNKNOWN: Completed Bar不足→UNKNOWN"
+            },
+            "monthly_timeframe_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "monthly_timeframe_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "TimeframeState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#18 月線 | TimeframeState | Existing Contract | UNKNOWN: Completed Bar不足→UNKNOWN"
+            },
+            "atr_value": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "atr_value"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "Decimal"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#19 ATR | Decimal | `>=0` | UNKNOWN: 無可靠ATR→UNKNOWN"
+            },
+            "drawdown_from_reference_high": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "drawdown_from_reference_high"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "Rate"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#20 高點回撤 | Rate | 依既有Reference High定義 | UNKNOWN: Reference High未知→UNKNOWN"
+            },
+            "previous_swing_low_1": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "previous_swing_low_1"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                    },
+                    {
+                      "enum": [
+                        "UNKNOWN",
+                        "NONE"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "MoneyPerUnit"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#21 前低 | MoneyPerUnit | Existing Swing Contract | UNKNOWN: 資料足夠且確認不存在→NONE；資料不足／無法可靠判定→UNKNOWN"
+            },
+            "previous_swing_low_2": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "previous_swing_low_2"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                    },
+                    {
+                      "enum": [
+                        "UNKNOWN",
+                        "NONE"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "MoneyPerUnit"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#22 前前低 | MoneyPerUnit | Existing Swing Contract | UNKNOWN: 已知不存在／不適用→NONE／NULL；資料不足→UNKNOWN"
+            },
+            "previous_swing_low_3": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "previous_swing_low_3"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                    },
+                    {
+                      "enum": [
+                        "UNKNOWN",
+                        "NONE"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "MoneyPerUnit"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#23 前前前低 | MoneyPerUnit | Existing Swing Contract | UNKNOWN: 已知不存在／不適用→NONE／NULL；資料不足→UNKNOWN"
+            },
+            "price_map": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "price_map"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredPriceMap"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#24 價格地圖 | StructuredPriceMap | LAYER_1～LAYER_5 Existing Contract | UNKNOWN: Required輸入不足→UNKNOWN"
+            },
+            "first_buy_zone": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "first_buy_zone"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "PriceZoneRef"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#25 第一買點／合理價區 | PriceZoneRef | 由Price Map映射 | UNKNOWN: 無合法映射→UNKNOWN"
+            },
+            "second_price_zone": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "second_price_zone"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "PriceZoneRef"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#26 甜甜價／第二價格區 | PriceZoneRef | 由Price Map映射 | UNKNOWN: 無合法映射→UNKNOWN"
+            },
+            "deep_extreme_discount_zone": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "deep_extreme_discount_zone"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "PriceZoneRef/List"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#27 深度／極端折價區 | PriceZoneRef/List | 由Price Map映射 | UNKNOWN: 無合法映射→UNKNOWN"
+            },
+            "left_buy_point_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "left_buy_point_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "TriState/Structured"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#28 左側狀態 | TriState/Structured | Existing Left Predicate | UNKNOWN: Required Predicate不明→UNKNOWN"
+            },
+            "right_confirmation_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "right_confirmation_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "TriState/Structured"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#29 右側狀態 | TriState/Structured | Existing Right Contract | UNKNOWN: Required Predicate不明→UNKNOWN"
+            },
+            "runaway_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "runaway_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#30 Runaway狀態 | StructuredState | Runaway Up／Down Existing Contracts | UNKNOWN: 衝突／不足→UNKNOWN或既有安全Fallback"
+            },
+            "macro_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "macro_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#31 Macro位置＋方向＋速度 | StructuredState | Level＋Direction＋Speed | UNKNOWN: Safety-required缺口→UNKNOWN"
+            },
+            "credit_liquidity_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "credit_liquidity_state"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "StructuredState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#32 信用／流動性位置＋方向＋速度 | StructuredState | Level＋Direction＋Speed | UNKNOWN: Safety-required缺口→UNKNOWN"
+            },
+            "material_news_policy_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "material_news_policy_state"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "StructuredEventState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#33 重大新聞／政策 | StructuredEventState | Work5 Event Contract | UNKNOWN: Coverage不足→受影響子欄UNKNOWN"
+            },
+            "exposure_overlap": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "exposure_overlap"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "StructuredExposure"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#34 曝險重疊 | StructuredExposure | Existing Look-through Contract | UNKNOWN: Coverage不足不攤回已知權重"
+            },
+            "position_cap": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "position_cap"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "Money/Rate Constraint"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#35 部位上限 | Money/Rate Constraint | Explicit Authorized Caps only | UNKNOWN: 確認無額外Applicable Cap→NONE／NOT_APPLICABLE；應存在但取不到→UNKNOWN；不得假設無上限"
+            },
+            "project_target_position": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "project_target_position"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "Money/Rate Target"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#36 客戶專案目標部位 | Money/Rate Target | Client-approved | UNKNOWN: 未核准→UNKNOWN"
+            },
+            "confirmed_position": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "confirmed_position"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "PositionFact"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#37 現有部位 | PositionFact | Broker／confirmed source | UNKNOWN: 對帳未完成→UNKNOWN"
+            },
+            "actual_completion_rate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "actual_completion_rate"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "Rate"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#38 Actual Completion Rate | Rate | Work38 Existing Formula | UNKNOWN: Target或Confirmed Position未知→UNKNOWN"
+            },
+            "normal_deployment_mode": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "normal_deployment_mode"
+                },
+                "value": {
+                  "enum": [
+                    "Base Deployment",
+                    "Left Overweight",
+                    "Right Confirmation",
+                    "Trend Deployment",
+                    "UNKNOWN"
+                  ]
+                },
+                "data_type": {
+                  "const": "Enum"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#39 Deployment Mode | Enum | Base／Left Overweight／Right Confirmation／Trend Deployment／UNKNOWN | UNKNOWN: 高順位Predicate UNKNOWN且影響Mode→UNKNOWN"
+            },
+            "primary_special_classification": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "primary_special_classification"
+                },
+                "value": {
+                  "enum": [
+                    "左側買點",
+                    "右側加碼",
+                    "Runaway Up",
+                    "Runaway Down",
+                    "技術減碼",
+                    "真正降低風險",
+                    "無特殊分類",
+                    "UNKNOWN"
+                  ]
+                },
+                "data_type": {
+                  "const": "Enum/Display"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#40 今日特殊分類 | Enum/Display | 六類Existing Contract；全False顯示「無特殊分類」 | UNKNOWN: 高順位UNKNOWN可令Primary=UNKNOWN"
+            },
+            "execution_action": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "execution_action"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "ActionState"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#41 今日動作 | ActionState | Existing Execution Result／Risk Action | UNKNOWN: 執行裁決不足→UNKNOWN"
+            },
+            "canonical_deployment_target_rate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "canonical_deployment_target_rate"
+                },
+                "value": {
+                  "enum": [
+                    10,
+                    20,
+                    30,
+                    45,
+                    60,
+                    75,
+                    85,
+                    95,
+                    100,
+                    "UNKNOWN"
+                  ]
+                },
+                "data_type": {
+                  "const": "Rate"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#42 執行比例（累積部署目標率） | Rate | 10/20/30/45/60/75/85/95/100% Existing Contract | UNKNOWN: Stage／Target無法裁決→UNKNOWN"
+            },
+            "execution_amount": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "execution_amount"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_NonnegativeMoneyObject"
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "Money"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#43 執行金額 | Money | `>=0` | UNKNOWN: 已知本輪不執行→KNOWN 0；需執行但Price／Budget／Gap任一Required未知→UNKNOWN"
+            },
+            "execution_quantity": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "execution_quantity"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "const": "UNKNOWN"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "Quantity"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#44 執行股數 | Quantity | 依lot／fractional／precision | UNKNOWN: 已知本輪不下單→KNOWN 0；需下單但Adapter規格或Price未知→UNKNOWN"
+            },
+            "execution_price": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "execution_price"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                    },
+                    {
+                      "enum": [
+                        "UNKNOWN",
+                        "NOT_APPLICABLE"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "MoneyPerUnit"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#45 執行價格 | MoneyPerUnit | 合法tick／price rules | UNKNOWN: 已知本輪不下單→NOT_APPLICABLE／NULL；需下單但無合法Order Price→UNKNOWN"
+            },
+            "projected_post_fill_completion_rate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "projected_post_fill_completion_rate"
+                },
+                "value": {
+                  "oneOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "enum": [
+                        "UNKNOWN",
+                        "NOT_APPLICABLE"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "data_type": {
+                  "const": "Rate"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#46 預估成交後完成率 | Rate | Work65 Post-fill Projection（承接Work36～38） | UNKNOWN: 已知無Planned Fill→NOT_APPLICABLE／NULL；有Planned Fill但Order Plan不足→UNKNOWN；Confirmed Fill後由#37／#38重算Actual"
+            },
+            "order_submission_plan": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "order_submission_plan"
+                },
+                "value": {
+                  "$ref": "#/$defs/V82O_StructuredOrderPlanValue"
+                },
+                "data_type": {
+                  "const": "StructuredOrderPlan"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#47 是否掛單／掛單方式 | StructuredOrderPlan | Existing Work36＋Adapter Contract | UNKNOWN: 完整裁決為不下單→`should_place_order=FALSE`且order mechanics為NOT_APPLICABLE；無法裁決是否下單→UNKNOWN"
+            },
+            "cancel_conditions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "cancel_conditions"
+                },
+                "value": {},
+                "data_type": {
+                  "const": "ConditionSet"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#48 取消條件 | ConditionSet | Existing Gates／Events／Order rules | UNKNOWN: 無Active／Planned Order且已知不需取消→NOT_APPLICABLE／NONE；有Order但條件資料不足→UNKNOWN"
+            },
+            "reevaluation_conditions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_name",
+                "value",
+                "data_type",
+                "data_as_of",
+                "source_reference",
+                "data_quality",
+                "issue_codes",
+                "rule_version",
+                "run_id"
+              ],
+              "properties": {
+                "field_name": {
+                  "const": "reevaluation_conditions"
+                },
+                "value": {
+                  "not": {
+                    "type": "null"
+                  },
+                  "description": "Canonical value is non-null by Engineering 65-B. Exact domain shape remains owned by its existing contract and is not redefined in W2."
+                },
+                "data_type": {
+                  "const": "ConditionSet"
+                },
+                "data_as_of": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_reference": {
+                  "type": [
+                    "string",
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "data_quality": {
+                  "enum": [
+                    "OK",
+                    "FALLBACK_USED",
+                    "INSUFFICIENT",
+                    "UNKNOWN"
+                  ]
+                },
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                },
+                "rule_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "run_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "description": "#49 下一次重新評估條件 | ConditionSet | Existing Trigger Types | UNKNOWN: 無法建立安全Trigger→UNKNOWN"
+            }
+          }
+        },
+        "fields_1_to_13": {
+          "type": "array",
+          "minItems": 13,
+          "maxItems": 13,
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 1
+                },
+                "display_label": {
+                  "const": "今日特殊分類"
+                },
+                "canonical_mapping": {
+                  "const": "#40 `primary_special_classification`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 2
+                },
+                "display_label": {
+                  "const": "目前部署階段"
+                },
+                "canonical_mapping": {
+                  "const": "#39 `normal_deployment_mode`＋#41 Context"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 3
+                },
+                "display_label": {
+                  "const": "目標與完成率"
+                },
+                "canonical_mapping": {
+                  "const": "#36 `project_target_position`＋#37 `confirmed_position`＋#38 `actual_completion_rate`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 4
+                },
+                "display_label": {
+                  "const": "今日動作"
+                },
+                "canonical_mapping": {
+                  "const": "#41 `execution_action`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 5
+                },
+                "display_label": {
+                  "const": "執行比例"
+                },
+                "canonical_mapping": {
+                  "const": "#42 `canonical_deployment_target_rate`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 6
+                },
+                "display_label": {
+                  "const": "執行金額"
+                },
+                "canonical_mapping": {
+                  "const": "#43 `execution_amount`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 7
+                },
+                "display_label": {
+                  "const": "執行股數"
+                },
+                "canonical_mapping": {
+                  "const": "#44 `execution_quantity`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 8
+                },
+                "display_label": {
+                  "const": "執行價格"
+                },
+                "canonical_mapping": {
+                  "const": "#45 `execution_price`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 9
+                },
+                "display_label": {
+                  "const": "成交後完成率"
+                },
+                "canonical_mapping": {
+                  "const": "#46 `projected_post_fill_completion_rate`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 10
+                },
+                "display_label": {
+                  "const": "是否掛單"
+                },
+                "canonical_mapping": {
+                  "const": "#47 `order_submission_plan.should_place_order`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 11
+                },
+                "display_label": {
+                  "const": "掛單方式"
+                },
+                "canonical_mapping": {
+                  "const": "#47 `order_submission_plan.{order_type,time_in_force,scheduling_mode}`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 12
+                },
+                "display_label": {
+                  "const": "取消條件"
+                },
+                "canonical_mapping": {
+                  "const": "#48 `cancel_conditions`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ordinal",
+                "display_label",
+                "canonical_mapping",
+                "value"
+              ],
+              "properties": {
+                "ordinal": {
+                  "const": 13
+                },
+                "display_label": {
+                  "const": "下一次重新評估條件"
+                },
+                "canonical_mapping": {
+                  "const": "#49 `reevaluation_conditions`"
+                },
+                "value": {},
+                "issue_codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          ],
+          "items": false,
+          "description": "Engineering 66-B exact 13-field read-only view. No second calculation or business rule may exist here."
+        }
+      },
+      "x-semantic-invariants": [
+        "every canonical_analysis.<field>.run_id == top-level run_id",
+        "top-level upstream_v70_snapshot_id == V82 Runtime Input upstream_v70_snapshot.upstream_v70_snapshot_id for the same formal run",
+        "every Money/MoneyPerUnit KNOWN value carries explicit currency and money lineage per Engineering 64-E",
+        "#47 order_submission_plan is one Structured Order Plan with the Engineering 65-D minimum fields",
+        "when #47 quantity is present/known it equals #44 execution_quantity",
+        "when #47 limit_price is present/known it equals #45 execution_price",
+        "fields_1_to_13 values are read-only projections of canonical_analysis and perform no second business calculation",
+        "#39 never accepts WAIT/Pause/Reduce as Deployment Mode",
+        "#42 accepts only the nine cumulative deployment target rates or UNKNOWN"
+      ]
+    },
+    "source_semantics_policy": {
+      "const": "PRESERVE_V82_CANONICAL_OUTPUT_NO_LOSSY_TRANSLATION"
+    },
+    "integration_diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "W3_Owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "funding_domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "funding_domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "W3_NonnegativeAmount": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "string",
+          "pattern": "^\\+?\\d+(?:\\.\\d+)?$"
+        }
+      ]
+    },
+    "W3_Money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/W3_NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "W3_Settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cash_basis",
+        "cash_state",
+        "source_status"
+      ],
+      "properties": {
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "cash_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total",
+            "available",
+            "unsettled",
+            "reserved"
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "available": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unsettled": {
+              "type": "number",
+              "minimum": 0
+            },
+            "reserved": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "W3_FinalTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "authorization_reference",
+        "confirmation_proof",
+        "payload"
+      ],
+      "properties": {
+        "allocation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmation_proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "confirmed_at",
+            "confirmed_by"
+          ],
+          "properties": {
+            "confirmed_at": {
+              "type": "string",
+              "minLength": 1
+            },
+            "confirmed_by": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "payload": {}
+      }
+    },
+    "W3_V82GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V82_EXISTING_RUNTIME_DERIVED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "W3_V75GapBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "payload"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "V75_EXISTING_EXPLICIT_GAP",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "payload": {}
+      }
+    },
+    "W3_RemainingGapByEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v82",
+        "v75"
+      ],
+      "properties": {
+        "v82": {
+          "$ref": "#/$defs/W3_V82GapBinding"
+        },
+        "v75": {
+          "$ref": "#/$defs/W3_V75GapBinding"
+        }
+      }
+    },
+    "W3_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "cash_basis",
+        "owner"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/W3_NonnegativeAmount"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        }
+      }
+    },
+    "W3_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/W3_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/W3_ExecutableLeg"
+        }
+      }
+    },
+    "W3_Temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "data_as_of"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_as_of": {
+          "type": "object",
+          "additionalProperties": {}
+        }
+      }
+    },
+    "W3_Versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule",
+        "data",
+        "schema"
+      ],
+      "properties": {
+        "rule": {
+          "type": "object"
+        },
+        "data": {
+          "type": "object"
+        },
+        "schema": {
+          "type": "object"
+        }
+      }
+    },
+    "W3_Lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reference_ids",
+        "upstream_snapshot_ids"
+      ],
+      "properties": {
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "upstream_snapshot_ids": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "W3_ReasonStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_reason_codes",
+        "source_status_codes",
+        "integration_diagnostics"
+      ],
+      "properties": {
+        "source_reason_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "source_status_codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "integration_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "W3_V70DryPowderContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "weight",
+        "source_status"
+      ],
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "source_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "W3_SgovBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "v70_original_dry_powder",
+        "sgov_bond_bucket_amount",
+        "sgov_dry_powder_bucket_amount",
+        "v75_undeployed_to_sgov",
+        "v82_undeployed_to_sgov",
+        "roles_kept_separate",
+        "v82_access_forbidden",
+        "v82_raw_equity_budget_auto_route_forbidden",
+        "final_aggregate_computed_in_work2",
+        "physical_subledger_out_of_scope"
+      ],
+      "properties": {
+        "v70_original_dry_powder": {
+          "$ref": "#/$defs/W3_V70DryPowderContext"
+        },
+        "sgov_bond_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sgov_dry_powder_bucket_amount": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v75_undeployed_to_sgov": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/W3_Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "v82_undeployed_to_sgov": {
+          "type": "null",
+          "description": "Current V82 Ready Output exposes no canonical v82_undeployed_to_sgov field; Work2 must not fabricate it."
+        },
+        "roles_kept_separate": {
+          "const": true
+        },
+        "v82_access_forbidden": {
+          "const": true
+        },
+        "v82_raw_equity_budget_auto_route_forbidden": {
+          "const": true
+        },
+        "final_aggregate_computed_in_work2": {
+          "const": false
+        },
+        "physical_subledger_out_of_scope": {
+          "const": true
+        }
+      }
+    },
+    "W3_SourceContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      }
+    },
+    "W3_V70Context": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "upstream_v70_snapshot_id",
+        "snapshot_as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_as_of": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "W3_SharedDecisionContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "source_namespace",
+        "payload",
+        "data_as_of",
+        "source_reference_ids",
+        "context_id",
+        "as_of"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {},
+        "data_as_of": {},
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "versions": {
+          "type": "object"
+        }
+      }
+    },
+    "W3_V82Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "authorization_reference",
+        "v70_original_dry_powder_executable",
+        "sgov_bucket_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V82"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/equity"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v82"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_original_dry_powder_executable": {
+          "const": false
+        },
+        "sgov_bucket_access": {
+          "const": "FORBIDDEN"
+        }
+      }
+    },
+    "W3_V75Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer",
+        "run_id",
+        "owner",
+        "shared_context_id",
+        "shared_context_digest_sha256",
+        "executable_budget_pointer",
+        "remaining_target_gap_pointer",
+        "final_target_pointer",
+        "sgov_context_access"
+      ],
+      "properties": {
+        "consumer": {
+          "const": "V75"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/W3_Owner"
+        },
+        "shared_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shared_context_digest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executable_budget_pointer": {
+          "const": "/funding_context/executable_budget/bond"
+        },
+        "remaining_target_gap_pointer": {
+          "const": "/funding_context/remaining_target_gap/v75"
+        },
+        "final_target_pointer": {
+          "const": "/final_target"
+        },
+        "sgov_context_access": {
+          "const": "READ_ONLY_BOUNDARY_CONTEXT"
+        }
+      }
+    },
+    "C7_CashState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "available",
+        "unsettled",
+        "reserved"
+      ],
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsettled": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "C7_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "C7_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/C7_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/C7_ExecutableLeg"
+        }
+      }
+    },
+    "C7_AccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "$ref": "#/$defs/C7_CashState"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/C7_ExecutableBudget"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "V82I_AssetIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset_id",
+        "asset_type",
+        "asset_grade",
+        "portfolio_role"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_type": {
+          "enum": [
+            "INDIVIDUAL_STOCK",
+            "BROAD_ETF",
+            "SECTOR_ETF",
+            "INDUSTRY_ETF",
+            "THEME_ETF",
+            "HIGH_VOLATILITY_ETF",
+            "OTHER_APPROVED_EQUITY_VEHICLE"
+          ]
+        },
+        "asset_grade": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "portfolio_role": {
+          "enum": [
+            "CORE",
+            "SATELLITE",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "V82I_ExecutionAccountRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account"
+      ],
+      "properties": {
+        "domain": {
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82I_ClientTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_target_position",
+        "authorization_reference"
+      ],
+      "properties": {
+        "project_target_position": {},
+        "position_cap": {},
+        "authorization_reference": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Authorized client target/constraints. C/Mentor provides/orchestrates; V82 consumes and does not rewrite authorization."
+    },
+    "V82I_UpstreamV70Snapshot": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "run_id",
+        "upstream_v70_snapshot_id",
+        "v70_stock_tactical_budget_amount",
+        "v70_stock_tactical_budget_currency",
+        "v70_stock_tactical_budget_status",
+        "v70_stock_tactical_budget_data_as_of",
+        "v70_original_dry_powder_amount",
+        "v70_original_dry_powder_currency",
+        "v70_budget_source_reference",
+        "v70_budget_data_quality",
+        "v70_budget_issue_codes"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstream_v70_snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_stock_tactical_budget_amount": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "V70-owned amount. UNKNOWN representation may be passed as a sentinel string; executable UNKNOWN semantics are W3."
+        },
+        "v70_stock_tactical_budget_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "v70_stock_tactical_budget_status": {},
+        "v70_stock_tactical_budget_data_as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "v70_original_dry_powder_amount": {},
+        "v70_original_dry_powder_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "v70_budget_source_reference": {},
+        "v70_budget_data_quality": {
+          "enum": [
+            "OK",
+            "FALLBACK_USED",
+            "INSUFFICIENT",
+            "UNKNOWN"
+          ]
+        },
+        "v70_budget_issue_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "description": "Exact Engineering 63-A minimum V70→V82 Tactical Budget Envelope. V82 consumes this upstream context but does not recompute V70 strategic/tactical budget. v70_original_dry_powder_* is upstream context only and is NOT V82 executable funding; execution funding is exclusively the same-account C7 equity executable leg."
+    },
+    "V82I_CashState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "available",
+        "unsettled",
+        "reserved"
+      ],
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsettled": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "V82I_ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82I_ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/V82I_ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/V82I_ExecutableLeg"
+        }
+      }
+    },
+    "V82I_AccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "$ref": "#/$defs/V82I_CashState"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/V82I_ExecutableBudget"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "V82I_C7FundingContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_name",
+        "contract_version",
+        "run_id",
+        "base_currency",
+        "bank_cash_scope",
+        "total_new_investment_amount",
+        "contexts",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "contract_name": {
+          "const": "LivingWaterAI.C.Work7.FundingContext"
+        },
+        "contract_version": {
+          "const": "C-W7-FUND-v1.0.0"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "bank_cash_scope": {
+          "const": "OUT_OF_SCOPE"
+        },
+        "total_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "contexts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/V82I_AccountContext"
+          }
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "description": "Verbatim structural consumer contract for C-W7-FUND-v1.0.0. Required semantic validation is frozen in x-semantic-invariants and A78_W02_Account_Isolation_Contract.json; W6 later implements it defensively."
+    },
+    "V82O_CanonicalMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_PositiveMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_NonnegativeMoneyObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency",
+        "source_reference",
+        "as_of",
+        "status"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "source_reference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "V82O_StructuredOrderPlanValue": {
+      "oneOf": [
+        {
+          "const": "UNKNOWN"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "should_place_order",
+            "order_type",
+            "limit_price",
+            "quantity",
+            "time_in_force",
+            "scheduling_mode",
+            "broker_or_adapter_constraints",
+            "order_intent_id"
+          ],
+          "properties": {
+            "should_place_order": {
+              "type": "boolean"
+            },
+            "order_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limit_price": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/V82O_PositiveMoneyObject"
+                },
+                {
+                  "enum": [
+                    "UNKNOWN",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "quantity": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "enum": [
+                    "UNKNOWN",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "time_in_force": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scheduling_mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "broker_or_adapter_constraints": {},
+            "order_intent_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,704 @@
+{
+  "contract_name": "LivingWaterAI.V82.RuntimeOutput",
+  "contract_version": "V82-OUTPUT-v1.0.1-W2-RECHECK2",
+  "run_id": "w4-run-001",
+  "v82_snapshot_id": "v82-w4-snap-001",
+  "upstream_v70_snapshot_id": "v70-snap-W4",
+  "asset_id": "QQQ",
+  "rule_version": "V82-v1.21.0",
+  "data_as_of": {
+    "shared": {
+      "macro": {
+        "timestamp": "2026-09-26T13:55:00+08:00"
+      },
+      "market": "2026-09-26T14:01:00+08:00",
+      "news": {
+        "timestamp": "2026-09-26T14:02:00+08:00",
+        "providers": [
+          "A",
+          "B"
+        ]
+      }
+    }
+  },
+  "evaluated_at": "2026-09-26T14:06:00+08:00",
+  "source_lineage": [
+    "C7-ref",
+    "V70-ref",
+    "market-ref",
+    "macro-ref",
+    "news-ref",
+    "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-8ac09011b2d345b9ebb1fbb201a5e0d7",
+    "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W4",
+    "C8C9.W3.SHARED_CONTEXT_SHA256:4806c1938843bbc93578b42c7b22031bdbf462264be6d53f6a84dfd83fb1f04e"
+  ],
+  "output_status": "OK",
+  "canonical_analysis": {
+    "latest_price": {
+      "field_name": "latest_price",
+      "value": {
+        "amount": 10.0,
+        "currency": "USD",
+        "source_reference": "market-ref",
+        "as_of": "2026-09-26T14:01:00+08:00",
+        "status": "KNOWN"
+      },
+      "data_type": "MoneyPerUnit",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "market_data_as_of": {
+      "field_name": "market_data_as_of",
+      "value": "2026-09-26T14:01:00+08:00",
+      "data_type": "DateTime",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "asset_behavior_classification": {
+      "field_name": "asset_behavior_classification",
+      "value": "BROAD_ETF",
+      "data_type": "EnumRef",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "primary_framework": {
+      "field_name": "primary_framework",
+      "value": "V82",
+      "data_type": "RuleRef",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "secondary_framework": {
+      "field_name": "secondary_framework",
+      "value": "NONE",
+      "data_type": "RuleRef/List",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "fundamental_state": {
+      "field_name": "fundamental_state",
+      "value": "OK",
+      "data_type": "StructuredState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "valuation_state": {
+      "field_name": "valuation_state",
+      "value": "NORMAL",
+      "data_type": "StructuredState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "td9_high_state": {
+      "field_name": "td9_high_state",
+      "value": "NONE",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "td9_low_state": {
+      "field_name": "td9_low_state",
+      "value": "NONE",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "kd_state": {
+      "field_name": "kd_state",
+      "value": "NEUTRAL",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "macd_state": {
+      "field_name": "macd_state",
+      "value": "NEUTRAL",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "ma_state": {
+      "field_name": "ma_state",
+      "value": "NEUTRAL",
+      "data_type": "StructuredSignal",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "emv_state": {
+      "field_name": "emv_state",
+      "value": "NEUTRAL",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "rsi_state": {
+      "field_name": "rsi_state",
+      "value": "NEUTRAL",
+      "data_type": "SignalState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "volume_price_state": {
+      "field_name": "volume_price_state",
+      "value": "NEUTRAL",
+      "data_type": "StructuredSignal",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "daily_timeframe_state": {
+      "field_name": "daily_timeframe_state",
+      "value": "NEUTRAL",
+      "data_type": "TimeframeState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "weekly_timeframe_state": {
+      "field_name": "weekly_timeframe_state",
+      "value": "NEUTRAL",
+      "data_type": "TimeframeState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "monthly_timeframe_state": {
+      "field_name": "monthly_timeframe_state",
+      "value": "NEUTRAL",
+      "data_type": "TimeframeState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "atr_value": {
+      "field_name": "atr_value",
+      "value": 1.0,
+      "data_type": "Decimal",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "drawdown_from_reference_high": {
+      "field_name": "drawdown_from_reference_high",
+      "value": 0.0,
+      "data_type": "Rate",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "previous_swing_low_1": {
+      "field_name": "previous_swing_low_1",
+      "value": null,
+      "data_type": "MoneyPerUnit",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "previous_swing_low_2": {
+      "field_name": "previous_swing_low_2",
+      "value": null,
+      "data_type": "MoneyPerUnit",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "previous_swing_low_3": {
+      "field_name": "previous_swing_low_3",
+      "value": null,
+      "data_type": "MoneyPerUnit",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "price_map": {
+      "field_name": "price_map",
+      "value": {
+        "state": "KNOWN"
+      },
+      "data_type": "StructuredPriceMap",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "first_buy_zone": {
+      "field_name": "first_buy_zone",
+      "value": null,
+      "data_type": "PriceZoneRef",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "second_price_zone": {
+      "field_name": "second_price_zone",
+      "value": null,
+      "data_type": "PriceZoneRef",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "deep_extreme_discount_zone": {
+      "field_name": "deep_extreme_discount_zone",
+      "value": null,
+      "data_type": "PriceZoneRef/List",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "left_buy_point_state": {
+      "field_name": "left_buy_point_state",
+      "value": "FALSE",
+      "data_type": "TriState/Structured",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "right_confirmation_state": {
+      "field_name": "right_confirmation_state",
+      "value": "FALSE",
+      "data_type": "TriState/Structured",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "runaway_state": {
+      "field_name": "runaway_state",
+      "value": {
+        "up": "FALSE",
+        "down": "FALSE"
+      },
+      "data_type": "StructuredState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "macro_state": {
+      "field_name": "macro_state",
+      "value": "OK",
+      "data_type": "StructuredState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "credit_liquidity_state": {
+      "field_name": "credit_liquidity_state",
+      "value": "OK",
+      "data_type": "StructuredState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "material_news_policy_state": {
+      "field_name": "material_news_policy_state",
+      "value": "OK",
+      "data_type": "StructuredEventState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "exposure_overlap": {
+      "field_name": "exposure_overlap",
+      "value": 0.0,
+      "data_type": "StructuredExposure",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "position_cap": {
+      "field_name": "position_cap",
+      "value": 1000.0,
+      "data_type": "Money/Rate Constraint",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "project_target_position": {
+      "field_name": "project_target_position",
+      "value": 1000.0,
+      "data_type": "Money/Rate Target",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "confirmed_position": {
+      "field_name": "confirmed_position",
+      "value": 1000.0,
+      "data_type": "PositionFact",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "actual_completion_rate": {
+      "field_name": "actual_completion_rate",
+      "value": 1.0,
+      "data_type": "Rate",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "normal_deployment_mode": {
+      "field_name": "normal_deployment_mode",
+      "value": "Base Deployment",
+      "data_type": "Enum",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "primary_special_classification": {
+      "field_name": "primary_special_classification",
+      "value": "無特殊分類",
+      "data_type": "Enum/Display",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "execution_action": {
+      "field_name": "execution_action",
+      "value": "NO_NEW_BUY",
+      "data_type": "ActionState",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "canonical_deployment_target_rate": {
+      "field_name": "canonical_deployment_target_rate",
+      "value": 10,
+      "data_type": "Rate",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "execution_amount": {
+      "field_name": "execution_amount",
+      "value": {
+        "amount": 0.0,
+        "currency": "USD",
+        "source_reference": "market-ref",
+        "as_of": "2026-09-26T14:01:00+08:00",
+        "status": "KNOWN"
+      },
+      "data_type": "Money",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "execution_quantity": {
+      "field_name": "execution_quantity",
+      "value": 0.0,
+      "data_type": "Quantity",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "execution_price": {
+      "field_name": "execution_price",
+      "value": "NOT_APPLICABLE",
+      "data_type": "MoneyPerUnit",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "projected_post_fill_completion_rate": {
+      "field_name": "projected_post_fill_completion_rate",
+      "value": 1.0,
+      "data_type": "Rate",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "order_submission_plan": {
+      "field_name": "order_submission_plan",
+      "value": {
+        "should_place_order": false,
+        "order_type": "NONE",
+        "limit_price": null,
+        "quantity": 0.0,
+        "time_in_force": "NONE",
+        "scheduling_mode": "MANUAL",
+        "broker_or_adapter_constraints": null,
+        "order_intent_id": null
+      },
+      "data_type": "StructuredOrderPlan",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "cancel_conditions": {
+      "field_name": "cancel_conditions",
+      "value": [],
+      "data_type": "ConditionSet",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    },
+    "reevaluation_conditions": {
+      "field_name": "reevaluation_conditions",
+      "value": [
+        "NEXT_CANONICAL_REFRESH"
+      ],
+      "data_type": "ConditionSet",
+      "data_as_of": null,
+      "source_reference": null,
+      "data_quality": "OK",
+      "issue_codes": [],
+      "rule_version": "V82-v1.21.0",
+      "run_id": "w4-run-001"
+    }
+  },
+  "fields_1_to_13": [
+    {
+      "ordinal": 1,
+      "display_label": "今日特殊分類",
+      "canonical_mapping": "#40 `primary_special_classification`",
+      "value": "無特殊分類"
+    },
+    {
+      "ordinal": 2,
+      "display_label": "目前部署階段",
+      "canonical_mapping": "#39 `normal_deployment_mode`＋#41 Context",
+      "value": {
+        "mode": "Base Deployment",
+        "execution_context": "NO_NEW_BUY"
+      }
+    },
+    {
+      "ordinal": 3,
+      "display_label": "目標與完成率",
+      "canonical_mapping": "#36 `project_target_position`＋#37 `confirmed_position`＋#38 `actual_completion_rate`",
+      "value": {
+        "project_target_position": 1000.0,
+        "confirmed_position": 1000.0,
+        "actual_completion_rate": 1.0
+      }
+    },
+    {
+      "ordinal": 4,
+      "display_label": "今日動作",
+      "canonical_mapping": "#41 `execution_action`",
+      "value": "NO_NEW_BUY"
+    },
+    {
+      "ordinal": 5,
+      "display_label": "執行比例",
+      "canonical_mapping": "#42 `canonical_deployment_target_rate`",
+      "value": 10
+    },
+    {
+      "ordinal": 6,
+      "display_label": "執行金額",
+      "canonical_mapping": "#43 `execution_amount`",
+      "value": {
+        "amount": 0.0,
+        "currency": "USD",
+        "source_reference": "market-ref",
+        "as_of": "2026-09-26T14:01:00+08:00",
+        "status": "KNOWN"
+      }
+    },
+    {
+      "ordinal": 7,
+      "display_label": "執行股數",
+      "canonical_mapping": "#44 `execution_quantity`",
+      "value": 0.0
+    },
+    {
+      "ordinal": 8,
+      "display_label": "執行價格",
+      "canonical_mapping": "#45 `execution_price`",
+      "value": "NOT_APPLICABLE"
+    },
+    {
+      "ordinal": 9,
+      "display_label": "成交後完成率",
+      "canonical_mapping": "#46 `projected_post_fill_completion_rate`",
+      "value": 1.0
+    },
+    {
+      "ordinal": 10,
+      "display_label": "是否掛單",
+      "canonical_mapping": "#47 `order_submission_plan.should_place_order`",
+      "value": false
+    },
+    {
+      "ordinal": 11,
+      "display_label": "掛單方式",
+      "canonical_mapping": "#47 `order_submission_plan.{order_type,time_in_force,scheduling_mode}`",
+      "value": {
+        "order_type": "NONE",
+        "time_in_force": "NONE",
+        "scheduling_mode": "MANUAL"
+      }
+    },
+    {
+      "ordinal": 12,
+      "display_label": "取消條件",
+      "canonical_mapping": "#48 `cancel_conditions`",
+      "value": []
+    },
+    {
+      "ordinal": 13,
+      "display_label": "下一次重新評估條件",
+      "canonical_mapping": "#49 `reevaluation_conditions`",
+      "value": [
+        "NEXT_CANONICAL_REFRESH"
+      ]
+    }
+  ]
+}

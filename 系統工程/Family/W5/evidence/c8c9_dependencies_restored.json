@@ -1,0 +1,158 @@
+[
+  {
+    "work": 4,
+    "constant": "INPUT_SCHEMA_FILENAME",
+    "filename": "C8C9_Work4_V82_Adapter_Input.schema_2026-09-26_1429.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 4,
+    "constant": "OUTPUT_SCHEMA_FILENAME",
+    "filename": "C8C9_Work4_V82_Integration_Output.schema_2026-09-26_1429.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 5,
+    "constant": "INPUT_SCHEMA_FILENAME",
+    "filename": "C8C9_Work5_V75_Adapter_Input.schema_RECHECK1_2026-09-27_0207.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 5,
+    "constant": "OUTPUT_SCHEMA_FILENAME",
+    "filename": "C8C9_Work5_V75_Integration_Output.schema_RECHECK1_2026-09-27_0207.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 5,
+    "constant": "FROZEN_V75_INPUT_SCHEMA_FILENAME",
+    "filename": "C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 5,
+    "constant": "FROZEN_V75_W6_SCHEMA_FILENAME",
+    "filename": "C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 6,
+    "constant": "_INPUT_SCHEMA",
+    "filename": "C8C9_Work6_Funding_Account_Isolation_Input.schema_2026-09-27_0242.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 6,
+    "constant": "_OUTPUT_SCHEMA",
+    "filename": "C8C9_Work6_Funding_Account_Isolation_Output.schema_2026-09-27_0242.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 6,
+    "constant": "_C7_SCHEMA",
+    "filename": "C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 6,
+    "constant": "_W3_SCHEMA",
+    "filename": "C8C9_Work3_Context_Handoff_Output.schema_RECHECK2_2026-09-26_1357.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 7,
+    "constant": "_INPUT_SCHEMA",
+    "filename": "C8C9_Work7_SGOV_Runtime_Role_Input.schema_2026-09-28_0017.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 7,
+    "constant": "_OUTPUT_SCHEMA",
+    "filename": "C8C9_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0017.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 7,
+    "constant": "_W3_SCHEMA",
+    "filename": "C8C9_Work3_Context_Handoff_Output.schema_RECHECK2_2026-09-26_1357.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 7,
+    "constant": "_W5_SCHEMA",
+    "filename": "C8C9_Work5_V75_Integration_Output.schema_RECHECK1_2026-09-27_0207.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 7,
+    "constant": "_W6_SCHEMA",
+    "filename": "C8C9_Work6_Funding_Account_Isolation_Output.schema_2026-09-27_0242.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 8,
+    "constant": "_INPUT_SCHEMA",
+    "filename": "C8C9_Work8_Protected_Holding_Input.schema_RECHECK2_2026-09-28_0157.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 8,
+    "constant": "_OUTPUT_SCHEMA",
+    "filename": "C8C9_Work8_Protected_Holding_Output.schema_RECHECK2_2026-09-28_0157.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 8,
+    "constant": "_WORK4_SCHEMA",
+    "filename": "C8C9_Work4_V82_Integration_Output.schema_2026-09-26_1429.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 8,
+    "constant": "_C7_SCHEMA",
+    "filename": "C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_INPUT_SCHEMA",
+    "filename": "C8C9_Work9_Unified_Deployment_Input.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_OUTPUT_SCHEMA",
+    "filename": "C8C9_Work9_Canonical_Deployment_Result.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_WORK4_SCHEMA",
+    "filename": "C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_WORK5_SCHEMA",
+    "filename": "C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_WORK6_SCHEMA",
+    "filename": "C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_WORK7_SCHEMA",
+    "filename": "C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  },
+  {
+    "work": 9,
+    "constant": "_WORK8_SCHEMA",
+    "filename": "C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+    "status": "SCHEMA_VALID"
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "case_id": "W5-FAMILY-REAL-POSITIVE",
+  "provenance": "SYNTHETIC_FUNCTIONAL_ONLY",
+  "request_sha256": "e4554e01c6c75cd349be31eec7cb5935c6d43288f965d9924b5e28a08a3ca5e7",
+  "context_sha256": "d3d3aa9027fb46d60077f41831fd3c3cd3f411a636bc94ca4ff3522dbe55ac6c",
+  "input_generator": "tests/test_family_end_to_end.py::full_family_case",
+  "expected": {
+    "status": "OK",
+    "equity_used": "0",
+    "bond_used": "160.00",
+    "reason": "Explicit target SGOV140+SPSB60 minus existing bond-role SGOV40; QQQ target/current100; original V75 70/30"
+  },
+  "actual": {
+    "status": "OK",
+    "call_trace": [
+      "C.Work7.run_asset_framework_integration",
+      "C8C9.Work4.build_v82_runtime_input",
+      "V82.validate_and_bind_funding",
+      "W5.tactical_cap",
+      "V82.evaluate_core_rule_state",
+      "V82.select_deployment_mode",
+      "V82.resolve_deployment_stage",
+      "V82.calculate_position_gap",
+      "V82.build_buy_execution_plan",
+      "C8C9.Work5.build_v75_runtime_input",
+      "V75.validate_v75_run_input",
+      "V75.build_work3_state",
+      "V75.predicates.PRED-001..010:SGOV",
+      "V75.evaluate_step10:SGOV",
+      "V75.build_decision:SGOV",
+      "V75.predicates.PRED-001..010:SPSB",
+      "V75.evaluate_step10:SPSB",
+      "V75.build_decision:SPSB",
+      "V75.proportional_scale_decisions",
+      "V75.calculate_v75_undeployed_to_sgov",
+      "V75.assemble_final_snapshot",
+      "V75.evaluate_runtime_ready",
+      "C8C9.Work5.consume_v75_runtime_ready",
+      "W5.reconcile_funding:Family_owner_actual_native_claims",
+      "C8C9.Work6.validate_funding_account_isolation",
+      "W5.check_aggregate:actual_native_claims",
+      "C8C9.Work7.validate_sgov_runtime_roles",
+      "W5.reconcile_sgov",
+      "C8C9.Work8.protect_client_action",
+      "C8C9.Work9.build_unified_deployment"
+    ],
+    "target_binding": {
+      "schema_version": "Family.W5.TargetBinding.v1",
+      "target_version": 1,
+      "target_hash": "bcc96cca7bbd6a90435a83e8ab63fe2c0b2a8b3fafd8fe271d9ff0df16ea05f5",
+      "allocation_id": "C-W6-FINAL-QA-003",
+      "target_record_id": "FT-SYNTHETIC-1",
+      "confirmation_run_id": "OLD_CONFIRMATION_RUN",
+      "analysis_run_id": "qa-run-3",
+      "original_payload_digest": "c7f289fcde77ed69f7658730306d0ccfc912b8b62a8bdad10ef315f5143b0312",
+      "binding_digest": "aa608fd99c8e12dc83baeabe735dc81389dd2f4a7f52a6435d8a14d1d597978c"
+    },
+    "production": "HOLD",
+    "trade_action": "NO_TRADE",
+    "runtime_mode": "REAL_DETERMINISTIC",
+    "data_provenance": "SYNTHETIC",
+    "replay_status": "COMPUTED",
+    "funding_aggregate": {
+      "owner": {
+        "client_id": "qa-client",
+        "funding_domain": "INVESTMENT_1",
+        "broker": "BROKER_1",
+        "account": "ACCOUNT_1",
+        "currency": "USD"
+      },
+      "run_id": "qa-run-3",
+      "equity_used": "0",
+      "bond_used": "160.00",
+      "available_remaining": "640.00",
+      "trade_action": "NO_TRADE"
+    },
+    "mentor_present": true,
+    "full_result_sha256": "d9241b915128192d8bf6b3de8c9efcc72588f1426d5a3231c7143bd92dd8c69e"
+  }
+}

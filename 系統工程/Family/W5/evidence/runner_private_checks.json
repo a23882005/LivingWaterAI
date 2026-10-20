@@ -1,0 +1,39 @@
+{
+  "scope": "Four real historical W1 databases through CLI; missing confirmed targets reported before engine dispatch. Other downstream inputs were deliberately left unavailable; this does not certify full private analysis.",
+  "cases": [
+    {
+      "case_number": 1,
+      "cli_exit": 2,
+      "status": "DATA_UNAVAILABLE",
+      "reason": "TARGET_REQUIRED",
+      "database_changed": false,
+      "existing_target_rows": 0
+    },
+    {
+      "case_number": 2,
+      "cli_exit": 2,
+      "status": "DATA_UNAVAILABLE",
+      "reason": "TARGET_REQUIRED",
+      "database_changed": false,
+      "existing_target_rows": 0
+    },
+    {
+      "case_number": 3,
+      "cli_exit": 2,
+      "status": "DATA_UNAVAILABLE",
+      "reason": "TARGET_REQUIRED",
+      "database_changed": false,
+      "existing_target_rows": 0
+    },
+    {
+      "case_number": 4,
+      "cli_exit": 2,
+      "status": "DATA_UNAVAILABLE",
+      "reason": "TARGET_REQUIRED",
+      "database_changed": false,
+      "existing_target_rows": 0
+    }
+  ],
+  "private_payload_location": "ZIP private_runner/",
+  "trade_action": "NO_TRADE"
+}

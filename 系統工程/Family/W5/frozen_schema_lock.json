@@ -1,0 +1,60 @@
+{
+  "drive_zip_id": "1GQHdYPwxFKZBFM1GbTAsTDXA48FYxrmA",
+  "zip_sha256": "23c81a626835086c5f41026d11be03c649c55af83bf5ab0d0dfce25f354f4d6d",
+  "files": [
+    {
+      "archive_path": "WORK5_OUTPUT/C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+      "sha256": "b7e5eea72add5058c1240a7691c2e5c94a9e9c961d015fcad236f468bf5621f8",
+      "destination": "schemas/C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK5_OUTPUT/C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+      "sha256": "a264493246e202a7440b8104a40c127ab39b638f4022e4659dd5c18d79abbee8",
+      "destination": "schemas/C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK6_OUTPUT/C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+      "sha256": "76e244e9859dd6f72cee748f8a9ece9af55bec7dead401605efa12f9886bb86f",
+      "destination": "schemas/C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK8_OUTPUT/C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+      "sha256": "d9d081a5bcb21de4c5031a7b47bcaee39811c63e48c0fb5d226ad51eb7136dba",
+      "destination": "schemas/C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK9_OUTPUT/C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+      "sha256": "332b72d0b947480f9e931c1c11478daef1c4688bcaf04224919cd0ff1a752c6a",
+      "destination": "schemas/C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK9_OUTPUT/C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+      "sha256": "24d6c6c3e1c2abd38db69ae3c774d11580ef2b07d6e215dd4a5906e88145778f",
+      "destination": "schemas/C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK9_OUTPUT/C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+      "sha256": "4d2306fd48c56255f92f8250e93f5492b8edbf32c65d4b4a29f51c4532160f0d",
+      "destination": "schemas/C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK9_OUTPUT/C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+      "sha256": "0940d4d6e3e5c3715eb40b5341e4801ef63965df3b1721433e3707de929ab73e",
+      "destination": "schemas/C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+      "manifest_match": true
+    },
+    {
+      "archive_path": "WORK9_OUTPUT/C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+      "sha256": "4896a1f7b5343a8d2581beab65dfa50a563c3583aa70170c59c8b1a0ce5327ee",
+      "destination": "schemas/C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+      "manifest_match": true
+    }
+  ]
+}

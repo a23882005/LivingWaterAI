@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C_Work7_Funding_Context.schema.json",
+  "title": "LivingWaterAI C Work7 Funding Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "run_id",
+    "base_currency",
+    "bank_cash_scope",
+    "total_new_investment_amount",
+    "contexts",
+    "source_reference_ids"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C.Work7.FundingContext"
+    },
+    "contract_version": {
+      "const": "C-W7-FUND-v1.0.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "bank_cash_scope": {
+      "const": "OUT_OF_SCOPE"
+    },
+    "total_new_investment_amount": {
+      "type": "number",
+      "minimum": 0
+    },
+    "contexts": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/AccountContext"
+      }
+    },
+    "source_reference_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "CashState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "available",
+        "unsettled",
+        "reserved"
+      ],
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsettled": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "ExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ExecutableBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "equity",
+        "bond"
+      ],
+      "properties": {
+        "equity": {
+          "$ref": "#/$defs/ExecutableLeg"
+        },
+        "bond": {
+          "$ref": "#/$defs/ExecutableLeg"
+        }
+      }
+    },
+    "AccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "$ref": "#/$defs/CashState"
+        },
+        "executable_budget": {
+          "$ref": "#/$defs/ExecutableBudget"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

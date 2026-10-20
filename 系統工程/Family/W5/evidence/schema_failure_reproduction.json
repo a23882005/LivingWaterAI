@@ -1,0 +1,20 @@
+[
+  {
+    "work": 5,
+    "exception": "V75IntegrationError",
+    "message": "C8C9.W5.SCHEMA_MISSING: required packaged schema missing: C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+    "result": "DEPENDENCY_MISSING_REPRODUCED"
+  },
+  {
+    "work": 8,
+    "exception": "ProtectedHoldingProtectionError",
+    "message": "C8C9.W8.SCHEMA_LOAD: cannot load C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json: [Errno 2] No such file or directory: '/workspace/scratch/a0e460ef352e/w5_start/sources/\u7cfb\u7d71\u5de5\u7a0b/C-\u914d\u7f6e\u6c7a\u7b56\u5f15\u64ce\uff0bMentor\u6574\u5408/\u6b63\u5f0fRuntime/WORK8_OUTPUT/C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json'",
+    "result": "DEPENDENCY_MISSING_REPRODUCED"
+  },
+  {
+    "work": 9,
+    "exception": "UnifiedDeploymentError",
+    "message": "C8C9.W9.SCHEMA_LOAD: cannot load C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json: [Errno 2] No such file or directory: '/workspace/scratch/a0e460ef352e/w5_start/sources/\u7cfb\u7d71\u5de5\u7a0b/C-\u914d\u7f6e\u6c7a\u7b56\u5f15\u64ce\uff0bMentor\u6574\u5408/\u6b63\u5f0fRuntime/WORK9_OUTPUT/C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json'",
+    "result": "DEPENDENCY_MISSING_REPRODUCED"
+  }
+]

@@ -1,0 +1,331 @@
+[
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work3_Context_Handoff_Input.schema_RECHECK2_2026-09-26_1357.json",
+    "sha": "1ac4f2425cbe7daad9fc346e1e34a3dc5660dff9",
+    "sha256": "fa0ef5c32c2a0599243ccf3d237f6a10e738fab3bcd67704203ae3da3c3f81f8",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work3_Context_Handoff_Output.schema_RECHECK2_2026-09-26_1357.json",
+    "sha": "384c0d519f272c23faf4f356934c78c63490c948",
+    "sha256": "4f1c63f1e4411a93ed4745de7c1c4ab35480b98235eb43e0c52cb32234a86689",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Adapter_Input.schema_2026-09-26_1429.json",
+    "sha": "d923b2466de17fbb59304ed5c456e50ff8c1fb98",
+    "sha256": "c32e484ac2ec2898beb72dc5f77bd745ac145c66cbc589f674234896964a3ab0",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Output.schema_2026-09-26_1429.json",
+    "sha": "bcee7dd0afb9bccfdf81a72e33ad02295e378c5d",
+    "sha256": "332b72d0b947480f9e931c1c11478daef1c4688bcaf04224919cd0ff1a752c6a",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Adapter_Input.schema_RECHECK1_2026-09-27_0207.json",
+    "sha": "075940dbaf45e1fdd3b29ffed655380c45e50f55",
+    "sha256": "3d89dae1e9f3ca4ec19e361e40e6fb554414c4770d6963aa9fa92afdbfd19bc8",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Output.schema_RECHECK1_2026-09-27_0207.json",
+    "sha": "0631f3383621eee7f93ad21757009d460615e5fb",
+    "sha256": "24d6c6c3e1c2abd38db69ae3c774d11580ef2b07d6e215dd4a5906e88145778f",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Input.schema_2026-09-27_0242.json",
+    "sha": "7531088776a81eda21792984b4aebec7b9c5bd41",
+    "sha256": "934546db3e970a9bbeaa578a2c560a68fa5492c425e203e53f108c1cee358c3a",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Output.schema_2026-09-27_0242.json",
+    "sha": "d28b14cd6d63681fe8a8816638e3d3018159875d",
+    "sha256": "4d2306fd48c56255f92f8250e93f5492b8edbf32c65d4b4a29f51c4532160f0d",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Input.schema_2026-09-28_0017.json",
+    "sha": "fde21989b7a8137bbc2774a1a151294be021da4f",
+    "sha256": "20bb0465302b6a62c9c391e5a95e721cf40acc68ecfc78ef5485df7b3c97c004",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0017.json",
+    "sha": "8e17f27869d3d00c75b80a0418a706240a779c80",
+    "sha256": "0940d4d6e3e5c3715eb40b5341e4801ef63965df3b1721433e3707de929ab73e",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Input.schema_RECHECK2_2026-09-28_0157.json",
+    "sha": "41a553775cd9b9a54ced37d366ae1feaf109ce01",
+    "sha256": "aeaddbba9221ab649fb3ff69be777728e0a1e721e5c44a2fafa06171040bc663",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Output.schema_RECHECK2_2026-09-28_0157.json",
+    "sha": "7f44bc0d353a19736e788dc5acedab2a8e1604dc",
+    "sha256": "4896a1f7b5343a8d2581beab65dfa50a563c3583aa70170c59c8b1a0ce5327ee",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Canonical_Deployment_Result.schema_2026-09-28_0342.json",
+    "sha": "424ca8e4d0f655397db8bc63632d95c4ec3e6951",
+    "sha256": "fd2cc043bdeb9661a13cd793f57b7000f4f1ff930dd0285699c9189647294384",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Input.schema_2026-09-28_0342.json",
+    "sha": "d96ce6ee1db718ef63ea92628b97f45fe462e854",
+    "sha256": "6b7c82c2a0e80aad49a8e77d7d6358a54abfcb33e12bbf46d392e95b4afb69cf",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/conftest.py",
+    "sha": "afde775bbe618a3775305716b293beb96bc7c3d3",
+    "sha256": "61b63825623fc82d418f5e646fa2d44d86796f2c5ccab7025727defa4531c0f8",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/helpers.py",
+    "sha": "9b531364a02922127b918d1aafed72f09827a4f1",
+    "sha256": "c19b9d8251448ea426934ed9aed0c33215a5ec065725fb66713f73055de51eb7",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_alias_and_account_isolation.py",
+    "sha": "126049c36f45806ca8d6802cfc021b07ed7239eb",
+    "sha256": "404798ab1b9eae5a4b4f70740dc24a35f5652999cc1255efe01e26de86704374",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_asset_predicate_evidence.py",
+    "sha": "f1a715400b50156ee78fa1c48e2e126f32e0b363",
+    "sha256": "f839d1f480532988b93145774d05e1dc649abbfd4e93f45b2d89aaa64abe781b",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_models_and_units.py",
+    "sha": "2689f7ef8d217bde01ad5756c15473002ebe61bb",
+    "sha256": "4429ff9d26e5ef70a0536b54d76bb4f33c9949252bab3e9f9b4366e64fa9ceea",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_predicate_result_contract.py",
+    "sha": "ee5d7ba9b0ebf60e255a9988d2cc0ffe99d5ead8",
+    "sha256": "9ab502dd6ad3b3df8b345d264621b84cbe19d71025092ecb0c08709cdc880ce4",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_scope_guard.py",
+    "sha": "d167062bfddb0a7a652faea14f99a18fdd08f2fa",
+    "sha256": "9fadb32e5e4a0bf12a3b6e881d8a6645f40d676414eedcc6705bf49400f26612",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_serialization.py",
+    "sha": "b3dbe3997efb399f7f600b5eb9ff0dc0611cc99b",
+    "sha256": "8c41aae84c0507b9703defcbcae4117a4a3b1c5b1b4203411ff354b5b8abfaea",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_settlement_and_safe_fail.py",
+    "sha": "210e1976057d874caa18a233450a3b812abae2f0",
+    "sha256": "943b7e47a371e6acda158d8ebdef647133ccc1da01b6b5e16421a3e55aca1d12",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_versions_sgov_and_precedence.py",
+    "sha": "cf1cea35321ff4640ac7d18fa0f6420624c3bcfa",
+    "sha256": "9e7f3e3f16c529eba0c4f47c747bde0bcc6f2fdeccc8d8043ad35fada3be2d9b",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work3_bucket_and_gap.py",
+    "sha": "a55696b5a4452d8f531af43798208dc2e30d03e3",
+    "sha256": "46c450bd46cddcb089415252345b61a0abce860d629e38f8d8533e76f4d5b071",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work3_contract_and_serialization.py",
+    "sha": "883f381e5cfc18c37f348b521df440371680d0b7",
+    "sha256": "5a8b35082a987480d50fdb02df341b4ca41d2494a9f8f5069b0f7b100625dff9",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work3_eligibility.py",
+    "sha": "941b79ad720144dcf48dc0df4681f188d542651e",
+    "sha256": "307a3be851e8d8f2cd735d05f14deca4604fa409c0d6bab1662e95b4e6f0f63a",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work3_sgov_and_boundaries.py",
+    "sha": "bea65d111f838b75b045e05d0facf94170558a63",
+    "sha256": "c454170219a6e20781e3aa36324bf94c6849adfc9f647ca22a8cb56faff45ada",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work4_models.py",
+    "sha": "46aa24ee0b2732be1c0c979914a8b7f53bf19ed4",
+    "sha256": "2f8770c801de7b5410acf8e6620f5792c7dd45ba4d753cf0c38603fd438c074f",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work4_predicates.py",
+    "sha": "fac78d00cdf7f43d4df361838ec49aac1fc4e946",
+    "sha256": "86f89f194cc5bf7dfe416d1d7ff36ebea1a31f9afa37226159c8e979f0f29b58",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work4_step10.py",
+    "sha": "8365bc5006fd039c95881c83500410661e5de17b",
+    "sha256": "c453f591c80f9816f8a436a95c0f15636e4d38387d2cbe3d24cf9865ae53fbae",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work5_final_snapshot.py",
+    "sha": "385ab73d5d677e0d2fcba0dac2f553afc32dd355",
+    "sha256": "1a25db220b7011c9bde2a21a19d75024e1f562cdec4ec2bc93ced6c4eca68277",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests/test_work6_runtime_ready.py",
+    "sha": "6eaae8f743eabcbfe1b525b5b9bc0f57960bd065",
+    "sha256": "311fdcbcbb5308c4fe0c3b917a5468cc3fa72a3fc4963131ad27cf41a5d5a19c",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w6_validation_account_isolation_gate.py",
+    "sha": "2ee68b0f03d9baa4790de4680e122f738c83fd26",
+    "sha256": "d287d477c5dce35ddb5394e2820b5a8f38ea7978e18698c0326aa2e07c691952",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w7_core_rule_engine_gate.py",
+    "sha": "db9097b8faed75cdada6fbabdd9f857594b80354",
+    "sha256": "a0cdc6202e460b613723883c74bdd64c25088f11f4af01e47e872d105cad9be5",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w8_deployment_execution_gate.py",
+    "sha": "1ca49d8fd7162ee4c34ced8f189255bd44a696e2",
+    "sha256": "e97eb0749d6980c31a491aadbbb0735dab92495a7da3d0e4ad92734f802fe66e",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w9_canonical_persistence_ports_gate.py",
+    "sha": "4c414b355e541e4c951fbf98192fcc59834a6aee",
+    "sha256": "4b58132faa78e495ec778de438ee2c4b22fbeb094937ae57b361b55ffe1d65ba",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/總經V70/V70_macro_latest.json",
+    "sha": "ca92c88643750ea73389d05c10421793b01669de",
+    "sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
+    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/__init__.py",
+    "sha256": "6090049fc004b7fbc5f578569dd9f6a8d35cd472e93bd2283bf0890dcb11796a",
+    "sha": "96e668198664b58946a891b288a2303d58ead67d",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/benchmark_reader.py",
+    "sha256": "af979cb9abe0d305b62539db65aefa34b9dd804be5b8e5328d29e07217b4adf2",
+    "sha": "85e08c45e6ffd495972a339c75f6750ae389fdfa",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/__init__.py",
+    "sha256": "49358e737e3b5c84c4161892f4ee0de26e65c859b854e9a56689951e0fc19f80",
+    "sha": "f527696c13b708971d5bb287f136dd37d35bad96",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/engine.py",
+    "sha256": "6e8d683809a1e080c3db06042c47005302e4cb6ac758d98877e46318405783f4",
+    "sha": "0d7688aa24ccca8112c53d496673046860a76efb",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/__init__.py",
+    "sha256": "453a0c70130fc47e0dedbdb7ce142253c54217b72a9ca1cb00170983b481a5d8",
+    "sha": "5da6122d1ebc8c2658241ab0381102466fe99fce",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/engine.py",
+    "sha256": "32107a0789ff9f6ca8dad48fc4e2bbb06db1934a5a3d347506cd214f8067545a",
+    "sha": "95942f1de44c26b011011045cda0dceeacf5da96",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work5/core_engine.py",
+    "sha256": "da618dda038f55aa664f65c4cb483c796bd0925f61eb4f822bf586e6a21314c5",
+    "sha": "4f70da456d6ae9b7ddede7ca3c2c2b9ec0926e3f",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work5/__init__.py",
+    "sha256": "0d8fc2d14338efc7bba38c951baa6ff072e2ca9626c1ed42e322369e799e8c34",
+    "sha": "d30685f5f7b29da9757b3195de9bef8cfb4109ce",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/__init__.py",
+    "sha256": "a595015ce59d1ada1fdc22c9eb5cc751f03c6e4b6739438496f5ca8a4670b0fa",
+    "sha": "0d3a5937085f67eade9429034ac613e32ea8b77d",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/adjustment_loop.py",
+    "sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "sha": "4b7bfc90f3a16578c65e11a8d3389d139c4fe209",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
+    "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+    "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/__init__.py",
+    "sha256": "cdac593779116663d31cc09772de6d5d2ec03d416180104f753b48836615495d",
+    "sha": "57a5ec0302561c5eaa6f331c3bd153321fa46624",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/68_C_Work7_V70_Asset_Framework_Result.schema.json",
+    "sha256": "d9d081a5bcb21de4c5031a7b47bcaee39811c63e48c0fb5d226ad51eb7136dba",
+    "sha": "fc5a087706c43bb90b437dc73972b8947b5f3d11",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/80_C_Work7_Funding_Context.schema.json",
+    "sha256": "76e244e9859dd6f72cee748f8a9ece9af55bec7dead401605efa12f9886bb86f",
+    "sha": "d2ed33494e2714475d2552a53b8ccbaf0fb3ff82",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/57_C_Work6_Mentor_Adjustment_Result.schema.json",
+    "sha256": "276894fbdff647e6b9222e97c8c635fb50f8b2c3a3d464229ff2f618e3e95486",
+    "sha": "457ba24a32673a238578c7c8ebb798a4901382e9",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/05_C_Canonical_Input.schema.json",
+    "sha256": "21a1d03e3cfe3f7e1409b32ec553699fbe0c657b80d63e90982ef5568672dcb4",
+    "sha": "09be5134b4f4af46b26e75342d98813ce2cfdfc5",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/xlsx_minimal_reader.py",
+    "sha256": "fd5fbcf1bb9867bf498cea0deea945cef4dd791f08da5cc25c4336de50eaf5fa",
+    "reason": "Direct import by C work2.benchmark_reader; baseline 32c9322c"
+  }
+]

@@ -1,0 +1,790 @@
+{
+  "contract_name": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationInput",
+  "contract_version": "C8C9-W6-FAII-v1.0.0",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "run_id": "w6-run-001",
+  "work3_handoff": {
+    "contract_name": "LivingWaterAI.C8C9.Work3.ContextHandoffResult",
+    "contract_version": "C8C9-W3-CHO-v1.0.1-RECHECK2",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "work2_contract_version": "C8C9-W2-UIC-v1.0.1-RECHECK1",
+    "context_handoff_id": "C8C9-W3-7b807e1e632b682a2d56452f1d174762",
+    "run_id": "w6-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "final_target": {
+      "allocation_id": "C-W6-FINAL-W6-001",
+      "authorization_reference": "C-W6-FINAL-W6-001",
+      "confirmation_proof": {
+        "confirmed_at": "2026-09-27T02:42:00+08:00",
+        "confirmed_by": "qa-client"
+      },
+      "payload": {
+        "instrument_targets": {
+          "QQQ": {
+            "project_target_position": 1000.0
+          },
+          "BOND": {
+            "project_target_position": 500.0
+          }
+        }
+      }
+    },
+    "client_state_context": {
+      "run_id": "w6-run-001",
+      "source_namespace": "C.CLIENT_STATE",
+      "payload": {
+        "client_id": "client-w6",
+        "portfolio_id": "portfolio-w6"
+      },
+      "data_as_of": "2026-09-27T02:42:00+08:00",
+      "source_reference_ids": [
+        "client-ref"
+      ]
+    },
+    "funding_context": {
+      "settlement": {
+        "cash_basis": "AVAILABLE",
+        "cash_state": {
+          "total": 1000.0,
+          "available": 800.0,
+          "unsettled": 100.0,
+          "reserved": 100.0
+        },
+        "source_status": "SETTLED"
+      },
+      "executable_budget": {
+        "equity": {
+          "amount": 450.0,
+          "currency": "USD",
+          "cash_basis": "AVAILABLE",
+          "owner": {
+            "funding_domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT"
+          }
+        },
+        "bond": {
+          "amount": 350.0,
+          "currency": "USD",
+          "cash_basis": "AVAILABLE",
+          "owner": {
+            "funding_domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT"
+          }
+        }
+      },
+      "remaining_target_gap": {
+        "v82": {
+          "mode": "V82_EXISTING_RUNTIME_DERIVED",
+          "payload": {
+            "source_owned": true,
+            "asset": "QQQ"
+          }
+        },
+        "v75": {
+          "mode": "V75_EXISTING_EXPLICIT_GAP",
+          "payload": {
+            "remaining_target_gap_amount": {
+              "amount": "310.00",
+              "currency": "USD"
+            }
+          }
+        }
+      },
+      "sgov_boundary": {
+        "v70_original_dry_powder": {
+          "amount": {
+            "amount": "200.00",
+            "currency": "USD"
+          },
+          "weight": 0.2,
+          "source_status": "KNOWN"
+        },
+        "sgov_bond_bucket_amount": {
+          "amount": "40.00",
+          "currency": "USD"
+        },
+        "sgov_dry_powder_bucket_amount": {
+          "amount": "60.00",
+          "currency": "USD"
+        },
+        "v75_undeployed_to_sgov": null,
+        "v82_undeployed_to_sgov": null,
+        "roles_kept_separate": true,
+        "v82_access_forbidden": true,
+        "v82_raw_equity_budget_auto_route_forbidden": true,
+        "final_aggregate_computed_in_work2": false,
+        "physical_subledger_out_of_scope": true
+      }
+    },
+    "v70_runtime_context": {
+      "run_id": "w6-run-001",
+      "source_namespace": "V70.RUNTIME_CONTEXT",
+      "upstream_v70_snapshot_id": "v70-snap-W6",
+      "snapshot_as_of": "2026-09-27T02:40:00+08:00",
+      "payload": {
+        "run_id": "w6-run-001",
+        "stock_tactical_amount": "450.00",
+        "bond_tactical_amount": "350.00",
+        "v70_original_dry_powder_amount": "200.00",
+        "value_state": "KNOWN",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      "data_as_of": {
+        "macro": "2026-09-27T02:40:00+08:00",
+        "rates": {
+          "curve": "2026-09-27T02:39:00+08:00"
+        }
+      },
+      "source_reference_ids": [
+        "V70-ref"
+      ]
+    },
+    "shared_decision_context": {
+      "run_id": "w6-run-001",
+      "source_namespace": "LOOP2.SHARED_DECISION_CONTEXT",
+      "context_id": "loop2-context-W6",
+      "context_version": "source-context-v8",
+      "as_of": "2026-09-27T02:44:00+08:00",
+      "payload": {
+        "macro": {
+          "rates": "source-owned"
+        },
+        "market": {
+          "snapshot_id": "market-W6"
+        },
+        "news": {
+          "snapshot_id": "news-W6"
+        }
+      },
+      "data_as_of": {
+        "macro": {
+          "timestamp": "2026-09-27T02:40:00+08:00"
+        },
+        "market": "2026-09-27T02:41:00+08:00",
+        "news": {
+          "timestamp": "2026-09-27T02:41:30+08:00"
+        }
+      },
+      "source_reference_ids": [
+        "market-ref",
+        "macro-ref",
+        "news-ref"
+      ],
+      "versions": {
+        "macro": "m8",
+        "market": "mk10",
+        "news": "n5"
+      }
+    },
+    "temporal": {
+      "as_of": "2026-09-27T02:44:00+08:00",
+      "data_as_of": {
+        "C7": {
+          "funding": "2026-09-27T02:42:00+08:00"
+        },
+        "V70": {
+          "macro": {
+            "timestamp": "2026-09-27T02:40:00+08:00"
+          }
+        },
+        "V82": "2026-09-27T02:41:00+08:00",
+        "V75": "2026-09-27T02:41:30+08:00"
+      }
+    },
+    "versions": {
+      "rule": {
+        "V82": "V82-v1.21.0",
+        "V75": "債券V75.md v2.7.0"
+      },
+      "data": {
+        "shared_market": "snapshot-W6"
+      },
+      "schema": {
+        "C7": "C-W7-FUND-v1.0.0",
+        "W2": "C8C9-W2-UIC-v1.0.1-RECHECK1"
+      }
+    },
+    "lineage": {
+      "source_reference_ids": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref"
+      ],
+      "upstream_snapshot_ids": {
+        "v70": "v70-snap-W6",
+        "c7": "c7-snap-W6"
+      }
+    },
+    "reason_status": {
+      "source_reason_codes": {
+        "C7": [],
+        "V82": [],
+        "V75": []
+      },
+      "source_status_codes": {
+        "C7": "READY",
+        "V82": "READY",
+        "V75": "READY"
+      },
+      "integration_diagnostics": []
+    },
+    "engine_bindings": {
+      "v82": {
+        "consumer": "V82",
+        "run_id": "w6-run-001",
+        "owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "shared_context_id": "loop2-context-W6",
+        "shared_context_digest_sha256": "7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+        "executable_budget_pointer": "/funding_context/executable_budget/equity",
+        "remaining_target_gap_pointer": "/funding_context/remaining_target_gap/v82",
+        "final_target_pointer": "/final_target",
+        "authorization_reference": "C-W6-FINAL-W6-001",
+        "v70_original_dry_powder_executable": false,
+        "sgov_bucket_access": "FORBIDDEN"
+      },
+      "v75": {
+        "consumer": "V75",
+        "run_id": "w6-run-001",
+        "owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "shared_context_id": "loop2-context-W6",
+        "shared_context_digest_sha256": "7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+        "executable_budget_pointer": "/funding_context/executable_budget/bond",
+        "remaining_target_gap_pointer": "/funding_context/remaining_target_gap/v75",
+        "final_target_pointer": "/final_target",
+        "sgov_context_access": "READ_ONLY_BOUNDARY_CONTEXT"
+      }
+    },
+    "integration_diagnostics": []
+  },
+  "c7_funding_context": {
+    "contract_name": "LivingWaterAI.C.Work7.FundingContext",
+    "contract_version": "C-W7-FUND-v1.0.0",
+    "run_id": "w6-run-001",
+    "base_currency": "USD",
+    "bank_cash_scope": "OUT_OF_SCOPE",
+    "total_new_investment_amount": 1200.0,
+    "contexts": [
+      {
+        "domain": "TW_LOCAL_BROKER",
+        "broker": "TW_LOCAL",
+        "account": "L1",
+        "bucket_new_investment_amount": 100.0,
+        "brokerage_cash_state": {
+          "total": 100.0,
+          "available": 100.0,
+          "unsettled": 0.0,
+          "reserved": 0.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_LOCAL_BROKER",
+            "source_broker": "TW_LOCAL",
+            "source_account": "L1"
+          },
+          "bond": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_LOCAL_BROKER",
+            "source_broker": "TW_LOCAL",
+            "source_account": "L1"
+          }
+        },
+        "source_reference_ids": [
+          "c7-local"
+        ]
+      },
+      {
+        "domain": "TW_SUB_BROKERAGE",
+        "broker": "TW_SUB",
+        "account": "S1",
+        "bucket_new_investment_amount": 100.0,
+        "brokerage_cash_state": {
+          "total": 100.0,
+          "available": 100.0,
+          "unsettled": 0.0,
+          "reserved": 0.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_SUB_BROKERAGE",
+            "source_broker": "TW_SUB",
+            "source_account": "S1"
+          },
+          "bond": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_SUB_BROKERAGE",
+            "source_broker": "TW_SUB",
+            "source_account": "S1"
+          }
+        },
+        "source_reference_ids": [
+          "c7-sub"
+        ]
+      },
+      {
+        "domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT",
+        "bucket_new_investment_amount": 1000.0,
+        "brokerage_cash_state": {
+          "total": 1000.0,
+          "available": 800.0,
+          "unsettled": 100.0,
+          "reserved": 100.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 450.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "US_BROKER",
+            "source_broker": "QA_BROKER",
+            "source_account": "QA_ACCOUNT"
+          },
+          "bond": {
+            "amount": 350.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "US_BROKER",
+            "source_broker": "QA_BROKER",
+            "source_account": "QA_ACCOUNT"
+          }
+        },
+        "source_reference_ids": [
+          "c7-us"
+        ]
+      }
+    ],
+    "source_reference_ids": [
+      "c7-snapshot-W6"
+    ]
+  },
+  "work4_adapter_result": {
+    "v82_runtime_input": {
+      "contract_name": "LivingWaterAI.V82.RuntimeInput",
+      "contract_version": "V82-INPUT-v1.0.1-W2-RECHECK2",
+      "run_id": "w6-run-001",
+      "client_project_version": "CLIENT-PROJECT-v1",
+      "asset": {
+        "asset_id": "QQQ",
+        "asset_type": "BROAD_ETF",
+        "asset_grade": "A",
+        "portfolio_role": "CORE"
+      },
+      "execution_account": {
+        "domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "client_target": {
+        "project_target_position": 1000.0,
+        "authorization_reference": "C-W6-FINAL-W6-001"
+      },
+      "upstream_v70_snapshot": {
+        "run_id": "w6-run-001",
+        "upstream_v70_snapshot_id": "v70-snap-W6",
+        "v70_stock_tactical_budget_amount": "450.00",
+        "v70_stock_tactical_budget_currency": "USD",
+        "v70_stock_tactical_budget_status": "KNOWN",
+        "v70_stock_tactical_budget_data_as_of": "2026-09-27T02:40:00+08:00",
+        "v70_original_dry_powder_amount": "200.00",
+        "v70_original_dry_powder_currency": "USD",
+        "v70_budget_source_reference": [
+          "V70-ref"
+        ],
+        "v70_budget_data_quality": "OK",
+        "v70_budget_issue_codes": []
+      },
+      "c7_funding_context": {
+        "contract_name": "LivingWaterAI.C.Work7.FundingContext",
+        "contract_version": "C-W7-FUND-v1.0.0",
+        "run_id": "w6-run-001",
+        "base_currency": "USD",
+        "bank_cash_scope": "OUT_OF_SCOPE",
+        "total_new_investment_amount": 1200.0,
+        "contexts": [
+          {
+            "domain": "TW_LOCAL_BROKER",
+            "broker": "TW_LOCAL",
+            "account": "L1",
+            "bucket_new_investment_amount": 100.0,
+            "brokerage_cash_state": {
+              "total": 100.0,
+              "available": 100.0,
+              "unsettled": 0.0,
+              "reserved": 0.0
+            },
+            "executable_budget": {
+              "equity": {
+                "amount": 0.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "TW_LOCAL_BROKER",
+                "source_broker": "TW_LOCAL",
+                "source_account": "L1"
+              },
+              "bond": {
+                "amount": 0.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "TW_LOCAL_BROKER",
+                "source_broker": "TW_LOCAL",
+                "source_account": "L1"
+              }
+            },
+            "source_reference_ids": [
+              "c7-local"
+            ]
+          },
+          {
+            "domain": "TW_SUB_BROKERAGE",
+            "broker": "TW_SUB",
+            "account": "S1",
+            "bucket_new_investment_amount": 100.0,
+            "brokerage_cash_state": {
+              "total": 100.0,
+              "available": 100.0,
+              "unsettled": 0.0,
+              "reserved": 0.0
+            },
+            "executable_budget": {
+              "equity": {
+                "amount": 0.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "TW_SUB_BROKERAGE",
+                "source_broker": "TW_SUB",
+                "source_account": "S1"
+              },
+              "bond": {
+                "amount": 0.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "TW_SUB_BROKERAGE",
+                "source_broker": "TW_SUB",
+                "source_account": "S1"
+              }
+            },
+            "source_reference_ids": [
+              "c7-sub"
+            ]
+          },
+          {
+            "domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT",
+            "bucket_new_investment_amount": 1000.0,
+            "brokerage_cash_state": {
+              "total": 1000.0,
+              "available": 800.0,
+              "unsettled": 100.0,
+              "reserved": 100.0
+            },
+            "executable_budget": {
+              "equity": {
+                "amount": 450.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "US_BROKER",
+                "source_broker": "QA_BROKER",
+                "source_account": "QA_ACCOUNT"
+              },
+              "bond": {
+                "amount": 350.0,
+                "cash_basis": "AVAILABLE",
+                "source_domain": "US_BROKER",
+                "source_broker": "QA_BROKER",
+                "source_account": "QA_ACCOUNT"
+              }
+            },
+            "source_reference_ids": [
+              "c7-us"
+            ]
+          }
+        ],
+        "source_reference_ids": [
+          "c7-snapshot-W6"
+        ]
+      },
+      "confirmed_position_snapshot": {
+        "quantity": 10,
+        "source": "BROKER"
+      },
+      "market_data_bundle": {
+        "shared_context_id": "loop2-context-W6",
+        "shared_context_digest_sha256": "7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+        "as_of": "2026-09-27T02:44:00+08:00",
+        "payload": {
+          "macro": {
+            "rates": "source-owned"
+          },
+          "market": {
+            "snapshot_id": "market-W6"
+          },
+          "news": {
+            "snapshot_id": "news-W6"
+          }
+        },
+        "data_as_of": {
+          "macro": {
+            "timestamp": "2026-09-27T02:40:00+08:00"
+          },
+          "market": "2026-09-27T02:41:00+08:00",
+          "news": {
+            "timestamp": "2026-09-27T02:41:30+08:00"
+          }
+        },
+        "source_reference_ids": [
+          "market-ref",
+          "macro-ref",
+          "news-ref"
+        ],
+        "versions": {
+          "macro": "m8",
+          "market": "mk10",
+          "news": "n5"
+        }
+      },
+      "event_context": null,
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-7b807e1e632b682a2d56452f1d174762",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W6",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9"
+      ]
+    },
+    "integration_binding": {
+      "run_id": "w6-run-001",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "currency": "USD",
+      "asset_id": "QQQ",
+      "work3_context_handoff_id": "C8C9-W3-7b807e1e632b682a2d56452f1d174762",
+      "upstream_v70_snapshot_id": "v70-snap-W6",
+      "shared_context_id": "loop2-context-W6",
+      "shared_context_digest_sha256": "7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+      "authorization_reference": "C-W6-FINAL-W6-001",
+      "equity_executable_budget": {
+        "amount": 450.0,
+        "currency": "USD",
+        "cash_basis": "AVAILABLE",
+        "owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "source_pointer": "/funding_context/executable_budget/equity"
+      },
+      "v70_original_dry_powder_executable": false,
+      "v82_undeployed_to_sgov_present": false
+    }
+  },
+  "work5_adapter_result": {
+    "v75_runtime_input": {
+      "client_ref": "CLIENT-W6-QA",
+      "run_id": "w6-run-001",
+      "analysis_timestamp": "2026-09-27T02:44:00+08:00",
+      "expected_rule_version": "債券V75.md v2.7.0",
+      "predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+      "deployment_parameter_version": "P0-02-FROZEN",
+      "broker_account_id": "QA_ACCOUNT",
+      "broker_domain_type": "US_BROKER",
+      "currency": "USD",
+      "bond_executable_budget": {
+        "amount": 350.0,
+        "currency": "USD"
+      },
+      "broker_cash_total": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 1000.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_available": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 800.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_unsettled": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 100.0,
+          "currency": "USD"
+        }
+      },
+      "broker_cash_reserved": {
+        "status": "KNOWN",
+        "value": {
+          "amount": 100.0,
+          "currency": "USD"
+        }
+      },
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "funding_settlement_status": "SETTLED",
+      "life_stage_code": "ACCUMULATION",
+      "strategic_bond_weight_b0": {
+        "value": "30",
+        "unit": "PERCENT"
+      },
+      "existing_bond_holdings": [
+        {
+          "asset_id": "SGOV",
+          "amount": {
+            "amount": "40.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        },
+        {
+          "asset_id": "SPSB",
+          "amount": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        }
+      ],
+      "target_bond_holdings": [
+        {
+          "asset_id": "SGOV",
+          "target_amount": {
+            "amount": "245.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        },
+        {
+          "asset_id": "SPSB",
+          "target_amount": {
+            "amount": "105.00",
+            "currency": "USD"
+          },
+          "broker_account_id": "QA_ACCOUNT"
+        }
+      ],
+      "authorized_universe": [
+        "SGOV",
+        "SPSB"
+      ],
+      "market_snapshot": {
+        "data_timestamp": "2026-09-27T02:41:00+08:00",
+        "data_source": "C8C9_WORK3_SHARED_MARKET",
+        "freshness_state": "FRESH",
+        "payload": {
+          "snapshot_id": "market-W6"
+        },
+        "source_lineage": [
+          "market-ref"
+        ]
+      },
+      "v70_snapshot": {
+        "data_timestamp": "2026-09-27T02:40:00+08:00",
+        "data_source": "V70.RUNTIME_CONTEXT",
+        "freshness_state": "FRESH",
+        "payload": {
+          "run_id": "w6-run-001",
+          "stock_tactical_amount": "450.00",
+          "bond_tactical_amount": "350.00",
+          "v70_original_dry_powder_amount": "200.00",
+          "value_state": "KNOWN",
+          "data_quality": "OK",
+          "issue_codes": []
+        },
+        "source_lineage": [
+          "V70-ref"
+        ]
+      },
+      "source_lineage": [
+        "C7-ref",
+        "V70-ref",
+        "market-ref",
+        "macro-ref",
+        "news-ref",
+        "V75-source-W6",
+        "client-ref",
+        "C8C9.W3.CONTEXT_HANDOFF:C8C9-W3-7b807e1e632b682a2d56452f1d174762",
+        "C8C9.W3.SHARED_CONTEXT_ID:loop2-context-W6",
+        "C8C9.W3.SHARED_CONTEXT_SHA256:7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+        "C8C9.W5.V75_SOURCE_CONTEXT_SHA256:08a40124271124ead9e4d5662a9b35999de4943a4c22a44fb4f02abbe6f9e955"
+      ]
+    },
+    "integration_binding": {
+      "run_id": "w6-run-001",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "currency": "USD",
+      "work3_context_handoff_id": "C8C9-W3-7b807e1e632b682a2d56452f1d174762",
+      "upstream_v70_snapshot_id": "v70-snap-W6",
+      "shared_context_id": "loop2-context-W6",
+      "shared_context_digest_sha256": "7e153fc578283da9d1ae0b029fdc59ef41e0e1e6823fedd27637873ffe6bd4c9",
+      "v75_source_context_digest_sha256": "08a40124271124ead9e4d5662a9b35999de4943a4c22a44fb4f02abbe6f9e955",
+      "bond_executable_budget": {
+        "amount": 350.0,
+        "currency": "USD",
+        "cash_basis": "AVAILABLE",
+        "owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "source_pointer": "/funding_context/executable_budget/bond"
+      },
+      "remaining_target_gap_pointer": "/funding_context/remaining_target_gap/v75",
+      "sgov_bond_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "40.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_dry_powder_bucket_amount": {
+        "status": "KNOWN",
+        "value": {
+          "amount": "60.00",
+          "currency": "USD"
+        }
+      },
+      "sgov_context_access": "READ_ONLY_BOUNDARY_CONTEXT"
+    }
+  }
+}

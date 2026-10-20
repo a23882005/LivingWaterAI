@@ -1,0 +1,327 @@
+{
+  "payload": {
+    "version": 1,
+    "target_id": "FT-CLIENT_TEST_A-v1",
+    "target_hash": "454193decc78c427a8451db61d45f853e59a7908023ad78a1f0f9a6d1a16279d",
+    "status": "CONFIRMED",
+    "proposed_at": "2026-10-20T07:00:00+08:00",
+    "expires_at": "2026-10-20T08:00:00+08:00",
+    "policy_version": "W2-07-TEST-v1",
+    "data_version": "TEST-DATA-v1",
+    "source_reference_ids": [
+      "SRC_TEST_FUNDING",
+      "SRC_TEST_TARGET"
+    ],
+    "draft": {
+      "contract_name": "LivingWaterAI.W2.FinalTargetDraft",
+      "contract_version": "W2-17-v1.0.0",
+      "status": "DRAFT",
+      "confirmation_status": "PENDING",
+      "is_trade_authorized": false,
+      "identity": {
+        "client_id": "CLIENT_TEST_A",
+        "run_id": "RUN_TEST_17",
+        "work6_snapshot_id": "C-W6-test-snapshot-17"
+      },
+      "allocation_id": "ALLOC-TEST-17",
+      "as_of": "2026-10-20T07:00:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 100000,
+        "currency": "TWD",
+        "source_reference_ids": [
+          "SRC_TEST_TARGET"
+        ]
+      },
+      "allocation_by_asset_type": [
+        {
+          "asset_type": "債券ETF",
+          "weight": {
+            "value": 0.4,
+            "value_state": "KNOWN"
+          },
+          "target_amount_by_currency": {
+            "TWD": 40000.0
+          },
+          "source_reference_ids": [
+            "SRC_TEST_TARGET"
+          ]
+        },
+        {
+          "asset_type": "股票ETF",
+          "weight": {
+            "value": 0.6,
+            "value_state": "KNOWN"
+          },
+          "target_amount_by_currency": {
+            "TWD": 60000.0
+          },
+          "source_reference_ids": [
+            "SRC_TEST_TARGET"
+          ]
+        }
+      ],
+      "target_lines": [
+        {
+          "instrument_id": "BOND-A.US",
+          "ticker": "BA",
+          "display_name": "Test Bond ETF",
+          "asset_type": "債券ETF",
+          "weight": {
+            "value": 0.4,
+            "value_state": "KNOWN",
+            "source_reference_ids": [
+              "SRC_TEST_TARGET"
+            ]
+          },
+          "target_amount": {
+            "amount": 40000.0,
+            "currency": "TWD",
+            "value_state": "KNOWN",
+            "source_reference_ids": [
+              "SRC_TEST_TARGET"
+            ]
+          },
+          "funding_bucket_id": null,
+          "market": "NASDAQ",
+          "base_currency": "USD",
+          "risk": {
+            "max_drawdown": {
+              "value": null,
+              "value_state": "UNKNOWN",
+              "unit": null,
+              "as_of": null,
+              "source_reference_ids": [],
+              "issue_codes": [
+                "RISK_METRIC_UNKNOWN"
+              ]
+            },
+            "drawdown_amount": {
+              "value": null,
+              "value_state": "UNKNOWN",
+              "unit": null,
+              "as_of": null,
+              "source_reference_ids": [],
+              "issue_codes": [
+                "RISK_METRIC_UNKNOWN"
+              ]
+            },
+            "recovery_period": {
+              "value": null,
+              "value_state": "UNKNOWN",
+              "unit": null,
+              "as_of": null,
+              "source_reference_ids": [],
+              "issue_codes": [
+                "RISK_METRIC_UNKNOWN"
+              ]
+            }
+          },
+          "source_reference_ids": [
+            "SRC_TEST_TARGET"
+          ],
+          "planned_investments": [
+            {
+              "amount": 1200.0,
+              "currency": "USD",
+              "value_state": "KNOWN",
+              "funding_bucket_id": "US_BROKER_A",
+              "source_reference_ids": [
+                "SRC_TEST_FUNDING"
+              ]
+            }
+          ],
+          "funding_bucket_ids": [
+            "US_BROKER_A"
+          ]
+        },
+        {
+          "instrument_id": "ETF-A.TW",
+          "ticker": "A",
+          "display_name": "Test ETF A",
+          "asset_type": "股票ETF",
+          "weight": {
+            "value": 0.6,
+            "value_state": "KNOWN",
+            "source_reference_ids": [
+              "SRC_TEST_TARGET"
+            ]
+          },
+          "target_amount": {
+            "amount": 60000.0,
+            "currency": "TWD",
+            "value_state": "KNOWN",
+            "source_reference_ids": [
+              "SRC_TEST_TARGET"
+            ]
+          },
+          "funding_bucket_id": null,
+          "market": "TWSE",
+          "base_currency": "TWD",
+          "risk": {
+            "max_drawdown": {
+              "value": -0.21,
+              "value_state": "KNOWN",
+              "unit": "ratio",
+              "as_of": "2026-10-20",
+              "source_reference_ids": [
+                "SRC_TEST_RISK"
+              ],
+              "issue_codes": []
+            },
+            "drawdown_amount": {
+              "value": 12600.0,
+              "value_state": "KNOWN",
+              "unit": "TWD",
+              "as_of": "2026-10-20",
+              "source_reference_ids": [
+                "SRC_TEST_RISK"
+              ],
+              "issue_codes": []
+            },
+            "recovery_period": {
+              "value": 28.0,
+              "value_state": "KNOWN",
+              "unit": "months",
+              "as_of": "2026-10-20",
+              "source_reference_ids": [
+                "SRC_TEST_RISK"
+              ],
+              "issue_codes": []
+            }
+          },
+          "source_reference_ids": [
+            "SRC_TEST_TARGET"
+          ],
+          "planned_investments": [
+            {
+              "amount": 6000.0,
+              "currency": "TWD",
+              "value_state": "KNOWN",
+              "funding_bucket_id": "TW_LOCAL_A",
+              "source_reference_ids": [
+                "SRC_TEST_FUNDING"
+              ]
+            }
+          ],
+          "funding_bucket_ids": [
+            "TW_LOCAL_A"
+          ]
+        }
+      ],
+      "cash_residual_by_funding_bucket": [
+        {
+          "funding_bucket_id": "TW_LOCAL_A",
+          "currency": "TWD",
+          "available_amount": 10000.0,
+          "allocated_amount": 6000.0,
+          "cash_residual": 4000.0,
+          "value_state": "KNOWN",
+          "source_reference_ids": [
+            "SRC_TEST_FUNDING"
+          ]
+        },
+        {
+          "funding_bucket_id": "US_BROKER_A",
+          "currency": "USD",
+          "available_amount": 2000.0,
+          "allocated_amount": 1200.0,
+          "cash_residual": 800.0,
+          "value_state": "KNOWN",
+          "source_reference_ids": [
+            "SRC_TEST_FUNDING"
+          ]
+        }
+      ],
+      "c_work6_snapshot_id": "C-W6-test-snapshot-17",
+      "source_reference_ids": [
+        "SRC_TEST_FUNDING",
+        "SRC_TEST_TARGET"
+      ],
+      "risk_trace": {
+        "BOND-A.US": {
+          "max_drawdown": {
+            "value": null,
+            "value_state": "UNKNOWN",
+            "unit": null,
+            "as_of": null,
+            "source_reference_ids": [],
+            "issue_codes": [
+              "RISK_METRIC_UNKNOWN"
+            ]
+          },
+          "drawdown_amount": {
+            "value": null,
+            "value_state": "UNKNOWN",
+            "unit": null,
+            "as_of": null,
+            "source_reference_ids": [],
+            "issue_codes": [
+              "RISK_METRIC_UNKNOWN"
+            ]
+          },
+          "recovery_period": {
+            "value": null,
+            "value_state": "UNKNOWN",
+            "unit": null,
+            "as_of": null,
+            "source_reference_ids": [],
+            "issue_codes": [
+              "RISK_METRIC_UNKNOWN"
+            ]
+          }
+        },
+        "ETF-A.TW": {
+          "max_drawdown": {
+            "value": -0.21,
+            "value_state": "KNOWN",
+            "unit": "ratio",
+            "as_of": "2026-10-20",
+            "source_reference_ids": [
+              "SRC_TEST_RISK"
+            ],
+            "issue_codes": []
+          },
+          "drawdown_amount": {
+            "value": 12600.0,
+            "value_state": "KNOWN",
+            "unit": "TWD",
+            "as_of": "2026-10-20",
+            "source_reference_ids": [
+              "SRC_TEST_RISK"
+            ],
+            "issue_codes": []
+          },
+          "recovery_period": {
+            "value": 28.0,
+            "value_state": "KNOWN",
+            "unit": "months",
+            "as_of": "2026-10-20",
+            "source_reference_ids": [
+              "SRC_TEST_RISK"
+            ],
+            "issue_codes": []
+          }
+        }
+      },
+      "issue_codes": [
+        "MULTI_CURRENCY_SEPARATE_BUCKETS_NO_FX"
+      ],
+      "draft_hash": "454193decc78c427a8451db61d45f853e59a7908023ad78a1f0f9a6d1a16279d"
+    },
+    "confirmation_evidence": {
+      "action": "CONFIRM",
+      "client_explicit_decision": "TRUE",
+      "confirmed_at": "2026-10-20T07:20:00+08:00",
+      "confirmed_by": "CLIENT_TEST_A",
+      "source_reference_ids": [
+        "SRC_TEST_FUNDING",
+        "SRC_TEST_TARGET"
+      ]
+    },
+    "confirmation_evidence_hash": "4027aaa0997ed6a0ebfb421e1083586dd35284dac69b504e48fc3ec7bcf83dae"
+  },
+  "target_version": 1,
+  "target_hash": "454193decc78c427a8451db61d45f853e59a7908023ad78a1f0f9a6d1a16279d",
+  "confirmation_run_id": "RUN_TEST_17"
+}

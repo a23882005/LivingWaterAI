@@ -1,0 +1,74 @@
+[
+  {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "repo/系統工程/Family/W5/tests",
+      "-q"
+    ],
+    "exit_code": 0,
+    "log": "regression_0.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "w2/tests",
+      "-q"
+    ],
+    "exit_code": 0,
+    "log": "regression_1.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "w5_start/sources/系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/tests",
+      "-q"
+    ],
+    "exit_code": 0,
+    "log": "regression_2.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "w5_start/sources/系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w6_validation_account_isolation_gate.py"
+    ],
+    "exit_code": 0,
+    "log": "regression_3.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "w5_start/sources/系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w7_core_rule_engine_gate.py"
+    ],
+    "exit_code": 0,
+    "log": "regression_4.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "w5_start/sources/系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w8_deployment_execution_gate.py"
+    ],
+    "exit_code": 0,
+    "log": "regression_5.log",
+    "status": "PASS"
+  },
+  {
+    "command": [
+      "python",
+      "w5_start/sources/系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w9_canonical_persistence_ports_gate.py"
+    ],
+    "exit_code": 0,
+    "log": "regression_6.log",
+    "status": "PASS"
+  }
+]

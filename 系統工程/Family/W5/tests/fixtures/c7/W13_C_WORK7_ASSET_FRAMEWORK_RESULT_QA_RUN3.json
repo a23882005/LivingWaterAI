@@ -1,0 +1,703 @@
+{
+  "contract_name": "LivingWaterAI.C.Work7.AssetFrameworkIntegrationResult",
+  "contract_version": "C-W7-v1.2.0",
+  "identity": {
+    "run_id": "qa-run-3",
+    "client_id": "qa-client",
+    "portfolio_id": "qa-portfolio",
+    "request_id": "C8C9-W13-C7-REQ-003"
+  },
+  "work7_snapshot_id": "C-W7-11e646e3069d5ca6a4c19a89a72f7bff",
+  "parent_work6_snapshot_id": "C-W6-33333333333333333333333333333333",
+  "status": "READY_FOR_PM_GATE",
+  "route": {
+    "decision": "PM_CONTRACT_SCHEMA_GATE",
+    "reason_codes": []
+  },
+  "v70_framework_snapshot": {
+    "owner_contract": "V70 owns Strategic Risk Budget/S0-B0/Macro math; C Work7 is consumer/adapter only.",
+    "run_id": "qa-run-3",
+    "upstream_v70_snapshot_id": "v70-snap-003",
+    "snapshot_as_of": "2026-09-26T13:05:00+08:00",
+    "strategic_stock_weight": 0.8,
+    "strategic_bond_weight": 0.2,
+    "tactical_tilt_t": 0.0,
+    "stock_tactical_weight": 0.8,
+    "bond_tactical_weight": 0.2,
+    "v70_original_dry_powder_weight": 0.0,
+    "data_quality": "OK",
+    "freshness": "FRESH",
+    "source_reference_ids": [
+      "V70-ref"
+    ]
+  },
+  "funding_context_snapshot": {
+    "value_state": "KNOWN",
+    "boundary_contract": "UPSTREAM_FUNDING_CONTEXT_VALIDATE_AND_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE",
+    "bank_cash_scope": "OUT_OF_SCOPE",
+    "base_currency": "USD",
+    "total_new_investment_amount": 1200.0,
+    "contexts": [
+      {
+        "domain": "TW_LOCAL_BROKER",
+        "broker": "TW_LOCAL",
+        "account": "L1",
+        "bucket_new_investment_amount": 100.0,
+        "brokerage_cash_state": {
+          "total": 100.0,
+          "available": 100.0,
+          "unsettled": 0.0,
+          "reserved": 0.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_LOCAL_BROKER",
+            "source_broker": "TW_LOCAL",
+            "source_account": "L1"
+          },
+          "bond": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_LOCAL_BROKER",
+            "source_broker": "TW_LOCAL",
+            "source_account": "L1"
+          }
+        },
+        "source_reference_ids": [
+          "c7-local"
+        ]
+      },
+      {
+        "domain": "TW_SUB_BROKERAGE",
+        "broker": "TW_SUB",
+        "account": "S1",
+        "bucket_new_investment_amount": 100.0,
+        "brokerage_cash_state": {
+          "total": 100.0,
+          "available": 100.0,
+          "unsettled": 0.0,
+          "reserved": 0.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_SUB_BROKERAGE",
+            "source_broker": "TW_SUB",
+            "source_account": "S1"
+          },
+          "bond": {
+            "amount": 0.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "TW_SUB_BROKERAGE",
+            "source_broker": "TW_SUB",
+            "source_account": "S1"
+          }
+        },
+        "source_reference_ids": [
+          "c7-sub"
+        ]
+      },
+      {
+        "domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT",
+        "bucket_new_investment_amount": 1000.0,
+        "brokerage_cash_state": {
+          "total": 1000.0,
+          "available": 800.0,
+          "unsettled": 100.0,
+          "reserved": 100.0
+        },
+        "executable_budget": {
+          "equity": {
+            "amount": 450.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "US_BROKER",
+            "source_broker": "QA_BROKER",
+            "source_account": "QA_ACCOUNT"
+          },
+          "bond": {
+            "amount": 350.0,
+            "cash_basis": "AVAILABLE",
+            "source_domain": "US_BROKER",
+            "source_broker": "QA_BROKER",
+            "source_account": "QA_ACCOUNT"
+          }
+        },
+        "source_reference_ids": [
+          "C7-ref"
+        ]
+      }
+    ],
+    "source_reference_ids": [
+      "C7-ref"
+    ],
+    "reason": null
+  },
+  "work6_final_target_reference": {
+    "allocation_id": "C-W6-FINAL-QA-003",
+    "confirmed_at": "2026-09-26T13:00:00+08:00",
+    "confirmed_by": "qa-client",
+    "source_reference_ids": [
+      "W13-C7-FINAL-TARGET-SOURCE"
+    ]
+  },
+  "protected_locked_weights": [],
+  "residual_allocation": {
+    "method": "LOCKED_FIRST_THEN_PROPORTIONAL_RESIDUAL_WITHIN_V70_BUCKET",
+    "buckets": [
+      {
+        "bucket": "STOCK",
+        "target_weight": 0.8,
+        "work6_final_target_bucket_weight": 0.7999999999999999,
+        "locked_weight": 0,
+        "residual_budget": 0.8,
+        "unlocked_reference_weight": 0.7999999999999999,
+        "allocated_residual_weight": 0.8,
+        "items": [
+          {
+            "instrument_id": "QQQ",
+            "ticker": "QQQ",
+            "asset_type": "股票ETF",
+            "bucket": "STOCK",
+            "protected": false,
+            "work6_final_target_weight": 0.1,
+            "integrated_weight": 0.10000000000000003,
+            "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+            "source_reference_ids": [
+              "W13-C7-FINAL-TARGET-SOURCE"
+            ]
+          },
+          {
+            "instrument_id": "CORE.US",
+            "ticker": "CORE",
+            "asset_type": "股票ETF",
+            "bucket": "STOCK",
+            "protected": false,
+            "work6_final_target_weight": 0.7,
+            "integrated_weight": 0.7000000000000001,
+            "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+            "source_reference_ids": [
+              "W13-C7-FINAL-TARGET-SOURCE"
+            ]
+          }
+        ]
+      },
+      {
+        "bucket": "BOND",
+        "target_weight": 0.2,
+        "work6_final_target_bucket_weight": 0.2,
+        "locked_weight": 0,
+        "residual_budget": 0.2,
+        "unlocked_reference_weight": 0.2,
+        "allocated_residual_weight": 0.2,
+        "items": [
+          {
+            "instrument_id": "SGOV",
+            "ticker": "SGOV",
+            "asset_type": "債券ETF",
+            "bucket": "BOND",
+            "protected": false,
+            "work6_final_target_weight": 0.2,
+            "integrated_weight": 0.2,
+            "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+            "source_reference_ids": [
+              "W13-C7-FINAL-TARGET-SOURCE"
+            ]
+          }
+        ]
+      },
+      {
+        "bucket": "V70_ORIGINAL_DRY_POWDER",
+        "target_weight": 0.0,
+        "work6_final_target_bucket_weight": 0.0,
+        "locked_weight": 0,
+        "residual_budget": 0.0,
+        "unlocked_reference_weight": 0,
+        "allocated_residual_weight": 0.0,
+        "items": []
+      }
+    ]
+  },
+  "integrated_asset_framework": {
+    "value_state": "KNOWN",
+    "stock_weight": 0.8,
+    "bond_weight": 0.2,
+    "v70_original_dry_powder_weight": 0.0,
+    "total_weight": 1.0,
+    "instrument_targets": [
+      {
+        "instrument_id": "QQQ",
+        "ticker": "QQQ",
+        "asset_type": "股票ETF",
+        "bucket": "STOCK",
+        "protected": false,
+        "work6_final_target_weight": 0.1,
+        "integrated_weight": 0.10000000000000003,
+        "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+        "source_reference_ids": [
+          "W13-C7-FINAL-TARGET-SOURCE"
+        ]
+      },
+      {
+        "instrument_id": "CORE.US",
+        "ticker": "CORE",
+        "asset_type": "股票ETF",
+        "bucket": "STOCK",
+        "protected": false,
+        "work6_final_target_weight": 0.7,
+        "integrated_weight": 0.7000000000000001,
+        "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+        "source_reference_ids": [
+          "W13-C7-FINAL-TARGET-SOURCE"
+        ]
+      },
+      {
+        "instrument_id": "SGOV",
+        "ticker": "SGOV",
+        "asset_type": "債券ETF",
+        "bucket": "BOND",
+        "protected": false,
+        "work6_final_target_weight": 0.2,
+        "integrated_weight": 0.2,
+        "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+        "source_reference_ids": [
+          "W13-C7-FINAL-TARGET-SOURCE"
+        ]
+      }
+    ],
+    "work6_final_target_preserved": true,
+    "reason": null
+  },
+  "drift_snapshot": {
+    "value_state": "KNOWN",
+    "as_of": "2026-09-26T13:00:00+08:00",
+    "denominator": {
+      "value_state": "KNOWN",
+      "amount": 1000.0,
+      "currency": "USD",
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "items": [
+      {
+        "instrument_id": "QQQ",
+        "ticker": "QQQ",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.1
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.1
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      },
+      {
+        "instrument_id": "CORE.US",
+        "ticker": "CORE",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.7
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.7
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      },
+      {
+        "instrument_id": "SGOV",
+        "ticker": "SGOV",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.2
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.2
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      }
+    ],
+    "renderer_must_not_recompute_final_target": true,
+    "reason": null
+  },
+  "radar_snapshot": {
+    "as_of": "2026-09-24T11:45:00+08:00",
+    "axes": [
+      {
+        "axis_id": "BULL_EARLY",
+        "label_zh": "牛市初期",
+        "order": 1
+      },
+      {
+        "axis_id": "BULL_MID",
+        "label_zh": "牛市中期",
+        "order": 2
+      },
+      {
+        "axis_id": "BULL_LATE",
+        "label_zh": "牛市末期",
+        "order": 3
+      },
+      {
+        "axis_id": "BEAR_NON_RECESSION_VALUATION",
+        "label_zh": "非衰退熊市／估值壓縮",
+        "order": 4
+      },
+      {
+        "axis_id": "BEAR_RECESSION",
+        "label_zh": "景氣衰退熊市",
+        "order": 5
+      },
+      {
+        "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+        "label_zh": "金融／流動性危機",
+        "order": 6
+      }
+    ],
+    "views": [
+      {
+        "view_id": "CURRENT_ATTACK",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "TARGET_ATTACK",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "CURRENT_DEFENSE",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "TARGET_DEFENSE",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      }
+    ],
+    "display_requirements": {
+      "same_six_axes_for_all_four_views": true,
+      "same_axis_order_for_all_four_views": true,
+      "six_chinese_labels_directly_visible": true,
+      "missing_overlapped_or_unreadable_label_is_formal_report_qa_fail": true
+    }
+  },
+  "snapshot_lineage": {
+    "run_id": "qa-run-3",
+    "canonical_request_id": "C8C9-W13-C7-REQ-003",
+    "work6_snapshot_id": "C-W6-33333333333333333333333333333333",
+    "v70_snapshot_id": "v70-snap-003",
+    "lineage_status": "SAME_RUN"
+  },
+  "hard_checks": {
+    "protected_existing_holding_contract": "PASS",
+    "portfolio_drift_snapshot_contract": "PASS",
+    "radar_axis_label_order_contract": "PASS",
+    "same_run_snapshot_lineage": "PASS",
+    "portfolio_math_100_percent": "PASS",
+    "v70_owner_boundary": "PASS",
+    "funding_context_schema_validation": "PASS",
+    "account_isolation": "PASS",
+    "no_cross_account_funding_executable_budget_isolation": "PASS"
+  },
+  "report_contract": {
+    "renderer_must_not_recompute_final_target": true,
+    "renderer_must_use_work6_drift_snapshot": true,
+    "renderer_must_use_work6_radar_snapshot": true,
+    "risk_warning_is_not_sell_instruction": true,
+    "funding_context_must_remain_account_isolated": true,
+    "funding_domain_engine_must_not_be_reimplemented_in_c7": true
+  },
+  "pm_gate": {
+    "required": true,
+    "status": "PENDING_ABC_PM_CONTRACT_SCHEMA_GATE",
+    "a78_a79_released": false,
+    "work8_released": false,
+    "required_hard_checks": [
+      "Protected Existing Holding Contract",
+      "Portfolio Drift Snapshot Contract",
+      "Radar Axis Label/Order Contract",
+      "Funding Context Schema/Validation",
+      "Account Isolation",
+      "No Cross-Account Funding/Executable Budget Isolation"
+    ]
+  },
+  "source_reference_ids": [
+    "V70-ref",
+    "W13-C7-FINAL-TARGET-SOURCE",
+    "C7-ref"
+  ],
+  "issues": [],
+  "created_at": "2026-09-26T13:20:00+08:00"
+}

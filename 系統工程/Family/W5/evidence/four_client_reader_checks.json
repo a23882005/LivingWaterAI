@@ -1,0 +1,26 @@
+[
+  {
+    "client_slot": 1,
+    "read_only_pass": true,
+    "cross_client_rejected": true,
+    "source_unchanged": true
+  },
+  {
+    "client_slot": 2,
+    "read_only_pass": true,
+    "cross_client_rejected": true,
+    "source_unchanged": true
+  },
+  {
+    "client_slot": 3,
+    "read_only_pass": true,
+    "cross_client_rejected": true,
+    "source_unchanged": true
+  },
+  {
+    "client_slot": 4,
+    "read_only_pass": true,
+    "cross_client_rejected": true,
+    "source_unchanged": true
+  }
+]

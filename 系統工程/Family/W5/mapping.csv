@@ -1,0 +1,26 @@
+source_table_column,destination_json_pointer,type,mapping_rule
+family_member_identity.client_id,/client_id,TEXT,Exact identity; trusted_context match
+portfolio_account.account_key,/owner/account,TEXT,Exact key; no label matching
+account_ownership.owner_client_id,/owner/client_id,TEXT,VERIFIED ownership
+account_broker_link.broker_key,/owner/broker,TEXT,ACTIVE exact broker key
+funding_account_domain_link.funding_domain_key,/owner/funding_domain,TEXT,W1 purpose domain key; distinct from C7 broker domain
+funding_account_domain_link.currency_code,/owner/currency,TEXT,Exact account currency scope; no FX borrowing
+funding_domain.purpose_code,/owner_binding/w1_funding_purpose,TEXT,INVESTMENT_CANDIDATE; protected/living expense not spendable
+portfolio_position.quantity_decimal,/positions/*/quantity,DECIMAL_TEXT,Latest per-account instrument as-of; null remains UNKNOWN
+portfolio_position.as_of_utc,/positions/*/source_position/as_of_utc,ISO8601,Read historical data at evaluation instant
+portfolio_instrument.instrument_key,/positions/*/instrument_key,TEXT,No ticker-only identity joins
+portfolio_instrument.exchange_code,/positions/*/source_instrument/exchange_code,TEXT,Preserved
+portfolio_instrument.quote_currency,/positions/*/source_instrument/quote_currency,TEXT,Preserved
+cash_balance_snapshot.*,/client_snapshot/payload/tables/cash_balance_snapshot,RAW_ROWS,Reported/settled/reserved/unsettled preserved; never infer AVAILABLE
+"universe_membership.universe_code,membership_code,version_no",/permissions/*/membership,ENUM,Latest effective confirmed PERSONAL/RESEARCH/EXCLUSION retained separately
+universe_confirmation.confirmed_at_utc,/permissions/*/membership,ISO8601,Confirmation must be available at evaluation
+"permission_policy.action_code,decision_code,version_no",/permissions/*/permission_decisions,ENUM,Confirmed applicable NEW_BUY facts; no analysis permission override
+holding_policy_proposal.policy_code,/permissions/*/holding_policy,ENUM,HOLD_AS_IS/ADJUSTABLE/UNKNOWN; native Work8 risk remains visible
+"W2-18.version,target_hash,draft",/confirmed_target,ORIGINAL_RECORD,Record unchanged; exact hash plus confirmation evidence validated
+W2-18.draft.identity.run_id,/target_binding/confirmation_run_id,TEXT,Historical run retained separately from analysis_run_id
+trusted_context.holdings_completeness,/positions,EVIDENCE,Explicit account completeness required to accept empty holdings
+C8C9.Work6.cash_eligibility.available,/aggregate/available_remaining,DECIMAL_TEXT,Native explicit AVAILABLE minus actual claims only
+"C8C9.Work6.cash_eligibility.equity_executable_budget,bond_executable_budget",/aggregate,DECIMAL_TEXT,Reuse native Work6 owner checks then exact combined claim cap
+trusted owner mapping native_owner,/owner_binding,EXPLICIT_MAPPING,W1 funding purpose is not C7 US_BROKER/TW domain; pin mapping digest and version
+P70-5.read_macro payload,/macro_snapshot/payload,ORIGINAL_DICT,Preserve original quality and provenance; digest-pinned
+explicit quantity/price/FX evidence,/valuation,DECIMAL_TEXT,"quantity*price*FX; unknown FX stays UNKNOWN, estimated quantity stays ESTIMATED"

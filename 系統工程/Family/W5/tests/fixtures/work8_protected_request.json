@@ -1,0 +1,1458 @@
+{
+  "contract_name": "LivingWaterAI.C8C9.Work8.ProtectedHoldingProtectionInput",
+  "contract_version": "C8C9-W8-PHPI-v1.0.1",
+  "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+  "run_id": "w8-run-001",
+  "c_work7_asset_framework_result": {
+    "contract_name": "LivingWaterAI.C.Work7.AssetFrameworkIntegrationResult",
+    "contract_version": "C-W7-v1.2.0",
+    "identity": {
+      "run_id": "w8-run-001",
+      "client_id": "CLIENT-DEMO",
+      "portfolio_id": "PORT-DEMO",
+      "request_id": "REQ-DEMO-001"
+    },
+    "work7_snapshot_id": "C-W7-18004d963f0826ffbd871f3233145ffe",
+    "parent_work6_snapshot_id": "C-W6-9dbc99d0088bb01c583d263785828a23",
+    "status": "READY_FOR_PM_GATE",
+    "route": {
+      "decision": "PM_CONTRACT_SCHEMA_GATE",
+      "reason_codes": []
+    },
+    "v70_framework_snapshot": {
+      "owner_contract": "V70 owns Strategic Risk Budget/S0-B0/Macro math; C Work7 is consumer/adapter only.",
+      "run_id": "RUN-DEMO-W1-001",
+      "upstream_v70_snapshot_id": "V70-SNAPSHOT-DEMO",
+      "snapshot_as_of": "2026-09-23T10:45:00+08:00",
+      "strategic_stock_weight": 0.6,
+      "strategic_bond_weight": 0.4,
+      "tactical_tilt_t": 0.0,
+      "stock_tactical_weight": 0.6,
+      "bond_tactical_weight": 0.4,
+      "v70_original_dry_powder_weight": 0.0,
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "source_reference_ids": [
+        "SRC_V70"
+      ]
+    },
+    "funding_context_snapshot": {
+      "value_state": "KNOWN",
+      "boundary_contract": "UPSTREAM_FUNDING_CONTEXT_VALIDATE_AND_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE",
+      "bank_cash_scope": "OUT_OF_SCOPE",
+      "base_currency": "TWD",
+      "total_new_investment_amount": 1000000.0,
+      "contexts": [
+        {
+          "domain": "TW_LOCAL_BROKER",
+          "broker": "TW-BROKER-A",
+          "account": "TWLOCAL-001",
+          "bucket_new_investment_amount": 300000.0,
+          "brokerage_cash_state": {
+            "total": 420000.0,
+            "available": 350000.0,
+            "unsettled": 50000.0,
+            "reserved": 20000.0
+          },
+          "executable_budget": {
+            "equity": {
+              "amount": 200000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "TW_LOCAL_BROKER",
+              "source_broker": "TW-BROKER-A",
+              "source_account": "TWLOCAL-001"
+            },
+            "bond": {
+              "amount": 100000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "TW_LOCAL_BROKER",
+              "source_broker": "TW-BROKER-A",
+              "source_account": "TWLOCAL-001"
+            }
+          },
+          "source_reference_ids": []
+        },
+        {
+          "domain": "TW_SUB_BROKERAGE",
+          "broker": "TW-BROKER-B",
+          "account": "TWSUB-001",
+          "bucket_new_investment_amount": 200000.0,
+          "brokerage_cash_state": {
+            "total": 260000.0,
+            "available": 220000.0,
+            "unsettled": 30000.0,
+            "reserved": 10000.0
+          },
+          "executable_budget": {
+            "equity": {
+              "amount": 150000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "TW_SUB_BROKERAGE",
+              "source_broker": "TW-BROKER-B",
+              "source_account": "TWSUB-001"
+            },
+            "bond": {
+              "amount": 50000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "TW_SUB_BROKERAGE",
+              "source_broker": "TW-BROKER-B",
+              "source_account": "TWSUB-001"
+            }
+          },
+          "source_reference_ids": []
+        },
+        {
+          "domain": "US_BROKER",
+          "broker": "US-BROKER-A",
+          "account": "US-001",
+          "bucket_new_investment_amount": 500000.0,
+          "brokerage_cash_state": {
+            "total": 620000.0,
+            "available": 550000.0,
+            "unsettled": 50000.0,
+            "reserved": 20000.0
+          },
+          "executable_budget": {
+            "equity": {
+              "amount": 350000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "US_BROKER",
+              "source_broker": "US-BROKER-A",
+              "source_account": "US-001"
+            },
+            "bond": {
+              "amount": 150000.0,
+              "cash_basis": "AVAILABLE",
+              "source_domain": "US_BROKER",
+              "source_broker": "US-BROKER-A",
+              "source_account": "US-001"
+            }
+          },
+          "source_reference_ids": []
+        }
+      ],
+      "source_reference_ids": [],
+      "reason": null
+    },
+    "work6_final_target_reference": {
+      "allocation_id": "C-W6-FINAL-97c157148ba5cccf73dfe332",
+      "confirmed_at": "2026-09-24T11:45:00+08:00",
+      "confirmed_by": "CLIENT-DEMO",
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "protected_locked_weights": [
+      {
+        "instrument_id": "TSM.US",
+        "ticker": "TSM",
+        "bucket": "STOCK",
+        "current_weight": 0.05,
+        "final_target_weight": 0.05,
+        "drift": 0.0,
+        "protected": true,
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      }
+    ],
+    "residual_allocation": {
+      "method": "LOCKED_FIRST_THEN_PROPORTIONAL_RESIDUAL_WITHIN_V70_BUCKET",
+      "buckets": [
+        {
+          "bucket": "STOCK",
+          "target_weight": 0.6,
+          "work6_final_target_bucket_weight": 0.6,
+          "locked_weight": 0.05,
+          "residual_budget": 0.5499999999999999,
+          "unlocked_reference_weight": 0.5499999999999999,
+          "allocated_residual_weight": 0.5499999999999999,
+          "items": [
+            {
+              "instrument_id": "0050.TW",
+              "ticker": "0050",
+              "asset_type": "股票ETF",
+              "bucket": "STOCK",
+              "protected": false,
+              "work6_final_target_weight": 0.5499999999999999,
+              "integrated_weight": 0.5499999999999999,
+              "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "TSM.US",
+              "ticker": "TSM",
+              "asset_type": "個別公司股票",
+              "bucket": "STOCK",
+              "protected": true,
+              "work6_final_target_weight": 0.05,
+              "integrated_weight": 0.05,
+              "allocation_rule": "LOCKED_CURRENT_WEIGHT",
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ]
+        },
+        {
+          "bucket": "BOND",
+          "target_weight": 0.4,
+          "work6_final_target_bucket_weight": 0.4,
+          "locked_weight": 0,
+          "residual_budget": 0.4,
+          "unlocked_reference_weight": 0.4,
+          "allocated_residual_weight": 0.4,
+          "items": [
+            {
+              "instrument_id": "SGOV.US",
+              "ticker": "SGOV",
+              "asset_type": "債券ETF",
+              "bucket": "BOND",
+              "protected": false,
+              "work6_final_target_weight": 0.4,
+              "integrated_weight": 0.4,
+              "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ]
+        },
+        {
+          "bucket": "V70_ORIGINAL_DRY_POWDER",
+          "target_weight": 0.0,
+          "work6_final_target_bucket_weight": 0.0,
+          "locked_weight": 0,
+          "residual_budget": 0.0,
+          "unlocked_reference_weight": 0,
+          "allocated_residual_weight": 0.0,
+          "items": []
+        }
+      ]
+    },
+    "integrated_asset_framework": {
+      "value_state": "KNOWN",
+      "stock_weight": 0.6,
+      "bond_weight": 0.4,
+      "v70_original_dry_powder_weight": 0.0,
+      "total_weight": 1.0,
+      "instrument_targets": [
+        {
+          "instrument_id": "0050.TW",
+          "ticker": "0050",
+          "asset_type": "股票ETF",
+          "bucket": "STOCK",
+          "protected": false,
+          "work6_final_target_weight": 0.5499999999999999,
+          "integrated_weight": 0.5499999999999999,
+          "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "TSM.US",
+          "ticker": "TSM",
+          "asset_type": "個別公司股票",
+          "bucket": "STOCK",
+          "protected": true,
+          "work6_final_target_weight": 0.05,
+          "integrated_weight": 0.05,
+          "allocation_rule": "LOCKED_CURRENT_WEIGHT",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "SGOV.US",
+          "ticker": "SGOV",
+          "asset_type": "債券ETF",
+          "bucket": "BOND",
+          "protected": false,
+          "work6_final_target_weight": 0.4,
+          "integrated_weight": 0.4,
+          "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "work6_final_target_preserved": true,
+      "reason": null
+    },
+    "drift_snapshot": {
+      "value_state": "KNOWN",
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 1000000.0,
+        "currency": "TWD",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      "items": [
+        {
+          "instrument_id": "0050.TW",
+          "ticker": "0050",
+          "current_weight": {
+            "value_state": "KNOWN",
+            "value": 0.55
+          },
+          "final_target_weight": {
+            "value_state": "KNOWN",
+            "value": 0.5499999999999999
+          },
+          "drift": {
+            "value_state": "KNOWN",
+            "value": 0.0
+          },
+          "protected": false,
+          "client_facing_action": "HOLD"
+        },
+        {
+          "instrument_id": "TSM.US",
+          "ticker": "TSM",
+          "current_weight": {
+            "value_state": "KNOWN",
+            "value": 0.05
+          },
+          "final_target_weight": {
+            "value_state": "KNOWN",
+            "value": 0.05
+          },
+          "drift": {
+            "value_state": "KNOWN",
+            "value": 0.0
+          },
+          "protected": true,
+          "client_facing_action": "HOLD_PROTECTED"
+        },
+        {
+          "instrument_id": "SGOV.US",
+          "ticker": "SGOV",
+          "current_weight": {
+            "value_state": "KNOWN",
+            "value": 0.4
+          },
+          "final_target_weight": {
+            "value_state": "KNOWN",
+            "value": 0.4
+          },
+          "drift": {
+            "value_state": "KNOWN",
+            "value": 0.0
+          },
+          "protected": false,
+          "client_facing_action": "HOLD"
+        }
+      ],
+      "renderer_must_not_recompute_final_target": true,
+      "reason": null
+    },
+    "radar_snapshot": {
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "axes": [
+        {
+          "axis_id": "BULL_EARLY",
+          "label_zh": "牛市初期",
+          "order": 1
+        },
+        {
+          "axis_id": "BULL_MID",
+          "label_zh": "牛市中期",
+          "order": 2
+        },
+        {
+          "axis_id": "BULL_LATE",
+          "label_zh": "牛市末期",
+          "order": 3
+        },
+        {
+          "axis_id": "BEAR_NON_RECESSION_VALUATION",
+          "label_zh": "非衰退熊市／估值壓縮",
+          "order": 4
+        },
+        {
+          "axis_id": "BEAR_RECESSION",
+          "label_zh": "景氣衰退熊市",
+          "order": 5
+        },
+        {
+          "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+          "label_zh": "金融／流動性危機",
+          "order": 6
+        }
+      ],
+      "views": [
+        {
+          "view_id": "CURRENT_ATTACK",
+          "axes": [
+            {
+              "axis_id": "BULL_EARLY",
+              "label_zh": "牛市初期",
+              "order": 1,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_MID",
+              "label_zh": "牛市中期",
+              "order": 2,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_LATE",
+              "label_zh": "牛市末期",
+              "order": 3,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_NON_RECESSION_VALUATION",
+              "label_zh": "非衰退熊市／估值壓縮",
+              "order": 4,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_RECESSION",
+              "label_zh": "景氣衰退熊市",
+              "order": 5,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+              "label_zh": "金融／流動性危機",
+              "order": 6,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            }
+          ],
+          "source_reference_ids": []
+        },
+        {
+          "view_id": "TARGET_ATTACK",
+          "axes": [
+            {
+              "axis_id": "BULL_EARLY",
+              "label_zh": "牛市初期",
+              "order": 1,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_MID",
+              "label_zh": "牛市中期",
+              "order": 2,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_LATE",
+              "label_zh": "牛市末期",
+              "order": 3,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_NON_RECESSION_VALUATION",
+              "label_zh": "非衰退熊市／估值壓縮",
+              "order": 4,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_RECESSION",
+              "label_zh": "景氣衰退熊市",
+              "order": 5,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+              "label_zh": "金融／流動性危機",
+              "order": 6,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            }
+          ],
+          "source_reference_ids": []
+        },
+        {
+          "view_id": "CURRENT_DEFENSE",
+          "axes": [
+            {
+              "axis_id": "BULL_EARLY",
+              "label_zh": "牛市初期",
+              "order": 1,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_MID",
+              "label_zh": "牛市中期",
+              "order": 2,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_LATE",
+              "label_zh": "牛市末期",
+              "order": 3,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_NON_RECESSION_VALUATION",
+              "label_zh": "非衰退熊市／估值壓縮",
+              "order": 4,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_RECESSION",
+              "label_zh": "景氣衰退熊市",
+              "order": 5,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+              "label_zh": "金融／流動性危機",
+              "order": 6,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            }
+          ],
+          "source_reference_ids": []
+        },
+        {
+          "view_id": "TARGET_DEFENSE",
+          "axes": [
+            {
+              "axis_id": "BULL_EARLY",
+              "label_zh": "牛市初期",
+              "order": 1,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_MID",
+              "label_zh": "牛市中期",
+              "order": 2,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BULL_LATE",
+              "label_zh": "牛市末期",
+              "order": 3,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_NON_RECESSION_VALUATION",
+              "label_zh": "非衰退熊市／估值壓縮",
+              "order": 4,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "BEAR_RECESSION",
+              "label_zh": "景氣衰退熊市",
+              "order": 5,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            },
+            {
+              "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+              "label_zh": "金融／流動性危機",
+              "order": 6,
+              "score": {
+                "value_state": "UNKNOWN",
+                "value": null,
+                "source_reference_ids": []
+              }
+            }
+          ],
+          "source_reference_ids": []
+        }
+      ],
+      "display_requirements": {
+        "same_six_axes_for_all_four_views": true,
+        "same_axis_order_for_all_four_views": true,
+        "six_chinese_labels_directly_visible": true,
+        "missing_overlapped_or_unreadable_label_is_formal_report_qa_fail": true
+      }
+    },
+    "snapshot_lineage": {
+      "run_id": "w8-run-001",
+      "canonical_request_id": "REQ-DEMO-001",
+      "work6_snapshot_id": "C-W6-9dbc99d0088bb01c583d263785828a23",
+      "v70_snapshot_id": "V70-SNAPSHOT-DEMO",
+      "lineage_status": "SAME_RUN"
+    },
+    "hard_checks": {
+      "protected_existing_holding_contract": "PASS",
+      "portfolio_drift_snapshot_contract": "PASS",
+      "radar_axis_label_order_contract": "PASS",
+      "same_run_snapshot_lineage": "PASS",
+      "portfolio_math_100_percent": "PASS",
+      "v70_owner_boundary": "PASS",
+      "funding_context_schema_validation": "PASS",
+      "account_isolation": "PASS",
+      "no_cross_account_funding_executable_budget_isolation": "PASS"
+    },
+    "report_contract": {
+      "renderer_must_not_recompute_final_target": true,
+      "renderer_must_use_work6_drift_snapshot": true,
+      "renderer_must_use_work6_radar_snapshot": true,
+      "risk_warning_is_not_sell_instruction": true,
+      "funding_context_must_remain_account_isolated": true,
+      "funding_domain_engine_must_not_be_reimplemented_in_c7": true
+    },
+    "pm_gate": {
+      "required": true,
+      "status": "PENDING_ABC_PM_CONTRACT_SCHEMA_GATE",
+      "a78_a79_released": false,
+      "work8_released": false,
+      "required_hard_checks": [
+        "Protected Existing Holding Contract",
+        "Portfolio Drift Snapshot Contract",
+        "Radar Axis Label/Order Contract",
+        "Funding Context Schema/Validation",
+        "Account Isolation",
+        "No Cross-Account Funding/Executable Budget Isolation"
+      ]
+    },
+    "source_reference_ids": [
+      "SRC_V70",
+      "SRC_CLIENT"
+    ],
+    "issues": [],
+    "created_at": "2026-09-24T16:10:00+08:00"
+  },
+  "work4_v82_integration_result": {
+    "contract_name": "LivingWaterAI.C8C9.Work4.V82IntegrationResult",
+    "contract_version": "C8C9-W4-V82AO-v1.0.0",
+    "baseline_id": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e",
+    "run_id": "w8-run-001",
+    "owner": {
+      "funding_domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT"
+    },
+    "currency": "USD",
+    "asset_id": "TSM.US",
+    "work3_context_handoff_id": "C8C9-W3-HANDOFF-W8-001",
+    "upstream_v70_snapshot_id": "v70-w8-snap-001",
+    "shared_context_id": "shared-w8-001",
+    "shared_context_digest_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "authorization_reference": "C-W6-FINAL-97c157148ba5cccf73dfe332",
+    "consumed_equity_executable_budget": {
+      "amount": "450.00",
+      "currency": "USD",
+      "cash_basis": "AVAILABLE",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "source_pointer": "/funding_context/executable_budget/equity"
+    },
+    "canonical_v82_output": {
+      "contract_name": "LivingWaterAI.V82.RuntimeOutput",
+      "contract_version": "V82-OUTPUT-v1.0.1-W2-RECHECK2",
+      "run_id": "w8-run-001",
+      "v82_snapshot_id": "v82-w8-snap-001",
+      "upstream_v70_snapshot_id": "v70-w8-snap-001",
+      "asset_id": "TSM.US",
+      "rule_version": "V82-v1.21.0",
+      "data_as_of": {
+        "shared": "2026-09-28T01:20:00+08:00"
+      },
+      "evaluated_at": "2026-09-28T01:29:00+08:00",
+      "source_lineage": [
+        "work3-w8",
+        "c7-w8",
+        "v70-w8"
+      ],
+      "output_status": "OK",
+      "canonical_analysis": {
+        "latest_price": {
+          "field_name": "latest_price",
+          "value": {
+            "amount": 200.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "market_data_as_of": {
+          "field_name": "market_data_as_of",
+          "value": "2026-09-28T01:20:00+08:00",
+          "data_type": "DateTime",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "asset_behavior_classification": {
+          "field_name": "asset_behavior_classification",
+          "value": "INDIVIDUAL_COMPANY_STOCK",
+          "data_type": "EnumRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "primary_framework": {
+          "field_name": "primary_framework",
+          "value": "V82",
+          "data_type": "RuleRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "secondary_framework": {
+          "field_name": "secondary_framework",
+          "value": "NONE",
+          "data_type": "RuleRef/List",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "fundamental_state": {
+          "field_name": "fundamental_state",
+          "value": {
+            "state": "RISK_REVIEW",
+            "source_owned": true
+          },
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "valuation_state": {
+          "field_name": "valuation_state",
+          "value": "EXPENSIVE",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "td9_high_state": {
+          "field_name": "td9_high_state",
+          "value": "HIGH_9",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "td9_low_state": {
+          "field_name": "td9_low_state",
+          "value": "NONE",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "kd_state": {
+          "field_name": "kd_state",
+          "value": "WEAKENING",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "macd_state": {
+          "field_name": "macd_state",
+          "value": "WEAKENING",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "ma_state": {
+          "field_name": "ma_state",
+          "value": "BELOW_MA20",
+          "data_type": "StructuredSignal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "emv_state": {
+          "field_name": "emv_state",
+          "value": "WEAK",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "rsi_state": {
+          "field_name": "rsi_state",
+          "value": "NEUTRAL",
+          "data_type": "SignalState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "volume_price_state": {
+          "field_name": "volume_price_state",
+          "value": "SELL_PRESSURE",
+          "data_type": "StructuredSignal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "daily_timeframe_state": {
+          "field_name": "daily_timeframe_state",
+          "value": "WEAK",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "weekly_timeframe_state": {
+          "field_name": "weekly_timeframe_state",
+          "value": "NEUTRAL",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "monthly_timeframe_state": {
+          "field_name": "monthly_timeframe_state",
+          "value": "UPTREND",
+          "data_type": "TimeframeState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "atr_value": {
+          "field_name": "atr_value",
+          "value": 8.0,
+          "data_type": "Decimal",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "drawdown_from_reference_high": {
+          "field_name": "drawdown_from_reference_high",
+          "value": 0.12,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_1": {
+          "field_name": "previous_swing_low_1",
+          "value": {
+            "amount": 180.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_2": {
+          "field_name": "previous_swing_low_2",
+          "value": {
+            "amount": 170.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "previous_swing_low_3": {
+          "field_name": "previous_swing_low_3",
+          "value": {
+            "amount": 160.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "price_map": {
+          "field_name": "price_map",
+          "value": {
+            "state": "KNOWN"
+          },
+          "data_type": "StructuredPriceMap",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "first_buy_zone": {
+          "field_name": "first_buy_zone",
+          "value": null,
+          "data_type": "PriceZoneRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "second_price_zone": {
+          "field_name": "second_price_zone",
+          "value": null,
+          "data_type": "PriceZoneRef",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "deep_extreme_discount_zone": {
+          "field_name": "deep_extreme_discount_zone",
+          "value": null,
+          "data_type": "PriceZoneRef/List",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "left_buy_point_state": {
+          "field_name": "left_buy_point_state",
+          "value": "FALSE",
+          "data_type": "TriState/Structured",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "right_confirmation_state": {
+          "field_name": "right_confirmation_state",
+          "value": "FALSE",
+          "data_type": "TriState/Structured",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "runaway_state": {
+          "field_name": "runaway_state",
+          "value": {
+            "up": "FALSE",
+            "down": "FALSE"
+          },
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "macro_state": {
+          "field_name": "macro_state",
+          "value": "CAUTION",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "credit_liquidity_state": {
+          "field_name": "credit_liquidity_state",
+          "value": "OK",
+          "data_type": "StructuredState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "material_news_policy_state": {
+          "field_name": "material_news_policy_state",
+          "value": "RISK_EVENT",
+          "data_type": "StructuredEventState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "exposure_overlap": {
+          "field_name": "exposure_overlap",
+          "value": 0.0,
+          "data_type": "StructuredExposure",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "position_cap": {
+          "field_name": "position_cap",
+          "value": 0.05,
+          "data_type": "Money/Rate Constraint",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "project_target_position": {
+          "field_name": "project_target_position",
+          "value": 0.05,
+          "data_type": "Money/Rate Target",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "confirmed_position": {
+          "field_name": "confirmed_position",
+          "value": 0.05,
+          "data_type": "PositionFact",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "actual_completion_rate": {
+          "field_name": "actual_completion_rate",
+          "value": 1.0,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "normal_deployment_mode": {
+          "field_name": "normal_deployment_mode",
+          "value": "Base Deployment",
+          "data_type": "Enum",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "primary_special_classification": {
+          "field_name": "primary_special_classification",
+          "value": "真正降低風險",
+          "data_type": "Enum/Display",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_action": {
+          "field_name": "execution_action",
+          "value": "REDUCE_RISK",
+          "data_type": "ActionState",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [
+            "V82_SOURCE_RISK_ACTION"
+          ],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "canonical_deployment_target_rate": {
+          "field_name": "canonical_deployment_target_rate",
+          "value": 10,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_amount": {
+          "field_name": "execution_amount",
+          "value": {
+            "amount": 0.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          },
+          "data_type": "Money",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_quantity": {
+          "field_name": "execution_quantity",
+          "value": 0.0,
+          "data_type": "Quantity",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "execution_price": {
+          "field_name": "execution_price",
+          "value": "NOT_APPLICABLE",
+          "data_type": "MoneyPerUnit",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "projected_post_fill_completion_rate": {
+          "field_name": "projected_post_fill_completion_rate",
+          "value": 1.0,
+          "data_type": "Rate",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "order_submission_plan": {
+          "field_name": "order_submission_plan",
+          "value": {
+            "should_place_order": false,
+            "order_type": "NONE",
+            "limit_price": null,
+            "quantity": 0.0,
+            "time_in_force": "NONE",
+            "scheduling_mode": "MANUAL",
+            "broker_or_adapter_constraints": null,
+            "order_intent_id": null
+          },
+          "data_type": "StructuredOrderPlan",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "cancel_conditions": {
+          "field_name": "cancel_conditions",
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ],
+          "data_type": "ConditionSet",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        },
+        "reevaluation_conditions": {
+          "field_name": "reevaluation_conditions",
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ],
+          "data_type": "ConditionSet",
+          "data_as_of": null,
+          "source_reference": null,
+          "data_quality": "OK",
+          "issue_codes": [],
+          "rule_version": "V82-v1.21.0",
+          "run_id": "w8-run-001"
+        }
+      },
+      "fields_1_to_13": [
+        {
+          "ordinal": 1,
+          "display_label": "今日特殊分類",
+          "canonical_mapping": "#40 `primary_special_classification`",
+          "value": "真正降低風險"
+        },
+        {
+          "ordinal": 2,
+          "display_label": "目前部署階段",
+          "canonical_mapping": "#39 `normal_deployment_mode`＋#41 Context",
+          "value": {
+            "mode": "Base Deployment",
+            "execution_context": "REDUCE_RISK"
+          }
+        },
+        {
+          "ordinal": 3,
+          "display_label": "目標與完成率",
+          "canonical_mapping": "#36 `project_target_position`＋#37 `confirmed_position`＋#38 `actual_completion_rate`",
+          "value": {
+            "project_target_position": 0.05,
+            "confirmed_position": 0.05,
+            "actual_completion_rate": 1.0
+          }
+        },
+        {
+          "ordinal": 4,
+          "display_label": "今日動作",
+          "canonical_mapping": "#41 `execution_action`",
+          "value": "REDUCE_RISK"
+        },
+        {
+          "ordinal": 5,
+          "display_label": "執行比例",
+          "canonical_mapping": "#42 `canonical_deployment_target_rate`",
+          "value": 10
+        },
+        {
+          "ordinal": 6,
+          "display_label": "執行金額",
+          "canonical_mapping": "#43 `execution_amount`",
+          "value": {
+            "amount": 0.0,
+            "currency": "USD",
+            "source_reference": "market-ref",
+            "as_of": "2026-09-28T01:20:00+08:00",
+            "status": "KNOWN"
+          }
+        },
+        {
+          "ordinal": 7,
+          "display_label": "執行股數",
+          "canonical_mapping": "#44 `execution_quantity`",
+          "value": 0.0
+        },
+        {
+          "ordinal": 8,
+          "display_label": "執行價格",
+          "canonical_mapping": "#45 `execution_price`",
+          "value": "NOT_APPLICABLE"
+        },
+        {
+          "ordinal": 9,
+          "display_label": "成交後完成率",
+          "canonical_mapping": "#46 `projected_post_fill_completion_rate`",
+          "value": 1.0
+        },
+        {
+          "ordinal": 10,
+          "display_label": "是否掛單",
+          "canonical_mapping": "#47 `order_submission_plan.should_place_order`",
+          "value": false
+        },
+        {
+          "ordinal": 11,
+          "display_label": "掛單方式",
+          "canonical_mapping": "#47 `order_submission_plan.{order_type,time_in_force,scheduling_mode}`",
+          "value": {
+            "order_type": "NONE",
+            "time_in_force": "NONE",
+            "scheduling_mode": "MANUAL"
+          }
+        },
+        {
+          "ordinal": 12,
+          "display_label": "取消條件",
+          "canonical_mapping": "#48 `cancel_conditions`",
+          "value": [
+            "SOURCE_OWNED_RISK_CONDITION"
+          ]
+        },
+        {
+          "ordinal": 13,
+          "display_label": "下一次重新評估條件",
+          "canonical_mapping": "#49 `reevaluation_conditions`",
+          "value": [
+            "NEXT_CANONICAL_REFRESH"
+          ]
+        }
+      ]
+    },
+    "source_semantics_policy": "PRESERVE_V82_CANONICAL_OUTPUT_NO_LOSSY_TRANSLATION",
+    "integration_diagnostics": []
+  }
+}

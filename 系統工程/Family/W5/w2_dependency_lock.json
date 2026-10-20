@@ -1,0 +1,17 @@
+{
+  "source_drive_id": "1-uML8UxBt7X5l1hz6sQ3ZJjoH7KhD-ex",
+  "files": [
+    {
+      "source_path": "runtime/c_configuration_core/work21/recovery.py",
+      "destination": "vendor/w2/runtime/c_configuration_core/work21/recovery.py",
+      "sha256": "d902c3e6a7315e33322eeee1aa44c70497dd12716974a53e68a090a112eb216f",
+      "reason": "W5-17 original isolated staging journal required by CI"
+    },
+    {
+      "source_path": "knowledge/W2_20_REASON_CODE_MAP.json",
+      "destination": "reason_catalog.json",
+      "sha256": "2c19102d99d21824516069b9dd2db906776caf97d4c9b90b3d740e1b960368f7",
+      "reason": "W5-16 original reason catalog"
+    }
+  ]
+}

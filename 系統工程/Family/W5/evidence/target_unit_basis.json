@@ -1,0 +1,57 @@
+{
+  "status": "W5_PROJECTION_IMPLEMENTED_CORE_UNCHANGED",
+  "source_zip_sha256": "23c81a626835086c5f41026d11be03c649c55af83bf5ab0d0dfce25f354f4d6d",
+  "sources": [
+    {
+      "path": "WORK13_OUTPUT/C8C9_Work13_Loop2_E2E.py",
+      "sha256": "78d7a153f7615a5cdd24b193e79997deb60628394479d2f69fcc289477d56b03",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    },
+    {
+      "path": "tools/qa_work13_fullchain_preflight.py",
+      "sha256": "1c69a8306974a77b3cefd633e332384cea91d0f588b78e612fe7f7c2c6260ee5",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    },
+    {
+      "path": "WORK11_OUTPUT/FIXTURES/W13_V82_CERTIFIED_DEPENDENCY_PROFILE_QA_RUN3_v1.json",
+      "sha256": "a13e057bd1e06bdd8d7392869ea32c3ed764a67999cee03dedae903d56c09fec",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    },
+    {
+      "path": "WORK11_OUTPUT/FIXTURES/W13_LOOP2_WORK3_INPUT_US_HAPPY.json",
+      "sha256": "90812e966f00e09369583418cdb29f58c352183de7db3f5194865a0e2ea48eb6",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    },
+    {
+      "path": "WORK11_OUTPUT/FIXTURES/W13_LOOP2_V82_ASSET_CONTEXT_US_HAPPY.json",
+      "sha256": "2d463a6a1bcff97ac12505cd20b4ecc93950b5da3ee6a7a163e0d08350a5ed1d",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    },
+    {
+      "path": "WORK11_OUTPUT/FIXTURES/W13_C_WORK6_SOURCE_QA_RUN3.json",
+      "sha256": "119b9ccda00218f1018d0c0b5e734f59d1311528981c9bd67c94197ae968beb8",
+      "reason": "Original corresponding Work13 fullchain test and its directly referenced inputs/preflight"
+    }
+  ],
+  "facts": {
+    "final_target_allocation_id": "C-W6-FINAL-QA-003",
+    "asset": "QQQ",
+    "target_portfolio_amount": 100,
+    "currency": "USD",
+    "denominator": 1000,
+    "target_weight": 0.1,
+    "weight_unit": "portfolio_weight"
+  },
+  "contract_basis": [
+    "V82 deployment.calculate_position_gap consumes project_target_position_amount",
+    "V82 canonical #36 data_type is Money/Rate Target",
+    "C8C9 Work8 compares canonical #36 to C7 integrated_weight"
+  ],
+  "mapping": "Compute V82 with original approved money; cross-check original Work6 amount/weight/denominator and native confirmed money; emit C7 weight only in rate-valued canonical #36 with explicit unit/source metadata. Preserve original native money and denominator in target_unit_projection.",
+  "positive": "Explicit synthetic Work6 source variant: same $1000 NAV, QQQ $100; bond SGOV140/SPSB60 follows native70/30; physical/logical SGOV40, dry0. Original C7/V82/V75/Work6..9 and Mentor executed; equity0/bond160; NO_TRADE.",
+  "remaining": [
+    "Full four-family source-backed acceptance",
+    "V75 client-action priority",
+    "Cross-currency FX bindings"
+  ]
+}

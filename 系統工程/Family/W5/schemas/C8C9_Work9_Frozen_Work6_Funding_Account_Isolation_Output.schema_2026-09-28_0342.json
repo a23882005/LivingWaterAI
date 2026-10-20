@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livingwaterai.local/schemas/C8C9_Work6_Funding_Account_Isolation_Output.schema.json",
+  "title": "LivingWaterAI C8C9 Work6 Funding Account Isolation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_name", "contract_version", "baseline_id", "run_id", "owner", "currency", "work3_context_handoff_id", "c7_funding_context_digest_sha256", "funding_event_reconciliation", "cash_eligibility", "adapter_binding_evidence", "source_semantics_policy", "integration_diagnostics"],
+  "properties": {
+    "contract_name": {"const": "LivingWaterAI.C8C9.Work6.FundingAccountIsolationResult"},
+    "contract_version": {"const": "C8C9-W6-FAIO-v1.0.0"},
+    "baseline_id": {"const": "C8C9-BL-20260926T1014+0800-W1-5a1038869805a25e"},
+    "run_id": {"type": "string", "minLength": 1},
+    "owner": {"type": "object", "additionalProperties": false, "required": ["funding_domain", "broker", "account"], "properties": {"funding_domain": {"enum": ["TW_LOCAL_BROKER", "TW_SUB_BROKERAGE", "US_BROKER"]}, "broker": {"type": "string", "minLength": 1}, "account": {"type": "string", "minLength": 1}}},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "work3_context_handoff_id": {"type": "string", "minLength": 1},
+    "c7_funding_context_digest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "funding_event_reconciliation": {"type": "object", "additionalProperties": false, "required": ["total_new_investment_amount", "three_domain_bucket_sum", "exact_three_domains", "duplicate_broker_account_context"], "properties": {"total_new_investment_amount": {"type": "string", "minLength": 1}, "three_domain_bucket_sum": {"type": "string", "minLength": 1}, "exact_three_domains": {"const": true}, "duplicate_broker_account_context": {"const": false}}},
+    "cash_eligibility": {"type": "object", "additionalProperties": false, "required": ["cash_basis", "total", "available", "unsettled", "reserved", "equity_executable_budget", "bond_executable_budget", "combined_executable_budget", "within_available", "within_owner_bucket", "unsettled_reserved_consumed", "available_formula_inferred"], "properties": {"cash_basis": {"const": "AVAILABLE"}, "total": {"type": "string"}, "available": {"type": "string"}, "unsettled": {"type": "string"}, "reserved": {"type": "string"}, "equity_executable_budget": {"type": "string"}, "bond_executable_budget": {"type": "string"}, "combined_executable_budget": {"type": "string"}, "within_available": {"const": true}, "within_owner_bucket": {"const": true}, "unsettled_reserved_consumed": {"const": false}, "available_formula_inferred": {"const": false}}},
+    "adapter_binding_evidence": {"type": "object", "additionalProperties": false, "required": ["work4_v82_serialized_owner_matches", "work5_v75_serialized_owner_matches", "work4_equity_budget_exact", "work5_bond_budget_exact", "cross_account_funding_forbidden", "cross_broker_funding_forbidden", "cross_domain_funding_forbidden", "wrong_owner_forbidden"], "properties": {"work4_v82_serialized_owner_matches": {"const": true}, "work5_v75_serialized_owner_matches": {"const": true}, "work4_equity_budget_exact": {"const": true}, "work5_bond_budget_exact": {"const": true}, "cross_account_funding_forbidden": {"const": true}, "cross_broker_funding_forbidden": {"const": true}, "cross_domain_funding_forbidden": {"const": true}, "wrong_owner_forbidden": {"const": true}}},
+    "source_semantics_policy": {"const": "VALIDATE_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE_NO_FX"},
+    "integration_diagnostics": {"type": "array", "maxItems": 0}
+  }
+}

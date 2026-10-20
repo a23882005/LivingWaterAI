@@ -1,0 +1,11 @@
+{
+  "tests": 29,
+  "result": "PASS",
+  "log": "evidence/recheck.log",
+  "fixes": [
+    "Reject NULL client_id rows",
+    "Reject macro source mutation during read",
+    "Correct evidence paths and archive identifiers"
+  ],
+  "full_pipeline_tested": false
+}

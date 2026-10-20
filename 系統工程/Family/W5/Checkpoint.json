@@ -1,0 +1,780 @@
+{
+  "contract_version": "2.2.1",
+  "status": "ENGINEERING_COMPLETE_PENDING_MIDDLE_PM_GATE",
+  "release": "RELEASED",
+  "implementation_completed": 18,
+  "total_tracking_items": 18,
+  "executor": "同一位W5小PM持續施工",
+  "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+  "next_owner": "Family中PM",
+  "next_action": "獨立驗收W5 Major/Gate C與main整合；另續協調正式來源覆蓋。W5依驗收意見修正。",
+  "deployment": {
+    "github": "WORK_BRANCH_ENGINEERING_DELIVERY",
+    "drive": "同一累計ZIP／Checkpoint／索引工程回交",
+    "backup_ref": "backup/w5-engineering-acceptance-20261021",
+    "main_unchanged": true,
+    "actions": "本輪302項；最終commit/run/log與雙端逐檔SHA見ZIP憑證",
+    "dual_deploy": "SEE_FINAL_RELEASE_RECEIPT",
+    "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
+    "previous_work_commit": "c48dd67573e0aca6f9b24316420cda46b51e8263",
+    "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
+    "drive_file_ids": {
+      "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
+      "checkpoint": "1jcy2YuhGmM3rs2yM5JFTt5wC5u2EXshB",
+      "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
+    },
+    "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+    "main_unchanged_by_w5": true
+  },
+  "validation_scope": "核准工程範圍：302本機測試PASS；115來源hash；23真實行情Family安全路徑；4家人歷史安全回覆。SYNTHETIC完整producer→正式股債Runtime→Mentor；Production HOLD、交易NONE。",
+  "w3_reader_acceptance": "PASS",
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "w5_major_gate": "SUBMITTED_PENDING_INDEPENDENT_ACCEPTANCE",
+  "work_items": {
+    "W5-01": {
+      "status": "PASS",
+      "scope": "基線接手、既有引擎入口與缺口定位；後續整合另驗",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/c8c9_dependencies.json",
+        "evidence/schema_failure_reproduction.json"
+      ]
+    },
+    "W5-02": {
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
+    },
+    "W5-03": {
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
+    },
+    "W5-04": {
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
+    },
+    "W5-05": {
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
+    },
+    "W5-06": {
+      "status": "PASS",
+      "completed": "新增Family typed boundary：四庫唯讀、可信client/owner/version/digest驗證、歷史W2確認Target不可變binding；原W2確認record重用測試通過。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
+    },
+    "W5-07": {
+      "status": "PASS",
+      "completed": "分離PERSONAL/RESEARCH/EXCLUSION、已確認NEW_BUY許可與既有持倉；重用原C8C9 Work8保留REDUCE_RISK及HOLD_PROTECTED雙欄。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
+    },
+    "W5-08": {
+      "status": "PASS",
+      "completed": "重用原C8C9 Work6資金隔離；明確映射W1用途domain與C7券商domain；同owner股債多筆精確守恆，明確AVAILABLE、未知FX及暫估股數品質保留。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
+    },
+    "W5-09": {
+      "status": "COMPLETED",
+      "completed": "已接23份行情；FamilyRunner可信來源digest/owner/full CSV/hash→原TD9/Swing/技術聚合→投影→正式引擎。合成完整正向與真實UNKNOWN安全路徑分開驗證。",
+      "remaining": "正式來源可用覆蓋另列source_coverage_gaps；本輪工程範圍已完成。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log",
+        "W5_09_SOURCE_MAPPING_SPEC.md",
+        "TECHNICAL_SOURCE_INTAKE.md",
+        "technical_source_lock.json",
+        "tests/test_technical_source_bridge.py",
+        "evidence/source09_tests.log",
+        "evidence/technical_partial_synthetic.json",
+        "evidence/market_intake.json",
+        "MARKET_INTAKE_RECEIPT.md"
+      ],
+      "completion_scope": "APPROVED_ENGINEERING_SCOPE"
+    },
+    "W5-10": {
+      "status": "COMPLETED",
+      "completed": "V70原context及本輪envelope、額度與Hard Gate實際限制V82；來源不足不猜預算。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
+      "evidence": [
+        "tests/test_stock_engine.py",
+        "tests/test_v70_source_bridge.py",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
+      ]
+    },
+    "W5-11": {
+      "status": "COMPLETED",
+      "completed": "原V82 49/13欄組裝及Work9動作映射，保留raw；未定義減碼NEEDS_REVIEW；目標單位採原Work6來源可核對投影。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
+      "evidence": [
+        "tests/test_stock_engine.py",
+        "tests/test_target_units.py",
+        "tests/test_native_adapters.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
+      ]
+    },
+    "W5-12": {
+      "status": "COMPLETED",
+      "completed": "原V75 predicates/Step10/逐檔配置實算；原Work5同源及資金守恆，非候選既有風險保留，缺必要市場資料停止。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
+      "evidence": [
+        "tests/test_bond_engine.py",
+        "tests/test_family_sources.py",
+        "tests/test_family_bridges.py",
+        "tests/test_v70_source_bridge.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
+      ]
+    },
+    "W5-13": {
+      "status": "COMPLETED",
+      "completed": "原始V75 account/per-asset輸出及Work9 canonical投影保留；空陣列account BLOCK不吞掉，零額Money等值序列化。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
+      "evidence": [
+        "tests/test_bond_engine.py",
+        "tests/test_bond_target_mentor.py",
+        "tests/test_target_units.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
+      ]
+    },
+    "W5-14": {
+      "status": "COMPLETED",
+      "completed": "原Work7與W1實體估值核對；existing roles、未分配及未成交contribution分開，同owner守恆、不寫ledger。",
+      "remaining": "來源實際可用範圍見SOURCE_MAPPING_STATUS.md；缺來源回不可用，未宣稱家人投資建議。",
+      "evidence": [
+        "tests/test_sgov_bridge.py",
+        "tests/test_position_source_bridge.py",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "ACCEPTANCE_MATRIX.md"
+      ]
+    },
+    "W5-15": {
+      "status": "COMPLETED",
+      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。 原C7實際運算、17份依賴及4份原golden固定；SOURCE_BACKED必須重算C7並全結果比對。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。 同一明示合成來源經FamilyRunner實際通過全部來源驗證、原C7/V82/V75/Work6-9與Mentor；歷史確認run保留，輸入不變。",
+      "remaining": "功能fixture完成；真實家人缺項覆蓋與具名producer另見open_gaps，不以合成功能結果冒充投資建議。",
+      "evidence": [
+        "中PM介面待界定.md",
+        "evidence/pipeline_unit_reproduction.json",
+        "tests/test_native_pipeline.py",
+        "family_runner.py",
+        "run_analysis.py",
+        "tests/test_family_runner.py",
+        "evidence/runner_tests.log",
+        "evidence/runner_private_checks.json",
+        "evidence/stock_source_tests.log",
+        "SOURCE_MAPPING_STATUS.md",
+        "evidence/funding_macro_bond_tests.log",
+        "evidence/position_source_tests.log",
+        "c7_engine.py",
+        "tests/test_c7_engine.py",
+        "tests/test_target_units.py",
+        "evidence/target_unit_positive.json",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "W7_RECOVERY_HANDOFF.md"
+      ]
+    },
+    "W5-16": {
+      "status": "COMPLETED",
+      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。 Family中PM核准原Work9 None/null與來源分欄；受影響34項補驗通過，未修改runtime或核心。",
+      "remaining": "無本棒待決項；09來源與18整線另列。",
+      "evidence": [
+        "tests/test_mentor_bridge.py",
+        "evidence/mentor_positive.json",
+        "evidence/mentor_tests.log",
+        "tests/test_target_units.py",
+        "evidence/target_unit_positive.json",
+        "PM16_APPROVAL_AND_ACCEPTANCE.md",
+        "tests/test_pm16_approval.py",
+        "evidence/pm16_tests.log",
+        "evidence/pm16_protection.log"
+      ]
+    },
+    "W5-17": {
+      "status": "COMPLETED",
+      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。 V70來源版本改變後快取重送拒絕，避免舊來源結果發布。 真Family結果重送、撤銷許可/版本/來源更改、Mentor後中斷恢復、實際延遲晚到與競爭發布驗證；重試預算跨重送保留。W7接口STAGING_VERIFIED。",
+      "remaining": "正式跨程序持久化由W7負責，未列PASS。",
+      "evidence": [
+        "tests/test_recovery_bridge.py",
+        "evidence/pipeline_recovery_tests.log",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "W7_RECOVERY_HANDOFF.md"
+      ]
+    },
+    "W5-18": {
+      "status": "COMPLETED",
+      "completed": "302測試及115來源hash；股債正向真計算、四客戶隔離、23行情Family安全路徑與四家人歷史安全結果。Actions與雙端交付最終憑證見ZIP RELEASE_RECEIPT.json。",
+      "remaining": "Family中PM獨立Major/Gate C與main整合。",
+      "evidence": [
+        "ENGINEERING_ACCEPTANCE_RESULT.md",
+        "evidence/final_w5_tests.log",
+        "evidence/family_technical_positive.json",
+        "evidence/real_market_family_safety.json",
+        ".github/workflows/family-w5.yml"
+      ],
+      "completion_scope": "APPROVED_ENGINEERING_SCOPE"
+    }
+  },
+  "open_gaps": [],
+  "recheck": {
+    "date": "2026-10-20",
+    "fixes": [
+      "Reject NULL client_id rows",
+      "Reject macro source mutation during read",
+      "Correct evidence paths and archive identifiers"
+    ],
+    "w5_tests": 29,
+    "component_total": 398,
+    "previous_component_tests_reused": 369,
+    "whole_line": "NOT_RUN",
+    "evidence": "evidence/recheck.json"
+  },
+  "resolved_gaps": [
+    {
+      "id": "W5-C8C9-FROZEN-SCHEMAS",
+      "owner": "Family中PM協調C8C9來源",
+      "files": [
+        {
+          "work": 5,
+          "constant": "FROZEN_V75_INPUT_SCHEMA_FILENAME",
+          "filename": "C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 5,
+          "constant": "FROZEN_V75_W6_SCHEMA_FILENAME",
+          "filename": "C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 6,
+          "constant": "_C7_SCHEMA",
+          "filename": "C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 8,
+          "constant": "_C7_SCHEMA",
+          "filename": "C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK4_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK5_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK6_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK7_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK8_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        }
+      ],
+      "impact": "W5-04/05/07/15/16/18完整驗收受影響",
+      "requested_action": "提供同版本Frozen原件及hash/准讀路徑；或具名核定對等schema來源與最小接線修正。保留原schema驗證。",
+      "status": "RESOLVED",
+      "resolution": "Work21原件9/9 Manifest符合；W5載入層保留原schema驗證；26/26引用通過",
+      "evidence": [
+        "frozen_schema_lock.json",
+        "evidence/c8c9_dependencies_restored.json",
+        "evidence/frozen_intake_tests.log"
+      ]
+    },
+    {
+      "id": "W5-C8C9-TARGET-UNIT",
+      "owner": "Family中PM界定跨線語意；W5小PM依裁決修接線",
+      "impact": "W5-15/16/18完整正向",
+      "files": [
+        "stock_engine.py",
+        "C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
+      ],
+      "fields": [
+        "canonical_analysis.project_target_position",
+        "integrated_asset_framework.instrument_targets[].integrated_weight"
+      ],
+      "requested_action": "指定目標金額/權重及來源NAV的既有綁定規格；界定W5投影或C8C9最小修正。合成組合案例不能單獨判定核心策略缺陷。",
+      "evidence": [
+        "target_units.py",
+        "tests/test_target_units.py",
+        "evidence/target_unit_basis.json",
+        "evidence/target_unit_positive.json"
+      ],
+      "status": "RESOLVED_IN_W5_PROJECTION",
+      "resolution": "Original Work6 explicit portfolio_amount/weight/denominator establish units. V82 money computation retained; canonical Money/Rate Target uses verified C7 portfolio_weight. Actual original engines through Work9 and Mentor pass."
+    }
+  ],
+  "schema_intake": {
+    "files": 9,
+    "manifest_matches": 9,
+    "schema_references_valid": 26,
+    "w5_tests_pass": 39,
+    "component_total": 408,
+    "fixture_semantics": "原Work21合成adapter案例；V75使用明示no-action決策fixture，真實策略調度由後續15棒完成",
+    "source_zip": "1GQHdYPwxFKZBFM1GbTAsTDXA48FYxrmA"
+  },
+  "family_bridges": {
+    "w5_tests": 77,
+    "unchanged_component_tests_reused": 369,
+    "component_total": 446,
+    "private_database_readbacks": 4,
+    "private_db_changed": false,
+    "source_tables": 29,
+    "w2_confirmation_record": "Original W2-17/18 synthetic golden output; no private target confirmation created",
+    "evidence": "evidence/family_bridges_tests.log"
+  },
+  "bond_native": {
+    "data_kind": "SYNTHETIC",
+    "new_tests_passed": 10,
+    "w5_tests_passed": 87,
+    "native_strategy_modifications": 0,
+    "family_e2e": false,
+    "backup_drive_ids": {
+      "zip": "1qnoBrbzbAm1hxuIXl53mj5DCAdkrMbRo",
+      "checkpoint": "1T-boO-a-axgcGdmm68PH3sB-8HeYtERW",
+      "index": "1a2S6feFxCbmrIyMNNRL9E2kVhqdF0AB8"
+    }
+  },
+  "stock_sgov": {
+    "w5_tests_passed": 110,
+    "new_tests_passed": 23,
+    "data_kind": "SYNTHETIC",
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "17ufHP0E-ZNg6G-9-kbj2eS-lA8YYwU5M",
+      "checkpoint": "1P1TX0YbZ1N-tk6cXlnHrgBTCkqZ7MH6m",
+      "index": "1Y0ntjr7WKYjqorsBYwCK0QLvg7QzU87q"
+    }
+  },
+  "pipeline_recovery": {
+    "w5_tests_passed": 124,
+    "strict_xfail": 1,
+    "whole_line_positive": "NOT_PASSED",
+    "core_modifications": 0,
+    "w2_recovery_sha256": "d902c3e6a7315e33322eeee1aa44c70497dd12716974a53e68a090a112eb216f",
+    "backup_drive_ids": {
+      "zip": "1CptcQD5ADHKCqwntBu1tIua8DhnqqHmY",
+      "checkpoint": "1y7-hvpW9cmwMtLaC6nbvvxt-o-ut0biH",
+      "index": "1aHVDuWieY_rYK1rCq0E29S9NmeACQKqG",
+      "root": "1ZcRuHgjPYD-yxm9zRqScYOUZ1ul4xW9Q"
+    }
+  },
+  "mentor_integration": {
+    "tests_passed": 13,
+    "w5_tests_passed": 137,
+    "strict_xfail": 1,
+    "w2_original_regression": 6,
+    "source_dependency_hashes": 90,
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "1NEvoidufZAlqx-rGW7sI3Pa1vg65WYtd",
+      "checkpoint": "1uy6TZ1exWziCgcKjM-aH9qqSKLkR-KeO",
+      "index": "12q9QoNnettrlCwLxHpmFjEXZKViIqZVC",
+      "root": "1yfBEeq1Y2KgrgluU5ag1clO6iD9SnmlK"
+    }
+  },
+  "family_runner": {
+    "w5_tests_passed": 151,
+    "strict_xfail": 1,
+    "new_tests": 14,
+    "private_history_cli_checks": 4,
+    "private_database_changed": false,
+    "target_identity_fix": "allocation_id=draft.allocation_id; target_record_id=record.target_id",
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "1-YtvxfFesG2rOr5YXeKRQV9tmTDFqgLP",
+      "checkpoint": "1DqCKshTvJj4Zz06ElCTZBy-zwpeImu0Q",
+      "index": "1i1Y3LK8kinhgsVZpjMEnpIYW3x0i0YZV",
+      "root": "14Xyw3tqNeepMr3mXMSJY5LCRpclv28rU"
+    }
+  },
+  "stock_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "scope": [
+      "W1 instrument/account/native owner/exchange/currency exact binding",
+      "W1 latest known quantity equals V82 confirmed quantity; ambiguous latest rows rejected",
+      "W1 NEW_BUY projection -> existing V82 required_known_caps; non-candidate cap zero",
+      "same-version policy ambiguity -> UNKNOWN; risk inputs retained"
+    ],
+    "tests": {
+      "w5_pass": 163,
+      "w5_xfail": 1,
+      "added": 12
+    },
+    "evidence": [
+      "stock_source_bridge.py",
+      "tests/test_stock_source_bridge.py",
+      "evidence/stock_source_tests.log"
+    ],
+    "remaining": [
+      "bond policy and quantity",
+      "C7 funding source semantic mapping",
+      "W3 raw macro to runtime field mapping",
+      "HOLD_AS_IS Work8 semantic binding",
+      "target units and formal technical producer",
+      "full Family E2E"
+    ]
+  },
+  "funding_macro_bond_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 181,
+      "w5_xfail": 1,
+      "added": 18
+    },
+    "completed": [
+      "C7 operator-source payload/version/owner binding",
+      "Family stock and bond actual claims use existing reconcile_funding",
+      "W3 m12 MOVE raw value/source/quality preserved and matched to V75 PRED-005.move",
+      "W1 bond physical quantity/account/currency mapping",
+      "W1 bond NEW_BUY policy uses original V75 per-asset zero-budget scaling; existing risk retained"
+    ],
+    "evidence": [
+      "SOURCE_MAPPING_STATUS.md",
+      "tests/test_family_sources.py",
+      "evidence/funding_macro_bond_tests.log",
+      "evidence/macro_move_projection.json"
+    ],
+    "remaining": [
+      "valuation and protected-holding semantic binding",
+      "SGOV physical W1 facts to native role snapshot",
+      "other macro/technical metrics and V70 tactical producer/source_run",
+      "confirmed Target source and unit interface",
+      "full Family E2E and final deployment"
+    ]
+  },
+  "position_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 196,
+      "w5_xfail": 1,
+      "added": 15
+    },
+    "completed": [
+      "W1 quantity x explicit quote/FX through existing value_position",
+      "Stock valuation price/time and non-SGOV bond value reconciliation",
+      "W1 SGOV physical quantity/value/owner/time bound before original Work7",
+      "W1 confirmed stock policy and current weight/NAV vs C7 protected flags",
+      "Family pipeline reuses protect_existing -> native Work8",
+      "valuation_digest binds source context for replay/publication validation"
+    ],
+    "evidence": [
+      "position_source_bridge.py",
+      "tests/test_position_source_bridge.py",
+      "evidence/position_source_tests.log",
+      "SOURCE_MAPPING_STATUS.md"
+    ],
+    "remaining": [
+      "Complete C7 confirmed Target/framework source semantics",
+      "Bond client-facing holding protection",
+      "Named quote/technical/V70 producers and different source_run binding",
+      "Target money/weight interface",
+      "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "target_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 210,
+      "w5_xfail": 1,
+      "added": 14
+    },
+    "completed": [
+      "Nonempty unique W2 target lines and exact C7 original target coverage",
+      "C7 work6_final_target_weight matches preserved W2 weight; protected integrated weights untouched",
+      "Selected V82 target amount/currency and pointer match preserved W2 target in both native handoffs",
+      "Digest-consistent semantic mutations rejected before dispatch"
+    ],
+    "evidence": [
+      "target_source_bridge.py",
+      "tests/test_target_source_bridge.py",
+      "evidence/target_source_tests.log"
+    ],
+    "remaining": [
+      "V75 target split / alias / funding bucket projection",
+      "C7 integrated weight derivation and target money/weight interface",
+      "Cross-currency target FX source",
+      "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "bond_target_mentor_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 228,
+      "w5_xfail": 1,
+      "added": 18
+    },
+    "completed": [
+      "Explicit W2 instrument aliases and same-account/currency per-asset V75 target amount binding",
+      "Confirmed W1 holding policy and C7 protected flag / raw client-action evidence",
+      "Mentor preserves native decision, C7 client action and W1 policy separately; digest/scope/permission checks",
+      "Exact native Money wire serialization; original raw snapshot retained; Work7 actual regression passes"
+    ],
+    "evidence": [
+      "bond_target_bridge.py",
+      "tests/test_bond_target_mentor.py",
+      "evidence/bond_target_mentor_tests.log",
+      "中PM介面待界定.md"
+    ],
+    "remaining": [
+      "Cross-engine bond client action priority",
+      "Work8 target money/weight interface",
+      "Cross-account split / FX and named sources",
+      "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "v70_run_binding": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 241,
+      "w5_xfail": 1,
+      "added": 13
+    },
+    "completed": [
+      "Original V70 context/run/digest preserved; versioned Family same-run envelope",
+      "Both engine contexts and V75 snapshot equal projection",
+      "Operator provenance/owner/version/future-data/quality checks",
+      "Different upstream run actual stock450/bond350; EXCEEDS_CAP zero/zero",
+      "Current source version revalidated before cached replay"
+    ],
+    "evidence": [
+      "v70_source_bridge.py",
+      "tests/test_v70_source_bridge.py",
+      "evidence/v70_run_binding_tests.log"
+    ],
+    "remaining": [
+      "Named formal V70 producer and technical/price/Target sources",
+      "C7 full framework semantic validation",
+      "Work8 target unit and bond client action interfaces",
+      "Full Family/Mentor and final deployment"
+    ]
+  },
+  "c7_native_integration": {
+    "status": "ORIGINAL_C7_COMPONENT_VERIFIED_FAMILY_E2E_PENDING",
+    "added_source_files": 17,
+    "immutable_work21_fixtures": 4,
+    "golden_exact_match": true,
+    "snapshot_id": "C-W7-11e646e3069d5ca6a4c19a89a72f7bff",
+    "source_backed_requires_actual_c7": true,
+    "evidence": [
+      "c7_engine.py",
+      "c7_fixture_lock.json",
+      "tests/test_c7_engine.py",
+      "evidence/c7_native_tests.log"
+    ],
+    "remaining": [
+      "Four confirmed historical Target sources",
+      "Source-consistent Work6/C7 inputs",
+      "Named technical/valuation/V70 sources",
+      "Target unit and bond client action contracts",
+      "Full Family/Mentor and final deployment"
+    ],
+    "tests": {
+      "w5_pass": 252,
+      "w5_xfail": 1,
+      "added": 11,
+      "hash_pass": 111
+    }
+  },
+  "target_unit_integration": {
+    "status": "NATIVE_FULLCHAIN_AND_MENTOR_VERIFIED",
+    "core_changes": 0,
+    "formula": "approved target amount / same-source denominator = portfolio_weight; canonical rate equals original C7 integrated weight",
+    "source_snapshot": "Original Work21 QA_RUN3 + explicitly adapted synthetic raw source; frozen files unchanged",
+    "actual_positive": {
+      "target_money_usd": 100,
+      "target_weight": 0.1,
+      "bond_targets_usd": {
+        "SGOV": 140,
+        "SPSB": 60
+      },
+      "equity_used": 0,
+      "bond_used": 160
+    },
+    "additional_fix": "Native V75 runtime_ready/formal_output_eligible required before unified publication",
+    "remaining": [
+      "Four-family source-backed E2E",
+      "V75 client-action priority",
+      "Formal technical/valuation/V70 producer binding",
+      "Cross-currency binding",
+      "Final deployment"
+    ],
+    "tests": {
+      "pass": 261,
+      "xfail": 0,
+      "added": 8,
+      "hashes": 111
+    }
+  },
+  "family_e2e_recovery": {
+    "status": "STAGING_VERIFIED",
+    "provenance": "SYNTHETIC_FUNCTIONAL_ONLY",
+    "real_family_investment_advice": false,
+    "core_changes": 0,
+    "positive": "FamilyRunner → actual C7/V82/V75/C8C9 → Mentor",
+    "retry_fix": "at most two total compute attempts per immutable request, across resends",
+    "w7_handoff": "W7_RECOVERY_HANDOFF.md",
+    "tests_log": "evidence/family_e2e_tests.log",
+    "evidence": "evidence/family_e2e_positive.json",
+    "tests": {
+      "pass": 268,
+      "xfail": 0,
+      "hashes": 111
+    }
+  },
+  "contract_closure": {
+    "progress": "15/18",
+    "newly_completed": [
+      "W5-10",
+      "W5-11",
+      "W5-12",
+      "W5-13",
+      "W5-14"
+    ],
+    "runtime_changes": 0,
+    "prior_ci_success": "https://github.com/a23882005/LivingWaterAI/actions/runs/39469962774",
+    "tests_reused": 268,
+    "source_hashes": 111,
+    "pr": "https://github.com/a23882005/LivingWaterAI/pull/22",
+    "main_observed": "bc8d581d74c7f17204a0b3e251c0f659279aedc8",
+    "final_release": false,
+    "deployment_copy_smoke": {
+      "status": "PASS",
+      "case": "test_family_real_engines_mentor_replay_and_historical_confirmation",
+      "exit_code": 0,
+      "log": "evidence/deployment_copy_smoke.log",
+      "source_zip_sha256": "c16593a7aeb9ad8634abb1b827029e5443651145017c389d09aac047e10a3cf8"
+    }
+  },
+  "pm16_approval": {
+    "status": "ACCEPTED_AND_VERIFIED",
+    "progress": "16/18",
+    "affected_tests_passed": 34,
+    "new_tests": 3,
+    "runtime_changes": 0,
+    "core_changes": 0,
+    "decision": "Original Work9 None/null plus separate V75 native facts, W1 policy and C7 client action; no new bond priority.",
+    "evidence": "PM16_APPROVAL_AND_ACCEPTANCE.md"
+  },
+  "technical_source_intake": {
+    "status": "ENGINEERING_VERIFIED_WITH_SOURCE_COVERAGE_GAPS",
+    "source_spec": "https://docs.google.com/document/d/1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho/edit",
+    "affected_pass": 34,
+    "new_tests": 17,
+    "source_hashes": 115,
+    "formal_producer_complete": false,
+    "family_runner_connected": true,
+    "real_history_received": true,
+    "core_changes": 0,
+    "real_history_count": 23,
+    "market_intake_evidence": "evidence/market_intake.json",
+    "evaluation_mode": "SNAPSHOT_AFTER_ACQUISITION",
+    "approval": "ENGINEERING_ACCEPTANCE_APPROVAL.md",
+    "synthetic_positive": "evidence/family_technical_positive.json",
+    "real_market_safety": "evidence/real_market_family_safety.json"
+  },
+  "source_coverage_gaps": [
+    {
+      "id": "W5-TECHNICAL-SOURCE",
+      "owner": "Family中PM指定來源",
+      "impact": "W5-09實際家人技術輸入",
+      "requested_action": "行情固定版本與23份原檔已接收；依MARKET_INTAKE_RECEIPT.md核定剩餘metadata及逐欄規則。",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN_NOT_ENGINEERING_DEFECT_UNDER_APPROVED_SCOPE"
+    },
+    {
+      "id": "W5-CONFIRMED-TARGET-SOURCE",
+      "owner": "Family中PM定位既有目標交付",
+      "impact": "四家人真實分析；不影響合成fixture功能測試",
+      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN_NOT_ENGINEERING_DEFECT_UNDER_APPROVED_SCOPE"
+    },
+    {
+      "id": "W5-SNAPSHOT-METADATA-AND-RULE-COVERAGE",
+      "owner": "Family中PM協調原資料責任線",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN",
+      "details": "商品/日曆/正式收盤/拆股、未核定KD/EMV/事件窗口/背離/閾值、六檔台灣債券ETF及NATO別名保持UNKNOWN/MISSING；本輪歷史PIT排除。"
+    }
+  ],
+  "engineering_acceptance": {
+    "approval": "User explicitly approved 2026-10-21 proposal items 2 and 6",
+    "progress": "18/18",
+    "local_tests_pass": 302,
+    "hashes": 115,
+    "real_market_safe_cases": 23,
+    "actual_family_history_safe_cases": 4,
+    "core_changes": 0,
+    "final_gate_owner": "Family中PM",
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "release_evidence": "ZIP RELEASE_RECEIPT.json and CI_RECEIPT.json",
+    "latest_metadata_affected_pass": 31
+  }
+}

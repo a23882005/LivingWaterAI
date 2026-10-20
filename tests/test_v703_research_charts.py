@@ -38,7 +38,7 @@ class V703ResearchChartsTests(unittest.TestCase):
         page = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
         parser = ResearchChartMarkup()
         parser.feed(page)
-        expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
+        self.assertTrue(page.lstrip().startswith("<!DOCTYPE html>"))\n        self.assertNotIn("# 最後修改日期時間", page[:200])\n        expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
         self.assertEqual(parser.figures, 13)
         self.assertEqual(parser.images, expected)
         self.assertIn("完整逐季數值表（28 季）", page)
@@ -70,9 +70,9 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertNotIn(">後三個月取價交易日</th>", rendered)
         self.assertNotIn(">報酬成熟狀態</th>", rendered)
         self.assertIn('position:sticky;left:0;z-index:30;box-sizing:border-box;width:8rem;min-width:8rem;max-width:8rem;background-color:#1e293b;white-space:normal', rendered)
-        self.assertIn('position:sticky;left:8rem;z-index:30;box-sizing:border-box;width:12rem;min-width:12rem;max-width:12rem;background-color:#1e293b;white-space:normal', rendered)
+        self.assertIn('position:sticky;left:8rem;z-index:30;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#1e293b;white-space:normal', rendered)
         self.assertIn('position:sticky;left:0;z-index:20;box-sizing:border-box;width:8rem;min-width:8rem;max-width:8rem;background-color:#0f172a', rendered)
-        self.assertIn('position:sticky;left:8rem;z-index:20;box-sizing:border-box;width:12rem;min-width:12rem;max-width:12rem;background-color:#0f172a', rendered)
+        self.assertIn('position:sticky;left:8rem;z-index:20;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#0f172a', rendered)
         self.assertIn("grid-cols-1 2xl:grid-cols-2", rendered)
 
     def test_deployment_upload_and_live_verification_cover_full_set(self):

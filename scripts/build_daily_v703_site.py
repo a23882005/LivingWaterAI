@@ -107,7 +107,7 @@ def _quarterly_chart_markup(template, source_dir=None):
     headings = [*frozen_headings, *(h for h in source_headings if h not in frozen_headings and h not in omitted_headings)]
     # Fixed widths make the second sticky column start exactly at the first
     # column's right edge, including on narrow phone screens.
-    sticky_widths = {headings[0]: "8rem", headings[1]: "12rem"}
+    sticky_widths = {headings[0]: "8rem", headings[1]: "6rem"}
     def sticky_style(heading, header=False):
         if heading not in sticky_widths:
             return ""

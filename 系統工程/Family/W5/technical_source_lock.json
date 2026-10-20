@@ -1,0 +1,33 @@
+{
+  "spec_url": "https://docs.google.com/document/d/1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho/edit",
+  "files": [
+    {
+      "destination": "vendor/technical/analytics.py",
+      "sha256": "2034cc9fb49e4659e55bcb16d96169f4f7b89c1c0b5d4bb0bca998b1f728aa19",
+      "reason": "User-specified W5-09 source mapping spec; reuse original numeric functions, no legacy strategy execution.",
+      "repository": "emmanuelwithme/OpenDataStockAnalysis",
+      "commit": "cd1e1dbc9fd7e226a0c31efe80def9ffb5f947cb",
+      "path": "yahoo_pipeline/yf_pipeline/analytics.py",
+      "git_blob": "4122af35a3a38824123cfff623b0c84c4f631f1f"
+    },
+    {
+      "destination": "vendor/technical/collector.py",
+      "sha256": "b4cc1f5e827c98d1e6898c3534c7f81aaea98e880e5a75dfd7b6b5dd6fea3967",
+      "reason": "User-specified W5-09 source mapping spec; reuse original numeric functions, no legacy strategy execution.",
+      "repository": "emmanuelwithme/OpenDataStockAnalysis",
+      "commit": "cd1e1dbc9fd7e226a0c31efe80def9ffb5f947cb",
+      "path": "yahoo_pipeline/yf_pipeline/collector.py",
+      "git_blob": "a0f68540ba25981055a063cf16c37526d893b6f1"
+    },
+    {
+      "destination": "vendor/technical/v82_engine.py",
+      "sha256": "a8b6f302489ada28c637685fb0aba4cb8251c2df38db562b6fdbedb11d95a1fb",
+      "reason": "User-specified W5-09 source mapping spec; reuse original numeric functions, no legacy strategy execution."
+    },
+    {
+      "destination": "W5_09_SOURCE_MAPPING_SPEC.md",
+      "sha256": "021c3f54ec999da57c9d1512d950a0145ce551f070a4142671391c6d12919477",
+      "reason": "User-specified W5-09 source mapping spec; reuse original numeric functions, no legacy strategy execution."
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## 2026-10-21 W5-09指定來源接線已交付，累計16/18
+
+原TD9/Swing及數值producer已鎖版；34項受影響測試PASS、115來源hash PASS。32項具名partial facts保留UNKNOWN並呼叫原V82聚合。完整history/時間/拆股metadata及窄裁定尚待中PM，詳TECHNICAL_SOURCE_INTAKE.md；未接FamilyRunner完整producer。16維持完成，18續待必要來源。
+
 # 給 Family 中PM：W5 剩餘來源協調
 
 目前16/18，既有核心未修改，Production HOLD、交易NONE。請沿現有資料定位，不要求家人重新填寫。收到下列資料/裁決後，W5只補受影響接線與驗證，再完成18整線交付。

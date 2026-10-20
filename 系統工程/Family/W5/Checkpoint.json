@@ -7,7 +7,7 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "Family中PM定位09正式來源；W5接回完成18",
-  "next_action": "依PM16_APPROVAL_AND_ACCEPTANCE.md；維持09來源阻塞，收到具名來源後續作18。",
+  "next_action": "Family中PM補TECHNICAL_SOURCE_INTAKE.md所列資料與窄裁定；W5接回完成09與18。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
@@ -119,11 +119,17 @@
     },
     "W5-09": {
       "status": "BLOCKED_EXTERNAL_SOURCE",
-      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。",
-      "remaining": "Family中PM接續定位完整現行V82 producer；既有行情歷史及舊TD9/Swing尚未核定。W5保留來源阻塞。",
+      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。 已接中PM逐欄規格，鎖三份原碼/規格，新增完整history intake與原TD9/Swing包裝、32項具名partial facts及原V82聚合；34項受影響測試PASS。",
+      "remaining": "TECHNICAL_SOURCE_INTAKE.md列原history/可信時間及拆股metadata、KD/EMV/敘述型predicate窄裁定；尚未接FamilyRunner完整producer。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log"
+        "evidence/stock_sgov_tests.log",
+        "W5_09_SOURCE_MAPPING_SPEC.md",
+        "TECHNICAL_SOURCE_INTAKE.md",
+        "technical_source_lock.json",
+        "tests/test_technical_source_bridge.py",
+        "evidence/source09_tests.log",
+        "evidence/technical_partial_synthetic.json"
       ]
     },
     "W5-10": {
@@ -723,5 +729,16 @@
     "core_changes": 0,
     "decision": "Original Work9 None/null plus separate V75 native facts, W1 policy and C7 client action; no new bond priority.",
     "evidence": "PM16_APPROVAL_AND_ACCEPTANCE.md"
+  },
+  "technical_source_intake": {
+    "status": "PARTIAL_IMPLEMENTED",
+    "source_spec": "https://docs.google.com/document/d/1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho/edit",
+    "affected_pass": 34,
+    "new_tests": 17,
+    "source_hashes": 115,
+    "formal_producer_complete": false,
+    "family_runner_connected": false,
+    "real_history_received": false,
+    "core_changes": 0
   }
 }

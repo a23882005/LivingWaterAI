@@ -111,17 +111,22 @@ def _quarterly_chart_markup(template, source_dir=None):
         "position:sticky;left:0;z-index:10;width:145px;min-width:145px;background:#0f172a",
         "position:sticky;left:145px;z-index:10;width:245px;min-width:245px;background:#0f172a",
     )
-    c_head = "".join(
-        f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap{" sticky left-0 z-30 bg-slate-800" if i == 0 else " sticky z-30 bg-slate-800" if i == 1 else ""}"'
-        f'{f" style=\"{sticky_head_styles[i]}\"" if i < 2 else ""}>{html.escape(h)}</th>'
-        for i, h in enumerate(c_headings)
-    )
+    def consensus_cell(tag, index, value):
+        if tag == "th":
+            base_class = "border border-slate-600 px-2 py-1 whitespace-nowrap"
+            sticky_class = " sticky left-0 z-30 bg-slate-800" if index == 0 else " sticky z-30 bg-slate-800" if index == 1 else ""
+            style = sticky_head_styles[index] if index < 2 else ""
+        else:
+            base_class = "border border-slate-700 px-2 py-1 whitespace-nowrap"
+            sticky_class = " sticky left-0 z-10 bg-slate-900" if index == 0 else " sticky z-10 bg-slate-900" if index == 1 else ""
+            style = sticky_cell_styles[index] if index < 2 else ""
+        style_attr = f' style="{style}"' if style else ""
+        return f'<{tag} class="{base_class}{sticky_class}"{style_attr}>{value}</{tag}>'
+
+    c_head = "".join(consensus_cell("th", i, html.escape(h)) for i, h in enumerate(c_headings))
     c_body = "\n".join(
-        '<tr>' + ''.join(
-            f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap{" sticky left-0 z-10 bg-slate-900" if i == 0 else " sticky z-10 bg-slate-900" if i == 1 else ""}"'
-            f'{f" style=\"{sticky_cell_styles[i]}\"" if i < 2 else ""}>{cell(row.get(h))}</td>'
-            for i, h in enumerate(c_headings)
-        ) + '</tr>' for row in consensus
+        '<tr>' + ''.join(consensus_cell("td", i, cell(row.get(h))) for i, h in enumerate(c_headings)) + '</tr>'
+        for row in consensus
     )
     plot_order = [
         ("Macro-SaFe", "macro_raw.png", "macro_diff.png"),

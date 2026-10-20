@@ -20,7 +20,7 @@ class PipelineError(ValueError):
     pass
 
 
-def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=None):
+def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=None, *, c7_source=None):
     data=apply_stock_policy(bundle,stock_source)
     stock_req,bond_req=data['stock_request'],data['bond_request']
     w3=stock_req['work3_handoff']
@@ -30,6 +30,12 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     run_id=w3['run_id'];client=w3['client_state_context']['payload']['client_id']
     framework=data['asset_framework']
     c7_computation=None if family_sources is None else family_sources.get('c7')
+    if c7_source is not None:
+        from c7_engine import run_c7_engine
+        computed=run_c7_engine(repo_path,c7_source)
+        if c7_computation is not None and computed!=c7_computation:
+            raise PipelineError('C7_SOURCE_MISMATCH')
+        c7_computation=computed
     if c7_computation is not None:
         if digest(framework)!=digest(c7_computation['result']):
             raise PipelineError('C7_COMPUTED_FRAMEWORK_MISMATCH')
@@ -44,10 +50,15 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         if digest(funding_snapshot[name])!=digest(c7[name]):
             raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
     stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
-    stock_output=assemble_stock_output(repo_path,stock,data['stock_source_fields'])
+    stock_output=assemble_stock_output(repo_path,stock,data['stock_source_fields'],c7_computation)
+    target_projection=None
+    if c7_computation is not None:
+        from target_units import project_target_units
+        target_projection=project_target_units(stock,c7_computation)
     bond=run_bond_engine(repo_path,bond_req,data['bond_evidence'],
                          None if family_sources is None else family_sources['bond'])
-    if bond.get('canonical') is None:
+    if (bond.get('canonical') is None or not bond.get('runtime_ready',{}).get('runtime_ready')
+            or not bond['runtime_ready']['output'].get('formal_output_eligible')):
         return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
                 'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
     trace=[*stock['call_trace'],*bond['call_trace']]
@@ -105,6 +116,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
         'stock_source':deepcopy(stock_source),'family_sources':deepcopy(family_sources),
+        'target_unit_projection':target_projection,
         'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,

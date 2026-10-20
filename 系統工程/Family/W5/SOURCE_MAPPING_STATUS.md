@@ -1,3 +1,13 @@
+## 2026-10-21 目標金額／權重接線完成，原生整線與Mentor通過
+
+已解決 W5-C8C9-TARGET-UNIT。原Work6同時保存QQQ portfolio_amount=100 USD、weight=0.1及denominator=1000 USD。V82 calculate_position_gap按金額運算；canonical #36原schema為Money/Rate Target，Work8明確取rate比較。W5 target_units.py核對同來源目標金額/權重/NAV、原生目標與持倉金額、同幣別/配置/批次，再於canonical #36送原C7 integrated_weight，metadata明列portfolio_weight與來源。原金額和分母保存在target_unit_projection；V82策略與Work8驗證維持原碼。
+
+正向案例由原Work21來源明示衍生合成raw Work6：NAV1000、QQQ100、債券目標SGOV140/SPSB60（原V75 70/30）；現有QQQ100、SGOV實體及bond role40、dry0。原C7重算後實際執行V82/V75、Work6資金、Work7 SGOV、Work8保護、Work9統一與explain_native。結果股票新增0、債券新增160，重跑完全相同，輸入不變。原Frozen fixture四份未修改，原golden測試保留。
+
+另修本線調度：V75 runtime_ready或formal_output_eligible未達標時保留原原因與輸出，停止Work9發布；用SGOV單一目標違反原70/30規則的INVALID_INPUT實測。舊混合fixture的XFAIL改成明確負向拒絕測試，完整正向由tests/test_target_units.py驗證。
+
+證據：evidence/target_unit_basis.json、target_unit_positive.json、target_unit_tests.log。仍8/18；本次完成原生整線功能，四家人完整Family來源接線與最終部署另依Checkpoint驗收。Family中PM續定位既有確認Target、C Work6原輸入與具名技術/估值/V70來源，界定V75客戶動作；W5接續Family入口與重送。Production HOLD，交易NONE。
+
 ## 2026-10-21 V70不同來源批次與Family重送綁定（仍8/18）
 
 新增v70_source_bridge.py，保留上游原context/payload/run_id及digest；project_v70_context建立本輪分析envelope，僅映射外層與payload的run_id，原金額、issue_codes、quality、snapshot/time/lineage保持。兩支線handoff及V75 snapshot逐欄比對，接原tactical_cap。W3 ready feed仍僅供原始總經來源，戰術額度由明確V70結果提供。

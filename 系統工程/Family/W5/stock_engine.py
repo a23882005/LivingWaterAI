@@ -94,7 +94,7 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract):
     return {**result,'status':plan.action,'position_gap':gap,'execution':plan}
 
 
-def assemble_stock_output(repo_path, calculation, source_fields):
+def assemble_stock_output(repo_path, calculation, source_fields, c7_computation=None):
     """Use the native 49/13 assembler; display fields remain producer-owned."""
     from livingwater_v82_runtime.canonical_output import (CANONICAL_FIELD_NAMES,
         assemble_canonical_analysis,build_runtime_output)
@@ -137,12 +137,22 @@ def assemble_stock_output(repo_path, calculation, source_fields):
         'order_submission_plan':order}
     if set(source_fields)!=set(CANONICAL_FIELD_NAMES)-set(computed):
         raise StockEvidenceError('CANONICAL_SOURCE_FIELDS_MISMATCH')
+    target_projection=None
+    if c7_computation is not None:
+        from target_units import project_target_units
+        target_projection=project_target_units(calculation,c7_computation)
+        computed['project_target_position']=target_projection['canonical_target_weight']
     values={**deepcopy(source_fields),**computed}
     schema=json.loads((Path(repo_path)/V82_PATH/'livingwater_v82_runtime/schema/runtime_output.schema.json').read_text())
     metadata={name:{'data_type':schema['properties']['canonical_analysis']['properties'][name]['properties']['data_type']['const'],
         'data_as_of':facts['as_of'],'source_reference':facts['source_reference'],
         'data_quality':'UNKNOWN' if value=='UNKNOWN' else 'OK',
         'issue_codes':list(plan.reason_codes)} for name,value in values.items()}
+    if target_projection is not None:
+        metadata['project_target_position'].update(
+            data_as_of=target_projection['source_target']['weight']['as_of'],
+            source_reference=['C7:'+target_projection['c7_snapshot_id'],
+                              'UNIT:portfolio_weight','SOURCE_SHA256:'+target_projection['source_digest']])
     analysis=assemble_canonical_analysis(values=values,run_id=wire['run_id'],
         rule_version=adapter.V82_RULE_VERSION,field_metadata=metadata)
     output=build_runtime_output(analysis=analysis,run_id=wire['run_id'],

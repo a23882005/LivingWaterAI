@@ -38,7 +38,7 @@ def run_c7_engine(repo_path, source):
         work6_output_schema_path=schemas/'57_C_Work6_Mentor_Adjustment_Result.schema.json',
         work7_output_schema_path=schemas/'68_C_Work7_V70_Asset_Framework_Result.schema.json',
         funding_context_schema_path=schemas/'80_C_Work7_Funding_Context.schema.json')
-    return {'source_digest':digest(source), 'result':result,
+    return {'source_digest':digest(source), 'original_source':deepcopy(source), 'result':result,
             'call_trace':['C.Work7.run_asset_framework_integration'],
             'production':'HOLD', 'trade_action':'NO_TRADE'}
 

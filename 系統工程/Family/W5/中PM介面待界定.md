@@ -1,3 +1,7 @@
+# 最新裁定依據：W5目標單位接線已完成
+
+2026-10-21：透過原Work6明確portfolio_amount/weight/denominator及V82原schema Money/Rate Target，已在W5完成金額運算與權重輸出的分工，Work8原驗證通過，原核心修改0。W5-C8C9-TARGET-UNIT移至resolved_gaps。下方早期請中PM界定目標單位的記錄已由本段取代；現行待協調為既有家人確認Target/C Work6輸入、具名producer與V75客戶動作優先序。完整證據見evidence/target_unit_basis.json、target_unit_positive.json與tests/test_target_units.py。
+
 # W5 同次調度：目標單位待界定
 
 狀態：OPEN；Production HOLD；交易 NONE。這是施工問題回交，並非整線驗收。

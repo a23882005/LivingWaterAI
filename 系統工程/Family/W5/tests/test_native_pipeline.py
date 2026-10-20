@@ -31,21 +31,13 @@ def pipeline_case():
         'asset_framework':template,'physical_sgov':physical}
 
 
-@pytest.mark.xfail(strict=True, raises=ValueError, reason='OPEN W5-C8C9-TARGET-UNIT: native Work8 compares money to weight')
-def test_actual_engines_to_full_work9_and_mentor():
+def test_legacy_unbound_money_weight_fixture_is_rejected():
+    # This mixed legacy fixture has no source-consistent C7 money/weight binding.
+    # The full positive chain now lives in test_target_units.py.
     data=pipeline_case();before=deepcopy(data)
-    try:
-        result=run_native_pipeline(ROOT,data)
-    except ValueError as error:
-        assert getattr(error,'code',None)=='C8C9.W8.FINAL_TARGET_BINDING'
-        assert 'differs from C7 integrated target' in str(error)
-        assert data==before
-        raise
-    assert result['status']=='NATIVE_PIPELINE_COMPLETE'
-    assert result['mentor_return']==result['unified_result']['mentor_return']
-    assert result['mentor_return']['canonical_deployment_result_sha256']==result['unified_result']['canonical_deployment_result_sha256']
-    assert result['funding_aggregate']['equity_used']=='450'
-    assert result['trade_action']=='NO_TRADE'
+    with pytest.raises(ValueError) as caught:
+        run_native_pipeline(ROOT,data)
+    assert getattr(caught.value,'code',None)=='C8C9.W8.FINAL_TARGET_BINDING'
     assert data==before
 
 

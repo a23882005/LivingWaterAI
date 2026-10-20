@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "Family中PM一次定位既有Target、C Work6/C7原輸入及具名技術/估值/V70來源，界定Work8單位與V75客戶動作；W5沿本Checkpoint接完整線。詳中PM介面待界定.md。",
+  "next_action": "W5接四家人來源一致的完整Family runner及重送；Family中PM定位既有確認Target、C Work6原輸入、具名technical/估值/V70來源，界定V75客戶動作優先序。Work8目標單位已由W5接線解決。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261021-c7-native",
+    "backup_ref": "backup/w5-20261021-target-units",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "97da10a17cb9eb5005673b3c15a15b50ad64fdc5",
+    "previous_work_commit": "2ea39780bfe5b595632c922e1d3e65859731c61f",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線252 PASS、1 strict XFAIL；新增11項原C7實算/封案golden/來源綁定；111來源與fixture hash PASS。四家人完整整線仍待既有來源與接口。",
+  "validation_scope": "本線261 PASS、0 XFAIL；原C7/股債/Work6..9/Mentor實際整線正向通過；111來源與fixture hash PASS。四家人完整來源接線及最終部署續作。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -140,11 +140,13 @@
     },
     "W5-11": {
       "status": "IN_PROGRESS",
-      "completed": "真計算→原生49/13組裝→原Work4consume→原Work9分支映射；金額/數量保留，未知減碼NEEDS_REVIEW。",
+      "completed": "真計算→原生49/13組裝→原Work4consume→原Work9分支映射；金額/數量保留，未知減碼NEEDS_REVIEW。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
       "remaining": "producer展示欄完整來源綁定及BLOCKED_UNKNOWN正式49/13傳輸待補。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log"
+        "evidence/stock_sgov_tests.log",
+        "tests/test_target_units.py",
+        "evidence/target_unit_positive.json"
       ]
     },
     "W5-12": {
@@ -180,7 +182,7 @@
     },
     "W5-15": {
       "status": "IN_PROGRESS",
-      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。 原C7實際運算、17份依賴及4份原golden固定；SOURCE_BACKED必須重算C7並全結果比對。",
+      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。 原C7實際運算、17份依賴及4份原golden固定；SOURCE_BACKED必須重算C7並全結果比對。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
       "remaining": "完整C7/確認Target來源語意、債券客戶行動保護、正式技術/報價/V70 producer與source_run、目標單位接口及Family/Mentor正向整線。",
       "evidence": [
         "中PM介面待界定.md",
@@ -196,17 +198,21 @@
         "evidence/funding_macro_bond_tests.log",
         "evidence/position_source_tests.log",
         "c7_engine.py",
-        "tests/test_c7_engine.py"
+        "tests/test_c7_engine.py",
+        "tests/test_target_units.py",
+        "evidence/target_unit_positive.json"
       ]
     },
     "W5-16": {
       "status": "IN_PROGRESS",
-      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。",
-      "remaining": "15完整真股債結果接入後驗收全部16棒；目前正向為原Work21凍結fixture經真Work9整合與說明。",
+      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
+      "remaining": "四家人來源一致的Family runner整線及V75客戶動作優先序驗收。",
       "evidence": [
         "tests/test_mentor_bridge.py",
         "evidence/mentor_positive.json",
-        "evidence/mentor_tests.log"
+        "evidence/mentor_tests.log",
+        "tests/test_target_units.py",
+        "evidence/target_unit_positive.json"
       ]
     },
     "W5-17": {
@@ -241,21 +247,6 @@
       "owner": "Family中PM定位既有目標交付",
       "impact": "四家人真實分析；不影響合成fixture功能測試",
       "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
-    },
-    {
-      "id": "W5-C8C9-TARGET-UNIT",
-      "owner": "Family中PM界定跨線語意；W5小PM依裁決修接線",
-      "impact": "W5-15/16/18完整正向",
-      "files": [
-        "stock_engine.py",
-        "C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
-      ],
-      "fields": [
-        "canonical_analysis.project_target_position",
-        "integrated_asset_framework.instrument_targets[].integrated_weight"
-      ],
-      "requested_action": "指定目標金額/權重及來源NAV的既有綁定規格；界定W5投影或C8C9最小修正。合成組合案例不能單獨判定核心策略缺陷。",
-      "evidence": "中PM介面待界定.md"
     }
   ],
   "recheck": {
@@ -340,6 +331,28 @@
         "evidence/c8c9_dependencies_restored.json",
         "evidence/frozen_intake_tests.log"
       ]
+    },
+    {
+      "id": "W5-C8C9-TARGET-UNIT",
+      "owner": "Family中PM界定跨線語意；W5小PM依裁決修接線",
+      "impact": "W5-15/16/18完整正向",
+      "files": [
+        "stock_engine.py",
+        "C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
+      ],
+      "fields": [
+        "canonical_analysis.project_target_position",
+        "integrated_asset_framework.instrument_targets[].integrated_weight"
+      ],
+      "requested_action": "指定目標金額/權重及來源NAV的既有綁定規格；界定W5投影或C8C9最小修正。合成組合案例不能單獨判定核心策略缺陷。",
+      "evidence": [
+        "target_units.py",
+        "tests/test_target_units.py",
+        "evidence/target_unit_basis.json",
+        "evidence/target_unit_positive.json"
+      ],
+      "status": "RESOLVED_IN_W5_PROJECTION",
+      "resolution": "Original Work6 explicit portfolio_amount/weight/denominator establish units. V82 money computation retained; canonical Money/Rate Target uses verified C7 portfolio_weight. Actual original engines through Work9 and Mentor pass."
     }
   ],
   "schema_intake": {
@@ -612,6 +625,36 @@
       "w5_xfail": 1,
       "added": 11,
       "hash_pass": 111
+    }
+  },
+  "target_unit_integration": {
+    "status": "NATIVE_FULLCHAIN_AND_MENTOR_VERIFIED",
+    "core_changes": 0,
+    "formula": "approved target amount / same-source denominator = portfolio_weight; canonical rate equals original C7 integrated weight",
+    "source_snapshot": "Original Work21 QA_RUN3 + explicitly adapted synthetic raw source; frozen files unchanged",
+    "actual_positive": {
+      "target_money_usd": 100,
+      "target_weight": 0.1,
+      "bond_targets_usd": {
+        "SGOV": 140,
+        "SPSB": 60
+      },
+      "equity_used": 0,
+      "bond_used": 160
+    },
+    "additional_fix": "Native V75 runtime_ready/formal_output_eligible required before unified publication",
+    "remaining": [
+      "Four-family source-backed E2E",
+      "V75 client-action priority",
+      "Formal technical/valuation/V70 producer binding",
+      "Cross-currency binding",
+      "Final deployment"
+    ],
+    "tests": {
+      "pass": 261,
+      "xfail": 0,
+      "added": 8,
+      "hashes": 111
     }
   }
 }

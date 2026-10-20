@@ -2,12 +2,12 @@
   "contract_version": "2.2.1",
   "status": "IN_PROGRESS",
   "release": "RELEASED",
-  "implementation_completed": 15,
+  "implementation_completed": 16,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-  "next_owner": "W5 小PM持續處理本線；Family 中PM協調具名來源與C8C9接口",
-  "next_action": "按PM_DECISIONS_REQUIRED.md一次解決兩項跨線事項；最終18驗收與PR整合。",
+  "next_owner": "Family中PM定位09正式來源；W5接回完成18",
+  "next_action": "依PM16_APPROVAL_AND_ACCEPTANCE.md；維持09來源阻塞，收到具名來源後續作18。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
@@ -120,7 +120,7 @@
     "W5-09": {
       "status": "BLOCKED_EXTERNAL_SOURCE",
       "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。",
-      "remaining": "正式具名producer、週/月K原規則與完整來源綁定待接。",
+      "remaining": "Family中PM接續定位完整現行V82 producer；既有行情歷史及舊TD9/Swing尚未核定。W5保留來源阻塞。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
         "evidence/stock_sgov_tests.log"
@@ -214,15 +214,19 @@
       ]
     },
     "W5-16": {
-      "status": "BLOCKED_EXTERNAL_INTERFACE",
-      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
-      "remaining": "四家人來源一致的Family runner整線及V75客戶動作優先序驗收。",
+      "status": "COMPLETED",
+      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。 Family中PM核准原Work9 None/null與來源分欄；受影響34項補驗通過，未修改runtime或核心。",
+      "remaining": "無本棒待決項；09來源與18整線另列。",
       "evidence": [
         "tests/test_mentor_bridge.py",
         "evidence/mentor_positive.json",
         "evidence/mentor_tests.log",
         "tests/test_target_units.py",
-        "evidence/target_unit_positive.json"
+        "evidence/target_unit_positive.json",
+        "PM16_APPROVAL_AND_ACCEPTANCE.md",
+        "tests/test_pm16_approval.py",
+        "evidence/pm16_tests.log",
+        "evidence/pm16_protection.log"
       ]
     },
     "W5-17": {
@@ -240,7 +244,7 @@
     "W5-18": {
       "status": "IN_PROGRESS",
       "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。 本輪補交CLI並實跑合成隔離與四庫歷史缺項案例。",
-      "remaining": "09具名技術來源與16債券客戶動作接口解決後，驗受影響案例及最終PR整合；施工包雙端驗證不等於整線放行。",
+      "remaining": "09必要來源齊備後，W5補受影響接線驗證與最終PR整合、雙端部署。16已完成。",
       "evidence": [
         ".github/workflows/family-w5.yml",
         "verify_dependencies.py",
@@ -709,5 +713,15 @@
       "log": "evidence/deployment_copy_smoke.log",
       "source_zip_sha256": "c16593a7aeb9ad8634abb1b827029e5443651145017c389d09aac047e10a3cf8"
     }
+  },
+  "pm16_approval": {
+    "status": "ACCEPTED_AND_VERIFIED",
+    "progress": "16/18",
+    "affected_tests_passed": 34,
+    "new_tests": 3,
+    "runtime_changes": 0,
+    "core_changes": 0,
+    "decision": "Original Work9 None/null plus separate V75 native facts, W1 policy and C7 client action; no new bond priority.",
+    "evidence": "PM16_APPROVAL_AND_ACCEPTANCE.md"
   }
 }

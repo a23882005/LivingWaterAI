@@ -1,6 +1,6 @@
 # W5 累計契約驗收矩陣（2026-10-21）
 
-結論：15/18；01～08、10～15、17完成，09來源協調中、16接口協調中、18整線待收尾。僅計已滿足本棒功能與證據者；不將合成資料列為真實家人投資建議。
+結論：16/18；01～08、10～17完成，09來源協調中、18整線待收尾。僅計已滿足本棒功能與證據者；不將合成資料列為真實家人投資建議。
 
 本輪不修改Runtime，不重跑未受影響的268項測試。沿用commit bccd1627a73dada8d4aadc03511586ac66f2312d的本機268 PASS、CI268 PASS/111來源hash PASS。CI run39469962774、job118791118667；完整log存交付包CI證據。原上游369項歷史回歸沿用原證據，未假稱本輪重跑。
 
@@ -13,7 +13,7 @@
 | 13 債券投影 | test_bond_engine.py; test_bond_target_mentor.py | account-level INVALID_INPUT/BLOCK即使空per-asset仍保留；長期Target和今日部署分開；raw Money保留。完成 |
 | 14 SGOV | test_sgov_bridge.py; test_position_source_bridge.py | physical120、既有roles100、未分配20；未成交contribution不加持股；超分配/跨戶拒絕、UNKNOWN保留。完成 |
 | 15/T01 真入口 | test_family_end_to_end.py | 真FamilyRunner→C7/V82/V75/C8C9→Mentor，股票目標/現有100，債券目標200扣既有40得到160；同源輸入不變。完成 |
-| 16/T09 說明 | test_mentor_bridge.py; test_bond_target_mentor.py | 真結果可說明，數字不可被LLM改寫，Protected風險保留。V75 client_preference_action接口仍待中PM界定，不能列整棒PASS |
+| 16/T09 說明 | test_mentor_bridge.py; test_bond_target_mentor.py | 真結果可說明，數字不可被LLM改寫，Protected風險保留。中PM核准原None/null＋來源分欄；受影響34項PASS，16完成，詳PM16_APPROVAL_AND_ACCEPTANCE.md |
 | 17/T10 恢復 | test_recovery_bridge.py; test_family_end_to_end.py | 真結果重送、競爭、實際逾時晚到、中斷恢復、撤權/版本更換；最多兩次計算跨重送保留。STAGING_VERIFIED |
 | T02 真W3來源 | test_family_sources.py | 原read_macro讀取核定feed，m12 MOVE 101.298698進原V75 predicate；其餘完整案例明標合成 |
 | T03 隔離 | test_family_input.py; test_family_boundary.py; test_funding_guard.py | 四client隔離、owner五維及digest核對；真實四庫唯讀檢查見evidence/runner_private_checks.json，私人內容僅Drive |

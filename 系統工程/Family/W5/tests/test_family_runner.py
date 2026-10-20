@@ -37,6 +37,24 @@ def runner_case():
         tables[name]=snapshot['tables'][name]
     tables['portfolio_instrument'][0].update(ticker='QQQ',exchange_code='NASDAQ')
     tables['portfolio_position'][0]['quantity_decimal']='0'
+    for asset,quantity in [('SGOV','1'),('SPSB','0')]:
+        tables['portfolio_instrument'].append({'client_id':req['client_id'],'instrument_key':asset+'_KEY',
+            'ticker':asset,'exchange_code':'ARCA','quote_currency':'USD'})
+        tables['portfolio_position'].append({'client_id':req['client_id'],'account_key':req['owner']['account'],
+            'instrument_key':asset+'_KEY','quantity_decimal':quantity,'as_of_utc':'2026-09-25T00:00:00Z'})
+        for name in ('universe_membership','universe_confirmation','permission_policy'):
+            rows=deepcopy([r for r in tables[name] if r.get('instrument_key')=='VT_KEY'])
+            for row in rows:
+                row['instrument_key']=asset+'_KEY'
+                if name=='permission_policy':row['policy_key']=asset+'_POLICY'
+            tables[name].extend(rows)
+        tables['permission_confirmation'].append({'client_id':req['client_id'],'policy_key':asset+'_POLICY',
+            'version_no':1,'confirmed_at_utc':'2026-10-01T00:00:00Z'})
+    raw={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-09-25T00:00:00Z','verification':{'ready':True},
+        'indicators':{'m12':{'value':80,'status':'OK','source':'https://finance.yahoo.com/quote/%5EMOVE/',
+            'unit':'','dataDate':'2026-09-24','method':'SYNTHETIC_TEST_ONLY'}}}
+    req['macro_snapshot'].update(payload=raw,asOf=raw['asOf'],digest=digest(raw))
+    req['expected_versions']['market']=ctx['expected_versions']['market']=digest(raw)
     refresh_snapshot(req,ctx)
     prepared=prepare_input(req,trusted_context=ctx)
     ctx['native_binding']={'schema_version':'Family.W5.NativeBinding.v1','request_digest':prepared.input_digest,
@@ -46,6 +64,12 @@ def runner_case():
     ctx['native_binding']['stock_instrument']={'instrument_key':'VT_KEY','asset_id':'QQQ',
         'account_key':req['owner']['account'],'native_owner':deepcopy(w3['owner']),
         'source_reference':'SYNTHETIC_W1_INSTRUMENT'}
+    ctx['native_binding']['bond_instruments']={asset:{'instrument_key':asset+'_KEY',
+        'account_key':req['owner']['account'],'native_owner':deepcopy(w3['owner']),
+        'exchange':'ARCA','source_reference':'SYNTHETIC_W1_BOND'} for asset in ('SGOV','SPSB')}
+    ctx['funding_source']={'c7_funding_context':deepcopy(bundle['stock_request']['c7_funding_context']),
+        'owner_binding':{'family_owner':deepcopy(req['owner']),'native_owner':deepcopy(w3['owner']),
+            'currency':'USD','version':req['expected_versions']['funding'],'source_reference':'SYNTHETIC_C7_SOURCE'}}
     return req,ctx
 
 

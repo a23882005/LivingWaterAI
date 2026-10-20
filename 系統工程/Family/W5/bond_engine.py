@@ -27,7 +27,7 @@ def _time(value):
     return result
 
 
-def run_bond_engine(repo_path, adapter_request, asset_evidence):
+def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=None):
     """Return original canonical output plus exact inputs and native call trace.
 
     This component accepts a C8C9 request, not a public Family request. The
@@ -70,6 +70,8 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence):
     decisions = []
     if state.work3_complete:
         expected = {item.asset_id for item in state.per_asset_inputs}
+        if policy_sources is not None and set(policy_sources)!=expected:
+            raise BondEvidenceError('POLICY_SOURCE_COVERAGE')
         if set(evidence) != expected:
             raise BondEvidenceError('ASSET_EVIDENCE_COVERAGE')
         for item in state.per_asset_inputs:
@@ -116,7 +118,11 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence):
                 'deployment_state': native_trace.deployment_state.value,
                 'deployment_pct': str(native_trace.deployment_pct),
                 'rule_ids': list(native_trace.step10_rule_ids)}
-            decisions.append(build_decision(item, native_trace, [facts['source_reference']]))
+            decision=build_decision(item, native_trace, [facts['source_reference']])
+            if policy_sources is not None and policy_sources[item.asset_id]['additional_new_buy_cap']=='0':
+                decision=proportional_scale_decisions([decision],Money(amount=Decimal('0'),currency=run.currency))[0]
+                trace.append('V75.proportional_scale_decisions:W1_NEW_BUY_ZERO:'+item.asset_id)
+            decisions.append(decision)
             trace.extend(['V75.evaluate_step10:' + item.asset_id, 'V75.build_decision:' + item.asset_id])
         decisions = proportional_scale_decisions(decisions, Money(
             amount=min(run.bond_executable_budget.amount,cap['amount']),currency=run.currency))
@@ -133,5 +139,5 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence):
     trace.extend(['V75.assemble_final_snapshot', 'V75.evaluate_runtime_ready'])
     canonical = adapter.consume_v75_runtime_ready(wire, built['integration_binding'])
     trace.append('C8C9.Work5.consume_v75_runtime_ready')
-    return {**result, 'status': wire['output']['evaluation_state'],
+    return {**result, 'policy_sources':deepcopy(policy_sources),'status': wire['output']['evaluation_state'],
             'runtime_ready': wire, 'canonical': canonical}

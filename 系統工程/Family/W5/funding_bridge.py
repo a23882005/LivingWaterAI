@@ -6,6 +6,25 @@ from funding_guard import check_aggregate,owner_key
 from runtime_loader import load_c_module
 
 
+def bind_funding_source(request,context):
+    source=context.get('funding_source')
+    require(isinstance(source,dict),'FUNDING_SOURCE_REQUIRED','trusted_context.funding_source',status='DATA_UNAVAILABLE')
+    mapping=source.get('owner_binding',{})
+    require(mapping.get('version')==request['expected_versions']['funding'] and bool(mapping.get('source_reference')),
+            'FUNDING_SOURCE_VERSION_MISMATCH','funding_source.owner_binding')
+    require(mapping.get('family_owner')==request['owner'] and mapping.get('currency')==request['owner']['currency'],
+            'FUNDING_SOURCE_OWNER_MISMATCH','funding_source.owner_binding')
+    for branch in ('stock_request','bond_request'):
+        native=request['native_bundle'][branch]
+        require(native['work3_handoff']['owner']==mapping.get('native_owner'),
+                'FUNDING_SOURCE_OWNER_MISMATCH',branch)
+        require(isinstance(source.get('c7_funding_context'),dict) and
+                digest(native['c7_funding_context'])==digest(source['c7_funding_context']),
+                'FUNDING_SOURCE_PAYLOAD_MISMATCH',branch+'.c7_funding_context')
+    return {'family_owner':deepcopy(request['owner']),'owner_binding':deepcopy(mapping),
+            'expected_binding_digest':digest(mapping),'c7_digest':digest(source['c7_funding_context'])}
+
+
 def reconcile_funding(repo_path,*,family_owner,native_request,owner_binding,expected_binding_digest,claims):
     require(digest(owner_binding)==expected_binding_digest,'OWNER_BINDING_HASH_MISMATCH','owner_binding')
     require(owner_binding.get('family_owner')==family_owner,'OWNER_BINDING_MISMATCH','owner_binding.family_owner')

@@ -1,3 +1,11 @@
+## 2026-10-21 資金／MOVE／債券來源接線增量（仍8/18）
+
+本線181 PASS、1 strict XFAIL，新增18項測試。Family入口驗獨立C7來源payload/version/owner，兩引擎實際claims共用既有reconcile_funding；AVAILABLE沿原C7明確值。W1債券數量/account/currency逐欄核對；禁止新買走原V75單標的0預算縮放，保留其他標的與既有風險動作。股債總額及未部署contribution守恆。
+
+原P70-5讀取器實際讀核定feed，MOVE=101.298698接原V75 PRED-005元件；source/quality完整保留，驗ready/時間/數值。MOVE五日變化率仍需要獨立來源；正向predicate測試該欄明標SYNTHETIC。W3 ready與V70 tactical預算分開。
+
+詳見SOURCE_MAPPING_STATUS.md、tests/test_family_sources.py、evidence/funding_macro_bond_tests.log、evidence/macro_move_projection.json。下一段由W5補估值、SGOV實體來源與保護持倉；中PM界定目標單位及定位確認Target/technical producer。Production HOLD、交易NONE。備份backup/w5-20261020-funding-macro-bond；commit、Actions及雙端讀回憑證見累計ZIP RELEASE_RECEIPT.json。
+
 ## 2026-10-20 股票來源逐欄接線增量（仍8/18）
 
 本線163 PASS、1 strict XFAIL。新增stock_source_bridge.py，Family入口強制具名W1 instrument/account/native owner映射，逐欄核對ticker、exchange、currency與原生confirmed quantity；最新持倉同時點重複/UNKNOWN拒絕。完整帳戶無該商品持倉才映射0。此輪僅接受相同ticker，不猜商品別名。

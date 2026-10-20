@@ -12,13 +12,14 @@ from bond_engine import run_bond_engine
 from funding_guard import check_aggregate
 from sgov_bridge import reconcile_sgov
 from stock_source_bridge import apply_stock_policy
+from funding_bridge import reconcile_funding
 
 
 class PipelineError(ValueError):
     pass
 
 
-def run_native_pipeline(repo_path, bundle, stock_source=None):
+def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=None):
     data=apply_stock_policy(bundle,stock_source)
     stock_req,bond_req=data['stock_request'],data['bond_request']
     w3=stock_req['work3_handoff']
@@ -38,7 +39,8 @@ def run_native_pipeline(repo_path, bundle, stock_source=None):
             raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
     stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
     stock_output=assemble_stock_output(repo_path,stock,data['stock_source_fields'])
-    bond=run_bond_engine(repo_path,bond_req,data['bond_evidence'])
+    bond=run_bond_engine(repo_path,bond_req,data['bond_evidence'],
+                         None if family_sources is None else family_sources['bond'])
     if bond.get('canonical') is None:
         return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
                 'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
@@ -47,19 +49,29 @@ def run_native_pipeline(repo_path, bundle, stock_source=None):
         return {'contract_name':module.INPUT_CONTRACT_NAME,'contract_version':module.INPUT_CONTRACT_VERSION,
                 'baseline_id':module.BASELINE_ID,'run_id':run_id,**payload}
     work6=load_c_module(repo_path,6)
-    isolated=work6.validate_funding_account_isolation(request(work6,work3_handoff=w3,
-        c7_funding_context=c7,work4_adapter_result=stock['built_input'],work5_adapter_result=bond['built_input']))
-    trace.append('C8C9.Work6.validate_funding_account_isolation')
-    owner={'client_id':client,**w3['owner'],'currency':w3['currency']}
+    funding_request=request(work6,work3_handoff=w3,c7_funding_context=c7,
+        work4_adapter_result=stock['built_input'],work5_adapter_result=bond['built_input'])
+    owner=({'client_id':client,**w3['owner'],'currency':w3['currency']} if family_sources is None
+           else family_sources['funding']['family_owner'])
     claims=[{'claim_id':'V82:'+stock_output['asset_id'],'owner':owner,'run_id':run_id,
              'asset_class':'EQUITY','amount':stock['execution'].execution_amount}]
     for d in bond['runtime_ready']['output']['per_asset_decisions']:
         if d['deploy_amount'] is None:raise PipelineError('BOND_DEPLOYMENT_UNKNOWN')
         claims.append({'claim_id':'V75:'+d['asset_id'],'owner':owner,'run_id':run_id,
                        'asset_class':'BOND','amount':d['deploy_amount']['amount']})
-    cash=isolated['cash_eligibility']
-    aggregate=check_aggregate(owner=owner,run_id=run_id,claims=claims,available=cash['available'],
-        equity_budget=cash['equity_executable_budget'],bond_budget=cash['bond_executable_budget'])
+    funding_reconciliation=None
+    if family_sources is not None:
+        f=family_sources['funding']
+        funding_reconciliation=reconcile_funding(repo_path,family_owner=owner,native_request=funding_request,
+            owner_binding=f['owner_binding'],expected_binding_digest=f['expected_binding_digest'],claims=claims)
+        isolated=funding_reconciliation['native_work6'];aggregate=funding_reconciliation['aggregate']
+        trace.append('W5.reconcile_funding:Family_owner_actual_native_claims')
+    else:
+        isolated=work6.validate_funding_account_isolation(funding_request)
+        cash=isolated['cash_eligibility']
+        aggregate=check_aggregate(owner=owner,run_id=run_id,claims=claims,available=cash['available'],
+            equity_budget=cash['equity_executable_budget'],bond_budget=cash['bond_executable_budget'])
+    trace.append('C8C9.Work6.validate_funding_account_isolation')
     trace.append('W5.check_aggregate:actual_native_claims')
     work7=load_c_module(repo_path,7)
     physical=reconcile_sgov(repo_path,request(work7,work3_handoff=w3,
@@ -77,7 +89,8 @@ def run_native_pipeline(repo_path, bundle, stock_source=None):
     unified=work9.build_unified_deployment(unified_request)
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
-        'stock_source':deepcopy(stock_source),'client_id':client,'run_id':run_id,
+        'stock_source':deepcopy(stock_source),'family_sources':deepcopy(family_sources),
+        'funding_reconciliation':funding_reconciliation,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
         'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,

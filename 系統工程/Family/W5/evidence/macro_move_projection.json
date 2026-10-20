@@ -1,0 +1,59 @@
+{
+  "producer": "Family.W5",
+  "schema_version": "Family.W5.MacroProjection.v1",
+  "source_digest": "2479999ac52eb0ceaba436e7148389dbc544e93eae6b4b1865e5849c3a6097ea",
+  "source_as_of": "2026-10-20T03:23:03.720004Z",
+  "source_verification": {
+    "ready": true,
+    "valid": 26,
+    "totalRequired": 26,
+    "independentIndicators": 25,
+    "sources": [
+      "09:00/18",
+      "10:00/8"
+    ],
+    "usableWithCaveat": [
+      "m06",
+      "m06_output_gap",
+      "m06_rstar",
+      "s05"
+    ],
+    "transportFields": 26,
+    "requiredScoringIndicators": 22,
+    "requiredScoringIndicatorsValidated": 22,
+    "missing": [],
+    "problems": [],
+    "transportIndicators": 28
+  },
+  "source_snapshot": {
+    "macro18": "0312949c3c4e158a7835cbe29e386a293843ce18",
+    "macro8": "6e9285c27981a404d6313d40aeea27fbf95513f8",
+    "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
+    "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
+    "macro18GeneratedAt": "2026-10-20T09:35:13.000156+08:00",
+    "macro8GeneratedAt": "2026-10-20T10:04:47+08:00"
+  },
+  "fields": {
+    "PRED-005.move": {
+      "value": "101.298698",
+      "unit": "MOVE_INDEX_POINTS",
+      "source_path": "/indicators/m12",
+      "source_row": {
+        "value": 101.298698,
+        "dataDate": "2026-10-19",
+        "source": "https://finance.yahoo.com/quote/%5EMOVE/",
+        "unit": "",
+        "method": "yfinance Yahoo Finance ^MOVE 日K Close",
+        "status": "OK",
+        "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對"
+      }
+    }
+  },
+  "remaining_metrics": "Require separately identified existing producer; no zero fill",
+  "tactical_budget_source": "SEPARATE_V70_RESULT_REQUIRED",
+  "scope": "Actual locked W3 reader/feed -> MOVE projection; complete PRED-005 still requires separately sourced five-day change",
+  "data_provenance": "SOURCE_BACKED_MACRO_COMPONENT_ONLY",
+  "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+  "source_sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
+  "reader_sha256": "982ba8cf638296474035f9b8cd6757016232d9bb9790c2f8fcd32a0627332492"
+}

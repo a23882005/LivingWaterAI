@@ -14,6 +14,9 @@ from mentor_bridge import explain_native
 from recovery_bridge import StagingAnalysisStore,RecoveryError,input_digest
 from verify_dependencies import verify
 from stock_source_bridge import bind_stock_source
+from bond_source_bridge import bind_bond_sources
+from macro_source_bridge import validate_macro_consumers
+from funding_bridge import bind_funding_source
 
 
 class FamilyRunner:
@@ -50,11 +53,14 @@ class FamilyRunner:
                     'NATIVE_CONFIRMATION_PROOF_MISMATCH',branch)
         require(bundle['stock_evidence']['evaluated_at']==request['evaluation_at'],'NATIVE_EVALUATION_TIME_MISMATCH','stock_evidence.evaluated_at')
         prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
+        prepared.payload['family_sources']={'funding':bind_funding_source(request,ctx),
+            'macro':validate_macro_consumers(request),'bond':bind_bond_sources(request,prepared,binding)}
         return prepared,ctx
 
     def _compute(self,request):
         prepared,ctx=self._validate(request)
-        native=run_native_pipeline(self.repo_path,deepcopy(request['native_bundle']),prepared.payload['stock_source'])
+        native=run_native_pipeline(self.repo_path,deepcopy(request['native_bundle']),
+            prepared.payload['stock_source'],prepared.payload['family_sources'])
         require(native.get('status')=='NATIVE_PIPELINE_COMPLETE','NATIVE_RESULT_INCOMPLETE','native.status',status='DATA_UNAVAILABLE')
         u=native['unified_result']
         mentor=explain_native(self.repo_path,native['work9_request'],u,trusted_context={

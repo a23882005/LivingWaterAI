@@ -101,7 +101,7 @@ def _quarterly_chart_markup(template, source_dir=None):
 
     source_headings = list(rows[0])
     frozen_headings = ("季度觀察交易日", "SP500後3個月價格報酬_pct")
-    omitted_headings = {"後三個月取價交易日", "報酬成熟狀態"}
+    omitted_headings = {"三個月目標日", "後三個月取價交易日", "報酬成熟狀態"}
     if not set(frozen_headings).issubset(source_headings):
         raise ValueError("Quarterly value table is missing its two frozen columns")
     headings = [*frozen_headings, *(h for h in source_headings if h not in frozen_headings and h not in omitted_headings)]

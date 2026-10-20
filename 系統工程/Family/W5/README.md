@@ -16,3 +16,6 @@ Production HOLD；交易授權 NONE。
 `runtime_loader` 不修改核心檔，也不替換 Frozen schema；缺件維持 DEPENDENCY_MISSING。
 
 詳見 Checkpoint.json 與 evidence/；私人四庫與讀取結果僅放私有 Drive。
+
+## Work21依賴接收
+九份Frozen原件保存在schemas/，雜湊與來源見frozen_schema_lock.json。runtime_loader驗證SHA-256後沿用原schema驗證。測試預設從repo根讀取原生程式；分離checkout時設定W5_SOURCE_ROOT為核定來源checkout根目錄。新增原Work21合成adapter案例，不改核心策略。

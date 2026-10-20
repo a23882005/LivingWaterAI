@@ -1,0 +1,16 @@
+[
+  {
+    "source_archive_path": "tools/qa_work4_v82_integration.py",
+    "source_sha256": "c697ddb27f8fe95d64dd7c8612c450388f99c021ce25fb6b5499a8995e84d7f2",
+    "fixture": "work4_adapter_request.json",
+    "scope": "Original synthetic happy-path request, generated using approved Work3 module",
+    "output_fixture": "work4_adapter_output.json",
+    "output_semantics": "Original synthetic no-action V82 wire output; not engine-produced"
+  },
+  {
+    "source_archive_path": "tools/qa_work5_v75_integration.py",
+    "source_sha256": "cc43356a52b0e97b172df084f8e5b9476b57d9c7773e5cb63e7d22b7bf9640ba",
+    "fixture": "work5_adapter_request.json",
+    "scope": "Original synthetic happy-path request, generated using approved Work3 module"
+  }
+]

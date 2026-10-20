@@ -1,22 +1,22 @@
 {
   "contract_version": "2.2.1",
-  "status": "IN_PROGRESS_WITH_DEPENDENCY_GAP",
+  "status": "IN_PROGRESS",
   "release": "RELEASED",
-  "implementation_completed": 1,
+  "implementation_completed": 5,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "中PM提供9份指定Frozen schema原件/核定來源；同一W5小PM續作原生adapter與Family調度。現有程式接線持續累積。",
+  "next_action": "同一W5小PM接續06～08家人/目標/資金映射與09～18整線工作；中PM協調既有確認Target與technical來源定位。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-start",
+    "backup_ref": "backup/w5-20261020-schema-intake",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
-    "github_readback": "前輪24/24 exact content PASS；本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "73189334d951f9f1a32e3327a80b1cc5b14fa488",
+    "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
+    "previous_work_commit": "e60c2f4e1cd2d085eb0e2bc3f5d74d65873a4124",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -40,24 +40,48 @@
       ]
     },
     "W5-02": {
-      "status": "IN_PROGRESS",
-      "completed": "V82原生196項回歸PASS",
-      "remaining": "C8C9股票adapter完整正向案例"
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
     },
     "W5-03": {
-      "status": "IN_PROGRESS",
-      "completed": "V82原生196項回歸PASS",
-      "remaining": "C8C9股票adapter完整正向案例"
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
     },
     "W5-04": {
-      "status": "DEPENDENCY_GAP",
-      "completed": "V75原生155項回歸PASS",
-      "remaining": "C8C9 V75 adapter需要Frozen輸入與Work6 schema"
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
     },
     "W5-05": {
-      "status": "DEPENDENCY_GAP",
-      "completed": "V75原生155項回歸PASS",
-      "remaining": "C8C9 V75 adapter需要Frozen輸入與Work6 schema"
+      "status": "PASS",
+      "result": "REUSE_VERIFIED",
+      "core_modifications": 0,
+      "completed": "原生回歸與原adapter正向build/consume、錯owner及缺欄位拒絕通過；必要Frozen原件由W5載入層定位。",
+      "evidence": [
+        "evidence/regression_runs.json",
+        "evidence/frozen_intake_tests.log",
+        "tests/test_native_adapters.py"
+      ]
     },
     "W5-06": {
       "status": "IN_PROGRESS",
@@ -106,6 +130,33 @@
     }
   },
   "open_gaps": [
+    {
+      "id": "W5-TECHNICAL-SOURCE",
+      "owner": "Family中PM指定來源",
+      "impact": "W5-09實際家人技術輸入",
+      "requested_action": "指定既有技術producer或正式輸入快照路徑與版本，W3原feed維持原樣。"
+    },
+    {
+      "id": "W5-CONFIRMED-TARGET-SOURCE",
+      "owner": "Family中PM定位既有目標交付",
+      "impact": "四家人真實分析；不影響合成fixture功能測試",
+      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
+    }
+  ],
+  "recheck": {
+    "date": "2026-10-20",
+    "fixes": [
+      "Reject NULL client_id rows",
+      "Reject macro source mutation during read",
+      "Correct evidence paths and archive identifiers"
+    ],
+    "w5_tests": 29,
+    "component_total": 398,
+    "previous_component_tests_reused": 369,
+    "whole_line": "NOT_RUN",
+    "evidence": "evidence/recheck.json"
+  },
+  "resolved_gaps": [
     {
       "id": "W5-C8C9-FROZEN-SCHEMAS",
       "owner": "Family中PM協調C8C9來源",
@@ -166,32 +217,23 @@
         }
       ],
       "impact": "W5-04/05/07/15/16/18完整驗收受影響",
-      "requested_action": "提供同版本Frozen原件及hash/准讀路徑；或具名核定對等schema來源與最小接線修正。保留原schema驗證。"
-    },
-    {
-      "id": "W5-TECHNICAL-SOURCE",
-      "owner": "Family中PM指定來源",
-      "impact": "W5-09實際家人技術輸入",
-      "requested_action": "指定既有技術producer或正式輸入快照路徑與版本，W3原feed維持原樣。"
-    },
-    {
-      "id": "W5-CONFIRMED-TARGET-SOURCE",
-      "owner": "Family中PM定位既有目標交付",
-      "impact": "四家人真實分析；不影響合成fixture功能測試",
-      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
+      "requested_action": "提供同版本Frozen原件及hash/准讀路徑；或具名核定對等schema來源與最小接線修正。保留原schema驗證。",
+      "status": "RESOLVED",
+      "resolution": "Work21原件9/9 Manifest符合；W5載入層保留原schema驗證；26/26引用通過",
+      "evidence": [
+        "frozen_schema_lock.json",
+        "evidence/c8c9_dependencies_restored.json",
+        "evidence/frozen_intake_tests.log"
+      ]
     }
   ],
-  "recheck": {
-    "date": "2026-10-20",
-    "fixes": [
-      "Reject NULL client_id rows",
-      "Reject macro source mutation during read",
-      "Correct evidence paths and archive identifiers"
-    ],
-    "w5_tests": 29,
-    "component_total": 398,
-    "previous_component_tests_reused": 369,
-    "whole_line": "NOT_RUN",
-    "evidence": "evidence/recheck.json"
+  "schema_intake": {
+    "files": 9,
+    "manifest_matches": 9,
+    "schema_references_valid": 26,
+    "w5_tests_pass": 39,
+    "component_total": 408,
+    "fixture_semantics": "原Work21合成adapter案例；V75使用明示no-action決策fixture，真實策略調度由後續15棒完成",
+    "source_zip": "1GQHdYPwxFKZBFM1GbTAsTDXA48FYxrmA"
   }
 }

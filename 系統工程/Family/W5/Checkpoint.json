@@ -11,12 +11,12 @@
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261021-bond-target-mentor",
+    "backup_ref": "backup/w5-20261021-v70-run-binding",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "1aae4a65b775ed072335d50a3f84627ad795c48e",
+    "previous_work_commit": "759efeb847752f1e7f2a3d46e37f50a8579dfe33",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線228 PASS、1 strict XFAIL；新增18項債券目標/Mentor/精確序列化測試，90來源hash PASS。完整Family Work9仍待目標單位及正式來源驗收。",
+  "validation_scope": "本線241 PASS、1 strict XFAIL；新增13項V70原批次/Family envelope/風險零上限/快取來源重驗。90來源hash PASS。完整Family仍待來源與接口驗收。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -128,13 +128,14 @@
     },
     "W5-10": {
       "status": "IN_PROGRESS",
-      "completed": "原Work4→V82資金/Core/Deployment；V70上限實際限制買入，EXCEEDS_CAP/Hard Gate/零預算測試通過。",
-      "remaining": "Family邊界調度、正式來源與不同source_run正式binding尚待完整驗收。",
+      "completed": "原Work4→V82資金/Core/Deployment；V70上限實際限制買入，EXCEEDS_CAP/Hard Gate/零預算測試通過。 已完成不同V70 source_run原件保留及Family envelope，實際股債風險歸零驗證。",
+      "remaining": "正式具名資料來源、C7完整語意及Family整線驗收續作。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
         "evidence/stock_sgov_tests.log",
         "SOURCE_MAPPING_STATUS.md",
-        "evidence/funding_macro_bond_tests.log"
+        "evidence/funding_macro_bond_tests.log",
+        "evidence/v70_run_binding_tests.log"
       ]
     },
     "W5-11": {
@@ -148,13 +149,14 @@
     },
     "W5-12": {
       "status": "IN_PROGRESS",
-      "completed": "原V75真計算已接同源V70 cap及EXCEEDS_CAP零上限；原預算與未部署contribution守恆。",
-      "remaining": "正式市場來源、Family調度及完整邊界驗收待續。",
+      "completed": "原V75真計算已接同源V70 cap及EXCEEDS_CAP零上限；原預算與未部署contribution守恆。 已完成不同V70 source_run原件保留及Family envelope，實際股債風險歸零驗證。",
+      "remaining": "正式具名資料來源、C7完整語意及Family整線驗收續作。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
         "evidence/stock_sgov_tests.log",
         "SOURCE_MAPPING_STATUS.md",
-        "evidence/funding_macro_bond_tests.log"
+        "evidence/funding_macro_bond_tests.log",
+        "evidence/v70_run_binding_tests.log"
       ]
     },
     "W5-13": {
@@ -207,7 +209,7 @@
     },
     "W5-17": {
       "status": "IN_PROGRESS",
-      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。",
+      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。 V70來源版本改變後快取重送拒絕，避免舊來源結果發布。",
       "remaining": "接完整15/16真結果、部分完成重算與W7接口驗收；不是正式持久化。",
       "evidence": [
         "tests/test_recovery_bridge.py",
@@ -555,6 +557,32 @@
       "Work8 target money/weight interface",
       "Cross-account split / FX and named sources",
       "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "v70_run_binding": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 241,
+      "w5_xfail": 1,
+      "added": 13
+    },
+    "completed": [
+      "Original V70 context/run/digest preserved; versioned Family same-run envelope",
+      "Both engine contexts and V75 snapshot equal projection",
+      "Operator provenance/owner/version/future-data/quality checks",
+      "Different upstream run actual stock450/bond350; EXCEEDS_CAP zero/zero",
+      "Current source version revalidated before cached replay"
+    ],
+    "evidence": [
+      "v70_source_bridge.py",
+      "tests/test_v70_source_bridge.py",
+      "evidence/v70_run_binding_tests.log"
+    ],
+    "remaining": [
+      "Named formal V70 producer and technical/price/Target sources",
+      "C7 full framework semantic validation",
+      "Work8 target unit and bond client action interfaces",
+      "Full Family/Mentor and final deployment"
     ]
   }
 }

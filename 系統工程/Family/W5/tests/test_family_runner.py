@@ -137,6 +137,11 @@ def runner_case():
             'as_of':bundle['physical_sgov']['as_of'],'source_reference':'SYNTHETIC_SPSB_QUOTE'}},
         'portfolio_nav':{'value':'1000','currency':'USD','state':'KNOWN','as_of':when,'source_reference':'SYNTHETIC_C_NAV'}}
     req['valuation_digest']=digest(ctx['valuation_source'])
+    ctx['v70_source']={'schema_version':'Family.W5.V70Source.v1','producer':'SYNTHETIC_V70',
+        'version':'1','source_reference':'SYNTHETIC_TACTICAL_RESULT',
+        'client_id':req['client_id'],'family_owner':deepcopy(req['owner']),
+        'context':deepcopy(w3['v70_runtime_context'])}
+    req['v70_source_digest']=digest(ctx['v70_source'])
     ctx['native_binding']['request_digest']=digest(req)
     return req,ctx
 

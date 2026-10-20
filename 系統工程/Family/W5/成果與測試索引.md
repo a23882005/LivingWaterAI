@@ -1,3 +1,13 @@
+## 2026-10-21 V70不同來源批次與Family重送綁定（仍8/18）
+
+新增v70_source_bridge.py，保留上游原context/payload/run_id及digest；project_v70_context建立本輪分析envelope，僅映射外層與payload的run_id，原金額、issue_codes、quality、snapshot/time/lineage保持。兩支線handoff及V75 snapshot逐欄比對，接原tactical_cap。W3 ready feed仍僅供原始總經來源，戰術額度由明確V70結果提供。
+
+operator trusted_context新增v70_source：schema_version=Family.W5.V70Source.v1、producer、version、source_reference、client_id、family_owner與context（原V70 runtime context）。request新增v70_source_digest，納入既有請求digest；來源版本變更後，原W2 staging快取重送會重新核對並拒絕舊請求。輸出保留source_run_id、analysis_run_id、original_source、projected_context與股債上限。
+
+本線241 PASS、1 strict XFAIL，90來源hash PASS。新增13項：不同upstream run實際執行V82/V75，正常450/350，EXCEEDS_CAP時0/0；原上游資料保持；缺來源、版本/owner/批次/時間/額度/品質/副本不符及快取重驗。證據見tests/test_v70_source_bridge.py與evidence/v70_run_binding_tests.log。
+
+本輪完成來源批次映射的本線接線；具名正式V70 producer、完整technical/報價/確認Target及C7全框架仍依既有交接定位。Family中PM裁定Work8金額/權重與V75客戶保護動作接口；W5依核定續接完整Family/Mentor。Production HOLD、交易NONE；備份backup/w5-20261021-v70-run-binding，commit/Actions/雙端讀回見累計ZIP RELEASE_RECEIPT.json。
+
 ## 2026-10-21 債券目標與Mentor來源接線（仍8/18）
 
 bond_target_bridge逐檔核W2確認target_amount、明確target_instrument_id別名、ticker、同帳戶/同幣別，並核W1確認holding policy與C7 protected標記；UNKNOWN/未確認/缺對應停止調度。目標與當期資金分開：合成歷史目標SGOV5600、SPSB2400，當期bond budget350，原V75實際縮放運算。

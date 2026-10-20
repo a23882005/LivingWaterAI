@@ -20,6 +20,7 @@ from funding_bridge import bind_funding_source
 from position_source_bridge import bind_position_values,bind_stock_protection
 from target_source_bridge import bind_target_source
 from bond_target_bridge import bind_bond_targets
+from v70_source_bridge import bind_v70_source
 
 
 class FamilyRunner:
@@ -63,6 +64,7 @@ class FamilyRunner:
         prepared.payload['family_sources']['protection']=bind_stock_protection(request,prepared,ctx,values)
         prepared.payload['family_sources']['target']=bind_target_source(request)
         prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding)
+        prepared.payload['family_sources']['v70']=bind_v70_source(request,ctx)
         return prepared,ctx
 
     def _compute(self,request):

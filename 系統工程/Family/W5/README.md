@@ -72,3 +72,7 @@ W5_TRUSTED_CONTEXT=/operator/context.json python 系統工程/Family/W5/run_anal
 request沿用Family.W5.request.v1並加入native_bundle。受控provider的native_binding含schema_version=Family.W5.NativeBinding.v1、request_digest、bundle_digest、target_binding_digest、family_owner、native_owner、data_provenance及source_reference；對應的是已審核輸入。逐欄正式來源映射仍依Checkpoint續作，此digest驗證本身不替代語意核對。CLI不從request自動建立這份binding。
 
 確認紀錄ID與配置ID分別保留為target_record_id及allocation_id，後者取原W2 draft.allocation_id。歷史確認payload/hash不改動。新入口已實際呼叫股債pipeline到既有Work8目標單位問題；完整Work9正向仍列待修。四庫歷史CLI讀取結果於私有ZIP的private_runner/，去識別摘要於evidence/runner_private_checks.json。
+
+### V70原批次與本輪分析的來源上下文
+
+operator提供`trusted_context.v70_source`，欄位與來源規格見`SOURCE_MAPPING_STATUS.md`最新段落。`v70_source.context`保存上游原件，`project_v70_context(original, analysis_run_id)`返回供原C8C9同run介面消費的深拷貝；兩份handoff與V75 snapshot必須使用同一投影。請求須附`v70_source_digest`。FamilyRunner每次驗證含快取命中與發布前，均重讀operator上下文並核對。原來源版本、品質、金額與風險碼不由W5重算。

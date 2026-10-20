@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/20 06:30｜版本：V70-3-27 build adapter v3.8（固定七張季度研究圖）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/20 08:20｜版本：V70-3-27 build adapter v3.9（12 張季度研究圖、總覽與完整數值表）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import csv

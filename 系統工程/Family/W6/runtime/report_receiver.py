@@ -73,7 +73,12 @@ def assemble(snapshot, request, result, *, client_id, members, sections=None, ev
         elif isinstance(obj, list):
             for value in obj:
                 check_identity(value)
-    for source in (snapshot, request, result):
+    # W5 retains upstream demonstration identities inside native_result as
+    # provenance. It is not a Family envelope and is never copied into the view.
+    # The Family result/mentor are checked here; receive_action verifies the
+    # request digest, canonical digest and native account owner separately.
+    family_result = {k: v for k, v in result.items() if k != 'native_result'}
+    for source in (snapshot, request, family_result):
         check_identity(source)
     tables = snapshot['tables']
     accounts = {r['account_key']: r for r in tables.get('portfolio_account', [])}

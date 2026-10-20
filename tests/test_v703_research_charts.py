@@ -70,6 +70,7 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("後三個月報酬尚未成熟，保留 NA", rendered)
         self.assertNotIn("五家機構偏多／偏空與動能上修／下修家數</h3>", rendered)
         self.assertNotIn(">後三個月取價交易日</th>", rendered)
+        self.assertNotIn(">三個月目標日</th>", rendered)
         self.assertNotIn(">報酬成熟狀態</th>", rendered)
         self.assertIn('position:sticky;left:0;z-index:30;box-sizing:border-box;width:8rem;min-width:8rem;max-width:8rem;background-color:#1e293b;white-space:normal', rendered)
         self.assertIn('position:sticky;left:8rem;z-index:30;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#1e293b;white-space:normal', rendered)

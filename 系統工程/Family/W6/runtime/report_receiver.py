@@ -49,7 +49,7 @@ def input_digest(request):
     return hashlib.sha256(json.dumps(wire,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 
 
-def assemble(snapshot, request, result, *, client_id, members):
+def assemble(snapshot, request, result, *, client_id, members, sections=None, events=None):
     require(client_id in members, 'MEMBER_NOT_ALLOWED')
     require(snapshot.get('schema_version') == 'Family.W5.W1Snapshot.v1', 'SNAPSHOT_SCHEMA')
     require(request.get('schema_version') == 'Family.W5.request.v1', 'REQUEST_SCHEMA')
@@ -98,11 +98,17 @@ def assemble(snapshot, request, result, *, client_id, members):
         require(key not in cash_seen, 'DUPLICATE_CASH_SNAPSHOT')
         cash_seen.add(key)
     action = receive_action(result, request)
+    from source_views import canonical_section, cash_history_view, history_view
+    sections = sections or {}
+    canonical = {name: canonical_section(sections.get(name), client_id=client_id, run_id=request['run_id'], section=name) for name in ('target','drift','performance','risk','look_through','valuation','funding')}
+    history = history_view(events or [], client_id)
+    cash = cash_history_view(snapshot)
     return {'schema_version': 'Family.W6.ReportView.v1', 'client_id': client_id,
             'member_alias': members[client_id], 'run_id': request['run_id'],
             'evaluation_at': request['evaluation_at'], 'mode': 'HISTORICAL_SOURCE_REVIEW',
             'holdings': sorted(holdings, key=lambda x: (x['position']['account_key'], x['position']['instrument_key'])),
             'source_tables': deepcopy(tables), 'engine': action,
+            'canonical_sections': canonical, 'history': history, 'history_state': 'UNKNOWN' if events is None else 'PROVIDED', 'cash_history': cash,
             'source_hashes': {k: digest(v) for k, v in [('snapshot', snapshot), ('request', request), ('result', result)]},
             'formal_output_eligible': False, 'production': 'HOLD', 'trade_authorization': 'NONE'}
 
@@ -152,5 +158,5 @@ def render_review(view):
         '<h1>' + e(view['member_alias']) + ' 歷史來源接收核對</h1><p>' + e(view['evaluation_at']) +
         '；歷史資料，非目前持股或交易建議。</p><div class="scroll"><table><tr><th>來源帳戶</th><th>標的</th><th>股數</th>'
         '<th>成本狀態</th><th>持股日期</th></tr>' + rows + '</table></div><h2>引擎結果</h2><p>' +
-        e(view['engine']['display']) + '</p><pre>' + e(json.dumps(view['engine'],ensure_ascii=False,indent=2)) +
+        e(view['engine']['display']) + '</p><h2>來源與資金狀態</h2><p>未提供的成本、績效、穿透、確認目標及可用資金，以UNKNOWN保留。</p><details><summary>檢視原始來源狀態</summary><pre>' + e(json.dumps({'canonical_sections':view['canonical_sections'],'cash_history':view['cash_history'],'history':view['history'],'history_state':view['history_state']},ensure_ascii=False,indent=2)) + '</pre></details><h2>引擎原始回覆</h2><pre>' + e(json.dumps(view['engine'],ensure_ascii=False,indent=2)) +
         '</pre><p>現金各日期快照分別保存，未相加；缺值不是0。Production HOLD；交易NONE。</p></html>')

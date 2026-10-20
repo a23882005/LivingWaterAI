@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/20 08:37（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
+# 最後修改日期時間：2026/10/20 08:54（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
 """Regression tests for V70-3-27 macro-health UI preparation.
 
 Run: python -m unittest tests/test_v703_outlook_ui.py -v
@@ -72,8 +72,8 @@ class V703OutlookUITest(unittest.TestCase):
         panel = re.search(r'<details id="v703-raw-data-panel".*?</details>', s, re.S)
         self.assertIsNotNone(panel)
         markup = panel.group(0)
-        self.assertEqual(re.findall(r'<th class="p-2">([^<]+)</th>', markup), [
-            "指標", "數值", "日期", "狀態"
+        self.assertEqual(re.findall(r'<th class="border border-slate-700 p-2">([^<]+)</th>', markup), [
+            "指標（程式變數）", "數值", "日期", "狀態"
         ])
         self.assertIn('colspan="4"', markup)
         renderer = re.search(r'<script id="v703-render-raw-data">(.*?)</script>', s, re.S)
@@ -91,6 +91,19 @@ class V703OutlookUITest(unittest.TestCase):
         for state in ("正常", "過期", "缺資料"):
             self.assertIn(state, renderer.group(1))
         self.assertIn("指標狀態：正常 ", renderer.group(1))
+
+    def test_raw_data_table_shows_program_variable_names_with_full_grid(self):
+        s = self.source
+        self.assertTrue(s.startswith("<!DOCTYPE html>"))
+        panel = re.search(r'<details id="v703-raw-data-panel".*?</details>', s, re.S)
+        self.assertIsNotNone(panel)
+        markup = panel.group(0)
+        self.assertIn('border-collapse border border-slate-700', markup)
+        self.assertGreaterEqual(markup.count('class="border border-slate-700 p-2"'), 4)
+        renderer = re.search(r'<script id="v703-render-raw-data">(.*?)</script>', s, re.S)
+        self.assertIsNotNone(renderer)
+        self.assertIn("id+'｜'+(labels[id]||'其他指標')", renderer.group(1))
+        self.assertIn("td.className='border border-slate-700 p-2'", renderer.group(1))
 
     def test_html_document_and_unique_ids(self):
         s = self.source

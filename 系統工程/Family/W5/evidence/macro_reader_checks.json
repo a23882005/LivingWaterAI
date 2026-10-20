@@ -1,0 +1,9 @@
+{
+  "digest": "2479999ac52eb0ceaba436e7148389dbc544e93eae6b4b1865e5849c3a6097ea",
+  "asOf": "2026-10-20T03:23:03.720004Z",
+  "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+  "source_path": "系統工程/總經V70/V70_macro_latest.json",
+  "source_sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
+  "reader_sha256": "982ba8cf638296474035f9b8cd6757016232d9bb9790c2f8fcd32a0627332492",
+  "data_provenance": "SOURCE_BACKED"
+}

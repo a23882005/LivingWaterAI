@@ -1,0 +1,258 @@
+{
+  "gate": "A78_W08_DEPLOYMENT_EXECUTION_GATE",
+  "passed": 50,
+  "total": 50,
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "MODE_TREND_PRIORITY",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "MODE_RUNAWAY_UNKNOWN_FAIL_CLOSED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "MODE_RIGHT",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "MODE_RIGHT_UNKNOWN",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "MODE_LEFT",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "MODE_BASE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "BASE_STAGE1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "RIGHT_STAGE8",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LEFT_STAGE2",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LEFT_STAGE7",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LEFT_STAGE_REQUIRED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LEFT_NO_STAGE8",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "TREND_EXPLICIT_STAGE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "TREND_NOT_FORCED_STAGE9",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "UNKNOWN_STAGE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "TARGET_AMOUNT",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "CONFIRMED_AMOUNT",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "ACTIVE_BUY_REMAINING",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "CANCEL_PENDING_STILL_ACTIVE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "PROJECTED_POSITION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "FINAL_GAP",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "ACTUAL_COMPLETION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "PROJECTED_COMPLETION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "DUP_ORDER_ID",
+      "pass": true,
+      "detail": "DUPLICATE_ORDER_INTENT_ID"
+    },
+    {
+      "id": "FILLED_GT_QTY",
+      "pass": true,
+      "detail": "ORDER_STATE_CONFLICT"
+    },
+    {
+      "id": "NEG_PROJECTED",
+      "pass": true,
+      "detail": "INVALID_EXECUTION_STATE_RECONCILIATION_REQUIRED"
+    },
+    {
+      "id": "ZERO_DENOM_UNKNOWN_COMPLETION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "TARGET_RATE_GT_100_FAIL_CLOSED",
+      "pass": true,
+      "detail": "INVALID_REQUIRED_DEPLOYMENT_INPUT"
+    },
+    {
+      "id": "BUY_ACTION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "CAP_MIN",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "QTY_FLOOR",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "NOTIONAL",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "NO_OVERRUN",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "ORDER_PLAN_CONSISTENCY",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "POST_FILL_COMPLETION",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "PERMISSION_BLOCK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "T1_BLOCK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "RECON_BLOCK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "CAP_UNKNOWN_FAIL_CLOSED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "TICK_ADAPTER_REQUIRED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "INTENT_ID_REQUIRED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "RESIDUAL_NOT_ZEROED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "CURRENCY_MISMATCH_FAIL_CLOSED",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_START",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_OPEN",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_PARTIAL",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_CANCEL_PENDING_FILL",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_REPLACE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_TERMINAL_NO_BACK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "id": "LIFE_NO_SKIP_START",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

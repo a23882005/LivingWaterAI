@@ -1,0 +1,176 @@
+{
+  "contract_version": "2.2.1",
+  "status": "IN_PROGRESS_WITH_DEPENDENCY_GAP",
+  "release": "RELEASED",
+  "implementation_completed": 1,
+  "total_tracking_items": 18,
+  "executor": "同一位W5小PM持續施工",
+  "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+  "next_owner": "同一位W5小PM",
+  "next_action": "中PM提供9份指定Frozen schema原件/核定來源；同一W5小PM續作原生adapter與Family調度。現有程式接線持續累積。",
+  "deployment": {
+    "github": "WORK_BRANCH_PENDING_UPLOAD",
+    "drive": "STAGING_PENDING_UPLOAD",
+    "backup_ref": "backup/w5-20261020-start",
+    "main_unchanged": true,
+    "actions": "NOT_RUN",
+    "dual_deploy": "NOT_VERIFIED"
+  },
+  "validation_scope": "W3讀取器10項接收檢查PASS、GitHub/Drive逐位元組一致；W5引擎整合測試仍未執行",
+  "w3_reader_acceptance": "PASS",
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "w5_major_gate": "NOT_SUBMITTED",
+  "work_items": {
+    "W5-01": {
+      "status": "PASS",
+      "scope": "基線接手、既有引擎入口與缺口定位；後續整合另驗",
+      "evidence": [
+        "regression_runs.json",
+        "c8c9_dependencies.json",
+        "schema_failure_reproduction.json"
+      ]
+    },
+    "W5-02": {
+      "status": "IN_PROGRESS",
+      "completed": "V82原生196項回歸PASS",
+      "remaining": "C8C9股票adapter完整正向案例"
+    },
+    "W5-03": {
+      "status": "IN_PROGRESS",
+      "completed": "V82原生196項回歸PASS",
+      "remaining": "C8C9股票adapter完整正向案例"
+    },
+    "W5-04": {
+      "status": "DEPENDENCY_GAP",
+      "completed": "V75原生155項回歸PASS",
+      "remaining": "C8C9 V75 adapter需要Frozen輸入與Work6 schema"
+    },
+    "W5-05": {
+      "status": "DEPENDENCY_GAP",
+      "completed": "V75原生155項回歸PASS",
+      "remaining": "C8C9 V75 adapter需要Frozen輸入與Work6 schema"
+    },
+    "W5-06": {
+      "status": "IN_PROGRESS",
+      "completed": "四庫唯讀snapshot、client隔離實測",
+      "remaining": "owner/target/引擎typed request完整映射"
+    },
+    "W5-07": {
+      "status": "PENDING"
+    },
+    "W5-08": {
+      "status": "IN_PROGRESS",
+      "completed": "精確合計守恆20項測試PASS",
+      "remaining": "接C7預算與真引擎占用"
+    },
+    "W5-09": {
+      "status": "IN_PROGRESS",
+      "completed": "P70-5原feed完整讀取",
+      "remaining": "中PM指定具名technical producer/input快照；准讀清單未含該來源"
+    },
+    "W5-10": {
+      "status": "PENDING"
+    },
+    "W5-11": {
+      "status": "PENDING"
+    },
+    "W5-12": {
+      "status": "PENDING"
+    },
+    "W5-13": {
+      "status": "PENDING"
+    },
+    "W5-14": {
+      "status": "PENDING"
+    },
+    "W5-15": {
+      "status": "PENDING"
+    },
+    "W5-16": {
+      "status": "PENDING"
+    },
+    "W5-17": {
+      "status": "PENDING"
+    },
+    "W5-18": {
+      "status": "PENDING"
+    }
+  },
+  "open_gaps": [
+    {
+      "id": "W5-C8C9-FROZEN-SCHEMAS",
+      "owner": "Family中PM協調C8C9來源",
+      "files": [
+        {
+          "work": 5,
+          "constant": "FROZEN_V75_INPUT_SCHEMA_FILENAME",
+          "filename": "C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 5,
+          "constant": "FROZEN_V75_W6_SCHEMA_FILENAME",
+          "filename": "C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 6,
+          "constant": "_C7_SCHEMA",
+          "filename": "C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 8,
+          "constant": "_C7_SCHEMA",
+          "filename": "C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK4_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK5_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK6_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK7_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        },
+        {
+          "work": 9,
+          "constant": "_WORK8_SCHEMA",
+          "filename": "C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+          "status": "DEPENDENCY_MISSING"
+        }
+      ],
+      "impact": "W5-04/05/07/15/16/18完整驗收受影響",
+      "requested_action": "提供同版本Frozen原件及hash/准讀路徑；或具名核定對等schema來源與最小接線修正。保留原schema驗證。"
+    },
+    {
+      "id": "W5-TECHNICAL-SOURCE",
+      "owner": "Family中PM指定來源",
+      "impact": "W5-09實際家人技術輸入",
+      "requested_action": "指定既有技術producer或正式輸入快照路徑與版本，W3原feed維持原樣。"
+    },
+    {
+      "id": "W5-CONFIRMED-TARGET-SOURCE",
+      "owner": "Family中PM定位既有目標交付",
+      "impact": "四家人真實分析；不影響合成fixture功能測試",
+      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
+    }
+  ]
+}

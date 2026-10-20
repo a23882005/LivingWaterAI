@@ -1,0 +1,7 @@
+source,table_or_file,fields,destination,conversion
+W1,portfolio_account,client_id/account_key/account_currency/account_state,client_snapshot.tables.portfolio_account,原欄保留，UNKNOWN不補值
+W1,portfolio_position,quantity_decimal/as_of_utc/cost_state,client_snapshot.tables.portfolio_position,Decimal文字與來源保留，不跨時點加總
+W1,cash_balance_snapshot,reported_cash_minor/reported_cash_basis/data_state,client_snapshot.tables.cash_balance_snapshot,原minor unit保留；AVAILABLE未提供不推導
+W1,final_target_version,version_no/lifecycle_state/confirmation_source_ref,client_snapshot.tables.final_target_version,保留原表，未確認不推定確認
+W1,sgov_role_proposal,role_state/dry_powder_bps/bond_core_bps,client_snapshot.tables.sgov_role_proposal,原角色及未知狀態保留
+W3,V70_macro_latest.json,"/schema,/asOf,/verification,/indicators",macro_snapshot.payload,原feed完整字典，不轉成客戶NAV或預算

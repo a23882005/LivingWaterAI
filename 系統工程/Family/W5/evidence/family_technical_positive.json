@@ -1,0 +1,759 @@
+{
+  "data_provenance": "SYNTHETIC",
+  "status": "OK",
+  "scope": "APPROVED_ENGINEERING_COMPLETE_INPUTS",
+  "expected": {
+    "equity_used": "0",
+    "bond_used": "160.00",
+    "available_remaining": "640.00"
+  },
+  "actual": {
+    "owner": {
+      "client_id": "qa-client",
+      "funding_domain": "INVESTMENT_1",
+      "broker": "BROKER_1",
+      "account": "ACCOUNT_1",
+      "currency": "USD"
+    },
+    "run_id": "qa-run-3",
+    "equity_used": "0",
+    "bond_used": "160.00",
+    "available_remaining": "640.00",
+    "trade_action": "NO_TRADE"
+  },
+  "call_trace": [
+    "C.Work7.run_asset_framework_integration",
+    "W5.synthetic_history",
+    "W5.build_partial_technical",
+    "V82.evaluate_technical",
+    "C8C9.Work4.build_v82_runtime_input",
+    "V82.validate_and_bind_funding",
+    "W5.tactical_cap",
+    "V82.evaluate_core_rule_state",
+    "V82.select_deployment_mode",
+    "V82.resolve_deployment_stage",
+    "V82.calculate_position_gap",
+    "V82.build_buy_execution_plan",
+    "C8C9.Work5.build_v75_runtime_input",
+    "V75.validate_v75_run_input",
+    "V75.build_work3_state",
+    "V75.predicates.PRED-001..010:SGOV",
+    "V75.evaluate_step10:SGOV",
+    "V75.build_decision:SGOV",
+    "V75.predicates.PRED-001..010:SPSB",
+    "V75.evaluate_step10:SPSB",
+    "V75.build_decision:SPSB",
+    "V75.proportional_scale_decisions",
+    "V75.calculate_v75_undeployed_to_sgov",
+    "V75.assemble_final_snapshot",
+    "V75.evaluate_runtime_ready",
+    "C8C9.Work5.consume_v75_runtime_ready",
+    "W5.reconcile_funding:Family_owner_actual_native_claims",
+    "C8C9.Work6.validate_funding_account_isolation",
+    "W5.check_aggregate:actual_native_claims",
+    "C8C9.Work7.validate_sgov_runtime_roles",
+    "W5.reconcile_sgov",
+    "C8C9.Work8.protect_client_action",
+    "C8C9.Work9.build_unified_deployment"
+  ],
+  "technical_intake": {
+    "schema_version": "Family.W5.PartialTechnical.v1",
+    "status": "PARTIAL_KNOWN",
+    "evaluation_mode": "SNAPSHOT_AFTER_ACQUISITION",
+    "snapshot_available_at": "2026-04-01T00:01:00+00:00",
+    "historical_pit_verified": false,
+    "history_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+    "evaluated_at": "2026-10-20T12:00:00Z",
+    "completed_bar_count": 65,
+    "sample_state": "COMPLETE",
+    "td9": {
+      "state": "COMPLETED",
+      "high_count": 9,
+      "low_count": 0,
+      "events": [
+        {
+          "side": "HIGH",
+          "session": "2026-01-13",
+          "available_at": "2026-04-01T00:01:00+00:00"
+        }
+      ],
+      "reason": "ORIGINAL_TD9_13_CONTIGUOUS_SESSIONS"
+    },
+    "swings": {
+      "lows": [
+        {
+          "asset_id": "QQQ",
+          "index": 6,
+          "value": 99.8,
+          "pivot_session": "2026-01-07",
+          "confirmation_session": "2026-01-09",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 12,
+          "value": 101.6,
+          "pivot_session": "2026-01-13",
+          "confirmation_session": "2026-01-15",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 18,
+          "value": 103.4,
+          "pivot_session": "2026-01-19",
+          "confirmation_session": "2026-01-21",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 24,
+          "value": 105.2,
+          "pivot_session": "2026-01-25",
+          "confirmation_session": "2026-01-27",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 30,
+          "value": 107.0,
+          "pivot_session": "2026-01-31",
+          "confirmation_session": "2026-02-02",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 36,
+          "value": 108.8,
+          "pivot_session": "2026-02-06",
+          "confirmation_session": "2026-02-08",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 42,
+          "value": 110.6,
+          "pivot_session": "2026-02-12",
+          "confirmation_session": "2026-02-14",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 48,
+          "value": 112.4,
+          "pivot_session": "2026-02-18",
+          "confirmation_session": "2026-02-20",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 54,
+          "value": 114.2,
+          "pivot_session": "2026-02-24",
+          "confirmation_session": "2026-02-26",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 60,
+          "value": 116.0,
+          "pivot_session": "2026-03-02",
+          "confirmation_session": "2026-03-04",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        }
+      ],
+      "highs": [
+        {
+          "asset_id": "QQQ",
+          "index": 5,
+          "value": 104.5,
+          "pivot_session": "2026-01-06",
+          "confirmation_session": "2026-01-08",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 11,
+          "value": 106.3,
+          "pivot_session": "2026-01-12",
+          "confirmation_session": "2026-01-14",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 17,
+          "value": 108.1,
+          "pivot_session": "2026-01-18",
+          "confirmation_session": "2026-01-20",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 23,
+          "value": 109.9,
+          "pivot_session": "2026-01-24",
+          "confirmation_session": "2026-01-26",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 29,
+          "value": 111.7,
+          "pivot_session": "2026-01-30",
+          "confirmation_session": "2026-02-01",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 35,
+          "value": 113.5,
+          "pivot_session": "2026-02-05",
+          "confirmation_session": "2026-02-07",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 41,
+          "value": 115.3,
+          "pivot_session": "2026-02-11",
+          "confirmation_session": "2026-02-13",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 47,
+          "value": 117.1,
+          "pivot_session": "2026-02-17",
+          "confirmation_session": "2026-02-19",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 53,
+          "value": 118.9,
+          "pivot_session": "2026-02-23",
+          "confirmation_session": "2026-02-25",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        },
+        {
+          "asset_id": "QQQ",
+          "index": 59,
+          "value": 120.7,
+          "pivot_session": "2026-03-01",
+          "confirmation_session": "2026-03-03",
+          "confirmed_at": "2026-04-01T00:01:00+00:00",
+          "source_available_at": "2026-04-01T00:01:00+00:00"
+        }
+      ],
+      "state": "PARTIAL_KNOWN",
+      "pending_tail_sessions": [
+        "2026-03-05",
+        "2026-03-06"
+      ]
+    },
+    "raw_numeric": {
+      "current": {
+        "high_td9_setup": 9,
+        "low_td9_setup": 0,
+        "kd_k_9_3": 70.588235,
+        "kd_d_9_3_3": 68.255405,
+        "macd_12_26": 2.090478,
+        "macd_signal_9": 2.062811,
+        "macd_histogram": 0.027667,
+        "ma5": 119.0,
+        "ma10": 118.35,
+        "ma20": 116.87,
+        "ma50": 112.358,
+        "ma60": 110.85,
+        "ma200": null,
+        "emv_14": 1242.538896,
+        "rsi14": 80.661491,
+        "atr14": 4.0,
+        "volume_ratio_5": 1.001883,
+        "volume_ratio_20": 1.009009,
+        "volume_ratio_50": 1.023569
+      },
+      "previous": {
+        "high_td9_setup": 9,
+        "low_td9_setup": 0,
+        "kd_k_9_3": 69.110106,
+        "kd_d_9_3_3": 66.415284,
+        "macd_12_26": 2.061446,
+        "macd_signal_9": 2.055894,
+        "macd_histogram": 0.005552,
+        "ma5": 118.74,
+        "ma10": 117.97,
+        "ma20": 116.55,
+        "ma50": 112.05,
+        "ma60": 110.55,
+        "ma200": null,
+        "emv_14": 1244.329086,
+        "rsi14": 79.262054,
+        "atr14": 4.0,
+        "volume_ratio_5": 1.001885,
+        "volume_ratio_20": 1.009018,
+        "volume_ratio_50": 1.023592
+      }
+    },
+    "base_facts": {
+      "macd_cross_positive": false,
+      "above_ma20": true,
+      "reclaim_ma20": false
+    },
+    "signals": {
+      "right_signals": [
+        {
+          "name": "higher_low",
+          "truth": "TRUE",
+          "reason": "KNOWN_ORIGINAL_RULE",
+          "dependencies": [
+            "confirmed_lows[-2:]"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": "higher_low:2026-03-06"
+        },
+        {
+          "name": "kd_golden_cross",
+          "truth": "UNKNOWN",
+          "reason": "KD_SMOOTHING_NOT_APPROVED",
+          "dependencies": [
+            "original_source.kd_golden_cross"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "macd_bear_hist_shrinking_or_positive",
+          "truth": "UNKNOWN",
+          "reason": "EVENT_VERSUS_STATE_PENDING",
+          "dependencies": [
+            "original_source.macd_bear_hist_shrinking_or_positive"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "dif_up",
+          "truth": "TRUE",
+          "reason": "KNOWN_ORIGINAL_RULE",
+          "dependencies": [
+            "DIF[t]",
+            "DIF[p]"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": "dif_up:2026-03-06"
+        },
+        {
+          "name": "emv_positive",
+          "truth": "UNKNOWN",
+          "reason": "EMV_3_3_SOURCE_AND_EVENT_SEMANTICS_PENDING",
+          "dependencies": [
+            "original_source.emv_positive"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "rsi_improving_or_near_50",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:rsi_improving_or_near_50",
+          "dependencies": [
+            "original_source.rsi_improving_or_near_50"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "above_ma20",
+          "truth": "UNKNOWN",
+          "reason": "ABOVE_VERSUS_RECLAIM_PENDING",
+          "dependencies": [
+            "original_source.above_ma20"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "volume_breakout",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:volume_breakout",
+          "dependencies": [
+            "original_source.volume_breakout"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "pressure_breakout",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:pressure_breakout",
+          "dependencies": [
+            "original_source.pressure_breakout"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "breakout_retest_success",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:breakout_retest_success",
+          "dependencies": [
+            "original_source.breakout_retest_success"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        }
+      ],
+      "up_price": [
+        {
+          "name": "new_20d_close_high",
+          "truth": "UNKNOWN",
+          "reason": "WINDOW_AND_TIE_RULE_PENDING",
+          "dependencies": [
+            "original_source.new_20d_close_high"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "break_confirmed_swing_high",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:break_confirmed_swing_high",
+          "dependencies": [
+            "original_source.break_confirmed_swing_high"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "higher_high_higher_low",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:higher_high_higher_low",
+          "dependencies": [
+            "original_source.higher_high_higher_low"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        }
+      ],
+      "up_confirm": [
+        {
+          "name": "kd_high_strong_not_breaking",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:kd_high_strong_not_breaking",
+          "dependencies": [
+            "original_source.kd_high_strong_not_breaking"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "macd_bull_hist_expanding",
+          "truth": "TRUE",
+          "reason": "KNOWN_ORIGINAL_RULE",
+          "dependencies": [
+            "H[p]",
+            "H[t]"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": "macd_bull_hist_expanding:2026-03-06"
+        },
+        {
+          "name": "ma5_gt_ma10_gt_ma20",
+          "truth": "TRUE",
+          "reason": "KNOWN_ORIGINAL_RULE",
+          "dependencies": [
+            "MA5[t]",
+            "MA10[t]",
+            "MA20[t]"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": "ma5_gt_ma10_gt_ma20:2026-03-06"
+        },
+        {
+          "name": "emv_positive_or_improving",
+          "truth": "UNKNOWN",
+          "reason": "EMV_3_3_SOURCE_REQUIRED",
+          "dependencies": [
+            "original_source.emv_positive_or_improving"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "price_volume_healthy",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:price_volume_healthy",
+          "dependencies": [
+            "original_source.price_volume_healthy"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "high_td9_then_new_high",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:high_td9_then_new_high",
+          "dependencies": [
+            "original_source.high_td9_then_new_high"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "rsi_high_no_divergence",
+          "truth": "UNKNOWN",
+          "reason": "COMPARABLE_SWING_PAIR_RULE_PENDING",
+          "dependencies": [
+            "original_source.rsi_high_no_divergence"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "eps_guidance_not_worse",
+          "truth": "UNKNOWN",
+          "reason": "FUNDAMENTAL_SOURCE_REQUIRED",
+          "dependencies": [
+            "original_source.eps_guidance_not_worse"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        }
+      ],
+      "down_break": [
+        {
+          "name": "keeps_breaking_lows",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:keeps_breaking_lows",
+          "dependencies": [
+            "original_source.keeps_breaking_lows"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "break_confirmed_swing_low",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:break_confirmed_swing_low",
+          "dependencies": [
+            "original_source.break_confirmed_swing_low"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "break_support_no_quick_reclaim",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:break_support_no_quick_reclaim",
+          "dependencies": [
+            "original_source.break_support_no_quick_reclaim"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        }
+      ],
+      "down_accel": [
+        {
+          "name": "macd_bear_hist_expanding",
+          "truth": "FALSE",
+          "reason": "KNOWN_ORIGINAL_RULE",
+          "dependencies": [
+            "H[p]",
+            "H[t]"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": "macd_bear_hist_expanding:2026-03-06"
+        },
+        {
+          "name": "kd_low_weak",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:kd_low_weak",
+          "dependencies": [
+            "original_source.kd_low_weak"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "emv_worsening",
+          "truth": "UNKNOWN",
+          "reason": "EMV_3_3_AND_DURATION_PENDING",
+          "dependencies": [
+            "original_source.emv_worsening"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "rsi_falling",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:rsi_falling",
+          "dependencies": [
+            "original_source.rsi_falling"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "price_down_volume_up",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:price_down_volume_up",
+          "dependencies": [
+            "original_source.price_down_volume_up"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "atr_expanding_fast",
+          "truth": "UNKNOWN",
+          "reason": "FAST_THRESHOLD_NOT_APPROVED",
+          "dependencies": [
+            "original_source.atr_expanding_fast"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "decline_accelerating",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:decline_accelerating",
+          "dependencies": [
+            "original_source.decline_accelerating"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        },
+        {
+          "name": "rebounds_weaker",
+          "truth": "UNKNOWN",
+          "reason": "NAMED_RULE_OR_SOURCE_REQUIRED:rebounds_weaker",
+          "dependencies": [
+            "original_source.rebounds_weaker"
+          ],
+          "source_digest": "303633174bb1e383bd54c0036a29bd7890b0a8aba5c2dd98b247783825b45cd9",
+          "sot_section": "W5-09 §4",
+          "event_id": null
+        }
+      ]
+    },
+    "ma20_ok": "UNKNOWN",
+    "native_technical_aggregation": {
+      "right_confirmation": "UNKNOWN",
+      "runaway_up": "UNKNOWN",
+      "runaway_down": "UNKNOWN"
+    },
+    "issue_codes": [],
+    "formal_producer_complete": false,
+    "execution_advice_allowed": false,
+    "trade_action": "NO_TRADE",
+    "data_provenance": "SYNTHETIC",
+    "source_reference": "SYNTHETIC_HISTORY",
+    "call_trace": [
+      "W5.synthetic_history",
+      "W5.build_partial_technical",
+      "V82.evaluate_technical"
+    ],
+    "synthetic_complete_predicates": {
+      "right_signals": [
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE",
+        "TRUE"
+      ],
+      "up_price": [
+        "FALSE",
+        "FALSE",
+        "FALSE"
+      ],
+      "up_confirm": [
+        "FALSE",
+        "TRUE",
+        "TRUE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE"
+      ],
+      "down_break": [
+        "FALSE",
+        "FALSE",
+        "FALSE"
+      ],
+      "down_accel": [
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE",
+        "FALSE"
+      ],
+      "ma20_ok": "TRUE"
+    },
+    "synthetic_fixture_scope": "ENGINEERING_ONLY_EXPLICIT_INPUTS_NOT_APPROVED_RULES"
+  },
+  "full_output_sha256": "c009e936e3f7e69a73d932440f1aa118416fade6667d4263637ca2df138316ce",
+  "full_output_location": "ZIP synthetic_evidence/family_technical_positive_full.json",
+  "core_changes": 0,
+  "trade_action": "NO_TRADE"
+}

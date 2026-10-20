@@ -1,3 +1,5 @@
+> CURRENT 2026-10-21：已依指揮官核准範圍完成FamilyRunner技術接線及工程驗證，最新成果與範圍詳 ENGINEERING_ACCEPTANCE_RESULT.md；正式工程完成數與最終部署證據以Checkpoint及ZIP根目錄RELEASE_RECEIPT.json為準。以下較早進度段落僅為歷程。
+
 ## 2026-10-21 目標金額／權重接線完成，原生整線與Mentor通過
 
 已解決 W5-C8C9-TARGET-UNIT。原Work6同時保存QQQ portfolio_amount=100 USD、weight=0.1及denominator=1000 USD。V82 calculate_position_gap按金額運算；canonical #36原schema為Money/Rate Target，Work8明確取rate比較。W5 target_units.py核對同來源目標金額/權重/NAV、原生目標與持倉金額、同幣別/配置/批次，再於canonical #36送原C7 integrated_weight，metadata明列portfolio_weight與來源。原金額和分母保存在target_unit_projection；V82策略與Work8驗證維持原碼。

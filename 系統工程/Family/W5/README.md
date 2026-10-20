@@ -1,3 +1,5 @@
+> CURRENT 2026-10-21：已依指揮官核准範圍完成FamilyRunner技術接線及工程驗證，最新成果與範圍詳 ENGINEERING_ACCEPTANCE_RESULT.md；正式工程完成數與最終部署證據以Checkpoint及ZIP根目錄RELEASE_RECEIPT.json為準。以下較早進度段落僅為歷程。
+
 ## 2026-10-21 估值／SGOV／股票保護來源接線（仍8/18）
 
 本線196 PASS、1 strict XFAIL，新增15項。Family入口接既有quantity×price×FX，明確每股單價單位、來源、時間與valuation_digest；核股票valuation_price、非SGOV債券既有金額，SGOV physical價值/owner/時間。合成實測1×120=120，原Work7角色100、未分配20，未成交contribution另列。

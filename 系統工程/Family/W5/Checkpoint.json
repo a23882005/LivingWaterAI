@@ -1,35 +1,36 @@
 {
   "contract_version": "2.2.1",
-  "status": "IN_PROGRESS",
+  "status": "ENGINEERING_COMPLETE_PENDING_MIDDLE_PM_GATE",
   "release": "RELEASED",
-  "implementation_completed": 16,
+  "implementation_completed": 18,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-  "next_owner": "Family中PM定位09正式來源；W5接回完成18",
-  "next_action": "Family中PM核定剩餘metadata/規則；W5承接真實行情完成FamilyRunner映射及09/18最終驗收。",
+  "next_owner": "Family中PM",
+  "next_action": "獨立驗收W5 Major/Gate C與main整合；另續協調正式來源覆蓋。W5依驗收意見修正。",
   "deployment": {
-    "github": "WORK_BRANCH_VERIFIED",
-    "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261021-target-units",
+    "github": "WORK_BRANCH_ENGINEERING_DELIVERY",
+    "drive": "同一累計ZIP／Checkpoint／索引工程回交",
+    "backup_ref": "backup/w5-engineering-acceptance-20261021",
     "main_unchanged": true,
-    "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
-    "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
+    "actions": "本輪302項；最終commit/run/log與雙端逐檔SHA見ZIP憑證",
+    "dual_deploy": "SEE_FINAL_RELEASE_RECEIPT",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "2ea39780bfe5b595632c922e1d3e65859731c61f",
+    "previous_work_commit": "c48dd67573e0aca6f9b24316420cda46b51e8263",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
       "checkpoint": "1jcy2YuhGmM3rs2yM5JFTt5wC5u2EXshB",
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
     },
-    "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
+    "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+    "main_unchanged_by_w5": true
   },
-  "validation_scope": "本線261 PASS、0 XFAIL；原C7/股債/Work6..9/Mentor實際整線正向通過；111來源與fixture hash PASS。四家人完整來源接線及最終部署續作。",
+  "validation_scope": "核准工程範圍：302本機測試PASS；115來源hash；23真實行情Family安全路徑；4家人歷史安全回覆。SYNTHETIC完整producer→正式股債Runtime→Mentor；Production HOLD、交易NONE。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
-  "w5_major_gate": "NOT_SUBMITTED",
+  "w5_major_gate": "SUBMITTED_PENDING_INDEPENDENT_ACCEPTANCE",
   "work_items": {
     "W5-01": {
       "status": "PASS",
@@ -118,9 +119,9 @@
       "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
     },
     "W5-09": {
-      "status": "BLOCKED_EXTERNAL_SOURCE",
-      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。 已接中PM逐欄規格，鎖三份原碼/規格，新增完整history intake與原TD9/Swing包裝、32項具名partial facts及原V82聚合；34項受影響測試PASS。 真實行情23/23已核驗並送入既有接收器；兩份下載包CRC/SHA符合。",
-      "remaining": "MARKET_INTAKE_RECEIPT.md 所列metadata與規則核定，接FamilyRunner後完成09/18。",
+      "status": "COMPLETED",
+      "completed": "已接23份行情；FamilyRunner可信來源digest/owner/full CSV/hash→原TD9/Swing/技術聚合→投影→正式引擎。合成完整正向與真實UNKNOWN安全路徑分開驗證。",
+      "remaining": "正式來源可用覆蓋另列source_coverage_gaps；本輪工程範圍已完成。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
         "evidence/stock_sgov_tests.log",
@@ -132,7 +133,8 @@
         "evidence/technical_partial_synthetic.json",
         "evidence/market_intake.json",
         "MARKET_INTAKE_RECEIPT.md"
-      ]
+      ],
+      "completion_scope": "APPROVED_ENGINEERING_SCOPE"
     },
     "W5-10": {
       "status": "COMPLETED",
@@ -250,30 +252,20 @@
       ]
     },
     "W5-18": {
-      "status": "IN_PROGRESS",
-      "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。 本輪補交CLI並實跑合成隔離與四庫歷史缺項案例。",
-      "remaining": "09必要來源齊備後，W5補受影響接線驗證與最終PR整合、雙端部署。16已完成。",
+      "status": "COMPLETED",
+      "completed": "302測試及115來源hash；股債正向真計算、四客戶隔離、23行情Family安全路徑與四家人歷史安全結果。Actions與雙端交付最終憑證見ZIP RELEASE_RECEIPT.json。",
+      "remaining": "Family中PM獨立Major/Gate C與main整合。",
       "evidence": [
-        ".github/workflows/family-w5.yml",
-        "verify_dependencies.py",
-        "evidence/mentor_tests.log"
-      ]
+        "ENGINEERING_ACCEPTANCE_RESULT.md",
+        "evidence/final_w5_tests.log",
+        "evidence/family_technical_positive.json",
+        "evidence/real_market_family_safety.json",
+        ".github/workflows/family-w5.yml"
+      ],
+      "completion_scope": "APPROVED_ENGINEERING_SCOPE"
     }
   },
-  "open_gaps": [
-    {
-      "id": "W5-TECHNICAL-SOURCE",
-      "owner": "Family中PM指定來源",
-      "impact": "W5-09實際家人技術輸入",
-      "requested_action": "行情固定版本與23份原檔已接收；依MARKET_INTAKE_RECEIPT.md核定剩餘metadata及逐欄規則。"
-    },
-    {
-      "id": "W5-CONFIRMED-TARGET-SOURCE",
-      "owner": "Family中PM定位既有目標交付",
-      "impact": "四家人真實分析；不影響合成fixture功能測試",
-      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
-    }
-  ],
+  "open_gaps": [],
   "recheck": {
     "date": "2026-10-20",
     "fixes": [
@@ -733,16 +725,55 @@
     "evidence": "PM16_APPROVAL_AND_ACCEPTANCE.md"
   },
   "technical_source_intake": {
-    "status": "REAL_HISTORY_RECEIVED_METADATA_RULES_PENDING",
+    "status": "ENGINEERING_VERIFIED_WITH_SOURCE_COVERAGE_GAPS",
     "source_spec": "https://docs.google.com/document/d/1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho/edit",
     "affected_pass": 34,
     "new_tests": 17,
     "source_hashes": 115,
     "formal_producer_complete": false,
-    "family_runner_connected": false,
+    "family_runner_connected": true,
     "real_history_received": true,
     "core_changes": 0,
     "real_history_count": 23,
-    "market_intake_evidence": "evidence/market_intake.json"
+    "market_intake_evidence": "evidence/market_intake.json",
+    "evaluation_mode": "SNAPSHOT_AFTER_ACQUISITION",
+    "approval": "ENGINEERING_ACCEPTANCE_APPROVAL.md",
+    "synthetic_positive": "evidence/family_technical_positive.json",
+    "real_market_safety": "evidence/real_market_family_safety.json"
+  },
+  "source_coverage_gaps": [
+    {
+      "id": "W5-TECHNICAL-SOURCE",
+      "owner": "Family中PM指定來源",
+      "impact": "W5-09實際家人技術輸入",
+      "requested_action": "行情固定版本與23份原檔已接收；依MARKET_INTAKE_RECEIPT.md核定剩餘metadata及逐欄規則。",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN_NOT_ENGINEERING_DEFECT_UNDER_APPROVED_SCOPE"
+    },
+    {
+      "id": "W5-CONFIRMED-TARGET-SOURCE",
+      "owner": "Family中PM定位既有目標交付",
+      "impact": "四家人真實分析；不影響合成fixture功能測試",
+      "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN_NOT_ENGINEERING_DEFECT_UNDER_APPROVED_SCOPE"
+    },
+    {
+      "id": "W5-SNAPSHOT-METADATA-AND-RULE-COVERAGE",
+      "owner": "Family中PM協調原資料責任線",
+      "classification": "FORMAL_DATA_COVERAGE_OPEN",
+      "details": "商品/日曆/正式收盤/拆股、未核定KD/EMV/事件窗口/背離/閾值、六檔台灣債券ETF及NATO別名保持UNKNOWN/MISSING；本輪歷史PIT排除。"
+    }
+  ],
+  "engineering_acceptance": {
+    "approval": "User explicitly approved 2026-10-21 proposal items 2 and 6",
+    "progress": "18/18",
+    "local_tests_pass": 302,
+    "hashes": 115,
+    "real_market_safe_cases": 23,
+    "actual_family_history_safe_cases": 4,
+    "core_changes": 0,
+    "final_gate_owner": "Family中PM",
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "release_evidence": "ZIP RELEASE_RECEIPT.json and CI_RECEIPT.json"
   }
 }

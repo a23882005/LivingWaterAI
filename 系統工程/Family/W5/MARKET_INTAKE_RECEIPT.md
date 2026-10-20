@@ -1,3 +1,5 @@
+> CURRENT 2026-10-21：已依指揮官核准範圍完成FamilyRunner技術接線及工程驗證，最新成果與範圍詳 ENGINEERING_ACCEPTANCE_RESULT.md；正式工程完成數與最終部署證據以Checkpoint及ZIP根目錄RELEASE_RECEIPT.json為準。以下較早進度段落僅為歷程。
+
 # W5-09 真實行情接收完成
 
 固定 commit bc8d581d74c7f17204a0b3e251c0f659279aedc8。23/23 CSV 原始 Git blob、大小、日期排序與唯一性核驗通過；VT／0050 SHA-256 符合補件。兩份 Actions ZIP 已下載，CRC 與 SHA-256 通過。逐檔證據見 evidence/market_intake.json。

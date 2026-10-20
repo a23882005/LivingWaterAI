@@ -1,18 +1,18 @@
 {
   "contract_version": "2.2.1",
-  "status": "ENGINEERING_COMPLETE_PENDING_MIDDLE_PM_GATE",
+  "status": "ENGINEERING_ACCEPTED_MAIN_MERGED_WITH_SOURCE_COVERAGE_GAPS",
   "release": "RELEASED",
   "implementation_completed": 18,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "Family中PM",
-  "next_action": "獨立驗收W5 Major/Gate C與main整合；另續協調正式來源覆蓋。W5依驗收意見修正。",
+  "next_action": "中PM續辦W6資料計算及既有正式來源缺口；W7按原工序承接身份與持久化；W5依具名缺陷修正。",
   "deployment": {
-    "github": "WORK_BRANCH_ENGINEERING_DELIVERY",
+    "github": "MAIN_MERGED_BY_FAMILY_MIDDLE_PM",
     "drive": "同一累計ZIP／Checkpoint／索引工程回交",
     "backup_ref": "backup/w5-engineering-acceptance-20261021",
-    "main_unchanged": true,
+    "main_unchanged": false,
     "actions": "本輪302項；最終commit/run/log與雙端逐檔SHA見ZIP憑證",
     "dual_deploy": "SEE_FINAL_RELEASE_RECEIPT",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
@@ -24,13 +24,14 @@
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-    "main_unchanged_by_w5": true
+    "main_unchanged_by_w5": true,
+    "main_merge_commit": "612a96daeb13f6c3cebd4ae0e8a4fa38d661cd31"
   },
   "validation_scope": "核准工程範圍：302本機測試PASS；115來源hash；23真實行情Family安全路徑；4家人歷史安全回覆。SYNTHETIC完整producer→正式股債Runtime→Mentor；Production HOLD、交易NONE。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
-  "w5_major_gate": "SUBMITTED_PENDING_INDEPENDENT_ACCEPTANCE",
+  "w5_major_gate": "PASS_WITH_SOURCE_COVERAGE_GAPS",
   "work_items": {
     "W5-01": {
       "status": "PASS",
@@ -776,5 +777,18 @@
     "trade_authorization": "NONE",
     "release_evidence": "ZIP RELEASE_RECEIPT.json and CI_RECEIPT.json",
     "latest_metadata_affected_pass": 31
+  },
+  "gate_c": "PASS_WITH_SOURCE_COVERAGE_GAPS",
+  "middle_pm_acceptance": {
+    "date": "2026-10-21 Asia/Taipei",
+    "status": "PASS_WITH_SOURCE_COVERAGE_GAPS",
+    "scope": "APPROVED_ENGINEERING_SCOPE",
+    "independent_tests_pass": 28,
+    "source_hashes_pass": 115,
+    "manifest_pass": 481,
+    "report_url": "https://docs.google.com/document/d/1PjYE8LoSEfD0hvekL9pie3ixGhGEnJd6eKH0J9NKetA/edit",
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "W2_open_P2": 12
   }
 }

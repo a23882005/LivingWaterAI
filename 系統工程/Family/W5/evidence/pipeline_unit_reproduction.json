@@ -1,0 +1,65 @@
+{
+  "case_id": "W5-C8C9-TARGET-UNIT",
+  "data_provenance": "SYNTHETIC",
+  "runtime_mode": "REAL_DETERMINISTIC",
+  "baseline_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+  "actual": {
+    "v82_target_amount": "1000.0",
+    "v82_canonical_target": 1000,
+    "c7_targets": [
+      {
+        "instrument_id": "0050.TW",
+        "ticker": "0050",
+        "asset_type": "股票ETF",
+        "bucket": "STOCK",
+        "protected": false,
+        "work6_final_target_weight": 0.5499999999999999,
+        "integrated_weight": 0.5499999999999999,
+        "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "instrument_id": "QQQ",
+        "ticker": "TSM",
+        "asset_type": "個別公司股票",
+        "bucket": "STOCK",
+        "protected": true,
+        "work6_final_target_weight": 0.05,
+        "integrated_weight": 0.05,
+        "allocation_rule": "LOCKED_CURRENT_WEIGHT",
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "instrument_id": "SGOV.US",
+        "ticker": "SGOV",
+        "asset_type": "債券ETF",
+        "bucket": "BOND",
+        "protected": false,
+        "work6_final_target_weight": 0.4,
+        "integrated_weight": 0.4,
+        "allocation_rule": "PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET",
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      }
+    ],
+    "stock_execution_amount": "450",
+    "error": {
+      "type": "ProtectedHoldingProtectionError",
+      "code": "C8C9.W8.FINAL_TARGET_BINDING",
+      "detail": "C8C9.W8.FINAL_TARGET_BINDING: V82 project_target_position differs from C7 integrated target"
+    }
+  },
+  "core_modifications": 0,
+  "interpretation": "Native money computation and Work8 weight equality conflict with current W5 mapping. Contract has Money/Rate Target; middle PM must resolve unit semantics and minimal correction ownership; synthetic fixture alone is not proof of a core strategy defect.",
+  "source_hashes": {
+    "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py": "2d5102593a06a2c4eff0a58aa0355b3e8a0630d7f4ccd464f74777e3027073b8",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py": "81e2b13ab208152c47a36338b265c819d79a63810a8378202e50783354d647dd"
+  },
+  "input_fixture": "tests/test_native_pipeline.py::pipeline_case",
+  "expected": "Same confirmed target should bind with explicit compatible units; Work9/Mentor positive remains unpassed."
+}

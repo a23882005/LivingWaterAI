@@ -1,0 +1,32 @@
+# W5 同次調度：目標單位待界定
+
+狀態：OPEN；Production HOLD；交易 NONE。這是施工問題回交，並非整線驗收。
+
+## 實測與範圍
+
+`tests/test_native_pipeline.py::pipeline_case` 將原 Work4／5／8 合成案例接成同次呼叫。實際執行 V82、V75、Work6、股債合計及 Work7 後，Work8 回 `C8C9.W8.FINAL_TARGET_BINDING`。V82 原生部署以目標金額 1000 計算，W5 目前將此金額投影至 canonical `project_target_position`；Work8 直接與 C7 `integrated_weight=0.05` 比較。
+
+這個組合案例仍有原 Work8 的持倉保護與配置 fixture 語意，尚不是已完成一致性核對的整線正向案例。單憑此失敗不能認定原核心策略有錯。可確定的是目前 W5 的金額投影與 Work8 的權重比較無法直接相接；既有 canonical schema 只標 `Money/Rate Target`，不足以授權 W5 任意換單位。
+
+## 精確位置與責任
+
+- V82：`系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py`，`calculate_position_gap(project_target_position_amount, ...)`；confirmed amount = quantity × price，target amount = project target amount × deployment rate。
+- W5：`系統工程/Family/W5/stock_engine.py`，`assemble_stock_output` 的 `project_target_position` 投影。
+- C8C9：`系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py`，`protect_client_action` 比較 `integrated_weight` 與 canonical `project_target_position`。
+- 影響：W5-15 的完整 Work9 正向結果、W5-16 真結果 Mentor 及 W5-18 整線驗收。
+- Family 中PM：指定此跨線欄位的正式單位，以及既有來源中的目標金額／權重／估值 NAV 綁定規格；界定最小修正應在 W5 投影或 C8C9 接口。若涉及核心，具名核定最小修改範圍。
+- W5 小PM：依指定語意補明確來源與單位轉換，保留原金額及原權重，建立語意一致的正向 fixture，再跑完整 Work9／Mentor。不得用調整數值、關閉 schema 或跳過原檢查取得 PASS。
+
+## 可重現證據
+
+`evidence/pipeline_unit_reproduction.json` 記原檔 SHA256、實際數值及錯誤；`evidence/pipeline_recovery_tests.log` 保存執行紀錄。正向測試暫標 strict XFAIL，僅允許此精確錯誤；不計為 PASS，未來意外通過亦使測試失敗，要求正式移除缺項並驗收。
+
+```sh
+W5_SOURCE_ROOT="$PWD/w5_start/sources" python -m pytest repo/系統工程/Family/W5/tests/test_native_pipeline.py -q -rx
+```
+
+## 獨立完成的恢復接線
+
+`recovery_bridge.py` 重用 W2 Work21 `new_test_state`／`apply_event`，只在同一 staging store 補 client_id＋request_id、完整輸入 digest、目前版本／許可重驗、實際逾時至多重試一次及晚到結果拒收。Decimal 精度、陣列順序與型別均納入版本化 digest；測試包含並行重送、快取撤權、計算中版本失效及真正延遲。
+
+此段測試使用受控無副作用計算 provider；完整 Family runner 接入及跨程序持久化未完成，後者由 W7 負責。沒有宣稱 W5-17 全棒或正式恢復 PASS。核心策略／Frozen schema 修改數仍為 0。

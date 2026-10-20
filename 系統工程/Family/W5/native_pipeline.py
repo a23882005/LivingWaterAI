@@ -1,0 +1,81 @@
+"""Same-run native engine pipeline, called after Family input authorization.
+
+This internal entry point accepts already-bound native inputs. It does not
+replace prepare_input or authenticate external requests.
+"""
+from copy import deepcopy
+from decimal import Decimal
+from family_input import digest
+from runtime_loader import load_c_module
+from stock_engine import run_stock_engine,assemble_stock_output
+from bond_engine import run_bond_engine
+from funding_guard import check_aggregate
+from sgov_bridge import reconcile_sgov
+
+
+class PipelineError(ValueError):
+    pass
+
+
+def run_native_pipeline(repo_path, bundle):
+    data=deepcopy(bundle)
+    stock_req,bond_req=data['stock_request'],data['bond_request']
+    w3=stock_req['work3_handoff']
+    for name in ('work3_handoff','c7_funding_context'):
+        if digest(stock_req[name])!=digest(bond_req[name]):
+            raise PipelineError('SHARED_SOURCE_MISMATCH:'+name)
+    run_id=w3['run_id'];client=w3['client_state_context']['payload']['client_id']
+    framework=data['asset_framework']
+    if framework['identity']['client_id']!=client or framework['identity']['run_id']!=run_id:
+        raise PipelineError('FRAMEWORK_CLIENT_RUN_MISMATCH')
+    if framework['work6_final_target_reference']['allocation_id']!=w3['final_target']['allocation_id']:
+        raise PipelineError('FRAMEWORK_TARGET_MISMATCH')
+    # Reconcile the C framework's funding snapshot with the exact dispatched C7.
+    funding_snapshot=framework['funding_context_snapshot'];c7=stock_req['c7_funding_context']
+    for name in ('base_currency','total_new_investment_amount','contexts','bank_cash_scope'):
+        if digest(funding_snapshot[name])!=digest(c7[name]):
+            raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
+    stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
+    stock_output=assemble_stock_output(repo_path,stock,data['stock_source_fields'])
+    bond=run_bond_engine(repo_path,bond_req,data['bond_evidence'])
+    if bond.get('canonical') is None:
+        return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
+                'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
+    trace=[*stock['call_trace'],*bond['call_trace']]
+    def request(module,**payload):
+        return {'contract_name':module.INPUT_CONTRACT_NAME,'contract_version':module.INPUT_CONTRACT_VERSION,
+                'baseline_id':module.BASELINE_ID,'run_id':run_id,**payload}
+    work6=load_c_module(repo_path,6)
+    isolated=work6.validate_funding_account_isolation(request(work6,work3_handoff=w3,
+        c7_funding_context=c7,work4_adapter_result=stock['built_input'],work5_adapter_result=bond['built_input']))
+    trace.append('C8C9.Work6.validate_funding_account_isolation')
+    owner={'client_id':client,**w3['owner'],'currency':w3['currency']}
+    claims=[{'claim_id':'V82:'+stock_output['asset_id'],'owner':owner,'run_id':run_id,
+             'asset_class':'EQUITY','amount':stock['execution'].execution_amount}]
+    for d in bond['runtime_ready']['output']['per_asset_decisions']:
+        if d['deploy_amount'] is None:raise PipelineError('BOND_DEPLOYMENT_UNKNOWN')
+        claims.append({'claim_id':'V75:'+d['asset_id'],'owner':owner,'run_id':run_id,
+                       'asset_class':'BOND','amount':d['deploy_amount']['amount']})
+    cash=isolated['cash_eligibility']
+    aggregate=check_aggregate(owner=owner,run_id=run_id,claims=claims,available=cash['available'],
+        equity_budget=cash['equity_executable_budget'],bond_budget=cash['bond_executable_budget'])
+    trace.append('W5.check_aggregate:actual_native_claims')
+    work7=load_c_module(repo_path,7)
+    physical=reconcile_sgov(repo_path,request(work7,work3_handoff=w3,
+        work4_v82_adapter_result=stock['built_input'],work5_v75_integration_result=bond['canonical'],
+        work6_funding_isolation_result=isolated),data['physical_sgov'])
+    trace.extend(['C8C9.Work7.validate_sgov_runtime_roles','W5.reconcile_sgov'])
+    work8=load_c_module(repo_path,8)
+    protected=work8.protect_client_action(request(work8,c_work7_asset_framework_result=framework,
+                                                 work4_v82_integration_result=stock_output))
+    trace.append('C8C9.Work8.protect_client_action')
+    work9=load_c_module(repo_path,9)
+    unified=work9.build_unified_deployment(request(work9,work4_v82_integration_result=stock_output,
+        work5_v75_integration_result=bond['canonical'],work6_funding_account_isolation_result=isolated,
+        work7_sgov_runtime_role_result=physical['native_work7'],work8_protected_holding_result=protected))
+    trace.append('C8C9.Work9.build_unified_deployment')
+    return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(data),'client_id':client,'run_id':run_id,
+        'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
+        'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
+        'mentor_return':deepcopy(unified['mentor_return']),'call_trace':trace,
+        'production':'HOLD','trade_action':'NO_TRADE'}

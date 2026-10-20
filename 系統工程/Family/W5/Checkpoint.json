@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "同一W5小PM補完09～14剩餘來源/UNKNOWN傳輸邊界，接15統一調度、16Mentor、17重送、18整線。中PM定位既有Target與具名技術producer。",
+  "next_action": "同一W5小PM續接Family runner、Mentor及恢復邊界；Family中PM界定目標金額/權重接口及最小修正責任，並定位既有Target與技術producer。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-stock-sgov",
+    "backup_ref": "backup/w5-20261020-pipeline-recovery",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "ab8fff69810241f422267fc8440ad18fd67d2a11",
+    "previous_work_commit": "175e3827ae90ce1ca53979a3c264de687888ee28",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -24,7 +24,7 @@
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
     }
   },
-  "validation_scope": "W3接收PASS；W5本線110項PASS，含合成輸入的股票/債券原生運算與原Work7 SGOV核對；整線與Actions待續。",
+  "validation_scope": "本線124 PASS、1 strict XFAIL（明列未通過的完整Work9正向案例）；恢復測試使用受控純計算provider。未達整線、Actions或最終部署。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -171,13 +171,26 @@
       ]
     },
     "W5-15": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "新增同次native pipeline；原股債、資金合計與Work7已實際呼叫。",
+      "remaining": "W5 canonical目標金額與Work8權重接口待界定；合成fixture完整語意、Family可信邊界與Work9正向尚未完成。",
+      "evidence": [
+        "中PM介面待界定.md",
+        "evidence/pipeline_unit_reproduction.json",
+        "tests/test_native_pipeline.py"
+      ]
     },
     "W5-16": {
       "status": "PENDING"
     },
     "W5-17": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。",
+      "remaining": "接完整15/16真結果、部分完成重算與W7接口驗收；不是正式持久化。",
+      "evidence": [
+        "tests/test_recovery_bridge.py",
+        "evidence/pipeline_recovery_tests.log"
+      ]
     },
     "W5-18": {
       "status": "PENDING"
@@ -195,6 +208,21 @@
       "owner": "Family中PM定位既有目標交付",
       "impact": "四家人真實分析；不影響合成fixture功能測試",
       "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
+    },
+    {
+      "id": "W5-C8C9-TARGET-UNIT",
+      "owner": "Family中PM界定跨線語意；W5小PM依裁決修接線",
+      "impact": "W5-15/16/18完整正向",
+      "files": [
+        "stock_engine.py",
+        "C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
+      ],
+      "fields": [
+        "canonical_analysis.project_target_position",
+        "integrated_asset_framework.instrument_targets[].integrated_weight"
+      ],
+      "requested_action": "指定目標金額/權重及來源NAV的既有綁定規格；界定W5投影或C8C9最小修正。合成組合案例不能單獨判定核心策略缺陷。",
+      "evidence": "中PM介面待界定.md"
     }
   ],
   "recheck": {
@@ -321,6 +349,19 @@
       "zip": "17ufHP0E-ZNg6G-9-kbj2eS-lA8YYwU5M",
       "checkpoint": "1P1TX0YbZ1N-tk6cXlnHrgBTCkqZ7MH6m",
       "index": "1Y0ntjr7WKYjqorsBYwCK0QLvg7QzU87q"
+    }
+  },
+  "pipeline_recovery": {
+    "w5_tests_passed": 124,
+    "strict_xfail": 1,
+    "whole_line_positive": "NOT_PASSED",
+    "core_modifications": 0,
+    "w2_recovery_sha256": "d902c3e6a7315e33322eeee1aa44c70497dd12716974a53e68a090a112eb216f",
+    "backup_drive_ids": {
+      "zip": "1CptcQD5ADHKCqwntBu1tIua8DhnqqHmY",
+      "checkpoint": "1y7-hvpW9cmwMtLaC6nbvvxt-o-ut0biH",
+      "index": "1aHVDuWieY_rYK1rCq0E29S9NmeACQKqG",
+      "root": "1ZcRuHgjPYD-yxm9zRqScYOUZ1ul4xW9Q"
     }
   }
 }

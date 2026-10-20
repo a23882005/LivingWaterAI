@@ -184,8 +184,14 @@ jobs:
                   chart_names=('macro_raw.png','macro_diff.png','goldman_raw.png','goldman_diff.png','bofa_raw.png','bofa_diff.png','morgan_stanley_raw.png','morgan_stanley_diff.png','ubs_raw.png','ubs_diff.png','jpm_raw.png','jpm_diff.png','overview.png')
                   assert page.count('id="v703-research-charts"')==1
                   assert '完整逐季數值表（28 季）' in page
-                  assert page.count('<tbody>') >= 2
-                  assert page.count('已成熟') >= 20
+                  research=page.split('<section id="v703-research-charts"',1)[1].split('</section>',1)[0]
+                  assert research.count('<tbody>') == 1
+                  assert '報酬成熟狀態' not in research
+                  assert '後三個月取價交易日' not in research
+                  assert '五家機構偏多／偏空與動能上修／下修家數</h3>' not in research
+                  assert research.count('position:sticky;left:0;') >= 2
+                  assert research.count('position:sticky;left:8rem;') >= 2
+                  assert 'grid-cols-1 2xl:grid-cols-2' in research
                   assert page.count('>NA</td>') > 0
                   for name in chart_names:
                       page_asset='v70-research-charts/'+name

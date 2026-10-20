@@ -11,6 +11,7 @@ import sys
 
 from runtime_loader import load_c_module
 from family_input import digest
+from tactical_budget import tactical_cap
 
 V75_PATH = Path('系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime')
 
@@ -46,15 +47,19 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence):
         build_decision, proportional_scale_decisions, calculate_v75_undeployed_to_sgov)
     from v75_runtime.work5 import assemble_final_snapshot
     from v75_runtime.work6 import evaluate_runtime_ready
+    from v75_runtime.models import Money
 
     request, evidence = deepcopy(adapter_request), deepcopy(asset_evidence)
     adapter = load_c_module(repo_path, 5)
     built = adapter.build_v75_runtime_input(request)
+    cap = tactical_cap(request['work3_handoff'], 'bond')
     trace = ['C8C9.Work5.build_v75_runtime_input', 'V75.validate_v75_run_input']
     checked = validate_v75_run_input(built['v75_runtime_input'])
     result = {'input_digest': digest({'request': request, 'evidence': evidence}),
               'built_input': built, 'call_trace': trace, 'predicate_results': {},
-              'native_step10_traces': {}, 'production': 'HOLD', 'trade_authorization': 'NONE'}
+              'native_step10_traces': {}, 'tactical_cap': {**cap,
+                  'amount': str(cap['amount']), 'source_amount': str(cap['source_amount'])},
+              'production': 'HOLD', 'trade_authorization': 'NONE'}
     if not checked.accepted:
         return {**result, 'status': checked.disposition.value,
                 'issues': [vars(issue) for issue in checked.issues], 'canonical': None}
@@ -113,7 +118,8 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence):
                 'rule_ids': list(native_trace.step10_rule_ids)}
             decisions.append(build_decision(item, native_trace, [facts['source_reference']]))
             trace.extend(['V75.evaluate_step10:' + item.asset_id, 'V75.build_decision:' + item.asset_id])
-        decisions = proportional_scale_decisions(decisions, run.bond_executable_budget)
+        decisions = proportional_scale_decisions(decisions, Money(
+            amount=min(run.bond_executable_budget.amount,cap['amount']),currency=run.currency))
         trace.append('V75.proportional_scale_decisions')
         undeployed = calculate_v75_undeployed_to_sgov(broker_domain=run.broker_domain_type.value,
             currency=run.currency, bond_executable_budget=run.bond_executable_budget, decisions=decisions)

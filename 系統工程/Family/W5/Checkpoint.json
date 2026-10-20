@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "同一W5小PM接續09～14技術/股債真結果/SGOV，再接15～18調度與Mentor；Family中PM定位既有確認Target及具名技術來源。",
+  "next_action": "同一W5小PM補完09～14剩餘來源/UNKNOWN傳輸邊界，接15統一調度、16Mentor、17重送、18整線。中PM定位既有Target與具名技術producer。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-bond-native",
+    "backup_ref": "backup/w5-20261020-stock-sgov",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "486219ff9995e36b90f15c04ae245fb0f1cac53f",
+    "previous_work_commit": "ab8fff69810241f422267fc8440ad18fd67d2a11",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -24,7 +24,7 @@
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
     }
   },
-  "validation_scope": "W3讀取器接收PASS；W5本線87項PASS含合成資料的原生V75計算。Family整線、Actions及最終部署尚未執行。",
+  "validation_scope": "W3接收PASS；W5本線110項PASS，含合成輸入的股票/債券原生運算與原Work7 SGOV核對；整線與Actions待續。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -118,33 +118,57 @@
     },
     "W5-09": {
       "status": "IN_PROGRESS",
-      "completed": "P70-5原feed完整讀取",
-      "remaining": "中PM指定具名technical producer/input快照；准讀清單未含該來源"
+      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。",
+      "remaining": "正式具名producer、週/月K原規則與完整來源綁定待接。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
+      ]
     },
     "W5-10": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "原Work4→V82資金/Core/Deployment；V70上限實際限制買入，EXCEEDS_CAP/Hard Gate/零預算測試通過。",
+      "remaining": "Family邊界調度、正式來源與不同source_run正式binding尚待完整驗收。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
+      ]
     },
     "W5-11": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "真計算→原生49/13組裝→原Work4consume→原Work9分支映射；金額/數量保留，未知減碼NEEDS_REVIEW。",
+      "remaining": "producer展示欄完整來源綁定及BLOCKED_UNKNOWN正式49/13傳輸待補。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
+      ]
     },
     "W5-12": {
       "status": "IN_PROGRESS",
-      "completed": "C8C9 Work5→V75原生PRED001..010→Step10→預算縮放→Work5/6→C8C9 consume，10項新測試PASS。",
-      "remaining": "正式來源市場context、V70 tactical上限綁定、Family調度及完整12棒驗收尚未完成。",
+      "completed": "原V75真計算已接同源V70 cap及EXCEEDS_CAP零上限；原預算與未部署contribution守恆。",
+      "remaining": "正式市場來源、Family調度及完整邊界驗收待續。",
       "evidence": [
-        "bond_engine.py",
-        "tests/test_bond_engine.py",
-        "evidence/bond_native_positive.json",
-        "evidence/bond_native_tests.log"
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
       ]
     },
     "W5-13": {
       "status": "IN_PROGRESS",
-      "completed": "保留原始RuntimeReady與account/per-asset狀態；空陣列INVALID_INPUT保留實測PASS。",
-      "remaining": "Work9正式canonical動作映射及完整13棒驗收尚未完成。"
+      "completed": "原Work9債券分支與account envelope映射，空per_asset仍保留BLOCK。",
+      "remaining": "完整逐檔動作與Family輸出契約測試待續。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
+      ]
     },
     "W5-14": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "原Work7角色驗證後，唯讀核對實體估值/角色金額/未分配，建議未成交contribution另列。",
+      "remaining": "真實W1角色/估值來源綁定與全部14棒邊界驗收待續。",
+      "evidence": [
+        "evidence/stock_sgov_positive.json",
+        "evidence/stock_sgov_tests.log"
+      ]
     },
     "W5-15": {
       "status": "PENDING"
@@ -286,6 +310,17 @@
       "zip": "1qnoBrbzbAm1hxuIXl53mj5DCAdkrMbRo",
       "checkpoint": "1T-boO-a-axgcGdmm68PH3sB-8HeYtERW",
       "index": "1a2S6feFxCbmrIyMNNRL9E2kVhqdF0AB8"
+    }
+  },
+  "stock_sgov": {
+    "w5_tests_passed": 110,
+    "new_tests_passed": 23,
+    "data_kind": "SYNTHETIC",
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "17ufHP0E-ZNg6G-9-kbj2eS-lA8YYwU5M",
+      "checkpoint": "1P1TX0YbZ1N-tk6cXlnHrgBTCkqZ7MH6m",
+      "index": "1Y0ntjr7WKYjqorsBYwCK0QLvg7QzU87q"
     }
   }
 }

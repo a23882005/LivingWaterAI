@@ -26,3 +26,6 @@ Production HOLD；交易授權 NONE。
 `funding_bridge.reconcile_funding`呼叫原C8C9 Work6，再用同一funding_guard核對各筆股債占用。owner_binding須由可信來源核定family_owner/native_owner/currency/version/source_reference並給expected_binding_digest；W1資金用途key與C7券商domain保持分離。
 `valuation.value_position`僅計算明確來源quantity × price × FX；不同幣別缺FX回UNKNOWN，暫估股數維持ESTIMATED。
 後續15棒runner尚待實作；以上模組已逐一實測。
+
+
+本輪新增股債原生計算與SGOV元件：stock_engine、bond_engine、tactical_budget、output_bridge、sgov_bridge。元件呼叫仍須由後續Family runner驗證身份、trusted producer contract、權限及來源binding；使用者入口尚未交付。工作項狀態及待補邊界以Checkpoint為準。

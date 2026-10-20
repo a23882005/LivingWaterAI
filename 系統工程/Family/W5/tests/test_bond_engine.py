@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 from test_native_adapters import ROOT, request
 from bond_engine import BondEvidenceError, run_bond_engine
+from output_bridge import normalize_bond
 
 
 def evidence():
@@ -81,6 +82,9 @@ def test_empty_account_failure_preserves_native_account_state():
     assert result['status']=='INVALID_INPUT'
     assert result['runtime_ready']['output']['per_asset_decisions']==[]
     assert result['canonical']['canonical_v75_output']['evaluation_state']=='INVALID_INPUT'
+    view=normalize_bond(ROOT,result['canonical'])
+    assert view['account_action']=='BLOCK'
+    assert view['per_asset']==[]
 
 
 def test_zero_budget_has_zero_actual_deployment():
@@ -100,3 +104,18 @@ def test_existing_position_native_risk_is_not_discarded():
     assert decision['asset_id']=='SGOV'
     assert decision['existing_position_action']=='TRUE_RISK_REDUCTION'
     assert decision['deploy_amount']['amount']=='0.00'
+
+
+@pytest.mark.parametrize('amount,issues,ceiling',[('125',[],'125'),('350',['EXCEEDS_CAP'],'0')])
+def test_bond_tactical_cap_limits_actual_native_deployment(amount,issues,ceiling):
+    req=request(5)
+    req['work3_handoff']['v70_runtime_context']['payload']['bond_tactical_amount']=amount
+    req['work3_handoff']['v70_runtime_context']['payload']['issue_codes']=issues
+    # Work5 proves V70 source-context equality, so update its same-source copy.
+    req['v75_source_context']['v70_snapshot']['payload']['bond_tactical_amount']=amount
+    req['v75_source_context']['v70_snapshot']['payload']['issue_codes']=issues
+    result=run_bond_engine(ROOT,req,evidence())
+    wire=result['runtime_ready']['output']
+    deployed=sum(Decimal(d['deploy_amount']['amount']) for d in wire['per_asset_decisions'])
+    assert deployed<=Decimal(ceiling)
+    assert deployed+Decimal(wire['v75_undeployed_to_sgov']['amount'])==Decimal('350')

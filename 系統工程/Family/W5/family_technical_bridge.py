@@ -91,5 +91,10 @@ def apply_technical_source(bundle,technical):
         fields['previous_swing_low_'+str(i+1)]=({'amount':lows[i]['value'],
             'currency':facts['currency'],'source_reference':technical['source_reference'],
             'as_of':lows[i]['confirmed_at'],'status':'KNOWN'} if i<len(lows) else 'UNKNOWN')
+    facts['technical_field_metadata']={name:{'data_as_of':technical.get('snapshot_available_at'),
+        'source_reference':technical['source_reference'],'data_quality':'UNKNOWN' if fields[name]=='UNKNOWN' else 'OK'}
+        for name in ('td9_high_state','td9_low_state','kd_state','macd_state','ma_state','emv_state','rsi_state',
+                     'volume_price_state','daily_timeframe_state','weekly_timeframe_state','monthly_timeframe_state',
+                     'atr_value','previous_swing_low_1','previous_swing_low_2','previous_swing_low_3')}
     data['technical_intake']=deepcopy(technical)
     return data

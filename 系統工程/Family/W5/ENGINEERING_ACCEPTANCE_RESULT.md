@@ -18,6 +18,6 @@
 
 ## 驗證與部署證據
 
-本機302項測試PASS（0失敗，105.62秒）；完整測試log：evidence/final_w5_tests.log。來源hash：115項；原核心與Frozen schema修改0。Actions及雙端讀回最終狀態、commit、backup ref、Drive備份ID、逐檔SHA記於同一累計ZIP的RELEASE_RECEIPT.json、CI_RECEIPT.json、CI_JOB.log。GitHub僅本線程式/說明/合成測試及公開行情摘要；私有家人資料及完整真實結果留Drive。
+本機302項測試PASS（0失敗，105.62秒）；末次技術欄位時間來源補正31項受影響測試PASS；完整測試log：evidence/final_w5_tests.log。來源hash：115項；原核心與Frozen schema修改0。Actions及雙端讀回最終狀態、commit、backup ref、Drive備份ID、逐檔SHA記於同一累計ZIP的RELEASE_RECEIPT.json、CI_RECEIPT.json、CI_JOB.log。GitHub僅本線程式/說明/合成測試及公開行情摘要；私有家人資料及完整真實結果留Drive。
 
 成果位置：GitHub a23882005/LivingWaterAI，w5/family-integration-v2.2.1，PR #22；Drive Family/W5，同一W5_累計施工成果_20261020.zip、Checkpoint.json與成果與測試索引.md。中PM接續獨立Major/Gate C與main整合；Production保持HOLD。

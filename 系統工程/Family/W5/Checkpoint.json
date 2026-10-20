@@ -774,6 +774,7 @@
     "final_gate_owner": "Family中PM",
     "production": "HOLD",
     "trade_authorization": "NONE",
-    "release_evidence": "ZIP RELEASE_RECEIPT.json and CI_RECEIPT.json"
+    "release_evidence": "ZIP RELEASE_RECEIPT.json and CI_RECEIPT.json",
+    "latest_metadata_affected_pass": 31
   }
 }

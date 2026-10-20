@@ -148,6 +148,9 @@ def assemble_stock_output(repo_path, calculation, source_fields, c7_computation=
         'data_as_of':facts['as_of'],'source_reference':facts['source_reference'],
         'data_quality':'UNKNOWN' if value=='UNKNOWN' else 'OK',
         'issue_codes':list(plan.reason_codes)} for name,value in values.items()}
+    for name,source_meta in facts.get('technical_field_metadata',{}).items():
+        if name not in metadata:raise StockEvidenceError('TECHNICAL_METADATA_FIELD_MISMATCH')
+        metadata[name].update(deepcopy(source_meta))
     if target_projection is not None:
         metadata['project_target_position'].update(
             data_as_of=target_projection['source_target']['weight']['as_of'],

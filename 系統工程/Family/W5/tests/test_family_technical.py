@@ -28,6 +28,9 @@ def test_producer_adapter_actual_runtime_and_mentor():
     assert out['technical_intake']['native_technical_aggregation']['runaway_up']=='UNKNOWN'
     assert out['native_result']['funding_aggregate']['bond_used']=='160.00'
     assert out['mentor'] and out['data_provenance']=='SYNTHETIC'
+    analysis=out['native_result']['stock_result']['canonical_v82_output']['canonical_analysis']
+    assert analysis['td9_high_state']['data_as_of']==c['technical_source']['metadata']['artifact_written_at']
+    assert analysis['kd_state']['value']=='UNKNOWN' and analysis['kd_state']['data_quality']=='UNKNOWN'
     assert 'V82.evaluate_core_rule_state' in out['call_trace']
     assert 'C8C9.Work9.build_unified_deployment' in out['call_trace']
     assert out['trade_action']=='NO_TRADE'

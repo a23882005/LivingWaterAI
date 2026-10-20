@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/20 08:20｜版本：V70-3-27 build adapter v3.9（12 張季度研究圖、總覽與完整數值表）｜檔案名稱：build_daily_v703_site.py
+# 最後修改日期時間（台灣時間）：2026/10/20 10:12｜版本：V70-3-27 build adapter v4.0（逐季表凍結前兩欄、移除重複表與欄位、放大圖表）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
 import csv
@@ -99,35 +99,33 @@ def _quarterly_chart_markup(template, source_dir=None):
             return html.escape(value)
         return f"{number:,.2f}" if math.isfinite(number) else "NA"
 
-    headings = list(rows[0])
-    head = "".join(f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap">{html.escape(h)}</th>' for h in headings)
-    body = "\n".join('<tr>' + ''.join(f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap">{cell(row.get(h))}</td>' for h in headings) + '</tr>' for row in rows)
-    c_headings = list(consensus[0])
-    sticky_head_styles = (
-        "position:sticky;left:0;z-index:30;width:145px;min-width:145px;background:#1e293b",
-        "position:sticky;left:145px;z-index:30;width:245px;min-width:245px;background:#1e293b",
+    source_headings = list(rows[0])
+    frozen_headings = ("季度觀察交易日", "SP500後3個月價格報酬_pct")
+    omitted_headings = {"後三個月取價交易日", "報酬成熟狀態"}
+    if not set(frozen_headings).issubset(source_headings):
+        raise ValueError("Quarterly value table is missing its two frozen columns")
+    headings = [*frozen_headings, *(h for h in source_headings if h not in frozen_headings and h not in omitted_headings)]
+    # Fixed widths make the second sticky column start exactly at the first
+    # column's right edge, including on narrow phone screens.
+    sticky_widths = {headings[0]: "8rem", headings[1]: "12rem"}
+    def sticky_style(heading, header=False):
+        if heading not in sticky_widths:
+            return ""
+        index = headings.index(heading)
+        left = "0" if index == 0 else sticky_widths[headings[0]]
+        z = 30 if header else 20
+        background = "#1e293b" if header else "#0f172a"
+        width = sticky_widths[heading]
+        wrap = ";white-space:normal;overflow-wrap:anywhere;vertical-align:top" if header else ""
+        return f' style="position:sticky;left:{left};z-index:{z};box-sizing:border-box;width:{width};min-width:{width};max-width:{width};background-color:{background}{wrap}"'
+    head = "".join(
+        f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap"{sticky_style(h, True)}>{html.escape(h)}</th>'
+        for h in headings
     )
-    sticky_cell_styles = (
-        "position:sticky;left:0;z-index:10;width:145px;min-width:145px;background:#0f172a",
-        "position:sticky;left:145px;z-index:10;width:245px;min-width:245px;background:#0f172a",
-    )
-    def consensus_cell(tag, index, value):
-        if tag == "th":
-            base_class = "border border-slate-600 px-2 py-1 whitespace-nowrap"
-            sticky_class = " sticky left-0 z-30 bg-slate-800" if index == 0 else " sticky z-30 bg-slate-800" if index == 1 else ""
-            style = sticky_head_styles[index] if index < 2 else ""
-        else:
-            base_class = "border border-slate-700 px-2 py-1 whitespace-nowrap"
-            sticky_class = " sticky left-0 z-10 bg-slate-900" if index == 0 else " sticky z-10 bg-slate-900" if index == 1 else ""
-            style = sticky_cell_styles[index] if index < 2 else ""
-        style_attr = f' style="{style}"' if style else ""
-        return f'<{tag} class="{base_class}{sticky_class}"{style_attr}>{value}</{tag}>'
-
-    c_head = "".join(consensus_cell("th", i, html.escape(h)) for i, h in enumerate(c_headings))
-    c_body = "\n".join(
-        '<tr>' + ''.join(consensus_cell("td", i, cell(row.get(h))) for i, h in enumerate(c_headings)) + '</tr>'
-        for row in consensus
-    )
+    body = "\n".join('<tr>' + ''.join(
+        f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap"{sticky_style(h)}>{cell(row.get(h))}</td>'
+        for h in headings
+    ) + '</tr>' for row in rows)
     plot_order = [
         ("Macro-SaFe", "macro_raw.png", "macro_diff.png"),
         ("高盛", "goldman_raw.png", "goldman_diff.png"),
@@ -139,18 +137,16 @@ def _quarterly_chart_markup(template, source_dir=None):
     figures = []
     for label, raw, diff in plot_order:
         for kind, name, caption in (("原始值", raw, f"{label}｜原始值"), ("季度微分", diff, f"{label}｜季度微分")):
-            figures.append(f'''<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-3"><figcaption class="text-sm font-semibold text-slate-100 mb-2">{caption}</figcaption><a href="v70-research-charts/{name}" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/{name}" alt="{label}{kind}與 S&amp;P 500 後三個月實際報酬季度研究圖" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>''')
-    overview = '<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-3"><figcaption class="text-sm font-semibold text-slate-100 mb-2">六組訊號總覽｜原始值與季度微分</figcaption><a href="v70-research-charts/overview.png" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/overview.png" alt="Macro-SaFe 與五大機構原始值和季度微分總覽，均搭配標普後三個月實際報酬" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>'
-    section = f'''<section id="v703-research-charts" class="max-w-6xl mx-auto px-4 py-6 mt-6 rounded-2xl border border-emerald-800 bg-slate-900/70" aria-labelledby="v703-research-charts-title">
+            figures.append(f'''<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-2"><figcaption class="text-sm font-semibold text-slate-100 mb-2">{caption}</figcaption><a href="v70-research-charts/{name}" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/{name}" alt="{label}{kind}與 S&amp;P 500 後三個月實際報酬季度研究圖" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>''')
+    overview = '<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-2"><figcaption class="text-sm font-semibold text-slate-100 mb-2">六組訊號總覽｜原始值與季度微分</figcaption><a href="v70-research-charts/overview.png" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/overview.png" alt="Macro-SaFe 與五大機構原始值和季度微分總覽，均搭配標普後三個月實際報酬" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>'
+    section = f'''<section id="v703-research-charts" class="max-w-6xl mx-auto px-3 py-6 mt-6 rounded-2xl border border-emerald-800 bg-slate-900/70" aria-labelledby="v703-research-charts-title">
 <h2 id="v703-research-charts-title" class="text-xl font-bold text-emerald-200 mb-2">📈 Macro-SaFe 與五大機構季度研究圖表及數值</h2>
 <p class="text-sm leading-7 text-slate-300 mb-2">六組訊號各含原始值及季度微分，共 12 張圖；每張僅搭配同一口徑的 S&amp;P 500 後三個月實際價格報酬，另附總覽圖。機構年底目標隱含報酬與三個月實際報酬期間不同，僅供研究觀察，不代表預測命中率或投資指示。</p>
 <p class="text-xs leading-6 text-amber-200 mb-5">季度序列為研究候選資料，Macro-SaFe 歷史分數並非正式月度分數；正式月資料只保留真實驗證分數，缺值維持 NA，季度資料不插值成月資料。2026-10-01 的後三個月報酬尚未成熟，保留 NA。五家機構共識家數不包含 Macro-SaFe；原始缺值及無前季值的微分不補值。</p>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">{''.join(figures)}{overview}</div>
-<h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">五家機構偏多／偏空與動能上修／下修家數</h3>
-<div class="overflow-x-auto rounded-lg"><table class="min-w-max text-xs text-slate-200 border-separate border-spacing-0"><thead class="bg-slate-800"><tr>{c_head}</tr></thead><tbody>{c_body}</tbody></table></div>
+<div class="grid grid-cols-1 2xl:grid-cols-2 gap-5">{''.join(figures)}{overview}</div>
 <h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">完整逐季數值表（28 季）</h3>
 <p class="text-xs text-slate-300 mb-2">水平滑動可檢視全部欄位。原始 CSV：<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_DATA}" download>下載逐季數值資料</a>；<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_CONSENSUS}" download>下載共識統計</a>。</p>
-<div class="overflow-x-auto rounded-lg"><table class="min-w-full text-xs text-slate-200"><thead class="bg-slate-800"><tr>{head}</tr></thead><tbody>{body}</tbody></table></div></section>'''
+<div class="overflow-x-auto rounded-lg max-w-full" style="overflow-x:auto;position:relative;max-width:100%;-webkit-overflow-scrolling:touch"><table class="w-max min-w-full text-xs text-slate-200" style="width:max-content;min-width:100%;border-collapse:separate;border-spacing:0"><thead class="bg-slate-800"><tr>{head}</tr></thead><tbody>{body}</tbody></table></div></section>'''
     return template[:section_start] + section + template[section_end + len("</section>"):]
 
 

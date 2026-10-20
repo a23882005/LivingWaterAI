@@ -36,3 +36,9 @@ def test_missing_db_not_created(tmp_path):
     p=tmp_path/'missing.db'
     with pytest.raises(FileNotFoundError):read_snapshot(p,expected_client_id='TEST')
     assert not p.exists()
+
+
+def test_null_client_row_rejected(tmp_path):
+    p=tmp_path/'a.db';make_db(p)
+    with sqlite3.connect(p) as c:c.execute("INSERT INTO portfolio_account VALUES (NULL,'1')")
+    with pytest.raises(InputError,match='CROSS_CLIENT'):read_snapshot(p,expected_client_id='TEST')

@@ -10,13 +10,19 @@
   "next_action": "中PM提供9份指定Frozen schema原件/核定來源；同一W5小PM續作原生adapter與Family調度。現有程式接線持續累積。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
-    "drive": "累計施工包與同一Checkpoint歸檔；fileId見外部receipt",
+    "drive": "累計施工保存，非最終部署；fileIds列於本欄",
     "backup_ref": "backup/w5-20261020-start",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
-    "source_commit": "807c319131a3f4af49193074e96aa3268c42bf53",
-    "github_readback": "24/24 exact content PASS"
+    "github_readback": "前輪24/24 exact content PASS；本輪讀回結果見ZIP RELEASE_RECEIPT.json",
+    "previous_work_commit": "73189334d951f9f1a32e3327a80b1cc5b14fa488",
+    "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
+    "drive_file_ids": {
+      "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
+      "checkpoint": "1jcy2YuhGmM3rs2yM5JFTt5wC5u2EXshB",
+      "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
+    }
   },
   "validation_scope": "W3讀取器10項接收檢查PASS、GitHub/Drive逐位元組一致；W5引擎整合測試仍未執行",
   "w3_reader_acceptance": "PASS",
@@ -28,9 +34,9 @@
       "status": "PASS",
       "scope": "基線接手、既有引擎入口與缺口定位；後續整合另驗",
       "evidence": [
-        "regression_runs.json",
-        "c8c9_dependencies.json",
-        "schema_failure_reproduction.json"
+        "evidence/regression_runs.json",
+        "evidence/c8c9_dependencies.json",
+        "evidence/schema_failure_reproduction.json"
       ]
     },
     "W5-02": {
@@ -174,5 +180,18 @@
       "impact": "四家人真實分析；不影響合成fixture功能測試",
       "requested_action": "指定既有確認Target資料位置；指定W2包現有為程式與golden，四庫final_target_version均0筆；不要求家人重新填資料。"
     }
-  ]
+  ],
+  "recheck": {
+    "date": "2026-10-20",
+    "fixes": [
+      "Reject NULL client_id rows",
+      "Reject macro source mutation during read",
+      "Correct evidence paths and archive identifiers"
+    ],
+    "w5_tests": 29,
+    "component_total": 398,
+    "previous_component_tests_reused": 369,
+    "whole_line": "NOT_RUN",
+    "evidence": "evidence/recheck.json"
+  }
 }

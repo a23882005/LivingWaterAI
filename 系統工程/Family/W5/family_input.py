@@ -45,7 +45,7 @@ def read_snapshot(db_path, *, expected_client_id):
             if not columns:
                 raise InputError('SCHEMA_MISSING:' + table)
             if 'client_id' in columns:
-                if conn.execute('SELECT 1 FROM ' + table + ' WHERE client_id <> ? LIMIT 1',
+                if conn.execute('SELECT 1 FROM ' + table + ' WHERE client_id IS NULL OR client_id <> ? LIMIT 1',
                                 (expected_client_id,)).fetchone():
                     raise InputError('CROSS_CLIENT_ROWS:' + table)
                 rows = conn.execute('SELECT * FROM ' + table + ' WHERE client_id=?',

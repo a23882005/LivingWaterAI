@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "W5續接V75目標拆分來源、債券客戶行動保護與Mentor整線；Family中PM定位既有確認Target及具名producer，界定目標金額/權重接口。",
+  "next_action": "W5續接具名來源及Family/Mentor整線；Family中PM裁定Work8金額/權重與V75客戶動作保護接口，定位既有確認Target與正式producer。詳中PM介面待界定.md。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261021-target-source",
+    "backup_ref": "backup/w5-20261021-bond-target-mentor",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "15e6c1dc7407a1156fae9e7591307073e693c56d",
+    "previous_work_commit": "1aae4a65b775ed072335d50a3f84627ad795c48e",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線210 PASS、1 strict XFAIL；新增14項確認目標語意測試。C7原始確認權重及V82同幣別金額已核；完整Family正向、V75目標拆分及跨幣別來源仍待驗收。",
+  "validation_scope": "本線228 PASS、1 strict XFAIL；新增18項債券目標/Mentor/精確序列化測試，90來源hash PASS。完整Family Work9仍待目標單位及正式來源驗收。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -528,6 +528,32 @@
       "V75 target split / alias / funding bucket projection",
       "C7 integrated weight derivation and target money/weight interface",
       "Cross-currency target FX source",
+      "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "bond_target_mentor_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 228,
+      "w5_xfail": 1,
+      "added": 18
+    },
+    "completed": [
+      "Explicit W2 instrument aliases and same-account/currency per-asset V75 target amount binding",
+      "Confirmed W1 holding policy and C7 protected flag / raw client-action evidence",
+      "Mentor preserves native decision, C7 client action and W1 policy separately; digest/scope/permission checks",
+      "Exact native Money wire serialization; original raw snapshot retained; Work7 actual regression passes"
+    ],
+    "evidence": [
+      "bond_target_bridge.py",
+      "tests/test_bond_target_mentor.py",
+      "evidence/bond_target_mentor_tests.log",
+      "中PM介面待界定.md"
+    ],
+    "remaining": [
+      "Cross-engine bond client action priority",
+      "Work8 target money/weight interface",
+      "Cross-account split / FX and named sources",
       "Full Family/Mentor E2E and final deployment"
     ]
   }

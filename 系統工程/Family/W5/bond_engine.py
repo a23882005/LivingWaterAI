@@ -20,6 +20,22 @@ class BondEvidenceError(ValueError):
     pass
 
 
+def money_wire(value):
+    """Exact Money JSON formatting for the frozen decimal-string schema.
+
+    Pydantic may serialize a native Decimal zero as 0E-28 after scaling.
+    Only Money.amount spelling changes; values and decisions remain identical.
+    """
+    if isinstance(value,list):return [money_wire(v) for v in value]
+    if not isinstance(value,dict):return value
+    result={k:money_wire(v) for k,v in value.items()}
+    if set(value)=={'amount','currency'} and isinstance(value['amount'],str):
+        amount=Decimal(value['amount'])
+        if not amount.is_finite():raise BondEvidenceError('NONFINITE_NATIVE_MONEY')
+        result['amount']='0' if amount==0 and 'e' in value['amount'].lower() else format(amount,'f')
+    return result
+
+
 def _time(value):
     result = datetime.fromisoformat(value.replace('Z', '+00:00'))
     if result.tzinfo is None:
@@ -135,9 +151,11 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
     snapshot = assemble_final_snapshot(run=run, work3_state=state, decisions=decisions,
                                       v75_undeployed_to_sgov=undeployed)
     ready = evaluate_runtime_ready(snapshot)
-    wire = ready.model_dump(mode='json')
+    raw_wire = ready.model_dump(mode='json')
+    wire = money_wire(raw_wire)
     trace.extend(['V75.assemble_final_snapshot', 'V75.evaluate_runtime_ready'])
     canonical = adapter.consume_v75_runtime_ready(wire, built['integration_binding'])
     trace.append('C8C9.Work5.consume_v75_runtime_ready')
     return {**result, 'policy_sources':deepcopy(policy_sources),'status': wire['output']['evaluation_state'],
+            'raw_runtime_ready':raw_wire,'wire_serialization':'EXACT_FIXED_POINT_MONEY_STRINGS',
             'runtime_ready': wire, 'canonical': canonical}

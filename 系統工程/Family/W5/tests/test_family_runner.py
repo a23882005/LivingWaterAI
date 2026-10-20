@@ -1,4 +1,5 @@
 from copy import deepcopy
+from decimal import Decimal
 import json
 import os
 from pathlib import Path
@@ -16,15 +17,35 @@ from test_native_adapters import ROOT
 
 def runner_case():
     bundle=pipeline_case();w3=bundle['stock_request']['work3_handoff']
+    # Coherent synthetic long-term bond targets: historical NAV 20000,
+    # SGOV 28%=5600 and SPSB 12%=2400; today's bond budget remains 350.
+    framework=bundle['asset_framework']
+    for rows in [framework['integrated_asset_framework']['instrument_targets'],
+                 next(x for x in framework['residual_allocation']['buckets'] if x['bucket']=='BOND')['items']]:
+        row=next(x for x in rows if x['instrument_id']=='SGOV.US')
+        row.update(work6_final_target_weight=.28,integrated_weight=.28)
+        added=deepcopy(row);added.update(instrument_id='SPSB.US',ticker='SPSB',
+            work6_final_target_weight=.12,integrated_weight=.12);rows.append(added)
+    drift=next(x for x in framework['drift_snapshot']['items'] if x['instrument_id']=='SGOV.US')
+    drift['current_weight']['value']=.12;drift['final_target_weight']['value']=.28;drift['drift']['value']=.16
+    added=deepcopy(drift);added.update(instrument_id='SPSB.US',ticker='SPSB')
+    added['current_weight']['value']=0;added['final_target_weight']['value']=.12;added['drift']['value']=.12
+    framework['drift_snapshot']['items'].append(added)
+    for row in bundle['bond_request']['v75_source_context']['target_bond_holdings']:
+        row['target_amount']['amount']={'SGOV':'5600','SPSB':'2400'}[row['asset_id']]
+    for branch in ('stock_request','bond_request'):
+        handoff=bundle[branch]['work3_handoff']
+        handoff['final_target']['payload']['instrument_targets']['BOND']['project_target_position']=8000
+        handoff['funding_context']['remaining_target_gap']['v75']['payload']['remaining_target_gap_amount']['amount']='7960'
     req,ctx=fixture(w3['client_state_context']['payload']['client_id'])
     req['run_id']=w3['run_id']
     target=req['confirmed_target'];draft=target['payload']['draft']
     draft['allocation_id']=w3['final_target']['allocation_id']
     # Explicit synthetic W2 target content; the original golden and real records
     # remain unchanged. Historical target amounts are distinct from new funding.
-    draft['target_lines']=[{'instrument_id':row['instrument_id'],
+    draft['target_lines']=[{'instrument_id':row['instrument_id'],'ticker':row['ticker'],
         'weight':{'value':row['work6_final_target_weight'],'value_state':'KNOWN'},
-        'target_amount':{'amount':str(row['work6_final_target_weight']*20000),
+        'target_amount':{'amount':str(Decimal(str(row['work6_final_target_weight']))*20000),
             'currency':'USD','value_state':'KNOWN'},
         'source_reference_ids':['SYNTHETIC_CONFIRMED_TARGET']}
         for row in bundle['asset_framework']['integrated_asset_framework']['instrument_targets']]
@@ -73,6 +94,9 @@ def runner_case():
         'effective_at_utc':'2026-10-01T00:00:00Z','source_reference':'SYNTHETIC_W1_POLICY'}]
     tables['holding_policy_confirmation']=[{'client_id':req['client_id'],'account_key':req['owner']['account'],
         'instrument_key':'VT_KEY','version_no':1,'confirmed_at_utc':'2026-10-01T00:00:00Z'}]
+    for name in ('holding_policy_proposal','holding_policy_confirmation'):
+        for asset in ('SGOV','SPSB'):
+            row=deepcopy(tables[name][0]);row['instrument_key']=asset+'_KEY';tables[name].append(row)
     framework=bundle['asset_framework'];asset=bundle['stock_request']['asset_context']['asset']['asset_id']
     framework['protected_locked_weights']=[r for r in framework['protected_locked_weights'] if r['instrument_id']!=asset]
     for row in framework['integrated_asset_framework']['instrument_targets']:
@@ -98,6 +122,7 @@ def runner_case():
         'account_key':req['owner']['account'],'native_owner':deepcopy(w3['owner']),
         'source_reference':'SYNTHETIC_W1_INSTRUMENT'}
     ctx['native_binding']['bond_instruments']={asset:{'instrument_key':asset+'_KEY',
+        'target_instrument_id':asset+'.US',
         'account_key':req['owner']['account'],'native_owner':deepcopy(w3['owner']),
         'exchange':'ARCA','source_reference':'SYNTHETIC_W1_BOND'} for asset in ('SGOV','SPSB')}
     ctx['funding_source']={'c7_funding_context':deepcopy(bundle['stock_request']['c7_funding_context']),

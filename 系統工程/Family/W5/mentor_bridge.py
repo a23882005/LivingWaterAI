@@ -4,6 +4,7 @@ Work9 owns priorities and actions. W2's frozen reason catalog owns translations.
 The trusted dispatcher supplies scope and result digest after authorization.
 """
 from copy import deepcopy
+from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
@@ -16,7 +17,7 @@ class MentorError(ValueError):
     pass
 
 
-def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggested_changes=()):
+def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggested_changes=(),bond_context=None):
     if llm_suggested_changes:raise MentorError('MODEL_FINANCIAL_MUTATION_REJECTED')
     req=deepcopy(work9_request);original=deepcopy(unified);context=deepcopy(trusted_context)
     if context.get('analysis_permission')!='ANALYZE_ONLY' or context.get('trade_authorization')!='NONE':
@@ -37,6 +38,17 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
     rebuilt=native.build_unified_deployment(req)
     if native._digest(rebuilt)!=native._digest(original):
         raise MentorError('NATIVE_SOURCE_RESULT_MISMATCH')
+    bond_facts=deepcopy(bond_context)
+    if bond_facts is not None:
+        if context.get('expected_bond_context_digest')!=native._digest(bond_facts):
+            raise MentorError('BOND_CONTEXT_DIGEST_MISMATCH')
+        for key in ('client_id','run_id','owner','currency'):
+            if bond_facts.get(key)!=context.get(key):raise MentorError('BOND_CONTEXT_SCOPE_MISMATCH:'+key)
+        assets={item['asset_id'] for item in original['canonical_deployment_result']['items']
+                if item['source_engine']=='V75' and item.get('asset_id') is not None}
+        if assets!=set(bond_facts['items']):raise MentorError('BOND_CONTEXT_COVERAGE_MISMATCH')
+    elif context.get('expected_bond_context_digest') is not None:
+        raise MentorError('BOND_CONTEXT_REQUIRED')
     catalog_bytes=(Path(__file__).parent/'reason_catalog.json').read_bytes()
     if hashlib.sha256(catalog_bytes).hexdigest()!=CATALOG_SHA256:
         raise MentorError('REASON_CATALOG_INTEGRITY')
@@ -66,6 +78,17 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
             row['field_evidence']=deepcopy(source)
             row['client_action']=deepcopy(item['client_preference_action'])
             row['risk_signal']=deepcopy(item['source_action'])
+            if bond_facts is not None:
+                facts=bond_facts['items'][item['asset_id']]
+                amount=item['deployment_amount']
+                if facts['new_buy_candidate'] is False and (
+                        amount.get('status')!='KNOWN' or
+                        Decimal(str(amount['value']['amount']))!=0):
+                    raise MentorError('BOND_PERMISSION_DEPLOYMENT_MISMATCH')
+                row['family_policy_context']=deepcopy(facts)
+                row['c7_client_action']=facts['c7_drift']['client_facing_action']
+                row['client_action_resolution']=facts['client_action_resolution']
+                row['summary']='原生風險、部署金額、家人政策與 C7 客戶動作分欄保留；跨引擎客戶動作待接口確認。'
         rows.append(row)
     return {'contract_name':'Family.W5.mentor.v1','language':'zh-Hant',
         'status':'EXPLAINED_WITH_PENDING_CODES' if unknown else 'EXPLAINED',

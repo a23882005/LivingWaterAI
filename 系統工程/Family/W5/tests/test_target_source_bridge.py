@@ -12,7 +12,7 @@ from test_stock_source_bridge import refresh
 def test_historical_money_and_weight_are_preserved_separately():
     req, _ = runner_case(); before = deepcopy(req)
     result = bind_target_source(req)
-    assert result['stock_target_amount']['amount'] == '1000.0'
+    assert result['stock_target_amount']['amount'] == '1000.00'
     assert next(x for x in result['source_target_lines'] if x['instrument_id']=='QQQ')['weight']['value'] == .05
     assert req == before
     result['source_target_lines'].clear()

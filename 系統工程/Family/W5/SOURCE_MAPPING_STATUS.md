@@ -1,3 +1,13 @@
+## 2026-10-21 債券目標與Mentor來源接線（仍8/18）
+
+bond_target_bridge逐檔核W2確認target_amount、明確target_instrument_id別名、ticker、同帳戶/同幣別，並核W1確認holding policy與C7 protected標記；UNKNOWN/未確認/缺對應停止調度。目標與當期資金分開：合成歷史目標SGOV5600、SPSB2400，當期bond budget350，原V75實際縮放運算。
+
+Mentor新增有digest/owner/run綁定的family_policy_context及c7_client_action，原V75 source_action、canonical與client_preference_action完整保留；禁止新買但部署額非零拒絕。原Work9 V75 client_preference_action為None，跨引擎客戶動作優先序須中PM界定，現狀明標SOURCE_FACTS_ONLY_PENDING_CROSS_ENGINE_PRIORITY。
+
+實測V75 Decimal零可能序列化成0E-28，與Frozen schema不合；W5 money_wire精確轉成一般十進位，指數零轉0，原0.00保留。另存raw_runtime_ready，策略/數值/原核心與schema未改。原Work7實際通過，完整Family仍停於既有Work8目標金額/權重接口。
+
+本線228 PASS、1 strict XFAIL，90來源hash PASS。測試明細見evidence/bond_target_mentor_tests.log及tests/test_bond_target_mentor.py；新增18項。中PM具體責任與原檔欄位見中PM介面待界定.md。跨帳戶目標拆分/FX及具名producer仍待來源；完整Family/Mentor與最終部署續作。Production HOLD、交易NONE。備份backup/w5-20261021-bond-target-mentor；commit/Actions/雙端讀回記累計ZIP RELEASE_RECEIPT.json。
+
 ## 2026-10-21 確認目標內容接線（仍8/18）
 
 新增 target_source_bridge.py：W2 歷史 target_lines 須非空、標的唯一且完整對應 C7；逐欄核原始 work6_final_target_weight，保護後 integrated_weight 保持原值。V82 明確 target pointer 與兩份原生 handoff 的同幣別目標金額，必須等於 W2 原 target_amount，與 planned_investments 分開。

@@ -30,3 +30,13 @@ W5_SOURCE_ROOT="$PWD/w5_start/sources" python -m pytest repo/系統工程/Family
 `recovery_bridge.py` 重用 W2 Work21 `new_test_state`／`apply_event`，只在同一 staging store 補 client_id＋request_id、完整輸入 digest、目前版本／許可重驗、實際逾時至多重試一次及晚到結果拒收。Decimal 精度、陣列順序與型別均納入版本化 digest；測試包含並行重送、快取撤權、計算中版本失效及真正延遲。
 
 此段測試使用受控無副作用計算 provider；完整 Family runner 接入及跨程序持久化未完成，後者由 W7 負責。沒有宣稱 W5-17 全棒或正式恢復 PASS。核心策略／Frozen schema 修改數仍為 0。
+
+## 2026-10-21 債券客戶動作接口
+
+原 `C8C9_Work9_Unified_Deployment_Mentor_Return.py` 的 V75逐檔與帳戶輸出，`client_preference_action` 固定為 `None`；原 Work8 接收 V82，未提供 V75 保護輸出。W5 已將 W1 確認 holding policy、C7 drift 原 client_facing_action、V75 raw source_action 和部署金額分欄接入 Mentor，附來源digest/owner/run並於Family重送前重驗。NEW_BUY拒絕時原V75縮放至零，Mentor另核實際部署為零。
+
+Family 中PM需具名界定：V75 的 HOLD_AS_IS 客戶動作是否沿 C7 drift，或由 C8C9 擴充統一保護介面；若改核心，列最小原檔/欄位/優先序與回歸。W5負責依核定來源接線，現階段保留 `SOURCE_FACTS_ONLY_PENDING_CROSS_ENGINE_PRIORITY`，未自行覆寫原 Work9 client_preference_action。
+
+同輪完成 W2→V75 明確商品別名及同帳戶/同幣別逐檔 target_amount 核對。以明確確認逐檔金額接原V75；跨帳戶目標拆分、整體目標拆資金桶及FX仍須具名來源，W5不重新配置。合成案例歷史NAV 20000、SGOV目標5600/SPSB2400，當期預算350，保留與長期目標不同的語意。
+
+V75原Decimal零有 `0E-28` 表示，Frozen Money schema要求一般十進位字串；W5 `money_wire`僅做Money字串等值序列化，指數零轉`0`，原`0.00`保持，原始snapshot另存raw_runtime_ready。原策略/Frozen schema修改0；實際Work7通過後仍到既有Work8目標單位待界定處。

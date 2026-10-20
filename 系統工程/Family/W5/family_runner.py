@@ -19,6 +19,7 @@ from macro_source_bridge import validate_macro_consumers
 from funding_bridge import bind_funding_source
 from position_source_bridge import bind_position_values,bind_stock_protection
 from target_source_bridge import bind_target_source
+from bond_target_bridge import bind_bond_targets
 
 
 class FamilyRunner:
@@ -61,6 +62,7 @@ class FamilyRunner:
         prepared.payload['family_sources']['valuation']=values
         prepared.payload['family_sources']['protection']=bind_stock_protection(request,prepared,ctx,values)
         prepared.payload['family_sources']['target']=bind_target_source(request)
+        prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding)
         return prepared,ctx
 
     def _compute(self,request):
@@ -72,7 +74,9 @@ class FamilyRunner:
         mentor=explain_native(self.repo_path,native['work9_request'],u,trusted_context={
             'client_id':request['client_id'],'run_id':request['run_id'],'owner':u['owner'],'currency':u['currency'],
             'analysis_permission':'ANALYZE_ONLY','trade_authorization':'NONE','runtime_mode':'REAL_DETERMINISTIC',
-            'data_provenance':ctx['native_binding']['data_provenance'],'expected_result_digest':digest(u)})
+            'data_provenance':ctx['native_binding']['data_provenance'],'expected_result_digest':digest(u),
+            'expected_bond_context_digest':digest(prepared.payload['family_sources']['bond_targets'])},
+            bond_context=prepared.payload['family_sources']['bond_targets'])
         return {'schema_version':'Family.W5.result.v1','status':'OK','client_id':request['client_id'],
             'request_id':request['request_id'],'run_id':request['run_id'],'owner':deepcopy(request['owner']),
             'input_digest':input_digest(request),'target_binding':deepcopy(prepared.payload['target_binding']),

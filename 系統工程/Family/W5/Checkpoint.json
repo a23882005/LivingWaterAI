@@ -7,7 +7,7 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "Family中PM定位09正式來源；W5接回完成18",
-  "next_action": "Family中PM補TECHNICAL_SOURCE_INTAKE.md所列資料與窄裁定；W5接回完成09與18。",
+  "next_action": "Family中PM核定剩餘metadata/規則；W5承接真實行情完成FamilyRunner映射及09/18最終驗收。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
@@ -119,8 +119,8 @@
     },
     "W5-09": {
       "status": "BLOCKED_EXTERNAL_SOURCE",
-      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。 已接中PM逐欄規格，鎖三份原碼/規格，新增完整history intake與原TD9/Swing包裝、32項具名partial facts及原V82聚合；34項受影響測試PASS。",
-      "remaining": "TECHNICAL_SOURCE_INTAKE.md列原history/可信時間及拆股metadata、KD/EMV/敘述型predicate窄裁定；尚未接FamilyRunner完整producer。",
+      "completed": "技術producer metadata、標的/幣別/週期/調整參數、available_at、swing確認時間與Close口徑檢查，合成訊號跑原生技術判定。 已接中PM逐欄規格，鎖三份原碼/規格，新增完整history intake與原TD9/Swing包裝、32項具名partial facts及原V82聚合；34項受影響測試PASS。 真實行情23/23已核驗並送入既有接收器；兩份下載包CRC/SHA符合。",
+      "remaining": "MARKET_INTAKE_RECEIPT.md 所列metadata與規則核定，接FamilyRunner後完成09/18。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
         "evidence/stock_sgov_tests.log",
@@ -129,7 +129,9 @@
         "technical_source_lock.json",
         "tests/test_technical_source_bridge.py",
         "evidence/source09_tests.log",
-        "evidence/technical_partial_synthetic.json"
+        "evidence/technical_partial_synthetic.json",
+        "evidence/market_intake.json",
+        "MARKET_INTAKE_RECEIPT.md"
       ]
     },
     "W5-10": {
@@ -263,7 +265,7 @@
       "id": "W5-TECHNICAL-SOURCE",
       "owner": "Family中PM指定來源",
       "impact": "W5-09實際家人技術輸入",
-      "requested_action": "指定既有技術producer或正式輸入快照路徑與版本，W3原feed維持原樣。"
+      "requested_action": "行情固定版本與23份原檔已接收；依MARKET_INTAKE_RECEIPT.md核定剩餘metadata及逐欄規則。"
     },
     {
       "id": "W5-CONFIRMED-TARGET-SOURCE",
@@ -731,14 +733,16 @@
     "evidence": "PM16_APPROVAL_AND_ACCEPTANCE.md"
   },
   "technical_source_intake": {
-    "status": "PARTIAL_IMPLEMENTED",
+    "status": "REAL_HISTORY_RECEIVED_METADATA_RULES_PENDING",
     "source_spec": "https://docs.google.com/document/d/1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho/edit",
     "affected_pass": 34,
     "new_tests": 17,
     "source_hashes": 115,
     "formal_producer_complete": false,
     "family_runner_connected": false,
-    "real_history_received": false,
-    "core_changes": 0
+    "real_history_received": true,
+    "core_changes": 0,
+    "real_history_count": 23,
+    "market_intake_evidence": "evidence/market_intake.json"
   }
 }

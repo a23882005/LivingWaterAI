@@ -1,3 +1,5 @@
+> 最新接收：真實行情23/23核驗並完成既有接收器執行；詳 MARKET_INTAKE_RECEIPT.md 與 evidence/market_intake.json。原history未收到的舊描述已由本筆取代。累計16/18。
+
 # W5-09 指定來源接線實作
 
 依W5_09_SOURCE_MAPPING_SPEC.md（原Doc 1WfxKFSOUQegC4pt8j1YcMMoMuxTYE7JBX7rUY1uGdho）施工。整線仍16/18；09已具名來源接線部分完成，待原始history/可信時間及剩餘規則；16保持完成。18待必要來源齊備。

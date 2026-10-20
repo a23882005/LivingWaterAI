@@ -1,0 +1,505 @@
+{
+  "commit": "bc8d581d74c7f17204a0b3e251c0f659279aedc8",
+  "csv_verified": 23,
+  "files": [
+    {
+      "path": "data/market_history/global/DRAM.csv",
+      "git_blob": "87be16cf4d3e0437fab92db42cb01eb66005f176",
+      "sha256": "932940268eb63e31c64823fd272871bdd71d9e082ed77e2e63302b7c3fcd479f",
+      "bytes": 16931,
+      "rows": 138,
+      "first": "2026-04-02",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/GOOG.csv",
+      "git_blob": "4195ac6563abfcc73382282459ac3a314343c2eb",
+      "sha256": "846a69df9590919728e0b289c0b51b23ef742db52c7ccf5ff130e8c3e839cb74",
+      "bytes": 674932,
+      "rows": 5577,
+      "first": "2004-08-19",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/GOOGL.csv",
+      "git_blob": "6ff24709fd9d0404aed11c3242a1fc71c9a953e4",
+      "sha256": "f56d2b2433db44968edeaf894d6a8fc87bce1dead7255fe407861ae57d8e2503",
+      "bytes": 673529,
+      "rows": 5577,
+      "first": "2004-08-19",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/IBKR.csv",
+      "git_blob": "1ea70bef409bd8f5e51a79bc4c57c70f47f1af71",
+      "sha256": "1251379f8affea8c442d67176aae7ddc9a33d75a7bf40b607c4f999ff270941c",
+      "bytes": 562279,
+      "rows": 4896,
+      "first": "2007-05-04",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/IEF.csv",
+      "git_blob": "7d10987913f76e97c3b21ea2f629f2110764186b",
+      "sha256": "c82d73f486f69341303555246dd9c328c3f57faa8db43b334be48c8b2a1b31ec",
+      "bytes": 738027,
+      "rows": 6095,
+      "first": "2002-07-30",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/MSFT.csv",
+      "git_blob": "37ff7dc7d4d27bb663184e7e067bdcf76431a756",
+      "sha256": "527eb5545d5e0665a65f2e73d9daa0692ed9c3afb77ba880f00187a190fa383c",
+      "bytes": 784451,
+      "rows": 6739,
+      "first": "2000-01-03",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/NATO.CN.csv",
+      "git_blob": "a2a30f5ecec0b87178d2bc7c404edd1b3d8fd56e",
+      "sha256": "8a5c10c81ed002d2f0ccbb463c632b1c73a94ebf6b40a07e4262d56c29fdfc73",
+      "bytes": 146838,
+      "rows": 1234,
+      "first": "2021-11-17",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/NVDA.csv",
+      "git_blob": "a2eb85261511b172044f8d30598da1916d946ccc",
+      "sha256": "dea6aba1011479110ed5b5413ea1c5a392aa19b8db88baaca89ac3f0aa8e9d2e",
+      "bytes": 832602,
+      "rows": 6739,
+      "first": "2000-01-03",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/PPH.csv",
+      "git_blob": "250addd7b1521bf91b204a14a0aebf287789d9ce",
+      "sha256": "d82fd867b81d569b18669dd0bd23821f4996afeb9c648c902af1727a1ed7103a",
+      "bytes": 780069,
+      "rows": 6719,
+      "first": "2000-02-01",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/QQQ.csv",
+      "git_blob": "7ab46d5d884b14ba4da184fd0d717edc884f2eae",
+      "sha256": "3e3f80822ee5a57a8f0401428e8fadeb7f398dfd7c01005f6f82805c88cfe2e1",
+      "bytes": 802743,
+      "rows": 6739,
+      "first": "2000-01-03",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/SGOV.csv",
+      "git_blob": "066e7137a521d77cb1a6cb379819ce7208de85c4",
+      "sha256": "439215f7463f7d29de03afe0278a957501011387e5f6fc064bffac0891818820",
+      "bytes": 199433,
+      "rows": 1605,
+      "first": "2020-06-01",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/SMH.csv",
+      "git_blob": "5c63c3a8f995f64be4eee35bca8eb649c3048ee9",
+      "sha256": "f66f0f45ca1a3f1cceb30db741b748c2853119666fda1b2da0aa55a33cad0730",
+      "bytes": 808355,
+      "rows": 6633,
+      "first": "2000-06-05",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/SOXX.csv",
+      "git_blob": "3432783650fa5b9da6928f2e6d4f7484b5ac981e",
+      "sha256": "085124a762b92afb4b9f98b9977fff540b50c59dd68eb3e97a2f1dc1f8a9b384",
+      "bytes": 781248,
+      "rows": 6354,
+      "first": "2001-07-13",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/SPLB.csv",
+      "git_blob": "9418ced473b57e3e2548cabf97a379e60e2ef885",
+      "sha256": "f524b34a4b31b6317a0cf419998c198ab794af583cf192806e7db775067229e4",
+      "bytes": 541529,
+      "rows": 4430,
+      "first": "2009-03-11",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/SPSB.csv",
+      "git_blob": "88898cda9f1a6ed74eae784c198ac6d9628e5ed4",
+      "sha256": "b6f7bf013e470de8c8fdf64627679d2645753473ae49db3f61a9aab650d89508",
+      "bytes": 516255,
+      "rows": 4224,
+      "first": "2010-01-04",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/TLT.csv",
+      "git_blob": "c91fd1321fe2942a053b17ff30e41cdec624f961",
+      "sha256": "ce6b163fa77c01523e9899e977ec9e7296a6c3df053c276bfe812ae2de9976c2",
+      "bytes": 743392,
+      "rows": 6095,
+      "first": "2002-07-30",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/VALL.L.csv",
+      "git_blob": "00d9a56f23f9fa0712cb928c36a58ebb15077411",
+      "sha256": "2b38dfdf2174677fafc55ded2288d41cfc4c4ef39e9aa14e3a97f05551c66c53",
+      "bytes": 5149,
+      "rows": 42,
+      "first": "2026-08-18",
+      "last": "2026-10-16",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/VOO.csv",
+      "git_blob": "2aa41f85f414acccbbf9bd249333617bd3a5b18e",
+      "sha256": "02200151a8f7e27b838673f2132d8f968f5846289227468a0f7c2db5ac89c75e",
+      "bytes": 492148,
+      "rows": 4052,
+      "first": "2010-09-09",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/VT.csv",
+      "git_blob": "cfdaf89d8757ffc85e83fefd472daf3086f5a088",
+      "sha256": "817eddd6a618fdb7d2befb512cbf35bf2ed9d2acfd303ae5248b2e853429d3e0",
+      "bytes": 555141,
+      "rows": 4607,
+      "first": "2008-06-26",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/VWRA.L.csv",
+      "git_blob": "3f4bccad60627909670e9e08e6bcb0592690eb0f",
+      "sha256": "d2c6369b54a1809a28c5408cb272ce4e55a9a56037d01b5684ef50c805ec09af",
+      "bytes": 217287,
+      "rows": 1828,
+      "first": "2019-07-23",
+      "last": "2026-10-16",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/global/ZTS.csv",
+      "git_blob": "250ec5b1ac5252bb6613074dc8c1f05599ea10d8",
+      "sha256": "af1ef4210de85fe6cf9319fee9210ce31eb3dfb777058adcd0e5f5449505ee64",
+      "bytes": 404960,
+      "rows": 3449,
+      "first": "2013-02-01",
+      "last": "2026-10-19",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/taiwan/0050.TW.csv",
+      "git_blob": "836d9ab7ec9a26052e7d083d8ecc186aedc7d04b",
+      "sha256": "94b958667625d958b8f7a5e2f5ef654c21b4477d0dbd2e7d696b9ff0d5bd1a2a",
+      "bytes": 503986,
+      "rows": 4355,
+      "first": "2009-01-02",
+      "last": "2026-10-20",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    },
+    {
+      "path": "data/market_history/taiwan/2330.TW.csv",
+      "git_blob": "44d7258ddb57bd50ac87ecbf295939b1df2da248",
+      "sha256": "fb4e5db444d550484971a0f7e0084d5b349f543ed0c01ce32aa2b0d30c3399ae",
+      "bytes": 634186,
+      "rows": 6661,
+      "first": "2000-01-04",
+      "last": "2026-10-20",
+      "receiver_status": "DATA_UNAVAILABLE",
+      "issues": [
+        "SOURCE_METADATA_REQUIRED",
+        "PRICE_BASIS_UNVERIFIED",
+        "SESSION_CONTINUITY_UNVERIFIED",
+        "BAR_RECEIPTS_REQUIRED"
+      ],
+      "aggregation": {
+        "right_confirmation": "UNKNOWN",
+        "runaway_up": "UNKNOWN",
+        "runaway_down": "UNKNOWN"
+      }
+    }
+  ],
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "unresolved": [
+    "split basis",
+    "historical per-bar availability",
+    "instrument/calendar/formal close metadata",
+    "unapproved strategy rules"
+  ],
+  "excluded_alias": "NATO.CN is not NATO LSEETF/USD",
+  "artifact_sha256": {
+    "global": "73be7654674f4b085c6337e8f148846e92bf5459df13ce0b22dbbfe85adbbd0a",
+    "taiwan": "3973dc86d353dc7a80a461d25adccfb9508853383c68ef837b3725365ce3908c"
+  },
+  "artifact_crc": "PASS",
+  "receipt": "https://github.com/a23882005/LivingWaterAI/pull/22#issuecomment-6300245672",
+  "runtime_changes": 0
+}

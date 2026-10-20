@@ -38,7 +38,9 @@ class V703ResearchChartsTests(unittest.TestCase):
         page = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
         parser = ResearchChartMarkup()
         parser.feed(page)
-        self.assertTrue(page.lstrip().startswith("<!DOCTYPE html>"))\n        self.assertNotIn("# 最後修改日期時間", page[:200])\n        expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
+        self.assertTrue(page.lstrip().startswith("<!DOCTYPE html>"))
+        self.assertNotIn("# 最後修改日期時間", page[:200])
+        expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
         self.assertEqual(parser.figures, 13)
         self.assertEqual(parser.images, expected)
         self.assertIn("完整逐季數值表（28 季）", page)

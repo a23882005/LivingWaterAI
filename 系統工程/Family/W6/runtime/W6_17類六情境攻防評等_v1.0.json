@@ -1,0 +1,544 @@
+{
+  "version": "W6-GRADE-v1.0",
+  "status": "PM_FIXED_BASELINE",
+  "method": "heuristic_policy_not_backtest",
+  "horizon": "6–12個月情境比較；非短線交易訊號",
+  "scenario_order": [
+    "牛市初期",
+    "牛市中期",
+    "牛市末期",
+    "正常修正",
+    "景氣衰退",
+    "金融危機"
+  ],
+  "grid": "level / 2",
+  "rows": [
+    {
+      "id": "S01",
+      "name": "全球股票",
+      "reason": "跨市場分散，仍承受股票系統性下跌。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 5,
+          "defense": 4
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 4
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 2,
+          "defense": 2
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 2
+        }
+      }
+    },
+    {
+      "id": "S02",
+      "name": "美國大型核心",
+      "reason": "大型企業核心曝險；集中於美國市場。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 5,
+          "defense": 4
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 4
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 2,
+          "defense": 2
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 2
+        }
+      }
+    },
+    {
+      "id": "S03",
+      "name": "科技／AI／高成長",
+      "reason": "成長行情參與度高，估值與利率敏感。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 6,
+          "defense": 2
+        },
+        "牛市中期": {
+          "attack": 6,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 5,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 1,
+          "defense": 2
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "S04",
+      "name": "台灣大型權值",
+      "reason": "科技出口與權值股集中，景氣循環敏感。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 6,
+          "defense": 3
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 2
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 2
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "S05",
+      "name": "製藥／醫療",
+      "reason": "需求相對穩定；仍有政策與個別產品風險。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 4,
+          "defense": 4
+        },
+        "牛市中期": {
+          "attack": 4,
+          "defense": 4
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 4
+        },
+        "正常修正": {
+          "attack": 3,
+          "defense": 4
+        },
+        "景氣衰退": {
+          "attack": 3,
+          "defense": 4
+        },
+        "金融危機": {
+          "attack": 2,
+          "defense": 3
+        }
+      }
+    },
+    {
+      "id": "S06",
+      "name": "美國中小型",
+      "reason": "復甦彈性較高，融資與信用收縮敏感。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 6,
+          "defense": 2
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 3,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 1,
+          "defense": 2
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "S07",
+      "name": "半導體",
+      "reason": "高成長與庫存循環並存，產業集中。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 6,
+          "defense": 2
+        },
+        "牛市中期": {
+          "attack": 6,
+          "defense": 2
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 1
+        },
+        "正常修正": {
+          "attack": 1,
+          "defense": 1
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "S08",
+      "name": "國防／軍工",
+      "reason": "訂單與政府預算支撐；一般金融危機不預設戰爭受惠。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "牛市中期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 3,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 3,
+          "defense": 3
+        },
+        "金融危機": {
+          "attack": 2,
+          "defense": 2
+        }
+      }
+    },
+    {
+      "id": "S09",
+      "name": "產業／主題",
+      "reason": "一般集中型主題基準；已有專屬類別者優先用專屬類別。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 5,
+          "defense": 2
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 2
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 1,
+          "defense": 2
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "S10",
+      "name": "大型成熟／高品質個股",
+      "reason": "品質提供相對支撐，單一公司風險仍高於分散工具。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 5,
+          "defense": 3
+        },
+        "牛市中期": {
+          "attack": 5,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 2,
+          "defense": 3
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 2
+        }
+      }
+    },
+    {
+      "id": "S11",
+      "name": "高Beta／事件型個股",
+      "reason": "上漲彈性高，波動與公司事件風險高。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 6,
+          "defense": 1
+        },
+        "牛市中期": {
+          "attack": 6,
+          "defense": 1
+        },
+        "牛市末期": {
+          "attack": 5,
+          "defense": 1
+        },
+        "正常修正": {
+          "attack": 1,
+          "defense": 1
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    },
+    {
+      "id": "B01",
+      "name": "極短天期高品質公債",
+      "reason": "有效存續期間≤1年，以收息和穩定為主。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 2,
+          "defense": 6
+        },
+        "牛市中期": {
+          "attack": 2,
+          "defense": 6
+        },
+        "牛市末期": {
+          "attack": 2,
+          "defense": 6
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 6
+        },
+        "景氣衰退": {
+          "attack": 2,
+          "defense": 6
+        },
+        "金融危機": {
+          "attack": 2,
+          "defense": 6
+        }
+      }
+    },
+    {
+      "id": "B02",
+      "name": "短天期高品質公債",
+      "reason": "有效存續期間>1至3年，利率敏感度較低。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 2,
+          "defense": 5
+        },
+        "牛市中期": {
+          "attack": 2,
+          "defense": 5
+        },
+        "牛市末期": {
+          "attack": 2,
+          "defense": 5
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 5
+        },
+        "景氣衰退": {
+          "attack": 3,
+          "defense": 6
+        },
+        "金融危機": {
+          "attack": 3,
+          "defense": 5
+        }
+      }
+    },
+    {
+      "id": "B03",
+      "name": "中天期高品質公債",
+      "reason": "有效存續期間>3至7年，兼具利率風險與降息受惠。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 3,
+          "defense": 4
+        },
+        "牛市中期": {
+          "attack": 2,
+          "defense": 4
+        },
+        "牛市末期": {
+          "attack": 2,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 3,
+          "defense": 4
+        },
+        "景氣衰退": {
+          "attack": 4,
+          "defense": 5
+        },
+        "金融危機": {
+          "attack": 4,
+          "defense": 4
+        }
+      }
+    },
+    {
+      "id": "B04",
+      "name": "長天期高品質公債",
+      "reason": "有效存續期間>7年；衰退欄以通膨回落、殖利率下降為假設。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 3,
+          "defense": 2
+        },
+        "牛市中期": {
+          "attack": 2,
+          "defense": 2
+        },
+        "牛市末期": {
+          "attack": 1,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 3,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 5,
+          "defense": 5
+        },
+        "金融危機": {
+          "attack": 4,
+          "defense": 4
+        }
+      }
+    },
+    {
+      "id": "B05",
+      "name": "投資等級公司債",
+      "reason": "基本列以中存續期間為準；同時承受利率及信用利差風險。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 4,
+          "defense": 4
+        },
+        "牛市中期": {
+          "attack": 3,
+          "defense": 4
+        },
+        "牛市末期": {
+          "attack": 2,
+          "defense": 3
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 3
+        },
+        "景氣衰退": {
+          "attack": 3,
+          "defense": 3
+        },
+        "金融危機": {
+          "attack": 2,
+          "defense": 2
+        }
+      }
+    },
+    {
+      "id": "B06",
+      "name": "非投資等級公司債",
+      "reason": "基本列以中存續期間為準；信用收縮時防禦較弱。",
+      "scenarios": {
+        "牛市初期": {
+          "attack": 5,
+          "defense": 3
+        },
+        "牛市中期": {
+          "attack": 4,
+          "defense": 3
+        },
+        "牛市末期": {
+          "attack": 3,
+          "defense": 2
+        },
+        "正常修正": {
+          "attack": 2,
+          "defense": 2
+        },
+        "景氣衰退": {
+          "attack": 1,
+          "defense": 1
+        },
+        "金融危機": {
+          "attack": 1,
+          "defense": 1
+        }
+      }
+    }
+  ]
+}

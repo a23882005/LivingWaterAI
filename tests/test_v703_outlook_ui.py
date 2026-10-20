@@ -72,7 +72,7 @@ class V703OutlookUITest(unittest.TestCase):
         panel = re.search(r'<details id="v703-raw-data-panel".*?</details>', s, re.S)
         self.assertIsNotNone(panel)
         markup = panel.group(0)
-        self.assertEqual(re.findall(r'<th class="border border-slate-700 p-2">([^<]+)</th>', markup), [
+        self.assertEqual(re.findall(r'<th class="border border-slate-700 p-2"(?: style="[^"]*")?>([^<]+)</th>', markup), [
             "指標（程式變數）", "數值", "日期", "狀態"
         ])
         self.assertIn('colspan="4"', markup)
@@ -100,10 +100,12 @@ class V703OutlookUITest(unittest.TestCase):
         markup = panel.group(0)
         self.assertIn('border-collapse border border-slate-700', markup)
         self.assertGreaterEqual(markup.count('class="border border-slate-700 p-2"'), 4)
+        self.assertGreaterEqual(markup.count('style="border:1px solid #475569"'), 5)
         renderer = re.search(r'<script id="v703-render-raw-data">(.*?)</script>', s, re.S)
         self.assertIsNotNone(renderer)
         self.assertIn("id+'｜'+(labels[id]||'其他指標')", renderer.group(1))
         self.assertIn("td.className='border border-slate-700 p-2'", renderer.group(1))
+        self.assertIn("td.style.border='1px solid #475569'", renderer.group(1))
 
     def test_html_document_and_unique_ids(self):
         s = self.source

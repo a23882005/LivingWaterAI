@@ -9,12 +9,14 @@
   "next_owner": "同一位W5小PM",
   "next_action": "中PM提供9份指定Frozen schema原件/核定來源；同一W5小PM續作原生adapter與Family調度。現有程式接線持續累積。",
   "deployment": {
-    "github": "WORK_BRANCH_PENDING_UPLOAD",
-    "drive": "STAGING_PENDING_UPLOAD",
+    "github": "WORK_BRANCH_VERIFIED",
+    "drive": "累計施工包與同一Checkpoint歸檔；fileId見外部receipt",
     "backup_ref": "backup/w5-20261020-start",
     "main_unchanged": true,
     "actions": "NOT_RUN",
-    "dual_deploy": "NOT_VERIFIED"
+    "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
+    "source_commit": "807c319131a3f4af49193074e96aa3268c42bf53",
+    "github_readback": "24/24 exact content PASS"
   },
   "validation_scope": "W3讀取器10項接收檢查PASS、GitHub/Drive逐位元組一致；W5引擎整合測試仍未執行",
   "w3_reader_acceptance": "PASS",

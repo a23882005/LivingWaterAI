@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "W5續核完整C7/確認Target來源語意、債券客戶行動保護、正式技術/V70/報價producer與整線Mentor；Family中PM界定目標金額/權重接口並定位既有來源。",
+  "next_action": "W5續接V75目標拆分來源、債券客戶行動保護與Mentor整線；Family中PM定位既有確認Target及具名producer，界定目標金額/權重接口。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261021-valuation-protection",
+    "backup_ref": "backup/w5-20261021-target-source",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "929fcb19a5125ab873c69fce63e9cdc37ab9c505",
+    "previous_work_commit": "15e6c1dc7407a1156fae9e7591307073e693c56d",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線196 PASS、1 strict XFAIL；新增15項估值/SGOV/保護來源及版本測試。完整Family Work9正向仍待目標單位及完整來源驗收。",
+  "validation_scope": "本線210 PASS、1 strict XFAIL；新增14項確認目標語意測試。C7原始確認權重及V82同幣別金額已核；完整Family正向、V75目標拆分及跨幣別來源仍待驗收。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -503,6 +503,31 @@
       "Bond client-facing holding protection",
       "Named quote/technical/V70 producers and different source_run binding",
       "Target money/weight interface",
+      "Full Family/Mentor E2E and final deployment"
+    ]
+  },
+  "target_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 210,
+      "w5_xfail": 1,
+      "added": 14
+    },
+    "completed": [
+      "Nonempty unique W2 target lines and exact C7 original target coverage",
+      "C7 work6_final_target_weight matches preserved W2 weight; protected integrated weights untouched",
+      "Selected V82 target amount/currency and pointer match preserved W2 target in both native handoffs",
+      "Digest-consistent semantic mutations rejected before dispatch"
+    ],
+    "evidence": [
+      "target_source_bridge.py",
+      "tests/test_target_source_bridge.py",
+      "evidence/target_source_tests.log"
+    ],
+    "remaining": [
+      "V75 target split / alias / funding bucket projection",
+      "C7 integrated weight derivation and target money/weight interface",
+      "Cross-currency target FX source",
       "Full Family/Mentor E2E and final deployment"
     ]
   }

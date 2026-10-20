@@ -20,6 +20,14 @@ def runner_case():
     req['run_id']=w3['run_id']
     target=req['confirmed_target'];draft=target['payload']['draft']
     draft['allocation_id']=w3['final_target']['allocation_id']
+    # Explicit synthetic W2 target content; the original golden and real records
+    # remain unchanged. Historical target amounts are distinct from new funding.
+    draft['target_lines']=[{'instrument_id':row['instrument_id'],
+        'weight':{'value':row['work6_final_target_weight'],'value_state':'KNOWN'},
+        'target_amount':{'amount':str(row['work6_final_target_weight']*20000),
+            'currency':'USD','value_state':'KNOWN'},
+        'source_reference_ids':['SYNTHETIC_CONFIRMED_TARGET']}
+        for row in bundle['asset_framework']['integrated_asset_framework']['instrument_targets']]
     draft['draft_hash']=digest({k:v for k,v in draft.items() if k!='draft_hash'})
     target['target_hash']=target['payload']['target_hash']=ctx['target_hash']=draft['draft_hash']
     evidence=target['payload']['confirmation_evidence']

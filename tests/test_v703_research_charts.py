@@ -40,6 +40,7 @@ class V703ResearchChartsTests(unittest.TestCase):
         parser.feed(page)
         self.assertTrue(page.lstrip().startswith("<!DOCTYPE html>"))
         self.assertNotIn("# 最後修改日期時間", page[:200])
+        self.assertNotIn("最後程式更新（台灣時間）", page)
         expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
         self.assertEqual(parser.figures, 13)
         self.assertEqual(parser.images, expected)

@@ -114,6 +114,21 @@ def assemble(snapshot, request, result, *, client_id, members, sections=None, ev
 
 
 def receive_action(result, request):
+    require(result.get('schema_version') == 'Family.W5.result.v1', 'RESULT_SCHEMA')
+    require(bool(request.get('run_id')) and result.get('run_id') == request['run_id'], 'RUN_MISMATCH')
+    require(bool(request.get('request_id')) and result.get('request_id') == request['request_id'], 'REQUEST_MISMATCH')
+    # Failure receipts may omit client_id; every supplied nested identity must match.
+    def check_client(value):
+        if isinstance(value, dict):
+            if 'client_id' in value:
+                require(value['client_id'] == request.get('client_id'), 'RESULT_CLIENT')
+            for child in value.values():
+                check_client(child)
+        elif isinstance(value, list):
+            for child in value:
+                check_client(child)
+    if result.get("status") != "OK":
+        check_client(result)
     require(result.get('production') == 'HOLD' and result.get('trade_action') == 'NO_TRADE', 'ENGINE_EXECUTION_SCOPE')
     status = result.get('status')
     require(status in ('OK', 'DATA_UNAVAILABLE', 'REJECTED', 'BLOCKED', 'INVALID_INPUT', 'ERROR'), 'RESULT_STATUS_UNKNOWN')

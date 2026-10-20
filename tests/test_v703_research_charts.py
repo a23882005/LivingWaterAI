@@ -1,14 +1,11 @@
 import importlib.util
-import json
 import tempfile
 import unittest
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location(
-    "build_daily_v703_site", ROOT / "scripts" / "build_daily_v703_site.py"
-)
+spec = importlib.util.spec_from_file_location("build_daily_v703_site", ROOT / "scripts" / "build_daily_v703_site.py")
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
 
@@ -37,77 +34,46 @@ class ResearchChartMarkup(HTMLParser):
 
 
 class V703ResearchChartsTests(unittest.TestCase):
-    def test_html_references_exactly_seven_saved_charts(self):
-        html = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
+    def test_html_references_twelve_plots_and_overview_in_requested_order(self):
+        page = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
         parser = ResearchChartMarkup()
-        parser.feed(html)
-        expected = {f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS}
-        self.assertEqual(parser.figures, 7)
-        self.assertEqual(set(parser.images), expected)
-        self.assertEqual(len(parser.images), len(expected))
-        self.assertIn("兩者期間不同", html)
-        self.assertIn("候選季度體質方向斜率", html)
-        self.assertNotIn("真實月斜率（分數點／月）", html)
-        self.assertIn("七線總覽", html)
-        self.assertIn("本頁研究圖固定呈現逐季資料", html)
-        self.assertTrue(all("季度研究圖" in alt for alt in parser.alts[:5]))
-        self.assertFalse(any("月度候選研究圖" in alt for alt in parser.alts))
-        self.assertIn("macro_slope_candidate.png", parser.images[-2])
-        self.assertIn("overview_7lines.png", parser.images[-1])
+        parser.feed(page)
+        expected = [f"v70-research-charts/{name}" for name in builder.RESEARCH_CHARTS]
+        self.assertEqual(parser.figures, 13)
+        self.assertEqual(parser.images, expected)
+        self.assertIn("完整逐季數值表（28 季）", page)
+        self.assertIn("2026-10-01", page)
+        self.assertIn("季度資料不插值成月資料", page)
+        self.assertIn("動能上修／下修家數", page)
+        self.assertTrue(all("後三個月實際報酬" in alt for alt in parser.alts))
+        names = ("Macro-SaFe｜原始值", "高盛｜原始值", "美國銀行｜原始值", "摩根士丹利｜原始值", "瑞銀｜原始值", "摩根大通｜原始值")
+        positions = [page.index(f"<figcaption class=\"text-sm font-semibold text-slate-100 mb-2\">{name}") for name in names]
+        self.assertEqual(positions, sorted(positions))
 
-    def test_build_always_copies_quarterly_pngs(self):
+    def test_builder_copies_all_pngs_and_both_source_tables(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            source_dir = root / "quarterly"
-            monthly_dir = root / "monthly"
-            source_dir.mkdir()
-            monthly_dir.mkdir()
-            original_dir = (Path(builder.__file__).resolve().parents[1]
-                            / "experiments" / "macro-safety-monthly-research" / "charts")
-            for target, source in builder.RESEARCH_CHARTS.items():
-                (source_dir / source).write_bytes((original_dir / source).read_bytes())
-            output, monthly_ready = builder.copy_research_charts(
-                root / "out", source_dir
-            )
+            output, monthly_ready = builder.copy_research_charts(Path(tmp) / "out")
             self.assertFalse(monthly_ready)
-            self.assertEqual({path.name for path in output.iterdir()}, set(builder.RESEARCH_CHARTS))
-            for target, source in builder.RESEARCH_CHARTS.items():
-                self.assertEqual((output / target).read_bytes(), (source_dir / source).read_bytes())
+            expected = set(builder.RESEARCH_CHARTS) | {builder.QUARTERLY_DATA, builder.QUARTERLY_CONSENSUS}
+            self.assertEqual({p.name for p in output.iterdir()}, expected)
+            for name in builder.RESEARCH_CHARTS:
+                self.assertEqual((output / name).read_bytes()[:8], b"\x89PNG\r\n\x1a\n")
 
-    def test_monthly_assets_never_replace_quarterly_charts(self):
-        signature = bytes([137]) + b"PNG" + bytes([13, 10, 26, 10])
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            quarterly, monthly = root / "quarterly", root / "monthly"
-            quarterly.mkdir()
-            monthly.mkdir()
-            for output_name, source_name in builder.RESEARCH_CHARTS.items():
-                (quarterly / source_name).write_bytes(signature + b"quarterly")
-                (monthly / output_name).write_bytes(signature + b"monthly")
-            output, monthly_ready = builder.copy_research_charts(
-                root / "out", quarterly
-            )
-            self.assertFalse(monthly_ready)
-            for output_name, source_name in builder.RESEARCH_CHARTS.items():
-                self.assertEqual((output / output_name).read_bytes(),
-                                 (quarterly / source_name).read_bytes())
+    def test_markup_builds_full_quarter_table_with_na_and_preserves_no_monthly_interpolation(self):
+        template = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
+        rendered = builder._quarterly_chart_markup(template)
+        self.assertEqual(rendered.count("<tbody>"), 2)
+        self.assertIn(">NA</td>", rendered)
+        self.assertIn("季度資料不插值成月資料", rendered)
+        self.assertIn("後三個月報酬尚未成熟，保留 NA", rendered)
 
-    def test_quarterly_markup_keeps_quarterly_scope_explicit(self):
-        html = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
-        quarterly = builder._quarterly_chart_markup(html)
-        self.assertIn("候選季度體質方向斜率", quarterly)
-        self.assertIn("本頁研究圖固定呈現逐季資料", quarterly)
-        self.assertNotIn("真實月斜率（分數點／月）", quarterly)
-
-    def test_deployment_upload_includes_chart_assets(self):
+    def test_deployment_upload_and_live_verification_cover_full_set(self):
         workflow = (ROOT / ".github" / "workflows" / "v703-site-deploy-1100.yml").read_text(encoding="utf-8")
         self.assertIn("build/site/v70-research-charts/*", workflow)
-        for name in builder.RESEARCH_CHARTS:
-            self.assertIn(name, workflow)
+        self.assertIn(builder.QUARTERLY_DATA, workflow)
+        self.assertIn(builder.QUARTERLY_CONSENSUS, workflow)
         self.assertIn("HOSTINGER_RESEARCH_CHARTS_LIVE_PASS", workflow)
         self.assertIn('--html "系統工程/總經V70/V70-3-27.html"', workflow)
-        self.assertNotIn("build_monthly_charts.py", workflow)
-        self.assertIn('git add "系統工程/總經V70/V70-3-27.html"', workflow)
 
 
 if __name__ == "__main__":

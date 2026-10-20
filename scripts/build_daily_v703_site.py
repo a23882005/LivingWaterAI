@@ -1,6 +1,7 @@
 # 最後修改日期時間（台灣時間）：2026/10/20 06:30｜版本：V70-3-27 build adapter v3.8（固定七張季度研究圖）｜檔案名稱：build_daily_v703_site.py
 """Build the V70-3-27 feed from 18 core records and 8 supplement inputs."""
 import argparse
+import csv
 import datetime as dt
 import hashlib
 import html
@@ -34,15 +35,24 @@ OFFICIAL_RELEASE_CALENDAR_PATH = "data/v703_official_monthly_release_calendar.js
 OFFICIAL_CALENDAR_DOMAINS = frozenset(("www.bls.gov", "www.ismworld.org", "fred.stlouisfed.org"))
 ACCEPTED_STATUS = frozenset(("OK", "USABLE"))
 CANDIDATE_STATUSES = frozenset(("FOUND", "NOT_FOUND", "BLOCKED", "METRIC_MISMATCH"))
+QUARTERLY_RESEARCH_DIR = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "quarterly_12charts_consensus_20261020"
 RESEARCH_CHARTS = {
-    "goldman.png": "高盛_年底目標_vs_SP500後3M_季度研究.png",
-    "jpm.png": "摩根大通_年底目標_vs_SP500後3M_季度研究.png",
-    "morgan_stanley.png": "摩根士丹利_年底目標_vs_SP500後3M_季度研究.png",
-    "bofa.png": "美國銀行_年底目標_vs_SP500後3M_季度研究.png",
-    "ubs.png": "瑞銀_年底目標_vs_SP500後3M_季度研究.png",
-    "macro_slope_candidate.png": "MacroSafety_candidate_quarterly_slope_vs_SP500_3M.png",
-    "overview_7lines.png": "seven_line_overview_candidate_quarterly.png",
+    "macro_raw.png": "Macro-SaFe_原始值_SP500後3M.png",
+    "macro_diff.png": "Macro-SaFe_季度微分_SP500後3M.png",
+    "goldman_raw.png": "高盛_原始值_SP500後3M.png",
+    "goldman_diff.png": "高盛_季度微分_SP500後3M.png",
+    "bofa_raw.png": "美國銀行_原始值_SP500後3M.png",
+    "bofa_diff.png": "美國銀行_季度微分_SP500後3M.png",
+    "morgan_stanley_raw.png": "摩根士丹利_原始值_SP500後3M.png",
+    "morgan_stanley_diff.png": "摩根士丹利_季度微分_SP500後3M.png",
+    "ubs_raw.png": "瑞銀_原始值_SP500後3M.png",
+    "ubs_diff.png": "瑞銀_季度微分_SP500後3M.png",
+    "jpm_raw.png": "摩根大通_原始值_SP500後3M.png",
+    "jpm_diff.png": "摩根大通_季度微分_SP500後3M.png",
+    "overview.png": "總覽_左原始值右季度微分_含共識統計.png",
 }
+QUARTERLY_DATA = "十二圖與共識統計_逐季資料.csv"
+QUARTERLY_CONSENSUS = "季度偏多偏空共識統計.csv"
 
 
 def _valid_png(path):
@@ -50,51 +60,75 @@ def _valid_png(path):
 
 
 def copy_research_charts(dest, source_dir=None):
-    """Copy the fixed seven-chart quarterly research set into the deploy artifact."""
-    root = Path(__file__).resolve().parents[1] / "experiments" / "macro-safety-monthly-research" / "charts"
-    source_dir = Path(source_dir) if source_dir else root
+    """Copy the fixed 12 quarterly charts, overview, and source tables."""
+    source_dir = Path(source_dir) if source_dir else QUARTERLY_RESEARCH_DIR
     output_dir = Path(dest) / "v70-research-charts"
     missing = [name for name in RESEARCH_CHARTS.values() if not _valid_png(source_dir / name)]
+    missing += [name for name in (QUARTERLY_DATA, QUARTERLY_CONSENSUS) if not (source_dir / name).is_file()]
     if missing:
         raise ValueError("Quarterly research chart assets missing or invalid: " + ", ".join(missing))
     output_dir.mkdir(parents=True, exist_ok=True)
     for output_name, source_name in RESEARCH_CHARTS.items():
         shutil.copyfile(source_dir / source_name, output_dir / output_name)
+    for name in (QUARTERLY_DATA, QUARTERLY_CONSENSUS):
+        shutil.copyfile(source_dir / name, output_dir / name)
     return output_dir, False
 
 
-def _quarterly_chart_markup(template):
-    """Keep the site copy aligned with the fixed quarterly research charts."""
+def _quarterly_chart_markup(template, source_dir=None):
+    """Render the fixed quarterly chart set, consensus, and complete value table."""
     section_start = template.find('<section id="v703-research-charts"')
     section_end = template.find("</section>", section_start)
     if section_start < 0 or section_end < 0:
-        raise ValueError("Canonical HTML is missing the seven-chart section")
-    before, section, after = template[:section_start], template[section_start:section_end], template[section_end:]
-    section = re.sub(
-        r'(<p class="text-sm leading-7 text-slate-300 mb-2">).*?(</p>)',
-        r'\1共七張：五家機構各一張、Macro Safety 候選季度體質方向斜率一張，以及納入五家機構、總經斜率和 S&amp;P 500 後三個月實際報酬的七線總覽一張。機構圖比較年底目標隱含報酬與觀察日之後三個月的實際報酬，兩者期間不同，供研究觀察，不代表預測命中率或投資指示。\2',
-        section, count=1, flags=re.S,
-    )
-    section = re.sub(
-        r'(<p class="text-xs leading-6 text-amber-200 mb-5">).*?(</p>)',
-        r'\1來源發布日與當時可得性仍有逐筆待核資料；請搭配研究 CSV 的來源、查核狀態及工作簿 SHA-256 閱讀。Macro Safety 圖是候選季度方向斜率，單位為分數點／季；目前沒有足夠真實月度分數計算正式月斜率，也沒有把季度值插值成月資料。七線總覽中的總經線同樣是候選季度序列。本頁研究圖固定呈現逐季資料；月度CSV另行保存，不混入季度圖。\2',
-        section, count=1, flags=re.S,
-    )
-    section = section.replace(
-        "Macro Safety｜真實月斜率與標普後三個月實際報酬",
-        "Macro Safety｜候選季度體質方向斜率與標普後三個月",
-    ).replace(
-        "Macro Safety 真實月斜率（分數點／月）與標普後三個月實際報酬",
-        "Macro Safety 候選季度體質方向斜率（分數點每季）與標普後三個月實際報酬",
-    ).replace(
-        "七線總覽｜五大機構、Macro Safety 月斜率與標普",
-        "七線總覽｜五大機構、Macro Safety 候選季度斜率與標普",
-    ).replace(
-        "七線總覽：五大機構比較、Macro Safety 真實月斜率和標普後三個月實際報酬",
-        "七線總覽：五大機構比較、Macro Safety 候選季度斜率和標普後三個月實際報酬",
-    )
-    section = section.replace("月度候選研究圖", "季度研究圖")
-    return before + section + after
+        raise ValueError("Canonical HTML is missing the quarterly research section")
+    source_dir = Path(source_dir) if source_dir else QUARTERLY_RESEARCH_DIR
+    with (source_dir / QUARTERLY_DATA).open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    with (source_dir / QUARTERLY_CONSENSUS).open(encoding="utf-8-sig", newline="") as f:
+        consensus = list(csv.DictReader(f))
+    if len(rows) != 28 or len(consensus) != 28:
+        raise ValueError("Quarterly research tables must contain 28 dated rows")
+
+    def cell(value):
+        value = (value or "").strip()
+        if value in ("", "NA", "N/A"):
+            return "NA"
+        try:
+            number = float(value)
+        except ValueError:
+            return html.escape(value)
+        return f"{number:,.2f}" if math.isfinite(number) else "NA"
+
+    headings = list(rows[0])
+    head = "".join(f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap">{html.escape(h)}</th>' for h in headings)
+    body = "\n".join('<tr>' + ''.join(f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap">{cell(row.get(h))}</td>' for h in headings) + '</tr>' for row in rows)
+    c_headings = list(consensus[0])
+    c_head = "".join(f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap">{html.escape(h)}</th>' for h in c_headings)
+    c_body = "\n".join('<tr>' + ''.join(f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap">{cell(row.get(h))}</td>' for h in c_headings) + '</tr>' for row in consensus)
+    plot_order = [
+        ("Macro-SaFe", "macro_raw.png", "macro_diff.png"),
+        ("高盛", "goldman_raw.png", "goldman_diff.png"),
+        ("美國銀行", "bofa_raw.png", "bofa_diff.png"),
+        ("摩根士丹利", "morgan_stanley_raw.png", "morgan_stanley_diff.png"),
+        ("瑞銀", "ubs_raw.png", "ubs_diff.png"),
+        ("摩根大通", "jpm_raw.png", "jpm_diff.png"),
+    ]
+    figures = []
+    for label, raw, diff in plot_order:
+        for kind, name, caption in (("原始值", raw, f"{label}｜原始值"), ("季度微分", diff, f"{label}｜季度微分")):
+            figures.append(f'''<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-3"><figcaption class="text-sm font-semibold text-slate-100 mb-2">{caption}</figcaption><a href="v70-research-charts/{name}" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/{name}" alt="{label}{kind}與 S&amp;P 500 後三個月實際報酬季度研究圖" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>''')
+    overview = '<figure class="rounded-xl border border-slate-700 bg-slate-950/70 p-3"><figcaption class="text-sm font-semibold text-slate-100 mb-2">六組訊號總覽｜原始值與季度微分</figcaption><a href="v70-research-charts/overview.png" target="_blank" rel="noopener noreferrer"><img src="v70-research-charts/overview.png" alt="Macro-SaFe 與五大機構原始值和季度微分總覽，均搭配標普後三個月實際報酬" loading="lazy" decoding="async" class="w-full h-auto rounded-lg"></a></figure>'
+    section = f'''<section id="v703-research-charts" class="max-w-6xl mx-auto px-4 py-6 mt-6 rounded-2xl border border-emerald-800 bg-slate-900/70" aria-labelledby="v703-research-charts-title">
+<h2 id="v703-research-charts-title" class="text-xl font-bold text-emerald-200 mb-2">📈 Macro-SaFe 與五大機構季度研究圖表及數值</h2>
+<p class="text-sm leading-7 text-slate-300 mb-2">六組訊號各含原始值及季度微分，共 12 張圖；每張僅搭配同一口徑的 S&amp;P 500 後三個月實際價格報酬，另附總覽圖。機構年底目標隱含報酬與三個月實際報酬期間不同，僅供研究觀察，不代表預測命中率或投資指示。</p>
+<p class="text-xs leading-6 text-amber-200 mb-5">季度序列為研究候選資料，Macro-SaFe 歷史分數並非正式月度分數；正式月資料只保留真實驗證分數，缺值維持 NA，季度資料不插值成月資料。2026-10-01 的後三個月報酬尚未成熟，保留 NA。五家機構共識家數不包含 Macro-SaFe；原始缺值及無前季值的微分不補值。</p>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">{''.join(figures)}{overview}</div>
+<h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">五家機構偏多／偏空與動能上修／下修家數</h3>
+<div class="overflow-x-auto rounded-lg"><table class="min-w-full text-xs text-slate-200"><thead class="bg-slate-800"><tr>{c_head}</tr></thead><tbody>{c_body}</tbody></table></div>
+<h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">完整逐季數值表（28 季）</h3>
+<p class="text-xs text-slate-300 mb-2">水平滑動可檢視全部欄位。原始 CSV：<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_DATA}" download>下載逐季數值資料</a>；<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_CONSENSUS}" download>下載共識統計</a>。</p>
+<div class="overflow-x-auto rounded-lg"><table class="min-w-full text-xs text-slate-200"><thead class="bg-slate-800"><tr>{head}</tr></thead><tbody>{body}</tbody></table></div></section>'''
+    return template[:section_start] + section + template[section_end + len("</section>"):]
 
 
 def _read(path):

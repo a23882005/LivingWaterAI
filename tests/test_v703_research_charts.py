@@ -67,6 +67,19 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("季度資料不插值成月資料", rendered)
         self.assertIn("後三個月報酬尚未成熟，保留 NA", rendered)
 
+    def test_consensus_table_freezes_observation_date_and_sp500_return_columns(self):
+        template = (ROOT / "系統工程" / "總經V70" / "V70-3-27.html").read_text(encoding="utf-8")
+        rendered = builder._quarterly_chart_markup(template)
+        consensus = rendered.split("五家機構偏多／偏空與動能上修／下修家數", 1)[1].split(
+            "完整逐季數值表（28 季）", 1
+        )[0]
+        self.assertIn("min-w-max", consensus)
+        self.assertIn("border-separate border-spacing-0", consensus)
+        self.assertIn("left:0;z-index:30;width:145px;min-width:145px;background:#1e293b", consensus)
+        self.assertIn("left:145px;z-index:30;width:245px;min-width:245px;background:#1e293b", consensus)
+        self.assertIn("left:0;z-index:10;width:145px;min-width:145px;background:#0f172a", consensus)
+        self.assertIn("left:145px;z-index:10;width:245px;min-width:245px;background:#0f172a", consensus)
+
     def test_deployment_upload_and_live_verification_cover_full_set(self):
         workflow = (ROOT / ".github" / "workflows" / "v703-site-deploy-1100.yml").read_text(encoding="utf-8")
         self.assertIn("build/site/v70-research-charts/*", workflow)

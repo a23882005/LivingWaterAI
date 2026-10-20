@@ -103,8 +103,26 @@ def _quarterly_chart_markup(template, source_dir=None):
     head = "".join(f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap">{html.escape(h)}</th>' for h in headings)
     body = "\n".join('<tr>' + ''.join(f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap">{cell(row.get(h))}</td>' for h in headings) + '</tr>' for row in rows)
     c_headings = list(consensus[0])
-    c_head = "".join(f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap">{html.escape(h)}</th>' for h in c_headings)
-    c_body = "\n".join('<tr>' + ''.join(f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap">{cell(row.get(h))}</td>' for h in c_headings) + '</tr>' for row in consensus)
+    sticky_head_styles = (
+        "position:sticky;left:0;z-index:30;width:145px;min-width:145px;background:#1e293b",
+        "position:sticky;left:145px;z-index:30;width:245px;min-width:245px;background:#1e293b",
+    )
+    sticky_cell_styles = (
+        "position:sticky;left:0;z-index:10;width:145px;min-width:145px;background:#0f172a",
+        "position:sticky;left:145px;z-index:10;width:245px;min-width:245px;background:#0f172a",
+    )
+    c_head = "".join(
+        f'<th class="border border-slate-600 px-2 py-1 whitespace-nowrap{" sticky left-0 z-30 bg-slate-800" if i == 0 else " sticky z-30 bg-slate-800" if i == 1 else ""}"'
+        f'{f" style=\"{sticky_head_styles[i]}\"" if i < 2 else ""}>{html.escape(h)}</th>'
+        for i, h in enumerate(c_headings)
+    )
+    c_body = "\n".join(
+        '<tr>' + ''.join(
+            f'<td class="border border-slate-700 px-2 py-1 whitespace-nowrap{" sticky left-0 z-10 bg-slate-900" if i == 0 else " sticky z-10 bg-slate-900" if i == 1 else ""}"'
+            f'{f" style=\"{sticky_cell_styles[i]}\"" if i < 2 else ""}>{cell(row.get(h))}</td>'
+            for i, h in enumerate(c_headings)
+        ) + '</tr>' for row in consensus
+    )
     plot_order = [
         ("Macro-SaFe", "macro_raw.png", "macro_diff.png"),
         ("高盛", "goldman_raw.png", "goldman_diff.png"),
@@ -124,7 +142,7 @@ def _quarterly_chart_markup(template, source_dir=None):
 <p class="text-xs leading-6 text-amber-200 mb-5">季度序列為研究候選資料，Macro-SaFe 歷史分數並非正式月度分數；正式月資料只保留真實驗證分數，缺值維持 NA，季度資料不插值成月資料。2026-10-01 的後三個月報酬尚未成熟，保留 NA。五家機構共識家數不包含 Macro-SaFe；原始缺值及無前季值的微分不補值。</p>
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">{''.join(figures)}{overview}</div>
 <h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">五家機構偏多／偏空與動能上修／下修家數</h3>
-<div class="overflow-x-auto rounded-lg"><table class="min-w-full text-xs text-slate-200"><thead class="bg-slate-800"><tr>{c_head}</tr></thead><tbody>{c_body}</tbody></table></div>
+<div class="overflow-x-auto rounded-lg"><table class="min-w-max text-xs text-slate-200 border-separate border-spacing-0"><thead class="bg-slate-800"><tr>{c_head}</tr></thead><tbody>{c_body}</tbody></table></div>
 <h3 class="text-lg font-bold text-emerald-200 mt-8 mb-2">完整逐季數值表（28 季）</h3>
 <p class="text-xs text-slate-300 mb-2">水平滑動可檢視全部欄位。原始 CSV：<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_DATA}" download>下載逐季數值資料</a>；<a class="underline text-cyan-200" href="v70-research-charts/{QUARTERLY_CONSENSUS}" download>下載共識統計</a>。</p>
 <div class="overflow-x-auto rounded-lg"><table class="min-w-full text-xs text-slate-200"><thead class="bg-slate-800"><tr>{head}</tr></thead><tbody>{body}</tbody></table></div></section>'''

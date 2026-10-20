@@ -8,7 +8,8 @@ import pytest
 from family_input import digest
 from family_boundary import prepare_input
 from family_runner import FamilyRunner
-from test_family_boundary import fixture
+from test_family_boundary import fixture,refresh_snapshot
+from test_family_bridges import policy_fixture
 from test_native_pipeline import pipeline_case
 from test_native_adapters import ROOT
 
@@ -27,11 +28,24 @@ def runner_case():
     bundle['asset_framework']['work6_final_target_reference'].update({k:evidence[k] for k in ('confirmed_at','confirmed_by')})
     bundle['stock_evidence']['evaluated_at']=req['evaluation_at']
     req['native_bundle']=bundle
+    snapshot=policy_fixture()
+    for rows in snapshot['tables'].values():
+        for row in rows:row['client_id']=req['client_id']
+    # Synthetic stock identity and position are explicit W1 facts, not inferred aliases.
+    tables=req['client_snapshot']['payload']['tables']
+    for name in ('universe_membership','universe_confirmation','permission_policy','permission_confirmation'):
+        tables[name]=snapshot['tables'][name]
+    tables['portfolio_instrument'][0].update(ticker='QQQ',exchange_code='NASDAQ')
+    tables['portfolio_position'][0]['quantity_decimal']='0'
+    refresh_snapshot(req,ctx)
     prepared=prepare_input(req,trusted_context=ctx)
     ctx['native_binding']={'schema_version':'Family.W5.NativeBinding.v1','request_digest':prepared.input_digest,
         'bundle_digest':digest(bundle),'target_binding_digest':prepared.payload['target_binding']['binding_digest'],
         'family_owner':deepcopy(req['owner']),'native_owner':deepcopy(w3['owner']),
         'data_provenance':'SYNTHETIC','source_reference':'SYNTHETIC_DISPATCH_TEST_ONLY'}
+    ctx['native_binding']['stock_instrument']={'instrument_key':'VT_KEY','asset_id':'QQQ',
+        'account_key':req['owner']['account'],'native_owner':deepcopy(w3['owner']),
+        'source_reference':'SYNTHETIC_W1_INSTRUMENT'}
     return req,ctx
 
 

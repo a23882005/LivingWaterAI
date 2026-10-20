@@ -13,6 +13,7 @@ from native_pipeline import run_native_pipeline
 from mentor_bridge import explain_native
 from recovery_bridge import StagingAnalysisStore,RecoveryError,input_digest
 from verify_dependencies import verify
+from stock_source_bridge import bind_stock_source
 
 
 class FamilyRunner:
@@ -48,11 +49,12 @@ class FamilyRunner:
             require(all(proof.get(k)==evidence.get(k) for k in ('confirmed_at','confirmed_by')),
                     'NATIVE_CONFIRMATION_PROOF_MISMATCH',branch)
         require(bundle['stock_evidence']['evaluated_at']==request['evaluation_at'],'NATIVE_EVALUATION_TIME_MISMATCH','stock_evidence.evaluated_at')
+        prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
         return prepared,ctx
 
     def _compute(self,request):
         prepared,ctx=self._validate(request)
-        native=run_native_pipeline(self.repo_path,deepcopy(request['native_bundle']))
+        native=run_native_pipeline(self.repo_path,deepcopy(request['native_bundle']),prepared.payload['stock_source'])
         require(native.get('status')=='NATIVE_PIPELINE_COMPLETE','NATIVE_RESULT_INCOMPLETE','native.status',status='DATA_UNAVAILABLE')
         u=native['unified_result']
         mentor=explain_native(self.repo_path,native['work9_request'],u,trusted_context={

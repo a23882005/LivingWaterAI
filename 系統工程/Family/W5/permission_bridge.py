@@ -7,7 +7,10 @@ from runtime_loader import load_c_module
 def effective(rows,confirmations,keys,at):
     eligible=[r for r in rows if timestamp(r['effective_at_utc'],'effective_at_utc')<=at]
     if not eligible:return None
-    latest=max(eligible,key=lambda r:r['version_no'])
+    version=max(r['version_no'] for r in eligible)
+    candidates=[r for r in eligible if r['version_no']==version]
+    if len(candidates)!=1:return None
+    latest=candidates[0]
     confirmed=[c for c in confirmations if all(c.get(k)==latest.get(k) for k in keys) and c.get('version_no')==latest['version_no'] and timestamp(c['confirmed_at_utc'],'confirmed_at_utc')<=at]
     if latest.get('evidence_state')!='VERIFIED' or len(confirmed)!=1:return None
     return latest
@@ -16,7 +19,7 @@ def effective(rows,confirmations,keys,at):
 def project_permissions(snapshot,*,account,evaluation_at):
     t=snapshot['tables'];at=timestamp(evaluation_at,'evaluation_at');client=snapshot['client_id']
     held={r['instrument_key'] for r in t['portfolio_position'] if r['account_key']==account and timestamp(r['as_of_utc'],'position.as_of')<=at}
-    all_ids=held|{r['instrument_key'] for r in t['universe_membership']}
+    all_ids=held|{r['instrument_key'] for r in t['universe_membership']}|{r['instrument_key'] for r in t['portfolio_instrument']}
     output=[]
     for asset in sorted(all_ids):
         memberships={}

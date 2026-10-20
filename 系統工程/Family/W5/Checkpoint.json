@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "同一W5小PM續接Family runner、Mentor及恢復邊界；Family中PM界定目標金額/權重接口及最小修正責任，並定位既有Target與技術producer。",
+  "next_action": "W5續接股債資金、總經、債券政策與保護持倉逐欄映射；Family中PM界定目標金額/權重接口並定位既有確認Target及技術producer。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-runner",
+    "backup_ref": "backup/w5-20261020-stock-source",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "c8608aa002b1b17df80dafa976ea8a5557daedd4",
+    "previous_work_commit": "d0e9fbde5224ab20cd16769ef290fc4f8df559cd",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線151 PASS、1 strict XFAIL；新增14項Family runner/CLI測試。四庫歷史經CLI確認Target缺項，資料庫hash不變；完整真股債Work9正向待續。",
+  "validation_scope": "本線163 PASS、1 strict XFAIL；新增12項股票來源語意/原生政策上限測試。完整股債Work9正向及Family端到端仍待完成。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -183,7 +183,8 @@
         "run_analysis.py",
         "tests/test_family_runner.py",
         "evidence/runner_tests.log",
-        "evidence/runner_private_checks.json"
+        "evidence/runner_private_checks.json",
+        "evidence/stock_source_tests.log"
       ]
     },
     "W5-16": {
@@ -412,5 +413,32 @@
       "index": "1i1Y3LK8kinhgsVZpjMEnpIYW3x0i0YZV",
       "root": "14Xyw3tqNeepMr3mXMSJY5LCRpclv28rU"
     }
+  },
+  "stock_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "scope": [
+      "W1 instrument/account/native owner/exchange/currency exact binding",
+      "W1 latest known quantity equals V82 confirmed quantity; ambiguous latest rows rejected",
+      "W1 NEW_BUY projection -> existing V82 required_known_caps; non-candidate cap zero",
+      "same-version policy ambiguity -> UNKNOWN; risk inputs retained"
+    ],
+    "tests": {
+      "w5_pass": 163,
+      "w5_xfail": 1,
+      "added": 12
+    },
+    "evidence": [
+      "stock_source_bridge.py",
+      "tests/test_stock_source_bridge.py",
+      "evidence/stock_source_tests.log"
+    ],
+    "remaining": [
+      "bond policy and quantity",
+      "C7 funding source semantic mapping",
+      "W3 raw macro to runtime field mapping",
+      "HOLD_AS_IS Work8 semantic binding",
+      "target units and formal technical producer",
+      "full Family E2E"
+    ]
   }
 }

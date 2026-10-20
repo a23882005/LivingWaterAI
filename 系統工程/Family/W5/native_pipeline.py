@@ -11,14 +11,15 @@ from stock_engine import run_stock_engine,assemble_stock_output
 from bond_engine import run_bond_engine
 from funding_guard import check_aggregate
 from sgov_bridge import reconcile_sgov
+from stock_source_bridge import apply_stock_policy
 
 
 class PipelineError(ValueError):
     pass
 
 
-def run_native_pipeline(repo_path, bundle):
-    data=deepcopy(bundle)
+def run_native_pipeline(repo_path, bundle, stock_source=None):
+    data=apply_stock_policy(bundle,stock_source)
     stock_req,bond_req=data['stock_request'],data['bond_request']
     w3=stock_req['work3_handoff']
     for name in ('work3_handoff','c7_funding_context'):
@@ -75,7 +76,8 @@ def run_native_pipeline(repo_path, bundle):
         work7_sgov_runtime_role_result=physical['native_work7'],work8_protected_holding_result=protected)
     unified=work9.build_unified_deployment(unified_request)
     trace.append('C8C9.Work9.build_unified_deployment')
-    return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(data),'client_id':client,'run_id':run_id,
+    return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
+        'stock_source':deepcopy(stock_source),'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
         'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,

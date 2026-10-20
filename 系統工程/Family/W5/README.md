@@ -1,3 +1,11 @@
+## 2026-10-20 股票來源逐欄接線增量（仍8/18）
+
+本線163 PASS、1 strict XFAIL。新增stock_source_bridge.py，Family入口強制具名W1 instrument/account/native owner映射，逐欄核對ticker、exchange、currency與原生confirmed quantity；最新持倉同時點重複/UNKNOWN拒絕。完整帳戶無該商品持倉才映射0。此輪僅接受相同ticker，不猜商品別名。
+
+既有project_permissions接入V82原生required_known_caps：PERSONAL/EXCLUSION/NEW_BUY未構成有效允許時增加0上限；原持倉、風險判斷與其他上限保留。同版本多筆policy回UNKNOWN。12項新測試包括重新雜湊仍拒錯商品/數量，以及實際V82允許450、排除/拒絕/未確認/歧義0。原native_bundle與有效輸入分別記digest，來源投影保留於結果。見evidence/stock_source_tests.log。
+
+股債資金、總經、債券政策與保護持倉的完整來源映射仍待接續；此次不視為Family端到端或最終部署。目標單位strict XFAIL保留，Production HOLD、交易NONE。備份backup/w5-20261020-stock-source；本輪commit/Actions/雙端讀回憑證見累計ZIP根目錄RELEASE_RECEIPT.json。
+
 # Family W5 接線施工中
 
 契約：v2.2.1；基線：32c9322c8bb3150480f6c86becf28e04592f5e8e。

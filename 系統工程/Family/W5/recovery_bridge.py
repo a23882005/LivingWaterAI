@@ -89,7 +89,10 @@ class StagingAnalysisStore:
             if entry['status']=='COMPLETE':
                 validate(deepcopy(frozen))
                 return {'status':'REPLAYED','input_digest':fingerprint,'result':deepcopy(entry['result'])}
-            for attempt in range(2):
+            # The retry budget belongs to the request, including later resends.
+            if entry['attempts'] >= 2:
+                raise RecoveryError('COMPUTATION_RETRY_EXHAUSTED')
+            for attempt in range(entry['attempts'],2):
                 validate(deepcopy(frozen))
                 executor=ThreadPoolExecutor(max_workers=1)
                 entry['attempts']+=1

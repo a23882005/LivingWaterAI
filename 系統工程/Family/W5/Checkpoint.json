@@ -2,12 +2,12 @@
   "contract_version": "2.2.1",
   "status": "IN_PROGRESS",
   "release": "RELEASED",
-  "implementation_completed": 8,
+  "implementation_completed": 10,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "W5接四家人來源一致的完整Family runner及重送；Family中PM定位既有確認Target、C Work6原輸入、具名technical/估值/V70來源，界定V75客戶動作優先序。Work8目標單位已由W5接線解決。",
+  "next_action": "完成09～14與16契約證據收斂、整線矩陣及最終部署；缺資料按原契約回不可用，不要求家人重填。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
@@ -181,9 +181,9 @@
       ]
     },
     "W5-15": {
-      "status": "IN_PROGRESS",
-      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。 原C7實際運算、17份依賴及4份原golden固定；SOURCE_BACKED必須重算C7並全結果比對。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。",
-      "remaining": "完整C7/確認Target來源語意、債券客戶行動保護、正式技術/報價/V70 producer與source_run、目標單位接口及Family/Mentor正向整線。",
+      "status": "COMPLETED",
+      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。 原C7實際運算、17份依賴及4份原golden固定；SOURCE_BACKED必須重算C7並全結果比對。 本輪原C7→V82/V75→Work6/7/8/9→Mentor實際正向通過；W5明確金額/權重來源核對，原核心/schema保持。 同一明示合成來源經FamilyRunner實際通過全部來源驗證、原C7/V82/V75/Work6-9與Mentor；歷史確認run保留，輸入不變。",
+      "remaining": "功能fixture完成；真實家人缺項覆蓋與具名producer另見open_gaps，不以合成功能結果冒充投資建議。",
       "evidence": [
         "中PM介面待界定.md",
         "evidence/pipeline_unit_reproduction.json",
@@ -200,7 +200,10 @@
         "c7_engine.py",
         "tests/test_c7_engine.py",
         "tests/test_target_units.py",
-        "evidence/target_unit_positive.json"
+        "evidence/target_unit_positive.json",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "W7_RECOVERY_HANDOFF.md"
       ]
     },
     "W5-16": {
@@ -216,12 +219,15 @@
       ]
     },
     "W5-17": {
-      "status": "IN_PROGRESS",
-      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。 V70來源版本改變後快取重送拒絕，避免舊來源結果發布。",
-      "remaining": "接完整15/16真結果、部分完成重算與W7接口驗收；不是正式持久化。",
+      "status": "COMPLETED",
+      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。 V70來源版本改變後快取重送拒絕，避免舊來源結果發布。 真Family結果重送、撤銷許可/版本/來源更改、Mentor後中斷恢復、實際延遲晚到與競爭發布驗證；重試預算跨重送保留。W7接口STAGING_VERIFIED。",
+      "remaining": "正式跨程序持久化由W7負責，未列PASS。",
       "evidence": [
         "tests/test_recovery_bridge.py",
-        "evidence/pipeline_recovery_tests.log"
+        "evidence/pipeline_recovery_tests.log",
+        "tests/test_family_end_to_end.py",
+        "evidence/family_e2e_tests.log",
+        "W7_RECOVERY_HANDOFF.md"
       ]
     },
     "W5-18": {
@@ -654,6 +660,22 @@
       "pass": 261,
       "xfail": 0,
       "added": 8,
+      "hashes": 111
+    }
+  },
+  "family_e2e_recovery": {
+    "status": "STAGING_VERIFIED",
+    "provenance": "SYNTHETIC_FUNCTIONAL_ONLY",
+    "real_family_investment_advice": false,
+    "core_changes": 0,
+    "positive": "FamilyRunner → actual C7/V82/V75/C8C9 → Mentor",
+    "retry_fix": "at most two total compute attempts per immutable request, across resends",
+    "w7_handoff": "W7_RECOVERY_HANDOFF.md",
+    "tests_log": "evidence/family_e2e_tests.log",
+    "evidence": "evidence/family_e2e_positive.json",
+    "tests": {
+      "pass": 268,
+      "xfail": 0,
       "hashes": 111
     }
   }

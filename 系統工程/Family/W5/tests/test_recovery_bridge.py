@@ -94,6 +94,9 @@ def test_two_timeouts_stop_after_one_retry(store):
     finally:release.set()
     assert all(e.wait(2) for e in finished)
     assert len(calls)==2 and next(iter(store._entries.values()))['publication_count']==0
+    with pytest.raises(RecoveryError,match='COMPUTATION_RETRY_EXHAUSTED'):
+        store.analyze(request(),validate=lambda r:None,compute=compute)
+    assert len(calls)==2
 
 
 def test_concurrent_same_request_commits_once(store):

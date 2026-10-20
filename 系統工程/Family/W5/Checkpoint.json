@@ -11,12 +11,12 @@
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-mentor",
+    "backup_ref": "backup/w5-20261020-runner",
     "main_unchanged": true,
-    "actions": "施工回歸workflow新增；執行run及結果見ZIP RELEASE_RECEIPT.json",
+    "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "6a586cac4acbc24b3919fcbac8e6d0b356a374e8",
+    "previous_work_commit": "c8608aa002b1b17df80dafa976ea8a5557daedd4",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線137 PASS、1 strict XFAIL；新增13項Mentor/恢復整合測試，原W2說明/恢復6項回歸PASS。原Work21合成fixture驗Mentor；完整真股債Work9正向待續。",
+  "validation_scope": "本線151 PASS、1 strict XFAIL；新增14項Family runner/CLI測試。四庫歷史經CLI確認Target缺項，資料庫hash不變；完整真股債Work9正向待續。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -173,12 +173,17 @@
     },
     "W5-15": {
       "status": "IN_PROGRESS",
-      "completed": "新增同次native pipeline；原股債、資金合計與Work7已實際呼叫。",
-      "remaining": "W5 canonical目標金額與Work8權重接口待界定；合成fixture完整語意、Family可信邊界與Work9正向尚未完成。",
+      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。",
+      "remaining": "完整來源逐欄映射、Family宏觀/政策/持倉到原生輸入的語意核對、目標金額/權重問題與完整正向整線驗收。native_binding由受控provider提供已審核輸入digest，尚未替代上述來源映射。",
       "evidence": [
         "中PM介面待界定.md",
         "evidence/pipeline_unit_reproduction.json",
-        "tests/test_native_pipeline.py"
+        "tests/test_native_pipeline.py",
+        "family_runner.py",
+        "run_analysis.py",
+        "tests/test_family_runner.py",
+        "evidence/runner_tests.log",
+        "evidence/runner_private_checks.json"
       ]
     },
     "W5-16": {
@@ -202,7 +207,7 @@
     },
     "W5-18": {
       "status": "IN_PROGRESS",
-      "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。",
+      "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。 本輪補交CLI並實跑合成隔離與四庫歷史缺項案例。",
       "remaining": "完整Family runner、各棒驗收、整線正向、最終PR整合與雙端正式部署。",
       "evidence": [
         ".github/workflows/family-w5.yml",
@@ -391,6 +396,21 @@
       "checkpoint": "1uy6TZ1exWziCgcKjM-aH9qqSKLkR-KeO",
       "index": "12q9QoNnettrlCwLxHpmFjEXZKViIqZVC",
       "root": "1yfBEeq1Y2KgrgluU5ag1clO6iD9SnmlK"
+    }
+  },
+  "family_runner": {
+    "w5_tests_passed": 151,
+    "strict_xfail": 1,
+    "new_tests": 14,
+    "private_history_cli_checks": 4,
+    "private_database_changed": false,
+    "target_identity_fix": "allocation_id=draft.allocation_id; target_record_id=record.target_id",
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "1-YtvxfFesG2rOr5YXeKRQV9tmTDFqgLP",
+      "checkpoint": "1DqCKshTvJj4Zz06ElCTZBy-zwpeImu0Q",
+      "index": "1i1Y3LK8kinhgsVZpjMEnpIYW3x0i0YZV",
+      "root": "14Xyw3tqNeepMr3mXMSJY5LCRpclv28rU"
     }
   }
 }

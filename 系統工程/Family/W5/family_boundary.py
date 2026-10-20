@@ -135,8 +135,10 @@ def prepare_input(request,*,trusted_context):
     require(macro.get('asOf')==macro.get('payload',{}).get('asOf'),'MACRO_ASOF_MISMATCH','macro_snapshot.asOf','W3')
     require(timestamp(macro.get('asOf'),'macro_snapshot.asOf')<=at,'FUTURE_MACRO','macro_snapshot.asOf','W3')
     for k in ('source_path','source_commit','source_sha256','reader_sha256'):require(nonempty(macro.get(k)),'MACRO_SOURCE_REQUIRED','macro_snapshot.'+k,'W3')
+    allocation_id=target['payload']['draft'].get('allocation_id')
+    require(nonempty(allocation_id),'TARGET_ALLOCATION_ID_REQUIRED','confirmed_target.payload.draft.allocation_id','W2')
     binding={'schema_version':'Family.W5.TargetBinding.v1','target_version':target['target_version'],'target_hash':target['target_hash'],
-        'allocation_id':target['payload']['target_id'],'confirmation_run_id':target['confirmation_run_id'],'analysis_run_id':req['run_id'],
+        'allocation_id':allocation_id,'target_record_id':target['payload']['target_id'],'confirmation_run_id':target['confirmation_run_id'],'analysis_run_id':req['run_id'],
         'original_payload_digest':digest(target['payload'])}
     binding['binding_digest']=digest(binding)
     return PreparedInput(digest(req),{'request':req,'target_binding':binding,'owner_binding':owner,'positions':positions,'engine_calls':0,'trade_action':'NO_TRADE'})

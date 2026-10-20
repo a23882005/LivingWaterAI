@@ -70,12 +70,13 @@ def run_native_pipeline(repo_path, bundle):
                                                  work4_v82_integration_result=stock_output))
     trace.append('C8C9.Work8.protect_client_action')
     work9=load_c_module(repo_path,9)
-    unified=work9.build_unified_deployment(request(work9,work4_v82_integration_result=stock_output,
+    unified_request=request(work9,work4_v82_integration_result=stock_output,
         work5_v75_integration_result=bond['canonical'],work6_funding_account_isolation_result=isolated,
-        work7_sgov_runtime_role_result=physical['native_work7'],work8_protected_holding_result=protected))
+        work7_sgov_runtime_role_result=physical['native_work7'],work8_protected_holding_result=protected)
+    unified=work9.build_unified_deployment(unified_request)
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(data),'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
-        'mentor_return':deepcopy(unified['mentor_return']),'call_trace':trace,
+        'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,
         'production':'HOLD','trade_action':'NO_TRADE'}

@@ -8,7 +8,7 @@ Production HOLD；交易授權 NONE。
 
 安裝：Python 3.11 以上，`python -m pip install -r 系統工程/Family/W5/requirements.lock`。
 本線測試：`python -m pytest 系統工程/Family/W5/tests`。
-目前尚未交付最終 `run_analysis.py`；不要將原生回歸通過視為整線分析入口已完成。
+已交付 `run_analysis.py` 及受控 staging dispatcher；完整來源映射及Work9正向依Checkpoint續驗。
 
 `family_input.read_snapshot` 只讀指定四庫隔離副本，保留歷史資料與未知值，不推導 AVAILABLE。
 `market_bridge.read_macro_snapshot` 直接呼叫已接收 P70-5，原 payload 不變。
@@ -35,4 +35,16 @@ Production HOLD；交易授權 NONE。
 
 `vendor/w2/`只含原W2 Work21直接依賴；來源hash見w2_dependency_lock.json。執行測試前設 `W5_W2_ROOT` 為本W5目錄下vendor/w2的絕對路徑。執行 `python 系統工程/Family/W5/verify_dependencies.py` 核對90項hash，再用原pytest入口。
 
-GitHub Actions使用同一pytest入口與核定基線checkout。現有strict XFAIL對應目標單位問題；施工回歸與W5整線驗收分別記錄。完整CLI仍待15棒接完。
+GitHub Actions使用同一pytest入口與核定基線checkout。現有strict XFAIL對應目標單位問題；施工回歸與W5整線驗收分別記錄。CLI已補交；15棒的完整來源映射與正向整線續作。
+
+## Family 調度入口與 CLI
+
+```sh
+W5_TRUSTED_CONTEXT=/operator/context.json python 系統工程/Family/W5/run_analysis.py --request request.json --output result.json
+```
+
+獨立的 `--trusted-context` 亦可指定 operator 檔；每次驗證重新讀取。請求本身不能設定可信context provider。API以 `FamilyRunner(repo_root, context_provider=...)` 重用同一測試store，單次CLI使用新的隔離store；跨程序持久化由W7接手。成功exit 0，其餘狀態exit 2，結果保留issue code及NO_TRADE。
+
+request沿用Family.W5.request.v1並加入native_bundle。受控provider的native_binding含schema_version=Family.W5.NativeBinding.v1、request_digest、bundle_digest、target_binding_digest、family_owner、native_owner、data_provenance及source_reference；對應的是已審核輸入。逐欄正式來源映射仍依Checkpoint續作，此digest驗證本身不替代語意核對。CLI不從request自動建立這份binding。
+
+確認紀錄ID與配置ID分別保留為target_record_id及allocation_id，後者取原W2 draft.allocation_id。歷史確認payload/hash不改動。新入口已實際呼叫股債pipeline到既有Work8目標單位問題；完整Work9正向仍列待修。四庫歷史CLI讀取結果於私有ZIP的private_runner/，去識別摘要於evidence/runner_private_checks.json。

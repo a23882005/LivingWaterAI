@@ -20,7 +20,7 @@ def fixture(client='SYNTHETIC_A',empty=False):
     if not empty:tables['portfolio_position']=[row(account_key='ACCOUNT_1',instrument_key='VT_KEY',as_of_utc=past,quantity_decimal='2.125')]
     payload={'client_id':client,'tables':tables,'payload_digest':digest(tables)}
     # W2-18 shape; explicitly synthetic confirmed record with historical run.
-    draft={'identity':{'client_id':client,'run_id':'OLD_CONFIRMATION_RUN'},'status':'DRAFT','confirmation_status':'PENDING','is_trade_authorized':False,'target_lines':[]}
+    draft={'identity':{'client_id':client,'run_id':'OLD_CONFIRMATION_RUN'},'allocation_id':'ALLOC-SYNTHETIC-1','status':'DRAFT','confirmation_status':'PENDING','is_trade_authorized':False,'target_lines':[]}
     draft['draft_hash']=digest(draft)
     evidence={'action':'CONFIRM','client_explicit_decision':'TRUE','confirmed_at':past,'confirmed_by':client,'source_reference_ids':['SYNTHETIC_CONFIRMATION']}
     record={'version':1,'target_id':'FT-SYNTHETIC-1','target_hash':draft['draft_hash'],'status':'CONFIRMED','draft':draft,
@@ -93,6 +93,8 @@ def test_actual_w2_confirmation_record_reused_unchanged():
     out=prepare_input(req,trusted_context=ctx)
     assert target==before
     assert out.payload['target_binding']['original_payload_digest']==digest(target['payload'])
+    assert out.payload['target_binding']['allocation_id']==target['payload']['draft']['allocation_id']
+    assert out.payload['target_binding']['target_record_id']==target['payload']['target_id']
 
 
 def test_account_identity_and_currency_isolation():

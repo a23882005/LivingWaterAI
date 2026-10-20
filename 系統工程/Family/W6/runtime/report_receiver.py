@@ -49,7 +49,7 @@ def input_digest(request):
     return hashlib.sha256(json.dumps(wire,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 
 
-def assemble(snapshot, request, result, *, client_id, members, sections=None, events=None):
+def assemble(snapshot, request, result, *, client_id, members, sections=None, events=None, target_validator=None):
     require(client_id in members, 'MEMBER_NOT_ALLOWED')
     require(snapshot.get('schema_version') == 'Family.W5.W1Snapshot.v1', 'SNAPSHOT_SCHEMA')
     require(request.get('schema_version') == 'Family.W5.request.v1', 'REQUEST_SCHEMA')
@@ -101,6 +101,18 @@ def assemble(snapshot, request, result, *, client_id, members, sections=None, ev
     from source_views import canonical_section, cash_history_view, history_view
     sections = sections or {}
     canonical = {name: canonical_section(sections.get(name), client_id=client_id, run_id=request['run_id'], section=name) for name in ('target','drift','performance','risk','look_through','valuation','funding')}
+    if request.get('confirmed_target') is not None:
+        require(callable(target_validator), 'TARGET_VALIDATOR_REQUIRED')
+        from target_receipt import receive_target
+        from inspect import getsource
+        target_view = receive_target(request['confirmed_target'], client_id=client_id,
+            report_run_id=request['run_id'], evaluation_at=when,
+            source_id='W5_REQUEST:' + request['request_id'] + ':confirmed_target',
+            rules_sha=hashlib.sha256(getsource(target_validator).encode()).hexdigest(),
+            validator=target_validator)
+        if sections.get('target') is not None:
+            require(canonical['target']['payload'] == target_view['payload'], 'TARGET_SECTION_CONFLICT')
+        canonical['target'] = target_view
     history = history_view(events or [], client_id)
     cash = cash_history_view(snapshot)
     return {'schema_version': 'Family.W6.ReportView.v1', 'client_id': client_id,

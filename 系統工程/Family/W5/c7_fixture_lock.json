@@ -1,0 +1,26 @@
+{
+  "provenance": "Original Work21 synthetic QA_RUN3; WORK21_MANIFEST_SHA256 verified",
+  "source_zip_sha256": "23c81a626835086c5f41026d11be03c649c55af83bf5ab0d0dfce25f354f4d6d",
+  "files": [
+    {
+      "destination": "tests/fixtures/c7/W13_C_WORK6_SOURCE_QA_RUN3.json",
+      "source_zip_path": "WORK11_OUTPUT/FIXTURES/W13_C_WORK6_SOURCE_QA_RUN3.json",
+      "sha256": "119b9ccda00218f1018d0c0b5e734f59d1311528981c9bd67c94197ae968beb8"
+    },
+    {
+      "destination": "tests/fixtures/c7/W13_LOOP2_C7_FUNDING_CONTEXT_US_HAPPY.json",
+      "source_zip_path": "WORK11_OUTPUT/FIXTURES/W13_LOOP2_C7_FUNDING_CONTEXT_US_HAPPY.json",
+      "sha256": "668bb8dc6b8010e1810887251db43fa759fa04254575603a92c885fd9986e366"
+    },
+    {
+      "destination": "tests/fixtures/c7/W13_C_WORK7_ASSET_FRAMEWORK_RESULT_QA_RUN3.json",
+      "source_zip_path": "WORK11_OUTPUT/FIXTURES/W13_C_WORK7_ASSET_FRAMEWORK_RESULT_QA_RUN3.json",
+      "sha256": "22d96bbb64ce1cd65b2dd7a30bd690427eb4dfc09b05eaba2069bc97258a57d3"
+    },
+    {
+      "destination": "tests/fixtures/c7/W13_C_WORK7_CANONICAL_INPUT_QA_RUN3.json",
+      "source_zip_path": "WORK11_OUTPUT/FIXTURES/W13_C_WORK7_CANONICAL_INPUT_QA_RUN3.json",
+      "sha256": "a2bb10014ed20074c6c64551c94d23e5cd9732ad14237598e3ab654dc75e46a7"
+    }
+  ]
+}

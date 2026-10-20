@@ -40,3 +40,17 @@ Family 中PM需具名界定：V75 的 HOLD_AS_IS 客戶動作是否沿 C7 drift�
 同輪完成 W2→V75 明確商品別名及同帳戶/同幣別逐檔 target_amount 核對。以明確確認逐檔金額接原V75；跨帳戶目標拆分、整體目標拆資金桶及FX仍須具名來源，W5不重新配置。合成案例歷史NAV 20000、SGOV目標5600/SPSB2400，當期預算350，保留與長期目標不同的語意。
 
 V75原Decimal零有 `0E-28` 表示，Frozen Money schema要求一般十進位字串；W5 `money_wire`僅做Money字串等值序列化，指數零轉`0`，原`0.00`保持，原始snapshot另存raw_runtime_ready。原策略/Frozen schema修改0；實際Work7通過後仍到既有Work8目標單位待界定處。
+
+## 2026-10-21 原始 C7 重新驗證與一次交回事項
+
+已補回准讀原始 work7/asset_framework.py 並實跑 Work21 QA_RUN3，結果完全符合原 golden。這項證據只證明原 C7 可正確載入與重現，不能解決目前拼接 runner fixture 的來源一致性。
+
+原 validate_drift_contract 要求 drift.denominator 與 confirmed final_target.denominator 完全相等，逐檔 drift=target-current，且非零漂移的 client_facing_action 應為 INCREASE_TARGET_WEIGHT/DECREASE_TARGET_WEIGHT；原 validate_protected_holding_contract 的保護對象為既有個股，非 ETF/債券。這些規則由原程式保留，W5 不擴充其策略。先前合成 runner 多處手動調整，不視為 C7 原生運算結果；SOURCE_BACKED 路徑現已要求原輸入重算及全結果核對。
+
+Family 中PM待提供／界定：
+1. W1 四庫 final_target_version 皆0筆：請定位四位家人已有確認記錄（fileId/path、client_id、allocation_id、版本、確認證據及target_lines），交 W2/資料責任人，不要求家人重填。
+2. C Work6→C7 原始 canonical_input、work6_result、funding_context 及 producer/version/source_reference：由C線提供與確認目標相符的既有原件，W5用原引擎運算。
+3. 正式 technical、報價/FX/NAV、V70戰術額度來源：各責任線指定檔案與欄位；W3原始feed就緒不等於戰術額度已具名。
+4. Work8 project_target_position 金額/權重，以及 V75 HOLD_AS_IS 客戶動作優先序：由中PM具名核定接口；若涉及原核心，明列最小修正範圍。
+
+影響W5-09～18最終驗收。W5現有來源綁定、實際引擎與恢復程式保留；收到既有來源與接口後續接同一Checkpoint，不另建替代規格。

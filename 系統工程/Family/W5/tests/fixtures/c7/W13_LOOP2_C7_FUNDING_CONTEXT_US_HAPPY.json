@@ -1,0 +1,106 @@
+{
+  "contract_name": "LivingWaterAI.C.Work7.FundingContext",
+  "contract_version": "C-W7-FUND-v1.0.0",
+  "run_id": "qa-run-3",
+  "base_currency": "USD",
+  "bank_cash_scope": "OUT_OF_SCOPE",
+  "total_new_investment_amount": 1200.0,
+  "contexts": [
+    {
+      "domain": "TW_LOCAL_BROKER",
+      "broker": "TW_LOCAL",
+      "account": "L1",
+      "bucket_new_investment_amount": 100.0,
+      "brokerage_cash_state": {
+        "total": 100.0,
+        "available": 100.0,
+        "unsettled": 0.0,
+        "reserved": 0.0
+      },
+      "executable_budget": {
+        "equity": {
+          "amount": 0.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "TW_LOCAL_BROKER",
+          "source_broker": "TW_LOCAL",
+          "source_account": "L1"
+        },
+        "bond": {
+          "amount": 0.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "TW_LOCAL_BROKER",
+          "source_broker": "TW_LOCAL",
+          "source_account": "L1"
+        }
+      },
+      "source_reference_ids": [
+        "c7-local"
+      ]
+    },
+    {
+      "domain": "TW_SUB_BROKERAGE",
+      "broker": "TW_SUB",
+      "account": "S1",
+      "bucket_new_investment_amount": 100.0,
+      "brokerage_cash_state": {
+        "total": 100.0,
+        "available": 100.0,
+        "unsettled": 0.0,
+        "reserved": 0.0
+      },
+      "executable_budget": {
+        "equity": {
+          "amount": 0.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "TW_SUB_BROKERAGE",
+          "source_broker": "TW_SUB",
+          "source_account": "S1"
+        },
+        "bond": {
+          "amount": 0.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "TW_SUB_BROKERAGE",
+          "source_broker": "TW_SUB",
+          "source_account": "S1"
+        }
+      },
+      "source_reference_ids": [
+        "c7-sub"
+      ]
+    },
+    {
+      "domain": "US_BROKER",
+      "broker": "QA_BROKER",
+      "account": "QA_ACCOUNT",
+      "bucket_new_investment_amount": 1000.0,
+      "brokerage_cash_state": {
+        "total": 1000.0,
+        "available": 800.0,
+        "unsettled": 100.0,
+        "reserved": 100.0
+      },
+      "executable_budget": {
+        "equity": {
+          "amount": 450.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "US_BROKER",
+          "source_broker": "QA_BROKER",
+          "source_account": "QA_ACCOUNT"
+        },
+        "bond": {
+          "amount": 350.0,
+          "cash_basis": "AVAILABLE",
+          "source_domain": "US_BROKER",
+          "source_broker": "QA_BROKER",
+          "source_account": "QA_ACCOUNT"
+        }
+      },
+      "source_reference_ids": [
+        "C7-ref"
+      ]
+    }
+  ],
+  "source_reference_ids": [
+    "C7-ref"
+  ]
+}

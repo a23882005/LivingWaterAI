@@ -1,0 +1,2800 @@
+{
+  "contract_name": "LivingWaterAI.C.Work6.MentorAdjustmentResult",
+  "contract_version": "C-W6-v1.0.0",
+  "identity": {
+    "run_id": "qa-run-3",
+    "client_id": "qa-client",
+    "portfolio_id": "qa-portfolio",
+    "request_id": "C8C9-W13-C7-REQ-003"
+  },
+  "work6_snapshot_id": "C-W6-33333333333333333333333333333333",
+  "parent_work6_snapshot_id": "C-W6-W13-QA-PARENT",
+  "loop_status": "FINAL_TARGET_CONFIRMED",
+  "route": {
+    "decision": "C_ONLY",
+    "reason_codes": []
+  },
+  "draft_allocation": {
+    "value_state": "KNOWN",
+    "snapshot": {
+      "allocation_id": "C-W6-PROP-4946536b8bbff9408027c79e",
+      "stage": "PROPOSED",
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 1000.0,
+        "currency": "USD",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      "positions": [
+        {
+          "instrument_id": "QQQ",
+          "ticker": "QQQ",
+          "display_name": "QQQ ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.1,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 100.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "CORE.US",
+          "ticker": "CORE",
+          "display_name": "Core US Equity ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.7,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 700.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "SGOV",
+          "ticker": "SGOV",
+          "display_name": "iShares 0-3 Month Treasury Bond ETF",
+          "asset_type": "債券ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.2,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 200.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "declared_total_weight": {
+        "value_state": "KNOWN",
+        "value": 1.0,
+        "unit": "portfolio_weight",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "source_native_status": "KNOWN"
+      },
+      "confirmation_status": "PENDING",
+      "confirmed_at": null,
+      "confirmed_by": null,
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "reason": "No new draft while blocked/rerouted."
+  },
+  "previous_proposal": {
+    "value_state": "KNOWN",
+    "snapshot": {
+      "allocation_id": "ALLOC-PROPOSED-001",
+      "stage": "PROPOSED",
+      "as_of": "2026-09-23T10:54:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 1000.0,
+        "currency": "USD",
+        "as_of": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      "positions": [
+        {
+          "instrument_id": "QQQ",
+          "ticker": "QQQ",
+          "display_name": "QQQ ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.1,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 100.0,
+            "currency": "USD",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "CORE.US",
+          "ticker": "CORE",
+          "display_name": "Core US Equity ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.7,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 700.0,
+            "currency": "USD",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "SGOV",
+          "ticker": "SGOV",
+          "display_name": "iShares 0-3 Month Treasury Bond ETF",
+          "asset_type": "債券ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.2,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 200.0,
+            "currency": "USD",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "declared_total_weight": {
+        "value_state": "KNOWN",
+        "value": 1.0,
+        "unit": "portfolio_weight",
+        "as_of": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "source_native_status": "KNOWN"
+      },
+      "confirmation_status": "PENDING",
+      "confirmed_at": null,
+      "confirmed_by": null,
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "reason": "No previous proposal available."
+  },
+  "current_proposal": {
+    "value_state": "KNOWN",
+    "snapshot": {
+      "allocation_id": "C-W6-PROP-4946536b8bbff9408027c79e",
+      "stage": "PROPOSED",
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 1000.0,
+        "currency": "USD",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      "positions": [
+        {
+          "instrument_id": "QQQ",
+          "ticker": "QQQ",
+          "display_name": "QQQ ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.1,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 100.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "CORE.US",
+          "ticker": "CORE",
+          "display_name": "Core US Equity ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.7,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 700.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "instrument_id": "SGOV",
+          "ticker": "SGOV",
+          "display_name": "iShares 0-3 Month Treasury Bond ETF",
+          "asset_type": "債券ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.2,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 200.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "declared_total_weight": {
+        "value_state": "KNOWN",
+        "value": 1.0,
+        "unit": "portfolio_weight",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "source_native_status": "KNOWN"
+      },
+      "confirmation_status": "PENDING",
+      "confirmed_at": null,
+      "confirmed_by": null,
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "reason": "No current proposal available."
+  },
+  "final_target": {
+    "value_state": "KNOWN",
+    "snapshot": {
+      "allocation_id": "C-W6-FINAL-QA-003",
+      "stage": "FINAL_TARGET",
+      "as_of": "2026-09-26T13:00:00+08:00",
+      "denominator": {
+        "value_state": "KNOWN",
+        "amount": 1000.0,
+        "currency": "USD",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      "positions": [
+        {
+          "instrument_id": "QQQ",
+          "ticker": "QQQ",
+          "display_name": "QQQ ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.1,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 100.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "W13-C7-FINAL-TARGET-SOURCE"
+          ]
+        },
+        {
+          "instrument_id": "CORE.US",
+          "ticker": "CORE",
+          "display_name": "Core US Equity ETF",
+          "asset_type": "股票ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.7,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 700.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "W13-C7-FINAL-TARGET-SOURCE"
+          ]
+        },
+        {
+          "instrument_id": "SGOV",
+          "ticker": "SGOV",
+          "display_name": "iShares 0-3 Month Treasury Bond ETF",
+          "asset_type": "債券ETF",
+          "market": "US",
+          "base_currency": "USD",
+          "value_state": "KNOWN",
+          "weight": {
+            "value_state": "KNOWN",
+            "value": 0.2,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "portfolio_amount": {
+            "value_state": "KNOWN",
+            "amount": 200.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "source_reference_ids": [
+            "W13-C7-FINAL-TARGET-SOURCE"
+          ]
+        }
+      ],
+      "declared_total_weight": {
+        "value_state": "KNOWN",
+        "value": 1.0,
+        "unit": "portfolio_weight",
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "source_native_status": "KNOWN"
+      },
+      "confirmation_status": "CONFIRMED",
+      "confirmed_at": "2026-09-26T13:00:00+08:00",
+      "confirmed_by": "qa-client",
+      "source_reference_ids": [
+        "W13-C7-FINAL-TARGET-SOURCE"
+      ]
+    },
+    "reason": "Final Target is not confirmed."
+  },
+  "confirmation_status": "CONFIRMED",
+  "preference_locks": [],
+  "drift_snapshot": {
+    "value_state": "KNOWN",
+    "as_of": "2026-09-26T13:00:00+08:00",
+    "denominator": {
+      "value_state": "KNOWN",
+      "amount": 1000.0,
+      "currency": "USD",
+      "as_of": "2026-09-24T11:45:00+08:00",
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ]
+    },
+    "items": [
+      {
+        "instrument_id": "QQQ",
+        "ticker": "QQQ",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.1
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.1
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      },
+      {
+        "instrument_id": "CORE.US",
+        "ticker": "CORE",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.7
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.7
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      },
+      {
+        "instrument_id": "SGOV",
+        "ticker": "SGOV",
+        "current_weight": {
+          "value_state": "KNOWN",
+          "value": 0.2
+        },
+        "final_target_weight": {
+          "value_state": "KNOWN",
+          "value": 0.2
+        },
+        "drift": {
+          "value_state": "KNOWN",
+          "value": 0.0
+        },
+        "protected": false,
+        "client_facing_action": "HOLD"
+      }
+    ],
+    "renderer_must_not_recompute_final_target": true,
+    "reason": null
+  },
+  "radar_snapshot": {
+    "as_of": "2026-09-24T11:45:00+08:00",
+    "axes": [
+      {
+        "axis_id": "BULL_EARLY",
+        "label_zh": "牛市初期",
+        "order": 1
+      },
+      {
+        "axis_id": "BULL_MID",
+        "label_zh": "牛市中期",
+        "order": 2
+      },
+      {
+        "axis_id": "BULL_LATE",
+        "label_zh": "牛市末期",
+        "order": 3
+      },
+      {
+        "axis_id": "BEAR_NON_RECESSION_VALUATION",
+        "label_zh": "非衰退熊市／估值壓縮",
+        "order": 4
+      },
+      {
+        "axis_id": "BEAR_RECESSION",
+        "label_zh": "景氣衰退熊市",
+        "order": 5
+      },
+      {
+        "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+        "label_zh": "金融／流動性危機",
+        "order": 6
+      }
+    ],
+    "views": [
+      {
+        "view_id": "CURRENT_ATTACK",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "TARGET_ATTACK",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "CURRENT_DEFENSE",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      },
+      {
+        "view_id": "TARGET_DEFENSE",
+        "axes": [
+          {
+            "axis_id": "BULL_EARLY",
+            "label_zh": "牛市初期",
+            "order": 1,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_MID",
+            "label_zh": "牛市中期",
+            "order": 2,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BULL_LATE",
+            "label_zh": "牛市末期",
+            "order": 3,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_NON_RECESSION_VALUATION",
+            "label_zh": "非衰退熊市／估值壓縮",
+            "order": 4,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "BEAR_RECESSION",
+            "label_zh": "景氣衰退熊市",
+            "order": 5,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          },
+          {
+            "axis_id": "FINANCIAL_LIQUIDITY_CRISIS",
+            "label_zh": "金融／流動性危機",
+            "order": 6,
+            "score": {
+              "value_state": "UNKNOWN",
+              "value": null,
+              "source_reference_ids": []
+            }
+          }
+        ],
+        "source_reference_ids": []
+      }
+    ],
+    "display_requirements": {
+      "same_six_axes_for_all_four_views": true,
+      "same_axis_order_for_all_four_views": true,
+      "six_chinese_labels_directly_visible": true,
+      "missing_overlapped_or_unreadable_label_is_formal_report_qa_fail": true
+    }
+  },
+  "adjustment_history": [
+    {
+      "adjustment_id": "ADJ-W6-001",
+      "evaluated_at": "2026-09-24T11:45:00+08:00",
+      "requested_change_types": [
+        "PREFERENCE_LOCK_UPDATE",
+        "FINAL_TARGET_CONFIRMATION"
+      ],
+      "route": "C_ONLY",
+      "previous_proposal_id": "ALLOC-PROPOSED-001",
+      "current_proposal_id": "C-W6-PROP-4946536b8bbff9408027c79e",
+      "confirmation_action": "CONFIRM",
+      "preference_actions": [
+        {
+          "instrument_id": "CORE.US",
+          "action": "LOCK"
+        }
+      ],
+      "source_reference_ids": [
+        "SRC_CLIENT"
+      ],
+      "status": "FINAL_TARGET_CONFIRMED"
+    }
+  ],
+  "proposal_engine_result": {
+    "contract_name": "LivingWaterAI.C.CanonicalOutput",
+    "contract_version": "C-W1-v1.0.1",
+    "identity": {
+      "run_id": "qa-run-3",
+      "client_id": "CLIENT-DEMO",
+      "portfolio_id": "PORT-DEMO",
+      "request_id": "C8C9-W13-C7-REQ-003"
+    },
+    "c_snapshot_id": "C-W5-b7eb359c97804ddc72ef832161e0658f",
+    "parent_c_snapshot_id": null,
+    "result_status": "BLOCKED",
+    "decision_phase": "FINAL_TARGET_CONFIRMED",
+    "allocations": {
+      "current_allocation": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "ALLOC-CURRENT-001",
+          "stage": "CURRENT",
+          "as_of": "2026-09-23T10:54:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "CONFIRMED",
+          "confirmed_at": "2026-09-23T10:54:00+08:00",
+          "confirmed_by": "CLIENT",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      },
+      "proposed_allocation": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "C-W6-PROP-4946536b8bbff9408027c79e",
+          "stage": "PROPOSED",
+          "as_of": "2026-09-24T11:45:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "PENDING",
+          "confirmed_at": null,
+          "confirmed_by": null,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      },
+      "final_target": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "C-W6-FINAL-97c157148ba5cccf73dfe332",
+          "stage": "FINAL_TARGET",
+          "as_of": "2026-09-24T11:45:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "CONFIRMED",
+          "confirmed_at": "2026-09-24T11:45:00+08:00",
+          "confirmed_by": "CLIENT-DEMO",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      }
+    },
+    "v70_asset_framework_reference": {
+      "run_id": "qa-run-3",
+      "upstream_v70_snapshot_id": "V70-SNAPSHOT-DEMO",
+      "snapshot_as_of": "2026-09-23T10:45:00+08:00",
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_V70"
+      ]
+    },
+    "benchmark_reference": {
+      "workbook_name": "標的績效基準資料.xlsx",
+      "drive_file_id": "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+      "file_fingerprint_sha256": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+      "sheets": {
+        "Sheet1_標的績效基準資料": {
+          "role": "PERFORMANCE_RISK_BASELINE",
+          "header_fingerprint_sha256": "a1182bd4e127ad20ece3daa551dfd4026cdff786c3e6d817506730c05b25737c"
+        },
+        "Sheet2_來源計算代理規則": {
+          "role": "SOURCE_CALC_PROXY_RULES",
+          "header_fingerprint_sha256": "c5dde81d9a4ac68eb3ad245099f924eaf21d84818417d861103f341f26b7b746"
+        },
+        "Sheet3_曝險度項目定義": {
+          "role": "EXPOSURE_TAXONOMY",
+          "header_fingerprint_sha256": "8f1a08b53f9d08a92a75572df173caec2876bf38dad4de86f4125684c5c13b13"
+        },
+        "Sheet4_標的曝險基準資料": {
+          "role": "EXPOSURE_PRIMITIVES",
+          "header_fingerprint_sha256": "38e594092282d083c2528d941fa92022df72ae2fcb34eb28345567819b23e620"
+        }
+      },
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_B_WORKBOOK"
+      ]
+    },
+    "performance_risk_result": {
+      "module_name": "C_WORK3_PERFORMANCE_RISK",
+      "status": "BLOCKED",
+      "formal_output_eligibility": {
+        "eligible": false,
+        "scope": "NONE",
+        "blocking_reasons": [
+          "C_DATA_INSUFFICIENT",
+          "C_FORMAL_OUTPUT_BLOCKED"
+        ],
+        "warning_reasons": [],
+        "evaluated_at": "2026-09-24T11:45:00+08:00",
+        "rule_references": [
+          "W2-SRC-004",
+          "W2-TR-001",
+          "W2-PER-001",
+          "W2-PER-002",
+          "W2-PER-003",
+          "W2-MET-001",
+          "W2-MET-002",
+          "W2-MET-003",
+          "W2-MET-004",
+          "W2-MET-005",
+          "W2-MET-006",
+          "W2-MET-007",
+          "W2-MET-008",
+          "W2-MET-009",
+          "W2-MET-010",
+          "W2-PRX-001",
+          "W2-PRX-002",
+          "W2-PRX-003",
+          "W2-DQ-001",
+          "W2-DQ-002",
+          "W2-DQ-003",
+          "W2-DQ-004",
+          "W2-DQ-005",
+          "W2-DQ-006",
+          "W2-DQ-007"
+        ]
+      },
+      "payload": null,
+      "issues": [
+        {
+          "code": "C_DATA_INSUFFICIENT",
+          "severity": "BLOCKING",
+          "field_path": "allocation.positions[1].ticker",
+          "message": "Ticker TSM is not available in the Work2 benchmark universe.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "code": "C_FORMAL_OUTPUT_BLOCKED",
+          "severity": "BLOCKING",
+          "field_path": "performance_risk_result",
+          "message": "Work3 input gate failed; no formal performance/risk result was produced.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_B_WORKBOOK"
+          ]
+        }
+      ],
+      "traceability": []
+    },
+    "lookthrough_exposure_result": {
+      "module_name": "lookthrough_exposure_result",
+      "status": "BLOCKED",
+      "formal_output_eligibility": {
+        "eligible": false,
+        "scope": "NONE",
+        "blocking_reasons": [
+          "C_DATA_INSUFFICIENT"
+        ],
+        "warning_reasons": [],
+        "evaluated_at": "2026-09-24T11:45:00+08:00",
+        "rule_references": [
+          "C-W4-LT-001",
+          "C-W4-LT-002",
+          "C-W4-LT-003",
+          "C-W4-LT-004",
+          "C-W4-LT-005",
+          "C-W4-LT-006",
+          "C-W4-LT-007",
+          "C-W4-LT-008",
+          "W2-PRX-001",
+          "W2-TAX-001",
+          "W2-DQ-005"
+        ]
+      },
+      "payload": null,
+      "issues": [
+        {
+          "code": "C_DATA_INSUFFICIENT",
+          "severity": "BLOCKING",
+          "field_path": "allocation.positions[1].ticker",
+          "message": "Ticker TSM is not in Work2 benchmark universe.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "traceability": []
+    },
+    "deployment_integration_reference": {
+      "status": "NOT_RUN",
+      "run_id": "qa-run-3",
+      "v82_snapshot_id": null,
+      "v75_snapshot_id": null,
+      "source_reference_ids": [],
+      "notes": "Deferred by governance to C Work8 after ABC PM Runtime Readiness Gate RELEASE; Work5 does not perform deployment integration."
+    },
+    "formal_output_eligibility": {
+      "eligible": false,
+      "scope": "NONE",
+      "blocking_reasons": [
+        "C_DATA_INSUFFICIENT",
+        "C_FORMAL_OUTPUT_BLOCKED"
+      ],
+      "warning_reasons": [],
+      "evaluated_at": "2026-09-24T11:45:00+08:00",
+      "rule_references": [
+        "C-W5-CORE-001",
+        "C-W5-CORE-002",
+        "C-W5-CORE-003",
+        "C-W5-CORE-004",
+        "C-W5-CORE-005",
+        "C-W5-CORE-006"
+      ]
+    },
+    "issues": [
+      {
+        "code": "C_PROXY_USED",
+        "severity": "WARNING",
+        "field_path": "Sheet1[6].代理標的",
+        "message": "Authorized proxy declaration preserved: VWRA -> VT.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_PROXY_USED",
+        "severity": "WARNING",
+        "field_path": "Sheet1[7].代理標的",
+        "message": "Authorized proxy declaration preserved: VALL -> VT.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_PARTIAL_OUTPUT",
+        "severity": "WARNING",
+        "field_path": "formal_output_eligibility",
+        "message": "B workbook is structurally valid, but some fields are UNKNOWN/STALE and remain blocked field-by-field.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_DATA_INSUFFICIENT",
+        "severity": "BLOCKING",
+        "field_path": "allocation.positions[1].ticker",
+        "message": "Ticker TSM is not available in the Work2 benchmark universe.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "code": "C_FORMAL_OUTPUT_BLOCKED",
+        "severity": "BLOCKING",
+        "field_path": "performance_risk_result",
+        "message": "Work3 input gate failed; no formal performance/risk result was produced.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_DATA_INSUFFICIENT",
+        "severity": "BLOCKING",
+        "field_path": "allocation.positions[1].ticker",
+        "message": "Ticker TSM is not in Work2 benchmark universe.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "code": "C_FORMAL_OUTPUT_BLOCKED",
+        "severity": "BLOCKING",
+        "field_path": "formal_output_eligibility",
+        "message": "Work5 completed fail-closed: no integrated module currently has formally eligible output.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      }
+    ],
+    "traceability": [
+      {
+        "field_path": "benchmark_reference",
+        "owner": "B_BENCHMARK",
+        "rule_references": [
+          "C-W1:BENCHMARK_REFERENCE_ONLY"
+        ],
+        "source_reference_ids": [
+          "SRC_B"
+        ],
+        "as_of": "2026-09-22T08:04:19+08:00",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "benchmark_reference",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-002",
+          "C-W2-v1.0.1"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "allocations.proposed_allocation",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-001",
+          "C-W5-CORE-003"
+        ],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "performance_risk_result",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-003",
+          "C-W3-v1.0.1"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "INSUFFICIENT",
+        "issue_codes": [
+          "C_DATA_INSUFFICIENT",
+          "C_FORMAL_OUTPUT_BLOCKED"
+        ]
+      },
+      {
+        "field_path": "lookthrough_exposure_result",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-003",
+          "C-W4-v1.0.0"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "INSUFFICIENT",
+        "issue_codes": [
+          "C_DATA_INSUFFICIENT"
+        ]
+      }
+    ],
+    "created_at": "2026-09-24T11:45:00+08:00",
+    "source_references": [
+      {
+        "source_id": "SRC_CLIENT",
+        "source_kind": "CLIENT_PROJECT",
+        "owner": "CLIENT_PROJECT",
+        "source_reference": "client-project://CLIENT-DEMO/PORT-DEMO",
+        "source_fingerprint": null,
+        "as_of": "2026-09-23T10:54:00+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "KNOWN",
+        "notes": "Synthetic schema-validation fixture only; not a real client.",
+        "source_fingerprint_algorithm": "NOT_APPLICABLE",
+        "source_version": "FIXTURE-v1"
+      },
+      {
+        "source_id": "SRC_B",
+        "source_kind": "B_BENCHMARK_SOT",
+        "owner": "B_BENCHMARK",
+        "source_reference": "drive://1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+        "source_fingerprint": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+        "as_of": "2026-09-22T08:04:19+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "UNKNOWN",
+        "freshness": "UNKNOWN",
+        "issue_codes": [
+          "C_MODULE_NOT_RUN"
+        ],
+        "source_native_status": null,
+        "notes": "Formal B workbook identity reference.",
+        "source_fingerprint_algorithm": "SHA256",
+        "source_version": "B-FORMAL-CLOSEOUT-2026-09-22"
+      },
+      {
+        "source_id": "SRC_V70",
+        "source_kind": "V70_SNAPSHOT",
+        "owner": "V70",
+        "source_reference": "V70-SNAPSHOT-DEMO",
+        "source_fingerprint": null,
+        "as_of": "2026-09-23T10:45:00+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "KNOWN",
+        "notes": "Synthetic interface fixture only; not a real V70 result.",
+        "source_fingerprint_algorithm": "NOT_APPLICABLE",
+        "source_version": "V70-CONTRACT-DEMO"
+      },
+      {
+        "source_id": "SRC_B_WORKBOOK",
+        "source_kind": "B_BENCHMARK_SOT",
+        "owner": "B_BENCHMARK",
+        "source_reference": "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+        "source_fingerprint": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+        "as_of": "2026-09-22T00:04:19.128Z",
+        "retrieved_at": "2026-09-23T12:47:49+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "FORMAL_B_SOT",
+        "notes": "Read by the locked C Work2 Benchmark Reader; Work5 does not substitute or recalculate B benchmark truth.",
+        "source_version": "drive-modified:2026-09-22T00:04:19.128Z",
+        "source_fingerprint_algorithm": "SHA256"
+      }
+    ]
+  },
+  "final_target_engine_result": {
+    "contract_name": "LivingWaterAI.C.CanonicalOutput",
+    "contract_version": "C-W1-v1.0.1",
+    "identity": {
+      "run_id": "qa-run-3",
+      "client_id": "CLIENT-DEMO",
+      "portfolio_id": "PORT-DEMO",
+      "request_id": "C8C9-W13-C7-REQ-003"
+    },
+    "c_snapshot_id": "C-W5-edd688f5bfc13101872e412fce8ef24a",
+    "parent_c_snapshot_id": "C-W5-b7eb359c97804ddc72ef832161e0658f",
+    "result_status": "BLOCKED",
+    "decision_phase": "FINAL_TARGET_CONFIRMED",
+    "allocations": {
+      "current_allocation": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "ALLOC-CURRENT-001",
+          "stage": "CURRENT",
+          "as_of": "2026-09-23T10:54:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-23T10:54:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-23T10:54:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "CONFIRMED",
+          "confirmed_at": "2026-09-23T10:54:00+08:00",
+          "confirmed_by": "CLIENT",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      },
+      "proposed_allocation": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "C-W6-PROP-4946536b8bbff9408027c79e",
+          "stage": "PROPOSED",
+          "as_of": "2026-09-24T11:45:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "PENDING",
+          "confirmed_at": null,
+          "confirmed_by": null,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      },
+      "final_target": {
+        "value_state": "KNOWN",
+        "snapshot": {
+          "allocation_id": "C-W6-FINAL-QA-003",
+          "stage": "FINAL_TARGET",
+          "as_of": "2026-09-24T11:45:00+08:00",
+          "denominator": {
+            "value_state": "KNOWN",
+            "amount": 1000.0,
+            "currency": "USD",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ]
+          },
+          "positions": [
+            {
+              "instrument_id": "QQQ",
+              "ticker": "QQQ",
+              "display_name": "QQQ ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.1,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 100.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "CORE.US",
+              "ticker": "CORE",
+              "display_name": "Core US Equity ETF",
+              "asset_type": "股票ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.7,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 700.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            },
+            {
+              "instrument_id": "SGOV",
+              "ticker": "SGOV",
+              "display_name": "iShares 0-3 Month Treasury Bond ETF",
+              "asset_type": "債券ETF",
+              "market": "US",
+              "base_currency": "USD",
+              "value_state": "KNOWN",
+              "weight": {
+                "value_state": "KNOWN",
+                "value": 0.2,
+                "unit": "portfolio_weight",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ],
+                "source_native_status": "KNOWN"
+              },
+              "portfolio_amount": {
+                "value_state": "KNOWN",
+                "amount": 200.0,
+                "currency": "USD",
+                "as_of": "2026-09-24T11:45:00+08:00",
+                "data_quality": "OK",
+                "freshness": "FRESH",
+                "issue_codes": [],
+                "source_reference_ids": [
+                  "SRC_CLIENT"
+                ]
+              },
+              "source_reference_ids": [
+                "SRC_CLIENT"
+              ]
+            }
+          ],
+          "declared_total_weight": {
+            "value_state": "KNOWN",
+            "value": 1.0,
+            "unit": "portfolio_weight",
+            "as_of": "2026-09-24T11:45:00+08:00",
+            "data_quality": "OK",
+            "freshness": "FRESH",
+            "issue_codes": [],
+            "source_reference_ids": [
+              "SRC_CLIENT"
+            ],
+            "source_native_status": "KNOWN"
+          },
+          "confirmation_status": "CONFIRMED",
+          "confirmed_at": "2026-09-26T13:00:00+08:00",
+          "confirmed_by": "qa-client",
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        "reason": null
+      }
+    },
+    "v70_asset_framework_reference": {
+      "run_id": "qa-run-3",
+      "upstream_v70_snapshot_id": "V70-SNAPSHOT-DEMO",
+      "snapshot_as_of": "2026-09-23T10:45:00+08:00",
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_V70"
+      ]
+    },
+    "benchmark_reference": {
+      "workbook_name": "標的績效基準資料.xlsx",
+      "drive_file_id": "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+      "file_fingerprint_sha256": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+      "sheets": {
+        "Sheet1_標的績效基準資料": {
+          "role": "PERFORMANCE_RISK_BASELINE",
+          "header_fingerprint_sha256": "a1182bd4e127ad20ece3daa551dfd4026cdff786c3e6d817506730c05b25737c"
+        },
+        "Sheet2_來源計算代理規則": {
+          "role": "SOURCE_CALC_PROXY_RULES",
+          "header_fingerprint_sha256": "c5dde81d9a4ac68eb3ad245099f924eaf21d84818417d861103f341f26b7b746"
+        },
+        "Sheet3_曝險度項目定義": {
+          "role": "EXPOSURE_TAXONOMY",
+          "header_fingerprint_sha256": "8f1a08b53f9d08a92a75572df173caec2876bf38dad4de86f4125684c5c13b13"
+        },
+        "Sheet4_標的曝險基準資料": {
+          "role": "EXPOSURE_PRIMITIVES",
+          "header_fingerprint_sha256": "38e594092282d083c2528d941fa92022df72ae2fcb34eb28345567819b23e620"
+        }
+      },
+      "data_quality": "OK",
+      "freshness": "FRESH",
+      "issue_codes": [],
+      "source_reference_ids": [
+        "SRC_B_WORKBOOK"
+      ]
+    },
+    "performance_risk_result": {
+      "module_name": "C_WORK3_PERFORMANCE_RISK",
+      "status": "BLOCKED",
+      "formal_output_eligibility": {
+        "eligible": false,
+        "scope": "NONE",
+        "blocking_reasons": [
+          "C_DATA_INSUFFICIENT",
+          "C_FORMAL_OUTPUT_BLOCKED"
+        ],
+        "warning_reasons": [],
+        "evaluated_at": "2026-09-24T11:45:00+08:00",
+        "rule_references": [
+          "W2-SRC-004",
+          "W2-TR-001",
+          "W2-PER-001",
+          "W2-PER-002",
+          "W2-PER-003",
+          "W2-MET-001",
+          "W2-MET-002",
+          "W2-MET-003",
+          "W2-MET-004",
+          "W2-MET-005",
+          "W2-MET-006",
+          "W2-MET-007",
+          "W2-MET-008",
+          "W2-MET-009",
+          "W2-MET-010",
+          "W2-PRX-001",
+          "W2-PRX-002",
+          "W2-PRX-003",
+          "W2-DQ-001",
+          "W2-DQ-002",
+          "W2-DQ-003",
+          "W2-DQ-004",
+          "W2-DQ-005",
+          "W2-DQ-006",
+          "W2-DQ-007"
+        ]
+      },
+      "payload": null,
+      "issues": [
+        {
+          "code": "C_DATA_INSUFFICIENT",
+          "severity": "BLOCKING",
+          "field_path": "allocation.positions[1].ticker",
+          "message": "Ticker TSM is not available in the Work2 benchmark universe.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        },
+        {
+          "code": "C_FORMAL_OUTPUT_BLOCKED",
+          "severity": "BLOCKING",
+          "field_path": "performance_risk_result",
+          "message": "Work3 input gate failed; no formal performance/risk result was produced.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_B_WORKBOOK"
+          ]
+        }
+      ],
+      "traceability": []
+    },
+    "lookthrough_exposure_result": {
+      "module_name": "lookthrough_exposure_result",
+      "status": "BLOCKED",
+      "formal_output_eligibility": {
+        "eligible": false,
+        "scope": "NONE",
+        "blocking_reasons": [
+          "C_DATA_INSUFFICIENT"
+        ],
+        "warning_reasons": [],
+        "evaluated_at": "2026-09-24T11:45:00+08:00",
+        "rule_references": [
+          "C-W4-LT-001",
+          "C-W4-LT-002",
+          "C-W4-LT-003",
+          "C-W4-LT-004",
+          "C-W4-LT-005",
+          "C-W4-LT-006",
+          "C-W4-LT-007",
+          "C-W4-LT-008",
+          "W2-PRX-001",
+          "W2-TAX-001",
+          "W2-DQ-005"
+        ]
+      },
+      "payload": null,
+      "issues": [
+        {
+          "code": "C_DATA_INSUFFICIENT",
+          "severity": "BLOCKING",
+          "field_path": "allocation.positions[1].ticker",
+          "message": "Ticker TSM is not in Work2 benchmark universe.",
+          "owner": "C_INTEGRATION",
+          "blocking": true,
+          "source_reference_ids": [
+            "SRC_CLIENT"
+          ]
+        }
+      ],
+      "traceability": []
+    },
+    "deployment_integration_reference": {
+      "status": "NOT_RUN",
+      "run_id": "qa-run-3",
+      "v82_snapshot_id": null,
+      "v75_snapshot_id": null,
+      "source_reference_ids": [],
+      "notes": "Deferred by governance to C Work8 after ABC PM Runtime Readiness Gate RELEASE; Work5 does not perform deployment integration."
+    },
+    "formal_output_eligibility": {
+      "eligible": false,
+      "scope": "NONE",
+      "blocking_reasons": [
+        "C_DATA_INSUFFICIENT",
+        "C_FORMAL_OUTPUT_BLOCKED"
+      ],
+      "warning_reasons": [],
+      "evaluated_at": "2026-09-24T11:45:00+08:00",
+      "rule_references": [
+        "C-W5-CORE-001",
+        "C-W5-CORE-002",
+        "C-W5-CORE-003",
+        "C-W5-CORE-004",
+        "C-W5-CORE-005",
+        "C-W5-CORE-006"
+      ]
+    },
+    "issues": [
+      {
+        "code": "C_PROXY_USED",
+        "severity": "WARNING",
+        "field_path": "Sheet1[6].代理標的",
+        "message": "Authorized proxy declaration preserved: VWRA -> VT.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_PROXY_USED",
+        "severity": "WARNING",
+        "field_path": "Sheet1[7].代理標的",
+        "message": "Authorized proxy declaration preserved: VALL -> VT.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_PARTIAL_OUTPUT",
+        "severity": "WARNING",
+        "field_path": "formal_output_eligibility",
+        "message": "B workbook is structurally valid, but some fields are UNKNOWN/STALE and remain blocked field-by-field.",
+        "owner": "C_INTEGRATION",
+        "blocking": false,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_DATA_INSUFFICIENT",
+        "severity": "BLOCKING",
+        "field_path": "allocation.positions[1].ticker",
+        "message": "Ticker TSM is not available in the Work2 benchmark universe.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "code": "C_FORMAL_OUTPUT_BLOCKED",
+        "severity": "BLOCKING",
+        "field_path": "performance_risk_result",
+        "message": "Work3 input gate failed; no formal performance/risk result was produced.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      },
+      {
+        "code": "C_DATA_INSUFFICIENT",
+        "severity": "BLOCKING",
+        "field_path": "allocation.positions[1].ticker",
+        "message": "Ticker TSM is not in Work2 benchmark universe.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ]
+      },
+      {
+        "code": "C_FORMAL_OUTPUT_BLOCKED",
+        "severity": "BLOCKING",
+        "field_path": "formal_output_eligibility",
+        "message": "Work5 completed fail-closed: no integrated module currently has formally eligible output.",
+        "owner": "C_INTEGRATION",
+        "blocking": true,
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ]
+      }
+    ],
+    "traceability": [
+      {
+        "field_path": "benchmark_reference",
+        "owner": "B_BENCHMARK",
+        "rule_references": [
+          "C-W1:BENCHMARK_REFERENCE_ONLY"
+        ],
+        "source_reference_ids": [
+          "SRC_B"
+        ],
+        "as_of": "2026-09-22T08:04:19+08:00",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "benchmark_reference",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-002",
+          "C-W2-v1.0.1"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "allocations.final_target",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-001",
+          "C-W5-CORE-003"
+        ],
+        "source_reference_ids": [
+          "SRC_CLIENT"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "OK",
+        "issue_codes": []
+      },
+      {
+        "field_path": "performance_risk_result",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-003",
+          "C-W3-v1.0.1"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "INSUFFICIENT",
+        "issue_codes": [
+          "C_DATA_INSUFFICIENT",
+          "C_FORMAL_OUTPUT_BLOCKED"
+        ]
+      },
+      {
+        "field_path": "lookthrough_exposure_result",
+        "owner": "C_INTEGRATION",
+        "rule_references": [
+          "C-W5-CORE-003",
+          "C-W4-v1.0.0"
+        ],
+        "source_reference_ids": [
+          "SRC_B_WORKBOOK"
+        ],
+        "as_of": "2026-09-24T11:45:00+08:00",
+        "data_quality": "INSUFFICIENT",
+        "issue_codes": [
+          "C_DATA_INSUFFICIENT"
+        ]
+      }
+    ],
+    "created_at": "2026-09-24T11:45:00+08:00",
+    "source_references": [
+      {
+        "source_id": "SRC_CLIENT",
+        "source_kind": "CLIENT_PROJECT",
+        "owner": "CLIENT_PROJECT",
+        "source_reference": "client-project://CLIENT-DEMO/PORT-DEMO",
+        "source_fingerprint": null,
+        "as_of": "2026-09-23T10:54:00+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "KNOWN",
+        "notes": "Synthetic schema-validation fixture only; not a real client.",
+        "source_fingerprint_algorithm": "NOT_APPLICABLE",
+        "source_version": "FIXTURE-v1"
+      },
+      {
+        "source_id": "SRC_B",
+        "source_kind": "B_BENCHMARK_SOT",
+        "owner": "B_BENCHMARK",
+        "source_reference": "drive://1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+        "source_fingerprint": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+        "as_of": "2026-09-22T08:04:19+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "UNKNOWN",
+        "freshness": "UNKNOWN",
+        "issue_codes": [
+          "C_MODULE_NOT_RUN"
+        ],
+        "source_native_status": null,
+        "notes": "Formal B workbook identity reference.",
+        "source_fingerprint_algorithm": "SHA256",
+        "source_version": "B-FORMAL-CLOSEOUT-2026-09-22"
+      },
+      {
+        "source_id": "SRC_V70",
+        "source_kind": "V70_SNAPSHOT",
+        "owner": "V70",
+        "source_reference": "V70-SNAPSHOT-DEMO",
+        "source_fingerprint": null,
+        "as_of": "2026-09-23T10:45:00+08:00",
+        "retrieved_at": "2026-09-23T10:54:00+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "KNOWN",
+        "notes": "Synthetic interface fixture only; not a real V70 result.",
+        "source_fingerprint_algorithm": "NOT_APPLICABLE",
+        "source_version": "V70-CONTRACT-DEMO"
+      },
+      {
+        "source_id": "SRC_B_WORKBOOK",
+        "source_kind": "B_BENCHMARK_SOT",
+        "owner": "B_BENCHMARK",
+        "source_reference": "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-",
+        "source_fingerprint": "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02",
+        "as_of": "2026-09-22T00:04:19.128Z",
+        "retrieved_at": "2026-09-23T12:47:49+08:00",
+        "data_quality": "OK",
+        "freshness": "FRESH",
+        "issue_codes": [],
+        "source_native_status": "FORMAL_B_SOT",
+        "notes": "Read by the locked C Work2 Benchmark Reader; Work5 does not substitute or recalculate B benchmark truth.",
+        "source_version": "drive-modified:2026-09-22T00:04:19.128Z",
+        "source_fingerprint_algorithm": "SHA256"
+      }
+    ]
+  },
+  "mentor_result_contract": {
+    "display_status": "FINAL_TARGET_CONFIRMED",
+    "next_route": "C_ONLY",
+    "human_readable_summary": "Final Target 已由客戶明確確認；報表只能呈現 C Engine 的 Final Target 與 Drift Snapshot。",
+    "report_engine_must_not_recompute_final_target": true,
+    "risk_warning_is_not_sell_instruction": true,
+    "protected_holding_actions": [
+      {
+        "instrument_id": "CORE.US",
+        "action": "HOLD_PROTECTED",
+        "risk_disclosure_separate_from_sell_action": true,
+        "note": "Risk/valuation/fundamental warnings may still be shown; Preference Lock itself does not authorize sell/reduce-to-zero."
+      }
+    ],
+    "route_reason_codes": []
+  },
+  "issues": [],
+  "created_at": "2026-09-26T13:20:00+08:00"
+}

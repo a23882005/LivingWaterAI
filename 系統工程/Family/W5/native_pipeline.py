@@ -29,6 +29,11 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
             raise PipelineError('SHARED_SOURCE_MISMATCH:'+name)
     run_id=w3['run_id'];client=w3['client_state_context']['payload']['client_id']
     framework=data['asset_framework']
+    c7_computation=None if family_sources is None else family_sources.get('c7')
+    if c7_computation is not None:
+        if digest(framework)!=digest(c7_computation['result']):
+            raise PipelineError('C7_COMPUTED_FRAMEWORK_MISMATCH')
+        framework=deepcopy(c7_computation['result'])
     if framework['identity']['client_id']!=client or framework['identity']['run_id']!=run_id:
         raise PipelineError('FRAMEWORK_CLIENT_RUN_MISMATCH')
     if framework['work6_final_target_reference']['allocation_id']!=w3['final_target']['allocation_id']:
@@ -46,6 +51,8 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
                 'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
     trace=[*stock['call_trace'],*bond['call_trace']]
+    if c7_computation is not None:
+        trace=c7_computation['call_trace']+trace
     def request(module,**payload):
         return {'contract_name':module.INPUT_CONTRACT_NAME,'contract_version':module.INPUT_CONTRACT_VERSION,
                 'baseline_id':module.BASELINE_ID,'run_id':run_id,**payload}

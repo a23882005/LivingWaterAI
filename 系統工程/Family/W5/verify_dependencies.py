@@ -12,7 +12,7 @@ def verify(repo_root):
         lock=json.loads((home/filename).read_text())
         for row in lock['files'] if isinstance(lock,dict) else lock:
             rows.append((Path(repo_root)/row['path'],row['sha256']))
-    for filename in ('w2_dependency_lock.json','frozen_schema_lock.json'):
+    for filename in ('w2_dependency_lock.json','frozen_schema_lock.json','c7_fixture_lock.json'):
         for row in json.loads((home/filename).read_text())['files']:
             rows.append((home/row['destination'],row['sha256']))
     for path,expected in rows:

@@ -226,5 +226,106 @@
     "sha": "ca92c88643750ea73389d05c10421793b01669de",
     "sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
     "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/__init__.py",
+    "sha256": "6090049fc004b7fbc5f578569dd9f6a8d35cd472e93bd2283bf0890dcb11796a",
+    "sha": "96e668198664b58946a891b288a2303d58ead67d",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/benchmark_reader.py",
+    "sha256": "af979cb9abe0d305b62539db65aefa34b9dd804be5b8e5328d29e07217b4adf2",
+    "sha": "85e08c45e6ffd495972a339c75f6750ae389fdfa",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/__init__.py",
+    "sha256": "49358e737e3b5c84c4161892f4ee0de26e65c859b854e9a56689951e0fc19f80",
+    "sha": "f527696c13b708971d5bb287f136dd37d35bad96",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/engine.py",
+    "sha256": "6e8d683809a1e080c3db06042c47005302e4cb6ac758d98877e46318405783f4",
+    "sha": "0d7688aa24ccca8112c53d496673046860a76efb",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/__init__.py",
+    "sha256": "453a0c70130fc47e0dedbdb7ce142253c54217b72a9ca1cb00170983b481a5d8",
+    "sha": "5da6122d1ebc8c2658241ab0381102466fe99fce",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/engine.py",
+    "sha256": "32107a0789ff9f6ca8dad48fc4e2bbb06db1934a5a3d347506cd214f8067545a",
+    "sha": "95942f1de44c26b011011045cda0dceeacf5da96",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work5/core_engine.py",
+    "sha256": "da618dda038f55aa664f65c4cb483c796bd0925f61eb4f822bf586e6a21314c5",
+    "sha": "4f70da456d6ae9b7ddede7ca3c2c2b9ec0926e3f",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work5/__init__.py",
+    "sha256": "0d8fc2d14338efc7bba38c951baa6ff072e2ca9626c1ed42e322369e799e8c34",
+    "sha": "d30685f5f7b29da9757b3195de9bef8cfb4109ce",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/__init__.py",
+    "sha256": "a595015ce59d1ada1fdc22c9eb5cc751f03c6e4b6739438496f5ca8a4670b0fa",
+    "sha": "0d3a5937085f67eade9429034ac613e32ea8b77d",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/adjustment_loop.py",
+    "sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "sha": "4b7bfc90f3a16578c65e11a8d3389d139c4fe209",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
+    "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+    "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/__init__.py",
+    "sha256": "cdac593779116663d31cc09772de6d5d2ec03d416180104f753b48836615495d",
+    "sha": "57a5ec0302561c5eaa6f331c3bd153321fa46624",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/68_C_Work7_V70_Asset_Framework_Result.schema.json",
+    "sha256": "d9d081a5bcb21de4c5031a7b47bcaee39811c63e48c0fb5d226ad51eb7136dba",
+    "sha": "fc5a087706c43bb90b437dc73972b8947b5f3d11",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/80_C_Work7_Funding_Context.schema.json",
+    "sha256": "76e244e9859dd6f72cee748f8a9ece9af55bec7dead401605efa12f9886bb86f",
+    "sha": "d2ed33494e2714475d2552a53b8ccbaf0fb3ff82",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/57_C_Work6_Mentor_Adjustment_Result.schema.json",
+    "sha256": "276894fbdff647e6b9222e97c8c635fb50f8b2c3a3d464229ff2f618e3e95486",
+    "sha": "457ba24a32673a238578c7c8ebb798a4901382e9",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/05_C_Canonical_Input.schema.json",
+    "sha256": "21a1d03e3cfe3f7e1409b32ec553699fbe0c657b80d63e90982ef5568672dcb4",
+    "sha": "09be5134b4f4af46b26e75342d98813ce2cfdfc5",
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/xlsx_minimal_reader.py",
+    "sha256": "fd5fbcf1bb9867bf498cea0deea945cef4dd791f08da5cc25c4336de50eaf5fa",
+    "reason": "Direct import by C work2.benchmark_reader; baseline 32c9322c"
   }
 ]

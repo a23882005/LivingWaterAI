@@ -191,6 +191,9 @@ jobs:
                   assert '五家機構偏多／偏空與動能上修／下修家數</h3>' not in research
                   assert research.count('position:sticky;left:0;') >= 2
                   assert research.count('position:sticky;left:8rem;') >= 2
+                  assert 'position:sticky;left:8rem;z-index:30;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#1e293b;white-space:normal' in research
+                  assert 'position:sticky;left:8rem;z-index:20;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#0f172a' in research
+                  assert '# 最後修改日期時間' not in page[:200]
                   assert 'grid-cols-1 2xl:grid-cols-2' in research
                   assert page.count('>NA</td>') > 0
                   for name in chart_names:

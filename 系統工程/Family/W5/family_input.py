@@ -4,6 +4,7 @@ from pathlib import Path
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 
 
 class InputError(ValueError):
@@ -19,6 +20,9 @@ TABLES = (
     'universe_membership', 'universe_confirmation',
     'protected_funding_claim', 'protected_funding_confirmation',
     'sgov_role_proposal', 'sgov_role_confirmation',
+    'portfolio_snapshot_run', 'portfolio_snapshot_item', 'portfolio_snapshot_lineage',
+    'permission_policy', 'permission_confirmation',
+    'holding_policy_proposal', 'holding_policy_confirmation', 'funding_source',
 )
 
 
@@ -32,7 +36,7 @@ def read_snapshot(db_path, *, expected_client_id):
         raise InputError('CLIENT_REQUIRED')
     path = Path(db_path).resolve(strict=True)
     before = hashlib.sha256(path.read_bytes()).hexdigest()
-    with sqlite3.connect(path.as_uri() + '?mode=ro', uri=True) as conn:
+    with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as conn:
         conn.row_factory = sqlite3.Row
         conn.execute('PRAGMA query_only=ON')
         conn.execute('BEGIN')

@@ -19,3 +19,10 @@ Production HOLD；交易授權 NONE。
 
 ## Work21依賴接收
 九份Frozen原件保存在schemas/，雜湊與來源見frozen_schema_lock.json。runtime_loader驗證SHA-256後沿用原schema驗證。測試預設從repo根讀取原生程式；分離checkout時設定W5_SOURCE_ROOT為核定來源checkout根目錄。新增原Work21合成adapter案例，不改核心策略。
+
+## Family 06～08呼叫邊界
+`family_boundary.prepare_input(request, trusted_context=...)`先驗身份/版本與原W2 confirmed record，產PreparedInput；trusted_context由受控測試呼叫方提供，W7日後接認證，不能從未信任request複製。完整性證據須帶account_key、as_of、snapshot_digest及source_reference；缺證據時回DATA_UNAVAILABLE。
+`permission_bridge.project_permissions`投影W1已確認用途與行動許可；`protect_existing`呼叫原C8C9 Work8保留風險與客戶行動。
+`funding_bridge.reconcile_funding`呼叫原C8C9 Work6，再用同一funding_guard核對各筆股債占用。owner_binding須由可信來源核定family_owner/native_owner/currency/version/source_reference並給expected_binding_digest；W1資金用途key與C7券商domain保持分離。
+`valuation.value_position`僅計算明確來源quantity × price × FX；不同幣別缺FX回UNKNOWN，暫估股數維持ESTIMATED。
+後續15棒runner尚待實作；以上模組已逐一實測。

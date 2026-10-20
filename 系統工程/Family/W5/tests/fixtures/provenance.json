@@ -12,5 +12,22 @@
     "source_sha256": "cc43356a52b0e97b172df084f8e5b9476b57d9c7773e5cb63e7d22b7bf9640ba",
     "fixture": "work5_adapter_request.json",
     "scope": "Original synthetic happy-path request, generated using approved Work3 module"
+  },
+  {
+    "source_archive_path": "tools/qa_work6_funding_account_isolation.py",
+    "source_sha256": "e6ea57b5fb71a074732c3d3ec8ad48c03293fff9b85dd44c424b48bbdf2d6ade",
+    "fixture": "work6_funding_request.json",
+    "scope": "Original synthetic native guard fixture; generation preserves source checks"
+  },
+  {
+    "source_archive_path": "tools/qa_work8_protected_holding_client_action.py",
+    "source_sha256": "b0821a3049c2cf49f5d817917ab1738f160430849af8e1649bc361c494430fab",
+    "fixture": "work8_protected_request.json",
+    "scope": "Original synthetic native guard fixture; generation preserves source checks"
+  },
+  {
+    "fixture": "w2_confirmed_target.json",
+    "source": "W2 tests/test_w2_19_loop2_orchestrator.py::confirmed_ledger",
+    "scope": "Actual W2-17/18 functions applied to original synthetic goldens; no private confirmation"
   }
 ]

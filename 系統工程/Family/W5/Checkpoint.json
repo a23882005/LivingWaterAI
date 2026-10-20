@@ -2,21 +2,21 @@
   "contract_version": "2.2.1",
   "status": "IN_PROGRESS",
   "release": "RELEASED",
-  "implementation_completed": 5,
+  "implementation_completed": 8,
   "total_tracking_items": 18,
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "同一W5小PM接續06～08家人/目標/資金映射與09～18整線工作；中PM協調既有確認Target與technical來源定位。",
+  "next_action": "同一W5小PM接續09～14技術/股債真結果/SGOV，再接15～18調度與Mentor；Family中PM定位既有確認Target及具名技術來源。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-schema-intake",
+    "backup_ref": "backup/w5-20261020-family-bridges",
     "main_unchanged": true,
     "actions": "NOT_RUN",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "e60c2f4e1cd2d085eb0e2bc3f5d74d65873a4124",
+    "previous_work_commit": "3795534bf7f3ab5c111e40fed3011cda200f6c97",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -84,17 +84,37 @@
       ]
     },
     "W5-06": {
-      "status": "IN_PROGRESS",
-      "completed": "四庫唯讀snapshot、client隔離實測",
-      "remaining": "owner/target/引擎typed request完整映射"
+      "status": "PASS",
+      "completed": "新增Family typed boundary：四庫唯讀、可信client/owner/version/digest驗證、歷史W2確認Target不可變binding；原W2確認record重用測試通過。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
     },
     "W5-07": {
-      "status": "PENDING"
+      "status": "PASS",
+      "completed": "分離PERSONAL/RESEARCH/EXCLUSION、已確認NEW_BUY許可與既有持倉；重用原C8C9 Work8保留REDUCE_RISK及HOLD_PROTECTED雙欄。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
     },
     "W5-08": {
-      "status": "IN_PROGRESS",
-      "completed": "精確合計守恆20項測試PASS",
-      "remaining": "接C7預算與真引擎占用"
+      "status": "PASS",
+      "completed": "重用原C8C9 Work6資金隔離；明確映射W1用途domain與C7券商domain；同owner股債多筆精確守恆，明確AVAILABLE、未知FX及暫估股數品質保留。",
+      "evidence": [
+        "evidence/family_bridges_tests.log",
+        "evidence/family_boundary_private_checks.json",
+        "mapping.csv",
+        "w1_schema_columns.json"
+      ],
+      "integration_followup": "10/12/15/16/18需再接真策略結果驗證；本階段使用明示SYNTHETIC占用與原生adapter fixture。"
     },
     "W5-09": {
       "status": "IN_PROGRESS",
@@ -235,5 +255,15 @@
     "component_total": 408,
     "fixture_semantics": "原Work21合成adapter案例；V75使用明示no-action決策fixture，真實策略調度由後續15棒完成",
     "source_zip": "1GQHdYPwxFKZBFM1GbTAsTDXA48FYxrmA"
+  },
+  "family_bridges": {
+    "w5_tests": 77,
+    "unchanged_component_tests_reused": 369,
+    "component_total": 446,
+    "private_database_readbacks": 4,
+    "private_db_changed": false,
+    "source_tables": 29,
+    "w2_confirmation_record": "Original W2-17/18 synthetic golden output; no private target confirmation created",
+    "evidence": "evidence/family_bridges_tests.log"
   }
 }

@@ -1,0 +1,1312 @@
+{
+  "portfolio_account": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_label",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_currency",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "portfolio_instrument": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_type",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "ticker",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "exchange_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "isin",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_label",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "quote_currency",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "identity_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "portfolio_position": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "quantity_decimal",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_basis_total_decimal",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_per_unit_decimal",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_currency",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cost_source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "position_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "position_source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "recorded_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "account_broker_link": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "link_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "broker_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "link_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "account_ownership": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "ownership_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "owner_client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "ownership_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "broker_registry": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "broker_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "broker_label",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "identity_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "cash_account_scope": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_currency_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "cash_balance_snapshot": [
+    {
+      "column": "cash_snapshot_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "source_snapshot_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "reported_cash_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "reported_cash_basis",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "normalized_settled_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "pending_receivable_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "pending_payable_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "reserved_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "payable_netting_evidence",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "nonoverlap_evidence",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "data_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "reconciled_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "currency_registry": [
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "minor_digits",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "verified_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "data_state",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "funding_domain": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "funding_domain_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "purpose_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "domain_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evidence_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "funding_account_domain_link": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "funding_domain_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "link_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "funding_evaluation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evaluation_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_snapshot_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evaluation_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "funding_assignment": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "assignment_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "funding_domain_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evaluation_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_snapshot_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "assigned_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "assignment_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "final_target_version": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "target_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "lifecycle_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "completeness_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_source_ref",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_by",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_ref",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "final_target_allocation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "target_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "weight_units",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "allocation_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "allocation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "allocation_source_ref",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "universe_membership": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "universe_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "membership_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "effective_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "universe_confirmation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "universe_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "confirmer_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmer_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "protected_funding_claim": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "protection_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_snapshot_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "cash_as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "funding_source_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "protection_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "claim_action",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "overlap_mode",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "amount_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "nonoverlap_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "reason_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "effective_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "protected_funding_confirmation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "protection_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "confirmer_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmer_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "sgov_role_proposal": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "position_as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "role_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "dry_powder_bps",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "bond_core_bps",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "reason_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "effective_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "sgov_role_confirmation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "position_as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "confirmer_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmer_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "portfolio_snapshot_run": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "run_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "run_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "data_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "sealed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "content_hash",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "portfolio_snapshot_item": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "run_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "item_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "domain_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "entity_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "field_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "value_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "value_type",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "value_text",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "value_integer_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "unit",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_row_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_observed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "recorded_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "portfolio_snapshot_lineage": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "run_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "item_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "origin_domain",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_record_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_effective_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_received_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_record_version",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "origin_evidence_state",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "permission_policy": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "policy_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "scope_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "action_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "decision_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "effective_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "permission_confirmation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "policy_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "confirmer_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmer_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "holding_policy_proposal": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "previous_version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "policy_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "idempotency_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "reason_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "effective_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "holding_policy_confirmation": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "instrument_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "version_no",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "confirmer_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmer_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmed_at_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "confirmation_source_reference",
+      "sqlite_type": "TEXT"
+    }
+  ],
+  "funding_source": [
+    {
+      "column": "client_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_id",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_kind",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "source_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "account_key",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "currency_code",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "amount_minor",
+      "sqlite_type": "INTEGER"
+    },
+    {
+      "column": "source_reference",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "as_of_utc",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "evidence_state",
+      "sqlite_type": "TEXT"
+    },
+    {
+      "column": "created_at_utc",
+      "sqlite_type": "TEXT"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "slot": 1,
+    "readonly_hash_unchanged": true,
+    "cross_client_rejected": true,
+    "tables_read": 29,
+    "accounts": 2,
+    "positions": 12,
+    "confirmed_target_rows": 0
+  },
+  {
+    "slot": 2,
+    "readonly_hash_unchanged": true,
+    "cross_client_rejected": true,
+    "tables_read": 29,
+    "accounts": 2,
+    "positions": 7,
+    "confirmed_target_rows": 0
+  },
+  {
+    "slot": 3,
+    "readonly_hash_unchanged": true,
+    "cross_client_rejected": true,
+    "tables_read": 29,
+    "accounts": 0,
+    "positions": 0,
+    "confirmed_target_rows": 0
+  },
+  {
+    "slot": 4,
+    "readonly_hash_unchanged": true,
+    "cross_client_rejected": true,
+    "tables_read": 29,
+    "accounts": 0,
+    "positions": 0,
+    "confirmed_target_rows": 0
+  }
+]

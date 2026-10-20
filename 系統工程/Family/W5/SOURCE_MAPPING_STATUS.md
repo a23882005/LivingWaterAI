@@ -1,3 +1,15 @@
+## 2026-10-21 估值／SGOV／保護持倉增量
+
+新增position_source_bridge.py並接FamilyRunner。operator提供valuation_source.prices（asset_id→instrument_key、value、currency、state、unit=CURRENCY_PER_SHARE、as_of、source_reference）、選用fx，以及明確portfolio_nav。請求新增valuation_digest=來源上下文的canonical JSON SHA256；重送、快取及發布前重驗沿用此綁定，來源資訊改變即拒舊請求。
+
+W1已核對實體數量以既有value_position公式quantity×price×explicit FX估值，要求quantity時間≤quote時間≤native分析時間≤Family evaluation_at；價格與W1商品幣別、V82 valuation_price/as_of核對。UNKNOWN保留並回報DATA_UNAVAILABLE。非SGOV債券既有金額逐筆比對估值；SGOV實體價值與physical_sgov金額、owner、時間核對後交原Work7，邏輯bond/dry-powder另列。當前Family原生支線為同幣別；跨幣別路由仍待原C契約接續，既有FX公式/UNKNOWN元件測試保留。
+
+股票保護從W1確認紀錄project_permissions取得HOLD_AS_IS或ADJUSTABLE，對照C7 target/drift/protected lock標記。現有權重以明確同幣別、同估值時間NAV核對，容差1e-12沿原Work8；不以局部持倉自行建立全戶NAV。Family pipeline交既有protect_existing→原Work8，保留risk_action及client_action。
+
+合成Family fixture本輪補齊明確報價、NAV、ADJUSTABLE政策；校正原先零股數卻帶protected current weight .05的混合fixture，並把native/shared分析時間與Family evaluation_at對齊、重算原shared digest。直接native pipeline的原始目標單位重現仍維持strict XFAIL。真家人資料未改寫。完整HOLD_AS_IS風險分離沿既有原Work8正向元件證據；新增測試驗W1確認政策→現有估值/保護標記綁定，完整Family Work9仍待目標單位界定。
+
+已接的來源欄位不代表完整C7全投資組合Target/Drift來源驗收完成。剩餘：C7全框架/已確認Target語意、正式報價/technical/V70 producer、不同source_run、完整Family/Mentor端到端與最終部署。
+
 # Family來源接線狀態｜2026-10-21
 
 W5線內施工；Production HOLD、交易NONE。沿原V82/V75/C8C9，核心檔案維持核定基線。

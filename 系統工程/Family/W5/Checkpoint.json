@@ -7,16 +7,16 @@
   "executor": "同一位W5小PM持續施工",
   "source_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
   "next_owner": "同一位W5小PM",
-  "next_action": "W5續接持倉估值、SGOV實體到角色及HOLD_AS_IS逐欄映射；Family中PM界定目標金額/權重接口，定位既有確認Target與技術producer。",
+  "next_action": "W5續核完整C7/確認Target來源語意、債券客戶行動保護、正式技術/V70/報價producer與整線Mentor；Family中PM界定目標金額/權重接口並定位既有來源。",
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-funding-macro-bond",
+    "backup_ref": "backup/w5-20261021-valuation-protection",
     "main_unchanged": true,
     "actions": "沿用施工回歸workflow；本輪run/結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "45dbe1ea61f2b91b257313c1ce9c76aaca3fbd12",
+    "previous_work_commit": "929fcb19a5125ab873c69fce63e9cdc37ab9c505",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
@@ -25,7 +25,7 @@
     },
     "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線181 PASS、1 strict XFAIL；新增18項資金/MOVE/債券來源及原生政策測試。實際W3 reader/feed MOVE接原V75 predicate元件；完整Family股債Work9正向待續。",
+  "validation_scope": "本線196 PASS、1 strict XFAIL；新增15項估值/SGOV/保護來源及版本測試。完整Family Work9正向仍待目標單位及完整來源驗收。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -168,17 +168,18 @@
     },
     "W5-14": {
       "status": "IN_PROGRESS",
-      "completed": "原Work7角色驗證後，唯讀核對實體估值/角色金額/未分配，建議未成交contribution另列。",
+      "completed": "原Work7角色驗證後，唯讀核對實體估值/角色金額/未分配，建議未成交contribution另列。 本輪W1實體數量×明確單價比對physical_sgov並接原Work7；同owner/時間核對已接。",
       "remaining": "真實W1角色/估值來源綁定與全部14棒邊界驗收待續。",
       "evidence": [
         "evidence/stock_sgov_positive.json",
-        "evidence/stock_sgov_tests.log"
+        "evidence/stock_sgov_tests.log",
+        "evidence/position_source_tests.log"
       ]
     },
     "W5-15": {
       "status": "IN_PROGRESS",
-      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。",
-      "remaining": "持倉估值與SGOV/保護持倉逐欄來源映射、其餘macro/technical及V70來源綁定、目標金額/權重接口與完整正向整線驗收。",
+      "completed": "新增FamilyRunner與run_analysis.py，獨立可信context provider→prepare_input→原生pipeline→Mentor→原W2 staging replay；身分/版本/owner/target/確認證據/bundle digest與發布前重驗已接。修正allocation_id取原W2 draft配置ID，另保留target_record_id。 本輪接C7來源/owner映射、原Family資金核對函式實際claims、W3 MOVE與債券W1數量/NEW_BUY政策。 本輪接估值/SGOV physical來源/股票確認保護政策與current weight-NAV核對；Family走既有protect_existing。",
+      "remaining": "完整C7/確認Target來源語意、債券客戶行動保護、正式技術/報價/V70 producer與source_run、目標單位接口及Family/Mentor正向整線。",
       "evidence": [
         "中PM介面待界定.md",
         "evidence/pipeline_unit_reproduction.json",
@@ -190,7 +191,8 @@
         "evidence/runner_private_checks.json",
         "evidence/stock_source_tests.log",
         "SOURCE_MAPPING_STATUS.md",
-        "evidence/funding_macro_bond_tests.log"
+        "evidence/funding_macro_bond_tests.log",
+        "evidence/position_source_tests.log"
       ]
     },
     "W5-16": {
@@ -473,6 +475,35 @@
       "other macro/technical metrics and V70 tactical producer/source_run",
       "confirmed Target source and unit interface",
       "full Family E2E and final deployment"
+    ]
+  },
+  "position_source_integration": {
+    "status": "PARTIAL_STAGING_VERIFIED",
+    "tests": {
+      "w5_pass": 196,
+      "w5_xfail": 1,
+      "added": 15
+    },
+    "completed": [
+      "W1 quantity x explicit quote/FX through existing value_position",
+      "Stock valuation price/time and non-SGOV bond value reconciliation",
+      "W1 SGOV physical quantity/value/owner/time bound before original Work7",
+      "W1 confirmed stock policy and current weight/NAV vs C7 protected flags",
+      "Family pipeline reuses protect_existing -> native Work8",
+      "valuation_digest binds source context for replay/publication validation"
+    ],
+    "evidence": [
+      "position_source_bridge.py",
+      "tests/test_position_source_bridge.py",
+      "evidence/position_source_tests.log",
+      "SOURCE_MAPPING_STATUS.md"
+    ],
+    "remaining": [
+      "Complete C7 confirmed Target/framework source semantics",
+      "Bond client-facing holding protection",
+      "Named quote/technical/V70 producers and different source_run binding",
+      "Target money/weight interface",
+      "Full Family/Mentor E2E and final deployment"
     ]
   }
 }

@@ -17,6 +17,7 @@ from stock_source_bridge import bind_stock_source
 from bond_source_bridge import bind_bond_sources
 from macro_source_bridge import validate_macro_consumers
 from funding_bridge import bind_funding_source
+from position_source_bridge import bind_position_values,bind_stock_protection
 
 
 class FamilyRunner:
@@ -55,6 +56,9 @@ class FamilyRunner:
         prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
         prepared.payload['family_sources']={'funding':bind_funding_source(request,ctx),
             'macro':validate_macro_consumers(request),'bond':bind_bond_sources(request,prepared,binding)}
+        values=bind_position_values(request,prepared,ctx)
+        prepared.payload['family_sources']['valuation']=values
+        prepared.payload['family_sources']['protection']=bind_stock_protection(request,prepared,ctx,values)
         return prepared,ctx
 
     def _compute(self,request):

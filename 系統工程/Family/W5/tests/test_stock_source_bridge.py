@@ -13,6 +13,7 @@ from test_native_adapters import ROOT
 
 def refresh(req,ctx):
     refresh_snapshot(req,ctx)
+    if 'valuation_source' in ctx:req['valuation_digest']=digest(ctx['valuation_source'])
     ctx['native_binding']['request_digest']=digest(req)
     ctx['native_binding']['bundle_digest']=digest(req['native_bundle'])
 

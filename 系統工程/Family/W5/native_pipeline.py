@@ -13,6 +13,7 @@ from funding_guard import check_aggregate
 from sgov_bridge import reconcile_sgov
 from stock_source_bridge import apply_stock_policy
 from funding_bridge import reconcile_funding
+from permission_bridge import protect_existing
 
 
 class PipelineError(ValueError):
@@ -79,8 +80,15 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         work6_funding_isolation_result=isolated),data['physical_sgov'])
     trace.extend(['C8C9.Work7.validate_sgov_runtime_roles','W5.reconcile_sgov'])
     work8=load_c_module(repo_path,8)
-    protected=work8.protect_client_action(request(work8,c_work7_asset_framework_result=framework,
-                                                 work4_v82_integration_result=stock_output))
+    protected_request=request(work8,c_work7_asset_framework_result=framework,work4_v82_integration_result=stock_output)
+    family_protection=None
+    if family_sources is None:
+        protected=work8.protect_client_action(protected_request)
+    else:
+        p=family_sources['protection']
+        family_protection=protect_existing(repo_path,native_request=protected_request,
+            projection=p['projection'],instrument_binding=p['instrument_binding'])
+        protected=family_protection['native_work8']
     trace.append('C8C9.Work8.protect_client_action')
     work9=load_c_module(repo_path,9)
     unified_request=request(work9,work4_v82_integration_result=stock_output,
@@ -90,7 +98,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
         'stock_source':deepcopy(stock_source),'family_sources':deepcopy(family_sources),
-        'funding_reconciliation':funding_reconciliation,'client_id':client,'run_id':run_id,
+        'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
         'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,

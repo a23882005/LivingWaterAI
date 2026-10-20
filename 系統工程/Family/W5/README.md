@@ -1,3 +1,11 @@
+## 2026-10-21 估值／SGOV／股票保護來源接線（仍8/18）
+
+本線196 PASS、1 strict XFAIL，新增15項。Family入口接既有quantity×price×FX，明確每股單價單位、來源、時間與valuation_digest；核股票valuation_price、非SGOV債券既有金額，SGOV physical價值/owner/時間。合成實測1×120=120，原Work7角色100、未分配20，未成交contribution另列。
+
+W1確認HOLD_AS_IS/ADJUSTABLE映射C7保護標記與現有權重/NAV，pipeline重用protect_existing→原Work8，保留風險/客戶行動。完整Family Work9仍保留目標單位strict XFAIL。此輪校正合成fixture的零股數/保護權重及native/shared時間一致性，真實歷史資料維持原件。
+
+詳見SOURCE_MAPPING_STATUS.md、position_source_bridge.py、tests/test_position_source_bridge.py與evidence/position_source_tests.log。後續W5續核完整C7/確認Target來源語意、債券客戶行動保護及整線Mentor；中PM界定目標單位與既有正式producer。Production HOLD、交易NONE。備份backup/w5-20261021-valuation-protection；本輪commit/Actions/雙端讀回見累計ZIP RELEASE_RECEIPT.json。
+
 ## 2026-10-21 資金／MOVE／債券來源接線增量（仍8/18）
 
 本線181 PASS、1 strict XFAIL，新增18項測試。Family入口驗獨立C7來源payload/version/owner，兩引擎實際claims共用既有reconcile_funding；AVAILABLE沿原C7明確值。W1債券數量/account/currency逐欄核對；禁止新買走原V75單標的0預算縮放，保留其他標的與既有風險動作。股債總額及未部署contribution守恆。

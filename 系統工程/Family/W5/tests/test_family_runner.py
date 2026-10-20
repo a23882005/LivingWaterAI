@@ -24,6 +24,11 @@ def runner_case():
     target['target_hash']=target['payload']['target_hash']=ctx['target_hash']=draft['draft_hash']
     evidence=target['payload']['confirmation_evidence']
     for branch in ('stock_request','bond_request'):
+        bundle[branch]['work3_handoff']['temporal']['as_of']=req['evaluation_at']
+        shared=bundle[branch]['work3_handoff']['shared_decision_context']
+        shared['as_of']=req['evaluation_at']
+        for engine in ('v82','v75'):
+            bundle[branch]['work3_handoff']['engine_bindings'][engine]['shared_context_digest_sha256']=digest(shared)
         bundle[branch]['work3_handoff']['final_target']['confirmation_proof']={k:evidence[k] for k in ('confirmed_at','confirmed_by')}
     bundle['asset_framework']['work6_final_target_reference'].update({k:evidence[k] for k in ('confirmed_at','confirmed_by')})
     bundle['stock_evidence']['evaluated_at']=req['evaluation_at']
@@ -36,7 +41,7 @@ def runner_case():
     for name in ('universe_membership','universe_confirmation','permission_policy','permission_confirmation'):
         tables[name]=snapshot['tables'][name]
     tables['portfolio_instrument'][0].update(ticker='QQQ',exchange_code='NASDAQ')
-    tables['portfolio_position'][0]['quantity_decimal']='0'
+    tables['portfolio_position'][0].update(quantity_decimal='0',as_of_utc='2026-09-25T00:00:00Z')
     for asset,quantity in [('SGOV','1'),('SPSB','0')]:
         tables['portfolio_instrument'].append({'client_id':req['client_id'],'instrument_key':asset+'_KEY',
             'ticker':asset,'exchange_code':'ARCA','quote_currency':'USD'})
@@ -55,6 +60,26 @@ def runner_case():
             'unit':'','dataDate':'2026-09-24','method':'SYNTHETIC_TEST_ONLY'}}}
     req['macro_snapshot'].update(payload=raw,asOf=raw['asOf'],digest=digest(raw))
     req['expected_versions']['market']=ctx['expected_versions']['market']=digest(raw)
+    tables['holding_policy_proposal']=[{'client_id':req['client_id'],'account_key':req['owner']['account'],
+        'instrument_key':'VT_KEY','version_no':1,'policy_code':'ADJUSTABLE','evidence_state':'VERIFIED',
+        'effective_at_utc':'2026-10-01T00:00:00Z','source_reference':'SYNTHETIC_W1_POLICY'}]
+    tables['holding_policy_confirmation']=[{'client_id':req['client_id'],'account_key':req['owner']['account'],
+        'instrument_key':'VT_KEY','version_no':1,'confirmed_at_utc':'2026-10-01T00:00:00Z'}]
+    framework=bundle['asset_framework'];asset=bundle['stock_request']['asset_context']['asset']['asset_id']
+    framework['protected_locked_weights']=[r for r in framework['protected_locked_weights'] if r['instrument_id']!=asset]
+    for row in framework['integrated_asset_framework']['instrument_targets']:
+        if row['instrument_id']==asset:row.update(ticker=asset,protected=False,allocation_rule='PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET')
+    for bucket in framework['residual_allocation']['buckets']:
+        for row in bucket['items']:
+            if row['instrument_id']==asset:row.update(ticker=asset,protected=False,allocation_rule='PROPORTIONAL_RESIDUAL_FROM_CONFIRMED_FINAL_TARGET')
+    for row in framework['drift_snapshot']['items']:
+        if row['instrument_id']==asset:
+            row.update(ticker=asset,protected=False,client_facing_action='HOLD')
+            row['current_weight']['value']=0
+            row['drift']['value']=row['final_target_weight']['value']
+    when=bundle['stock_evidence']['as_of']
+    framework['drift_snapshot']['as_of']=when
+    framework['drift_snapshot']['denominator'].update(amount=1000,currency='USD',as_of=when)
     refresh_snapshot(req,ctx)
     prepared=prepare_input(req,trusted_context=ctx)
     ctx['native_binding']={'schema_version':'Family.W5.NativeBinding.v1','request_digest':prepared.input_digest,
@@ -70,6 +95,16 @@ def runner_case():
     ctx['funding_source']={'c7_funding_context':deepcopy(bundle['stock_request']['c7_funding_context']),
         'owner_binding':{'family_owner':deepcopy(req['owner']),'native_owner':deepcopy(w3['owner']),
             'currency':'USD','version':req['expected_versions']['funding'],'source_reference':'SYNTHETIC_C7_SOURCE'}}
+    ctx['valuation_source']={'prices':{
+        'QQQ':{'instrument_key':'VT_KEY','value':'10','currency':'USD','state':'KNOWN','unit':'CURRENCY_PER_SHARE',
+            'as_of':bundle['stock_evidence']['as_of'],'source_reference':'SYNTHETIC_QQQ_QUOTE'},
+        'SGOV':{'instrument_key':'SGOV_KEY','value':'120','currency':'USD','state':'KNOWN','unit':'CURRENCY_PER_SHARE',
+            'as_of':bundle['physical_sgov']['as_of'],'source_reference':'SYNTHETIC_SGOV_QUOTE'},
+        'SPSB':{'instrument_key':'SPSB_KEY','value':'50','currency':'USD','state':'KNOWN','unit':'CURRENCY_PER_SHARE',
+            'as_of':bundle['physical_sgov']['as_of'],'source_reference':'SYNTHETIC_SPSB_QUOTE'}},
+        'portfolio_nav':{'value':'1000','currency':'USD','state':'KNOWN','as_of':when,'source_reference':'SYNTHETIC_C_NAV'}}
+    req['valuation_digest']=digest(ctx['valuation_source'])
+    ctx['native_binding']['request_digest']=digest(req)
     return req,ctx
 
 

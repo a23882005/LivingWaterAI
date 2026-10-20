@@ -28,10 +28,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-and-deploy:
-    # Exact one-off verified repair merge may trigger deployment; unrelated pushes remain skipped.
+    # Scheduled/manual deployments and explicitly scoped V70 feature or verified repair pushes.
     if: >-
       github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'fix(v703): deploy') || startsWith(github.event.head_commit.message, 'fix(v703): synchronize canonical')))
+      (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'feat(v703):') || startsWith(github.event.head_commit.message, 'fix(v703): deploy') || startsWith(github.event.head_commit.message, 'fix(v703): synchronize canonical')))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:

@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/20 08:29（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
+# 最後修改日期時間：2026/10/20 08:34（台灣時間）｜檔案名稱：test_v703_outlook_ui.py
 """Regression tests for V70-3-27 macro-health UI preparation.
 
 Run: python -m unittest tests/test_v703_outlook_ui.py -v
@@ -81,6 +81,9 @@ class V703OutlookUITest(unittest.TestCase):
         self.assertNotIn("r.method", renderer.group(1))
         self.assertNotIn("r.source", renderer.group(1))
         self.assertNotIn("開啟來源", renderer.group(1))
+        self.assertNotIn("r.detail", renderer.group(1))
+        self.assertNotIn("沿用人工查證", renderer.group(1))
+        self.assertIn("const status=String(r.status||'未提供')", renderer.group(1))
 
     def test_html_document_and_unique_ids(self):
         s = self.source

@@ -1,0 +1,51 @@
+name: Family W5 construction regression
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [w5/family-integration-v2.2.1]
+    paths:
+      - '系統工程/Family/W5/**'
+      - '.github/workflows/family-w5.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: work
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 32c9322c8bb3150480f6c86becf28e04592f5e8e
+          path: baseline
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked dependencies
+        working-directory: work
+        run: python -m pip install -r 系統工程/Family/W5/requirements.lock
+      - name: Verify authorized sources and run synthetic tests
+        working-directory: work
+        env:
+          W5_SOURCE_ROOT: ${{ github.workspace }}/baseline
+          W5_W2_ROOT: ${{ github.workspace }}/work/系統工程/Family/W5/vendor/w2
+        run: |
+          python 系統工程/Family/W5/verify_dependencies.py
+          python -m pytest 系統工程/Family/W5/tests -q -rx --junitxml=w5-results.xml
+      - name: Record construction scope
+        if: always()
+        run: |
+          echo 'W5 施工回歸：合成資料；已知 XFAIL 須依 Checkpoint 續修。整線驗收另行記錄。Production HOLD；交易 NONE。' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-w5-synthetic-test-results
+          path: work/w5-results.xml
+          if-no-files-found: ignore

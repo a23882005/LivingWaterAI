@@ -29,3 +29,10 @@ Production HOLD；交易授權 NONE。
 
 
 本輪新增股債原生計算與SGOV元件：stock_engine、bond_engine、tactical_budget、output_bridge、sgov_bridge。元件呼叫仍須由後續Family runner驗證身份、trusted producer contract、權限及來源binding；使用者入口尚未交付。工作項狀態及待補邊界以Checkpoint為準。
+
+## Mentor與施工回歸
+`mentor_bridge.explain_native`接原Work9 request/result與可信dispatcher context；重用Work9來源驗證及W2原理由表。trusted_context必須由受控呼叫方提供，含client、run、owner、幣別、分析許可、資料來源類型及完整result digest。原W2 mock說明器保持原版。
+
+`vendor/w2/`只含原W2 Work21直接依賴；來源hash見w2_dependency_lock.json。執行測試前設 `W5_W2_ROOT` 為本W5目錄下vendor/w2的絕對路徑。執行 `python 系統工程/Family/W5/verify_dependencies.py` 核對90項hash，再用原pytest入口。
+
+GitHub Actions使用同一pytest入口與核定基線checkout。現有strict XFAIL對應目標單位問題；施工回歸與W5整線驗收分別記錄。完整CLI仍待15棒接完。

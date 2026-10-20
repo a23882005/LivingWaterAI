@@ -1,0 +1,351 @@
+{
+  "case_id": "W5-MENTOR-NATIVE-WORK9-FIXTURE",
+  "data_provenance": "SYNTHETIC",
+  "strategy_outputs": "Original Work21 frozen fixture; real Work9 normalization and W5 explanation executed",
+  "expected": {
+    "stock_source_action": "REDUCE_RISK",
+    "stock_client_action": "HOLD_PROTECTED",
+    "bond_amount": "70.00",
+    "sgov_amount": "0",
+    "trade_action": "NO_TRADE"
+  },
+  "actual": {
+    "status": "EXPLAINED_WITH_PENDING_CODES",
+    "mentor_return": {
+      "contract_name": "LivingWaterAI.C8C9.Work9.MentorReturn",
+      "contract_version": "C8C9-W9-MR-v1.0.0",
+      "run_id": "w8-run-001",
+      "owner": {
+        "funding_domain": "US_BROKER",
+        "broker": "QA_BROKER",
+        "account": "QA_ACCOUNT"
+      },
+      "currency": "USD",
+      "canonical_deployment_result_sha256": "531ba0ff8f5431351877a44b68239433a856b517ffe2a3662fa514bfcda1cd20",
+      "item_ids": [
+        "V82:TSM.US",
+        "V75:BNDW",
+        "V75:SGOV"
+      ],
+      "interpretation_policy": "EXPLAIN_CANONICAL_SOURCE_FACTS_ONLY_NO_RECOMPUTE",
+      "unknown_false_zero_neutral_equivalence_forbidden": true,
+      "risk_signal_and_client_preference_must_remain_separate": true,
+      "cross_account_or_domain_reallocation_forbidden": true,
+      "mentor_may_explain_but_not_mutate_actions": true
+    },
+    "canonical_deployment_result": {
+      "items": [
+        {
+          "item_id": "V82:TSM.US",
+          "source_engine": "V82",
+          "asset_id": "TSM.US",
+          "canonical_action": "HOLD",
+          "source_action": "REDUCE_RISK",
+          "client_preference_action": "HOLD_PROTECTED",
+          "deployment_amount": {
+            "status": "KNOWN",
+            "value": {
+              "amount": 0.0,
+              "currency": "USD"
+            }
+          },
+          "deployment_ratio": {
+            "status": "KNOWN",
+            "value": {
+              "value": 10,
+              "unit": "PERCENT"
+            }
+          },
+          "account_owner": {
+            "funding_domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT"
+          },
+          "funding_source": {
+            "budget_type": "EQUITY_EXECUTABLE_BUDGET",
+            "cash_basis": "AVAILABLE",
+            "amount": "450.00",
+            "currency": "USD",
+            "source_pointer": "/funding_context/executable_budget/equity"
+          },
+          "reason_codes": [
+            "V82_SOURCE_RISK_ACTION",
+            "C8C9_W9_PROTECTED_CLIENT_ACTION_FROM_C_WORK6_7"
+          ],
+          "data_lineage": [
+            "work3-w8",
+            "c7-w8",
+            "v70-w8"
+          ],
+          "rule_lineage": [
+            "V82_RULE:V82-v1.21.0",
+            "WORK4_CONTRACT:C8C9-W4-V82AO-v1.0.0",
+            "WORK8_CONTRACT:C8C9-W8-PHPO-v1.0.1"
+          ],
+          "source_snapshot_digest_sha256": "80f0c3af593744e73832aef5aedddf85c38c456e65d3ebcaf1f2c929b21d25de",
+          "source_decision": {
+            "raw_execution_action": "REDUCE_RISK",
+            "order_submission_plan": {
+              "should_place_order": false,
+              "order_type": "NONE",
+              "limit_price": null,
+              "quantity": 0.0,
+              "time_in_force": "NONE",
+              "scheduling_mode": "MANUAL",
+              "broker_or_adapter_constraints": null,
+              "order_intent_id": null
+            },
+            "cancel_conditions": [
+              "SOURCE_OWNED_RISK_CONDITION"
+            ],
+            "reevaluation_conditions": [
+              "NEXT_CANONICAL_REFRESH"
+            ],
+            "protected_holding": {
+              "protection_applied": true,
+              "current_weight": 0.05,
+              "final_target_weight": 0.05,
+              "drift": 0.0,
+              "allocation_rule": "LOCKED_CURRENT_WEIGHT",
+              "client_facing_action": "HOLD_PROTECTED",
+              "target_change_authorized": false,
+              "explicit_client_unlock_required_before_target_change": true
+            },
+            "risk_signal_visibility": {
+              "raw_execution_action": "REDUCE_RISK",
+              "fundamental_state": {
+                "source_owned": true,
+                "state": "RISK_REVIEW"
+              },
+              "valuation_state": "EXPENSIVE",
+              "primary_special_classification": "真正降低風險",
+              "technical_macro_signal_values": {
+                "td9_high_state": "HIGH_9",
+                "td9_low_state": "NONE",
+                "kd_state": "WEAKENING",
+                "macd_state": "WEAKENING",
+                "ma_state": "BELOW_MA20",
+                "emv_state": "WEAK",
+                "rsi_state": "NEUTRAL",
+                "volume_price_state": "SELL_PRESSURE",
+                "daily_timeframe_state": "WEAK",
+                "weekly_timeframe_state": "NEUTRAL",
+                "monthly_timeframe_state": "UPTREND",
+                "runaway_state": {
+                  "down": "FALSE",
+                  "up": "FALSE"
+                },
+                "macro_state": "CAUTION",
+                "credit_liquidity_state": "OK",
+                "material_news_policy_state": "RISK_EVENT"
+              },
+              "source_issue_codes": [
+                "V82_SOURCE_RISK_ACTION"
+              ],
+              "canonical_v82_output_preserved": true,
+              "canonical_v82_output_sha256": "80f0c3af593744e73832aef5aedddf85c38c456e65d3ebcaf1f2c929b21d25de",
+              "hard_gate_signal_recomputed": false,
+              "risk_signal_rewritten": false
+            }
+          }
+        },
+        {
+          "item_id": "V75:BNDW",
+          "source_engine": "V75",
+          "asset_id": "BNDW",
+          "canonical_action": "BUY",
+          "source_action": {
+            "deployment_state": "SMALL_BUY",
+            "new_money_action": "SMALL_BUY",
+            "existing_position_action": "HOLD",
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE"
+          },
+          "client_preference_action": null,
+          "deployment_amount": {
+            "status": "KNOWN",
+            "value": {
+              "amount": "70.00",
+              "currency": "USD"
+            }
+          },
+          "deployment_ratio": {
+            "status": "KNOWN",
+            "value": {
+              "value": "20",
+              "unit": "PERCENT"
+            }
+          },
+          "account_owner": {
+            "funding_domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT"
+          },
+          "funding_source": {
+            "budget_type": "BOND_EXECUTABLE_BUDGET",
+            "cash_basis": "AVAILABLE",
+            "amount": "350.00",
+            "currency": "USD",
+            "source_pointer": "/funding_context/executable_budget/bond"
+          },
+          "reason_codes": [
+            "V75_QA_BUY"
+          ],
+          "data_lineage": [
+            "V75-QA-BNDW",
+            "V75-OUTPUT-QA"
+          ],
+          "rule_lineage": [
+            "V75_RULE:V75-vQA",
+            "V75_PREDICATE:V75-PRED-vQA",
+            "V75_DEPLOYMENT_PARAMETER:V75-DP-vQA",
+            "WORK5_CONTRACT:C8C9-W5-V75AO-v1.0.1-RECHECK1"
+          ],
+          "source_snapshot_digest_sha256": "1a8bb3defefa27134fd5fd2e73dbc168f15807f7f8046eb8d2278e290d2c4cb4",
+          "source_decision": {
+            "asset_id": "BNDW",
+            "deployment_state": "SMALL_BUY",
+            "deployment_pct": {
+              "value": "20",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "70.00",
+              "currency": "USD"
+            },
+            "new_money_action": "SMALL_BUY",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "QA"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "V75_QA_BUY"
+            ],
+            "source_lineage": [
+              "V75-QA-BNDW"
+            ]
+          }
+        },
+        {
+          "item_id": "V75:SGOV",
+          "source_engine": "V75",
+          "asset_id": "SGOV",
+          "canonical_action": "PAUSE",
+          "source_action": {
+            "deployment_state": "PAUSE",
+            "new_money_action": "PAUSE",
+            "existing_position_action": "HOLD",
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE"
+          },
+          "client_preference_action": null,
+          "deployment_amount": {
+            "status": "KNOWN",
+            "value": {
+              "amount": "0",
+              "currency": "USD"
+            }
+          },
+          "deployment_ratio": {
+            "status": "KNOWN",
+            "value": {
+              "value": "0",
+              "unit": "PERCENT"
+            }
+          },
+          "account_owner": {
+            "funding_domain": "US_BROKER",
+            "broker": "QA_BROKER",
+            "account": "QA_ACCOUNT"
+          },
+          "funding_source": {
+            "budget_type": "BOND_EXECUTABLE_BUDGET",
+            "cash_basis": "AVAILABLE",
+            "amount": "350.00",
+            "currency": "USD",
+            "source_pointer": "/funding_context/executable_budget/bond"
+          },
+          "reason_codes": [
+            "V75_QA_PAUSE"
+          ],
+          "data_lineage": [
+            "V75-QA-SGOV",
+            "V75-OUTPUT-QA"
+          ],
+          "rule_lineage": [
+            "V75_RULE:V75-vQA",
+            "V75_PREDICATE:V75-PRED-vQA",
+            "V75_DEPLOYMENT_PARAMETER:V75-DP-vQA",
+            "WORK5_CONTRACT:C8C9-W5-V75AO-v1.0.1-RECHECK1"
+          ],
+          "source_snapshot_digest_sha256": "f02e67015d7a7e365d9514772d53d2adeeb40ae2a2ae49a17d1e15e840965a6d",
+          "source_decision": {
+            "asset_id": "SGOV",
+            "deployment_state": "PAUSE",
+            "deployment_pct": {
+              "value": "0",
+              "unit": "PERCENT"
+            },
+            "deploy_amount": {
+              "amount": "0",
+              "currency": "USD"
+            },
+            "new_money_action": "PAUSE",
+            "existing_position_action": "HOLD",
+            "classification": [
+              "QA"
+            ],
+            "gate_state": "PASS",
+            "evaluation_state": "COMPLETE",
+            "reason_codes": [
+              "V75_QA_PAUSE"
+            ],
+            "source_lineage": [
+              "V75-QA-SGOV"
+            ]
+          }
+        }
+      ],
+      "undeployed_disposition": {
+        "status": "ROUTE_TO_SGOV_DRY_POWDER",
+        "source_role": "V75_UNDEPLOYED_TO_SGOV",
+        "destination_role": "SGOV_DRY_POWDER_BUCKET",
+        "contribution": {
+          "amount": "280.00",
+          "currency": "USD"
+        },
+        "account_owner": {
+          "funding_domain": "US_BROKER",
+          "broker": "QA_BROKER",
+          "account": "QA_ACCOUNT"
+        },
+        "contribution_applied_to_aggregate": false,
+        "final_dry_powder_aggregate_computed": false,
+        "family_physical_subledger_created": false
+      },
+      "funding_context": {
+        "cash_basis": "AVAILABLE",
+        "equity_executable_budget": "450.00",
+        "bond_executable_budget": "350.00",
+        "unsettled": "100.00",
+        "reserved": "100.00",
+        "funding_reallocation_performed": false,
+        "available_formula_recomputed": false
+      }
+    },
+    "canonical_deployment_result_sha256": "531ba0ff8f5431351877a44b68239433a856b517ffe2a3662fa514bfcda1cd20",
+    "source_result_digest": "5a67661a1af7314156436da88af81189ffbe050ad3c65856050793ab2e3e5ecc",
+    "unknown_reason_codes": [
+      "V82_SOURCE_RISK_ACTION",
+      "C8C9_W9_PROTECTED_CLIENT_ACTION_FROM_C_WORK6_7",
+      "V75_QA_BUY",
+      "V75_QA_PAUSE"
+    ],
+    "trade_action": "NO_TRADE"
+  },
+  "numeric_mutation": false,
+  "source_fixture": "tests/fixtures/work9_mentor_request.json",
+  "tests": "tests/test_mentor_bridge.py"
+}

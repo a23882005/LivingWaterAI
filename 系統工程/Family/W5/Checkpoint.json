@@ -11,20 +11,21 @@
   "deployment": {
     "github": "WORK_BRANCH_VERIFIED",
     "drive": "累計施工保存，非最終部署；fileIds列於本欄",
-    "backup_ref": "backup/w5-20261020-pipeline-recovery",
+    "backup_ref": "backup/w5-20261020-mentor",
     "main_unchanged": true,
-    "actions": "NOT_RUN",
+    "actions": "施工回歸workflow新增；執行run及結果見ZIP RELEASE_RECEIPT.json",
     "dual_deploy": "NOT_VERIFIED_FINAL_DEPLOYMENT_PENDING",
     "github_readback": "最新commit與本輪讀回結果見ZIP RELEASE_RECEIPT.json",
-    "previous_work_commit": "175e3827ae90ce1ca53979a3c264de687888ee28",
+    "previous_work_commit": "6a586cac4acbc24b3919fcbac8e6d0b356a374e8",
     "current_work_commit_location": "ZIP根目錄RELEASE_RECEIPT.json；此Checkpoint隨同commit保存，避免自指雜湊",
     "drive_file_ids": {
       "zip": "1lm3ss_YSN7VVaQDSRqDrJ_Zk40XhsCX0",
       "checkpoint": "1jcy2YuhGmM3rs2yM5JFTt5wC5u2EXshB",
       "index": "1j7qoMxIX7wl4scZ_mafZ5eOUalHTp-8_"
-    }
+    },
+    "main_before_commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e"
   },
-  "validation_scope": "本線124 PASS、1 strict XFAIL（明列未通過的完整Work9正向案例）；恢復測試使用受控純計算provider。未達整線、Actions或最終部署。",
+  "validation_scope": "本線137 PASS、1 strict XFAIL；新增13項Mentor/恢復整合測試，原W2說明/恢復6項回歸PASS。原Work21合成fixture驗Mentor；完整真股債Work9正向待續。",
   "w3_reader_acceptance": "PASS",
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -181,11 +182,18 @@
       ]
     },
     "W5-16": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "原Work9統一輸出/mentor_return接繁中欄位說明；沿用原W2理由表，原風險與保護動作分欄，數值/來源完整保留；拒絕LLM改值、未知理由待解釋。",
+      "remaining": "15完整真股債結果接入後驗收全部16棒；目前正向為原Work21凍結fixture經真Work9整合與說明。",
+      "evidence": [
+        "tests/test_mentor_bridge.py",
+        "evidence/mentor_positive.json",
+        "evidence/mentor_tests.log"
+      ]
     },
     "W5-17": {
       "status": "IN_PROGRESS",
-      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。",
+      "completed": "重用原W2 staging journal；同鍵digest衝突、快取及發布前重驗、並行重送、實際逾時一次重試與晚到拒收，受控provider測試通過。 已接原Work9→Mentor實際說明結果重送，以及完成說明後中斷、同快照重算只發布一次。",
       "remaining": "接完整15/16真結果、部分完成重算與W7接口驗收；不是正式持久化。",
       "evidence": [
         "tests/test_recovery_bridge.py",
@@ -193,7 +201,14 @@
       ]
     },
     "W5-18": {
-      "status": "PENDING"
+      "status": "IN_PROGRESS",
+      "completed": "新增family-w5.yml施工回歸，鎖定基線checkout、Python3.12、90項來源/依賴hash與同一本線測試入口；僅合成資料。",
+      "remaining": "完整Family runner、各棒驗收、整線正向、最終PR整合與雙端正式部署。",
+      "evidence": [
+        ".github/workflows/family-w5.yml",
+        "verify_dependencies.py",
+        "evidence/mentor_tests.log"
+      ]
     }
   },
   "open_gaps": [
@@ -362,6 +377,20 @@
       "checkpoint": "1y7-hvpW9cmwMtLaC6nbvvxt-o-ut0biH",
       "index": "1aHVDuWieY_rYK1rCq0E29S9NmeACQKqG",
       "root": "1ZcRuHgjPYD-yxm9zRqScYOUZ1ul4xW9Q"
+    }
+  },
+  "mentor_integration": {
+    "tests_passed": 13,
+    "w5_tests_passed": 137,
+    "strict_xfail": 1,
+    "w2_original_regression": 6,
+    "source_dependency_hashes": 90,
+    "core_modifications": 0,
+    "backup_drive_ids": {
+      "zip": "1NEvoidufZAlqx-rGW7sI3Pa1vg65WYtd",
+      "checkpoint": "1uy6TZ1exWziCgcKjM-aH9qqSKLkR-KeO",
+      "index": "12q9QoNnettrlCwLxHpmFjEXZKViIqZVC",
+      "root": "1yfBEeq1Y2KgrgluU5ag1clO6iD9SnmlK"
     }
   }
 }

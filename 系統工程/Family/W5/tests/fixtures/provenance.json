@@ -29,5 +29,12 @@
     "fixture": "w2_confirmed_target.json",
     "source": "W2 tests/test_w2_19_loop2_orchestrator.py::confirmed_ledger",
     "scope": "Actual W2-17/18 functions applied to original synthetic goldens; no private confirmation"
+  },
+  {
+    "fixture": "work9_mentor_request.json",
+    "source_archive_path": "WORK11_OUTPUT/FIXTURES/W15_W16_W18_WORK9_INPUT_HAPPY.json",
+    "source_sha256": "40196c2335ad7a0f2150d36fad61f67aff7f17f005a35138462190de4726ac62",
+    "manifest_verified": true,
+    "scope": "Original synthetic Work9 normalization and Mentor case; source engine outputs are fixture-owned"
   }
 ]

@@ -1,3 +1,26 @@
+# 最新進度｜BR v0.2 事件與來源追溯接線
+日期：2026-10-21。此段取代下方v0.1同事項；本輪仍由Family中PM負責。
+
+- 49項測試PASS；W5原引擎兩次重新計算、完整Golden比對PASS。
+- 事件生產器已實接W5；32個來源圖節點通過校驗，原案例1帳戶／3持倉逐值保留。另測兩帳戶隔離、未知現金、零持倉、篡改重算hash與錯誤回覆保留。
+- event_capture保存所有request/context頂層欄位、版本、完整portfolio tables、輸出及其hash。分析模式前後實際持倉相同；建議不記成已成交交易。
+- 拆股／配息／FX口徑守衛已做：未來資料、重複還原、總報酬又加股息、反向匯率、過期與非有限匯率均拒絕；未實施價格調整或交易。
+- 既有23份歷史CSV共104,788筆，檔案SHA與原context一致；解析資料hash與原intake、逐列內容一致。日期順序／重複／收集時間／數值檢查PASS；盤點29筆拆股、2,223筆配息。
+- CSV byte SHA與canonical rows SHA是不同欄位，程式分別核對，不混用。
+
+執行：`python -m pytest -q tests`；`python run_w5_replay.py /path/to/w5_handoff evidence/w5_replay.json`；`python audit_existing_history.py /path/to/w5_handoff/market_intake evidence/history_audit.json`。
+
+## 工序狀態
+BR-01／04／06本段完成；BR-02完整portfolio事件與BR-05輸入到結果來源圖已接線測試。BR-03／07／08已接既有真實歷史快照及缺口驗證，原始發布vintage、拆股還原與配息報酬口徑的正式證據仍OPEN。BR-09階段交付更新；整線仍IN_PROGRESS，W7 NOT_RELEASED。
+
+歷史CSV存在拆股／股息欄位，不等於原價格口徑已核准。快照收集完成時間可作此份快照最早可用界線；不能回填成歷史每根K棒當時可用時間。market_basis的evidence_ref需由可信來源登記實證支援；測試中的正向口徑為明示合成案例。
+來源圖目前從收到的原request/context開始，外部CSV／網站來源以歷史稽核及原W5來源鎖銜接；不是對外部來源真偽的認證。W5需先執行自身驗證，event_capture不替代原授權驗證。
+
+下一責任仍Family中PM：把歷史稽核接成可信來源登記與可用時間選擇，沿既有來源處理口徑缺項，完成BR整線裁定。W6 PASS維持，Production HOLD、交易NONE。
+
+---
+以下v0.1為前段實作背景；進度以本段為準。
+
 # Family BR｜重播核心與W5接線 v0.1
 
 日期：2026-10-21。負責人：Family中PM（本對話）。

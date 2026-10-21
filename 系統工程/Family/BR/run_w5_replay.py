@@ -10,6 +10,7 @@ import sys
 from copy import deepcopy
 sys.path.insert(0,str(Path(__file__).parent/'runtime'))
 from replay import digest, replay, verify_files
+from event_capture import capture, verify_capture
 
 
 def main(handoff,output):
@@ -59,6 +60,9 @@ def main(handoff,output):
     result['golden_compatibility']={'original_sha256':w5digest(original),
         'explicit_addition':{'technical_intake':None},'all_original_fields':'EXACT_COMPARE'}
     result['verified_w5_dependencies']=dependency_count
+    captured=capture(req,ctx,result['result'],source_lock_sha256=digest(lock))
+    result['capture_proof']=verify_capture(captured,req,ctx,result['result'],source_lock_sha256=digest(lock))
+    Path(output).with_name('w5_captured_event.json').write_text(json.dumps(captured,ensure_ascii=False,indent=2)+'\n')
     result['historical_readiness']='OPEN_PUBLICATION_VINTAGE_EVIDENCE'
     result['note']='Original synthetic golden; historical availability is not inferred.'
     Path(output).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

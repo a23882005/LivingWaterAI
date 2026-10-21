@@ -1,7 +1,7 @@
 {
-  "version": "BR-v0.3.4",
+  "version": "BR-v0.3.5",
   "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
-  "core_tests_passed": 75,
+  "core_tests_passed": 83,
   "w5_original_dependencies_verified": 115,
   "locked_source_files": 184,
   "w5_fresh_executions": 2,
@@ -9,10 +9,9 @@
   "historical_readiness": "OPEN",
   "next_owner": "Family中PM本人",
   "next_tasks": [
-    "取得固定歷史案例的可靠可得時點與版本證據",
-    "釐清2013反向分割的供應商事件日與發行人收盤生效映射、價格及股數基準",
-    "沿原W5接口處理剩餘規則/來源，完成受信審核分支及歷史正向實算",
-    "BR前置裁定後循序W7，嚴格Project隔離已核准並待能力實證"
+    "取得BR驗收範圍明確裁定；具體原條件與工程範圍提案見CAPTURE_REPLAY_REVIEW.md，尚未改動條件",
+    "沿原條件補價格/股數調整基準與W5未核定規則/來源，完成完整真實策略正向",
+    "BR完成後先與指揮官重新討論W7規劃，再決定施工"
   ],
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -32,20 +31,30 @@
   "provider_price_convention": "CONFIRMED",
   "existing_performance_convention": "PRETAX_ADJ_CLOSE_PROXY_CONFIRMED",
   "per_instrument_adjustment_verification": "OPEN",
-  "validation_this_revision": "RUN_ALL_PASS_75_TESTS_AND_BOUNDED_OFFICIAL_REVIEW",
+  "validation_this_revision": "RUN_ALL_PASS_83_TESTS_CAPTURE_BOUND_AND_REAL_NUMERIC_REPLAY",
   "engineering_acceptance": "ENGINEERING_ACCEPTED_WITH_DECLARED_SOURCE_GAPS",
   "closeout_review": "COMPLETE",
   "closeout_decision": "CLOSEOUT_DECISION.md",
   "handoff_to": "同一位Family中PM續作",
-  "w7_planning": "CONTRACT_V1_1_STRICT_PROJECT_ISOLATION_CONFIRMED_PLATFORM_PROOF_PENDING",
+  "w7_planning": "REQUIRES_NEW_COMMANDER_DISCUSSION_AFTER_BR_BEFORE_START",
   "archive_binding": "REMOTE_COMMIT_TO_W5_PASS_4052_ROWS",
   "archive_evidence": "evidence/archive_verification/RESULT.json",
-  "current_work": "BR_REMAINING_PIT_AND_ADJUSTMENT_EVIDENCE",
+  "current_work": "BR_FULL_ACCEPTANCE_GAPS_REVIEWED_SCOPE_PROPOSAL_NOT_APPROVED",
   "official_source_review": {
     "status": "PASS_BOUNDED_SOURCE_REVIEW",
     "calendar_sessions_2026": 200,
     "dividend_events_2026": 3,
     "split_event_ratio": "VERIFIED_2013_10_24_1_FOR_2",
     "report": "evidence/official_review_run/official_source_review.json"
-  }
+  },
+  "capture_availability": {
+    "status": "VERIFIED_AFTER_CAPTURE_ONLY",
+    "artifact_id": 12228981182,
+    "run_id": 39340856153,
+    "available_at_upper_bound": "2026-10-19T23:20:14Z",
+    "cutoff": "2026-10-20T12:00:00Z"
+  },
+  "real_numeric_replay": "PASS_200_ROWS_11_INDEPENDENT_FIELDS_TWO_EXECUTIONS",
+  "real_w5_safety_replay": "PASS_EXACT_ORIGINAL_GOLDEN_TWO_EXECUTIONS",
+  "full_historical_strategy_positive": false
 }

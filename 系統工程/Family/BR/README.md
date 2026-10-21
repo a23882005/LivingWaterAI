@@ -1,3 +1,11 @@
+# 最新補充裁定｜BR v0.3.1
+
+2026-10-21：原collector及analytics來源SHA核對一致；拆股欄位慣例與既有Adj Close稅前近似績效口徑已確認，禁止重複還原／重複加息。詳細證據及正式剩餘條件見SOURCE_ADJUDICATION.md。
+
+工程PASS維持；逐案例公司行動品質與歷史發布版本證據尚待補齊，BR正式Major OPEN_SOURCE_EVIDENCE、W7 NOT_RELEASED。原Registry未升格，執行程式未改。既有60項測試、92項邊界驗證沿v0.3，本次未重跑。以下舊紀錄由本補充更正口徑狀態。
+
+---
+
 # 最新裁定｜BR v0.3
 
 本輪工程回歸PASS_WITH_DECLARED_SOURCE_GAPS；正式BR Major為OPEN_SOURCE_EVIDENCE。詳細九項對照與三類來源待辦見BR_REVIEW.md。

@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "scope": "BR engineering regression with declared source evidence gaps",
+  "w5_status": "PASS",
+  "capture_status": "PASS",
+  "history_files": 23,
+  "snapshot_integrity_passed": 23,
+  "registry_boundary_checks": 92,
+  "historical_ready": false,
+  "br_major_gate": "OPEN_SOURCE_EVIDENCE",
+  "w7_release": "NOT_RELEASED",
+  "production": "HOLD",
+  "trade_authorization": "NONE"
+}

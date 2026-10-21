@@ -1,7 +1,7 @@
 {
-  "version": "BR-v0.3.3",
+  "version": "BR-v0.3.4",
   "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
-  "core_tests_passed": 64,
+  "core_tests_passed": 75,
   "w5_original_dependencies_verified": 115,
   "locked_source_files": 184,
   "w5_fresh_executions": 2,
@@ -9,9 +9,10 @@
   "historical_readiness": "OPEN",
   "next_owner": "Family中PM本人",
   "next_tasks": [
-    "核實所選案例公司行動/日曆/收盤及原規則輸入",
-    "具體處理BR受信審核讀取分支並實算",
-    "確認W7可信Project隔離方案，按原前置裁定開工"
+    "取得固定歷史案例的可靠可得時點與版本證據",
+    "釐清2013反向分割的供應商事件日與發行人收盤生效映射、價格及股數基準",
+    "沿原W5接口處理剩餘規則/來源，完成受信審核分支及歷史正向實算",
+    "BR前置裁定後循序W7，嚴格Project隔離已核准並待能力實證"
   ],
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -31,13 +32,20 @@
   "provider_price_convention": "CONFIRMED",
   "existing_performance_convention": "PRETAX_ADJ_CLOSE_PROXY_CONFIRMED",
   "per_instrument_adjustment_verification": "OPEN",
-  "validation_this_revision": "ORIGINAL_RUN_ALL_PASS_AND_ARCHIVE_TESTS_4_PASS",
+  "validation_this_revision": "RUN_ALL_PASS_75_TESTS_AND_BOUNDED_OFFICIAL_REVIEW",
   "engineering_acceptance": "ENGINEERING_ACCEPTED_WITH_DECLARED_SOURCE_GAPS",
   "closeout_review": "COMPLETE",
   "closeout_decision": "CLOSEOUT_DECISION.md",
   "handoff_to": "同一位Family中PM續作",
-  "w7_planning": "DIRECTION_APPROVED_CONTRACT_V1_PLATFORM_BINDING_PENDING",
+  "w7_planning": "CONTRACT_V1_1_STRICT_PROJECT_ISOLATION_CONFIRMED_PLATFORM_PROOF_PENDING",
   "archive_binding": "REMOTE_COMMIT_TO_W5_PASS_4052_ROWS",
   "archive_evidence": "evidence/archive_verification/RESULT.json",
-  "current_work": "BR_SOURCE_EVIDENCE_AND_W7_PLATFORM_DECISION"
+  "current_work": "BR_REMAINING_PIT_AND_ADJUSTMENT_EVIDENCE",
+  "official_source_review": {
+    "status": "PASS_BOUNDED_SOURCE_REVIEW",
+    "calendar_sessions_2026": 200,
+    "dividend_events_2026": 3,
+    "split_event_ratio": "VERIFIED_2013_10_24_1_FOR_2",
+    "report": "evidence/official_review_run/official_source_review.json"
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "version": "BR-v0.1",
+  "status": "IN_PROGRESS",
+  "core_tests_passed": 26,
+  "w5_original_dependencies_verified": 115,
+  "locked_source_files": 184,
+  "w5_fresh_executions": 2,
+  "full_golden_compare": "PASS_EXPLICIT_NULL_ADDITION",
+  "historical_readiness": "OPEN",
+  "next_owner": "Family中PM（本對話）",
+  "next_tasks": [
+    "BR-02/05 producer接線",
+    "BR-07/08真實歷史來源與口徑案例",
+    "BR-09整線驗收"
+  ],
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "w7_release": "NOT_RELEASED"
+}

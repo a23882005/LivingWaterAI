@@ -1,3 +1,9 @@
+# 最新收尾｜BR v0.3.2
+
+2026-10-21：收尾裁定與工程成果接收完成；完整run_all重新執行PASS。見CLOSEOUT_DECISION.md及evidence/handoff_review/。BR正式整線OPEN_SOURCE_EVIDENCE與W7 NOT_RELEASED保持，剩餘03/07/08證據具名交接。下一對話由Family中PM重新規劃W7並接續推進；現有W7草稿僅供參考。
+
+---
+
 # 最新補充裁定｜BR v0.3.1
 
 2026-10-21：原collector及analytics來源SHA核對一致；拆股欄位慣例與既有Adj Close稅前近似績效口徑已確認，禁止重複還原／重複加息。詳細證據及正式剩餘條件見SOURCE_ADJUDICATION.md。

@@ -1,17 +1,17 @@
 {
-  "version": "BR-v0.3.2",
+  "version": "BR-v0.3.3",
   "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
-  "core_tests_passed": 60,
+  "core_tests_passed": 64,
   "w5_original_dependencies_verified": 115,
   "locked_source_files": 184,
   "w5_fresh_executions": 2,
   "full_golden_compare": "PASS_EXPLICIT_NULL_ADDITION",
   "historical_readiness": "OPEN",
-  "next_owner": "新對話Family中PM",
+  "next_owner": "Family中PM本人",
   "next_tasks": [
-    "定位既有歷史發布／修訂存檔；不可由現有快照倒填",
-    "核對所選正式案例公司行動與價格／股數基準",
-    "依原BR工序裁定正式Major"
+    "核實所選案例公司行動/日曆/收盤及原規則輸入",
+    "具體處理BR受信審核讀取分支並實算",
+    "確認W7可信Project隔離方案，按原前置裁定開工"
   ],
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -31,10 +31,13 @@
   "provider_price_convention": "CONFIRMED",
   "existing_performance_convention": "PRETAX_ADJ_CLOSE_PROXY_CONFIRMED",
   "per_instrument_adjustment_verification": "OPEN",
-  "validation_this_revision": "FULL_RUN_ALL_PASS",
+  "validation_this_revision": "ORIGINAL_RUN_ALL_PASS_AND_ARCHIVE_TESTS_4_PASS",
   "engineering_acceptance": "ENGINEERING_ACCEPTED_WITH_DECLARED_SOURCE_GAPS",
   "closeout_review": "COMPLETE",
   "closeout_decision": "CLOSEOUT_DECISION.md",
-  "handoff_to": "新對話Family中PM",
-  "w7_planning": "REPLAN_IN_NEW_CONVERSATION"
+  "handoff_to": "同一位Family中PM續作",
+  "w7_planning": "DIRECTION_APPROVED_CONTRACT_V1_PLATFORM_BINDING_PENDING",
+  "archive_binding": "REMOTE_COMMIT_TO_W5_PASS_4052_ROWS",
+  "archive_evidence": "evidence/archive_verification/RESULT.json",
+  "current_work": "BR_SOURCE_EVIDENCE_AND_W7_PLATFORM_DECISION"
 }

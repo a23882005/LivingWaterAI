@@ -1,5 +1,5 @@
 {
-  "version": "BR-v0.3.1",
+  "version": "BR-v0.3.2",
   "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
   "core_tests_passed": 60,
   "w5_original_dependencies_verified": 115,
@@ -7,7 +7,7 @@
   "w5_fresh_executions": 2,
   "full_golden_compare": "PASS_EXPLICIT_NULL_ADDITION",
   "historical_readiness": "OPEN",
-  "next_owner": "Family中PM（本對話）",
+  "next_owner": "新對話Family中PM",
   "next_tasks": [
     "定位既有歷史發布／修訂存檔；不可由現有快照倒填",
     "核對所選正式案例公司行動與價格／股數基準",
@@ -31,5 +31,10 @@
   "provider_price_convention": "CONFIRMED",
   "existing_performance_convention": "PRETAX_ADJ_CLOSE_PROXY_CONFIRMED",
   "per_instrument_adjustment_verification": "OPEN",
-  "validation_this_revision": "DOCUMENT_AND_SOURCE_HASH_REVIEW_ONLY"
+  "validation_this_revision": "FULL_RUN_ALL_PASS",
+  "engineering_acceptance": "ENGINEERING_ACCEPTED_WITH_DECLARED_SOURCE_GAPS",
+  "closeout_review": "COMPLETE",
+  "closeout_decision": "CLOSEOUT_DECISION.md",
+  "handoff_to": "新對話Family中PM",
+  "w7_planning": "REPLAN_IN_NEW_CONVERSATION"
 }

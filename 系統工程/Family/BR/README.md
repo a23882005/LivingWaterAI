@@ -1,3 +1,7 @@
+# 最新進度｜BR v0.3.5
+
+可信GitHub Actions封存時點已核實，新增受信唯讀capture reader。200筆真實行情11欄獨立數值正向重播及原W5安全Golden雙跑通過；run_all共83測試PASS。完整策略正向與個別調整基準仍未滿足原收尾條件，BR OPEN_SOURCE_EVIDENCE。原條件對照與待裁定提案見CAPTURE_REPLAY_REVIEW.md。指揮官最新指示：先完成BR，W7需再次討論規劃才開工；W7 NOT_RELEASED。
+
 # 最新進度｜BR v0.3.4
 
 2026-10-21：官方VOO商品、NYSE日曆、配息與SEC歷史反向分割證據已保存；200個交易日與3次配息核驗通過。run_all新增離線官方來源核驗步驟，75項測試及原W5重播、23CSV/92邊界全部PASS。見OFFICIAL_SOURCE_REVIEW.md。BR整線OPEN_SOURCE_EVIDENCE；W7契約v1.1嚴格Project隔離已確認，平台實證待辦；W7 NOT_RELEASED。完整來源原件與實測證據在Drive同ID v0.3.4包，GitHub保留通用程式/測試/文件。

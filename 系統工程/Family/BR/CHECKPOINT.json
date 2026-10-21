@@ -1,7 +1,7 @@
 {
-  "version": "BR-v0.2",
-  "status": "IN_PROGRESS",
-  "core_tests_passed": 49,
+  "version": "BR-v0.3",
+  "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
+  "core_tests_passed": 60,
   "w5_original_dependencies_verified": 115,
   "locked_source_files": 184,
   "w5_fresh_executions": 2,
@@ -9,9 +9,9 @@
   "historical_readiness": "OPEN",
   "next_owner": "Family中PM（本對話）",
   "next_tasks": [
-    "歷史稽核接可信來源登記與可用時間選擇",
-    "沿既有來源處理歷史發布與還原口徑證據",
-    "BR-09整線裁定"
+    "定位歷史發布／修訂證據",
+    "確認拆股還原與配息報酬口徑",
+    "依原工序完成BR正式Major裁定"
   ],
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -22,5 +22,9 @@
   "historical_snapshot_files": 23,
   "historical_rows": 104788,
   "split_events": 29,
-  "dividend_events": 2223
+  "dividend_events": 2223,
+  "br_major_gate": "OPEN_SOURCE_EVIDENCE",
+  "source_registry": "INTEGRATED",
+  "registry_boundary_checks": 92,
+  "clean_run": "PASS"
 }

@@ -1,3 +1,21 @@
+# 最新裁定｜BR v0.3
+
+本輪工程回歸PASS_WITH_DECLARED_SOURCE_GAPS；正式BR Major為OPEN_SOURCE_EVIDENCE。詳細九項對照與三類來源待辦見BR_REVIEW.md。
+
+乾淨目錄一次跑通：60項測試、原W5雙次實算、完整事件來源圖、23份歷史CSV稽核與92項來源時間／用途邊界驗證。
+
+```sh
+python run_all.py /path/to/w5_handoff /path/to/evidence_output
+```
+
+source_registry的發布版digest由交付manifest固定，應與請求資料分開提供。已登記快照支援ARCHIVE_READ_ONLY；DECISION_INPUT及HISTORICAL_REPLAY會明確要求相應口徑／發布證據，不因檔案雜湊正確就升格用途。
+
+本輪工程段已完成。下一責任仍Family中PM：定位既有歷史發布、拆股還原、配息報酬口徑證據，依原九項完成正式Major裁定，再接W7。W6 PASS維持，Production HOLD、交易NONE。
+
+以下為前版工程紀錄，進度與裁定以本段及BR_REVIEW.md為準。
+
+---
+
 # 最新進度｜BR v0.2 事件與來源追溯接線
 日期：2026-10-21。此段取代下方v0.1同事項；本輪仍由Family中PM負責。
 

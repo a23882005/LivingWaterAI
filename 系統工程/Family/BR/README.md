@@ -1,3 +1,7 @@
+# 最新進度｜BR v0.3.4
+
+2026-10-21：官方VOO商品、NYSE日曆、配息與SEC歷史反向分割證據已保存；200個交易日與3次配息核驗通過。run_all新增離線官方來源核驗步驟，75項測試及原W5重播、23CSV/92邊界全部PASS。見OFFICIAL_SOURCE_REVIEW.md。BR整線OPEN_SOURCE_EVIDENCE；W7契約v1.1嚴格Project隔離已確認，平台實證待辦；W7 NOT_RELEASED。完整來源原件與實測證據在Drive同ID v0.3.4包，GitHub保留通用程式/測試/文件。
+
 # 最新進度｜BR v0.3.3
 
 2026-10-21：本輪原run_all重跑PASS；新增VOO遠端封存綁定核驗與4項測試，合計64項PASS。實際成果、仍待條件及程式接線限制見 TAKEOVER_FINDINGS.md。BR OPEN_SOURCE_EVIDENCE、historical_ready=false、W7 NOT_RELEASED保持。W7方向已由指揮官確認，29項契約已形成，可信Project綁定方案待裁定。以下為歷史紀錄。

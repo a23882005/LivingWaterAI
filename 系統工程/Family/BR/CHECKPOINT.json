@@ -1,5 +1,5 @@
 {
-  "version": "BR-v0.3",
+  "version": "BR-v0.3.1",
   "status": "ENGINEERING_REGRESSION_PASS_WITH_SOURCE_GAPS",
   "core_tests_passed": 60,
   "w5_original_dependencies_verified": 115,
@@ -9,9 +9,9 @@
   "historical_readiness": "OPEN",
   "next_owner": "Family中PM（本對話）",
   "next_tasks": [
-    "定位歷史發布／修訂證據",
-    "確認拆股還原與配息報酬口徑",
-    "依原工序完成BR正式Major裁定"
+    "定位既有歷史發布／修訂存檔；不可由現有快照倒填",
+    "核對所選正式案例公司行動與價格／股數基準",
+    "依原BR工序裁定正式Major"
   ],
   "production": "HOLD",
   "trade_authorization": "NONE",
@@ -26,5 +26,10 @@
   "br_major_gate": "OPEN_SOURCE_EVIDENCE",
   "source_registry": "INTEGRATED",
   "registry_boundary_checks": 92,
-  "clean_run": "PASS"
+  "clean_run": "PASS",
+  "source_convention_review": "SOURCE_ADJUDICATION.md",
+  "provider_price_convention": "CONFIRMED",
+  "existing_performance_convention": "PRETAX_ADJ_CLOSE_PROXY_CONFIRMED",
+  "per_instrument_adjustment_verification": "OPEN",
+  "validation_this_revision": "DOCUMENT_AND_SOURCE_HASH_REVIEW_ONLY"
 }

@@ -1,0 +1,29 @@
+{
+  "schema_version": "Family.BR.Replay.v1",
+  "event_id": "BR-W5-GOLDEN-001",
+  "data_kind": "SYNTHETIC",
+  "status": "PASS",
+  "golden_diff": [],
+  "repeat_diff": [],
+  "result_sha256": "6f8eac193ed2ffcd7eab6d8254fcff3e90eac76716231302ca10cb7e2109ac5f",
+  "executions": 2,
+  "trade_authorization": "NONE",
+  "golden_compatibility": {
+    "original_sha256": "d9241b915128192d8bf6b3de8c9efcc72588f1426d5a3231c7143bd92dd8c69e",
+    "explicit_addition": {
+      "technical_intake": null
+    },
+    "all_original_fields": "EXACT_COMPARE"
+  },
+  "verified_w5_dependencies": 115,
+  "capture_proof": {
+    "status": "PASS",
+    "lineage_nodes": 32,
+    "accounts": 1,
+    "positions": 3,
+    "event_sha256": "109350737cd9aca1593f40dfdaa53e7f867cc39102ffe757ca9d72e6ba92c615",
+    "portfolio_unchanged": true
+  },
+  "historical_readiness": "OPEN_PUBLICATION_VINTAGE_EVIDENCE",
+  "note": "Original synthetic golden; historical availability is not inferred."
+}

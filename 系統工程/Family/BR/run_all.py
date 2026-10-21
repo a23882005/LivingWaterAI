@@ -1,0 +1,53 @@
+"""One command verifies BR code, original engines, history and registry.
+
+Usage: python run_all.py W5_HANDOFF_DIRECTORY OUTPUT_DIRECTORY
+Requires the pinned requirements.lock in an isolated Python environment.
+"""
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+
+def run(handoff, output):
+    home=Path(__file__).resolve().parent
+    source=Path(handoff).resolve();out=Path(output).resolve()
+    out.mkdir(parents=True,exist_ok=True)
+    tasks=[('tests',[sys.executable,'-m','pytest','-q',str(home/'tests')]),
+        ('w5',[sys.executable,str(home/'run_w5_replay.py'),str(source),str(out/'w5_replay.json')]),
+        ('history',[sys.executable,str(home/'audit_existing_history.py'),str(source/'market_intake'),str(out/'history_audit.json')]),
+        ('registry',[sys.executable,str(home/'run_registry_checks.py'),str(source/'market_intake'),str(out/'history_audit.json'),str(out)]),
+        ('official_sources',[sys.executable,str(home/'review_official_sources.py'),
+            str(source/'market_intake/VOO.csv'),str(home/'evidence/official_review'),
+            'a3c1f35cdd27644129b3d798cc8a0a1524df1160b220e208bc82be2d4e49c930',
+            str(out/'official_source_review.json')]),
+        ('capture_replay',[sys.executable,str(home/'run_capture_replay.py'),
+            str(source),str(out/'capture_replay.json')])]
+    for name,command in tasks:
+        task=subprocess.run(command,cwd=home,text=True,capture_output=True)
+        (out/(name+'.log')).write_text(task.stdout+task.stderr)
+        if task.returncode:
+            (out/'RUN_STATUS.json').write_text(json.dumps({'status':'FAIL','step':name,'returncode':task.returncode},indent=2)+'\n')
+            raise SystemExit(task.returncode)
+    replay=json.loads((out/'w5_replay.json').read_text())
+    history=json.loads((out/'history_audit.json').read_text())
+    registry=json.loads((out/'registry_checks.json').read_text())
+    official=json.loads((out/'official_source_review.json').read_text())
+    captured=json.loads((out/'capture_replay.json').read_text())
+    status={'status':'PASS','scope':'BR engineering regression with declared source evidence gaps',
+        'w5_status':replay['status'],'capture_status':replay['capture_proof']['status'],
+        'history_files':history['files'],'snapshot_integrity_passed':history['snapshot_integrity_passed'],
+        'registry_boundary_checks':registry['boundary_checks'],
+        'official_source_review':official['status'],
+        'official_calendar_sessions':official['calendar_sessions_matched'],
+        'official_dividends_compared':len(official['dividends']),
+        'capture_availability_verified':captured['capture']['availability_verified_for_capture_replay'],
+        'real_numeric_replay_fields':captured['positive_numeric_replay']['independently_checked_fields'],
+        'real_w5_safety_replay':captured['original_w5_safety_replay']['status'],
+        'historical_ready':False,'br_major_gate':'OPEN_SOURCE_EVIDENCE',
+        'w7_release':'NOT_RELEASED','production':'HOLD','trade_authorization':'NONE'}
+    (out/'RUN_STATUS.json').write_text(json.dumps(status,ensure_ascii=False,indent=2)+'\n')
+    print(json.dumps(status,ensure_ascii=False))
+
+
+if __name__=='__main__':run(*sys.argv[1:])

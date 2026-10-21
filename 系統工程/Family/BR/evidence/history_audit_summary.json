@@ -1,0 +1,17 @@
+{
+  "schema_version": "Family.BR.HistoryAudit.v1",
+  "files": 23,
+  "snapshot_integrity_passed": 23,
+  "scope": "Existing W5 snapshots only; not source publication verification",
+  "production": "HOLD",
+  "trade_authorization": "NONE",
+  "rows": 104788,
+  "split_events": 29,
+  "dividend_events": 2223,
+  "historical_readiness": "OPEN",
+  "issues": [
+    "PER_BAR_PUBLICATION_UNPROVEN",
+    "SPLIT_BASIS_UNVERIFIED",
+    "DIVIDEND_RETURN_CONVENTION_UNCONFIRMED"
+  ]
+}

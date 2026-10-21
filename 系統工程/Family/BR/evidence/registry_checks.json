@@ -1,0 +1,196 @@
+{
+  "schema_version": "Family.BR.RegistryChecks.v1",
+  "status": "PASS",
+  "sources": 23,
+  "boundary_checks": 92,
+  "registry_sha256": "86e2814a73a2e5799b7f5ff4405dbf3de73451dba271da456bccc70912b1ee5c",
+  "results": [
+    {
+      "symbol": "0050.TW",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "2330.TW",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "DRAM",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "GOOG",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "GOOGL",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "IBKR",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "IEF",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "MSFT",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "NATO.CN",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "NVDA",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "PPH",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "QQQ",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "SGOV",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "SMH",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "SOXX",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "SPLB",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "SPSB",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "TLT",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "VALL.L",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "VOO",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "VT",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "VWRA.L",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    },
+    {
+      "symbol": "ZTS",
+      "at_capture": true,
+      "decision_eligible": false,
+      "before_capture": true,
+      "historical": true,
+      "decision": true
+    }
+  ],
+  "historical_readiness": "OPEN_SOURCE_EVIDENCE",
+  "production": "HOLD",
+  "trade_authorization": "NONE"
+}

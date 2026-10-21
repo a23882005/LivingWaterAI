@@ -16,6 +16,14 @@
     "all_original_fields": "EXACT_COMPARE"
   },
   "verified_w5_dependencies": 115,
+  "capture_proof": {
+    "status": "PASS",
+    "lineage_nodes": 32,
+    "accounts": 1,
+    "positions": 3,
+    "event_sha256": "109350737cd9aca1593f40dfdaa53e7f867cc39102ffe757ca9d72e6ba92c615",
+    "portfolio_unchanged": true
+  },
   "historical_readiness": "OPEN_PUBLICATION_VINTAGE_EVIDENCE",
   "note": "Original synthetic golden; historical availability is not inferred."
 }

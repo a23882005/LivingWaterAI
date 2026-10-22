@@ -1,0 +1,81 @@
+{
+  "checked_at": "2026-10-22T08:18:59.846166+00:00",
+  "items": {
+    "m02": {
+      "id": "m02",
+      "label": "HY OAS",
+      "value": 3.33,
+      "unit": "%",
+      "observation_date": "2026-10-20",
+      "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+      "method": "FRED_CSV 官方或鏡像時間序列",
+      "status": "OK",
+      "detail": "",
+      "error": ""
+    },
+    "m14": {
+      "id": "m14",
+      "label": "淨流動性 13週變化（$bn）",
+      "value": -77.286,
+      "unit": "USD bn",
+      "observation_date": "2026-10-14",
+      "source_url": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
+      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
+      "status": "OK",
+      "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000",
+      "error": ""
+    }
+  },
+  "attempts": {
+    "BAMLH0A0HYM2": [
+      {
+        "provider": "FRED_CSV",
+        "result": "OK",
+        "verified_at": "2026-10-22T08:19:05.312140+00:00",
+        "observation_date": "2026-10-20"
+      }
+    ],
+    "WALCL": [
+      {
+        "provider": "FRED_CSV",
+        "result": "OK",
+        "verified_at": "2026-10-22T08:19:05.382109+00:00",
+        "observation_date": "2026-10-14"
+      }
+    ],
+    "WDTGAL": [
+      {
+        "provider": "FRED_CSV",
+        "result": "OK",
+        "verified_at": "2026-10-22T08:19:06.335767+00:00",
+        "observation_date": "2026-10-14"
+      }
+    ],
+    "RRPONTSYD": [
+      {
+        "provider": "FRED_CSV",
+        "result": "OK",
+        "verified_at": "2026-10-22T08:19:07.342105+00:00",
+        "observation_date": "2026-10-21"
+      }
+    ]
+  },
+  "providers": {
+    "BAMLH0A0HYM2": [
+      "FRED_CSV",
+      "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2"
+    ],
+    "WALCL": [
+      "FRED_CSV",
+      "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL"
+    ],
+    "WDTGAL": [
+      "FRED_CSV",
+      "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL"
+    ],
+    "RRPONTSYD": [
+      "FRED_CSV",
+      "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD"
+    ]
+  }
+}

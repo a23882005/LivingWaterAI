@@ -20,7 +20,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight18:
-    if: "${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}"
+    # Repair branches may be pushed for review; only main may write shared state.
+    if: "${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push') }}"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

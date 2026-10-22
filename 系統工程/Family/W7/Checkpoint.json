@@ -1,0 +1,35 @@
+{
+  "schema": "Family-W7-checkpoint-v1",
+  "owner": "Family中PM本人",
+  "mode": "sequential",
+  "contract_version": "v1.5.10",
+  "current_work": "W7-A01",
+  "completed": [
+    "H2接任核對",
+    "A01來源重現、有限重試修補及本機驗證"
+  ],
+  "formal_W7_accepted": 0,
+  "formal_W7_total": 29,
+  "in_progress": [
+    "A01雙端證據保存及讀回"
+  ],
+  "source_versions": {
+    "main": "e90855a805459dca63210fecbfdf3334ccacc672",
+    "handoff": "20261022-H2"
+  },
+  "evidence": [
+    "evidence/A01/"
+  ],
+  "issues": [
+    "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
+    "GitHub runner修補後整鏈重跑於A13；當前為本機真實FRED CSV驗證。"
+  ],
+  "next_action": "A02共同政策日期與核實契約",
+  "next_owner": "Family中PM本人",
+  "controls": {
+    "production": "HOLD",
+    "trading": "NONE",
+    "W4": "CANCELLED",
+    "RM17": "FROZEN"
+  }
+}

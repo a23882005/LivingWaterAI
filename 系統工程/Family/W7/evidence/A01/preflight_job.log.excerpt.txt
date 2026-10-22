@@ -1,0 +1,10 @@
+2026-10-22T01:34:21.8087052Z DATA_SOURCE_FAILED VIXCLS FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2026-10-22T01:34:55.7788900Z DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2026-10-22T01:34:55.8901658Z DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ParserError: Error tokenizing data. C error: Expected 1 fields in line 5, saw 3
+2026-10-22T01:34:55.8902041Z m02       MISSING         None ---
+2026-10-22T01:34:56.7600763Z DATA_SOURCE_FAILED CPILFESL FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2026-10-22T01:34:58.4819352Z DATA_SOURCE_FAILED WALCL FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2026-10-22T01:34:58.5366705Z DATA_SOURCE_FAILED WALCL FRED_CSV: ParserError: Error tokenizing data. C error: Expected 1 fields in line 5, saw 3
+2026-10-22T01:34:58.5367250Z m14       MISSING         None ---
+2026-10-22T01:35:01.7690082Z DATA_SOURCE_FAILED UNRATE FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2026-10-22T01:35:02.8862642Z DATA_SOURCE_FAILED PAYEMS FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)

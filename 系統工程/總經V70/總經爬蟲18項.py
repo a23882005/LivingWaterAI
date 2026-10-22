@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import tempfile
+import hashlib
 from pathlib import Path
 
 D009_RUN_STARTED=time.monotonic()
@@ -159,6 +160,7 @@ class Fetcher:
         self.s.get=cached_get
         self.frederrors={}
         self.fredsources={}
+        self.fredattempts={}
 
     def fred(self, series):
         if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
@@ -191,10 +193,13 @@ class Fetcher:
             params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json',
                               'observation_start':earliest})
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
+        retried=set()
+        self.fredattempts[series]=[]
         for provider,url in providers:
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
                 errors.append('D009 fetch deadline reached')
                 break
+            response=None
             try:
                 if provider in ('BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     current_year=dt.datetime.now().year
@@ -262,14 +267,37 @@ class Fetcher:
                         raise ValueError('Insufficient '+series+' history; missing '+','.join(missing))
                 self.fredcache[series]=out
                 self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
+                self.fredattempts[series].append({'provider':provider,'result':'OK',
+                    'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                    'observation_date':str(out.index[-1].date())})
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:
                 detail=str(exc)
                 if api_key: detail=detail.replace(api_key,'[REDACTED]')
                 diagnostic=provider+': '+type(exc).__name__+': '+detail[:220]
+                # HTTP 200 is not proof of valid provider data. Preserve safe
+                # response metadata, not response bodies or API credentials.
+                attempt={'provider':provider,'result':'FAILED','error':diagnostic,
+                         'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat()}
+                if response is not None:
+                    body=getattr(response,'content',b'')
+                    attempt.update(http_status=getattr(response,'status_code',None),
+                        content_type=getattr(response,'headers',{}).get('Content-Type',''),
+                        response_sha256=hashlib.sha256(body).hexdigest())
+                self.fredattempts[series].append(attempt)
                 errors.append(diagnostic)
                 print('DATA_SOURCE_FAILED',series,diagnostic,flush=True)
+                # A malformed successful FRED response used to be cached and
+                # immediately abandoned. Retry it once with the HTTP cache
+                # cleared; normal provider throttling/deadline still apply.
+                malformed=isinstance(exc,(ValueError,pd.errors.ParserError))
+                if (provider in ('FRED_OFFICIAL_API','FRED_CSV') and malformed
+                        and response is not None and getattr(response,'status_code',0)==200
+                        and provider not in retried):
+                    retried.add(provider)
+                    self._http_cache.pop((url,()),None)
+                    providers.insert(providers.index((provider,url))+1,(provider,url))
         message='All FRED sources failed for '+series+' | '+' | '.join(errors)
         self.frederrors[series]=message
         raise RuntimeError(message)

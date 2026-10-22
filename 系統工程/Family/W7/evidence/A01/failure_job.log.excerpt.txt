@@ -1,0 +1,1 @@
+2026-10-22T03:23:53.8025563Z QUALITY_GATE_BLOCKED: {"ready": false, "independent": 25, "transport": 28, "requiredScoring": 22, "requiredScoringValidated": 20, "asOf": "2026-10-22T03:23:53.789106Z", "missing": [], "problems": ["m06_rate: market data over 4 weekdays", "m02: status STALE", "m14: status STALE"]}

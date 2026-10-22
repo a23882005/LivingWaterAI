@@ -93,3 +93,13 @@ def test_source_table_preserved_exactly(data,tmp_path):
     with sqlite3.connect(p) as db:
         assert db.execute('select * from original').fetchall()==[(58,)]
         assert db.execute("select sql from sqlite_master where name='original'").fetchone()==('CREATE TABLE original(value integer)',)
+
+
+def test_lost_ack_lookup_survives_expired_session(data):
+    d=Fake(data);w.initialize(d,'run');d.fail='after-upload'
+    with pytest.raises(OSError):w.apply(d,'run',body())
+    d.fail=None
+    assert w.lookup(d,'run','synthetic-A','one')=={'found':True,'delta':7,'value':7}
+    assert w.lookup(d,'run','synthetic-B','one')['found'] is False
+    assert w.lookup(d,'run','synthetic-A','uncommitted')['found'] is False
+    assert d.count==1

@@ -23,7 +23,7 @@ def build():
     public.mkdir(parents=True,exist_ok=True);private.mkdir(parents=True,exist_ok=True)
     bridge='''
 set_time_limit(300);
-function drive_call($body) {
+function drive_reply($body) {
     $script=dirname(__DIR__,2).'/.family-b04-shared-__RUN_ID__/shared_drive_writer.py';
     $pipes=[];
     $process=proc_open(['python3',$script,'call'],[0=>['pipe','r'],1=>['pipe','w'],2=>['file','/dev/null','a']],$pipes);
@@ -32,8 +32,24 @@ function drive_call($body) {
     $reply=stream_get_contents($pipes[1],8192);fclose($pipes[1]);
     $code=proc_close($process);
     $result=json_decode($reply,true);
-    if ($code!==0 || !is_array($result) || !isset($result['value'])) throw new Exception('WRITER_RETRY');
+    if ($code!==0 || !is_array($result) || isset($result['error'])) throw new Exception('WRITER_RETRY');
+    return $result;
+}
+function drive_call($body) {
+    $result=drive_reply($body);
+    if (!isset($result['value'])) throw new Exception('WRITER_VALUE_MISSING');
     return (int)$result['value'];
+}
+function reconcile_pending($query,$account) {
+    $pending=$query("SELECT seq,request_id,delta FROM jobs WHERE account=? AND state IN ('QUEUED','RECONCILE') ORDER BY seq",[$account])->fetchAll(PDO::FETCH_ASSOC);
+    foreach($pending as $job) {
+        $receipt=drive_reply(['account'=>$account,'lookup_id'=>$job['request_id']]);
+        if (!array_key_exists('found',$receipt)) throw new Exception('RECEIPT_MISSING');
+        if ($receipt['found']) {
+            if ((int)$receipt['delta']!==(int)$job['delta']) throw new Exception('RECEIPT_COLLISION');
+            $query("UPDATE jobs SET state='DONE',result=? WHERE seq=?",[(int)$receipt['value'],$job['seq']]);
+        }
+    }
 }
 '''.replace('__RUN_ID__',run)
     php=(hosted.ROOT/'public/index.php').read_text()
@@ -45,6 +61,12 @@ function drive_call($body) {
     assert old in php;php=php.replace(old,new)
     old="$v=$query('SELECT value FROM counters WHERE account=?',[$account])->fetchColumn();"
     assert old in php;php=php.replace(old,"$v=drive_call(['account'=>$account,'expires'=>(int)$s['expires']]);")
+    # Resolve remote commits before an old session cancels its unfinished queue.
+    php=php.replace("if (!$valid) {\n            $query", "if (!$valid) {\n            reconcile_pending($query,$account);\n            $query")
+    php=php.replace("elseif ($op==='logout') {", "elseif ($op==='logout') {\n            try { reconcile_pending($query,$account); } catch(Throwable $ignored) {\n                $query(\"UPDATE jobs SET state='RECONCILE' WHERE account=? AND state='QUEUED'\",[$account]);\n            }")
+    # Invalid-session login reconciles both states, then cancels remaining ones.
+    old="UPDATE jobs SET state='CANCELLED' WHERE account=? AND state='QUEUED'"
+    php=php.replace(old,"UPDATE jobs SET state='CANCELLED' WHERE account=? AND state IN ('QUEUED','RECONCILE')",1)
     php=php.replace('.family-w7-probe-', '.family-b04-shared-')
     (public/'index.php').write_text(php)
     for name in ['shared_drive_writer.py','actions_drive_write_probe.py']:
@@ -89,19 +111,26 @@ def verify():
     check('lost_commit_ack_returns_retry',call('chatA','drain')[0]==503)
     check('restart_recovers_without_double_apply',call('actionA','drain')[1]['result']['value']==16)
     check('queue_receipt_after_recovery',call('chatA','status',{'request_id':'crash-after-upload'})[1]['result']['state']=='DONE')
+    call('actionA','submit',{'request_id':'crash-after-upload-logout','delta':2})
+    check('second_lost_ack_returns_retry',call('chatA','drain')[0]==503)
+    check('logout_after_lost_ack',call('chatA','logout')[0]==200)
+    check('action_revoked_at_boundary',call('actionA','read')[0]==401)
+    call('chatA','login')
+    check('relogin_reconciles_committed_receipt',call('chatA','status',{'request_id':'crash-after-upload-logout'})[1]['result']['state']=='DONE')
+    check('relogin_preserves_single_apply',call('chatA','drain')[1]['result']['value']==18)
     check('other_account_unchanged',call('chatB','read')[1]['result']['value']==0)
     check('other_account_receipt_denied',call('chatB','status',{'request_id':'one'})[0]==404)
     call('chatA','submit',{'request_id':'cancel','delta':90});call('chatA','logout')
     check('logout_revokes_action',call('actionA','read')[0]==401)
     call('chatA','login')
     check('logout_cancels_pending',call('chatA','status',{'request_id':'cancel'})[1]['result']['state']=='CANCELLED')
-    check('relogin_preserves_drive_data',call('chatA','read')[1]['result']['value']==16)
+    check('relogin_preserves_drive_data',call('chatA','read')[1]['result']['value']==18)
     payload=Drive().read()
     with tempfile.TemporaryDirectory() as f:
         path=Path(f)/'readback.db';path.write_bytes(payload)
         with sqlite3.connect(path) as db:
-            check('independent_actions_drive_readback',db.execute("select value from b04s_counters where account='synthetic-A'").fetchone()==(16,))
-            check('six_unique_drive_receipts',db.execute('select count(*) from b04s_receipts').fetchone()==(6,))
+            check('independent_actions_drive_readback',db.execute("select value from b04s_counters where account='synthetic-A'").fetchone()==(18,))
+            check('seven_unique_drive_receipts',db.execute('select count(*) from b04s_receipts').fetchone()==(7,))
             check('original_source_table_preserved',db.execute("select count(*) from sqlite_master where type='table' and name not like 'b04s_%'").fetchone()[0]>0)
     return {'schema':'Family-B04-shared-writer-v1','status':'PASS','scope':'TEMP_ONLY_HOSTED_QUEUE_TO_DRIVE','run':run,'checks':checks,'count':len(checks),'drive_sha256_before_cleanup':hashlib.sha256(payload).hexdigest()}
 

@@ -108,6 +108,17 @@ def apply(d, run, body, crash=False):
     patch(d, {'last': digest(candidate), 'before': None, 'after': None})
     return result
 
+def lookup(d, run, account, request_id):
+    if account not in ('synthetic-A','synthetic-B') or not isinstance(request_id,str) or not 1 <= len(request_id) <= 128:
+        raise RuntimeError('invalid_lookup')
+    payload=resolve(d,run)
+    with tempfile.TemporaryDirectory() as folder:
+        path=Path(folder)/'lookup.db';path.write_bytes(payload)
+        with sqlite3.connect(path.as_uri()+'?mode=ro',uri=True) as db:
+            exists=db.execute("select 1 from sqlite_master where name='b04s_receipts'").fetchone()
+            row=db.execute('select delta,result from b04s_receipts where account=? and request_id=?',(account,request_id)).fetchone() if exists else None
+    return {'found':bool(row),'delta':row[0] if row else None,'value':row[1] if row else None}
+
 def cleanup(d, run):
     p = props(d)
     if not p.get(PREFIX+'run'): return {'state':'CLEAN'}
@@ -146,7 +157,10 @@ def main():
         elif mode=='call':
             body=json.loads(sys.stdin.read(8193))
             # Controlled crash only for this disposable acceptance-test request.
-            result=apply(d,config['run'],body,crash=body.get('request_id')=='crash-after-upload')
+            if 'lookup_id' in body:
+                result=lookup(d,config['run'],body['account'],body['lookup_id'])
+            else:
+                result=apply(d,config['run'],body,crash=body.get('request_id','').startswith('crash-after-upload'))
         else: raise RuntimeError('unknown_operation')
         print(json.dumps(result))
 

@@ -508,7 +508,8 @@
   "notes": [
     "Task提交八個原始欄位，不直接手填衍生m06；builder依V70-3-27公式計算。",
     "m03三欄只接受明示Forward/FY1，TTM未採用。",
-    "candidate_checks每項恰好四筆；FOUND/NOT_FOUND/BLOCKED/METRIC_MISMATCH均如實保留。"
+    "candidate_checks每項恰好四筆；FOUND/NOT_FOUND/BLOCKED/METRIC_MISMATCH均如實保留。",
+    "Fed現行目標區間原始擷取證據：data/audit/fed_target_evidence_20261023_035201_TPE.json。"
   ]
 }
 

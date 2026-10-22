@@ -15,3 +15,7 @@ PR25合併0bb3eb10a0c6552d5a28597c1b568d314306efad；切換執行commit a766fcfb
 Drive：獨立爬蟲與HTML讀回同版；爬蟲ZIP同ID更新並讀回SHA256=41a42df3d8e7636b38a4aa50ad700627d1a177e89e0ad4330dd64d7bff892411。完整發布ZIP、配對JSON與四治理同步為本項最後收尾，完成讀回後更新Checkpoint。
 
 正式Family W7驗收仍0/29。Production HOLD、交易NONE、W4取消、RM17凍結，BR結案成果及限制沿用。正式家人/共用/帳號DB僅Drive。下一工序由本人完成A13收尾後A14，再B01。
+
+
+## 完成交付複驗
+完整包納入全部W7修復程式/契約/六項必要測試及其相依、正式發布日曆；從包內直接65/65測試PASS，獨立建置ready=true、22/22。完整包/工作包/配對JSON完成同ID更新與逐位元讀回；最終SHA以根檔案管理及A14治理憑證為準。A13 PASS；A14驗收登記後接B01。

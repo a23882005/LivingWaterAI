@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-A13",
+  "current_work": "W7-B01",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -13,13 +13,17 @@
     "W7-A06快取錯誤與來源診斷保存、CSV/JSON/報告測試",
     "W7-A07最新診斷與歷史分離、歷史復原、診斷告警及期限盤點",
     "W7-A09共用政策邊界與歸檔負向測試、Action實跑",
-    "W7-A10真實Chromium 31案例含瀏覽器算分→歸檔冪等"
+    "W7-A10真實Chromium 31案例含瀏覽器算分→歸檔冪等",
+    "W7-A04真實Task切換、輸出提交與證據讀回",
+    "W7-A08 main核心/診斷/artifact/狀態分支同批驗證",
+    "W7-A11正式部署與完整線上HTML/JSON/receipt驗證",
+    "W7-A12真實每日分數歸檔與歷史/月度資料驗證",
+    "W7-A13完整交付包自足建置與65測試、雙端逐檔驗證",
+    "W7-A14總經故障階段驗收及治理結案"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
-  "in_progress": [
-    "W7-A13 真實資料、發布、歸檔PASS；完整Drive包及治理同步收尾"
-  ],
+  "in_progress": [],
   "source_versions": {
     "main": "52fcb582dc5ab0e5deee70db1430738d39236436",
     "handoff": "20261022-H2",
@@ -42,7 +46,7 @@
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "真實核心重跑已完成；新版Task補充資料及正式發布/歸檔/完整Drive包待A13接續。"
   ],
-  "next_action": "本人A13協調Task/消費端切換、真實來源重跑、發布讀回、歸檔及正式交付包同版",
+  "next_action": "本人從W7-B01定位四家人、共用與帳號正式DB及原計算器，依v1.5.10施工",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -50,7 +54,7 @@
     "W4": "CANCELLED",
     "RM17": "FROZEN"
   },
-  "current_work_status": "IN_PROGRESS",
+  "current_work_status": "READY_NOT_STARTED",
   "verification": {
     "new_tests": "5/5 PASS",
     "existing_d009_tests": "9/9 PASS",
@@ -87,13 +91,14 @@
       "task_status": "completed",
       "crawler_zip_sha256": "41a42df3d8e7636b38a4aa50ad700627d1a177e89e0ad4330dd64d7bff892411",
       "crawler_zip_backup": "187kFwJ1R_UURP-z37054dh2xg5pPqhM7",
-      "formal_release": "LIVE_VERIFIED_PENDING_DRIVE_PACKAGE_SYNC",
+      "formal_release": "PASS_LIVE_VERIFIED",
       "supplement_commit": "950921e627541e4dec218aa20ecf6ab8569faff4",
       "deployment_run": 39763653456,
       "deployment_result": "success",
       "archive_score": 57.196,
-      "archive_status": "FORMAL_VALID"
+      "archive_status": "FORMAL_VALID",
+      "package_tests": "65/65 PASS; standalone site build ready 22/22"
     }
   },
-  "review_note": "A04/A08/A11/A12真實後段驗證完成；A13交付治理收尾。"
+  "review_note": "A01～A14總經故障階段驗收PASS；正式W7仍0/29。B01由本人接續，總經既有來源例外與研究限制完整保留。"
 }

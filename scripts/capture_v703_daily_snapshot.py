@@ -14,6 +14,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+try:
+    from validate_v703_publication import validate_current_contract
+except ModuleNotFoundError:
+    from scripts.validate_v703_publication import validate_current_contract
+
 FIELDS = [
     "daily_record_id", "observation_date", "run_timestamp_utc", "feed_asof_utc",
     "v70_version", "source_commit", "feed_sha256", "health_score", "score_status",
@@ -51,6 +56,11 @@ def validate_feed(feed: dict) -> dict:
 def build_record(feed: dict, browser_snapshot: dict, run_timestamp_utc: str,
                  source_commit: str, feed_sha256: str) -> dict[str, str]:
     indicators = validate_feed(feed)
+    try:
+        run_time=datetime.fromisoformat(run_timestamp_utc.replace('Z','+00:00'))
+        validate_current_contract(feed,run_time)
+    except (ValueError,TypeError,AttributeError) as exc:
+        raise CaptureError('Current publication contract failed: '+str(exc)) from exc
     if browser_snapshot.get("verified") is not True or browser_snapshot.get("canPublish") is not True:
         raise CaptureError("Live V70 page did not verify the feed and formal calculation")
     latest = browser_snapshot.get("latest")
@@ -67,6 +77,7 @@ def build_record(feed: dict, browser_snapshot: dict, run_timestamp_utc: str,
     if latest.get("syntheticInputs") is True or str(latest.get("status", "")).startswith("DEMO_"):
         raise CaptureError("Synthetic/demo calculation cannot be archived as V70 daily data")
     try:
+        if isinstance(latest["macroSafety"],bool):raise ValueError("boolean score")
         score = float(latest["macroSafety"])
     except (KeyError, TypeError, ValueError) as exc:
         raise CaptureError("Live page did not return mSafe_final") from exc
@@ -78,6 +89,7 @@ def build_record(feed: dict, browser_snapshot: dict, run_timestamp_utc: str,
     local_date = datetime.fromisoformat(feed["asOf"].replace("Z", "+00:00")).astimezone(
         ZoneInfo("Asia/Taipei")).date().isoformat()
     observation_date = feed.get("batchDateTaipei") or local_date
+    if observation_date != local_date:raise CaptureError("Batch date differs from Taipei feed date")
     raw_values = {key: ("NA" if row.get("value") is None or str(row.get("value")).strip() == ""
                         else row.get("value")) for key, row in indicators.items()}
     provenance = {key: row for key, row in indicators.items()}

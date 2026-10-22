@@ -1,0 +1,52 @@
+test_bad_child_and_derived_rejected (test_v703_publication.PublicationContractTests.test_bad_child_and_derived_rejected) ... ok
+test_live_payload_exact_match (test_v703_publication.PublicationContractTests.test_live_payload_exact_match) ... ok
+test_valid_and_expiry_boundary (test_v703_publication.PublicationContractTests.test_valid_and_expiry_boundary) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.019s
+
+OK
+test_archive_rechecks_current_policy_and_rejects_boolean_score (test_macro_safety_daily_capture.DailyCaptureTests.test_archive_rechecks_current_policy_and_rejects_boolean_score) ... ok
+test_conflicting_record_preserves_existing_archive_bytes (test_macro_safety_daily_capture.DailyCaptureTests.test_conflicting_record_preserves_existing_archive_bytes) ... ok
+test_daily_archive_append_is_idempotent_and_keeps_old_rows (test_macro_safety_daily_capture.DailyCaptureTests.test_daily_archive_append_is_idempotent_and_keeps_old_rows) ... ok
+test_formal_archive_rejects_demo_invalid_score_and_source_mismatch (test_macro_safety_daily_capture.DailyCaptureTests.test_formal_archive_rejects_demo_invalid_score_and_source_mismatch) ... ARCHIVE_CASE demo PASS
+ARCHIVE_CASE demo_status PASS
+ARCHIVE_CASE blocked PASS
+ARCHIVE_CASE unverified PASS
+ARCHIVE_CASE missing_values PASS
+ARCHIVE_CASE invalid_dates PASS
+ARCHIVE_CASE lineage PASS
+ARCHIVE_CASE nan PASS
+ARCHIVE_CASE overflow PASS
+ok
+test_gate_rejects_incomplete_or_mismatched_browser_capture (test_macro_safety_daily_capture.DailyCaptureTests.test_gate_rejects_incomplete_or_mismatched_browser_capture) ... ok
+test_verified_final_score_raw_na_and_source_data (test_macro_safety_daily_capture.DailyCaptureTests.test_verified_final_score_raw_na_and_source_data) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.032s
+
+OK
+test_calendar_month_elapsed_duration (test_macro_safety_monthly.MonthlyResearchTests.test_calendar_month_elapsed_duration) ... ok
+test_csv_reader_preserves_literal_na (test_macro_safety_monthly.MonthlyResearchTests.test_csv_reader_preserves_literal_na) ... ok
+test_delayed_retry_uses_actual_observation_date (test_macro_safety_monthly.MonthlyResearchTests.test_delayed_retry_uses_actual_observation_date) ... ok
+test_existing_delayed_snapshot_keeps_date_and_matures_return (test_macro_safety_monthly.MonthlyResearchTests.test_existing_delayed_snapshot_keeps_date_and_matures_return) ... ok
+test_existing_delayed_snapshot_refreshes_same_day_only (test_macro_safety_monthly.MonthlyResearchTests.test_existing_delayed_snapshot_refreshes_same_day_only) ... ok
+test_merge_preserves_timestamp_history_and_realized_return (test_macro_safety_monthly.MonthlyResearchTests.test_merge_preserves_timestamp_history_and_realized_return) ... ok
+test_merge_refresh_keeps_corrected_delayed_snapshot (test_macro_safety_monthly.MonthlyResearchTests.test_merge_refresh_keeps_corrected_delayed_snapshot) ... ok
+test_month_key_unique_and_atomic_rerun (test_macro_safety_monthly.MonthlyResearchTests.test_month_key_unique_and_atomic_rerun) ... ok
+test_monthly_scores_and_slopes_collect_without_publishing_unlicensed_prices (test_macro_safety_monthly.MonthlyResearchTests.test_monthly_scores_and_slopes_collect_without_publishing_unlicensed_prices) ... ok
+test_quarterly_input_fails_closed (test_macro_safety_monthly.MonthlyResearchTests.test_quarterly_input_fails_closed) ... ok
+test_real_months_slope_na_and_maturity (test_macro_safety_monthly.MonthlyResearchTests.test_real_months_slope_na_and_maturity) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.006s
+
+OK
+test_forecast_after_snapshot_is_not_used_and_empty_bank_is_na (test_bank_macro_monthly.BankMacroMonthlyTests.test_forecast_after_snapshot_is_not_used_and_empty_bank_is_na) ... ok
+test_implied_return_rejects_invalid_or_nonpositive_prices (test_bank_macro_monthly.BankMacroMonthlyTests.test_implied_return_rejects_invalid_or_nonpositive_prices) ... ok
+test_joins_each_bank_to_latest_known_forecast_and_preserves_na (test_bank_macro_monthly.BankMacroMonthlyTests.test_joins_each_bank_to_latest_known_forecast_and_preserves_na) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

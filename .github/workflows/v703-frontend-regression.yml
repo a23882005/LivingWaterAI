@@ -10,6 +10,8 @@ on:
       - 'tests/policy_case_matrix.py'
       - 'tests/test_v703_policy*.py'
       - 'tests/v703_browser_fixture.py'
+      - 'scripts/capture_v703_daily_snapshot.py'
+      - 'scripts/validate_v703_publication.py'
       - '系統工程/總經V70/V70-3-27.html'
       - 'tests/test_v703_monthly_release.py'
       - 'tests/test_v703_failure_mail.py'
@@ -166,6 +168,13 @@ jobs:
                   results.append(name);print('BROWSER_CASE',name,'PASS',flush=True)
               context,page=open_feed(feed())
               check('formal_valid',page.evaluate('window.v703CanPublishFormalAllocation()===true'),page)
+              from scripts.capture_v703_daily_snapshot import build_record,append_idempotent
+              from pathlib import Path
+              snapshot=page.evaluate("({verified:window.v703FeedVerified,canPublish:window.v703CanPublishFormalAllocation(),latest:window.v703Latest,sourceBatch:window.v703SourceBatch})")
+              record=build_record(feed(),snapshot,'2026-10-22T03:01:00Z','synthetic-test-commit','synthetic-test-hash')
+              archive=Path('build/w7-browser/synthetic_daily.csv')
+              check('browser_score_archive',append_idempotent(archive,record) and not append_idempotent(archive,record),page)
+
               for name,row,now,expected in cases():
                   actual=page.evaluate('x=>v703PolicyIssues(x.row,x.now).length===0',{'row':b._normalize(row,'m06_rate'),'now':now.timestamp()*1000})
                   check('shared_'+name,actual==expected,page)

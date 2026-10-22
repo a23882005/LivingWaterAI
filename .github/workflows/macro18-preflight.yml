@@ -17,6 +17,9 @@ on:
       - 'tests/test_macro18_*.py'
       - 'scripts/validate_macro18_outputs.py'
       - 'tests/test_v703_policy*.py'
+      - 'tests/test_v703_publication.py'
+      - 'scripts/validate_v703_publication.py'
+      - 'scripts/capture_v703_daily_snapshot.py'
       - 'tests/policy_case_matrix.py'
       - 'tests/test_macro_safety_daily_capture.py'
       - 'tests/test_v703_monthly_release.py'
@@ -47,7 +50,7 @@ jobs:
       - name: Policy and formal archive contract regression
         run: |
           set -o pipefail
-          for pattern in test_v703_policy*.py test_v703_monthly_release.py test_macro_safety_daily_capture.py test_macro_supplement_contract.py; do
+          for pattern in test_v703_policy*.py test_v703_monthly_release.py test_macro_safety_daily_capture.py test_macro_supplement_contract.py test_v703_publication.py test_macro_safety_monthly.py test_bank_macro_monthly.py; do
             python -m unittest discover -s tests -p "$pattern" -v 2>&1 | tee -a build/repair-qa/policy-archive.log
           done
       - uses: actions/upload-artifact@v4

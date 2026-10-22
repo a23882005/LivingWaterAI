@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-10-22T10:18:00+08:00",
-  "as_of_taipei": "2026-10-22 10:18:00",
+  "generated_at": "2026-10-22T18:21:19+08:00",
+  "as_of_taipei": "2026-10-22T18:21:19+08:00",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -11,21 +11,50 @@
       "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
       "method": "Federal Reserve官方政策頁目前目標區間3.75%–4.00%之算術中點；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方頁直接顯示自2026-09-17起目標區間為3.75%–4.00%，中點3.875%；FRED/ALFRED本輪均為維護或連線錯誤，未冒充成功。",
-      "retrieval_time": "2026-10-22T10:18:00+08:00",
+      "detail": "Fed官方頁直接顯示自2026-09-17起目標區間為3.75%–4.00%，中點3.875%；2026-10-22 18:21:19台灣時間重新直接核實現行性並保存原始擷取內容與SHA256；FRED/ALFRED早間查核均為維護或連線錯誤，未冒充成功。",
+      "retrieval_time": "2026-10-22T18:21:19+08:00",
       "publication_date": "2026-09-16",
       "vintage": "current target range effective 2026-09-17",
+      "policy_schema": "fed-target-evidence-v1",
+      "effective_date": "2026-09-17",
+      "lower_bound": {
+        "value": 3.75,
+        "effective_date": "2026-09-17"
+      },
+      "upper_bound": {
+        "value": 4.0,
+        "effective_date": "2026-09-17"
+      },
+      "last_verified_at": "2026-10-22T18:21:19+08:00",
+      "source_evidence": {
+        "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+        "checked_at": "2026-10-22T18:21:19+08:00",
+        "result": "CURRENT_CONFIRMED",
+        "excerpt": "2026 policy table: September 17; increase 25; decrease 0; level 3.75-4.00. Last Update: September 16, 2026.",
+        "response_sha256": "ba24344feefc74b5b64c1a7a93859051a4195aec5b415aec0f8711ea0066dc4e",
+        "effective_date": "2026-09-17",
+        "publication_date": "2026-09-16",
+        "lower_bound": {
+          "value": 3.75,
+          "effective_date": "2026-09-17"
+        },
+        "upper_bound": {
+          "value": 4.0,
+          "effective_date": "2026-09-17"
+        },
+        "value": 3.875
+      },
       "candidate_checks": [
         {
           "site": "Federal Reserve",
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC目標區間",
           "status": "FOUND",
-          "checked_at": "2026-10-22T10:18:00+08:00",
+          "checked_at": "2026-10-22T18:21:19+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
-          "notes": "官方頁直接顯示目前目標區間3.75%–4.00%。"
+          "notes": "官方頁重新直接顯示目前目標區間3.75%–4.00%；擷取原文另存稽核檔，內容SHA256=ba24344feefc74b5b64c1a7a93859051a4195aec5b415aec0f8711ea0066dc4e。"
         },
         {
           "site": "FRED DFEDTARL",
@@ -482,3 +511,4 @@
     "candidate_checks每項恰好四筆；FOUND/NOT_FOUND/BLOCKED/METRIC_MISMATCH均如實保留。"
   ]
 }
+

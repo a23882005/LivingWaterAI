@@ -1,0 +1,72 @@
+[
+  {
+    "archive": "W5_FULL.zip",
+    "member": "w2/runtime/c_configuration_core/work17/target_draft.py",
+    "sha256": "5a3694ffe0613a30bbdca7f6d82054dfe4c39f7919076d50e04a66e16e3c7640",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W5_FULL.zip",
+    "member": "w2/runtime/c_configuration_core/work18/target_confirmation.py",
+    "sha256": "e43bdd331e876673d646a577117bfe4ded8176af19470926cd66523fab5c1060",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W5_FULL.zip",
+    "member": "w2/tests/test_w2_17_target_draft.py",
+    "sha256": "60ca0f77e29dc304b19af11357366207bcabea85790d71592eae3b06acb851a0",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W5_FULL.zip",
+    "member": "w2/tests/test_w2_18_target_confirmation.py",
+    "sha256": "5c00b0ef4a419bac6fffb1a82307bdc7486069f2f2d67a33a32f5d3602f4441c",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/package.py",
+    "sha256": "feb3122ce56bfbbc2cfe64f306d1f7df8083a24aed078e4faa0402c9161b0413",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/reader.mjs",
+    "sha256": "6f08332cf1c280e07f607e5fcdf53acf2f7c8c7f05f5c74826e5e36f08588d83",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/render.mjs",
+    "sha256": "03342a940db10c4776cc07aab11d9b8c5571e073f957721f0a91cc9749930e5b",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/report.mjs",
+    "sha256": "7380f5e583cedcc24f550f9183c1f3e1445c2702e847111daa309647a8e77348",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/validate.mjs",
+    "sha256": "f594b23adbec10466e12955dd03612b6a91e6c1851d4cfbe9982c4a8507833d6",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  },
+  {
+    "archive": "W6_FINAL.zip",
+    "member": "sources/rebuild/src_v16/workbook.mjs",
+    "sha256": "8ac0718c3210167aaa2c5243c9d43f84f939722d6f8dab43fb7753e41e8b4d66",
+    "git_main_path": null,
+    "disposition": "PROMOTE_EXACT_ACCEPTED_SOURCE_TO_GITHUB_BEFORE_RUNTIME_INTEGRATION"
+  }
+]

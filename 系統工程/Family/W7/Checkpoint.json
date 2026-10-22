@@ -52,7 +52,7 @@
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "B01名稱搜尋漏列系統工程/資料庫內四個16384-byte舊DB；未改舊庫，維持已驗收W5四庫現用ID映射，補正不得以搜尋空結果宣稱不存在。"
   ],
-  "next_action": "本人完成其餘W5/C/WORK12逐檔處置與每日資料版本鎖修正，再驗收B03進B04",
+  "next_action": "本人完成其餘W5/C/WORK12逐檔語意讀寫處置清冊，再驗收B03接B04",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -113,11 +113,12 @@
       "python_ast_modules": 115,
       "dynamic_schema_checks": 26,
       "accepted_frozen_lock_checks": 115,
-      "current_lock_mismatches": 1,
+      "current_lock_mismatches": 0,
       "synthetic_code_tamper": "REJECTED",
       "missing_github_sources": "2 W2 producers + 2 tests + 6 W6 renderer files located in accepted archives",
       "W2_source_integration": "6 exact accepted source files, original tests 9/9 and W5 seam tests 4/4 PASS",
-      "W6_disposition": "6 renderer files reviewed; data/template dependencies and B16 parameterization recorded"
+      "W6_disposition": "6 renderer files reviewed; data/template dependencies and B16 parameterization recorded",
+      "macro_lock_repair": "Immutable accepted fixture preserves original SHA; original verifier 115/115; 5/5 separation tests PASS"
     }
   },
   "review_note": "A01～A14、B01/B02來源盤點完成；B03施工中。正式W7 0/29維持。B02不含B12/B20/B21正式運行接線。"

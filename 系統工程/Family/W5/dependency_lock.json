@@ -222,10 +222,12 @@
     "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
   },
   {
-    "path": "系統工程/總經V70/V70_macro_latest.json",
+    "path": "系統工程/Family/W5/tests/fixtures/macro/V70_macro_W5_accepted.json",
     "sha": "ca92c88643750ea73389d05c10421793b01669de",
     "sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
-    "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
+    "reason": "Preserve W5 accepted bytes and hash as immutable fixture; current macro data is read and validated by P70-5 and macro_source_bridge separately.",
+    "source_path": "系統工程/總經V70/V70_macro_latest.json",
+    "role": "IMMUTABLE_ACCEPTANCE_FIXTURE"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/__init__.py",

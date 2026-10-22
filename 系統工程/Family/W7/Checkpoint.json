@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-B01",
+  "current_work": "W7-B02",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -19,13 +19,14 @@
     "W7-A11正式部署與完整線上HTML/JSON/receipt驗證",
     "W7-A12真實每日分數歸檔與歷史/月度資料驗證",
     "W7-A13完整交付包自足建置與65測試、雙端逐檔驗證",
-    "W7-A14總經故障階段驗收及治理結案"
+    "W7-A14總經故障階段驗收及治理結案",
+    "W7-B01四戶獨立正式DB建立、身分/版本/schema登錄與Drive讀回"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
   "in_progress": [],
   "source_versions": {
-    "main": "52fcb582dc5ab0e5deee70db1430738d39236436",
+    "main": "33a50ff82e626a776d2eee904deae80a81c9e361",
     "handoff": "20261022-H2",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad"
@@ -46,7 +47,7 @@
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "真實核心重跑已完成；新版Task補充資料及正式發布/歸檔/完整Drive包待A13接續。"
   ],
-  "next_action": "本人從W7-B01定位四家人、共用與帳號正式DB及原計算器，依v1.5.10施工",
+  "next_action": "本人W7-B02定位共用績效正式來源、schema及既有計算函式",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -98,7 +99,8 @@
       "archive_score": 57.196,
       "archive_status": "FORMAL_VALID",
       "package_tests": "65/65 PASS; standalone site build ready 22/22"
-    }
+    },
+    "B01": "4/4 identity match, SQLite integrity ok, foreign keys 0 errors, Drive byte readback PASS, root owner-only"
   },
-  "review_note": "A01～A14總經故障階段驗收PASS；正式W7仍0/29。B01由本人接續，總經既有來源例外與研究限制完整保留。"
+  "review_note": "A01～A14結案；B01完成，四庫原驗收bytes不變、owner-only，詳細私有登錄僅Drive。B02接續。"
 }

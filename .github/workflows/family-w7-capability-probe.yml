@@ -31,3 +31,44 @@ jobs:
           name: family-w7-synthetic-capability-${{ github.run_id }}
           path: synthetic-results.xml
       - run: echo 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> "$GITHUB_STEP_SUMMARY"
+  existing-service-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read only the existing Hostinger runtime capabilities
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          command_timeout: 60s
+          script: |
+            if command -v php >/dev/null 2>&1; then
+              php -r 'echo "FAMILY_B04_CAPABILITIES ".json_encode(["php"=>PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION,"pdo_sqlite"=>extension_loaded("pdo_sqlite"),"curl"=>extension_loaded("curl"),"openssl"=>extension_loaded("openssl")]).PHP_EOL;'
+            else
+              echo 'FAMILY_B04_CAPABILITIES {"php":false}'
+            fi
+            if command -v python3 >/dev/null 2>&1; then
+              python3 -c 'import json,sys,sqlite3; print("FAMILY_B04_PYTHON "+json.dumps({"python":"%d.%d"%sys.version_info[:2],"sqlite":sqlite3.sqlite_version}))'
+            else
+              echo 'FAMILY_B04_PYTHON {"python":false}'
+            fi
+      - name: Verify designated Family Drive connection with TEMP read only
+        env:
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: python 系統工程/Family/W7/probes/actions_drive_read_probe.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b04-connection-${{ github.run_id }}
+          path: build/family-b04/drive-read.json
+          if-no-files-found: warn

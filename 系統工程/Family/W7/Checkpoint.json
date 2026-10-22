@@ -1,8 +1,8 @@
 {
-  "schema": "Family-W7-checkpoint-v1",
+  "schema": "Family-W7-checkpoint-v2",
   "owner": "Family中PM本人",
   "mode": "sequential",
-  "contract_version": "v1.5.10",
+  "contract_version": "v1.6.0",
   "current_work": "W7-B04",
   "completed": [
     "H2接任核對",
@@ -25,13 +25,11 @@
     "W7-B03 169檔存取/呼叫/動態依賴逐檔處置、W2/W6/WORK12接線責任與來源鎖核對完成",
     "H3接任實體校驗及B04可用工具/官方能力查核完成"
   ],
-  "formal_W7_accepted": 0,
-  "formal_W7_total": 29,
   "in_progress": [
-    "W7-B04可信Project/session與Chat/Action共同寫入入口能力驗證"
+    "W7-B04 家人帳號／四小時跨對話／共同寫入入口實測"
   ],
   "source_versions": {
-    "main": "bb9c2769dac7151261e586321ebf644332c456fa",
+    "main": "521074a65d85ceb7700effeed07df98fa384a9ea",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -64,7 +62,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "由總PM本人取得B04身分邊界與最小私有連接服務裁決；候選詳B04_TAKEOVER_REVIEW.md。核定後先合成接線實證，再B05。",
+  "next_action": "本人依v1.6.0簡化家人版完成B04最小接線實測；通過後依B05～B23循序，不再維護原29項進度。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -154,7 +152,8 @@
         "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39823921536",
         "log_excerpt": "2026-10-22T17:34:47.5797964Z 12 passed in 0.19s\n2026-10-22T17:34:48.5482332Z SHA256 digest of uploaded artifact zip is 86a2dd2ac701c47b9991ee1b9b1a0c03548e84993730e21ac49f647a3bcbbfa7\n2026-10-22T17:34:49.0399898Z Artifact family-w7-synthetic-capability-39823921536.zip successfully finalized. Artifact ID 12445502207\n2026-10-22T17:34:49.0401530Z Artifact family-w7-synthetic-capability-39823921536 has been successfully uploaded! Final size is 669 bytes. Artifact ID is 12445502207\n2026-10-22T17:34:49.0528448Z ##[group]Run echo 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\n2026-10-22T17:34:49.0529457Z \u001b[36;1mecho 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\u001b[0m\n"
       },
-      "takeover_review": "COMPLETED_AVAILABLE_INTERFACE_AUDIT; original Project/device identity and shared service still NOT_PROVEN"
+      "takeover_review": "能力查核沿用；後續按已核定簡化帳號方案施工，原生Project/device ID不再阻擋開工。",
+      "native_project_device_requirement": "REPLACED_BY_APPROVED_FAMILY_ACCOUNT_BOUNDARY"
     },
     "H3_takeover": {
       "payload_files": 363,
@@ -166,5 +165,39 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23接任完成；B04候選涉及原生Project/裝置邊界及私有服務，待指揮官裁決；現行契約與所有已驗收成果保持。"
+  "review_note": "2026-10-23指揮官核定：只用B01～B23，已完成B01～B03、B04進行中；家人帳號識別與最小存檔防覆蓋。",
+  "w7_progress": {
+    "scheme": "B01-B23",
+    "completed": 3,
+    "total": 23,
+    "current": "W7-B04",
+    "completed_ids": [
+      "W7-B01",
+      "W7-B02",
+      "W7-B03"
+    ],
+    "remaining_ids": [
+      "W7-B04",
+      "W7-B05",
+      "W7-B06",
+      "W7-B07",
+      "W7-B08",
+      "W7-B09",
+      "W7-B10",
+      "W7-B11",
+      "W7-B12",
+      "W7-B13",
+      "W7-B14",
+      "W7-B15",
+      "W7-B16",
+      "W7-B17",
+      "W7-B18",
+      "W7-B19",
+      "W7-B20",
+      "W7-B21",
+      "W7-B22",
+      "W7-B23"
+    ],
+    "rule": "唯一正式進度；每項依契約完成條件與證據裁定"
+  }
 }

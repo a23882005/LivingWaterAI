@@ -1,0 +1,13 @@
+name: LivingWaterAI Gmail Failure Notification QA
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  intentional-failure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Intentional isolated failure for Gmail notification verification
+        run: |
+          echo "::error::INTENTIONAL_NOTIFICATION_TEST_FAILURE; no production changes"
+          exit 1

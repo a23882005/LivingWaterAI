@@ -1,0 +1,16 @@
+{
+  "schema": "fed-target-evidence-v1/raw-audit",
+  "fetched_at": "2026-10-22T18:21:19+08:00",
+  "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+  "page_title": "Federal Reserve Board - Open Market Operations",
+  "extraction_method": "browser DOM innerText from the current 2026 target-rate table plus page Last Update line",
+  "raw_content": "2026\nMake Full Screen\nDate\tIncrease\tDecrease\tLevel (%)\nSeptember 17\t25\t0\t3.75-4.00\nLast Update: September 16, 2026",
+  "response_sha256": "ba24344feefc74b5b64c1a7a93859051a4195aec5b415aec0f8711ea0066dc4e",
+  "parsed": {
+    "publication_date": "2026-09-16",
+    "effective_date": "2026-09-17",
+    "lower_bound": 3.75,
+    "upper_bound": 4.0,
+    "midpoint": 3.875
+  }
+}

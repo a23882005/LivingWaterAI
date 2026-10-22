@@ -1,0 +1,178 @@
+{
+  "backend": {
+    "jobs": [
+      {
+        "id": 119762029440,
+        "name": "repair-qa",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39760153970,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Isolated repair regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Policy and formal archive contract regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          }
+        ]
+      },
+      {
+        "id": 119762031349,
+        "name": "preflight18",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 39760153970,
+        "logs_url": null,
+        "steps": null
+      },
+      {
+        "id": 119762032180,
+        "name": "notify-on-critical",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 39760153970,
+        "logs_url": null,
+        "steps": null
+      }
+    ]
+  },
+  "browser": {
+    "jobs": [
+      {
+        "id": 119762029367,
+        "name": "w7-contract-browser",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39760153987,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Install Chromium",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "W7 policy and formal operation browser acceptance",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          }
+        ]
+      },
+      {
+        "id": 119762030857,
+        "name": "v703-browser",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 39760153987,
+        "logs_url": null,
+        "steps": null
+      }
+    ]
+  },
+  "deploy": {
+    "jobs": [
+      {
+        "id": 119762032329,
+        "name": "build-and-deploy",
+        "status": "completed",
+        "conclusion": "skipped",
+        "run_id": 39760154112,
+        "logs_url": null,
+        "steps": null
+      }
+    ]
+  }
+}

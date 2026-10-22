@@ -1,0 +1,8 @@
+test_action_rechecks_time_and_edits (test_v703_policy_frontend.FrontendTests.test_action_rechecks_time_and_edits) ... ok
+test_all_inline_script_syntax (test_v703_policy_frontend.FrontendTests.test_all_inline_script_syntax) ... ok
+test_shared_backend_frontend_cases (test_v703_policy_frontend.FrontendTests.test_shared_backend_frontend_cases) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.223s
+
+OK

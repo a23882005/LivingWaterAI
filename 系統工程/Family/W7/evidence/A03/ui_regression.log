@@ -1,0 +1,13 @@
+test_five_bank_outlook_is_display_only_and_source_scoped (test_v703_outlook_ui.V703OutlookUITest.test_five_bank_outlook_is_display_only_and_source_scoped) ... ok
+test_four_health_thresholds (test_v703_outlook_ui.V703OutlookUITest.test_four_health_thresholds) ... ok
+test_html_document_and_unique_ids (test_v703_outlook_ui.V703OutlookUITest.test_html_document_and_unique_ids) ... ok
+test_missing_score_starts_as_na_and_four_bands_stay_visible (test_v703_outlook_ui.V703OutlookUITest.test_missing_score_starts_as_na_and_four_bands_stay_visible) ... ok
+test_original_data_and_risk_gates_remain (test_v703_outlook_ui.V703OutlookUITest.test_original_data_and_risk_gates_remain) ... ok
+test_raw_data_panel_keeps_explanation_visible_when_values_are_missing (test_v703_outlook_ui.V703OutlookUITest.test_raw_data_panel_keeps_explanation_visible_when_values_are_missing) ... ok
+test_raw_data_table_hides_method_and_source_columns (test_v703_outlook_ui.V703OutlookUITest.test_raw_data_table_hides_method_and_source_columns) ... ok
+test_raw_data_table_shows_program_variable_names_with_full_grid (test_v703_outlook_ui.V703OutlookUITest.test_raw_data_table_shows_program_variable_names_with_full_grid) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.016s
+
+OK

@@ -1,0 +1,8 @@
+{
+  "id": "6a9401fbb0648191ad87e528dd375daf",
+  "title": "總體經濟狀況",
+  "prompt": "執行「總體經濟狀況」每日完整報告，保留原有09:00核心資料、10:00補充、11:00 builder／部署查核、V70-3-27最新GitHub main HTML與JSON核對、總經體質分、八群、通膨、信用、利率、就業、GDP、流動性、估值、Goldilocks、V82／債券V75、Actions／Hostinger／Gmail等全部原有職責與品質規則。新增最高優先報告必備段落：每次固定提供S&P 500未來3個月、6個月、12個月三種期限的前瞻預測；每一期分別列出基準、上行、下行、危機情境的報酬區間、主觀機率（合計100%）、中心判斷、主要依據、觸發與改判條件，並指出對VT／VWRA、VOO、QQQ及股票／債券配置的影響。每次根據最新已核實數據與最新正式HTML重新評估，標明資料日期、預測基準日及研究估計性質，不得照抄昨日數字、冒充回測或正式模型驗證；必要資料不足則清楚註明限制。維持每日10:00 Asia/Taipei原排程、啟用狀態、通知功能及其餘既有任務規則。",
+  "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Taipei:20261018T100000\nRRULE:FREQ=DAILY;BYHOUR=10;BYMINUTE=0;BYSECOND=0\nEND:VEVENT",
+  "is_enabled": true,
+  "updated_at": "2026-10-22T02:13:41.935586+00:00"
+}

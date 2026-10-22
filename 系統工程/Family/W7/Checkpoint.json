@@ -1,0 +1,72 @@
+{
+  "schema": "Family-W7-checkpoint-v1",
+  "owner": "Family中PM本人",
+  "mode": "sequential",
+  "contract_version": "v1.5.10",
+  "current_work": "W7-A13",
+  "completed": [
+    "H2接任核對",
+    "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
+    "W7-A02共同政策證據契約、builder驗證與12項測試",
+    "W7-A03前後端契約一致、正式配置當下重驗及開頁過期保護",
+    "W7-A05每日程序口徑補正（正式交付包A13切換）",
+    "W7-A06快取錯誤與來源診斷保存、CSV/JSON/報告測試",
+    "W7-A07最新診斷與歷史分離、歷史復原、診斷告警及期限盤點",
+    "W7-A09共用政策邊界與歸檔負向測試、Action實跑",
+    "W7-A10真實Chromium 31案例含瀏覽器算分→歸檔冪等"
+  ],
+  "formal_W7_accepted": 0,
+  "formal_W7_total": 29,
+  "in_progress": [
+    "W7-A04 PREPARED_PENDING_A13_ACTIVATION：實際Task切換與真實產出讀回待A13",
+    "W7-A08 IMPLEMENTED_PENDING_A13：隔離接線完成；main診斷保存與產物/狀態分支一致讀回待A13",
+    "W7-A11 IMPLEMENTED_PENDING_A13：發布前共同契約與完整線上比對接線完成，正式發布驗收於A13",
+    "W7-A12 IMPLEMENTED_PENDING_A13：歸檔契約及月度相依回歸完成，真實來源正式歸檔於A13"
+  ],
+  "source_versions": {
+    "main": "e90855a805459dca63210fecbfdf3334ccacc672",
+    "handoff": "20261022-H2",
+    "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576"
+  },
+  "evidence": [
+    "evidence/A01/",
+    "evidence/A02/",
+    "evidence/A03/",
+    "evidence/A04/",
+    "evidence/A06/",
+    "evidence/A07/",
+    "evidence/A09/",
+    "evidence/A10/",
+    "evidence/A11_A12/"
+  ],
+  "issues": [
+    "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
+    "GitHub runner修補後整鏈重跑於A13；當前為本機真實FRED CSV驗證。"
+  ],
+  "next_action": "本人A13協調Task/消費端切換、真實來源重跑、發布讀回、歸檔及正式交付包同版",
+  "next_owner": "Family中PM本人",
+  "controls": {
+    "production": "HOLD",
+    "trading": "NONE",
+    "W4": "CANCELLED",
+    "RM17": "FROZEN"
+  },
+  "current_work_status": "READY_NOT_STARTED",
+  "verification": {
+    "new_tests": "5/5 PASS",
+    "existing_d009_tests": "9/9 PASS",
+    "self_test": "PASS",
+    "github_readback": "tree matches local",
+    "drive_working_zip_id": "1MBqnDK7et_SCQCWzXQN4G4bU9jkSuwlr",
+    "A01_initial_zip_sha256": "382dd544cdb5e93a3d0d7628fc45ccd9984cb58424a515d9da08590b85cfea53",
+    "formal_release": "pending A13",
+    "A02_tests": "12/12 PASS + monthly 4/4 PASS",
+    "A03_tests": "3/3 Node runtime suites (13 shared policy cases + dynamic edit/expiry checks); UI regression log",
+    "A04_tests": "3/3 PASS，提示詞預備完成",
+    "A06_tests": "2/2 diagnostics + 5/5 source regression + self-test PASS",
+    "A07_tests": "12/12 state-alert + 7/7 source-output PASS",
+    "A08": "Isolated Actions run39757613903 repair-qa PASS, artifact upload PASS; preflight/notify skipped; formal main acceptance pending A13",
+    "A09_A12": "09h isolated run39760153970: 65/65 PASS; Chromium run39760153987: 31/31 PASS"
+  },
+  "review_note": "A09/A10完成；A11/A12隔離工程與測試完成，正式整鏈條件接A13由本人施工。"
+}

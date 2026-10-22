@@ -1,0 +1,17 @@
+test_bound_date_and_midpoint (test_v703_policy_evidence.PolicyEvidenceTests.test_bound_date_and_midpoint) ... ok
+test_changed_source_evidence_or_value (test_v703_policy_evidence.PolicyEvidenceTests.test_changed_source_evidence_or_value) ... ok
+test_exact_expiry_boundary (test_v703_policy_evidence.PolicyEvidenceTests.test_exact_expiry_boundary) ... ok
+test_four_children_fully_checked (test_v703_policy_evidence.PolicyEvidenceTests.test_four_children_fully_checked) ... ok
+test_future_effective (test_v703_policy_evidence.PolicyEvidenceTests.test_future_effective) ... ok
+test_malformed_numeric_is_rejected (test_v703_policy_evidence.PolicyEvidenceTests.test_malformed_numeric_is_rejected) ... ok
+test_missing_evidence (test_v703_policy_evidence.PolicyEvidenceTests.test_missing_evidence) ... ok
+test_normalization_preserves_evidence_no_new_clock (test_v703_policy_evidence.PolicyEvidenceTests.test_normalization_preserves_evidence_no_new_clock) ... ok
+test_old_effective_recent_evidence (test_v703_policy_evidence.PolicyEvidenceTests.test_old_effective_recent_evidence) ... ok
+test_old_retrieval_cannot_refresh_verification (test_v703_policy_evidence.PolicyEvidenceTests.test_old_retrieval_cannot_refresh_verification) ... ok
+test_timezone_future_and_clock_order (test_v703_policy_evidence.PolicyEvidenceTests.test_timezone_future_and_clock_order) ... ok
+test_wrong_unit (test_v703_policy_evidence.PolicyEvidenceTests.test_wrong_unit) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.002s
+
+OK

@@ -1,0 +1,72 @@
+test_bound_date_and_midpoint (test_v703_policy_evidence.PolicyEvidenceTests.test_bound_date_and_midpoint) ... ok
+test_changed_source_evidence_or_value (test_v703_policy_evidence.PolicyEvidenceTests.test_changed_source_evidence_or_value) ... ok
+test_exact_expiry_boundary (test_v703_policy_evidence.PolicyEvidenceTests.test_exact_expiry_boundary) ... ok
+test_four_children_fully_checked (test_v703_policy_evidence.PolicyEvidenceTests.test_four_children_fully_checked) ... ok
+test_future_effective (test_v703_policy_evidence.PolicyEvidenceTests.test_future_effective) ... ok
+test_malformed_numeric_is_rejected (test_v703_policy_evidence.PolicyEvidenceTests.test_malformed_numeric_is_rejected) ... ok
+test_missing_evidence (test_v703_policy_evidence.PolicyEvidenceTests.test_missing_evidence) ... ok
+test_normalization_preserves_evidence_no_new_clock (test_v703_policy_evidence.PolicyEvidenceTests.test_normalization_preserves_evidence_no_new_clock) ... ok
+test_old_effective_recent_evidence (test_v703_policy_evidence.PolicyEvidenceTests.test_old_effective_recent_evidence) ... ok
+test_old_retrieval_cannot_refresh_verification (test_v703_policy_evidence.PolicyEvidenceTests.test_old_retrieval_cannot_refresh_verification) ... ok
+test_timezone_future_and_clock_order (test_v703_policy_evidence.PolicyEvidenceTests.test_timezone_future_and_clock_order) ... ok
+test_wrong_unit (test_v703_policy_evidence.PolicyEvidenceTests.test_wrong_unit) ... ok
+test_action_rechecks_time_and_edits (test_v703_policy_frontend.FrontendTests.test_action_rechecks_time_and_edits) ... ok
+test_all_inline_script_syntax (test_v703_policy_frontend.FrontendTests.test_all_inline_script_syntax) ... ok
+test_shared_backend_frontend_cases (test_v703_policy_frontend.FrontendTests.test_shared_backend_frontend_cases) ... ok
+test_shared_contract_matrix (test_v703_policy_rate.PolicyRateBoundaryTests.test_shared_contract_matrix) ... POLICY_CASE valid_old_effective PASS
+POLICY_CASE effective_date PASS
+POLICY_CASE value PASS
+POLICY_CASE source_url PASS
+POLICY_CASE unit PASS
+POLICY_CASE last_verified_at PASS
+POLICY_CASE retrieval_time PASS
+POLICY_CASE publication_date PASS
+POLICY_CASE evidence_result PASS
+POLICY_CASE evidence_response_sha256 PASS
+POLICY_CASE evidence_excerpt PASS
+POLICY_CASE missing_evidence PASS
+POLICY_CASE bound_date PASS
+POLICY_CASE before_expiry PASS
+POLICY_CASE exact_expiry PASS
+ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.237s
+
+OK
+test_after_next_report_release_same_previous_month_must_fail (test_v703_monthly_release.OfficialMonthlyReleaseTests.test_after_next_report_release_same_previous_month_must_fail) ... ok
+test_calendar_rejects_untrusted_source_and_future_verification (test_v703_monthly_release.OfficialMonthlyReleaseTests.test_calendar_rejects_untrusted_source_and_future_verification) ... ok
+test_official_latest_september_observations_pass_after_day_46 (test_v703_monthly_release.OfficialMonthlyReleaseTests.test_official_latest_september_observations_pass_after_day_46) ... ok
+test_unverified_month_and_no_calendar_fail_closed (test_v703_monthly_release.OfficialMonthlyReleaseTests.test_unverified_month_and_no_calendar_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+OK
+test_conflicting_record_preserves_existing_archive_bytes (test_macro_safety_daily_capture.DailyCaptureTests.test_conflicting_record_preserves_existing_archive_bytes) ... ok
+test_daily_archive_append_is_idempotent_and_keeps_old_rows (test_macro_safety_daily_capture.DailyCaptureTests.test_daily_archive_append_is_idempotent_and_keeps_old_rows) ... ok
+test_formal_archive_rejects_demo_invalid_score_and_source_mismatch (test_macro_safety_daily_capture.DailyCaptureTests.test_formal_archive_rejects_demo_invalid_score_and_source_mismatch) ... ARCHIVE_CASE demo PASS
+ARCHIVE_CASE demo_status PASS
+ARCHIVE_CASE blocked PASS
+ARCHIVE_CASE unverified PASS
+ARCHIVE_CASE missing_values PASS
+ARCHIVE_CASE invalid_dates PASS
+ARCHIVE_CASE lineage PASS
+ARCHIVE_CASE nan PASS
+ARCHIVE_CASE overflow PASS
+ok
+test_gate_rejects_incomplete_or_mismatched_browser_capture (test_macro_safety_daily_capture.DailyCaptureTests.test_gate_rejects_incomplete_or_mismatched_browser_capture) ... ok
+test_verified_final_score_raw_na_and_source_data (test_macro_safety_daily_capture.DailyCaptureTests.test_verified_final_score_raw_na_and_source_data) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.008s
+
+OK
+test_complete_fixture (test_macro_supplement_contract.SupplementTests.test_complete_fixture) ... ok
+test_missing_extra_policy_and_stale (test_macro_supplement_contract.SupplementTests.test_missing_extra_policy_and_stale) ... ok
+test_prompt_preserves_original (test_macro_supplement_contract.SupplementTests.test_prompt_preserves_original) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK

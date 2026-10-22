@@ -18,6 +18,7 @@ import os
 import sys
 import time
 import tempfile
+import hashlib
 from pathlib import Path
 
 D009_RUN_STARTED=time.monotonic()
@@ -159,10 +160,12 @@ class Fetcher:
         self.s.get=cached_get
         self.frederrors={}
         self.fredsources={}
+        self.fredattempts={}
 
     def fred(self, series):
         if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
             raise TimeoutError('D009 fetch deadline: FRED request refused')
+        if hasattr(self,'job_series'): self.job_series.add(series)
         if series in self.fredcache: return self.fredcache[series]
         if series in self.frederrors: raise RuntimeError(self.frederrors[series])
         from io import StringIO
@@ -191,10 +194,13 @@ class Fetcher:
             params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json',
                               'observation_start':earliest})
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
+        retried=set()
+        self.fredattempts[series]=[]
         for provider,url in providers:
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
                 errors.append('D009 fetch deadline reached')
                 break
+            response=None
             try:
                 if provider in ('BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     current_year=dt.datetime.now().year
@@ -262,14 +268,37 @@ class Fetcher:
                         raise ValueError('Insufficient '+series+' history; missing '+','.join(missing))
                 self.fredcache[series]=out
                 self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
+                self.fredattempts[series].append({'provider':provider,'result':'OK',
+                    'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                    'observation_date':str(out.index[-1].date())})
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:
                 detail=str(exc)
                 if api_key: detail=detail.replace(api_key,'[REDACTED]')
                 diagnostic=provider+': '+type(exc).__name__+': '+detail[:220]
+                # HTTP 200 is not proof of valid provider data. Preserve safe
+                # response metadata, not response bodies or API credentials.
+                attempt={'provider':provider,'result':'FAILED','error':diagnostic,
+                         'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat()}
+                if response is not None:
+                    body=getattr(response,'content',b'')
+                    attempt.update(http_status=getattr(response,'status_code',None),
+                        content_type=getattr(response,'headers',{}).get('Content-Type',''),
+                        response_sha256=hashlib.sha256(body).hexdigest())
+                self.fredattempts[series].append(attempt)
                 errors.append(diagnostic)
                 print('DATA_SOURCE_FAILED',series,diagnostic,flush=True)
+                # A malformed successful FRED response used to be cached and
+                # immediately abandoned. Retry it once with the HTTP cache
+                # cleared; normal provider throttling/deadline still apply.
+                malformed=isinstance(exc,(ValueError,pd.errors.ParserError))
+                if (provider in ('FRED_OFFICIAL_API','FRED_CSV') and malformed
+                        and response is not None and getattr(response,'status_code',0)==200
+                        and provider not in retried):
+                    retried.add(provider)
+                    self._http_cache.pop((url,()),None)
+                    providers.insert(providers.index((provider,url))+1,(provider,url))
         message='All FRED sources failed for '+series+' | '+' | '.join(errors)
         self.frederrors[series]=message
         raise RuntimeError(message)
@@ -722,6 +751,8 @@ def run(outdir,overrides_path=None,cache_path=None):
     }
     results={}
     for k in LABELS:
+        started_at=dt.datetime.now(dt.timezone.utc).isoformat()
+        f.job_series=set()
         try:
             # Reserve final two minutes of the 20-minute job for validation and publishing.
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
@@ -734,6 +765,15 @@ def run(outdir,overrides_path=None,cache_path=None):
             else:r=row(k,src=(SOURCES.get(k) or [''])[0],method='須人工核實或授權 API',error=reasons.get(k,'無穩定來源'))
         except Exception as ex:
             r=row(k,src=(SOURCES.get(k) or [''])[0],method='抓取失敗',error=str(ex)[:220])
+        attempts={series:list(f.fredattempts.get(series,[])) for series in sorted(f.job_series)}
+        r.update(attempted_at=started_at, attempt_result='SUCCESS' if r.get('value') is not None else 'FAILED',
+                 source_attempts=attempts, cache_used=False, cache_source=None,
+                 last_verified_at=None, source_evidence=None)
+        # Only record successful provider evidence, never infer it from output time.
+        successes=[a for entries in attempts.values() for a in entries if a.get('result')=='OK']
+        if r.get('value') is not None and attempts and all(any(a.get('result')=='OK' for a in entries) for entries in attempts.values()):
+            r['last_verified_at']=min(a['verified_at'] for a in successes)
+            r['source_evidence']={'series':attempts}
         results[k]=r
         print(f"{k:9s} {r['status']:7s} {str(r['value']):>12s} {r['observation_date'] or '---'}",flush=True)
     # Optional dated and source-backed records; never overwrite the results automatically via HTML defaults.
@@ -748,6 +788,12 @@ def run(outdir,overrides_path=None,cache_path=None):
             if original['status']=='OK' and verified['observation_date']<original['observation_date']:
                 print('SKIP 舊覆寫:',k)
             else:
+                for field in ('attempted_at','attempt_result','source_attempts'):
+                    verified[field]=original.get(field)
+                verified['retrieval_error']=original.get('error','')
+                verified['cache_used']=False
+                verified['last_verified_at']=v.get('last_verified_at')
+                verified['source_evidence']=v.get('source_evidence')
                 results[k]=verified
                 if k=='m07': results['s03']=row('s03',verified['value'],verified['observation_date'],verified['source_url'],'同步複用 m07 人工驗證值')
     # Cached source-backed values are historical fallback, never silently treated as current.
@@ -773,6 +819,13 @@ def run(outdir,overrides_path=None,cache_path=None):
                         # as a retained reference, never a new live-source retrieval.
                         checked['status']='USABLE' if k in ('m04','m15','m18') else 'STALE'
                         checked['detail']='歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用'
+                        failed=results[k]
+                        checked.update(error=failed.get('error',''), retrieval_error=failed.get('error',''),
+                            attempted_at=failed.get('attempted_at'), attempt_result=failed.get('attempt_result','FAILED'),
+                            source_attempts=failed.get('source_attempts',{}), cache_used=True,
+                            cache_source={'file':Path(cache_path).name,'sha256':hashlib.sha256(Path(cache_path).read_bytes()).hexdigest(),
+                                          'generated_at':old.get('generated_at'),'observation_date':prior.get('observation_date')},
+                            last_verified_at=prior.get('last_verified_at'), source_evidence=prior.get('source_evidence'))
                         results[k]=checked
                     except (ValueError,TypeError,KeyError,OverflowError) as e:
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)
@@ -792,6 +845,10 @@ def run(outdir,overrides_path=None,cache_path=None):
         results['s03']=row('s03',a['value'],a['observation_date'],a['source_url'],'與 m07 同步',status=a['status'],detail='同一 VIX 數列')
     else:
         results['s03']=row('s03',src=SOURCES['m07'][0],method='與 m07 同步',error='m07 沒有可信值；禁止使用獨立 s03 備援')
+    for field in ('attempted_at','attempt_result','source_attempts','cache_used','cache_source','last_verified_at','source_evidence','retrieval_error'):
+        if field in a: results['s03'][field]=a[field]
+    for record in results.values():
+        record.setdefault('retrieval_error',record.get('error',''))
     summary={s:sum(x['status']==s for x in results.values()) for s in ('OK','USABLE','STALE','MISSING')}
     independent_ids=[key for key in LABELS if key!='s03']
     independent_summary={status:sum(results[key]['status']==status for key in independent_ids)
@@ -803,15 +860,19 @@ def run(outdir,overrides_path=None,cache_path=None):
     out=Path(outdir);out.mkdir(exist_ok=True,parents=True)
     atomic_write_text(out/'18_macro_verification.json',json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     with (out/'18_macro_verification.csv').open('w',newline='',encoding='utf-8-sig') as w:
-        fieldnames=list(next(iter(results.values())).keys());wr=csv.DictWriter(w,fieldnames=fieldnames)
-        wr.writeheader();wr.writerows(results.values())
+        fieldnames=list(dict.fromkeys(field for record in results.values() for field in record))
+        wr=csv.DictWriter(w,fieldnames=fieldnames)
+        wr.writeheader()
+        for record in results.values():
+            wr.writerow({key:json.dumps(value,ensure_ascii=False,sort_keys=True) if isinstance(value,(dict,list)) else value
+                         for key,value in record.items()})
     with (out/'18_macro_report.md').open('w',encoding='utf-8') as w:
         w.write('# 18 項獨立總經指標查核報告（19欄含s03重複VIX）\n\n')
-        w.write(f"產出時間：{report['generated_at']}；OK={summary['OK']}／STALE={summary['STALE']}／MISSING={summary['MISSING']}\n\n")
+        w.write(f"產出時間：{report['generated_at']}；OK={summary['OK']}／USABLE={summary['USABLE']}／STALE={summary['STALE']}／MISSING={summary['MISSING']}\n\n")
         w.write('| ID | 指標 | 值 | 真正觀測日 | 狀態 | 來源或卡點 |\n|---|---|---:|---|---|---|\n')
         for v in results.values():
             val=('-' if v['value'] is None else f"{v['value']:g} {v['unit']}")
-            desc='來源: '+(v['source_url'] or '無')+'；方式: '+v['method']+'；問題: '+v['error']+'；備註: '+v['detail']
+            desc='來源: '+(v['source_url'] or '無')+'；方式: '+v['method']+'；問題: '+v['error']+'；備註: '+v['detail']+'；取得結果: '+str(v.get('attempt_result'))+'；快取: '+str(v.get('cache_used',False))+'；最後核實: '+str(v.get('last_verified_at'))+'；診斷: '+json.dumps(v.get('source_attempts',{}),ensure_ascii=False)
             desc=desc.replace('|',';').replace('\n',' ') 
             w.write(f"| {v['id']} | {v['label']} | {val} | {v['observation_date'] or '-'} | {v['status']} | {desc} |\n")
         w.write('\n未驗證項目請查看 CSV/JSON 的 error/detail；不得將 MISSING 或 STALE 冒充最新正式值。\n')
@@ -1056,7 +1117,7 @@ def selftest():
     except ValueError:
         pass
     assert all(k not in LABELS for k in ('m06','m03_qqq','m03_spy','m03_vt'))
-    print('SELF-TEST PASS: 18 core indicators + s03 duplicate; nine V70-3-27 supplement inputs delegated')
+    print('SELF-TEST PASS: 18 core indicators + s03 duplicate; eight V70-3-27 supplement inputs delegated')
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser(description='V70.3 18 項自動抓取與已核定LEI基準')

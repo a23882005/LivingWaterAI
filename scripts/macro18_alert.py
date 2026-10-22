@@ -9,7 +9,7 @@ import argparse
 import datetime as dt
 import json
 from pathlib import Path
-from macro18_state import read_valid, atomic_write
+from macro18_state import read_valid, read_diagnostics, atomic_write
 
 CORE = {"m02", "m07", "m01", "m08", "m05", "m19"}
 BAD = {"STALE", "MISSING"}
@@ -24,14 +24,19 @@ def evaluate(report, previous, today):
             continue
         status = item["status"]
         before = old.get(key, {})
-        count = int(before.get("consecutive_failures", 0)) + 1 if status in BAD else 0
+        retrieval_failed=item.get("attempt_result")=="FAILED"
+        failed=status in BAD or retrieval_failed
+        count = int(before.get("consecutive_failures", 0)) + 1 if failed else 0
         last_alert = before.get("last_alert_date")
         should_alert = bool(count and last_alert != today and (count == 1 or count == 3 or (count > 3 and count % 3 == 0)))
-        if key in CORE and status in BAD and last_alert != today:
+        if key in CORE and failed and last_alert != today:
             should_alert = True
         if should_alert:
             alerts.append({"indicator": key, "status": status, "count": count,
-                           "observation_date": item.get("observation_date")})
+                           "observation_date": item.get("observation_date"),
+                           "retrieval_failed":retrieval_failed, "error":item.get("retrieval_error") or item.get("error",""),
+                           "attempted_at":item.get("attempted_at"),"cache_used":item.get("cache_used",False),
+                           "last_verified_at":item.get("last_verified_at"),"source_attempts":item.get("source_attempts",{})})
         updated[key] = {
             "consecutive_failures": count,
             "last_alert_date": today if should_alert else (last_alert if count else None),
@@ -43,10 +48,13 @@ def evaluate(report, previous, today):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--report", required=True)
+    p.add_argument("--diagnostics",help="latest diagnostics bound to this exact report")
     p.add_argument("--state", required=True)
     p.add_argument("--alert-file", required=True)
     args = p.parse_args()
     report = read_valid(args.report)
+    if args.diagnostics:
+        report=read_diagnostics(args.diagnostics,report)
     state_path = Path(args.state)
     if state_path.exists():
         try:

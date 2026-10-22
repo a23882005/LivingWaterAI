@@ -13,14 +13,54 @@ on:
       - 'scripts/macro18_alert.py'
       - 'tests/test_d009_alert.py'
       - 'tests/test_d009_state.py'
+      - 'tests/test_d009_diagnostics.py'
+      - 'tests/test_macro18_*.py'
+      - 'scripts/validate_macro18_outputs.py'
+      - 'tests/test_v703_policy*.py'
+      - 'tests/test_v703_publication.py'
+      - 'scripts/validate_v703_publication.py'
+      - 'scripts/capture_v703_daily_snapshot.py'
+      - 'tests/policy_case_matrix.py'
+      - 'tests/test_macro_safety_daily_capture.py'
+      - 'tests/test_v703_monthly_release.py'
 permissions:
   contents: write
 concurrency:
-  group: livingwater-macro18-preflight
+  group: livingwater-macro18-preflight-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  repair-qa:
+    if: "${{ github.ref != 'refs/heads/main' }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Isolated repair regression
+        run: |
+          python -m pip install requests pandas
+          mkdir -p build/repair-qa
+          set -o pipefail
+          python -m unittest discover -s tests -p "test_d009_*.py" -v 2>&1 | tee build/repair-qa/state-alert.log
+          python -m unittest discover -s tests -p "test_macro18_*.py" -v 2>&1 | tee build/repair-qa/source-output.log
+      - name: Policy and formal archive contract regression
+        run: |
+          set -o pipefail
+          for pattern in test_v703_policy*.py test_v703_monthly_release.py test_macro_safety_daily_capture.py test_macro_supplement_contract.py test_v703_publication.py test_macro_safety_monthly.py test_bank_macro_monthly.py; do
+            python -m unittest discover -s tests -p "$pattern" -v 2>&1 | tee -a build/repair-qa/policy-archive.log
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: macro18-repair-qa-${{ github.run_id }}
+          path: build/repair-qa/
   preflight18:
-    if: "${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}"
+    # Repair branches may be pushed for review; only main may write shared state.
+    if: "${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push') }}"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -32,9 +72,10 @@ jobs:
         run: |
           python -m pip install requests pandas yfinance pypdf
           python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
-          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/macro18_state.py scripts/macro18_alert.py
+          python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/macro18_state.py scripts/macro18_alert.py scripts/validate_macro18_outputs.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test
           python -m unittest discover -s tests -p "test_d009_*.py" -v
+          python -m unittest discover -s tests -p "test_macro18_*.py" -v
       - name: Mount dedicated persistent state branch and restore missing cache
         run: |
           git fetch origin automation-state
@@ -55,6 +96,7 @@ jobs:
           python "系統工程/總經V70/總經爬蟲18項.py" "${args[@]}"
       - name: Contract QA and copy for 10 AM Task
         run: |
+          python scripts/validate_macro18_outputs.py build/macro18
           python - <<'PY'
           import json,pathlib
           p=pathlib.Path('build/macro18/18_macro_verification.json')
@@ -76,13 +118,14 @@ jobs:
           PY
       - name: Evaluate consecutive failures and persist alert state
         run: |
-          python scripts/macro18_alert.py --report build/macro18/18_macro_verification.json --state /tmp/livingwater-macro-state/macro_alert_state.json --alert-file build/macro18/alerts.json
-      - name: Rotate three verified snapshots on automation-state
-        run: |
           python scripts/macro18_state.py snapshot --input build/macro18/18_macro_verification.json --state-dir /tmp/livingwater-macro-state
+          cp /tmp/livingwater-macro-state/macro18_latest_diagnostics.json build/macro18/macro18_latest_diagnostics.json
+          python scripts/macro18_alert.py --diagnostics /tmp/livingwater-macro-state/macro18_latest_diagnostics.json --report build/macro18/18_macro_verification.json --state /tmp/livingwater-macro-state/macro_alert_state.json --alert-file build/macro18/alerts.json
+      - name: Persist snapshots and latest diagnostics on automation-state
+        run: |
           git -C /tmp/livingwater-macro-state config user.name "github-actions[bot]"
           git -C /tmp/livingwater-macro-state config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C /tmp/livingwater-macro-state add -A backups/ macro_alert_state.json
+          git -C /tmp/livingwater-macro-state add -A backups/ macro_alert_state.json macro18_latest_diagnostics.json
           if ! git -C /tmp/livingwater-macro-state diff --cached --quiet; then
             git -C /tmp/livingwater-macro-state commit -m "data(D009): rotate validated macro18 backups"
             for attempt in 1 2 3; do
@@ -130,7 +173,7 @@ jobs:
                  'rows':len(d['items']),
                  'statuses':{k:sum(v.get('status')==k for v in d['items'].values())
                              for k in ('OK','USABLE','STALE','MISSING')},
-                 'checks':['static_qa','unittest','source_collection','contract_validation','alert_state','snapshot_rotation']}
+                 'checks':['static_qa','unittest','source_collection','contract_validation','alert_state','snapshot_rotation','csv_report_consistency','latest_diagnostics']}
           atomic_write('data/d009_actions_proof.json',
                        (json.dumps(proof,ensure_ascii=False,indent=2)+'\n').encode())
           PY
@@ -165,7 +208,7 @@ jobs:
 
   notify-on-critical:
     needs: preflight18
-    if: "${{ always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'manual-test: crawler fallback'))) }}"
+    if: "${{ always() && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'manual-test: crawler fallback'))) }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

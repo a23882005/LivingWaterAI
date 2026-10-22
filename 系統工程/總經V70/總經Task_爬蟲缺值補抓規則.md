@@ -61,3 +61,27 @@ Task提供四個有日期、有來源的原始值，不手填衍生m06。建置�
 候選查核狀態使用FOUND、NOT_FOUND、BLOCKED或METRIC_MISMATCH；正式資料狀態依證據使用OK、USABLE、MISSING、STALE或UNVERIFIED。缺值的value設null並解釋原因；不可猜值、沿用舊值或用範本值冒充觀測值。
 
 提交後讀回GitHub主分支，確認八個鍵與內容。11:00 Action需驗證25個獨立指標、28個傳輸指標、26個必要資料項及22/22計分欄位。全部通過才發布；未看到Action run及線上讀回證據，不得宣稱已部署。
+
+
+## 五、W7-A02共同政策證據契約（2026-10-22，隔離修復版）
+
+由Family總PM依v1.5.10 A02定案，供A03前端與A04 Task生產者共同實作；A13整套驗證後切換正式消費端。現行Task提示詞由A04更新。本段優先於舊版將政策日期當行情日期的作法。
+
+- `policy_schema`固定字串`fed-target-evidence-v1`。`value`為有限數值中點，`unit`為`%`。
+- `effective_date`、`publication_date`、`observation_date`為YYYY-MM-DD；保留來源所載政策生效／發布日期，observation_date等於effective_date。發布不晚於生效，兩者不晚於判定當日（Asia/Taipei）；不將生效日改成取得日。
+- `retrieval_time`、`last_verified_at`為含時區RFC3339時間戳，計算轉UTC；取得≤成功核實≤判定時點。日級政策不據此推定未提供的生效時分。
+- **有限期限：取得及成功核實各須小於26小時**；恰滿26小時即失效。這是A02工程期限決定，與既有每日更新／26小時快照保護一致，並非官方政策有效期。政策可能長期不變，但須重新取得現行官方證據；週末也不自動展延。有效期限為兩個時點各加26小時的較早者。快取讀取、重建、recover及失敗重試不更新此兩時點。
+- `lower_bound`、`upper_bound`各為物件，必含數值`value`與`effective_date`；日期均等於本筆effective_date，0≤下限≤上限≤100，中點誤差≤1e-9。不得以EFFR代替目標區間。
+- `source_evidence`必含`url`、`checked_at`、`result`、`excerpt`、`response_sha256`、`effective_date`、`publication_date`、`lower_bound`、`upper_bound`、`value`。URL等於本筆source_url，HTTPS且host為www.federalreserve.gov、fred.stlouisfed.org或alfred.stlouisfed.org；checked_at等於last_verified_at；result為CURRENT_CONFIRMED。excerpt為實際來源的必要簡短證據摘要，response_sha256為取得內容的64字元小寫SHA256。資料欄位逐一與本筆值及日期相同；上下限證據結構與本筆一致。
+- 生產者須真正查核當期官方政策頁／最新官方序列，確認沒有已生效的更新，保留取得內容以供hash稽核。舊公告本身只證明歷史決定；CURRENT_CONFIRMED須由本次現行查核產生，不能單靠舊公告或自填旗標。單一URL或hash格式正確不代表來源真實性已獲獨立證明；A04負責實際生產與證據留存，A13做真實整鏈驗證。
+- 四站candidate_checks既有格式保留；四個m06子項各先通過status、有限數值、來源、method、日期／既有期限及候選查核結構。m06_rate另通過本節政策證據。任一子項失格，衍生m06=MISSING/value=null，原因加入QA，22項計分合格數依實際結果產生。
+- 衍生m06保留原V3公式；其observation_date採rstar與output_gap兩個已驗證季度期末中較早者，四個原始日期另保留在子項與detail，避免將政策生效日或月資料誤標成衍生季度日期。
+- 正式feed命名：policy_schema→policySchema、effective_date→effectiveDate、lower_bound→lowerBound、upper_bound→upperBound、last_verified_at→lastVerifiedAt、source_evidence→sourceEvidence；既有retrievalTime/publicationDate/dataDate保留。sourceEvidence內部保留原snake_case。normalize原樣傳遞，禁止自行產生新查核時間。
+- A03須按同一欄位與期限驗證，修改值／日期／來源即重驗，正式配置動作當下重驗；A04須生產上述證據；A05更新每日程序；A13驗證GitHub／Drive／Task／前端整套相容後發布。本契約不變更其他18項快取資格或投資計分公式。
+
+
+## 六、A04生產者提交前檢查（A13協調切換）
+
+schema維持`V70.3/10h-eight-supplement-v3`，以policy_schema識別新增政策契約；generated_at與as_of_taipei皆為含時區RFC3339，表示同一實際生成時點，as_of_taipei固定+08:00（取代無時區顯示字串）。新輸出由scripts/validate_macro_supplement.py檢查八鍵、時間、單項資格、四站紀錄、政策證據、Forward/FY1證據與MMFI百分比。檢查不會修改輸入或發布。
+
+新Task提示詞位於系統工程/Family/W7/A04_Task提示詞_待A13切換.txt，原真實提示詞與排程已存evidence/A04/task_before.json供差異核對。原提示詞逐字保留於新版前段；A13完成配套相容測試後，同一Task原ID更新prompt，保持排程／啟用／通知；隨後以真實取得資料產出及提交讀回。A04目前的預備測試不替代此真實生產驗收，交由A13收斂。

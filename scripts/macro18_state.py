@@ -109,8 +109,33 @@ def _lei_fingerprint(history):
     return [tuple(entry.get(field) for field in fields) for entry in history]
 
 
+def report_digest(raw):
+    return hashlib.sha256(json.dumps(raw,ensure_ascii=False,sort_keys=True,separators=(",",":")).encode()).hexdigest()
+
+
+def save_diagnostics(raw, state_dir):
+    validate(raw)
+    envelope={"schema":"macro18-latest-diagnostics-v1", "report_sha256":report_digest(raw),
+              "recorded_at":dt.datetime.now(dt.timezone.utc).isoformat(), "report":raw}
+    atomic_write(Path(state_dir)/"macro18_latest_diagnostics.json",
+                 (json.dumps(envelope,ensure_ascii=False,indent=2)+"\n").encode())
+
+
+def read_diagnostics(path, expected_report=None):
+    envelope=json.loads(Path(path).read_text(encoding="utf-8"))
+    if envelope.get("schema")!="macro18-latest-diagnostics-v1":
+        raise ValueError("invalid diagnostics schema")
+    raw=validate(envelope["report"])
+    if envelope.get("report_sha256")!=report_digest(raw):
+        raise ValueError("diagnostics digest mismatch")
+    if expected_report is not None and report_digest(raw)!=report_digest(expected_report):
+        raise ValueError("diagnostics/report batch mismatch")
+    return raw
+
+
 def snapshot(source, state_dir):
     raw = read_valid(source)
+    save_diagnostics(raw,state_dir)
     payload = (json.dumps(raw, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
     digest = hashlib.sha256(payload).hexdigest()[:16]
     existing = snapshots(state_dir)
@@ -149,6 +174,8 @@ def recover(output, state_dir):
             for item in raw["items"].values():
                 if item.get("value") is not None:
                     item["status"] = "STALE"
+                    item["cache_used"] = True
+                    item["cache_source"] = {"file":candidate.name,"mode":"HISTORICAL_BACKUP"}
                     item["detail"] = (item.get("detail") or "") + "; D009 historical backup recovery"
             raw["recovery"] = {"mode": "HISTORICAL_BACKUP", "snapshot": candidate.name}
             atomic_write(output, (json.dumps(raw, ensure_ascii=False, indent=2)+"\n").encode("utf-8"))

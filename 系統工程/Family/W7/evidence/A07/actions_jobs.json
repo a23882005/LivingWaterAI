@@ -1,0 +1,80 @@
+{
+  "jobs": [
+    {
+      "id": 119753504475,
+      "name": "repair-qa",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 39757613903,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Isolated repair regression",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "id": 119753506068,
+      "name": "preflight18",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39757613903,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 119753506283,
+      "name": "notify-on-critical",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 39757613903,
+      "logs_url": null,
+      "steps": null
+    }
+  ]
+}

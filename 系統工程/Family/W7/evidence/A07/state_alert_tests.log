@@ -1,0 +1,38 @@
+test_first_failure_and_same_day_suppression (test_d009_alert.TestD009Alerts.test_first_failure_and_same_day_suppression) ... ok
+test_sixth_failure_realerts_but_fifth_does_not (test_d009_alert.TestD009Alerts.test_sixth_failure_realerts_but_fifth_does_not) ... ok
+test_third_failure_and_recovery_reset (test_d009_alert.TestD009Alerts.test_third_failure_and_recovery_reset) ... ok
+test_digest_and_batch_reject_tampering (test_d009_diagnostics.DiagnosticsStateTests.test_digest_and_batch_reject_tampering) ... ok
+test_same_observation_new_evidence_saved_without_rotation (test_d009_diagnostics.DiagnosticsStateTests.test_same_observation_new_evidence_saved_without_rotation) ... ok
+test_usable_cache_source_failure_alerts_without_promoting_status (test_d009_diagnostics.DiagnosticsStateTests.test_usable_cache_source_failure_alerts_without_promoting_status) ... ok
+test_corrupt_head_does_not_replace_three_valid_backups (test_d009_state.TestD009State.test_corrupt_head_does_not_replace_three_valid_backups) ... ok
+test_corrupt_report_rejected (test_d009_state.TestD009State.test_corrupt_report_rejected) ... ok
+test_dedupe_ignores_retrieval_time_but_keeps_new_lei_vintage (test_d009_state.TestD009State.test_dedupe_ignores_retrieval_time_but_keeps_new_lei_vintage) ... ok
+test_exact_indicator_contract_rejects_unknown_key (test_d009_state.TestD009State.test_exact_indicator_contract_rejects_unknown_key) ... ok
+test_lei_history_rejects_duplicate_months (test_d009_state.TestD009State.test_lei_history_rejects_duplicate_months) ... ok
+test_rotate_dedupe_and_recover (test_d009_state.TestD009State.test_rotate_dedupe_and_recover) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.060s
+
+OK
+D009 validated snapshot saved: macro18_20261022T093715517668Z_e8873084b4ab3c4e.json
+D009 validated snapshot saved: macro18_20261022T093715523082Z_5a5b8e63dbe9ae25.json
+D009 snapshot unchanged; existing backups retained
+D009 recovered HISTORICAL backup: macro18_20261022T093715523082Z_5a5b8e63dbe9ae25.json
+D009 validated snapshot saved: macro18_20261022T093715531329Z_e8873084b4ab3c4e.json
+D009 validated snapshot saved: macro18_20261022T093715534203Z_71b18bbf87450869.json
+D009 validated snapshot saved: macro18_20261022T093715537106Z_0f7b601a340b2f42.json
+D009 invalid backup retained for investigation: macro18_99999999T999999999999Z_corrupt.json
+D009 validated snapshot saved: macro18_20261022T093715540357Z_5156a4e4e90f4ffd.json
+D009 backup rejected: macro18_99999999T999999999999Z_corrupt.json JSONDecodeError
+D009 recovered HISTORICAL backup: macro18_20261022T093715540357Z_5156a4e4e90f4ffd.json
+D009 validated snapshot saved: macro18_20261022T093715547489Z_059b7341b973bc27.json
+D009 snapshot unchanged; existing backups retained
+D009 validated snapshot saved: macro18_20261022T093715554072Z_a33db9f0e47c31e6.json
+D009 validated snapshot saved: macro18_20261022T093715556867Z_e8873084b4ab3c4e.json
+D009 snapshot unchanged; existing backups retained
+D009 validated snapshot saved: macro18_20261022T093715561501Z_71b18bbf87450869.json
+D009 validated snapshot saved: macro18_20261022T093715566014Z_0f7b601a340b2f42.json
+D009 validated snapshot saved: macro18_20261022T093715569689Z_5156a4e4e90f4ffd.json
+D009 recovered HISTORICAL backup: macro18_20261022T093715569689Z_5156a4e4e90f4ffd.json
+D009 recovered HISTORICAL backup: macro18_20261022T093715569689Z_5156a4e4e90f4ffd.json

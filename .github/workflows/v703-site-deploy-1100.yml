@@ -24,14 +24,14 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: lw-v703-site-deploy
+  group: lw-v703-site-deploy-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   build-and-deploy:
     # Scheduled/manual deployments and explicitly scoped V70 feature or verified repair pushes.
     if: >-
-      github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'feat(v703):') || startsWith(github.event.head_commit.message, 'fix(v703): deploy') || startsWith(github.event.head_commit.message, 'fix(v703): synchronize canonical')))
+      github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'feat(v703):') || startsWith(github.event.head_commit.message, 'fix(v703): deploy') || startsWith(github.event.head_commit.message, 'fix(v703): synchronize canonical'))))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -46,9 +46,13 @@ jobs:
           test -s data/8_macro_supplement_verified.json
           test -s data/v703_official_monthly_release_calendar.json
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+          python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
+          python -m unittest discover -s tests -p 'test_v703_publication.py' -v
+          python -m unittest discover -s tests -p 'test_macro_safety_daily_capture.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
           python -m unittest discover -s tests -p 'test_bank_macro_monthly.py' -v
+          python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
       - name: Require complete 22 of 22 scoring inputs before publishing
         run: |
@@ -95,6 +99,8 @@ jobs:
               assert 'ttm' not in row['method'].lower()
           print('V70_3_27_QA_PASS',feed['asOf'])
           PY
+      - name: Recheck policy freshness before any publication
+        run: python scripts/validate_v703_publication.py build/site/V70_macro_latest.json
       - name: Publish matching JSON beside official GitHub HTML
         run: |
           python - <<'PY'
@@ -170,6 +176,8 @@ jobs:
                       live=json.load(response)
                   with urllib.request.urlopen(base+"/?v="+stamp,timeout=20) as response:
                       page=response.read().decode("utf-8")
+                  from scripts.validate_v703_publication import verify_live_payload
+                  verify_live_payload(expected,live,Path('build/site/index.html').read_text(encoding='utf8'),page)
                   assert live["schema"]==expected["schema"]
                   assert live["asOf"]==expected["asOf"]
                   assert live["verification"]["ready"] is True

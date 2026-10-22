@@ -190,6 +190,81 @@ def _official_release_calendar(path, today):
     return result
 
 
+POLICY_VERIFICATION_HOURS = 26
+POLICY_SCHEMA = "fed-target-evidence-v1"
+
+
+def _aware_time(value):
+    parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("timezone required")
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def _validate_policy(item, today, now_utc):
+    """Validate an effective policy using bounded, value-bound current evidence."""
+    try:
+        if now_utc is None or now_utc.tzinfo is None:
+            raise ValueError("aware verification clock required")
+        if item.get("policy_schema") != POLICY_SCHEMA:
+            raise ValueError("policy schema required")
+        effective = dt.date.fromisoformat(item["effective_date"])
+        published = dt.date.fromisoformat(item["publication_date"])
+        if effective > today or published > today or published > effective:
+            raise ValueError("future/inconsistent policy dates")
+        if item["observation_date"] != item["effective_date"]:
+            raise ValueError("observation must preserve policy effective date")
+        retrieved = _aware_time(item["retrieval_time"])
+        verified = _aware_time(item["last_verified_at"])
+        if not retrieved <= verified <= now_utc:
+            raise ValueError("retrieval/verification clock order")
+        if max((now_utc - verified).total_seconds(), (now_utc - retrieved).total_seconds()) >= POLICY_VERIFICATION_HOURS * 3600:
+            raise ValueError("policy verification expired")
+        if published > retrieved.astimezone(dt.timezone(dt.timedelta(hours=8))).date():
+            raise ValueError("retrieval precedes publication")
+        if item.get("unit") != "%":
+            raise ValueError("target rate unit must be percent")
+        bounds = []
+        for name in ("lower_bound", "upper_bound"):
+            bound = item[name]
+            value = bound["value"]
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError("numeric target bound required")
+            if bound["effective_date"] != item["effective_date"]:
+                raise ValueError("target bounds effective dates differ")
+            bounds.append(value)
+        if not 0 <= bounds[0] <= bounds[1] <= 100:
+            raise ValueError("invalid target interval")
+        if abs(float(item["value"]) - sum(bounds) / 2) > 1e-9:
+            raise ValueError("target midpoint mismatch")
+        ev = item["source_evidence"]
+        parsed = urlparse(ev["url"])
+        if (parsed.scheme != "https" or parsed.hostname not in
+                {"www.federalreserve.gov", "fred.stlouisfed.org", "alfred.stlouisfed.org"}
+                or parsed.username or parsed.password):
+            raise ValueError("official policy source required")
+        if ev["url"] != item["source_url"] or ev["checked_at"] != item["last_verified_at"]:
+            raise ValueError("evidence source/time mismatch")
+        if ev.get("result") != "CURRENT_CONFIRMED" or not str(ev.get("excerpt", "")).strip():
+            raise ValueError("current-policy evidence required")
+        if not re.fullmatch(r"[0-9a-f]{64}", ev.get("response_sha256", "")):
+            raise ValueError("retrieved evidence digest required")
+        for field in ("effective_date", "publication_date", "lower_bound", "upper_bound", "value"):
+            if ev[field] != item[field]:
+                raise ValueError("evidence binding mismatch: " + field)
+    except (KeyError, TypeError, ValueError, AttributeError, OverflowError) as exc:
+        return ["m06_rate: " + str(exc)]
+    return []
+
+
+def _m06_component_issues(inputs, today, releases, now_utc):
+    issues = []
+    for key in M06_COMPONENTS:
+        issues.extend(_validate(key, inputs.get(key), today, releases, now_utc))
+        issues.extend(_validate_candidate_checks(key, inputs.get(key)))
+    return issues
+
+
 def _validate(key, item, today, releases=None, now_utc=None):
     problems = []
     if not isinstance(item, dict):
@@ -213,6 +288,8 @@ def _validate(key, item, today, releases=None, now_utc=None):
             age, obs = _days_old(date, today)
             if age < 0:
                 problems.append(f"{key}: future observation")
+            elif key == "m06_rate":
+                problems.extend(_validate_policy(item, today, now_utc))
             elif key in QUARTERLY:
                 if obs.month not in (3, 6, 9, 12) or obs != dt.date(obs.year, obs.month, (dt.date(obs.year + (obs.month == 12), obs.month % 12 + 1, 1) - dt.timedelta(days=1)).day):
                     problems.append(f"{key}: quarterly observation must use quarter-end date")
@@ -310,6 +387,11 @@ def _normalize(item, indicator_id=None):
         "method": item.get("method", ""), "status": item.get("status", "MISSING"),
         "detail": item.get("detail", ""),
     }
+    for source, target in (("policy_schema", "policySchema"), ("effective_date", "effectiveDate"),
+                           ("lower_bound", "lowerBound"), ("upper_bound", "upperBound"),
+                           ("last_verified_at", "lastVerifiedAt"), ("source_evidence", "sourceEvidence")):
+        if source in item:
+            normalized[target] = item[source]
     if isinstance(item.get("candidate_checks"), list):
         normalized["candidateChecks"] = [dict(check) if isinstance(check, dict) else check
                                          for check in item["candidate_checks"]]
@@ -403,20 +485,15 @@ def build(macro_path, supplement_path, html_path, dest):
     inputs = dict(base)
     inputs.update(records)
     m06_children = [inputs[key] for key in M06_COMPONENTS]
-    m06_ready = all(
-        isinstance(row, dict) and row.get("status") in ACCEPTED_STATUS
-        and row.get("value") is not None and math.isfinite(float(row["value"]))
-        and isinstance(row.get("observation_date"), str)
-        and str(row.get("source_url") or "").startswith("https://")
-        for row in m06_children
-    )
+    m06_issues = _m06_component_issues(inputs, today, official_releases, now)
+    m06_ready = not m06_issues
     if m06_ready:
         fed, inflation, rstar, output_gap = (float(row["value"]) for row in m06_children)
         actual_gap = (fed - inflation) - rstar
         taylor_gap = 0.5 * (inflation - 2.0) + 0.5 * output_gap
         m06_value = actual_gap - taylor_gap
         m06_status = "USABLE" if any(row.get("status") == "USABLE" for row in m06_children) else "OK"
-        m06_date = min(row["observation_date"] for row in m06_children)
+        m06_date = min(inputs[key]["observation_date"] for key in ("m06_rstar", "m06_output_gap"))
         m06_source = " | ".join(dict.fromkeys(row["source_url"] for row in m06_children))
         m06_detail = "V3=(Fed中點−未來12M通膨預期−HLW r*)−[0.5×(同一未來12M通膨預期−2)+0.5×實際GDP/潛在GDP缺口]；" + "; ".join(
             f"{key}={inputs[key]['value']}@{inputs[key]['observation_date']}" for key in M06_COMPONENTS
@@ -434,7 +511,7 @@ def build(macro_path, supplement_path, html_path, dest):
     if inputs["m16"].get("status") not in ACCEPTED_STATUS:
         raise ValueError("LEI_HISTORY_BLOCKED: m16 must be verified before deriving m21")
     lei_history = _lei_history(src, inputs["m16"])
-    calc_problems = []
+    calc_problems = list(m06_issues)
     for key in SUPPLEMENT_IDS:
         calc_problems.extend(_validate_candidate_checks(key, inputs[key]))
     missing = []

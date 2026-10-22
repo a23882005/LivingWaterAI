@@ -1,0 +1,9 @@
+執行「總體經濟狀況」每日完整報告，保留原有09:00核心資料、10:00補充、11:00 builder／部署查核、V70-3-27最新GitHub main HTML與JSON核對、總經體質分、八群、通膨、信用、利率、就業、GDP、流動性、估值、Goldilocks、V82／債券V75、Actions／Hostinger／Gmail等全部原有職責與品質規則。新增最高優先報告必備段落：每次固定提供S&P 500未來3個月、6個月、12個月三種期限的前瞻預測；每一期分別列出基準、上行、下行、危機情境的報酬區間、主觀機率（合計100%）、中心判斷、主要依據、觸發與改判條件，並指出對VT／VWRA、VOO、QQQ及股票／債券配置的影響。每次根據最新已核實數據與最新正式HTML重新評估，標明資料日期、預測基準日及研究估計性質，不得照抄昨日數字、冒充回測或正式模型驗證；必要資料不足則清楚註明限制。維持每日10:00 Asia/Taipei原排程、啟用狀態、通知功能及其餘既有任務規則。
+
+【W7-A04｜A13協調切換後啟用的正式資料生產規格】
+先讀a23882005/LivingWaterAI main的系統工程/總經V70/總經Task_爬蟲缺值補抓規則.md、每天總經及html更新程序.md與scripts/validate_macro_supplement.py。核對main已包含fed-target-evidence-v1共同契約與配套builder、前端；如版本不一致先回報總PM並保留最後有效資料。
+八項輸出限定m06_rate、m06_inf、m06_rstar、m06_output_gap、s05、m03_qqq、m03_spy、m03_vt，每項四站candidate_checks。既有label/value/unit/observation_date/source_url/method/status/detail/retrieval_time/publication_date/vintage保留，schema維持V70.3/10h-eight-supplement-v3；generated_at與as_of_taipei記同一實際執行時點，兩者RFC3339含時區，as_of_taipei固定+08:00。m06由builder依四子項衍生。
+m06_rate按共同契約第五節逐欄產生policy_schema、effective_date、lower_bound、upper_bound、last_verified_at、source_evidence；以官方現行政策核實上下限及同生效日，中點一致。發布日、生效日、取得時間、最後成功核實時間分開，時間戳必含時區；取得與核實各小於26小時。source_evidence保存URL、checked_at、CURRENT_CONFIRMED、必要簡短摘要、實際取得內容SHA256、上下限／中點／生效／發布日期；原始取得證據另存同批次稽核檔，SHA必實算。無法保留內容或核實現行性就標UNVERIFIED並具體說明；不得自行填hash或刷新快取時間。
+對本次八項JSON執行validate_macro_supplement.py檢查；缺證據／來源失敗／逾期如實標示，報告繼續完成但正式配置維持NA。提交data/8_macro_supplement_verified.json前核對遠端當前blob避免覆蓋並行更新；提交後按commit讀回bytes/hash及八鍵，記錄commit與查核結果。不可為了發布而改ready或解除其他指標門檻。部署與線上成功由11:00流程憑run／HTML／JSON／receipt證據確認。
+保持每日10:00 Asia/Taipei排程、啟用與通知設定；原報告全部職責及S&P500未來3／6／12個月四情境、機率、中心、觸發條件完整保留。
+

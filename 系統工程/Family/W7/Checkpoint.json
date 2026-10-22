@@ -52,7 +52,8 @@
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "B01名稱搜尋漏列系統工程/資料庫內四個16384-byte舊DB；未改舊庫，維持已驗收W5四庫現用ID映射，補正不得以搜尋空結果宣稱不存在。",
     "B09: permission_bridge歷史持倉集合需與position_view共同清倉投影；合成零股仍持有及同時點順序依賴已重現。",
-    "B10/B19: technical_source_bridge真實snapshot模式固定2026-10-19/20可用時點，正式接線需可信當批收據。"
+    "B10/B19: technical_source_bridge真實snapshot模式固定2026-10-19/20可用時點，正式接線需可信當批收據。",
+    "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。"
   ],
   "next_action": "本人完成C/vendor/WORK12其餘逐檔讀寫處置，再驗收B03接B04",
   "next_owner": "Family中PM本人",

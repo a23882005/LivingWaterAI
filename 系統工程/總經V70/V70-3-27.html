@@ -367,8 +367,50 @@
 
         // Metadata: a user's manual entry date is NOT automatically today's observation date.
         // For each indicator require a valid observation date and actual source, and check frequency freshness.
+        // W7-A03: same fed-target-evidence-v1 contract as the Python builder.
+        function v703PolicyIssues(r, now=Date.now()) {
+            const bad=[];
+            try {
+                const day=x=>typeof x==='string' && /^\d{4}-\d{2}-\d{2}$/.test(x) &&
+                    Number.isFinite(Date.parse(x+'T00:00:00Z')) && new Date(x+'T00:00:00Z').toISOString().slice(0,10)===x;
+                const timestamp=x=>typeof x==='string' && /(?:Z|[+-]\d{2}:\d{2})$/.test(x) ? Date.parse(x) : NaN;
+                const today=new Date(now+8*3600000).toISOString().slice(0,10);
+                if(r.policySchema!=='fed-target-evidence-v1')bad.push('policy schema');
+                if(!day(r.effectiveDate)||!day(r.publicationDate)||r.effectiveDate>today||r.publicationDate>r.effectiveDate||r.dataDate!==r.effectiveDate)bad.push('policy dates');
+                const retrieved=timestamp(r.retrievalTime), verified=timestamp(r.lastVerifiedAt);
+                if(!Number.isFinite(retrieved)||!Number.isFinite(verified)||retrieved>verified||verified>now||
+                   now-retrieved>=26*3600000||now-verified>=26*3600000)bad.push('policy verification time');
+                if(Number.isFinite(retrieved)&&r.publicationDate>new Date(retrieved+8*3600000).toISOString().slice(0,10))bad.push('publication after retrieval');
+                const low=r.lowerBound, high=r.upperBound;
+                if(!low||!high||!Number.isFinite(low.value)||!Number.isFinite(high.value)||
+                   low.effective_date!==r.effectiveDate||high.effective_date!==r.effectiveDate||
+                   low.value<0||high.value>100||low.value>high.value||!Number.isFinite(r.value)||
+                   Math.abs(r.value-(low.value+high.value)/2)>1e-9||r.unit!=='%')bad.push('target bounds/midpoint');
+                const ev=r.sourceEvidence, url=new URL(ev.url);
+                if(url.protocol!=='https:'||url.username||url.password||!['www.federalreserve.gov','fred.stlouisfed.org','alfred.stlouisfed.org'].includes(url.hostname)||
+                   ev.url!==r.source||ev.checked_at!==r.lastVerifiedAt||ev.result!=='CURRENT_CONFIRMED'||
+                   typeof ev.excerpt!=='string'||!ev.excerpt.trim()||!/^([0-9a-f]{64})$/.test(ev.response_sha256))bad.push('policy evidence');
+                if(ev.effective_date!==r.effectiveDate||ev.publication_date!==r.publicationDate||ev.value!==r.value||
+                   ev.lower_bound?.value!==low?.value||ev.lower_bound?.effective_date!==low?.effective_date||
+                   ev.upper_bound?.value!==high?.value||ev.upper_bound?.effective_date!==high?.effective_date)bad.push('policy evidence binding');
+            } catch(e) {bad.push('missing policy evidence');}
+            return bad;
+        }
+        function v703SnapshotCurrent(asOf, now=Date.now()) {
+            const made=Date.parse(String(asOf||''));
+            return Number.isFinite(made) && made<=now+5*60000 && now-made<26*3600000;
+        }
+        function v703InputsMatchSnapshot() {
+            const data=window.v703VerifiedInputSnapshot;
+            return !!data && macroConfig.every(cfg=>{
+                const row=data[cfg.id], input=document.getElementById('in_'+cfg.id);
+                return row && input && input.value.trim()!=='' && Number(input.value)===Number(row.value) &&
+                    document.getElementById('v703-date-'+cfg.id)?.value===row.dataDate &&
+                    document.getElementById('v703-source-'+cfg.id)?.value===row.source;
+            });
+        }
         function v703DateNowUTC() {
-            const d = new Date();
+            const d = new Date(Date.now()+8*3600000);
             return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
         }
         function v703TradingDaysBetween(date, today) {
@@ -380,7 +422,8 @@
             const days=Math.floor((today-date)/86400000);
             if(days<0)return true;
             if(['m03_qqq','m03_spy','m03_vt'].includes(id))return false; // PE reference age is checked against last verification time in the feed loader, not the observation month.
-            if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150; // quarterly HLW/output-gap, quarter-end date
+            if(id==='m06_rate')return false; // Policy evidence has its own bounded current check.
+            if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150 || ![2,5,8,11].includes(date.getUTCMonth()) || new Date(date.getTime()+86400000).getUTCDate()!==1; // quarterly HLW/output-gap, quarter-end date
             if(id==='m16')return days>90;
             if(id==='m14')return days>14;
             if(['m04','m05','m15','m18','m19','m20','m06_inf'].includes(id)){
@@ -425,6 +468,10 @@
                     problems.push(cfg.id+':ETF本益比缺少7天內有效驗證');
                     continue;
                 }
+                if(cfg.id==='m06_rate'){
+                    const row={...window.v703VerifiedInputSnapshot?.m06_rate,value:n,dataDate:rawDate,source:src.value};
+                    problems.push(...v703PolicyIssues(row).map(x=>'m06_rate:'+x));
+                }
                 const stale=!peReference && v703ObservationStale(cfg.id,date,today);
                 if(stale) problems.push(cfg.id+':資料過期');
             }
@@ -437,7 +484,10 @@
         // passes the loader's schema, provenance, date, freshness and quality checks.
         window.v703FeedVerified = false;
         window.v703CanPublishFormalAllocation = function() {
-            return window.v703FeedVerified === true &&
+            const current=v703SnapshotCurrent(window.v703SourceBatch?.asOf) && v703InputsMatchSnapshot();
+            const dates=window.v703DemoMode!==true && window.v703ValidateDates();
+            window.v703VerifiedDataDates=dates;
+            return current && dates && window.v703FeedVerified === true &&
                 window.v703DemoMode !== true &&
                 window.v703DataComplete === true &&
                 window.v703VerifiedDataDates === true &&
@@ -3543,7 +3593,7 @@ if (recBlack) {
      // Old JSON must never masquerade as a current verified macro feed.
      const produced=Date.parse(String(doc.asOf||''));
      if(!Number.isFinite(produced)||produced>Date.now()+5*60*1000)throw new Error('快照產出時間缺失或位於未來');
-     const snapshotOld=Date.now()-produced>26*3600*1000;
+     const snapshotOld=!v703SnapshotCurrent(doc.asOf);
      if(snapshotOld)throw new Error('正式快照超過26小時；保留歷史資料但停止當作當前配置依據');
      // An old published snapshot must remain visibly old, not masquerade as a fresh run.
      if(doc.verification.independentIndicators!==25 || Object.keys(data).length < 28)throw new Error('獨立原始欄／傳輸欄數量不符（預期25項獨立原始欄、至少28欄）');
@@ -3554,11 +3604,14 @@ if (recBlack) {
      window.v703SourceBatch={asOf:doc.asOf,batchDateTaipei:doc.batchDateTaipei||null,sourceSnapshot:doc.sourceSnapshot||null,verified:false};
 
 
+     if(v703PolicyIssues(data.m06_rate).length)throw new Error('政策日期／當期核實證據未通過');
      const m06RawIds=['m06_rate','m06_inf','m06_rstar','m06_output_gap'];
      for(const id of m06RawIds){
        const row=data[id];
        if(!row||row.value===null||String(row.value).trim()===''||!['OK','USABLE'].includes(row.status))
          throw new Error('m06計算輸入缺漏或未驗證：'+id);
+       if(typeof row.value==='boolean'||!String(row.method||'').trim()||(row.status==='USABLE'&&!String(row.detail||'').trim()))throw new Error('m06子項口徑缺漏：'+id);
+       if(!Array.isArray(row.candidateChecks)||row.candidateChecks.length!==4||row.candidateChecks.some(c=>!c||!String(c.site||'').trim()||!/^https:\/\//.test(String(c.url||''))||!String(c.metric_or_horizon||'').trim()||!['FOUND','NOT_FOUND','BLOCKED','METRIC_MISMATCH'].includes(c.status)||!String(c.checked_at||'').trim()))throw new Error('m06候選查核缺漏：'+id);
      }
      const m06Raw=m06RawIds.map(id=>Number(data[id].value));
      if(!m06Raw.every(Number.isFinite))throw new Error('m06計算輸入缺漏，停止使用內嵌m06分數');
@@ -3608,6 +3661,7 @@ if (recBlack) {
        if(slider)slider.value=val;if(score)score.textContent=val.toFixed(1);
      }
      window.v703ApplyLEIHistory(leiRows,data.m16);
+     window.v703VerifiedInputSnapshot=JSON.parse(JSON.stringify(data));
      window.v703SourceBatch.verified=true;
      window.v703FeedVerified=true;
      try{v703ApplyM06Derived();}catch(e){}

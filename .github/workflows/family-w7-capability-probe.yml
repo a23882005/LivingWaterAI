@@ -72,3 +72,78 @@ jobs:
           name: family-b04-connection-${{ github.run_id }}
           path: build/family-b04/drive-read.json
           if-no-files-found: warn
+  hosted-synthetic-entry:
+    needs: existing-service-readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build temporary synthetic entry with ephemeral test credentials
+        id: build
+        run: |
+          case "${LW_DIR%/}" in
+            public_html|*/public_html) ;;
+            *) echo 'Invalid existing website directory'; exit 1 ;;
+          esac
+          python 系統工程/Family/W7/probes/hosted_entry_client.py build
+      - name: Upload only the unique test entry through existing deployment credentials
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b04-hosted/public/index.php
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/family-w7-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          timeout: 90s
+          command_timeout: 90s
+      - name: Check remote PHP syntax
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: php -l "${LW_DIR%/}/family-w7-probe-$LW_RUN-$LW_ATTEMPT/index.php" >/dev/null
+      - name: Verify real HTTPS login resume isolation queue and retry
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+        run: python 系統工程/Family/W7/probes/hosted_entry_client.py verify
+      - name: Remove only this run temporary endpoint and synthetic state
+        if: always() && steps.build.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            LW_DIR="${LW_DIR%/}"
+            case "$LW_DIR" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            probe="$LW_DIR/family-w7-probe-$LW_RUN-$LW_ATTEMPT"
+            state="$(dirname "$LW_DIR")/.family-w7-probe-$LW_RUN-$LW_ATTEMPT.sqlite"
+            rm -f -- "$probe/index.php" "$state" "$state-journal" "$state-wal" "$state-shm"
+            if [ -d "$probe" ]; then rmdir -- "$probe"; fi
+            test ! -e "$probe/index.php"
+            test ! -e "$state"
+            echo 'FAMILY_B04_TEMP_CLEANUP_PASS'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b04-hosted-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/family-b04-hosted/hosted-proof.json
+          if-no-files-found: warn

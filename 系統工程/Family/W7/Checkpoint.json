@@ -54,7 +54,8 @@
     "evidence/B03/",
     "B04_TAKEOVER_REVIEW.md",
     "B04_ENTRY_INTERFACE.md",
-    "evidence/B04/entry_tests.log"
+    "evidence/B04/entry_tests.log",
+    "evidence/B04/entry_action_run.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -157,7 +158,7 @@
       "takeover_review": "能力查核沿用；後續按已核定簡化帳號方案施工，原生Project/device ID不再阻擋開工。",
       "native_project_device_requirement": "REPLACED_BY_APPROVED_FAMILY_ACCOUNT_BOUNDARY",
       "http_entry": {
-        "status": "LOCAL_PASS_CI_PENDING",
+        "status": "LOCAL_AND_ACTION_PASS",
         "tests": 20,
         "scope": "SYNTHETIC_ONLY",
         "implementation": "probes/family_entry_probe.py",
@@ -167,7 +168,23 @@
         "parallel_requests": true,
         "killed_writer_rollback": true,
         "live_chatgpt_connection": "PENDING",
-        "service_drive_authorization": "PENDING"
+        "service_drive_authorization": "PENDING",
+        "action_run": {
+          "commit": "1be52b89f733b50f48ac9fd064a8957f49340ace",
+          "run_id": 39840388680,
+          "job_id": 120039545523,
+          "conclusion": "success",
+          "tests": 20,
+          "scope": "SYNTHETIC_ONLY_HTTP_PROCESS_RESTART",
+          "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39840388680",
+          "artifact_id": 12452359271,
+          "artifact_sha256": "5b50a1361930364a16c2146f088cca062abb0a98d90f555c84cb5a4e3c7c0fcd",
+          "log_excerpt": [
+            "2026-10-22T19:28:44.5434425Z 20 passed in 0.92s",
+            "2026-10-22T19:28:45.1893160Z SHA256 digest of uploaded artifact zip is 5b50a1361930364a16c2146f088cca062abb0a98d90f555c84cb5a4e3c7c0fcd",
+            "2026-10-22T19:28:45.7193881Z Artifact family-w7-synthetic-capability-39840388680.zip successfully finalized. Artifact ID 12452359271"
+          ]
+        }
       }
     },
     "H3_takeover": {
@@ -180,7 +197,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；20/20本機PASS，GitHub實跑待讀回；現3/23。",
+  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；本機20/20、GitHub run39840388680 20/20 PASS；待實際託管與Chat/Action/Drive連線，現3/23。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,

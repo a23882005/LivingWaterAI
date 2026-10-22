@@ -1,0 +1,126 @@
+{
+  "commit": "2d569cc9d61bc70538f5dd6e3087d4af5d014e08",
+  "matched": 30,
+  "files": [
+    {
+      "name": "run_analysis.py",
+      "git_blob": "fbcd4d8aef11bcf3a22a05c7e6b1ffc7071eb6fb"
+    },
+    {
+      "name": "target_source_bridge.py",
+      "git_blob": "a9172384985cdfa0ca73d0d0511ead09baeb6450"
+    },
+    {
+      "name": "recovery_bridge.py",
+      "git_blob": "0f4963adfe03006d5b4007f55ee875d817c6a3bf"
+    },
+    {
+      "name": "bond_engine.py",
+      "git_blob": "4e9a6c9ab4610ea2171089e72f58410af399431a"
+    },
+    {
+      "name": "bond_source_bridge.py",
+      "git_blob": "46443a5b73075838b9fcb299a1a649fdaf8f1a26"
+    },
+    {
+      "name": "tactical_budget.py",
+      "git_blob": "1ace15d62da165460273ebe62db3cdc33239f88f"
+    },
+    {
+      "name": "mentor_bridge.py",
+      "git_blob": "164f673841fb737fc388d9af93feaa345c6f6550"
+    },
+    {
+      "name": "output_bridge.py",
+      "git_blob": "06b574854384f813405f27547bd71432a441cd08"
+    },
+    {
+      "name": "position_source_bridge.py",
+      "git_blob": "7a28fab8d9a780de94aeb72503085b64eb70c1e7"
+    },
+    {
+      "name": "runtime_loader.py",
+      "git_blob": "90f98e8706b2a9dc429c150510679bbbbb5ce7ae"
+    },
+    {
+      "name": "family_technical_bridge.py",
+      "git_blob": "1f8be53f11be52fa8df8b14a53c87a0dae95567d"
+    },
+    {
+      "name": "macro_source_bridge.py",
+      "git_blob": "694ed4571f19c00e371ffeb93d0b1c0d8d13db62"
+    },
+    {
+      "name": "verify_dependencies.py",
+      "git_blob": "b1aba1f8e2303a967d9d8dc9c07beadc4080df8e"
+    },
+    {
+      "name": "stock_engine.py",
+      "git_blob": "9269922e32549b902440f85443fd3c3a44cee46e"
+    },
+    {
+      "name": "v70_source_bridge.py",
+      "git_blob": "a171a85a5acee0e66622db4ec479e066d781a90b"
+    },
+    {
+      "name": "market_bridge.py",
+      "git_blob": "10beea7f3a17335be7055cbeeee1e4da39c40d08"
+    },
+    {
+      "name": "funding_guard.py",
+      "git_blob": "5778b32babdedd253176d0adc0f33d340963a3ef"
+    },
+    {
+      "name": "native_pipeline.py",
+      "git_blob": "2d52e6274bb03646a4b025a0427f476b5500fc5e"
+    },
+    {
+      "name": "technical_source_bridge.py",
+      "git_blob": "3c44e0302873d5faae02ebc9cebcf539713b1c00"
+    },
+    {
+      "name": "family_boundary.py",
+      "git_blob": "50a39c1b536455b7f18579ee1e23eb7b6e2168a2"
+    },
+    {
+      "name": "c7_engine.py",
+      "git_blob": "e802b65249ef7e8d3bd02af38bcc6112c47d5721"
+    },
+    {
+      "name": "target_units.py",
+      "git_blob": "5b8723de6ec00ec4b2a9b209cb201d19efc7ef74"
+    },
+    {
+      "name": "bond_target_bridge.py",
+      "git_blob": "eda49e81610b913a7dfd481e9401ea62625832bd"
+    },
+    {
+      "name": "funding_bridge.py",
+      "git_blob": "20ef09ac70e70f60a9ff60ee6a8908e01c1b324d"
+    },
+    {
+      "name": "permission_bridge.py",
+      "git_blob": "f93944520e7100dfd5b5933bd5c5dce61e5f4506"
+    },
+    {
+      "name": "family_runner.py",
+      "git_blob": "2a830cc1f88d49dcea9dbd7da45bdd62b8beb6dd"
+    },
+    {
+      "name": "stock_source_bridge.py",
+      "git_blob": "9f8ae0efa78def48c4a176f454b227773c216734"
+    },
+    {
+      "name": "valuation.py",
+      "git_blob": "e65188f6596a4b5bd8df2eaf5a5d2c6e589e5a63"
+    },
+    {
+      "name": "sgov_bridge.py",
+      "git_blob": "ea0ef5a2d8fac82a1b3c55a05613154ecfd585c6"
+    },
+    {
+      "name": "family_input.py",
+      "git_blob": "cdab707a55b0dea7ed9e94f67f90c9f976e8a1c7"
+    }
+  ]
+}

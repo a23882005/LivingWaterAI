@@ -8,15 +8,9 @@ def node(code,p):
  if r.returncode:raise AssertionError(r.stderr)
 class FrontendTests(unittest.TestCase):
  def test_shared_backend_frontend_cases(self):
-  rows=[policy()]
-  for k,v in [('effective_date','2026-10-23'),('value',4.2),('source_url','https://example.com'),('unit','bp'),('last_verified_at','2026-10-22T02:05:00'),('retrieval_time','2026-10-20T02:00:00Z'),('publication_date','2026-07-31')]:
-   r=policy();r[k]=v;rows.append(r)
-  for k,v in [('result','CACHE_READ'),('response_sha256','bad'),('excerpt','')]:
-   r=policy();r['source_evidence'][k]=v;rows.append(r)
-  r=policy();del r['source_evidence'];rows.append(r)
-  r=policy();r['upper_bound']['effective_date']='2026-07-31';rows.append(r)
-  cases=[dict(row=b._normalize(r,'m06_rate'),valid=not b._validate('m06_rate',r,NOW.date(),{},NOW)) for r in rows]
-  node('for(const x of p.cases)assert.strictEqual(c.v703PolicyIssues(x.row,p.now).length===0,x.valid);',dict(cases=cases,now=NOW.timestamp()*1000))
+  from policy_case_matrix import cases
+  shared=[dict(name=n,row=b._normalize(r,'m06_rate'),valid=expected,now=t.timestamp()*1000) for n,r,t,expected in cases()]
+  node('for(const x of p.cases)assert.strictEqual(c.v703PolicyIssues(x.row,x.now).length===0,x.valid,x.name);',dict(cases=shared))
  def test_action_rechecks_time_and_edits(self):
   node('''
 let now=p.now; class Clock extends Date {constructor(...a){super(...(a.length?a:[now]));} static now(){return now;}} c.Date=Clock;

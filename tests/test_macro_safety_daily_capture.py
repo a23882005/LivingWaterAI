@@ -57,6 +57,33 @@ class DailyCaptureTests(unittest.TestCase):
         with self.assertRaises(capture.CaptureError):
             capture.build_record(feed, snapshot, "2026-10-18T23:01:00Z", "c", "h")
 
+    def test_formal_archive_rejects_demo_invalid_score_and_source_mismatch(self):
+        import copy
+        feed=self.feed()
+        mutations=[('demo',lambda s:s['latest'].update(syntheticInputs=True)),
+                   ('demo_status',lambda s:s['latest'].update(status='DEMO_SYNTHETIC')),
+                   ('blocked',lambda s:s.update(canPublish=False)),
+                   ('unverified',lambda s:s.update(verified=False)),
+                   ('missing_values',lambda s:s['latest']['dataValidation'].update(allMacroValuesPresent=False)),
+                   ('invalid_dates',lambda s:s['latest']['dataValidation'].update(allDatesAndSourcesValid=False)),
+                   ('lineage',lambda s:s['sourceBatch'].update(sourceSnapshot={})),
+                   ('nan',lambda s:s['latest'].update(macroSafety=float('nan'))),
+                   ('overflow',lambda s:s['latest'].update(macroSafety=101))]
+        for name,mutate in mutations:
+            with self.subTest(case=name):
+                snapshot=copy.deepcopy(self.browser_snapshot(feed));mutate(snapshot)
+                with self.assertRaises(capture.CaptureError):
+                    capture.build_record(feed,snapshot,'2026-10-18T23:01:00Z','c','h')
+                print('ARCHIVE_CASE',name,'PASS',flush=True)
+
+    def test_conflicting_record_preserves_existing_archive_bytes(self):
+        record=capture.build_record(self.feed(),self.browser_snapshot(self.feed()),'2026-10-18T23:01:00Z','c','h')
+        with tempfile.TemporaryDirectory() as td:
+            path=Path(td)/'daily.csv';capture.append_idempotent(path,record);before=path.read_bytes()
+            with self.assertRaises(capture.CaptureError):
+                capture.append_idempotent(path,dict(record,health_score='1'))
+            self.assertEqual(path.read_bytes(),before)
+
     def test_daily_archive_append_is_idempotent_and_keeps_old_rows(self):
         feed = self.feed()
         record = capture.build_record(feed, self.browser_snapshot(feed), "2026-10-18T23:01:00Z", "commit123", "feedsha")

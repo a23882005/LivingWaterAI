@@ -7,6 +7,9 @@ on:
     paths:
       - '.github/workflows/v703-frontend-regression.yml'
       - 'scripts/build_daily_v703_site.py'
+      - 'tests/policy_case_matrix.py'
+      - 'tests/test_v703_policy*.py'
+      - 'tests/v703_browser_fixture.py'
       - '系統工程/總經V70/V70-3-27.html'
       - 'tests/test_v703_monthly_release.py'
       - 'tests/test_v703_failure_mail.py'
@@ -16,6 +19,7 @@ permissions:
   contents: read
 jobs:
   v703-browser:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -116,3 +120,83 @@ jobs:
               server.terminate()
               with contextlib.suppress(Exception):server.wait(timeout=3)
           PY
+  w7-contract-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Chromium
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install chromium --with-deps
+      - name: W7 policy and formal operation browser acceptance
+        run: |
+          mkdir -p build/w7-browser
+          set -o pipefail
+          python -u - <<'PYTEST' 2>&1 | tee build/w7-browser/cases.log
+          import sys,json,copy,datetime
+          sys.path.insert(0,'tests')
+          from playwright.sync_api import sync_playwright
+          from v703_browser_fixture import feed,HTML,NOW,b
+          from policy_case_matrix import cases
+          results=[]
+          with sync_playwright() as driver:
+              browser=driver.chromium.launch(headless=True)
+              def open_feed(data):
+                  context=browser.new_context(locale='zh-TW',timezone_id='Asia/Taipei')
+                  page=context.new_page()
+                  page.clock.install(time=NOW)
+                  page.on('dialog',lambda dialog:dialog.accept())
+                  def route(r):
+                      path=r.request.url
+                      if path=='http://w7.test/':r.fulfill(content_type='text/html',body=HTML.read_text())
+                      elif path=='http://w7.test/V70_macro_latest.json':r.fulfill(json=data)
+                      else:r.abort()
+                  page.route('**/*',route)
+                  page.goto('http://w7.test/',wait_until='domcontentloaded')
+                  page.wait_for_function("document.querySelector('#family-data-status') && !document.querySelector('#family-data-status').textContent.includes('正在讀取')")
+                  return context,page
+              def check(name,condition,page):
+                  if not condition:
+                      print('FAILED_STATE',page.evaluate("({verified:window.v703FeedVerified,issues:window.v703DateIssues,status:document.querySelector('#family-data-status')?.textContent})"))
+                      raise AssertionError(name)
+                  results.append(name);print('BROWSER_CASE',name,'PASS',flush=True)
+              context,page=open_feed(feed())
+              check('formal_valid',page.evaluate('window.v703CanPublishFormalAllocation()===true'),page)
+              for name,row,now,expected in cases():
+                  actual=page.evaluate('x=>v703PolicyIssues(x.row,x.now).length===0',{'row':b._normalize(row,'m06_rate'),'now':now.timestamp()*1000})
+                  check('shared_'+name,actual==expected,page)
+              for key in ['in_m06_rate','v703-date-m06_rate','v703-source-m06_rate']:
+                  original=page.locator('#'+key).input_value()
+                  page.locator('#'+key).evaluate("(e,v)=>{e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));}",{'in_m06_rate':'4.2','v703-date-m06_rate':'2026-07-29','v703-source-m06_rate':'https://example.com'}[key])
+                  check('manual_'+key,page.evaluate('window.v703CanPublishFormalAllocation()===false'),page)
+                  context.close();context,page=open_feed(feed())
+              page.clock.set_fixed_time(datetime.datetime(2026,10,23,4,tzinfo=datetime.timezone.utc))
+              check('open_page_policy_expired',page.evaluate('window.v703CanPublishFormalAllocation()===false'),page)
+              context.close();context,page=open_feed(feed())
+              page.evaluate("window.v703SourceBatch.asOf=new Date(Date.now()-26*3600000).toISOString()")
+              check('open_page_snapshot_expired',page.evaluate('window.v703CanPublishFormalAllocation()===false'),page)
+              context.close();context,page=open_feed(feed())
+              page.evaluate('window.v703StartDemo()')
+              check('research_mode',page.evaluate('window.v703DemoMode===true && window.v703CanPublishFormalAllocation()===false'),page)
+              context.close()
+              for key in b.M06_COMPONENTS:
+                  for fault in ['stale','candidate_missing']:
+                      data=feed()
+                      if fault=='stale':data['indicators'][key]['dataDate']='2020-01-01'
+                      else:data['indicators'][key]['candidateChecks']=[]
+                      context,page=open_feed(data)
+                      check(key+'_'+fault,page.evaluate('window.v703CanPublishFormalAllocation()===false'),page)
+                      context.close()
+              browser.close()
+          from pathlib import Path
+          Path('build/w7-browser/result.json').write_text(json.dumps({'fixture':'SYNTHETIC ONLY','cases':results,'count':len(results),'status':'PASS'},indent=2))
+          PYTEST
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: w7-contract-browser-${{ github.run_id }}
+          path: build/w7-browser/

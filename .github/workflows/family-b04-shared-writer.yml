@@ -1,0 +1,140 @@
+name: Family B04 shared writer integration
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b04-shared-writer.yml'
+      - '系統工程/Family/W7/probes/shared_drive_writer.py'
+      - '系統工程/Family/W7/probes/shared_writer_client.py'
+      - '系統工程/Family/W7/tests/test_shared_drive_writer.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b04-temp-drive-writer
+  cancel-in-progress: false
+jobs:
+  shared-writer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest 系統工程/Family/W7/tests/test_shared_drive_writer.py -q
+      - name: Build isolated temporary bridge and private configuration
+        id: build
+        env:
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: |
+          case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+          python 系統工程/Family/W7/probes/shared_writer_client.py build
+      - name: Prepare private directory outside public_html
+        id: private
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            folder="$(dirname "${LW_DIR%/}")/.family-b04-shared-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$folder"
+            mkdir "$folder"
+            chmod 700 "$folder"
+      - name: Upload private worker and OAuth configuration
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b04-shared/private/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-b04-shared-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Upload authenticated temporary PHP bridge
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b04-shared/public/index.php
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/family-b04-shared-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Initialize durable Drive baseline
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          command_timeout: 120s
+          script: |
+            set -eu
+            folder="$(dirname "${LW_DIR%/}")/.family-b04-shared-$LW_RUN-$LW_ATTEMPT"
+            chmod 600 "$folder/config.json"
+            php -l "${LW_DIR%/}/family-b04-shared-$LW_RUN-$LW_ATTEMPT/index.php" >/dev/null
+            python3 "$folder/shared_drive_writer.py" init
+      - name: Verify common HTTPS queue and independent Drive readback
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: python 系統工程/Family/W7/probes/shared_writer_client.py verify
+      - name: Restore baseline then remove temporary credentials and endpoint
+        if: always() && steps.private.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          command_timeout: 180s
+          script: |
+            set -eu
+            LW_DIR="${LW_DIR%/}"
+            case "$LW_DIR" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            folder="$(dirname "$LW_DIR")/.family-b04-shared-$LW_RUN-$LW_ATTEMPT"
+            probe="$LW_DIR/family-b04-shared-$LW_RUN-$LW_ATTEMPT"
+            state="$(dirname "$LW_DIR")/.family-b04-shared-$LW_RUN-$LW_ATTEMPT.sqlite"
+            # Hide endpoint first. Keep recovery files if remote restore fails.
+            rm -f -- "$probe/index.php"
+            if [ -f "$folder/config.json" ] && [ -f "$folder/shared_drive_writer.py" ]; then
+              python3 "$folder/shared_drive_writer.py" cleanup
+            fi
+            rm -f -- "$folder/config.json" "$folder/shared_drive_writer.py" "$folder/actions_drive_write_probe.py"
+            if [ -d "$folder/__pycache__" ]; then rm -f -- "$folder/__pycache__/"*.pyc; rmdir "$folder/__pycache__"; fi
+            rm -f -- "$state" "$state-journal" "$state-wal" "$state-shm"
+            if [ -d "$folder" ]; then rmdir "$folder"; fi
+            if [ -d "$probe" ]; then rmdir "$probe"; fi
+            test ! -e "$folder/config.json"
+            test ! -e "$probe/index.php"
+            test ! -e "$state"
+            echo FAMILY_B04_SHARED_WRITER_CLEANUP_PASS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b04-shared-writer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/family-b04-shared/proof.json

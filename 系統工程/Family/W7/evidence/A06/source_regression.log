@@ -1,0 +1,19 @@
+test_api_failure_then_csv_success_keeps_attempts_and_redacts_key (test_macro18_source_response.SourceResponseTests.test_api_failure_then_csv_success_keeps_attempts_and_redacts_key) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+test_malformed_response_retried_without_cached_body (test_macro18_source_response.SourceResponseTests.test_malformed_response_retried_without_cached_body) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+test_rate_limit_is_not_retried_as_parse_error (test_macro18_source_response.SourceResponseTests.test_rate_limit_is_not_retried_as_parse_error) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: HTTPError: 429 Client Error: None for url: https://fred.stlouisfed.org/
+ok
+test_repeated_malformed_response_stops_after_two (test_macro18_source_response.SourceResponseTests.test_repeated_malformed_response_stops_after_two) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+ok
+test_valid_source_is_not_retried (test_macro18_source_response.SourceResponseTests.test_valid_source_is_not_retried) ... FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.017s
+
+OK

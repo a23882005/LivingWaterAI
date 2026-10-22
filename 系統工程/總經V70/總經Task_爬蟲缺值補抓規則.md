@@ -78,3 +78,10 @@ Task提供四個有日期、有來源的原始值，不手填衍生m06。建置�
 - 衍生m06保留原V3公式；其observation_date採rstar與output_gap兩個已驗證季度期末中較早者，四個原始日期另保留在子項與detail，避免將政策生效日或月資料誤標成衍生季度日期。
 - 正式feed命名：policy_schema→policySchema、effective_date→effectiveDate、lower_bound→lowerBound、upper_bound→upperBound、last_verified_at→lastVerifiedAt、source_evidence→sourceEvidence；既有retrievalTime/publicationDate/dataDate保留。sourceEvidence內部保留原snake_case。normalize原樣傳遞，禁止自行產生新查核時間。
 - A03須按同一欄位與期限驗證，修改值／日期／來源即重驗，正式配置動作當下重驗；A04須生產上述證據；A05更新每日程序；A13驗證GitHub／Drive／Task／前端整套相容後發布。本契約不變更其他18項快取資格或投資計分公式。
+
+
+## 六、A04生產者提交前檢查（A13協調切換）
+
+schema維持`V70.3/10h-eight-supplement-v3`，以policy_schema識別新增政策契約；generated_at與as_of_taipei皆為含時區RFC3339，表示同一實際生成時點，as_of_taipei固定+08:00（取代無時區顯示字串）。新輸出由scripts/validate_macro_supplement.py檢查八鍵、時間、單項資格、四站紀錄、政策證據、Forward/FY1證據與MMFI百分比。檢查不會修改輸入或發布。
+
+新Task提示詞位於系統工程/Family/W7/A04_Task提示詞_待A13切換.txt，原真實提示詞與排程已存evidence/A04/task_before.json供差異核對。原提示詞逐字保留於新版前段；A13完成配套相容測試後，同一Task原ID更新prompt，保持排程／啟用／通知；隨後以真實取得資料產出及提交讀回。A04目前的預備測試不替代此真實生產驗收，交由A13收斂。

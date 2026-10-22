@@ -1,0 +1,8 @@
+test_complete_fixture (test_macro_supplement_contract.SupplementTests.test_complete_fixture) ... ok
+test_missing_extra_policy_and_stale (test_macro_supplement_contract.SupplementTests.test_missing_extra_policy_and_stale) ... ok
+test_prompt_preserves_original (test_macro_supplement_contract.SupplementTests.test_prompt_preserves_original) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK

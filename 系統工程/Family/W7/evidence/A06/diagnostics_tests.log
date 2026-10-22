@@ -1,0 +1,27 @@
+test_failed_fetch_cache_preserves_error_and_three_outputs (test_macro18_cache_diagnostics.DiagnosticsTests.test_failed_fetch_cache_preserves_error_and_three_outputs) ... m07       MISSING         None ---
+m01       MISSING         None ---
+m08       MISSING         None ---
+m02       MISSING         None ---
+m04       MISSING         None ---
+m05       MISSING         None ---
+m09       MISSING         None ---
+m10       MISSING         None ---
+m12       MISSING         None ---
+m13       MISSING         None ---
+m17       MISSING         None ---
+m14       MISSING         None ---
+m15       MISSING         None ---
+m16       MISSING         None ---
+m18       MISSING         None ---
+m19       MISSING         None ---
+m20       MISSING         None ---
+s03       MISSING         None ---
+s04       MISSING         None ---
+ok
+test_netliq_common_wednesday_and_exact_13_weeks (test_macro18_cache_diagnostics.DiagnosticsTests.test_netliq_common_wednesday_and_exact_13_weeks) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.016s
+
+OK
+完成輸出: /tmp/tmphwnk2m__/out 獨立指標統計 18 項: {'OK': 0, 'USABLE': 0, 'STALE': 1, 'MISSING': 17} 交換欄位統計: {'OK': 0, 'USABLE': 0, 'STALE': 1, 'MISSING': 18}

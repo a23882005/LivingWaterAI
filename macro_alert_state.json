@@ -1,6 +1,6 @@
 {
   "schema": "D009-alert-state-v1",
-  "updated_at": "2026-10-21",
+  "updated_at": "2026-10-22",
   "indicators": {
     "m07": {
       "consecutive_failures": 0,
@@ -18,9 +18,9 @@
       "status": "OK"
     },
     "m02": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-10-22",
+      "status": "STALE"
     },
     "m04": {
       "consecutive_failures": 0,
@@ -58,9 +58,9 @@
       "status": "OK"
     },
     "m14": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-10-22",
+      "status": "STALE"
     },
     "m15": {
       "consecutive_failures": 0,

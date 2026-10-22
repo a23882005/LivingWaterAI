@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-19T23:08:43.578869+08:00",
+  "generated_at": "2026-10-22T09:35:03.399498+08:00",
   "independent_indicators": {
     "excluded_duplicate": "s03 (same VIX as m07)",
     "summary": {
       "MISSING": 0,
-      "OK": 18,
-      "STALE": 0,
+      "OK": 16,
+      "STALE": 2,
       "USABLE": 0
     },
     "total": 18
@@ -17,23 +17,23 @@
       "id": "m01",
       "label": "10Y−2Y 殖利率曲線",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-21",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "%",
-      "value": 0.35
+      "value": 0.32
     },
     "m02": {
-      "detail": "",
+      "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
       "error": "",
       "id": "m02",
       "label": "HY OAS",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "observation_date": "2026-10-16",
+      "method": "人工查證輸入：既有快取再驗證",
+      "observation_date": "2026-10-19",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
-      "status": "OK",
+      "status": "STALE",
       "unit": "%",
-      "value": 3.31
+      "value": 3.29
     },
     "m04": {
       "detail": "統計月份2026-09；8月54.6",
@@ -54,7 +54,7 @@
       "label": "Core CPI YoY",
       "method": "FRED CPILFESL 同一數列 YoY",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "status": "OK",
       "unit": "%",
       "value": 2.565841
@@ -64,12 +64,12 @@
       "error": "",
       "id": "m07",
       "label": "VIX",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "observation_date": "2026-10-16",
-      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
+      "observation_date": "2026-10-21",
+      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "status": "OK",
       "unit": "",
-      "value": 19.99
+      "value": 16.68
     },
     "m08": {
       "detail": "10Y TIPS real yield",
@@ -77,11 +77,11 @@
       "id": "m08",
       "label": "10Y 實質殖利率",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-21",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "%",
-      "value": 2.74
+      "value": 2.76
     },
     "m09": {
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
@@ -89,11 +89,11 @@
       "id": "m09",
       "label": "DXY",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
-      "observation_date": "2026-10-19",
+      "observation_date": "2026-10-21",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "status": "OK",
       "unit": "",
-      "value": 101.917
+      "value": 101.709
     },
     "m10": {
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
@@ -101,11 +101,11 @@
       "id": "m10",
       "label": "WTI",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
-      "observation_date": "2026-10-19",
+      "observation_date": "2026-10-21",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "status": "OK",
       "unit": "USD/bbl",
-      "value": 97.760002
+      "value": 98.199997
     },
     "m12": {
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
@@ -113,11 +113,11 @@
       "id": "m12",
       "label": "MOVE",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
-      "observation_date": "2026-10-19",
+      "observation_date": "2026-10-21",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
       "status": "OK",
       "unit": "",
-      "value": 102.885201
+      "value": 95.938698
     },
     "m13": {
       "detail": "5Y nominal minus 5Y TIPS real yield on same day",
@@ -125,21 +125,21 @@
       "id": "m13",
       "label": "5Y Breakeven",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-21",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "%",
-      "value": 2.37
+      "value": 2.4
     },
     "m14": {
-      "detail": "開始=2026-07-15, 結束=2026-10-14, 單位十億美元; Fed Δ=12.611000, TGA Δ=89.847000, RRP Δ=0.050000; 淨流動性 Δ=-77.286000",
+      "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
       "error": "",
       "id": "m14",
       "label": "淨流動性 13週變化（$bn）",
-      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
+      "method": "人工查證輸入：既有快取再驗證",
       "observation_date": "2026-10-14",
       "source_url": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
-      "status": "OK",
+      "status": "STALE",
       "unit": "USD bn",
       "value": -77.286
     },
@@ -168,16 +168,16 @@
       "value": -0.7
     },
     "m17": {
-      "detail": "5Y breakeven change from 2026-09-16",
+      "detail": "5Y breakeven change from 2026-09-21",
       "error": "",
       "id": "m17",
       "label": "5Y Breakeven 近1月變化（pp）",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "observation_date": "2026-10-16",
+      "observation_date": "2026-10-21",
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "pp",
-      "value": 0.02
+      "value": 0.07
     },
     "m18": {
       "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率",
@@ -196,9 +196,9 @@
       "error": "",
       "id": "m19",
       "label": "U3 失業率",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
+      "method": "BLS_HISTORY_V2 官方或鏡像時間序列",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "status": "OK",
       "unit": "%",
       "value": 4.2
@@ -210,7 +210,7 @@
       "label": "3個月平均非農新增就業（千人）",
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "observation_date": "2026-09-01",
-      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
       "status": "OK",
       "unit": "千人",
       "value": 50.666667
@@ -221,11 +221,11 @@
       "id": "s03",
       "label": "VIX 短期",
       "method": "與 m07 同步",
-      "observation_date": "2026-10-16",
-      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "observation_date": "2026-10-21",
+      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "status": "OK",
       "unit": "",
-      "value": 19.99
+      "value": 16.68
     },
     "s04": {
       "detail": "來源為 CNN 非公開保證 API",
@@ -233,11 +233,11 @@
       "id": "s04",
       "label": "CNN Fear & Greed",
       "method": "CNN 非官方可讀 JSON（可能變動）",
-      "observation_date": "2026-10-19",
+      "observation_date": "2026-10-21",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "status": "OK",
       "unit": "",
-      "value": 25.269643
+      "value": 31.371429
     }
   },
   "lei_history": [
@@ -246,7 +246,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-06-01",
       "publication_date": "2026-07-20",
-      "retrieved_at": "2026-10-19T15:08:40.115623+00:00",
+      "retrieved_at": "2026-10-22T01:34:59.742835+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
       "status": "OK",
       "unit": "%",
@@ -257,7 +257,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-07-01",
       "publication_date": "2026-08-20",
-      "retrieved_at": "2026-10-19T15:08:41.100146+00:00",
+      "retrieved_at": "2026-10-22T01:35:00.663250+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
       "status": "OK",
       "unit": "%",
@@ -268,7 +268,7 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-08-01",
       "publication_date": "2026-09-18",
-      "retrieved_at": "2026-10-19T15:08:42.044586+00:00",
+      "retrieved_at": "2026-10-22T01:35:01.694989+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
       "status": "OK",
       "unit": "%",
@@ -279,8 +279,8 @@
   "schema": "V70.3/18-macro-collector-v1",
   "summary": {
     "MISSING": 0,
-    "OK": 19,
-    "STALE": 0,
+    "OK": 17,
+    "STALE": 2,
     "USABLE": 0
   }
 }

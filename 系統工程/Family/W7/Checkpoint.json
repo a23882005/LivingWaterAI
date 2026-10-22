@@ -26,10 +26,10 @@
     "H3接任實體校驗及B04可用工具/官方能力查核完成"
   ],
   "in_progress": [
-    "W7-B04 家人帳號／四小時跨對話／共同寫入入口實測"
+    "W7-B04 HTTP入口及中斷恢復已實作；待既有服務連線與實際Chat/Action/Drive驗證"
   ],
   "source_versions": {
-    "main": "521074a65d85ceb7700effeed07df98fa384a9ea",
+    "main": "b63df49e493864b6221417aa9d7de294831533d9",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -52,7 +52,9 @@
     "evidence/A11_A12/",
     "evidence/A13/",
     "evidence/B03/",
-    "B04_TAKEOVER_REVIEW.md"
+    "B04_TAKEOVER_REVIEW.md",
+    "B04_ENTRY_INTERFACE.md",
+    "evidence/B04/entry_tests.log"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -62,7 +64,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人依v1.6.0簡化家人版完成B04最小接線實測；通過後依B05～B23循序，不再維護原29項進度。",
+  "next_action": "本人接上既有託管管理連線，於TEMP合成資源完成實際Chat/Action/Drive端到端驗證，再簽B04接B05。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -153,7 +155,20 @@
         "log_excerpt": "2026-10-22T17:34:47.5797964Z 12 passed in 0.19s\n2026-10-22T17:34:48.5482332Z SHA256 digest of uploaded artifact zip is 86a2dd2ac701c47b9991ee1b9b1a0c03548e84993730e21ac49f647a3bcbbfa7\n2026-10-22T17:34:49.0399898Z Artifact family-w7-synthetic-capability-39823921536.zip successfully finalized. Artifact ID 12445502207\n2026-10-22T17:34:49.0401530Z Artifact family-w7-synthetic-capability-39823921536 has been successfully uploaded! Final size is 669 bytes. Artifact ID is 12445502207\n2026-10-22T17:34:49.0528448Z ##[group]Run echo 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\n2026-10-22T17:34:49.0529457Z \u001b[36;1mecho 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\u001b[0m\n"
       },
       "takeover_review": "能力查核沿用；後續按已核定簡化帳號方案施工，原生Project/device ID不再阻擋開工。",
-      "native_project_device_requirement": "REPLACED_BY_APPROVED_FAMILY_ACCOUNT_BOUNDARY"
+      "native_project_device_requirement": "REPLACED_BY_APPROVED_FAMILY_ACCOUNT_BOUNDARY",
+      "http_entry": {
+        "status": "LOCAL_PASS_CI_PENDING",
+        "tests": 20,
+        "scope": "SYNTHETIC_ONLY",
+        "implementation": "probes/family_entry_probe.py",
+        "report": "B04_ENTRY_INTERFACE.md",
+        "real_http": true,
+        "process_restart": true,
+        "parallel_requests": true,
+        "killed_writer_rollback": true,
+        "live_chatgpt_connection": "PENDING",
+        "service_drive_authorization": "PENDING"
+      }
     },
     "H3_takeover": {
       "payload_files": 363,
@@ -165,7 +180,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23指揮官核定：只用B01～B23，已完成B01～B03、B04進行中；家人帳號識別與最小存檔防覆蓋。",
+  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；20/20本機PASS，GitHub實跑待讀回；現3/23。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,

@@ -1,3 +1,4 @@
+# 2026/10/22 W7-A13：以新版八項補充與核心資料重驗 main 真實 feed；共用政策 Chromium 案例同步保留。
 # 最後修改日期時間：2026/10/20 09:37（台灣時間）｜檔案名稱：v703-frontend-regression.yml｜版本：V70-3-27 瀏覽器回歸測試（季度共識表固定前兩欄）
 # 2026/10/20 本輪回歸：驗證最新 main feed 建置與 Hostinger 上季度完整表格的固定日期／SP500實際報酬兩欄。
 name: LivingWaterAI V70-3-27 Browser Regression

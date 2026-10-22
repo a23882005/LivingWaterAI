@@ -58,7 +58,7 @@
     "A04_tests": "3/3 PASS，提示詞預備完成",
     "A06_tests": "2/2 diagnostics + 5/5 source regression + self-test PASS",
     "A07_tests": "12/12 state-alert + 7/7 source-output PASS",
-    "A08": "YAML parse PASS；isolated runner verification tracked separately；main acceptance pending A13"
+    "A08": "Isolated Actions run39757613903 repair-qa PASS, artifact upload PASS; preflight/notify skipped; formal main acceptance pending A13"
   },
   "review_note": "A07本機驗證完成；A08工程接線完成但正式執行讀回待A13，循序進入A09。"
 }

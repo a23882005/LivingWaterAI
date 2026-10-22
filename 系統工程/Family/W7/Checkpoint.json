@@ -3,10 +3,11 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-A02",
+  "current_work": "W7-A03",
   "completed": [
     "H2接任核對",
-    "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回"
+    "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
+    "W7-A02共同政策證據契約、builder驗證與12項測試"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
@@ -17,13 +18,14 @@
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576"
   },
   "evidence": [
-    "evidence/A01/"
+    "evidence/A01/",
+    "evidence/A02/"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "GitHub runner修補後整鏈重跑於A13；當前為本機真實FRED CSV驗證。"
   ],
-  "next_action": "A02共同政策日期與核實契約",
+  "next_action": "A03前端政策證據、改值重驗及26小時動態保護",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -39,7 +41,8 @@
     "github_readback": "tree matches local",
     "drive_working_zip_id": "1MBqnDK7et_SCQCWzXQN4G4bU9jkSuwlr",
     "A01_initial_zip_sha256": "382dd544cdb5e93a3d0d7628fc45ccd9984cb58424a515d9da08590b85cfea53",
-    "formal_release": "pending A13"
+    "formal_release": "pending A13",
+    "A02_tests": "12/12 PASS + monthly 4/4 PASS"
   },
-  "review_note": "本次僅校正接續狀態；A06完整JSON/CSV診斷保存、A13整鏈驗證發布仍待辦。"
+  "review_note": "A02完成隔離工作版本；A03前端、A04生產者、A13整鏈切換依序接續。"
 }

@@ -1,0 +1,14 @@
+{
+  "schema": "Family-B05-header-tests-v1",
+  "commit": "837271afc0329f864c7bb15a63f4c848f83b7e9d",
+  "run_id": 39871051286,
+  "job_id": 120145295715,
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39871051286",
+  "conclusion": "success",
+  "tests": 16,
+  "artifact_id": 12466810511,
+  "artifact_sha256": "ce757f5f5ebd053e9021abba667d60f4a772fe562259fa5d50e72c410d1d1060",
+  "scope": "SYNTHETIC_HEADER_PARSER_AND_ACL_ONLY",
+  "private_draft_readback": "EXACT_BYTES_PASS_6_HEADERS",
+  "remaining": "Full resource policy review and placement pending; B05 IN_PROGRESS"
+}

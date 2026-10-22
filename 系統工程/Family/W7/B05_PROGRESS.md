@@ -13,3 +13,5 @@ VerifiedPrincipal只能由受信任後端的session驗證層建立；此型別�
 本機測試16/16 PASS：本人權限、錯戶/過期/非驗證principal、文字偽造權限、三種狀態、待綁定拒絕、重複欄位/多表頭/多資源/多file_id、缺少政策、未知操作及萬用權限拒絕。
 
 本人下一步：依B03的169檔清冊完成其餘共用規則/設定資源逐項歸類與外置ACL覆核，驗證完整catalog，將核准表頭放回正確DB/資源同目錄並讀回，再簽B05接B06。B05仍進行中；W7 4/23。
+
+GitHub Actions run39871051286/job120145295715 SUCCESS，16/16 PASS；artifact12466810511/SHA ce757f5f5ebd053e9021abba667d60f4a772fe562259fa5d50e72c410d1d1060。私有草稿Drive下載逐位元一致。

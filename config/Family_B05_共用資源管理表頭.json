@@ -1,0 +1,28 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "config/ib_global_symbols.txt",
+      "git_blob": "238556ad7ba4f0b172580e6126a872e2f2e4249b",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "config/Family_B05_共用資源管理表頭.json",
+      "disposition": "既有區域symbols清單→收集器；保留原排程清單，B19按需批次不覆寫此清單。"
+    },
+    {
+      "path": "config/ib_taiwan_symbols.txt",
+      "git_blob": "feaccf67df166509ce33aaf2c542bbba397e3227",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "config/Family_B05_共用資源管理表頭.json",
+      "disposition": "既有區域symbols清單→收集器；保留原排程清單，B19按需批次不覆寫此清單。"
+    }
+  ]
+}

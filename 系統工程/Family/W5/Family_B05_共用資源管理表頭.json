@@ -1,0 +1,83 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/Family/W5/c7_fixture_lock.json",
+      "git_blob": "ccb7267eec60b50abc07c77d8651d7fa1cec81df",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    },
+    {
+      "path": "系統工程/Family/W5/dependency_lock.json",
+      "git_blob": "0d54ada2dde6e1f6b7d35cd5999dae35249d0de1",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    },
+    {
+      "path": "系統工程/Family/W5/frozen_schema_lock.json",
+      "git_blob": "aa0e1e28b1aab2e45ca1706121a685ee45e8ed72",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    },
+    {
+      "path": "系統工程/Family/W5/reason_catalog.json",
+      "git_blob": "078f269b0cba8089a554668debd309b290c1920c",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/Family/W5/source_lock.json",
+      "git_blob": "b2676db62386211aa862f9129db46c80ba39009c",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    },
+    {
+      "path": "系統工程/Family/W5/technical_source_lock.json",
+      "git_blob": "299306784a2d19749515abf590fd39b89e8939dd",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    },
+    {
+      "path": "系統工程/Family/W5/w2_dependency_lock.json",
+      "git_blob": "eafe7a3833f3384d7ca7fbaaa6a826f282dd953a",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W5/Family_B05_共用資源管理表頭.json",
+      "disposition": "固定程式/schema/驗收fixture來源與SHA清單→原verify_dependencies；沿用，唯一每日快照分離修復見B03_MACRO_LOCK_REPAIR.md。"
+    }
+  ]
+}

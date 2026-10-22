@@ -1,0 +1,50 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/05_C_Canonical_Input.schema.json",
+      "git_blob": "09be5134b4f4af46b26e75342d98813ce2cfdfc5",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/57_C_Work6_Mentor_Adjustment_Result.schema.json",
+      "git_blob": "457ba24a32673a238578c7c8ebb798a4901382e9",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/68_C_Work7_V70_Asset_Framework_Result.schema.json",
+      "git_blob": "fc5a087706c43bb90b437dc73972b8947b5f3d11",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/80_C_Work7_Funding_Context.schema.json",
+      "git_blob": "d2ed33494e2714475d2552a53b8ccbaf0fb3ff82",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    }
+  ]
+}

@@ -6,6 +6,12 @@ on:
       - '.github/workflows/family-b05-resource-headers.yml'
       - '系統工程/Family/W7/resource_headers.py'
       - '系統工程/Family/W7/tests/test_resource_headers.py'
+      - '系統工程/Family/W7/source_resources.py'
+      - '系統工程/Family/W7/source_policies.json'
+      - '系統工程/Family/W7/B05_SOURCE_CATALOG.json'
+      - '系統工程/Family/W7/verify_source_resources.py'
+      - '系統工程/Family/W7/tests/test_source_resources.py'
+      - '**/Family_B05_共用資源管理表頭.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,7 +27,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest==9.1.1
-      - run: python -m pytest 系統工程/Family/W7/tests/test_resource_headers.py -q --junitxml=b05-results.xml
+      - run: python -m pytest 系統工程/Family/W7/tests/test_resource_headers.py 系統工程/Family/W7/tests/test_source_resources.py -q --junitxml=b05-results.xml
+      - run: python 系統工程/Family/W7/verify_source_resources.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

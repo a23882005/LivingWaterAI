@@ -1,0 +1,28 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/schema/runtime_input.schema.json",
+      "git_blob": "7c8ec0e1d3399fe98c48facd15c0883079cf0c91",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/schema/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/schema/runtime_output.schema.json",
+      "git_blob": "77424f97c9962b0312fb79e62f32da0dc72d9633",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/schema/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    }
+  ]
+}

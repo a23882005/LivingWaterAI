@@ -1,0 +1,160 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work3_Context_Handoff_Input.schema_RECHECK2_2026-09-26_1357.json",
+      "git_blob": "1ac4f2425cbe7daad9fc346e1e34a3dc5660dff9",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work3_Context_Handoff_Output.schema_RECHECK2_2026-09-26_1357.json",
+      "git_blob": "384c0d519f272c23faf4f356934c78c63490c948",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Adapter_Input.schema_2026-09-26_1429.json",
+      "git_blob": "d923b2466de17fbb59304ed5c456e50ff8c1fb98",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Output.schema_2026-09-26_1429.json",
+      "git_blob": "bcee7dd0afb9bccfdf81a72e33ad02295e378c5d",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Adapter_Input.schema_RECHECK1_2026-09-27_0207.json",
+      "git_blob": "075940dbaf45e1fdd3b29ffed655380c45e50f55",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Output.schema_RECHECK1_2026-09-27_0207.json",
+      "git_blob": "0631f3383621eee7f93ad21757009d460615e5fb",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Input.schema_2026-09-27_0242.json",
+      "git_blob": "7531088776a81eda21792984b4aebec7b9c5bd41",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Output.schema_2026-09-27_0242.json",
+      "git_blob": "d28b14cd6d63681fe8a8816638e3d3018159875d",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Input.schema_2026-09-28_0017.json",
+      "git_blob": "fde21989b7a8137bbc2774a1a151294be021da4f",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0017.json",
+      "git_blob": "8e17f27869d3d00c75b80a0418a706240a779c80",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Input.schema_RECHECK2_2026-09-28_0157.json",
+      "git_blob": "41a553775cd9b9a54ced37d366ae1feaf109ce01",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Output.schema_RECHECK2_2026-09-28_0157.json",
+      "git_blob": "7f44bc0d353a19736e788dc5acedab2a8e1604dc",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Canonical_Deployment_Result.schema_2026-09-28_0342.json",
+      "git_blob": "424ca8e4d0f655397db8bc63632d95c4ec3e6951",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    },
+    {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Input.schema_2026-09-28_0342.json",
+      "git_blob": "d96ce6ee1db718ef63ea92628b97f45fe462e854",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "source.runtime": {
+    "read": [
+      "account:mou",
+      "account:Arthur",
+      "account:Lilian",
+      "account:Joseph",
+      "service:family-runtime"
+    ],
+    "update": []
+  },
+  "source.qa": {
+    "read": [
+      "service:family-test"
+    ],
+    "update": []
+  },
+  "source.governance": {
+    "read": [
+      "service:family-build"
+    ],
+    "update": []
+  }
+}

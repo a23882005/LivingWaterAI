@@ -1,0 +1,17 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/Family/W6/runtime/W6_17類六情境攻防評等_v1.0.json",
+      "git_blob": "4cd333be719252034b6b9d6e8a787c838db816c4",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/Family/W6/runtime/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    }
+  ]
+}

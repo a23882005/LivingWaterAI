@@ -1,0 +1,17 @@
+{
+  "schema": "Family-source-headers-v1",
+  "policy_catalog": "系統工程/Family/W7/source_policies.json",
+  "resources": [
+    {
+      "path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/contracts/V75_Work4_Deployment_State_Selection_Contract_RECHECK2_FINAL.json",
+      "git_blob": "d0014083daf0fc1ddba8b2ff6e2743704935fb46",
+      "category": "readonly_resource",
+      "policy_ref": "source.runtime",
+      "state": "Close",
+      "readers": [],
+      "updater": null,
+      "header_path": "系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/contracts/Family_B05_共用資源管理表頭.json",
+      "disposition": "凍結schema/規則：只讀載入驗證或分類；結構/$ref見本列，沿用版本鎖，不作個人DB或可變資料。"
+    }
+  ]
+}

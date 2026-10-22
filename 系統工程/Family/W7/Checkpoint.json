@@ -26,10 +26,10 @@
     "H3接任實體校驗及B04可用工具/官方能力查核完成"
   ],
   "in_progress": [
-    "W7-B04 Actions Drive OAuth讀寫/備份/中斷復原PASS；常駐共同writer、ChatGPT跨對話與長期OAuth授權待完成"
+    "W7-B04共同HTTPS queue→Drive writer 27/27 PASS、故障邊界14/14 PASS；登出交界receipt對帳PASS，續MCP/認證、真實跨對話與長期授權"
   ],
   "source_versions": {
-    "main": "4614b04d2fa50562ff25d2bfe5d6cb07159b89d5",
+    "main": "36199c834d986012d5a4b85c59d8c5e567acafe1",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -58,7 +58,9 @@
     "evidence/B04/entry_action_run.json",
     "B04_ACTIONS_CONNECTION.md",
     "evidence/B04/hosted_action_run.json",
-    "evidence/B04/oauth_drive_roundtrip.json"
+    "evidence/B04/oauth_drive_roundtrip.json",
+    "B04_SHARED_WRITER.md",
+    "evidence/B04/shared_writer_action_run.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -68,7 +70,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "總PM本人續共同writer與ChatGPT實際接線；OAuth Testing七天期限待品牌設定與發布條件核對。B04未通過，不提前進B05。",
+  "next_action": "本人完成MCP transport/服務OAuth，再接ChatGPT實際跨對話及常駐服務；Google長期授權持續待處理。B04後循序B05～B23。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -147,7 +149,7 @@
       "session_queue_local_tests": "8/8 PASS",
       "trusted_native_project_session": "NOT_PROVEN",
       "actions_drive_authorization": "PASS_OAUTH_REFRESH_AND_READ_WRITE_RECOVERY",
-      "shared_live_writer": "NOT_PROVEN",
+      "shared_live_writer": "PASS_TEMP_HOSTED_QUEUE_TO_DRIVE; PERMANENT_SERVICE_AND_CHATGPT_PENDING",
       "action_run": {
         "commit": "193c34d1a4faf9c75cde92eba6450eb527e81ff7",
         "run_id": 39823921536,
@@ -171,7 +173,7 @@
         "parallel_requests": true,
         "killed_writer_rollback": true,
         "live_chatgpt_connection": "PENDING",
-        "service_drive_authorization": "PASS_ACTIONS_OAUTH; SHARED_HOSTED_WRITER_PENDING",
+        "service_drive_authorization": "PASS_ACTIONS_OAUTH_AND_TEMP_SHARED_HOSTED_WRITER",
         "action_run": {
           "commit": "1be52b89f733b50f48ac9fd064a8957f49340ace",
           "run_id": 39840388680,
@@ -286,7 +288,92 @@
         "refresh_token_lifetime_days": 7,
         "long_term_authorization": "PENDING_BRANDING_AND_OAUTH_PUBLISHING_REVIEW",
         "official_source": "https://developers.google.com/identity/protocols/oauth2"
-      }
+      },
+      "shared_writer": {
+        "schema": "Family-B04-shared-writer-acceptance-v1",
+        "commit": "36199c834d986012d5a4b85c59d8c5e567acafe1",
+        "run_id": 39869009274,
+        "job_id": 120138396679,
+        "conclusion": "success",
+        "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39869009274",
+        "unit_tests": 14,
+        "report": {
+          "schema": "Family-B04-shared-writer-v1",
+          "status": "PASS",
+          "scope": "TEMP_ONLY_HOSTED_QUEUE_TO_DRIVE",
+          "run": "39869009274-1",
+          "checks": [
+            "unauthenticated_rejected",
+            "action_cannot_login",
+            "fixed_four_hours",
+            "separate_connection_resume",
+            "identity_override_rejected",
+            "action_queues_for_chat",
+            "chat_drains_to_drive",
+            "duplicate_receipt",
+            "collision_rejected",
+            "parallel_chat_action_queue",
+            "parallel_exact_once",
+            "lost_commit_ack_returns_retry",
+            "restart_recovers_without_double_apply",
+            "queue_receipt_after_recovery",
+            "second_lost_ack_returns_retry",
+            "logout_after_lost_ack",
+            "action_revoked_at_boundary",
+            "relogin_reconciles_committed_receipt",
+            "relogin_preserves_single_apply",
+            "other_account_unchanged",
+            "other_account_receipt_denied",
+            "logout_revokes_action",
+            "logout_cancels_pending",
+            "relogin_preserves_drive_data",
+            "independent_actions_drive_readback",
+            "seven_unique_drive_receipts",
+            "original_source_table_preserved"
+          ],
+          "count": 27,
+          "drive_sha256_before_cleanup": "0905ff659a18e421097a4426c039d231ba52b08321ce8d397d3baa1c3561c59b"
+        },
+        "restored": {
+          "state": "RESTORED",
+          "bytes": 8192,
+          "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+          "backup_id": "1ZRKcTzli75zV2g67NbaxAdI3Bst5RzcR"
+        },
+        "cleanup": "PASS_PRIVATE_CONFIG_ENDPOINT_QUEUE_REMOVED",
+        "artifact_id": 12464738416,
+        "artifact_sha256": "f63669ae2b18c743df12600e3558c0135561febdbb1d9be1a6aaf6ecd201c709",
+        "prior_runs": [
+          {
+            "run_id": 39867840207,
+            "unit_tests": 10,
+            "https_checks": 22,
+            "conclusion": "success"
+          },
+          {
+            "run_id": 39867947638,
+            "unit_tests": 13,
+            "https_checks": 22,
+            "conclusion": "success"
+          }
+        ],
+        "existing_regression_runs": [
+          39867840186,
+          39867947753,
+          39869009482
+        ],
+        "limits": [
+          "Synthetic TEMP only",
+          "No real ChatGPT cross-conversation acceptance yet",
+          "Real four-hour expiry and Drive-outage logout not separately exercised live"
+        ]
+      },
+      "remaining_acceptance": [
+        "MCP transport與服務OAuth認證",
+        "真實ChatGPT兩段對話續接",
+        "常駐服務設定與長期Google OAuth授權"
+      ],
+      "session_boundary": "PASS_LOST_ACK_LOGOUT_RELOGIN_RECEIPT_RECONCILIATION; REAL_FOUR_HOUR_EXPIRY_AND_DRIVE_OUTAGE_LOGOUT_NOT_SEPARATELY_LIVE_TESTED"
     },
     "H3_takeover": {
       "payload_files": 363,
@@ -298,7 +385,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23 Actions run39866437563成功，10項測試及TEMP同ID寫入/讀回/程序中斷後原始8192 bytes復原PASS。W7仍3/23。",
+  "review_note": "2026-10-23 run39869009274 SUCCESS：14項程式測試、27項共同入口Drive整合驗收及baseline復原/私密設定清理PASS；W7 3/23，B04進行中。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,

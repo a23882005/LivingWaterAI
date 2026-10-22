@@ -40,3 +40,9 @@ GitHub工具目前提供程式、Actions結果讀取與提交，未提供Secrets
 3. B04通過後依B05～B23循序施工。正式家人/共用/帳號DB只放Drive；Production HOLD、交易NONE、W4取消、RM17凍結。
 
 已實測一般HTTPS跨連線；實際四家人ChatGPT連線、正式帳號與Drive共同writer接線仍在上述未結工作中。工程環境與授權接通之後仍由總PM本人完成實作及驗收。
+
+## 2026-10-23共同writer接線更新
+
+已完成合成HTTPS共同queue到Drive writer的實際接線；單主機flock、Drive持久journal與資料/receipt原子image配合，修復上傳成功但回覆中斷的重試重複問題。程式、部署、驗收及私人設定清理見B04_SHARED_WRITER.md與evidence/B04/shared_writer_action_run.json。接續由本人完成MCP transport、服務端認證與真實跨對話接線，OAuth Testing期限仍在待辦。
+
+登出交界補強：Drive已提交但queue尚未確認時，登出/失效session重新登入先以receipt對帳；已提交工作標為DONE，未提交工作才取消。線上新增登出再登入去重驗收，結果以shared_writer_action_run.json為準。

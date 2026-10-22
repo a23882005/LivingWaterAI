@@ -64,3 +64,9 @@ B04通過後由本人接B05～B23。W7目前3/23；正式家人/共用/帳號DB�
 ## 最新接線實證
 
 既有Actions已於run39842417666實際部署PHP合成入口，18/18 HTTPS及清理PASS。主機部署能力已核實，續接Family Drive指定服務授權與實際ChatGPT工具連線。詳B04_ACTIONS_CONNECTION.md。
+
+## 2026-10-23共同writer更新
+
+Family專用Drive OAuth與TEMP同ID回存/復原已PASS。共同入口已整合單主機writer、持久Drive journal、資料/receipt一起提交與中斷後去重；詳B04_SHARED_WRITER.md、evidence/B04/shared_writer_action_run.json。上方歷史「Drive授權待接」由本段取代。本人下一步接MCP/家人認證與真實ChatGPT跨對話。
+
+登出交界補強：Drive已提交但queue尚未確認時，登出/失效session重新登入先以receipt對帳；已提交工作標為DONE，未提交工作才取消。線上新增登出再登入去重驗收，結果以shared_writer_action_run.json為準。

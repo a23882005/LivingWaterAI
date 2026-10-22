@@ -1,0 +1,79 @@
+{
+  "schema": "Family-B04-shared-writer-acceptance-v1",
+  "commit": "36199c834d986012d5a4b85c59d8c5e567acafe1",
+  "run_id": 39869009274,
+  "job_id": 120138396679,
+  "conclusion": "success",
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39869009274",
+  "unit_tests": 14,
+  "report": {
+    "schema": "Family-B04-shared-writer-v1",
+    "status": "PASS",
+    "scope": "TEMP_ONLY_HOSTED_QUEUE_TO_DRIVE",
+    "run": "39869009274-1",
+    "checks": [
+      "unauthenticated_rejected",
+      "action_cannot_login",
+      "fixed_four_hours",
+      "separate_connection_resume",
+      "identity_override_rejected",
+      "action_queues_for_chat",
+      "chat_drains_to_drive",
+      "duplicate_receipt",
+      "collision_rejected",
+      "parallel_chat_action_queue",
+      "parallel_exact_once",
+      "lost_commit_ack_returns_retry",
+      "restart_recovers_without_double_apply",
+      "queue_receipt_after_recovery",
+      "second_lost_ack_returns_retry",
+      "logout_after_lost_ack",
+      "action_revoked_at_boundary",
+      "relogin_reconciles_committed_receipt",
+      "relogin_preserves_single_apply",
+      "other_account_unchanged",
+      "other_account_receipt_denied",
+      "logout_revokes_action",
+      "logout_cancels_pending",
+      "relogin_preserves_drive_data",
+      "independent_actions_drive_readback",
+      "seven_unique_drive_receipts",
+      "original_source_table_preserved"
+    ],
+    "count": 27,
+    "drive_sha256_before_cleanup": "0905ff659a18e421097a4426c039d231ba52b08321ce8d397d3baa1c3561c59b"
+  },
+  "restored": {
+    "state": "RESTORED",
+    "bytes": 8192,
+    "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+    "backup_id": "1ZRKcTzli75zV2g67NbaxAdI3Bst5RzcR"
+  },
+  "cleanup": "PASS_PRIVATE_CONFIG_ENDPOINT_QUEUE_REMOVED",
+  "artifact_id": 12464738416,
+  "artifact_sha256": "f63669ae2b18c743df12600e3558c0135561febdbb1d9be1a6aaf6ecd201c709",
+  "prior_runs": [
+    {
+      "run_id": 39867840207,
+      "unit_tests": 10,
+      "https_checks": 22,
+      "conclusion": "success"
+    },
+    {
+      "run_id": 39867947638,
+      "unit_tests": 13,
+      "https_checks": 22,
+      "conclusion": "success"
+    }
+  ],
+  "existing_regression_runs": [
+    39867840186,
+    39867947753,
+    39869009482
+  ],
+  "limits": [
+    "Synthetic TEMP only",
+    "No real ChatGPT cross-conversation acceptance yet",
+    "Real four-hour expiry and Drive-outage logout not separately exercised live"
+  ]
+}

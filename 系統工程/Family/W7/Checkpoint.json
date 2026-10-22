@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-B03",
+  "current_work": "W7-B04",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -21,12 +21,13 @@
     "W7-A13完整交付包自足建置與65測試、雙端逐檔驗證",
     "W7-A14總經故障階段驗收及治理結案",
     "W7-B01四戶獨立正式DB建立、身分/版本/schema登錄與Drive讀回",
-    "W7-B02共用來源/schema及WORK12真實計算元件定位、原碼介面讀取驗證"
+    "W7-B02共用來源/schema及WORK12真實計算元件定位、原碼介面讀取驗證",
+    "W7-B03 169檔存取/呼叫/動態依賴逐檔處置、W2/W6/WORK12接線責任與來源鎖核對完成"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
   "in_progress": [
-    "W7-B03全線直接/間接存取與動態依賴清冊"
+    "W7-B04可信Project/session與Chat/Action共同寫入入口能力驗證"
   ],
   "source_versions": {
     "main": "b952f6feee4461b2c8de280c329d1ce0ab704530",
@@ -53,9 +54,10 @@
     "B01名稱搜尋漏列系統工程/資料庫內四個16384-byte舊DB；未改舊庫，維持已驗收W5四庫現用ID映射，補正不得以搜尋空結果宣稱不存在。",
     "B09: permission_bridge歷史持倉集合需與position_view共同清倉投影；合成零股仍持有及同時點順序依賴已重現。",
     "B10/B19: technical_source_bridge真實snapshot模式固定2026-10-19/20可用時點，正式接線需可信當批收據。",
-    "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。"
+    "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
+    "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人完成C/vendor/WORK12其餘逐檔讀寫處置，再驗收B03接B04",
+  "next_action": "本人核對合成Action實跑與雙端治理；接續定位可信Project/session及具Drive授權之共同writer入口，未證實前不簽B04完成",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -63,7 +65,7 @@
     "W4": "CANCELLED",
     "RM17": "FROZEN"
   },
-  "current_work_status": "IN_PROGRESS",
+  "current_work_status": "PARTIAL_CAPABILITY_PROVEN",
   "verification": {
     "new_tests": "5/5 PASS",
     "existing_d009_tests": "9/9 PASS",
@@ -111,7 +113,7 @@
     "B01": "4/4 identity match, SQLite integrity ok, foreign keys 0 errors, Drive byte readback PASS, root owner-only",
     "B02": "PASS_SOURCE_INVENTORY: WORK12 accepted archive located; original CAGR/MDD imports and synthetic smoke pass; two distinct DB schemas and release-state gates identified",
     "B03": {
-      "status": "IN_PROGRESS",
+      "status": "PASS_INVENTORY",
       "source_files": 161,
       "python_ast_modules": 115,
       "dynamic_schema_checks": 26,
@@ -122,8 +124,21 @@
       "W2_source_integration": "6 exact accepted source files, original tests 9/9 and W5 seam tests 4/4 PASS",
       "W6_disposition": "6 renderer files reviewed; data/template dependencies and B16 parameterization recorded",
       "macro_lock_repair": "Immutable accepted fixture preserves original SHA; original verifier 115/115; 5/5 separation tests PASS",
-      "W5_top_level_disposition": "30/30 GitHub bytes and blob matched; semantic I/O/disposition complete; two synthetic projection diagnostics reproduced, B09 fix pending"
+      "W5_top_level_disposition": "30/30 GitHub bytes and blob matched; semantic I/O/disposition complete; two synthetic projection diagnostics reproduced, B09 fix pending",
+      "current_inventory_files": 169,
+      "work12_original_modules": 2,
+      "work12_source_and_boundary_tests": "4/4 PASS",
+      "closure_report": "B03_CLOSEOUT.md"
+    },
+    "B04": {
+      "status": "PARTIAL",
+      "pm_chat_drive_roundtrip": "PASS same ID, 57->58 synthetic, exact byte readback",
+      "session_queue_local_tests": "8/8 PASS",
+      "trusted_native_project_session": "NOT_PROVEN",
+      "actions_drive_authorization": "NOT_PROVEN",
+      "shared_live_writer": "NOT_PROVEN",
+      "action_run": "PENDING_PUSH"
     }
   },
-  "review_note": "A01～A14、B01/B02來源盤點完成；B03施工中。正式W7 0/29維持。B02不含B12/B20/B21正式運行接線。"
+  "review_note": "B03盤點完成；B04合成原型及PM Drive回存已驗證，平台可信Project/session與跨Chat/Action正式寫入入口仍待實證。正式W7 0/29。"
 }

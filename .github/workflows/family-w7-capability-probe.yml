@@ -1,0 +1,32 @@
+name: Family W7 synthetic capability probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-w7-capability-probe.yml'
+      - '系統工程/Family/W7/probes/**'
+      - '系統工程/Family/W7/tests/test_session_queue_probe.py'
+      - '系統工程/Family/W7/tests/test_work12_source_contract.py'
+      - '系統工程/Family/W7/vendor/work12/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest 系統工程/Family/W7/tests/test_session_queue_probe.py 系統工程/Family/W7/tests/test_work12_source_contract.py -q --junitxml=synthetic-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-w7-synthetic-capability-${{ github.run_id }}
+          path: synthetic-results.xml
+      - run: echo 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> "$GITHUB_STEP_SUMMARY"

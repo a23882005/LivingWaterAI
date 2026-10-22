@@ -1,0 +1,16 @@
+{
+  "scope": "SYNTHETIC_W7_CAPABILITY_ONLY",
+  "file_id": "1SDnOCLoHpX-XfJ9v838o84VJmzdmoPzI",
+  "backup_id": "1N2MWpHKyr0mMDrRVstfU4bwgws9uM28T",
+  "before_value": 57,
+  "after_value": 58,
+  "before_sha256": "a64c9fc8092a57edd47480bb149053aa1c3ca3d3a99a1aa80fddca1955b08ab3",
+  "after_sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+  "byte_readback": "PASS",
+  "sqlite_integrity": "ok",
+  "limitations": [
+    "PM connector only; not proof of each family Chat permissions",
+    "No proof of trusted native Project identifier",
+    "No proof of Actions Drive credentials or distributed queue"
+  ]
+}

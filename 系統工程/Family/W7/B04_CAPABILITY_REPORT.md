@@ -8,4 +8,4 @@
 
 既有PM工具對TEMP DB回存及原12項Actions通過證據保留在evidence/B04/。
 
-本人下一步接上既有託管管理連線，核實入口及Drive授權，再於TEMP資源端到端實測。通過B04後由本人循序接B05～B23。正式DB僅Drive；Production HOLD、交易NONE、W4取消、RM17凍結。
+本人下一步沿既有GitHub Actions部署管線接線，核實入口及Drive授權，再於TEMP資源端到端實測；Hostinger管理外掛不作前置。通過B04後由本人循序接B05～B23。正式DB僅Drive；Production HOLD、交易NONE、W4取消、RM17凍結。

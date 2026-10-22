@@ -51,10 +51,12 @@ python 系統工程/Family/W7/probes/family_entry_probe.py --state /tmp/family-s
 
 只綁定127.0.0.1；stdout輸出實際port，未部署公網服務。合成庫與key不納入GitHub或工作包。
 
-## 接續施工所需的外部連線
+## 接續施工：沿既有GitHub Actions部署
 
-本回合工具清單沒有Hostinger管理工具；本執行環境的Codex設定亦沒有Hostinger MCP註冊，無Codex CLI。未取得可驗證的既有Family服務端點或服務端Drive授權。Hostinger技能的註冊/OAuth需要應用程式宿主配合，遠端暫存執行環境的設定不等於指揮官Android應用程式已連線。
+2026-10-23指揮官最新指示：部署由既有GitHub Actions處理；Hostinger管理外掛不作前置。總PM本人沿既有Actions部署管線核對與接線，完成Family入口及Drive端到端驗證。
 
-下一步由總PM本人接上既有託管環境的可用管理連線，核對服務能力及既有授權後，於TEMP合成資源實測Chat與Action共用入口、Drive下載/備份/同ID回存/讀回。正式家人/共用/帳號DB仍只存Drive。實際ChatGPT跨對話登入與Action到Drive端到端驗證保留為B04未結事項。
+已核對既有`.github/workflows/v703-site-deploy-1100.yml`：Actions使用既有SFTP/SSH secrets與網站目錄變數，完成上傳、線上讀回及部署回執。本輪只讀既有設定引用，不讀取secret值；其部署能力供Family接線參考，原總經發布流程維持既有用途。
 
-B04完成上述實證才簽收並接B05～B23。W7仍3/23；Production HOLD、交易NONE、W4取消、RM17凍結。
+下一步由總PM本人循序完成Family測試入口、Actions到服務/Drive的授權與TEMP合成DB下載、備份、同ID回存、讀回。實際ChatGPT跨對話與共同寫入驗證仍屬B04收尾；不以Hostinger外掛可用性阻擋施工。
+
+B04通過後由本人接B05～B23。W7目前3/23；正式家人/共用/帳號DB僅Drive；Production HOLD、交易NONE、W4取消、RM17凍結。

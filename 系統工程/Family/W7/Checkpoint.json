@@ -65,7 +65,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人接上既有託管管理連線，於TEMP合成資源完成實際Chat/Action/Drive端到端驗證，再簽B04接B05。",
+  "next_action": "本人沿既有GitHub Actions部署管線完成Family測試入口及Drive授權/回存端到端驗證；Hostinger管理外掛不作前置。通過B04後接B05～B23。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -197,7 +197,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；本機20/20、GitHub run39840388680 20/20 PASS；待實際託管與Chat/Action/Drive連線，現3/23。",
+  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；本機20/20、GitHub run39840388680 20/20 PASS；待實際託管與Chat/Action/Drive連線，現3/23。 2026-10-23指揮官最新指示：部署由既有GitHub Actions處理；Hostinger管理外掛不作前置。總PM本人沿既有Actions部署管線核對與接線，完成Family入口及Drive端到端驗證。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,
@@ -231,5 +231,12 @@
       "W7-B23"
     ],
     "rule": "唯一正式進度；每項依契約完成條件與證據裁定"
+  },
+  "deployment_route": {
+    "executor": "GitHub Actions",
+    "hostinger_plugin_required": false,
+    "decision": "指揮官2026-10-23明示",
+    "existing_reference": ".github/workflows/v703-site-deploy-1100.yml",
+    "scope": "沿用既有部署能力，Family測試接線；正式Production仍HOLD"
   }
 }

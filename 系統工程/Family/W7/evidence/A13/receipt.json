@@ -1,0 +1,23 @@
+{
+  "status": "A13_IN_PROGRESS",
+  "main_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
+  "core_commit": "463a50e0ff86defaf60408913b86cc10db77de0c",
+  "state_commit": "efe9728698cf8bc71d099cb77770b85b6cc1bdf6",
+  "core_run": 39761729130,
+  "core_run_result": "success",
+  "artifact_id": 12417204540,
+  "artifact_sha256": "e75476e4ec510029d3958dab76f8208622d6db577556f385ca95a0a9b3805e1d",
+  "artifact_core_equals_main": true,
+  "artifact_diagnostics_equals_state": true,
+  "diagnostics_report_equals_main": true,
+  "diagnostics_report_sha256": "de7f0f237121c3ea1e07c25fe329af8235a4d35dc9bf6bbe1f3a94de7f1f2ae9",
+  "browser_contract_job": 119767281122,
+  "browser_contract_result": "success",
+  "real_feed_browser_job": 119767280754,
+  "real_feed_browser_result": "blocked on pre-refresh core and old policy schema",
+  "task_run": "1a571116-8b18-8327-9897-f26d909a66a4",
+  "task_status": "in_progress",
+  "crawler_zip_sha256": "41a42df3d8e7636b38a4aa50ad700627d1a177e89e0ad4330dd64d7bff892411",
+  "crawler_zip_backup": "187kFwJ1R_UURP-z37054dh2xg5pPqhM7",
+  "formal_release": "pending Task output, real-feed acceptance, deployment readback and full package sync"
+}

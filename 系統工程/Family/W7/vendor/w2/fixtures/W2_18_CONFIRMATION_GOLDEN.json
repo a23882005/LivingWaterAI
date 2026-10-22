@@ -1,0 +1,24 @@
+{
+  "fixture_type": "SYNTHETIC_TEST_ONLY",
+  "input_draft_fixture": "W2_17_TARGET_DRAFT_GOLDEN.json",
+  "client_id": "CLIENT_TEST_A",
+  "target_version": 1,
+  "proposal": {
+    "proposed_at": "2026-10-20T07:00:00+08:00",
+    "expires_at": "2026-10-20T08:00:00+08:00",
+    "policy_version": "W2-07-TEST-v1",
+    "data_version": "TEST-DATA-v1",
+    "source_reference_ids": ["SRC_TEST_FUNDING", "SRC_TEST_TARGET"]
+  },
+  "confirmation": {
+    "action": "CONFIRM",
+    "client_explicit_decision": "TRUE",
+    "confirmed_at": "2026-10-20T07:20:00+08:00",
+    "confirmed_by": "CLIENT_TEST_A"
+  },
+  "expected": {
+    "status": "CONFIRMED",
+    "state_scope": "ISOLATED_TEST_STAGING",
+    "external_commit": false
+  }
+}

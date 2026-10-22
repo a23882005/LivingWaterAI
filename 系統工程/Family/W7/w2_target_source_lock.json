@@ -1,0 +1,55 @@
+{
+  "schema": "Family.W7.W2TargetSourceLock.v1",
+  "source": "W5_FULL.zip from verified H2",
+  "files": [
+    {
+      "archive_member": "w2/runtime/c_configuration_core/work17/target_draft.py",
+      "destination": "vendor/w2/runtime/c_configuration_core/work17/target_draft.py",
+      "sha256": "5a3694ffe0613a30bbdca7f6d82054dfe4c39f7919076d50e04a66e16e3c7640",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    },
+    {
+      "archive_member": "w2/runtime/c_configuration_core/work18/target_confirmation.py",
+      "destination": "vendor/w2/runtime/c_configuration_core/work18/target_confirmation.py",
+      "sha256": "e43bdd331e876673d646a577117bfe4ded8176af19470926cd66523fab5c1060",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    },
+    {
+      "archive_member": "w2/tests/test_w2_17_target_draft.py",
+      "destination": "vendor/w2/tests/test_w2_17_target_draft.py",
+      "sha256": "60ca0f77e29dc304b19af11357366207bcabea85790d71592eae3b06acb851a0",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    },
+    {
+      "archive_member": "w2/tests/test_w2_18_target_confirmation.py",
+      "destination": "vendor/w2/tests/test_w2_18_target_confirmation.py",
+      "sha256": "5c00b0ef4a419bac6fffb1a82307bdc7486069f2f2d67a33a32f5d3602f4441c",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    },
+    {
+      "archive_member": "w2/fixtures/W2_17_TARGET_DRAFT_GOLDEN.json",
+      "destination": "vendor/w2/fixtures/W2_17_TARGET_DRAFT_GOLDEN.json",
+      "sha256": "d7e8cd820882aad2f8339e21ee0944a36646bca07b755f57af3c935cfa73a4a1",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    },
+    {
+      "archive_member": "w2/fixtures/W2_18_CONFIRMATION_GOLDEN.json",
+      "destination": "vendor/w2/fixtures/W2_18_CONFIRMATION_GOLDEN.json",
+      "sha256": "9559b9fbf575fa0b1d5baa5cc17eaebcad306d16e973b0a86114ccb7b6a0e21b",
+      "disposition": "EXACT_ACCEPTED_SOURCE_REUSE",
+      "direct_io": "fixtures read by tests only; producers operate on in-memory mappings",
+      "dependencies": "Python standard library; tests import work17/work18 and two synthetic fixtures"
+    }
+  ],
+  "scope": "target producers, original synthetic tests and fixtures; persistence B14 pending"
+}

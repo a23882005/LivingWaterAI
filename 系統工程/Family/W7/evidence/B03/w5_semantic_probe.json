@@ -1,0 +1,21 @@
+{
+  "scope": "SYNTHETIC_ONLY_DIAGNOSTIC_NOT_REMEDIATION_PASS",
+  "source_commit": "2d569cc9d61bc70538f5dd6e3087d4af5d014e08",
+  "source_sha256": {
+    "permission_bridge.py": "b2446b2677b16b849740efc26ca389a8a9be1cf7eb8d29f16f1b7e6639567e6f",
+    "family_boundary.py": "2c305b080a4bd5147b3da85db2f6c8090508c91a977227f753083c8877b9af9e"
+  },
+  "cleared_position": {
+    "latest_quantity": "0",
+    "observed_existing_holding": true,
+    "observed_retain": true,
+    "required_work": "W7-B09",
+    "status": "REPRODUCED_PENDING_FIX"
+  },
+  "same_timestamp": {
+    "forward": "10",
+    "reversed": "0",
+    "status": "ORDER_DEPENDENCE_REPRODUCED",
+    "downstream": "stock/bond source bridges reject ambiguity; B09 centralizes projection"
+  }
+}

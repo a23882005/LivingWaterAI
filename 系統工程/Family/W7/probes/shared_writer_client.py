@@ -41,10 +41,10 @@ function drive_call($body) {
     php=php.replace('SELECT seq,delta FROM jobs','SELECT seq,delta,request_id FROM jobs')
     old="""$query('UPDATE counters SET value=value+? WHERE account=?',[$job['delta'],$account]);
                     $v=$query('SELECT value FROM counters WHERE account=?',[$account])->fetchColumn();"""
-    new="""$v=drive_call(['account'=>$account,'request_id'=>$job['request_id'],'delta'=>(int)$job['delta']]);"""
+    new="""$v=drive_call(['account'=>$account,'request_id'=>$job['request_id'],'delta'=>(int)$job['delta'],'expires'=>(int)$s['expires']]);"""
     assert old in php;php=php.replace(old,new)
     old="$v=$query('SELECT value FROM counters WHERE account=?',[$account])->fetchColumn();"
-    assert old in php;php=php.replace(old,"$v=drive_call(['account'=>$account]);")
+    assert old in php;php=php.replace(old,"$v=drive_call(['account'=>$account,'expires'=>(int)$s['expires']]);")
     php=php.replace('.family-w7-probe-', '.family-b04-shared-')
     (public/'index.php').write_text(php)
     for name in ['shared_drive_writer.py','actions_drive_write_probe.py']:

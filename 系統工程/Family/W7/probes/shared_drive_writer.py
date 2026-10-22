@@ -10,6 +10,7 @@ from pathlib import Path
 import sqlite3
 import sys
 import tempfile
+import time
 from actions_drive_write_probe import Drive, API, TEST_ID, BACKUP_FOLDER, KEYS, target, checked, digest
 
 PREFIX = 'b04s_'
@@ -83,7 +84,13 @@ def db_operation(data, account, request_id=None, delta=None):
             db.close()
         return checked(path.read_bytes()), {'value': value, 'duplicate': False}
 
+def deadline(body):
+    expires = body.get('expires')
+    if type(expires) is not int or time.time() >= expires:
+        raise RuntimeError('session_expired')
+
 def apply(d, run, body, crash=False):
+    deadline(body)
     original = resolve(d, run)
     candidate, result = db_operation(original, body['account'], body.get('request_id'), body.get('delta'))
     if candidate == original: return result
@@ -94,6 +101,7 @@ def apply(d, run, body, crash=False):
     p = props(d)
     if p.get(PREFIX+'before') != digest(original) or p.get(PREFIX+'after') != digest(candidate) or d.read() != original:
         raise RuntimeError('journal_conflict')
+    deadline(body)
     d.write(candidate)
     if crash: os._exit(73)
     if d.read() != candidate: raise RuntimeError('readback_mismatch')

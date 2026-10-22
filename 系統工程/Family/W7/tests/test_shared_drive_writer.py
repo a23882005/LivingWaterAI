@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import sqlite3
 import sys
+import time
 import pytest
 sys.path.insert(0,str(Path(__file__).parents[1]/'probes'))
 import shared_drive_writer as w
@@ -27,7 +28,7 @@ class Fake:
         self.data=data;self.count+=1
         if self.fail=='after-upload':raise OSError()
 
-def body(rid='one',account='synthetic-A',delta=7):return dict(account=account,request_id=rid,delta=delta)
+def body(rid='one',account='synthetic-A',delta=7):return dict(account=account,request_id=rid,delta=delta,expires=int(time.time())+14400)
 
 @pytest.mark.parametrize('boundary',['before-journal','before-upload','after-upload'])
 def test_retry_each_failure_boundary(data,boundary):
@@ -36,7 +37,7 @@ def test_retry_each_failure_boundary(data,boundary):
     d.fail=None
     assert w.apply(d,'run',body())['value']==7
     assert w.apply(d,'run',body())=={'value':7,'duplicate':True}
-    assert w.apply(d,'run',{'account':'synthetic-B'})['value']==0
+    assert w.apply(d,'run',{'account':'synthetic-B','expires':int(time.time())+14400})['value']==0
     assert w.cleanup(d,'run')['state']=='RESTORED';assert d.data==data
 
 @pytest.mark.parametrize('boundary',['before-upload','after-upload'])
@@ -72,4 +73,23 @@ def test_identity_guard(data):
 def test_ack_lost_retry_preserves_later_receipt(data):
     d=Fake(data);w.initialize(d,'run');w.apply(d,'run',body());w.apply(d,'run',body('two',delta=3))
     assert w.apply(d,'run',body())['value']==7
-    assert w.apply(d,'run',{'account':'synthetic-A'})['value']==10
+    assert w.apply(d,'run',{'account':'synthetic-A','expires':int(time.time())+14400})['value']==10
+
+
+def test_expired_before_upload_does_not_write(data,monkeypatch):
+    d=Fake(data);w.initialize(d,'run');request=body();calls=iter([request['expires']-1,request['expires']])
+    monkeypatch.setattr(w.time,'time',lambda:next(calls))
+    with pytest.raises(RuntimeError,match='session_expired'):w.apply(d,'run',request)
+    assert d.count==0;assert d.data==data
+
+def test_missing_deadline_rejected(data):
+    d=Fake(data);w.initialize(d,'run');request=body();request.pop('expires')
+    with pytest.raises(RuntimeError,match='session_expired'):w.apply(d,'run',request)
+    assert d.count==0
+
+def test_source_table_preserved_exactly(data,tmp_path):
+    candidate,result=w.db_operation(data,'synthetic-A','one',7)
+    p=tmp_path/'readback.db';p.write_bytes(candidate)
+    with sqlite3.connect(p) as db:
+        assert db.execute('select * from original').fetchall()==[(58,)]
+        assert db.execute("select sql from sqlite_master where name='original'").fetchone()==('CREATE TABLE original(value integer)',)

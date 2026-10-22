@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.6.0",
-  "current_work": "W7-B04",
+  "current_work": "W7-B05",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -23,13 +23,14 @@
     "W7-B01四戶獨立正式DB建立、身分/版本/schema登錄與Drive讀回",
     "W7-B02共用來源/schema及WORK12真實計算元件定位、原碼介面讀取驗證",
     "W7-B03 169檔存取/呼叫/動態依賴逐檔處置、W2/W6/WORK12接線責任與來源鎖核對完成",
-    "H3接任實體校驗及B04可用工具/官方能力查核完成"
+    "H3接任實體校驗及B04可用工具/官方能力查核完成",
+    "W7-B04依v1.6.0最小能力實測範圍驗收PASS：入口、服務授權、共同寫入、中斷/登出恢復及正式接線依據"
   ],
   "in_progress": [
-    "W7-B04共同HTTPS queue→Drive writer 27/27 PASS、故障邊界14/14 PASS；登出交界receipt對帳PASS，續MCP/認證、真實跨對話與長期授權"
+    "W7-B05表頭解析/權限檢查16/16 PASS；六DB私有表頭草稿保存，續169檔資源覆核與正式落位"
   ],
   "source_versions": {
-    "main": "36199c834d986012d5a4b85c59d8c5e567acafe1",
+    "main": "109e99eaa2a760fc7ddc1fbf13c18e25f7540d35",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -60,7 +61,9 @@
     "evidence/B04/hosted_action_run.json",
     "evidence/B04/oauth_drive_roundtrip.json",
     "B04_SHARED_WRITER.md",
-    "evidence/B04/shared_writer_action_run.json"
+    "evidence/B04/shared_writer_action_run.json",
+    "B04_CLOSEOUT.md",
+    "B05_PROGRESS.md"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -70,7 +73,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人完成MCP transport/服務OAuth，再接ChatGPT實際跨對話及常駐服務；Google長期授權持續待處理。B04後循序B05～B23。",
+  "next_action": "本人續B05其餘共用資源清冊/外置ACL覆核與表頭落位，驗收後接B06；正式認證與ChatGPT接線歸B07，跨對話/裝置及長時間情境由B23/W8完成。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -78,7 +81,7 @@
     "W4": "CANCELLED",
     "RM17": "FROZEN"
   },
-  "current_work_status": "PARTIAL_CAPABILITY_PROVEN",
+  "current_work_status": "IN_PROGRESS",
   "verification": {
     "new_tests": "5/5 PASS",
     "existing_d009_tests": "9/9 PASS",
@@ -144,7 +147,7 @@
       "closure_report": "B03_CLOSEOUT.md"
     },
     "B04": {
-      "status": "PARTIAL",
+      "status": "PASS_MINIMAL_CAPABILITY_SCOPE",
       "pm_chat_drive_roundtrip": "PASS same ID, 57->58 synthetic, exact byte readback",
       "session_queue_local_tests": "8/8 PASS",
       "trusted_native_project_session": "NOT_PROVEN",
@@ -368,12 +371,24 @@
           "Real four-hour expiry and Drive-outage logout not separately exercised live"
         ]
       },
-      "remaining_acceptance": [
-        "MCP transport與服務OAuth認證",
-        "真實ChatGPT兩段對話續接",
-        "常駐服務設定與長期Google OAuth授權"
-      ],
-      "session_boundary": "PASS_LOST_ACK_LOGOUT_RELOGIN_RECEIPT_RECONCILIATION; REAL_FOUR_HOUR_EXPIRY_AND_DRIVE_OUTAGE_LOGOUT_NOT_SEPARATELY_LIVE_TESTED"
+      "session_boundary": "PASS_LOST_ACK_LOGOUT_RELOGIN_RECEIPT_RECONCILIATION; REAL_FOUR_HOUR_EXPIRY_AND_DRIVE_OUTAGE_LOGOUT_NOT_SEPARATELY_LIVE_TESTED",
+      "closeout_report": "B04_CLOSEOUT.md",
+      "followups_by_stage": {
+        "B06": [
+          "正式共同writer與資源權限接線"
+        ],
+        "B07": [
+          "MCP transport/家人服務OAuth",
+          "真實ChatGPT跨對話接線",
+          "Google長期授權與常駐設定"
+        ],
+        "B18_B21": [
+          "正式Action接共同writer"
+        ],
+        "B23_W8": [
+          "四戶真實保存、跨對話/裝置切換、實際四小時及Drive離線情境"
+        ]
+      }
     },
     "H3_takeover": {
       "payload_files": 363,
@@ -383,21 +398,34 @@
       "git_snapshot_files": 282,
       "sqlite_checks": 5,
       "status": "PASS"
+    },
+    "B05": {
+      "status": "IN_PROGRESS",
+      "local_tests": "16/16 PASS",
+      "private_draft_id": "1Il5hlTRi7dyuw9LxWAQPacZoQD7Pe5IS",
+      "draft_headers": 6,
+      "bound_existing_resources": 5,
+      "account_database_binding": "PENDING_B07_FAIL_CLOSED",
+      "remaining": [
+        "B03其餘資源逐項覆核",
+        "外置政策核定與完整catalog",
+        "表頭同目錄落位/讀回"
+      ]
     }
   },
-  "review_note": "2026-10-23 run39869009274 SUCCESS：14項程式測試、27項共同入口Drive整合驗收及baseline復原/私密設定清理PASS；W7 3/23，B04進行中。",
+  "review_note": "2026-10-23重新依原v1.6.0契約裁定B04最小能力實測PASS；修正PM將正式接線提前作B04阻擋的工序膨脹。功能未完成項逐項歸回B06/B07/B18/B21/B23/W8。W7 4/23，B05進行中。",
   "w7_progress": {
     "scheme": "B01-B23",
-    "completed": 3,
+    "completed": 4,
     "total": 23,
-    "current": "W7-B04",
+    "current": "W7-B05",
     "completed_ids": [
       "W7-B01",
       "W7-B02",
-      "W7-B03"
+      "W7-B03",
+      "W7-B04"
     ],
     "remaining_ids": [
-      "W7-B04",
       "W7-B05",
       "W7-B06",
       "W7-B07",

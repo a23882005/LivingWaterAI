@@ -1,0 +1,29 @@
+name: Family B05 resource headers
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b05-resource-headers.yml'
+      - '系統工程/Family/W7/resource_headers.py'
+      - '系統工程/Family/W7/tests/test_resource_headers.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  headers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest 系統工程/Family/W7/tests/test_resource_headers.py -q --junitxml=b05-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b05-headers-${{ github.run_id }}
+          path: b05-results.xml

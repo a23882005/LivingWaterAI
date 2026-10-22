@@ -2,6 +2,9 @@ import contextlib,csv,datetime as dt,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 import pandas as pd
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from validate_macro18_outputs import validate_outputs
 from test_macro18_source_response import macro
 
 class DiagnosticsTests(unittest.TestCase):
@@ -28,6 +31,10 @@ class DiagnosticsTests(unittest.TestCase):
    self.assertEqual(json.loads(rows['m02']['cache_source']),r['cache_source'])
    report=(Path(tmp)/'out/18_macro_report.md').read_text();self.assertIn('synthetic timeout',report);self.assertIn('2026-10-20T01:00:00Z',report)
    self.assertEqual(json.loads((Path(tmp)/'out/18_macro_verification.json').read_text())['items']['m02'],r)
+   self.assertEqual(validate_outputs(Path(tmp)/'out'),19)
+   csvpath=Path(tmp)/'out/18_macro_verification.csv'
+   csvpath.write_text(csvpath.read_text(encoding='utf-8-sig').replace('synthetic timeout','erased'),encoding='utf-8-sig')
+   with self.assertRaises(ValueError):validate_outputs(Path(tmp)/'out')
  def test_netliq_common_wednesday_and_exact_13_weeks(self):
   dates=pd.to_datetime(['2026-07-15','2026-10-14','2026-10-15'])
   series={'WALCL':pd.Series([10000,12000,15000],index=dates),'WDTGAL':pd.Series([1000,1500,2000],index=dates),'RRPONTSYD':pd.Series([1,1.25,3],index=dates)}

@@ -3,19 +3,21 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-A07",
+  "current_work": "W7-A09",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
     "W7-A02共同政策證據契約、builder驗證與12項測試",
     "W7-A03前後端契約一致、正式配置當下重驗及開頁過期保護",
     "W7-A05每日程序口徑補正（正式交付包A13切換）",
-    "W7-A06快取錯誤與來源診斷保存、CSV/JSON/報告測試"
+    "W7-A06快取錯誤與來源診斷保存、CSV/JSON/報告測試",
+    "W7-A07最新診斷與歷史分離、歷史復原、診斷告警及期限盤點"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
   "in_progress": [
-    "W7-A04 PREPARED_PENDING_A13_ACTIVATION：實際Task切換與真實產出讀回待A13"
+    "W7-A04 PREPARED_PENDING_A13_ACTIVATION：實際Task切換與真實產出讀回待A13",
+    "W7-A08 IMPLEMENTED_PENDING_A13：隔離接線完成；main診斷保存與產物/狀態分支一致讀回待A13"
   ],
   "source_versions": {
     "main": "e90855a805459dca63210fecbfdf3334ccacc672",
@@ -27,13 +29,14 @@
     "evidence/A02/",
     "evidence/A03/",
     "evidence/A04/",
-    "evidence/A06/"
+    "evidence/A06/",
+    "evidence/A07/"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
     "GitHub runner修補後整鏈重跑於A13；當前為本機真實FRED CSV驗證。"
   ],
-  "next_action": "A07最新診斷與歷史觀測分離、復原與告警相容",
+  "next_action": "A09後端政策、快取、狀態、告警及正式歸檔測試與Action接線",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -53,7 +56,9 @@
     "A02_tests": "12/12 PASS + monthly 4/4 PASS",
     "A03_tests": "3/3 Node runtime suites (13 shared policy cases + dynamic edit/expiry checks); UI regression log",
     "A04_tests": "3/3 PASS，提示詞預備完成",
-    "A06_tests": "2/2 diagnostics + 5/5 source regression + self-test PASS"
+    "A06_tests": "2/2 diagnostics + 5/5 source regression + self-test PASS",
+    "A07_tests": "12/12 state-alert + 7/7 source-output PASS",
+    "A08": "YAML parse PASS；isolated runner verification tracked separately；main acceptance pending A13"
   },
-  "review_note": "A04按契約分為預備及A13協調啟用；目前Task仍原prompt。A05/A06隔離工作版本完成，A07續工。"
+  "review_note": "A07本機驗證完成；A08工程接線完成但正式執行讀回待A13，循序進入A09。"
 }

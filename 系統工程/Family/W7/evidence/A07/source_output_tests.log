@@ -1,0 +1,41 @@
+test_failed_fetch_cache_preserves_error_and_three_outputs (test_macro18_cache_diagnostics.DiagnosticsTests.test_failed_fetch_cache_preserves_error_and_three_outputs) ... m07       MISSING         None ---
+m01       MISSING         None ---
+m08       MISSING         None ---
+m02       MISSING         None ---
+m04       MISSING         None ---
+m05       MISSING         None ---
+m09       MISSING         None ---
+m10       MISSING         None ---
+m12       MISSING         None ---
+m13       MISSING         None ---
+m17       MISSING         None ---
+m14       MISSING         None ---
+m15       MISSING         None ---
+m16       MISSING         None ---
+m18       MISSING         None ---
+m19       MISSING         None ---
+m20       MISSING         None ---
+s03       MISSING         None ---
+s04       MISSING         None ---
+ok
+test_netliq_common_wednesday_and_exact_13_weeks (test_macro18_cache_diagnostics.DiagnosticsTests.test_netliq_common_wednesday_and_exact_13_weeks) ... ok
+test_api_failure_then_csv_success_keeps_attempts_and_redacts_key (test_macro18_source_response.SourceResponseTests.test_api_failure_then_csv_success_keeps_attempts_and_redacts_key) ... 完成輸出: /tmp/tmplmfyk0ay/out 獨立指標統計 18 項: {'OK': 0, 'USABLE': 0, 'STALE': 1, 'MISSING': 17} 交換欄位統計: {'OK': 0, 'USABLE': 0, 'STALE': 1, 'MISSING': 18}
+DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_OFFICIAL_API: JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+test_malformed_response_retried_without_cached_body (test_macro18_source_response.SourceResponseTests.test_malformed_response_retried_without_cached_body) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+test_rate_limit_is_not_retried_as_parse_error (test_macro18_source_response.SourceResponseTests.test_rate_limit_is_not_retried_as_parse_error) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: HTTPError: 429 Client Error: None for url: https://fred.stlouisfed.org/
+ok
+test_repeated_malformed_response_stops_after_two (test_macro18_source_response.SourceResponseTests.test_repeated_malformed_response_stops_after_two) ... DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+DATA_SOURCE_FAILED BAMLH0A0HYM2 FRED_CSV: ValueError: CSV schema mismatch
+ok
+test_valid_source_is_not_retried (test_macro18_source_response.SourceResponseTests.test_valid_source_is_not_retried) ... FRED_PROVIDER BAMLH0A0HYM2 FRED_CSV 2026-10-20
+ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.024s
+
+OK

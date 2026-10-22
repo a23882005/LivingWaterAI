@@ -1,0 +1,39 @@
+{
+  "schema": "fed-target-evidence-v1/audit",
+  "captured_at": "2026-10-23T03:52:01.711+08:00",
+  "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+  "raw_content": "2026\nDate\tIncrease\tDecrease\tLevel (%)\nSeptember 17\t25\t0\t3.75-4.00\nLast Update: September 16, 2026\n",
+  "response_sha256": "f4e1ec10d809e0faca8d1a78a6e517a1bd1f71366ab0eef78962a6df49f0d3f8",
+  "result": "CURRENT_CONFIRMED",
+  "parsed": {
+    "effective_date": "2026-09-17",
+    "publication_date": "2026-09-16",
+    "lower_bound": 3.75,
+    "upper_bound": 4,
+    "midpoint": 3.875,
+    "unit": "%"
+  },
+  "corroboration": [
+    {
+      "url": "https://fred.stlouisfed.org/series/DFEDTARL",
+      "checked_at": "2026-10-23T03:52:01.711+08:00",
+      "observation_date": "2026-10-22",
+      "value": 3.75,
+      "status": "FOUND"
+    },
+    {
+      "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+      "checked_at": "2026-10-23T03:52:01.711+08:00",
+      "observation_date": "2026-10-22",
+      "value": 4,
+      "status": "FOUND"
+    },
+    {
+      "url": "https://alfred.stlouisfed.org/series?seid=DFEDTARU",
+      "checked_at": "2026-10-23T03:52:01.711+08:00",
+      "observation_date": "2026-10-22",
+      "value": 4,
+      "status": "FOUND"
+    }
+  ]
+}

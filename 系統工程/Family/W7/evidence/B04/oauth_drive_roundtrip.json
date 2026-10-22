@@ -1,0 +1,39 @@
+{
+  "commit": "4614b04d2fa50562ff25d2bfe5d6cb07159b89d5",
+  "run_id": 39866437563,
+  "job_id": 120129684482,
+  "conclusion": "success",
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39866437563",
+  "tests": 10,
+  "artifact_id": 12464770204,
+  "artifact_sha256": "0cd958042dc42fbf26302cf7ef525e3c00a6bfafebe449b7caf743bd0396904a",
+  "reports": [
+    {
+      "schema": "Family-B04-drive-roundtrip-v1",
+      "scope": "FIXED_TEMP_SYNTHETIC_ONLY",
+      "status": "PASS",
+      "mode": "verify",
+      "prior_recovery": {
+        "status": "CLEAN"
+      },
+      "worker_exit": 73,
+      "write_readback": true,
+      "recovery": {
+        "status": "RESTORED",
+        "backup_id": "1wnzAhB5cltURq4mGEHDl_-v6mB21HpEo",
+        "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+        "bytes": 8192
+      },
+      "restored_exact_bytes": true
+    },
+    {
+      "schema": "Family-B04-drive-roundtrip-v1",
+      "scope": "FIXED_TEMP_SYNTHETIC_ONLY",
+      "status": "PASS",
+      "mode": "recover",
+      "recovery": {
+        "status": "CLEAN"
+      }
+    }
+  ]
+}

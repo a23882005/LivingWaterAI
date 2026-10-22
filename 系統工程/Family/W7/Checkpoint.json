@@ -26,10 +26,10 @@
     "H3接任實體校驗及B04可用工具/官方能力查核完成"
   ],
   "in_progress": [
-    "W7-B04 Actions真實主機HTTPS18項及清理已PASS；Drive服務授權/端到端共同writer與ChatGPT連線待接"
+    "W7-B04 Actions Drive OAuth讀寫/備份/中斷復原PASS；常駐共同writer、ChatGPT跨對話與長期OAuth授權待完成"
   ],
   "source_versions": {
-    "main": "5593640a1d570b77a48795b47a8360f9e7c8f23d",
+    "main": "4614b04d2fa50562ff25d2bfe5d6cb07159b89d5",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -57,7 +57,8 @@
     "evidence/B04/entry_tests.log",
     "evidence/B04/entry_action_run.json",
     "B04_ACTIONS_CONNECTION.md",
-    "evidence/B04/hosted_action_run.json"
+    "evidence/B04/hosted_action_run.json",
+    "evidence/B04/oauth_drive_roundtrip.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -67,7 +68,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人接入Family專用Drive服務授權，實跑TEMP合成庫讀寫/回存及實際ChatGPT跨對話入口；B04通過後接B05～B23。",
+  "next_action": "總PM本人續共同writer與ChatGPT實際接線；OAuth Testing七天期限待品牌設定與發布條件核對。B04未通過，不提前進B05。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -145,7 +146,7 @@
       "pm_chat_drive_roundtrip": "PASS same ID, 57->58 synthetic, exact byte readback",
       "session_queue_local_tests": "8/8 PASS",
       "trusted_native_project_session": "NOT_PROVEN",
-      "actions_drive_authorization": "NOT_PROVEN",
+      "actions_drive_authorization": "PASS_OAUTH_REFRESH_AND_READ_WRITE_RECOVERY",
       "shared_live_writer": "NOT_PROVEN",
       "action_run": {
         "commit": "193c34d1a4faf9c75cde92eba6450eb527e81ff7",
@@ -170,7 +171,7 @@
         "parallel_requests": true,
         "killed_writer_rollback": true,
         "live_chatgpt_connection": "PENDING",
-        "service_drive_authorization": "PENDING",
+        "service_drive_authorization": "PASS_ACTIONS_OAUTH; SHARED_HOSTED_WRITER_PENDING",
         "action_run": {
           "commit": "1be52b89f733b50f48ac9fd064a8957f49340ace",
           "run_id": 39840388680,
@@ -231,14 +232,60 @@
           "sqlite": "3.34.1"
         },
         "drive_connection": {
-          "status": "AWAITING_FAMILY_DRIVE_CONNECTION",
+          "status": "PASS",
           "fields_present": {
-            "FAMILY_DRIVE_CLIENT_ID": false,
-            "FAMILY_DRIVE_CLIENT_SECRET": false,
-            "FAMILY_DRIVE_REFRESH_TOKEN": false
+            "FAMILY_DRIVE_CLIENT_ID": true,
+            "FAMILY_DRIVE_CLIENT_SECRET": true,
+            "FAMILY_DRIVE_REFRESH_TOKEN": true
           },
-          "scope": "Only these designated workflow fields checked; not an inventory of other credentials."
+          "read_job_id": 120125682760,
+          "read_run_id": 39842417666
         }
+      },
+      "actions_drive_roundtrip": {
+        "commit": "4614b04d2fa50562ff25d2bfe5d6cb07159b89d5",
+        "run_id": 39866437563,
+        "job_id": 120129684482,
+        "conclusion": "success",
+        "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39866437563",
+        "tests": 10,
+        "artifact_id": 12464770204,
+        "artifact_sha256": "0cd958042dc42fbf26302cf7ef525e3c00a6bfafebe449b7caf743bd0396904a",
+        "reports": [
+          {
+            "schema": "Family-B04-drive-roundtrip-v1",
+            "scope": "FIXED_TEMP_SYNTHETIC_ONLY",
+            "status": "PASS",
+            "mode": "verify",
+            "prior_recovery": {
+              "status": "CLEAN"
+            },
+            "worker_exit": 73,
+            "write_readback": true,
+            "recovery": {
+              "status": "RESTORED",
+              "backup_id": "1wnzAhB5cltURq4mGEHDl_-v6mB21HpEo",
+              "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+              "bytes": 8192
+            },
+            "restored_exact_bytes": true
+          },
+          {
+            "schema": "Family-B04-drive-roundtrip-v1",
+            "scope": "FIXED_TEMP_SYNTHETIC_ONLY",
+            "status": "PASS",
+            "mode": "recover",
+            "recovery": {
+              "status": "CLEAN"
+            }
+          }
+        ]
+      },
+      "oauth_lifetime": {
+        "publishing_status": "Testing",
+        "refresh_token_lifetime_days": 7,
+        "long_term_authorization": "PENDING_BRANDING_AND_OAUTH_PUBLISHING_REVIEW",
+        "official_source": "https://developers.google.com/identity/protocols/oauth2"
       }
     },
     "H3_takeover": {
@@ -251,7 +298,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23 Actions實際SSH/HTTPS部署18/18及清理PASS，原20項PASS；Family Drive指定授權欄位待接入。W7 3/23。",
+  "review_note": "2026-10-23 Actions run39866437563成功，10項測試及TEMP同ID寫入/讀回/程序中斷後原始8192 bytes復原PASS。W7仍3/23。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,

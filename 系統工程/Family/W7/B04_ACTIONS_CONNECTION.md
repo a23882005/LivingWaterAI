@@ -24,14 +24,19 @@ GitHub run39842417666三個job SUCCESS：原20項合成測試通過；實際網�
 |FAMILY_DRIVE_CLIENT_SECRET|該應用程式密鑰|
 |FAMILY_DRIVE_REFRESH_TOKEN|經Drive授權帳號同意的離線更新token|
 
-本輪上述三個workflow環境欄位均為空，狀態AWAITING_FAMILY_DRIVE_CONNECTION；尚未執行Google token交換或Drive請求。這是指定接線欄位結果，不推論其他名稱、環境或帳號都沒有Google憑證。如已有合適授權，直接將既有名稱接入本workflow，無須重辦；若需新增授權，透過Google正常同意流程及GitHub Secrets設定，不經對話或repo存放secret值。
+2026-10-23接線已完成：三個Secrets已存入指定GitHub repository，readiness job120125682760實際OAuth更新及TEMP讀取PASS（8192 bytes，完整性/外鍵PASS）。原run39842417666其餘HTTPS與cleanup job亦SUCCESS。下方待接文字由本段取代。
+
+新增獨立workflow `family-b04-drive-roundtrip.yml`，commit4614b04d2fa50562ff25d2bfe5d6cb07159b89d5，run39866437563/job120129684482 SUCCESS。10/10本機與Actions故障邊界測試通過。固定TEMP ID備份→建立獨立合成表交易→同ID回存→精確讀回→worker立即exit73（不執行finally）→新OAuth client依Drive持久journal恢復；原8192 bytes SHA 7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8完全恢復。二次recover為CLEAN。備份ID1wnzAhB5cltURq4mGEHDl_-v6mB21HpEo保留在Backup。證據evidence/B04/oauth_drive_roundtrip.json。
+
+限制：workflow concurrency只序列化本probe；hash重驗可偵測外部更動，但不是跨服務原子鎖。本次不等於常駐共同writer或真實ChatGPT跨對話驗收。整台runner失聯時由下次執行先recover，尚未驗證無人值守災難復原。Google OAuth仍Testing；官方規則此Drive refresh token七天到期，不能宣稱永久接通。長期授權需品牌/發布條件核對，正式Family Production仍HOLD。
+官方來源：https://developers.google.com/identity/protocols/oauth2
 
 GitHub工具目前提供程式、Actions結果讀取與提交，未提供Secrets管理。PM的Drive外掛連線與Actions服務連線分開，現有PM回存證據保存於drive_probe.json。
 
 ## 本人接續
 
-1. 接入Family專用Drive服務授權，執行既有TEMP合成庫讀取探測。
-2. 在同一服務入口完成合成備份、交易、同ID回存、讀回與中斷恢復，核實ChatGPT實際工具連線與跨對話接續。
+1. 已完成Family專用Drive服務授權及TEMP讀寫/備份/復原；接續處理OAuth Testing七天限制。
+2. 將已測復原能力接至常駐共同writer，核實ChatGPT實際工具連線與跨對話接續。
 3. B04通過後依B05～B23循序施工。正式家人/共用/帳號DB只放Drive；Production HOLD、交易NONE、W4取消、RM17凍結。
 
 已實測一般HTTPS跨連線；實際四家人ChatGPT連線、正式帳號與Drive共同writer接線仍在上述未結工作中。工程環境與授權接通之後仍由總PM本人完成實作及驗收。

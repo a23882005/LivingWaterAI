@@ -60,3 +60,7 @@ python 系統工程/Family/W7/probes/family_entry_probe.py --state /tmp/family-s
 下一步由總PM本人循序完成Family測試入口、Actions到服務/Drive的授權與TEMP合成DB下載、備份、同ID回存、讀回。實際ChatGPT跨對話與共同寫入驗證仍屬B04收尾；不以Hostinger外掛可用性阻擋施工。
 
 B04通過後由本人接B05～B23。W7目前3/23；正式家人/共用/帳號DB僅Drive；Production HOLD、交易NONE、W4取消、RM17凍結。
+
+## 最新接線實證
+
+既有Actions已於run39842417666實際部署PHP合成入口，18/18 HTTPS及清理PASS。主機部署能力已核實，續接Family Drive指定服務授權與實際ChatGPT工具連線。詳B04_ACTIONS_CONNECTION.md。

@@ -1,0 +1,52 @@
+{
+  "schema": "Family-B04-hosted-proof-v1",
+  "scope": "SYNTHETIC_ONLY_HTTPS",
+  "status": "PASS",
+  "checks": [
+    "unauthenticated_rejected",
+    "action_cannot_start_login",
+    "fixed_four_hours",
+    "new_https_connection_resumes",
+    "relogin_does_not_extend",
+    "account_field_rejected",
+    "action_enqueue",
+    "cross_account_status_rejected",
+    "collision_rejected",
+    "chat_drains_action",
+    "retry_returns_done",
+    "retry_not_applied_twice",
+    "parallel_requests_accepted",
+    "parallel_no_lost_or_duplicate_updates",
+    "other_account_unchanged",
+    "logout_revokes_action_access",
+    "logout_cancels_queued_work",
+    "new_session_preserves_committed_data"
+  ],
+  "count": 18,
+  "run": "39842417666-1",
+  "commit": "84207b73b8a342ebcf9a959fc4e393dcdf5e7bd4",
+  "run_id": 39842417666,
+  "job_id": 120046782714,
+  "conclusion": "success",
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39842417666",
+  "cleanup": "PASS_ENDPOINT_AND_SYNTHETIC_STATE_REMOVED",
+  "artifact_id": 12453348009,
+  "artifact_sha256": "f416884327e6d4dbc84f47833bbe18e45896232e92537c6c0a9b839b0646b61f",
+  "host_runtime": {
+    "php": "8.2",
+    "pdo_sqlite": true,
+    "curl": true,
+    "openssl": true,
+    "python": "3.9",
+    "sqlite": "3.34.1"
+  },
+  "drive_connection": {
+    "status": "AWAITING_FAMILY_DRIVE_CONNECTION",
+    "fields_present": {
+      "FAMILY_DRIVE_CLIENT_ID": false,
+      "FAMILY_DRIVE_CLIENT_SECRET": false,
+      "FAMILY_DRIVE_REFRESH_TOKEN": false
+    },
+    "scope": "Only these designated workflow fields checked; not an inventory of other credentials."
+  }
+}

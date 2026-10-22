@@ -9,3 +9,7 @@
 既有PM工具對TEMP DB回存及原12項Actions通過證據保留在evidence/B04/。
 
 本人下一步沿既有GitHub Actions部署管線接線，核實入口及Drive授權，再於TEMP資源端到端實測；Hostinger管理外掛不作前置。通過B04後由本人循序接B05～B23。正式DB僅Drive；Production HOLD、交易NONE、W4取消、RM17凍結。
+
+## Actions實際部署新增成果
+
+2026-10-23 run39842417666：沿既有SSH設定完成PHP合成入口實際部署，18/18 HTTPS檢查及清理PASS，原20項合成測試PASS。詳細B04_ACTIONS_CONNECTION.md及evidence/B04/hosted_action_run.json。Family指定Drive服務授權欄位待接入，後續由本人完成TEMP回存及實際ChatGPT連線。

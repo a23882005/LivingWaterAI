@@ -26,10 +26,10 @@
     "H3接任實體校驗及B04可用工具/官方能力查核完成"
   ],
   "in_progress": [
-    "W7-B04 HTTP入口及中斷恢復已實作；待既有服務連線與實際Chat/Action/Drive驗證"
+    "W7-B04 Actions真實主機HTTPS18項及清理已PASS；Drive服務授權/端到端共同writer與ChatGPT連線待接"
   ],
   "source_versions": {
-    "main": "b63df49e493864b6221417aa9d7de294831533d9",
+    "main": "5593640a1d570b77a48795b47a8360f9e7c8f23d",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -55,7 +55,9 @@
     "B04_TAKEOVER_REVIEW.md",
     "B04_ENTRY_INTERFACE.md",
     "evidence/B04/entry_tests.log",
-    "evidence/B04/entry_action_run.json"
+    "evidence/B04/entry_action_run.json",
+    "B04_ACTIONS_CONNECTION.md",
+    "evidence/B04/hosted_action_run.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -65,7 +67,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人沿既有GitHub Actions部署管線完成Family測試入口及Drive授權/回存端到端驗證；Hostinger管理外掛不作前置。通過B04後接B05～B23。",
+  "next_action": "本人接入Family專用Drive服務授權，實跑TEMP合成庫讀寫/回存及實際ChatGPT跨對話入口；B04通過後接B05～B23。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -185,6 +187,58 @@
             "2026-10-22T19:28:45.7193881Z Artifact family-w7-synthetic-capability-39840388680.zip successfully finalized. Artifact ID 12452359271"
           ]
         }
+      },
+      "hosted_https": {
+        "schema": "Family-B04-hosted-proof-v1",
+        "scope": "SYNTHETIC_ONLY_HTTPS",
+        "status": "PASS",
+        "checks": [
+          "unauthenticated_rejected",
+          "action_cannot_start_login",
+          "fixed_four_hours",
+          "new_https_connection_resumes",
+          "relogin_does_not_extend",
+          "account_field_rejected",
+          "action_enqueue",
+          "cross_account_status_rejected",
+          "collision_rejected",
+          "chat_drains_action",
+          "retry_returns_done",
+          "retry_not_applied_twice",
+          "parallel_requests_accepted",
+          "parallel_no_lost_or_duplicate_updates",
+          "other_account_unchanged",
+          "logout_revokes_action_access",
+          "logout_cancels_queued_work",
+          "new_session_preserves_committed_data"
+        ],
+        "count": 18,
+        "run": "39842417666-1",
+        "commit": "84207b73b8a342ebcf9a959fc4e393dcdf5e7bd4",
+        "run_id": 39842417666,
+        "job_id": 120046782714,
+        "conclusion": "success",
+        "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39842417666",
+        "cleanup": "PASS_ENDPOINT_AND_SYNTHETIC_STATE_REMOVED",
+        "artifact_id": 12453348009,
+        "artifact_sha256": "f416884327e6d4dbc84f47833bbe18e45896232e92537c6c0a9b839b0646b61f",
+        "host_runtime": {
+          "php": "8.2",
+          "pdo_sqlite": true,
+          "curl": true,
+          "openssl": true,
+          "python": "3.9",
+          "sqlite": "3.34.1"
+        },
+        "drive_connection": {
+          "status": "AWAITING_FAMILY_DRIVE_CONNECTION",
+          "fields_present": {
+            "FAMILY_DRIVE_CLIENT_ID": false,
+            "FAMILY_DRIVE_CLIENT_SECRET": false,
+            "FAMILY_DRIVE_REFRESH_TOKEN": false
+          },
+          "scope": "Only these designated workflow fields checked; not an inventory of other credentials."
+        }
       }
     },
     "H3_takeover": {
@@ -197,7 +251,7 @@
       "status": "PASS"
     }
   },
-  "review_note": "2026-10-23 B04 HTTP共同入口整批實作；本機20/20、GitHub run39840388680 20/20 PASS；待實際託管與Chat/Action/Drive連線，現3/23。 2026-10-23指揮官最新指示：部署由既有GitHub Actions處理；Hostinger管理外掛不作前置。總PM本人沿既有Actions部署管線核對與接線，完成Family入口及Drive端到端驗證。",
+  "review_note": "2026-10-23 Actions實際SSH/HTTPS部署18/18及清理PASS，原20項PASS；Family Drive指定授權欄位待接入。W7 3/23。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 3,

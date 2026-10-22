@@ -17,7 +17,7 @@
 |verify_dependencies.py|讀source/dependency/w2/frozen_schema/c7_fixture/technical六鎖及各檔bytes；回傳校驗數|沿用原驗證器；本輪前已完成每日快照分離修正；B10～B12變更被鎖定程式須局部更新與回歸。|
 |stock_source_bridge.py|讀W1 instrument/position及permissions投影，核對原生股數；產生stock source與新增買入cap|B09/B10承接最新有效持倉；完整快照才能以缺列代表零；幣別／市場／account映射照原契約。|
 |bond_source_bridge.py|讀W1持倉／政策、bond instruments及V75 evidence；產生實體股數與買入限制|B09/B10與股票共用清倉語意；保留SGOV實體與邏輯金額分離；不自行推算券商或匯率。|
-|macro_source_bridge.py|讀記憶體macro feed與bond evidence；驗ready/schema/MOVE來源、日期、值；回傳MOVE投影|B10由market_bridge取得已驗證每輪資料；本檔無26小時過期驗證，入口須保留既有P70-5期限驗證。|
+|macro_source_bridge.py|讀記憶體macro feed與bond evidence；驗ready/schema/MOVE來源、日期、值；回傳MOVE投影|B10由market_bridge取得已驗證每輪資料；本檔及P70-5均無26小時過期驗證；B10須在正式消費入口接入A段既定有效期契約並實測。|
 |market_bridge.py|直接讀P70-5.py與latest JSON、動態呼叫read_macro；前後bytes不變；輸出commit/hash/reader hash|B10使用固定下載快照及已核實commit；source_commit參數本身不構成遠端核實，可信入口供應。|
 |funding_bridge.py|讀可信funding source/version及native owner；間接C8C9 Work6/schema；輸出資金核對結果|B10沿用原來源與雙分支相等檢查；B15持久保存結果，不改資金公式。|
 |funding_guard.py|純記憶體精確Decimal、owner/run/claim；輸出股債使用及餘額|沿用保守精度、重複claim及總額限制；B10/B15保存來源與結果。|

@@ -1,0 +1,10 @@
+{
+  "commit": "193c34d1a4faf9c75cde92eba6450eb527e81ff7",
+  "run_id": 39823921536,
+  "job_id": 119982054504,
+  "conclusion": "success",
+  "tests": 12,
+  "scope": "SYNTHETIC_ONLY_NO_DRIVE_CREDENTIALS",
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39823921536",
+  "log_excerpt": "2026-10-22T17:34:47.5797964Z 12 passed in 0.19s\n2026-10-22T17:34:48.5482332Z SHA256 digest of uploaded artifact zip is 86a2dd2ac701c47b9991ee1b9b1a0c03548e84993730e21ac49f647a3bcbbfa7\n2026-10-22T17:34:49.0399898Z Artifact family-w7-synthetic-capability-39823921536.zip successfully finalized. Artifact ID 12445502207\n2026-10-22T17:34:49.0401530Z Artifact family-w7-synthetic-capability-39823921536 has been successfully uploaded! Final size is 669 bytes. Artifact ID is 12445502207\n2026-10-22T17:34:49.0528448Z ##[group]Run echo 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\n2026-10-22T17:34:49.0529457Z \u001b[36;1mecho 'SYNTHETIC ONLY; no Drive credentials, no formal DB, no deployment. Production HOLD; trading NONE.' >> \"$GITHUB_STEP_SUMMARY\"\u001b[0m\n"
+}

@@ -1,3 +1,5 @@
+> 2026-10-22後續狀態：B03盤點已完成，現行以B03_CLOSEOUT.md及Checkpoint.json為準；以下保留本次早期施工紀錄。
+
 # W7-B03 依賴盤點與版本鎖核對
 
 2026-10-22；本人循序施工；狀態 IN_PROGRESS。核對 GitHub main a4ea9c0b1a3e92f217e0131fccddbfa91bad0ed9，完整 tree 695 項、未截斷。

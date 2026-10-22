@@ -7,7 +7,7 @@
 | PM Chat修改檔案同ID回存 | TEMP既有W7_Arthur_Capability_Test.db，原合成值57→58；先Backup，SQLite交易，原ID更新，重新下載bytes/SHA/完整性/值核對 | PASS，證據evidence/B04/drive_probe.json。只證明本PM連線，不推論四家人Chat均有相同權限。 |
 | 固定4小時與隔離契約 | 本機簽章原型：到期邊界、讀取不延長、不同project/member/device拒絕、竄改claims拒絕 | 原型PASS；尚未取得平台可信Project ID或跨對話session儲存入口，對話文字/檔名不可作信任根。 |
 | 共同排隊契約 | 同一SQLite authority上多connection競爭、FIFO、重開接續、同request去重/衝突拒絕、租約到期fencing | 原型PASS；SQLite存在單一服務本機才有互斥意義，不能各Chat下載副本各自加鎖。正式共同服務與Drive提交fencing仍待B06。 |
-| Action觸發與合成執行 | 新增family-w7-capability-probe.yml，main特定路徑push/手動入口，唯讀repo權限；僅12項合成測試和JUnit | 提交後核對run；不含私人DB、憑證或部署。API工具未提供workflow_dispatch寫入動作，實測push入口。 |
+| Action觸發與合成執行 | 新增family-w7-capability-probe.yml，main特定路徑push/手動入口，唯讀repo權限；僅12項合成測試和JUnit | 實跑run39823921536、job119982054504 SUCCESS，12/12 PASS，JUnit artifact上傳成功；不含私人DB、憑證或部署。API工具未提供workflow_dispatch寫入動作，實測push入口。 |
 | Action存取Drive | 現行區域Actions只有市場CSV快取與git/artifact，不能從PM OAuth能力推論Action已取得Drive授權 | NOT_PROVEN；本次不讀或輸出任何secret值。B18/B21須取得指定資源的服務授權實證。 |
 
 ## 待接線的明確界面

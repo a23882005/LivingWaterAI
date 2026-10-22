@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   email-result-report:
-    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'skipped' }}
+    if: ${{ github.event_name == 'workflow_run' && true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout report sender

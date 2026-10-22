@@ -95,7 +95,7 @@ class Coordinator:
     backup returns a verified, immutable copy with source ID/hash metadata.
     """
     def __init__(self, headers, policies, backend, lock_dir, handlers, clock=time.time,
-                 restore_subjects=()):
+                 restore_subjects=(), *, session_guard):
         self.headers = copy.deepcopy(headers)
         self.policies = copy.deepcopy(validate_policies(policies))
         for key, h in self.headers.items():
@@ -106,12 +106,20 @@ class Coordinator:
         if len(set(ids)) != len(ids):
             raise ValueError('DUPLICATE_FILE_ID')
         self.backend, self.handlers, self.clock = backend, dict(handlers), clock
+        if not callable(session_guard):
+            raise TypeError('SESSION_GUARD_REQUIRED')
+        self.session_guard = session_guard
         self.restore_subjects = frozenset(restore_subjects)
         self.lock_dir = Path(lock_dir)
         self.lock_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
 
     def _admit(self, resource, principal, operation):
-        return authorize(self.headers[resource], self.policies, principal, operation, int(self.clock()))
+        file_id = authorize(self.headers[resource], self.policies, principal, operation, int(self.clock()))
+        # B07 supplies the authoritative session lookup, including revocation.
+        # It may accept its VerifiedPrincipal subclass containing a session ID.
+        if self.session_guard(principal) is not True:
+            raise PermissionError('SESSION_REVOKED')
+        return file_id
 
     @contextmanager
     def _lock(self, file_id):

@@ -64,7 +64,8 @@ def coordinator(d,p,crash=False):
         def write(id_,data):original_write(id_,data);os._exit(73)
         backend.write=write
     return w.Coordinator({'test.b06':header()},{'test.b06':{'read':['account:synthetic'],'update':['account:synthetic']}},
-        backend,BUILD/'locks',{'add':add},restore_subjects=['account:synthetic'])
+        backend,BUILD/'locks',{'add':add},restore_subjects=['account:synthetic'],
+        session_guard=lambda p:p.subject=='account:synthetic')
 
 def clean(d):
     p=target(d)

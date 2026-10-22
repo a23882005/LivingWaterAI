@@ -45,11 +45,11 @@ def add(db,payload):
     db.execute('update counter set n=n+?',(payload['delta'],))
     return db.execute('select n from counter').fetchone()[0]
 
-def manager(root, backend=None, clock=time.time, handlers=None):
+def manager(root, backend=None, clock=time.time, handlers=None, guard=lambda p:True):
     h=dict(schema=SCHEMA,resource_key='family.mou',binding='BOUND',file_id='synthetic_database',policy_ref='private.mou',state='Close',readers=[],updater=None)
     return w.Coordinator({'family.mou':h},{'private.mou':{'read':['account:mou'],'update':['account:mou']}},
                          backend or Disk(root),Path(root)/'locks',handlers or {'add':add},clock,
-                         restore_subjects=['account:mou'])
+                         restore_subjects=['account:mou'],session_guard=guard)
 
 def principal():return VerifiedPrincipal('account:mou',int(time.time())+1000)
 
@@ -164,3 +164,17 @@ def test_backup_tamper_and_wrong_resource(setup):
     r=m.update('family.mou',principal(),'one',s['epoch'],'add',{'delta':5})
     b=r['backup_id'];d._save(b+'.meta',json.dumps(dict(source_id='other',sha256='0'*64)).encode())
     with pytest.raises(PermissionError):m.restore('family.mou',principal(),b,s['epoch'],'restore')
+
+def test_logout_during_backup_stops_commit(setup):
+    root,d,m,s,original=setup;active=[True]
+    d.hook=lambda:active.__setitem__(0,False)
+    with pytest.raises(PermissionError,match='SESSION_REVOKED'):
+        manager(root,d,guard=lambda p:active[0]).update('family.mou',principal(),'logout',s['epoch'],'add',{'delta':9})
+    assert d.read('synthetic_database')==original
+
+def test_no_maintenance_role_cannot_restore(setup):
+    root,d,m,s,_=setup
+    r=m.update('family.mou',principal(),'one',s['epoch'],'add',{'delta':1})
+    m.restore_subjects=frozenset()
+    with pytest.raises(PermissionError,match='MAINTENANCE_ROLE'):
+        m.restore('family.mou',principal(),r['backup_id'],s['epoch'],'restore')

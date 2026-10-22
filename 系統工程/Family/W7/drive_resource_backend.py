@@ -5,6 +5,7 @@ The single-host coordinator lock spans every Drive call. Transport must enforce
 timeouts/response size, renew its service token and redact errors at the edge.
 """
 import json
+import copy
 from 資料存取管理 import checked, digest, canonical
 from resource_headers import render_header, validate_header
 
@@ -14,7 +15,7 @@ UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files/'
 class DriveResourceBackend:
     def __init__(self, transport, resources, backup_folder):
         self.call = transport.call
-        self.resources = {k: dict(v) for k,v in resources.items()}
+        self.resources = copy.deepcopy(resources)
         self.backup_folder = backup_folder
         journals = [v['journal_id'] for v in self.resources.values()]
         if len(journals) != len(set(journals)) or set(journals) & set(resources):

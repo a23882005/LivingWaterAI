@@ -253,6 +253,10 @@ class Coordinator:
                 raise RuntimeError('BACKUP_HASH_MISMATCH')
             next_epoch = uuid.uuid4().hex
             self._state(file_id, journal, 'Update', principal.subject)
-            saved = self._commit(file_id, original, candidate, journal, principal, resource,
-                                 next_epoch, restore=key)
-            return dict(epoch=next_epoch, duplicate=False, before_restore_backup=saved)
+            try:
+                saved = self._commit(file_id, original, candidate, journal, principal, resource,
+                                     next_epoch, restore=key)
+                return dict(epoch=next_epoch, duplicate=False, before_restore_backup=saved)
+            finally:
+                if journal['pending'] is None:
+                    self._state(file_id, journal, 'Close')

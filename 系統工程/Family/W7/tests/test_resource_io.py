@@ -178,3 +178,13 @@ def test_no_maintenance_role_cannot_restore(setup):
     m.restore_subjects=frozenset()
     with pytest.raises(PermissionError,match='MAINTENANCE_ROLE'):
         m.restore('family.mou',principal(),r['backup_id'],s['epoch'],'restore')
+
+def test_restore_backup_failure_releases_display_state(setup):
+    root,d,m,s,_=setup
+    r=m.update('family.mou',principal(),'one',s['epoch'],'add',{'delta':1})
+    current=d.read('synthetic_database')
+    def failed(id):raise OSError('backup service unavailable')
+    d.backup=failed
+    with pytest.raises(OSError):m.restore('family.mou',principal(),r['backup_id'],s['epoch'],'restore')
+    assert d.journal('synthetic_database')['state']=='Close'
+    assert d.read('synthetic_database')==current

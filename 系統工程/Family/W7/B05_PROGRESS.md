@@ -1,17 +1,13 @@
-# B05資源管理表頭｜進行中
+# B05 資源表頭結案：PASS
 
-2026-10-23；Family總PM本人；B04已依原v1.6.0最小能力探測契約結案。
+依 v1.6.0 原完成條件驗收；B01～B05完成，W7進度5/23。Family總PM本人接續B06。
 
-已新增resource_headers.py與16項測試。表頭固定Close/Read/Update、資源鍵、唯一Drive file_id、外置policy_ref、目前讀者與更新持有者；拒絕重複JSON鍵、未知欄位、路徑型ID、重複資源/檔案綁定及缺少政策。Close代表沒有活動持有者，並非永久禁止存取。真正互斥由B06管理，authorize只做身分/期限與ACL判斷，不授予鎖。
+六份DB管理表頭已存放於指定Drive位置並逐份讀回核對內容與parent：四戶及帳號庫表頭在根目錄，共用庫表頭在B02確認的共用資料庫目錄。四戶/共用庫綁定既有唯一DB ID；帳號庫按B07原工序待建立，PENDING_B07、null ID、Close，存取一律拒絕。正式ID/外置政策與表頭定位在Drive私有登錄，程式庫沒有實際DB ID。
 
-VerifiedPrincipal只能由受信任後端的session驗證層建立；此型別不是加密憑證或網路身分驗證。不得將HTTP/工具使用者輸入直接轉成此物件。B07須接入真實驗證來源，B06才取得檔案與執行鎖。
+B03 169項逐項列於B05_SOURCE_CATALOG.json：40份共用規則/設定採8個同目錄管理表頭JSON；30項合成QA專用；99項程式/工作流/文件僅作來源治理，不授予runtime資料存取或Drive寫入。來源資源以Git blob固定版本，程式實際讀取bytes時核對；外置source_policies.json只讀，更新名單為空。原排程、原凍結schema及投資規則均未修改。
 
-六個資料庫表頭草稿已由B01/B02私有登錄產生：四戶與共用庫有既有唯一ID；帳號庫按B07尚待建立，binding=PENDING_B07、file_id=null、Close，所有存取拒絕。草稿最小ACL為本人私庫、四戶讀共用庫、受信任共用writer更新共用庫、帳號服務管理帳號庫；服務角色後續須在正式政策覆核與身分接線時落實。
+私庫ACL只允許所屬家人帳號；共用庫由四戶讀、受信任shared-data-writer更新；帳號庫只供受信任account-manager。政策和catalog必須由可信部署設定供入，禁止以使用者訊息/HTTP payload改寫。VerifiedPrincipal是後端型別，不是網路驗證本身；B07負責真實session建立。Close/Read/Update與holder可解析；B06負責活動狀態與真正互斥，表頭不是鎖。
 
-私有草稿位置：Drive W7/Family_W7_B05_私有管理表頭草稿.zip，ID1Il5hlTRi7dyuw9LxWAQPacZoQD7Pe5IS；六份MD、外置policy、registry與README共9檔。SHA256 2dae436d2b7f43a468f9c24512a6485faedc9366fde696e55a8c90b7cb84a93b。此包尚未部署至各DB同目錄。真實DB ID與私有登錄保持Drive；程式庫只含合成測試。
+GitHub Actions run39872600001/job120150385331成功：24項測試PASS、完整169項覆核、40/40實際checkout來源hash通過。六份Drive表頭、私有政策、登錄均已讀回一致。完整證據見evidence/B05/closeout.json；前次16測試與草稿記錄保留歷史。
 
-本機測試16/16 PASS：本人權限、錯戶/過期/非驗證principal、文字偽造權限、三種狀態、待綁定拒絕、重複欄位/多表頭/多資源/多file_id、缺少政策、未知操作及萬用權限拒絕。
-
-本人下一步：依B03的169檔清冊完成其餘共用規則/設定資源逐項歸類與外置ACL覆核，驗證完整catalog，將核准表頭放回正確DB/資源同目錄並讀回，再簽B05接B06。B05仍進行中；W7 4/23。
-
-GitHub Actions run39871051286/job120145295715 SUCCESS，16/16 PASS；artifact12466810511/SHA ce757f5f5ebd053e9021abba667d60f4a772fe562259fa5d50e72c410d1d1060。私有草稿Drive下載逐位元一致。
+B06下一步：將B04已實測單一writer抽離TEMP限定與合成counter，接B05可信catalog/ACL；完成最新版下載、每次備份、SQLite交易、相同ID回存、讀回、完整讀者快照、逾期拒絕、冪等與故障/還原。正式資料仍需後續整體驗收與Gate D；Production HOLD，交易NONE。

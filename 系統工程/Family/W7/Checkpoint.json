@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.6.0",
-  "current_work": "W7-B05",
+  "current_work": "W7-B06",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -24,13 +24,14 @@
     "W7-B02共用來源/schema及WORK12真實計算元件定位、原碼介面讀取驗證",
     "W7-B03 169檔存取/呼叫/動態依賴逐檔處置、W2/W6/WORK12接線責任與來源鎖核對完成",
     "H3接任實體校驗及B04可用工具/官方能力查核完成",
-    "W7-B04依v1.6.0最小能力實測範圍驗收PASS：入口、服務授權、共同寫入、中斷/登出恢復及正式接線依據"
+    "W7-B04依v1.6.0最小能力實測範圍驗收PASS：入口、服務授權、共同寫入、中斷/登出恢復及正式接線依據",
+    "W7-B05 169項覆核、40份共用來源表頭、六DB表頭同目錄落位與外置ACL/讀回驗收PASS"
   ],
   "in_progress": [
-    "W7-B05表頭解析/權限檢查16/16 PASS；六DB私有表頭草稿保存，續169檔資源覆核與正式落位"
+    "W7-B06統一讀寫管理：承接B04共同writer與B05權限/資源表頭，實作正式通用入口"
   ],
   "source_versions": {
-    "main": "837271afc0329f864c7bb15a63f4c848f83b7e9d",
+    "main": "ac8edc77f84345b575d213cda0a50eeed9d479be",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -64,7 +65,8 @@
     "evidence/B04/shared_writer_action_run.json",
     "B04_CLOSEOUT.md",
     "B05_PROGRESS.md",
-    "evidence/B05/header_tests.json"
+    "evidence/B05/header_tests.json",
+    "evidence/B05/closeout.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -401,47 +403,43 @@
       "status": "PASS"
     },
     "B05": {
-      "status": "IN_PROGRESS",
-      "local_tests": "16/16 PASS",
-      "private_draft_id": "1Il5hlTRi7dyuw9LxWAQPacZoQD7Pe5IS",
-      "draft_headers": 6,
-      "bound_existing_resources": 5,
-      "account_database_binding": "PENDING_B07_FAIL_CLOSED",
-      "remaining": [
-        "B03其餘資源逐項覆核",
-        "外置政策核定與完整catalog",
-        "表頭同目錄落位/讀回"
-      ],
-      "action_run": {
-        "schema": "Family-B05-header-tests-v1",
-        "commit": "837271afc0329f864c7bb15a63f4c848f83b7e9d",
-        "run_id": 39871051286,
-        "job_id": 120145295715,
-        "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39871051286",
-        "conclusion": "success",
-        "tests": 16,
-        "artifact_id": 12466810511,
-        "artifact_sha256": "ce757f5f5ebd053e9021abba667d60f4a772fe562259fa5d50e72c410d1d1060",
-        "scope": "SYNTHETIC_HEADER_PARSER_AND_ACL_ONLY",
-        "private_draft_readback": "EXACT_BYTES_PASS_6_HEADERS",
-        "remaining": "Full resource policy review and placement pending; B05 IN_PROGRESS"
-      }
+      "schema": "Family-B05-closeout-v1",
+      "status": "PASS",
+      "commit": "ac8edc77f84345b575d213cda0a50eeed9d479be",
+      "run_id": 39872600001,
+      "job_id": 120150385331,
+      "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39872600001",
+      "conclusion": "success",
+      "tests": 24,
+      "source_inventory": 169,
+      "readonly_sources": 40,
+      "source_governance_only": 99,
+      "qa_only": 30,
+      "colocated_source_catalogs": 8,
+      "source_byte_hashes": "40/40 PASS",
+      "drive_headers": "6/6 exact-text-and-parent PASS",
+      "external_policy_readback_sha256": "ce2cf489d9d1a0588d27502aa6490e512602b0c0bd1028d45354fd099bb64ac1",
+      "private_registry_readback_sha256": "ec31a22412a6e3e8afb764b5bbfe78875a883365df95845290cea37b892d0b74",
+      "artifact_id": 12466718165,
+      "artifact_sha256": "12bbcd21f28cc947ff263ff8da6403f950a6b3a2fed9c228c566976079a444f7",
+      "account_database": "PENDING_B07_FAIL_CLOSED",
+      "boundary": "B05 metadata and admission complete; B06 runtime lock/state/I/O and B07 real identity remain separate acceptance items"
     }
   },
-  "review_note": "2026-10-23重新依原v1.6.0契約裁定B04最小能力實測PASS；修正PM將正式接線提前作B04阻擋的工序膨脹。功能未完成項逐項歸回B06/B07/B18/B21/B23/W8。W7 4/23，B05進行中。",
+  "review_note": "B05依原契約表頭/外置帳號權限/解析/落位條件驗收PASS；5/23。B06接統一I/O，B07接真實登入與帳號庫。",
   "w7_progress": {
     "scheme": "B01-B23",
-    "completed": 4,
+    "completed": 5,
     "total": 23,
-    "current": "W7-B05",
+    "current": "W7-B06",
     "completed_ids": [
       "W7-B01",
       "W7-B02",
       "W7-B03",
-      "W7-B04"
+      "W7-B04",
+      "W7-B05"
     ],
     "remaining_ids": [
-      "W7-B05",
       "W7-B06",
       "W7-B07",
       "W7-B08",

@@ -1,0 +1,23 @@
+{
+  "schema": "Family-B05-closeout-v1",
+  "status": "PASS",
+  "commit": "ac8edc77f84345b575d213cda0a50eeed9d479be",
+  "run_id": 39872600001,
+  "job_id": 120150385331,
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39872600001",
+  "conclusion": "success",
+  "tests": 24,
+  "source_inventory": 169,
+  "readonly_sources": 40,
+  "source_governance_only": 99,
+  "qa_only": 30,
+  "colocated_source_catalogs": 8,
+  "source_byte_hashes": "40/40 PASS",
+  "drive_headers": "6/6 exact-text-and-parent PASS",
+  "external_policy_readback_sha256": "ce2cf489d9d1a0588d27502aa6490e512602b0c0bd1028d45354fd099bb64ac1",
+  "private_registry_readback_sha256": "ec31a22412a6e3e8afb764b5bbfe78875a883365df95845290cea37b892d0b74",
+  "artifact_id": 12466718165,
+  "artifact_sha256": "12bbcd21f28cc947ff263ff8da6403f950a6b3a2fed9c228c566976079a444f7",
+  "account_database": "PENDING_B07_FAIL_CLOSED",
+  "boundary": "B05 metadata and admission complete; B06 runtime lock/state/I/O and B07 real identity remain separate acceptance items"
+}

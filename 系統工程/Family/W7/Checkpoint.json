@@ -3,19 +3,18 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.5.10",
-  "current_work": "W7-A01",
+  "current_work": "W7-A02",
   "completed": [
     "H2接任核對",
-    "A01來源重現、有限重試修補及本機驗證"
+    "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回"
   ],
   "formal_W7_accepted": 0,
   "formal_W7_total": 29,
-  "in_progress": [
-    "A01雙端證據保存及讀回"
-  ],
+  "in_progress": [],
   "source_versions": {
     "main": "e90855a805459dca63210fecbfdf3334ccacc672",
-    "handoff": "20261022-H2"
+    "handoff": "20261022-H2",
+    "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576"
   },
   "evidence": [
     "evidence/A01/"
@@ -31,5 +30,16 @@
     "trading": "NONE",
     "W4": "CANCELLED",
     "RM17": "FROZEN"
-  }
+  },
+  "current_work_status": "READY_NOT_STARTED",
+  "verification": {
+    "new_tests": "5/5 PASS",
+    "existing_d009_tests": "9/9 PASS",
+    "self_test": "PASS",
+    "github_readback": "tree matches local",
+    "drive_working_zip_id": "1MBqnDK7et_SCQCWzXQN4G4bU9jkSuwlr",
+    "A01_initial_zip_sha256": "382dd544cdb5e93a3d0d7628fc45ccd9984cb58424a515d9da08590b85cfea53",
+    "formal_release": "pending A13"
+  },
+  "review_note": "本次僅校正接續狀態；A06完整JSON/CSV診斷保存、A13整鏈驗證發布仍待辦。"
 }

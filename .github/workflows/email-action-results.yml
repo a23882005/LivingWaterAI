@@ -9,6 +9,7 @@ on:
       - LivingWaterAI V70.3 09h Preflight 18 Macro
       - LivingWaterAI 11h Verified V70.3 Site Deploy
       - LivingWaterAI 14h30 IB Taiwan market history
+      - LivingWaterAI Gmail Failure Notification QA
     types: [completed]
 
 permissions:
@@ -33,6 +34,7 @@ jobs:
             "LivingWaterAI V70.3 09h Preflight 18 Macro") name="macro18-09h-$SOURCE_RUN_ID" ;;
             "LivingWaterAI 11h Verified V70.3 Site Deploy") name="v70-3-27-qa-$SOURCE_RUN_ID" ;;
             "LivingWaterAI 14h30 IB Taiwan market history") name="ib-taiwan-history-$SOURCE_RUN_ID" ;;
+            "LivingWaterAI Gmail Failure Notification QA") name="notification-qa-$SOURCE_RUN_ID" ;;
             *) echo "::error::Unrecognized source workflow: $SOURCE_RUN_NAME"; exit 1 ;;
           esac
           echo "name=$name" >> "$GITHUB_OUTPUT"

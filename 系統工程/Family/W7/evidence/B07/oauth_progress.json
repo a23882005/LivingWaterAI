@@ -1,0 +1,32 @@
+{
+  "schema": "Family-B07-oauth-progress-v1",
+  "status": "LOCAL_AND_CI_PASS_LIVE_RETESTING",
+  "formal_progress": "6/23",
+  "code_commit": "ffc42ea610f930a59cba9bbc33c3c047830f5cc4",
+  "local_tests": 149,
+  "ci_tests": 149,
+  "ci_run_id": 39901611803,
+  "ci_job_id": 120244239584,
+  "live_code_commit": "cadfd79b6c57d077fd1ef8dbe98edb41ba35a85e",
+  "live_run_id": 39901726271,
+  "live_job_id": 120244598440,
+  "google_console": "Site Unavailable in current cloud browser; live publishing status not read",
+  "remaining": [
+    "HTTPS OAuth routing and direct token latency",
+    "persistent private runtime deployment",
+    "real first activation",
+    "ChatGPT exact client redirect and cross-chat verification",
+    "Google long-term authorization"
+  ],
+  "live_first_attempt": {
+    "run_id": 39901726271,
+    "status": "FAIL",
+    "stage": "normal-login-and-resume",
+    "error_type": "ServiceTransportError",
+    "cleanup": "PASS",
+    "independent_temp_sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+    "artifact_id": 12479039269
+  },
+  "live_retry_run_id": 39902456514,
+  "private_backup_config": "Corrected to owner-only private folder; same file ID, exact Drive readback PASS; details in private governance"
+}

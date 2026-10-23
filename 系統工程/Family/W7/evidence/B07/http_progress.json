@@ -1,0 +1,79 @@
+{
+  "schema": "Family-B07-http-progress-v1",
+  "status": "IN_PROGRESS",
+  "formal_progress": "6/23",
+  "local_tests": 103,
+  "code_commit": "fddfbb37cce0792bc3184819d572f2dfea88fada",
+  "http_run": 39886316687,
+  "regression": {
+    "run": 39882408901,
+    "job": 120183157129,
+    "commit": "f493003b8e7f5109676d91e0f274416817870375",
+    "status": "PASS",
+    "tests": 50,
+    "artifact": 12471372050,
+    "artifact_sha256": "68e0aa0ad4f8f1c036c0cd43db3d483d362a026856de584a8815d40eb7397026",
+    "checks": [
+      "process_exit_73",
+      "lost_ack_dedup",
+      "parallel_value_4_receipts_3",
+      "exact_restore",
+      "old_epoch_rejected",
+      "header_closed",
+      "cleanup_clean"
+    ]
+  },
+  "remaining": [
+    "real_account_activation",
+    "persistent_private_configuration",
+    "actual_ChatGPT_MCP_OAuth_connection",
+    "Google_long_term_authorization"
+  ],
+  "controls": {
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "attempts": [
+    {
+      "run": 39881745256,
+      "result": "initialization_failed_cleanup_pass"
+    },
+    {
+      "run": 39882253074,
+      "result": "Python39_authorizer_failure_cleanup_pass"
+    },
+    {
+      "run": 39882600935,
+      "result": "initial_login_check_failed_cleanup_pass"
+    },
+    {
+      "run": 39883824649,
+      "result": "provider_unavailable_cleanup_pass"
+    },
+    {
+      "run": 39884198303,
+      "result": "initial_login_http_500_after_121_seconds_cleanup_pass",
+      "passed_checks": [
+        "isolated_test_gate",
+        "login_page",
+        "page_csp",
+        "origin_rejected",
+        "csrf_rejected",
+        "identity_override_rejected"
+      ]
+    },
+    {
+      "run": 39885151317,
+      "result": "initial_login_HTTP500_three_attempts_cleanup_pass"
+    }
+  ],
+  "fixes": [
+    "Python39_callable_authorizer_release",
+    "same_request_id_for_bounded_HTTP_retries",
+    "worker_cleanup_shared_lock",
+    "bounded_60s_hosted_transport",
+    "seed_receipt_recovery",
+    "browser_same_body_retry_for_HTTP500_and_network_loss_with_four_JS_tests",
+    "private_background_job_202_result_polling_atomic_result_and_cleanup_wait"
+  ]
+}

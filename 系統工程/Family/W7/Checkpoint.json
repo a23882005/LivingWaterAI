@@ -716,5 +716,12 @@
     "stable_key": true,
     "actual_chatgpt_metadata_discovery": true,
     "actual_chatgpt_login_verified": false
+  },
+  "B07_human_manager": {
+    "user_id": "活水AI管理者",
+    "confirmed_by": "指揮官本對話明確指定",
+    "status": "CHINESE_IDENTITY_CODE_TESTED_ENROLLMENT_PENDING",
+    "local_tests_passed": 99,
+    "account_created": false
   }
 }

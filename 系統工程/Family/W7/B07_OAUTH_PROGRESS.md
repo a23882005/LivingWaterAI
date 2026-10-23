@@ -1,3 +1,9 @@
+## 2026-10-24 管理者帳號正式命名與中文支援
+
+指揮官明確指定首位管理者登入帳號為「活水AI管理者」，取代 mou 建議值。帳號核心及 account: 身分驗證同步支援漢字，保留既有英數名稱；service: 身分保持英數範圍。拒絕空白、路徑、冒號、不可見控制字元及超長名稱。
+
+實測中文管理者建立→首次登入→強制改密碼→重新登入→OAuth code/token→身分讀回通過；帳號/OAuth/HTTP 60項、資源表頭/來源/私有服務39項，共99項本機測試PASS。新案例納入既有B07 CI。正式真人帳號尚待安全啟用，HTTP gateway、短效初始憑證私有交付、token延遲及實際ChatGPT連線由Family中PM本人續作。B07仍IN_PROGRESS、6/23。
+
 ## 2026-10-24 B07 實際 ChatGPT OAuth 用戶端已私有部署
 
 - 指揮官表單實際取得 metadata、scope family:session 與四個端點；已核實實際 callback https://chatgpt.com/connector_platform_oauth_redirect 。取代先前暫定 callback；client_id=family-chatgpt，公開用戶端、無 client secret、token auth=none、PKCE S256。

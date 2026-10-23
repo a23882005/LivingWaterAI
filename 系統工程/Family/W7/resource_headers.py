@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 SCHEMA = 'Family-resource-header-v1'
 FIELDS = {'schema','resource_key','binding','file_id','policy_ref','state','readers','updater'}
-SUBJECT = re.compile(r'(?:account|service):[A-Za-z0-9_.-]{1,80}\Z')
+SUBJECT = re.compile(r'(?:account:[A-Za-z0-9_.\u3400-\u4dbf\u4e00-\u9fff\U00020000-\U0002fa1f-]{1,80}|service:[A-Za-z0-9_.-]{1,80})\Z')
 
 def _unique(pairs):
     result = {}

@@ -19,7 +19,7 @@ from pathlib import Path
 from resource_headers import VerifiedPrincipal
 
 TTL = 4 * 60 * 60
-NAME = re.compile(r'[A-Za-z0-9_.-]{1,80}\Z')
+NAME = re.compile(r'[A-Za-z0-9_.\u3400-\u4dbf\u4e00-\u9fff\U00020000-\U0002fa1f-]{1,80}\Z')
 SCHEMA = '''
 CREATE TABLE account (
  user_id TEXT PRIMARY KEY, password_shift TEXT NOT NULL,

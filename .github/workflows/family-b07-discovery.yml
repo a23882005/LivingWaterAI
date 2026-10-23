@@ -1,0 +1,102 @@
+name: Family B07 discovery bootstrap
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-discovery.yml'
+      - '系統工程/Family/W7/public_discovery/**'
+      - '系統工程/Family/W7/deployment/publish_discovery.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b07-discovery
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: php --version
+      - run: python -m pip install pytest==8.4.2
+      - run: python -m pytest 系統工程/Family/W7/tests/test_discovery_bootstrap.py -q
+      - run: php -l 系統工程/Family/W7/public_discovery/index.php
+      - name: Validate and prepare discovery gateway
+        run: python 系統工程/Family/W7/deployment/publish_discovery.py build
+      - name: Prepare exclusive private staging directory
+        id: staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            stage="$(dirname "${LW_DIR%/}")/.family-discovery-stage-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$stage"
+            mkdir -m 700 "$stage"
+      - name: Upload static pages and installer
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-discovery/private/*,build/family-discovery/private/.htaccess
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-discovery-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Publish isolated discovery gateway
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-discovery-stage-$LW_RUN-$LW_ATTEMPT"
+            python3 "$stage/publish_discovery.py" install "${LW_DIR%/}"
+      - name: Verify HTTPS discovery and disabled authorization
+        run: python 系統工程/Family/W7/deployment/publish_discovery.py verify https://www.happihelp.com
+      - name: Remove exclusive staging files
+        if: always() && steps.staging.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            python3 - "$parent/.family-discovery-stage-$LW_RUN-$LW_ATTEMPT" "$LW_RUN-$LW_ATTEMPT" <<'PY'
+            import pathlib,shutil,sys
+            folder=pathlib.Path(sys.argv[1])
+            assert folder.name=='.family-discovery-stage-'+sys.argv[2]
+            assert not folder.is_symlink()
+            if folder.exists():shutil.rmtree(folder)
+            print('DISCOVERY_STAGING_CLEANUP_PASS')
+            PY
+      - name: Remove runner staging files
+        if: always()
+        run: rm -rf -- build/family-discovery/private

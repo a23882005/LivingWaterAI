@@ -216,3 +216,19 @@ def test_python39_authorizer_commit_rollback_and_guard(tmp_path, monkeypatch):
         w.transaction(image,'user','legacy-denied','bad',{},forbidden)
     _,result,_=w.transaction(image,'user','legacy-after','add',{'delta':1},add)
     assert result==1
+
+
+def test_unchanged_close_skips_redundant_network_writes(setup):
+    root,d,m,s,original=setup
+    writes=[];save=d.save_journal
+    def traced(id,value):
+        writes.append(copy.deepcopy(value));save(id,value)
+    d.save_journal=traced
+    assert m.snapshot('family.mou',principal())['data']==original
+    assert [j['state'] for j in writes]==['Read','Close']
+    writes.clear()
+    m.update('family.mou',principal(),'efficient',s['epoch'],'add',{'delta':1})
+    assert [j['state'] for j in writes]==['Update','Update','Close']
+    assert writes[1]['pending'] is not None
+    assert writes[-1]['pending'] is None
+    assert value(m.snapshot('family.mou',principal())['data'],root)==1

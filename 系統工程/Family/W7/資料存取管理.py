@@ -146,6 +146,7 @@ class Coordinator:
             journal = dict(epoch=uuid.uuid4().hex, last=digest(data), pending=None,
                            state='Close', readers=[], updater=None, last_restore=None)
             self._save(file_id, journal)
+        confirmed = copy.deepcopy(journal)
         pending = journal['pending']
         if pending:
             actual = digest(data)
@@ -159,12 +160,18 @@ class Coordinator:
         elif digest(data) != journal['last']:
             raise RuntimeError('EXTERNAL_CHANGE')
         journal.update(state='Close', readers=[], updater=None)
-        self._save(file_id, journal)
+        # The freshly read journal is already durable when unchanged. Avoid a
+        # redundant Drive write/readback while preserving every state transition.
+        if journal != confirmed:
+            self._save(file_id, journal)
         return data, journal
 
     def _state(self, file_id, journal, state, subject=None):
-        journal.update(state=state, readers=[subject] if state == 'Read' else [],
-                       updater=subject if state == 'Update' else None)
+        target = dict(state=state, readers=[subject] if state == 'Read' else [],
+                      updater=subject if state == 'Update' else None)
+        if all(journal.get(k) == v for k, v in target.items()):
+            return
+        journal.update(target)
         self._save(file_id, journal)
 
     def snapshot(self, resource, principal):

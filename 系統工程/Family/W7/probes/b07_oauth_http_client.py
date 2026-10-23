@@ -65,6 +65,7 @@ def verify():
             except urllib.error.HTTPError as e:
                 with e:return e.code,e.headers,e.read(65536)
         result=once(req);end=time.monotonic()+600
+        print(json.dumps({'http_route':path.split('?',1)[0],'http_status':result[0]}),flush=True)
         if not poll and result[0]==202:raise AssertionError('oauth_must_not_return_poll_job')
         while poll and result[0]==202:
             job=json.loads(result[2])['pending']

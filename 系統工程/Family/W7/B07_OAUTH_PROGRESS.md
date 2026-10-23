@@ -36,3 +36,11 @@ run39901726271於normal-login-and-resume發生ServiceTransportError，尚未走�
 run39904973080/job120254733860 PASS，程式fc81ee553a2b46d6ba7988c2480d630364bbf191。私有服務目錄位於公開網站根之外；runtime.json與32-byte server.key為0600，目錄0700；設定取自已核實owner-only Drive配置與備份目錄。設定更新前私有備份、原子替換、逐位元讀回；重複安裝維持同key，已有設定卻遺失/損毀key則拒絕重建。12項Python3.9測試PASS，主機安裝／讀回與staging cleanup PASS。沒有公開入口、沒有真人帳號初始化，enabled=false。
 
 標準HTTPS路由與隔離驗收已提交92838009813eb96e391d7de6a8bb721af9968316；token/MCP/consent回應直接等待至105秒，不向OAuth客戶端送背景工作202。實測結果待下段讀回。
+
+## HTTPS首輪與延遲修復
+
+run39905273785/job120255680420：153項CI PASS；登入/首次改密碼/正常登入/discovery/明確同意/精確回呼等9項檢查PASS，token交換105.834秒後客戶端失敗；唯讀主機診斷確認該背景工作最終200。已關閉入口、移除測試工作、還原TEMP，獨立Drive下載基線雜湊一致。
+
+修復：Coordinator只省略已讀回且完全不變的Close journal重寫，以及commit後重複Close；保留每次新讀DB/hash/journal、Read/Update/Close實際轉換、備份、pending、同ID寫回及復原。完整本機166項PASS，將重驗B06真實Drive與HTTPS，不因單元測試就宣稱逾時解決。
+
+代理已實際進入ChatGPT登入帳號的Plugins→Add custom MCP server→Advanced OAuth settings，讀到User-Defined OAuth Client、callback、none token auth與手動endpoint/PKCE欄位。測試URL僅作未提交表單檢視；沒有建立插件、沒有完成授權、沒有跨對話驗收。正式callback於提交前需再次核對。

@@ -1,0 +1,30 @@
+{
+  "schema": "Family-B07-oauth-https-progress-v1",
+  "status": "FIRST_RUN_TIMEOUT_REPAIR_PENDING",
+  "first_run": 39905273785,
+  "first_job": 120255680420,
+  "ci_tests": 153,
+  "successful_checks": [
+    "account_page",
+    "initial_login",
+    "first_password_change",
+    "normal_login",
+    "oauth_discovery",
+    "resource_discovery",
+    "explicit_consent_page",
+    "authorization_direct_reply",
+    "exact_redirect_state_issuer"
+  ],
+  "failed_check": "standard_token_response",
+  "http_elapsed_seconds": 105.834,
+  "private_job_result_status": 200,
+  "diagnostics_jobs": [
+    120260000618,
+    120260565840
+  ],
+  "cleanup": "PASS_PRIVATE_ENTRY_AND_JOBS_REMOVED",
+  "independent_temp_sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+  "artifact_id": 12481655146,
+  "artifact_sha256": "edcca79bc22a5d3306c1ef3feff368f78c27b3017e50fe0fce7c35dd8e1db4f0",
+  "repair": "Skip unchanged Close journal writes; retain fresh DB/hash/journal checks, real state transitions, backup, pending commit, readback, recovery."
+}

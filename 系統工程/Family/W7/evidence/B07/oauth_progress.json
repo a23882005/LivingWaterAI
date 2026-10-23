@@ -1,6 +1,6 @@
 {
   "schema": "Family-B07-oauth-progress-v1",
-  "status": "LOCAL_AND_CI_PASS_LIVE_RETESTING",
+  "status": "LOCAL_CI_AND_DRIVE_PASS_HTTPS_PENDING",
   "formal_progress": "6/23",
   "code_commit": "ffc42ea610f930a59cba9bbc33c3c047830f5cc4",
   "local_tests": 149,
@@ -10,7 +10,7 @@
   "live_code_commit": "cadfd79b6c57d077fd1ef8dbe98edb41ba35a85e",
   "live_run_id": 39901726271,
   "live_job_id": 120244598440,
-  "google_console": "Site Unavailable in current cloud browser; live publishing status not read",
+  "google_console": "User screenshot: Family-Drive / External / Testing; publish disabled pending Branding. Agent browser Site Unavailable; no publishing change.",
   "remaining": [
     "HTTPS OAuth routing and direct token latency",
     "persistent private runtime deployment",
@@ -28,5 +28,49 @@
     "artifact_id": 12479039269
   },
   "live_retry_run_id": 39902456514,
-  "private_backup_config": "Corrected to owner-only private folder; same file ID, exact Drive readback PASS; details in private governance"
+  "private_backup_config": "Corrected to owner-only private folder; same file ID, exact Drive readback PASS; details in private governance",
+  "live_verify": {
+    "schema": "Family-B07-oauth-live-v1",
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "status": "PASS",
+    "stage": "complete",
+    "prior_cleanup": {
+      "state": "CLEAN"
+    },
+    "fixed_four_hours": true,
+    "token_exchange_seconds": 52.538,
+    "oauth_checks": [
+      "durable_migration",
+      "pkce_code_exchange",
+      "fresh_service_mcp_identity",
+      "refresh",
+      "logout_revokes_oauth"
+    ],
+    "checks": [
+      "initial_change",
+      "password_change",
+      "login",
+      "fresh_manager_resume",
+      "b06_session_guard",
+      "fixed_four_hours",
+      "logout_revocation"
+    ],
+    "cleanup": {
+      "state": "RESTORED",
+      "bytes": 8192,
+      "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+      "baseline_backup": "1Klxew5mhAITk-ilNmAM2JN22d2rFHyux"
+    }
+  },
+  "live_cleanup": {
+    "schema": "Family-B07-oauth-live-v1",
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "status": "PASS",
+    "stage": "complete",
+    "cleanup": {
+      "state": "CLEAN"
+    }
+  },
+  "live_artifact_id": 12479539004,
+  "live_artifact_sha256": "4e81fce383f8eae40ba24d9b4ea82ee24e742c1ea2e0ec7401a40c6ec91494c7"
 }

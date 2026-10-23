@@ -1,0 +1,14 @@
+{
+  "schema": "Family-B07-private-runtime-proof-v1",
+  "status": "PASS_PRIVATE_DISABLED",
+  "code_commit": "fc81ee553a2b46d6ba7988c2480d630364bbf191",
+  "run_id": 39904973080,
+  "job_id": 120254733860,
+  "python39_tests": 12,
+  "stable_key": true,
+  "config_readback": true,
+  "private_permissions": true,
+  "staging_cleanup": "PASS",
+  "public_entry_enabled": false,
+  "real_accounts_enrolled": false
+}

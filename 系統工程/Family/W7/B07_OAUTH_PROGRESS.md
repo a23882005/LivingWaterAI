@@ -25,6 +25,14 @@ https://developers.openai.com/plugins/build/mcp-server
 
 ## 真實Drive首輪診斷
 
-run39901726271於normal-login-and-resume發生ServiceTransportError，尚未走到OAuth交換；不能據此斷言是授權碼期限或Google發布狀態造成。cleanup PASS，獨立Drive下載8192 bytes之SHA256與原始基線完全一致。補入白名單provider錯誤代碼後run39902456514重測中。
+run39901726271於normal-login-and-resume發生ServiceTransportError，尚未走到OAuth交換；不能據此斷言是授權碼期限或Google發布狀態造成。cleanup PASS，獨立Drive下載8192 bytes之SHA256與原始基線完全一致。補入白名單provider錯誤代碼後run39902456514重測PASS：PKCE交換、fresh instance MCP身分、refresh與登出撤銷均通過；cleanup還原8192 bytes原始基線，再檢查CLEAN。token交換52.538秒，尚待HTTPS主機與ChatGPT實測。
 
 正式私有資源設定原backup_folder指向公開根Backup，已先在私有W7備份，建立owner-only私人備份子目錄，原ID僅替換backup_folder並精確讀回。正式帳號資料尚未啟用；未調整根Backup分享權限。私人ID僅保存於Drive治理。
+
+指揮官截圖確認Family-Drive專案為External／Testing，發布按鈕灰色並提示先完成品牌設定；代理瀏覽器仍Site Unavailable。使用者已授權總PM本人自行查資料與設定，可獨立完成部分繼續施工，不反覆要求使用者搬資料。
+
+## 主機持久私有設定
+
+run39904973080/job120254733860 PASS，程式fc81ee553a2b46d6ba7988c2480d630364bbf191。私有服務目錄位於公開網站根之外；runtime.json與32-byte server.key為0600，目錄0700；設定取自已核實owner-only Drive配置與備份目錄。設定更新前私有備份、原子替換、逐位元讀回；重複安裝維持同key，已有設定卻遺失/損毀key則拒絕重建。12項Python3.9測試PASS，主機安裝／讀回與staging cleanup PASS。沒有公開入口、沒有真人帳號初始化，enabled=false。
+
+標準HTTPS路由與隔離驗收已提交92838009813eb96e391d7de6a8bb721af9968316；token/MCP/consent回應直接等待至105秒，不向OAuth客戶端送背景工作202。實測結果待下段讀回。

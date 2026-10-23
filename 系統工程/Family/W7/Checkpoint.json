@@ -42,7 +42,10 @@
       "handoff": "20261022-H2"
     },
     "main_semantics": "本輪修改前核對基準；本文件所在commit為治理更新版本",
-    "B07_http_code": "fddfbb37cce0792bc3184819d572f2dfea88fada"
+    "B07_http_code": "fddfbb37cce0792bc3184819d572f2dfea88fada",
+    "B07_oauth_code": "ffc42ea610f930a59cba9bbc33c3c047830f5cc4",
+    "B07_private_runtime": "fc81ee553a2b46d6ba7988c2480d630364bbf191",
+    "B07_https_oauth": "92838009813eb96e391d7de6a8bb721af9968316"
   },
   "evidence": [
     "evidence/A01/",
@@ -75,7 +78,8 @@
     "系統工程/Family/W7/evidence/B07/core_progress.json",
     "系統工程/Family/W7/evidence/B07/http_progress.json",
     "B07_OAUTH_PROGRESS.md",
-    "evidence/B07/oauth_progress.json"
+    "evidence/B07/oauth_progress.json",
+    "evidence/B07/private_runtime.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -85,7 +89,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人續B07：OAuth/PKCE、同意頁、MCP session介面及持久key程式已完成，本機及Actions149測試PASS；接真實Drive OAuth、HTTPS直回應驗收、持久部署、真人啟用、ChatGPT跨對話及Google長期授權。Google Cloud代理瀏覽器Site Unavailable，待使用者協助管理頁。正式仍6/23。",
+  "next_action": "本人續B07：Drive OAuth重測PASS；主機私有持久設定與固定key部署PASS（入口disabled）；驗收HTTPS標準OAuth端點，再接真人安全啟用、ChatGPT實際client/redirect與跨對話、Google長期授權。正式6/23。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -547,7 +551,7 @@
       "artifact": 12472934584
     },
     "B07_oauth": {
-      "status": "LOCAL_CI_PASS_LIVE_RETESTING",
+      "status": "LOCAL_CI_AND_DRIVE_PASS_HTTPS_PENDING",
       "local_tests": 149,
       "ci_tests": 149,
       "run_id": 39901611803,
@@ -555,7 +559,17 @@
       "code_commit": "ffc42ea610f930a59cba9bbc33c3c047830f5cc4",
       "live_retry_run_id": 39902456514,
       "first_live_failure": "ServiceTransportError at normal-login-and-resume; cleanup and independent baseline readback PASS",
-      "private_backup": "owner-only folder corrected and read back"
+      "private_backup": "owner-only folder corrected and read back",
+      "token_exchange_seconds": 52.538,
+      "live_run_id": 39902456514,
+      "live_job_id": 120246859117,
+      "cleanup": "RESTORED_AND_CLEAN"
+    },
+    "B07_private_runtime": {
+      "status": "PASS_PRIVATE_DISABLED",
+      "run_id": 39904973080,
+      "job_id": 120254733860,
+      "code_commit": "fc81ee553a2b46d6ba7988c2480d630364bbf191"
     }
   },
   "review_note": "B01～B06 PASS；B07原核心/HTTPS驗收沿用。新增OAuth/MCP/私有key程式149測試雙端PASS；實際HTTPS OAuth、真人啟用、持久部署、ChatGPT跨對話及Google長期授權仍待完成，B07保持IN_PROGRESS。",

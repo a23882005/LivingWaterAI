@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import sys
 import time
+import traceback
 BASE=Path(__file__).resolve().parent
 sys.path.insert(0,str(BASE))
 from account_http import AccountHTTP,RateLimiter
@@ -52,6 +53,12 @@ def main(mode):
 
 if __name__=='__main__':
     try: main(sys.argv[1])
-    except Exception:
+    except Exception as error:
         # Provider/credential/request exception details never reach logs.
-        print(json.dumps({'error':'SERVICE_RETRY'}));raise SystemExit(1)
+        report={'error':'SERVICE_RETRY'}
+        if sys.argv[1] != 'call':
+            report['error_type']=type(error).__name__
+            report['frames']=[{'file':Path(f.filename).name,'function':f.name,'line':f.lineno}
+                              for f in traceback.extract_tb(error.__traceback__)
+                              if Path(f.filename).parent==BASE]
+        print(json.dumps(report));raise SystemExit(1)

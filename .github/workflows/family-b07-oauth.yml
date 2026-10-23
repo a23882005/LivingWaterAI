@@ -1,0 +1,51 @@
+name: Family B07 OAuth and MCP boundary
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-oauth.yml'
+      - '系統工程/Family/W7/account_oauth.py'
+      - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W7/oauth_http.py'
+      - '系統工程/Family/W7/private_service_config.py'
+      - '系統工程/Family/W7/tests/test_account_oauth.py'
+      - '系統工程/Family/W7/tests/test_account_mcp.py'
+      - '系統工程/Family/W7/tests/test_oauth_http.py'
+      - '系統工程/Family/W7/tests/test_private_service_config.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m pip install pytest==8.4.2
+      - name: OAuth MCP and existing account regression
+        run: >-
+          python -m pytest
+          系統工程/Family/W7/tests/test_account_oauth.py
+          系統工程/Family/W7/tests/test_account_mcp.py
+          系統工程/Family/W7/tests/test_oauth_http.py
+          系統工程/Family/W7/tests/test_private_service_config.py
+          系統工程/Family/W7/tests/test_account_http_jobs.py
+          系統工程/Family/W7/tests/test_account_browser_retry.py
+          系統工程/Family/W7/tests/test_account_http.py
+          系統工程/Family/W7/tests/test_accounts.py
+          系統工程/Family/W7/tests/test_drive_service_transport.py
+          系統工程/Family/W7/tests/test_resource_io.py
+          系統工程/Family/W7/tests/test_drive_resource_backend.py
+          系統工程/Family/W7/tests/test_resource_headers.py
+          系統工程/Family/W7/tests/test_source_resources.py
+          -q --junitxml=build/family-b07-oauth/results.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: family-b07-oauth-${{ github.run_id }}
+          path: build/family-b07-oauth/results.xml
+          if-no-files-found: error

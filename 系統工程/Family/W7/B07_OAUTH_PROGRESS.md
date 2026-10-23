@@ -1,3 +1,13 @@
+## 2026-10-24 B07 OAuth探索入口部署完成
+
+- 獨立探索入口：https://www.happihelp.com/family-connect/mcp 。提供OAuth metadata與401 Bearer resource_metadata挑戰，暫不提供登入、token交換或資料操作；正式帳號庫、既有私有runtime未變更。
+- 部署來源caa185a9c95b19b68f2d899401779d7a3358b99c；run39991335504/job120543562369 SUCCESS。15項PHP邊界/安裝保護測試PASS、PHP語法PASS；HTTPS兩份metadata=200、MCP=401、token=503、未知路徑=404，staging/runner清理PASS。
+- 首輪run39991185926於測試中文路徑轉義失敗，未進入部署；改為環境變數傳遞路徑後重驗通過。本機無PHP，僅2項安裝測試PASS/13項skip；正式15項結果以GitHub PHP執行為準。
+- 用途：讓指揮官在ChatGPT表單填入入口，展開進階OAuth設定，核對實際client/redirect。URL尚未經ChatGPT實際讀取；跨對話授權、真人帳號啟用及85.426秒token交換相容性仍待完成。無自動註冊或示範client。
+- OAuth discovery目前提供路徑後綴形式；標準根/.well-known前綴路徑尚未部署，後續依客戶端實測補接或採手動精確端點設定。
+- B01～B06 PASS，正式6/23；B07 IN_PROGRESS。Production HOLD、交易NONE、W4取消、RM17凍結。下一步由本人核對實際ChatGPT設定、完成正式gateway/安全真人啟用及驗收。
+
+
 ## 2026-10-24 私有帳號與路由組裝進展（尚未公開啟用）
 
 - 新授權部署 run39985989631/job120525205726 SUCCESS；來源1fd20c6068fb4c7319fd3edd61c42d9661d95925。12項部署測試、固定key、私有設定讀回與暫存清理PASS；主機仍PRIVATE_PERSISTENT_DISABLED。

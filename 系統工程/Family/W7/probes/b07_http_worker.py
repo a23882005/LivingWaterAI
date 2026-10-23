@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import time
 import traceback
+import fcntl
 BASE=Path(__file__).resolve().parent
 sys.path.insert(0,str(BASE))
 from account_http import AccountHTTP,RateLimiter
@@ -52,7 +53,12 @@ def main(mode):
     print(json.dumps({'status':status,'headers':headers,'body':body.decode()}))
 
 if __name__=='__main__':
-    try: main(sys.argv[1])
+    try:
+        # A web-server timeout may leave its child finishing a durable write.
+        # Cleanup must wait for that child, including after a lost HTTP reply.
+        with (BASE/'call.lock').open('a') as lock:
+            fcntl.flock(lock,fcntl.LOCK_EX)
+            main(sys.argv[1])
     except Exception as error:
         # Provider/credential/request exception details never reach logs.
         report={'error':'SERVICE_RETRY'}

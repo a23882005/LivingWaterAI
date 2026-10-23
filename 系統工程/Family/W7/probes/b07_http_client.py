@@ -12,6 +12,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+import time
 
 ROOT=Path('build/family-b07-http')
 SOURCE=Path(__file__).resolve().parents[1]
@@ -46,21 +47,31 @@ def verify():
     c=json.loads((ROOT/'test-keys.json').read_text());jar=http.cookiejar.CookieJar()
     opener=urllib.request.build_opener(NoRedirect(),urllib.request.HTTPCookieProcessor(jar))
     url=c['origin']+'/family-b07-http-'+c['run']+'/index.php'
-    checks=[];csrf=''
+    checks=[];csrf='';last_status=None;transient_statuses=[]
     def call(path='',body=None,extra=None,authenticated=True,transport=None):
+        nonlocal last_status
         headers={'X-Family-Test-Key':c['key']} if authenticated else {}
         if body is not None:
             headers.update({'Content-Type':'application/json','Origin':c['origin'],'X-Family-CSRF':csrf})
             body=json.dumps(dict(body,request_id=body.get('request_id',uuid.uuid4().hex))).encode()
         headers.update(extra or {})
         req=urllib.request.Request(url+path,data=body,headers=headers)
-        try:
-            with (transport or opener).open(req,timeout=300) as r:return r.status,r.headers,r.read(32768)
-        except urllib.error.HTTPError as e:
-            with e:return e.code,e.headers,e.read(32768)
+        # The same serialized request ID is retained after an unknown response.
+        # B06 reconciles its journal/receipt before another write is attempted.
+        for attempt in range(3):
+            try:
+                with (transport or opener).open(req,timeout=300) as r:result=(r.status,r.headers,r.read(32768))
+            except urllib.error.HTTPError as e:
+                with e:result=(e.code,e.headers,e.read(32768))
+            last_status=result[0]
+            if last_status not in (502,503,504) or attempt==2:return result
+            transient_statuses.append(last_status)
+            print(json.dumps({'retry_http_status':last_status,'attempt':attempt+1}),flush=True)
+            time.sleep(2)
     def check(name,condition):
-        if not condition:raise AssertionError(name)
+        if not condition:raise AssertionError(name+':http='+str(last_status))
         checks.append(name)
+        print(json.dumps({'passed_check':name}),flush=True)
     check('isolated_test_gate',call(authenticated=False)[0]==401)
     status,headers,page=call()
     check('login_page',status==200 and 'text/html' in headers.get('Content-Type','') and 'Family 帳號登入'.encode() in page)
@@ -84,13 +95,12 @@ def verify():
     other=urllib.request.build_opener(NoRedirect(),urllib.request.HTTPCookieProcessor(jar))
     status,_,data=call('/session',transport=other)
     check('new_http_connection_resume',status==200 and json.loads(data)['result']=={'user_id':'synthetic_manager','expires_at':deadline})
-    import time
     status,_,_=call('/manage',{'operation':'create','user_id':'synthetic_child','password':secrets.token_urlsafe(24),'role':'member','until':int(time.time())+1800})
     check('manager_create',status==200)
     check('logout',call('/logout',{})[0]==200)
     check('logout_revocation',call('/session')[0]==401)
     return {'schema':'Family-B07-https-proof-v1','status':'PASS','scope':'ISOLATED_HTTPS_TO_APPROVED_DRIVE_TEMP',
-            'checks':checks,'count':len(checks),'run':c['run']}
+            'checks':checks,'count':len(checks),'run':c['run'],'transient_http_statuses':transient_statuses}
 
 if __name__=='__main__':
     if sys.argv[1]=='build':build()

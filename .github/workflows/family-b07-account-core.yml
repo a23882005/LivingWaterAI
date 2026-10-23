@@ -1,0 +1,50 @@
+name: Family B07 account core
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-account-core.yml'
+      - '系統工程/Family/W7/帳號管理.py'
+      - '系統工程/Family/W7/drive_service_transport.py'
+      - '系統工程/Family/W7/tests/test_accounts.py'
+      - '系統工程/Family/W7/tests/test_drive_service_transport.py'
+      - '系統工程/Family/W7/probes/b07_account_integration.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b04-temp-drive-writer
+  cancel-in-progress: false
+jobs:
+  accounts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest 系統工程/Family/W7/tests/test_accounts.py 系統工程/Family/W7/tests/test_drive_service_transport.py 系統工程/Family/W7/tests/test_resource_io.py 系統工程/Family/W7/tests/test_drive_resource_backend.py 系統工程/Family/W7/tests/test_resource_headers.py 系統工程/Family/W7/tests/test_source_resources.py -q --junitxml=build/family-b07/results.xml
+      - name: Account transactions through B06 and real Drive TEMP
+        env:
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: python 系統工程/Family/W7/probes/b07_account_integration.py verify
+      - name: Restore approved TEMP after any failure
+        if: always()
+        env:
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: python 系統工程/Family/W7/probes/b07_account_integration.py cleanup
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b07-core-${{ github.run_id }}
+          path: |
+            build/family-b07/*.json
+            build/family-b07/results.xml

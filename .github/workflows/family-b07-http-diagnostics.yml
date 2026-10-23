@@ -7,7 +7,7 @@ on:
     inputs:
       target_run:
         required: true
-        default: '39886316687-1'
+        default: '39905273785-1'
 permissions:
   contents: read
 jobs:
@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 5
     env:
       LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
-      LW_TARGET: ${{ inputs.target_run || '39886316687-1' }}
+      LW_TARGET: ${{ inputs.target_run || '39905273785-1' }}
     steps:
       - uses: appleboy/ssh-action@v1
         with:
@@ -36,6 +36,13 @@ jobs:
             root=Path(sys.argv[1]);jobs=root/'jobs'
             pending=list(jobs.glob('*.request.json'));results=list(jobs.glob('*.result.json'))
             statuses=[]
+            safe_paths={'/','/login','/change-password','/session','/logout','/oauth/authorize','/oauth/token','/oauth/.well-known/oauth-authorization-server','/mcp','/mcp/.well-known/oauth-protected-resource'}
+            active=[]
+            for path in pending:
+                try:
+                    route=json.loads(path.read_text())['path'].split('?',1)[0].split('/index.php',1)[-1]
+                    active.append(route if route in safe_paths else 'other')
+                except Exception:active.append('unreadable')
             for path in results:
                 try:statuses.append(json.loads(path.read_text())['status'])
                 except Exception:statuses.append('unreadable')
@@ -43,9 +50,9 @@ jobs:
             for path in Path('/proc').glob('[0-9]*/cmdline'):
                 try:
                     data=path.read_bytes()
-                    if str(root/'b07_http_worker.py').encode() in data and b'\x00job\x00' in data:workers+=1
+                    if any(str(root/n).encode() in data for n in ('b07_http_worker.py','b07_oauth_http_worker.py')) and b'\x00job\x00' in data:workers+=1
                 except OSError:pass
             print(json.dumps({'exists':root.exists(),'pending':len(pending),'results':len(results),'statuses':statuses,
                 'oldest_pending_seconds':int(max([time.time()-p.stat().st_mtime for p in pending] or [0])),
-                'background_workers':workers}))
+                'background_workers':workers,'active_routes':active}))
             PY

@@ -1,3 +1,10 @@
+## 2026-10-24 B07 實際 ChatGPT OAuth 用戶端已私有部署
+
+- 指揮官表單實際取得 metadata、scope family:session 與四個端點；已核實實際 callback https://chatgpt.com/connector_platform_oauth_redirect 。取代先前暫定 callback；client_id=family-chatgpt，公開用戶端、無 client secret、token auth=none、PKCE S256。
+- 新增 private_entry_config.py 與獨立 family-b07-private-client.yml，既有 runtime.lock 序列化、0600 原子寫入、相同設定重裝備份讀回；不同既有設定拒絕靜默覆寫。無 Drive/帳號庫寫入、runtime 與 key 保持原值、未開放 HTTP。
+- commit 6af8df3b4962fe0e859930b312c8e38315f88116；run 39996157180 / job 120560100393。28 項本機與 GitHub Python3.9 測試 PASS；正式主機 CONFIRMED_CLIENT_INSTALLED / public_enabled=false / stable_key=true / runtime_unchanged=true，清理 PASS。
+- 未完成：正式 HTTP gateway、首位真人管理者經核實設定及安全短效交付、首次改密碼、token 延遲與 ChatGPT 實際登入/跨對話驗收。尚未指示提交 ChatGPT 表單，不能將 metadata 成功視為登入完成。B07 IN_PROGRESS、6/23 不變。
+
 ## 2026-10-24 B07 OAuth探索入口部署完成
 
 - 獨立探索入口：https://www.happihelp.com/family-connect/mcp 。提供OAuth metadata與401 Bearer resource_metadata挑戰，暫不提供登入、token交換或資料操作；正式帳號庫、既有私有runtime未變更。

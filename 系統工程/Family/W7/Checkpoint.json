@@ -96,7 +96,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "核對ChatGPT進階OAuth實際client與redirect，完成正式gateway、真人安全啟用、token延遲及跨對話驗收。探索入口已部署，帳號服務仍未啟用。",
+  "next_action": "完成正式HTTP gateway、核實首位真人管理者帳號並短效安全啟用、首次改密碼、token延遲與實際ChatGPT跨對話驗收。OAuth用戶端已私有部署；B07仍IN_PROGRESS。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -702,5 +702,19 @@
     "mcp_url": "https://www.happihelp.com/family-connect/mcp",
     "authentication_enabled": false,
     "chatgpt_verified": false
+  },
+  "B07_confirmed_chatgpt_client": {
+    "status": "PRIVATE_CLIENT_INSTALLED_PUBLIC_LOGIN_PENDING",
+    "source_commit": "6af8df3b4962fe0e859930b312c8e38315f88116",
+    "run_id": 39996157180,
+    "job_id": 120560100393,
+    "tests_passed": 28,
+    "client_id": "family-chatgpt",
+    "redirect_uri": "https://chatgpt.com/connector_platform_oauth_redirect",
+    "public_enabled": false,
+    "runtime_unchanged": true,
+    "stable_key": true,
+    "actual_chatgpt_metadata_discovery": true,
+    "actual_chatgpt_login_verified": false
   }
 }

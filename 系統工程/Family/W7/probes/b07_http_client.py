@@ -63,6 +63,17 @@ def verify():
                 with (transport or opener).open(req,timeout=300) as r:result=(r.status,r.headers,r.read(32768))
             except urllib.error.HTTPError as e:
                 with e:result=(e.code,e.headers,e.read(32768))
+            deadline=time.monotonic()+600
+            while result[0]==202:
+                job=json.loads(result[2])['pending']
+                if not re.fullmatch('[a-f0-9]{48}',job) or time.monotonic()>=deadline:
+                    raise RuntimeError('INVALID_OR_EXPIRED_JOB')
+                time.sleep(2)
+                poll=urllib.request.Request(url+'/_result/'+job,headers={'X-Family-Test-Key':c['key']})
+                try:
+                    with (transport or opener).open(poll,timeout=30) as r:result=(r.status,r.headers,r.read(32768))
+                except urllib.error.HTTPError as e:
+                    with e:result=(e.code,e.headers,e.read(32768))
             last_status=result[0]
             if last_status not in (500,502,503,504) or attempt==2:return result
             transient_statuses.append(last_status)

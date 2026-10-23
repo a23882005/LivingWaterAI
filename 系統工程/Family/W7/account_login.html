@@ -20,6 +20,14 @@ async function request(path,body){
  for(let attempt=0;attempt<3;attempt++){
   try{response=await fetch(base+'/index.php/'+path,options);}
   catch(error){if(attempt===2)throw error;response=null;}
+  const deadline=Date.now()+600000;
+  while(response&&response.status===202){
+   const pending=(await response.json()).pending;
+   if(!/^[a-f0-9]{48}$/.test(pending)||Date.now()>=deadline)throw new Error('INVALID_OR_EXPIRED_JOB');
+   status.textContent='處理中，請稍候…';
+   await new Promise(resolve=>setTimeout(resolve,2000));
+   response=await fetch(base+'/index.php/_result/'+pending,{credentials:'same-origin'});
+  }
   if(response&&![500,502,503,504].includes(response.status))break;
   if(attempt===2)throw new Error('RETRY_EXHAUSTED');
   status.textContent='正在確認處理結果，請稍候…';

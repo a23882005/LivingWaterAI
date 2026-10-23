@@ -7,6 +7,9 @@ import sys
 import time
 import traceback
 import fcntl
+import re
+import io
+from contextlib import redirect_stdout
 BASE=Path(__file__).resolve().parent
 sys.path.insert(0,str(BASE))
 from account_http import AccountHTTP,RateLimiter
@@ -29,7 +32,7 @@ def store(d,p):
     policy={'accounts':{'read':['service:account-manager'],'update':['service:account-manager']}}
     return a.B06AccountStore({'accounts':h},policy,b,BASE/'locks')
 
-def main(mode):
+def main(mode, request=None):
     os.umask(0o077)
     c=configuration();d=ServiceProbe()
     d.transport.timeout=60  # Hosted outbound requests retain a finite bound.
@@ -55,20 +58,48 @@ def main(mode):
                 time.sleep(2)
         print(json.dumps({'status':'INITIALIZED_SYNTHETIC_TEMP'}));return
     if mode!='call':raise ValueError('MODE')
-    request=json.loads(sys.stdin.buffer.read(20000))
+    if request is None:request=json.loads(sys.stdin.buffer.read(20000))
     p=json.loads((BASE/'runtime.json').read_text());key=bytes.fromhex(c['server_key'])
     manager=a.AccountManager(store(d,p),key)
     app=AccountHTTP(manager,c['origin'],'b07-http-'+c['run'],RateLimiter(BASE/'rate.db',key))
     status,headers,body=app.handle(request['method'],request['path'],request['headers'],request['body'].encode(),request['peer'])
     print(json.dumps({'status':status,'headers':headers,'body':body.decode()}))
 
+def wait_jobs(timeout=600):
+    deadline=time.monotonic()+timeout
+    while list((BASE/'jobs').glob('*.request.json')):
+        if time.monotonic()>=deadline:raise RuntimeError('JOBS_STILL_RUNNING')
+        time.sleep(1)
+
+def run_mode(mode, job_id=None):
+    os.umask(0o077)
+    if mode=='job' and (not isinstance(job_id,str) or not re.fullmatch('[a-f0-9]{48}',job_id)):
+        raise ValueError('INVALID_JOB')
+    if mode=='cleanup':wait_jobs()
+    with (BASE/'call.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        if mode!='job':return main(mode)
+        request_path=BASE/'jobs'/(job_id+'.request.json')
+        result_path=BASE/'jobs'/(job_id+'.result.json')
+        if result_path.exists():return
+        try:
+            raw=request_path.read_bytes()
+            if len(raw)>20000:raise ValueError('REQUEST_TOO_LARGE')
+            output=io.StringIO()
+            with redirect_stdout(output):main('call',json.loads(raw))
+            result=json.loads(output.getvalue())
+        except Exception:
+            result={'status':503,'headers':[['Cache-Control','no-store'],['Content-Type','application/json']],
+                    'body':json.dumps({'error':'SERVICE_RETRY'})}
+        temp=result_path.with_suffix('.tmp')
+        temp.write_text(json.dumps(result));os.replace(temp,result_path)
+        request_path.unlink(missing_ok=True)
+
 if __name__=='__main__':
     try:
         # A web-server timeout may leave its child finishing a durable write.
         # Cleanup must wait for that child, including after a lost HTTP reply.
-        with (BASE/'call.lock').open('a') as lock:
-            fcntl.flock(lock,fcntl.LOCK_EX)
-            main(sys.argv[1])
+        run_mode(sys.argv[1],sys.argv[2] if len(sys.argv)>2 else None)
     except Exception as error:
         # Provider/credential/request exception details never reach logs.
         report={'error':'SERVICE_RETRY'}

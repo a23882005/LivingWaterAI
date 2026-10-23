@@ -73,14 +73,16 @@ def transaction(data, subject, request_id, operation, payload, handler):
             encoded = canonical(result)
             if len(encoded.encode()) > 1024 * 1024:
                 raise ValueError('RESULT_TOO_LARGE')
-            db.set_authorizer(None)
+            # Python 3.9 on the writer host requires a callable; None is only
+            # supported from 3.11. Handlers have already returned here.
+            db.set_authorizer(lambda *args: sqlite3.SQLITE_OK)
             db.execute(f'insert into {RECEIPTS} values(?,?,?,?)',
                        (subject, request_id, fingerprint, encoded))
             if db.execute('pragma foreign_key_check').fetchall():
                 raise ValueError('FOREIGN_KEYS_FAILED')
             db.commit()
         except BaseException:
-            db.set_authorizer(None)
+            db.set_authorizer(lambda *args: sqlite3.SQLITE_OK)
             db.rollback()
             raise
         finally:

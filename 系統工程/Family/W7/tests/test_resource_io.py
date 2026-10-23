@@ -188,3 +188,31 @@ def test_restore_backup_failure_releases_display_state(setup):
     with pytest.raises(OSError):m.restore('family.mou',principal(),r['backup_id'],s['epoch'],'restore')
     assert d.journal('synthetic_database')['state']=='Close'
     assert d.read('synthetic_database')==current
+
+
+def test_python39_authorizer_commit_rollback_and_guard(tmp_path, monkeypatch):
+    original_connect=sqlite3.connect
+    class LegacyConnection(sqlite3.Connection):
+        def set_authorizer(self, callback):
+            if callback is None: raise TypeError('Python 3.9 requires callable')
+            return super().set_authorizer(callback)
+    def connect(*args, **kwargs):
+        kwargs['factory']=LegacyConnection
+        return original_connect(*args, **kwargs)
+    monkeypatch.setattr(sqlite3,'connect',connect)
+    # Exercise actual SQLite writes and a forbidden transaction, not a stub.
+    image_path=tmp_path/'legacy.db'
+    with original_connect(image_path) as db:
+        db.execute('create table counter(n integer)')
+        db.execute('insert into counter values(0)')
+        db.commit()
+    image=image_path.read_bytes()
+    changed,result,_=w.transaction(image,'user','legacy-ok','add',{'delta':2},add)
+    assert result==2 and changed!=image
+    def forbidden(db,payload):
+        db.execute('update counter set n=999')
+        db.execute('COMMIT')
+    with pytest.raises(sqlite3.DatabaseError):
+        w.transaction(image,'user','legacy-denied','bad',{},forbidden)
+    _,result,_=w.transaction(image,'user','legacy-after','add',{'delta':1},add)
+    assert result==1

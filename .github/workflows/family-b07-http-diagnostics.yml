@@ -1,0 +1,51 @@
+name: Family B07 private job diagnostics
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/family-b07-http-diagnostics.yml']
+  workflow_dispatch:
+    inputs:
+      target_run:
+        required: true
+        default: '39886316687-1'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_TARGET: ${{ inputs.target_run || '39886316687-1' }}
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_TARGET
+          script: |
+            set -eu
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_TARGET" in *[!0-9-]*|'') exit 1 ;; esac
+            folder="$(dirname "${LW_DIR%/}")/.family-b07-http-$LW_TARGET"
+            python3 - "$folder" <<'PY'
+            from pathlib import Path
+            import json,sys,time
+            root=Path(sys.argv[1]);jobs=root/'jobs'
+            pending=list(jobs.glob('*.request.json'));results=list(jobs.glob('*.result.json'))
+            statuses=[]
+            for path in results:
+                try:statuses.append(json.loads(path.read_text())['status'])
+                except Exception:statuses.append('unreadable')
+            workers=0
+            for path in Path('/proc').glob('[0-9]*/cmdline'):
+                try:
+                    data=path.read_bytes()
+                    if str(root/'b07_http_worker.py').encode() in data and b'\x00job\x00' in data:workers+=1
+                except OSError:pass
+            print(json.dumps({'exists':root.exists(),'pending':len(pending),'results':len(results),'statuses':statuses,
+                'oldest_pending_seconds':int(max([time.time()-p.stat().st_mtime for p in pending] or [0])),
+                'background_workers':workers}))
+            PY

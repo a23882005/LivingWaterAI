@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.6.0",
-  "current_work": "W7-B06",
+  "current_work": "W7-B07",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -25,13 +25,14 @@
     "W7-B03 169檔存取/呼叫/動態依賴逐檔處置、W2/W6/WORK12接線責任與來源鎖核對完成",
     "H3接任實體校驗及B04可用工具/官方能力查核完成",
     "W7-B04依v1.6.0最小能力實測範圍驗收PASS：入口、服務授權、共同寫入、中斷/登出恢復及正式接線依據",
-    "W7-B05 169項覆核、40份共用來源表頭、六DB表頭同目錄落位與外置ACL/讀回驗收PASS"
+    "W7-B05 169項覆核、40份共用來源表頭、六DB表頭同目錄落位與外置ACL/讀回驗收PASS",
+    "W7-B06共同I/O/Drive adapter驗收PASS：49測試、真實中斷/並行/備份/同ID回存/精確還原、資源設定讀回"
   ],
   "in_progress": [
-    "W7-B06統一讀寫管理：承接B04共同writer與B05權限/資源表頭，實作正式通用入口"
+    "W7-B07登入、固定四小時、本人改密碼/管理權、跨對話session及服務授權接線"
   ],
   "source_versions": {
-    "main": "ac8edc77f84345b575d213cda0a50eeed9d479be",
+    "main": "220e76b13d356f459b254fbe99ffa121d78f5338",
     "handoff": "20261022-H3",
     "A01_code_commit": "6a21aaa34000141185bf08a66e05cf4422e0b576",
     "A13_merge": "0bb3eb10a0c6552d5a28597c1b568d314306efad",
@@ -66,7 +67,10 @@
     "B04_CLOSEOUT.md",
     "B05_PROGRESS.md",
     "evidence/B05/header_tests.json",
-    "evidence/B05/closeout.json"
+    "evidence/B05/closeout.json",
+    "B06_RESOURCE_IO.md",
+    "B06_ACCEPTANCE.md",
+    "evidence/B06/closeout.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -76,7 +80,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人續B05其餘共用資源清冊/外置ACL覆核與表頭落位，驗收後接B06；正式認證與ChatGPT接線歸B07，跨對話/裝置及長時間情境由B23/W8完成。",
+  "next_action": "本人接B07：建立帳號管理.py與帳號庫，接B06 session_guard/可信帳號服務，完成固定四小時、換人/改密碼/管理權、跨對話及服務OAuth設定；之後循序B08～B23→W8。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -424,23 +428,70 @@
       "artifact_sha256": "12bbcd21f28cc947ff263ff8da6403f950a6b3a2fed9c228c566976079a444f7",
       "account_database": "PENDING_B07_FAIL_CLOSED",
       "boundary": "B05 metadata and admission complete; B06 runtime lock/state/I/O and B07 real identity remain separate acceptance items"
+    },
+    "B06": {
+      "schema": "Family-B06-closeout-v1",
+      "status": "PASS",
+      "commit": "220e76b13d356f459b254fbe99ffa121d78f5338",
+      "run_id": 39874853420,
+      "job_id": 120157848757,
+      "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39874853420",
+      "tests": 49,
+      "conclusion": "success",
+      "verify": {
+        "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+        "mode": "verify",
+        "status": "PASS",
+        "stage": "complete",
+        "prior_cleanup": {
+          "state": "CLEAN"
+        },
+        "crash_exit": 73,
+        "lost_ack_dedup": true,
+        "parallel_value": 4,
+        "unique_receipts": 3,
+        "exact_restore": true,
+        "old_epoch_rejected": true,
+        "header_closed": true,
+        "cleanup": {
+          "state": "RESTORED",
+          "bytes": 8192,
+          "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+          "baseline_backup": "1BBwXRCOao82slzOIXQSBc0TcGJSRAu4L"
+        }
+      },
+      "cleanup": {
+        "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+        "mode": "cleanup",
+        "status": "PASS",
+        "stage": "complete",
+        "cleanup": {
+          "state": "CLEAN"
+        }
+      },
+      "artifact_id": 12468545902,
+      "artifact_sha256": "d1bb8efee6507484d938e99e8772fe982a54216f5a9ad031feccf6468a1b0a3f",
+      "private_config_sha256": "cc44f794c3f734720c7b75c66ceeb5214e2f826474840621b4f0df79c66eb455",
+      "resource_config_readback": "5 bound mappings, 1 pending B07; six journal exact bytes/parents PASS",
+      "boundary": "Single writer host; B07 supplies real session/token service, B18/B21 formal Action queue binding, B23/W8 four-family end-to-end",
+      "independent_temp_readback": "8192 bytes/SHA256 exact baseline PASS"
     }
   },
-  "review_note": "B05依原契約表頭/外置帳號權限/解析/落位條件驗收PASS；5/23。B06接統一I/O，B07接真實登入與帳號庫。",
+  "review_note": "B06依v1.6.0共同I/O完成條件驗收PASS；6/23。B07接帳號庫/登入與正式服務身分，B18/B21接Action，B23/W8四戶端到端。",
   "w7_progress": {
     "scheme": "B01-B23",
-    "completed": 5,
+    "completed": 6,
     "total": 23,
-    "current": "W7-B06",
+    "current": "W7-B07",
     "completed_ids": [
       "W7-B01",
       "W7-B02",
       "W7-B03",
       "W7-B04",
-      "W7-B05"
+      "W7-B05",
+      "W7-B06"
     ],
     "remaining_ids": [
-      "W7-B06",
       "W7-B07",
       "W7-B08",
       "W7-B09",

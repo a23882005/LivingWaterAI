@@ -1,0 +1,47 @@
+{
+  "schema": "Family-B06-closeout-v1",
+  "status": "PASS",
+  "commit": "220e76b13d356f459b254fbe99ffa121d78f5338",
+  "run_id": 39874853420,
+  "job_id": 120157848757,
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39874853420",
+  "tests": 49,
+  "conclusion": "success",
+  "verify": {
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "mode": "verify",
+    "status": "PASS",
+    "stage": "complete",
+    "prior_cleanup": {
+      "state": "CLEAN"
+    },
+    "crash_exit": 73,
+    "lost_ack_dedup": true,
+    "parallel_value": 4,
+    "unique_receipts": 3,
+    "exact_restore": true,
+    "old_epoch_rejected": true,
+    "header_closed": true,
+    "cleanup": {
+      "state": "RESTORED",
+      "bytes": 8192,
+      "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+      "baseline_backup": "1BBwXRCOao82slzOIXQSBc0TcGJSRAu4L"
+    }
+  },
+  "cleanup": {
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "mode": "cleanup",
+    "status": "PASS",
+    "stage": "complete",
+    "cleanup": {
+      "state": "CLEAN"
+    }
+  },
+  "artifact_id": 12468545902,
+  "artifact_sha256": "d1bb8efee6507484d938e99e8772fe982a54216f5a9ad031feccf6468a1b0a3f",
+  "private_config_sha256": "cc44f794c3f734720c7b75c66ceeb5214e2f826474840621b4f0df79c66eb455",
+  "resource_config_readback": "5 bound mappings, 1 pending B07; six journal exact bytes/parents PASS",
+  "boundary": "Single writer host; B07 supplies real session/token service, B18/B21 formal Action queue binding, B23/W8 four-family end-to-end",
+  "independent_temp_readback": "8192 bytes/SHA256 exact baseline PASS"
+}

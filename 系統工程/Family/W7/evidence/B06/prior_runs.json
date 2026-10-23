@@ -1,0 +1,82 @@
+[
+  {
+    "run_id": 39874004526,
+    "job_id": 120155034407,
+    "commit": "0a578b1ec974b59a4d507666bfc0df25710e352e",
+    "tests": 41,
+    "conclusion": "success",
+    "verify": {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "verify",
+      "status": "PASS",
+      "stage": "complete",
+      "prior_cleanup": {
+        "state": "CLEAN"
+      },
+      "crash_exit": 73,
+      "lost_ack_dedup": true,
+      "parallel_value": 4,
+      "unique_receipts": 3,
+      "exact_restore": true,
+      "old_epoch_rejected": true,
+      "header_closed": true,
+      "cleanup": {
+        "state": "RESTORED",
+        "bytes": 8192,
+        "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+        "baseline_backup": "16rba8G9Pf9Jp58wmqZrAT0mKUG6Wwdwu"
+      }
+    },
+    "cleanup": {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "cleanup",
+      "status": "PASS",
+      "stage": "complete",
+      "cleanup": {
+        "state": "CLEAN"
+      }
+    },
+    "artifact_id": 12467572423,
+    "artifact_sha256": "f861b2cd120666d7d09baa06938c6a310d574f74daca73f2b791e951f49fed3e"
+  },
+  {
+    "run_id": 39874304163,
+    "job_id": 120156035474,
+    "commit": "a63dbb3832bcec9ecd097bc50b28227d29696497",
+    "tests": 48,
+    "conclusion": "success",
+    "verify": {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "verify",
+      "status": "PASS",
+      "stage": "complete",
+      "prior_cleanup": {
+        "state": "CLEAN"
+      },
+      "crash_exit": 73,
+      "lost_ack_dedup": true,
+      "parallel_value": 4,
+      "unique_receipts": 3,
+      "exact_restore": true,
+      "old_epoch_rejected": true,
+      "header_closed": true,
+      "cleanup": {
+        "state": "RESTORED",
+        "bytes": 8192,
+        "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+        "baseline_backup": "1eeoxZvAivJonNZiKpstI135re53hXA0q"
+      }
+    },
+    "cleanup": {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "cleanup",
+      "status": "PASS",
+      "stage": "complete",
+      "cleanup": {
+        "state": "CLEAN"
+      }
+    },
+    "artifact_id": 12467766595,
+    "artifact_sha256": "8498205feed5e6a09bacf7d7d1e8c8c944d24bc66cac4bf77eb07aa9ec06ffba"
+  }
+]

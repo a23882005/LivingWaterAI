@@ -1,0 +1,109 @@
+name: Family B07 confirmed ChatGPT client
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-private-client.yml'
+      - '系統工程/Family/W7/private_entry_config.py'
+      - '系統工程/Family/W7/tests/test_private_entry_config.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b07-private-runtime-provision
+  cancel-in-progress: false
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m pip install pytest==8.4.2
+      - run: python -m pytest 系統工程/Family/W7/tests/test_private_entry_config.py 系統工程/Family/W7/tests/test_private_runtime.py 系統工程/Family/W7/tests/test_private_account_service.py -q
+      - name: Prepare confirmed client installer
+        run: |
+          mkdir -p build/family-b07-client/private
+          cp 系統工程/Family/W7/private_entry_config.py 系統工程/Family/W7/private_runtime.py 系統工程/Family/W7/private_service_config.py build/family-b07-client/private/
+      - name: Prepare exclusive private staging directory
+        id: staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            stage="$(dirname "${LW_DIR%/}")/.family-b07-client-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$stage"
+            mkdir -m 700 "$stage"
+      - name: Upload private installer
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b07-client/private/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-b07-client-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Install confirmed client without enabling public entry
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-b07-client-$LW_RUN-$LW_ATTEMPT"
+            python3 - "$stage" "$parent/.family-b07-service" <<'PYCODE'
+            import json,sys
+            from pathlib import Path
+            sys.path.insert(0,sys.argv[1])
+            from private_entry_config import install_entry
+            root=Path(sys.argv[2])
+            first=install_entry(root)
+            assert install_entry(root)==first
+            print(json.dumps(first))
+            PYCODE
+      - name: Remove exclusive staging secrets
+        if: always() && steps.staging.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            python3 - "$parent/.family-b07-client-$LW_RUN-$LW_ATTEMPT" "$LW_RUN-$LW_ATTEMPT" <<'PY'
+            import pathlib,shutil,sys
+            folder=pathlib.Path(sys.argv[1])
+            assert folder.name=='.family-b07-client-'+sys.argv[2]
+            assert not folder.is_symlink()
+            if folder.exists():shutil.rmtree(folder)
+            print('PRIVATE_STAGING_CLEANUP_PASS')
+            PY
+      - name: Remove runner secrets
+        if: always()
+        run: rm -rf -- build/family-b07-client/private

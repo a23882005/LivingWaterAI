@@ -41,7 +41,8 @@
       "main": "b952f6feee4461b2c8de280c329d1ce0ab704530",
       "handoff": "20261022-H2"
     },
-    "main_semantics": "本輪修改前核對基準；本文件所在commit為治理更新版本"
+    "main_semantics": "本輪修改前核對基準；本文件所在commit為治理更新版本",
+    "B07_http_code": "fddfbb37cce0792bc3184819d572f2dfea88fada"
   },
   "evidence": [
     "evidence/A01/",
@@ -82,7 +83,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人續B07：HTTPS背景登入入口已實作，103項本機測試通過，主機run39886316687驗收中；完成後接真人安全啟用、持久私有設定、MCP/OAuth跨對話與Google長期授權。正式進度仍6/23。",
+  "next_action": "本人續B07：HTTPS背景登入/管理入口103測試與16項真實HTTPS→Drive驗收、精確還原/清理PASS。接真人安全首次啟用、持久私有設定、MCP/OAuth與ChatGPT跨對話真實通道、Google長期授權。整項B07仍施工中，正式6/23；完成後循序B08。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -533,14 +534,18 @@
       "independent_temp_readback": "8192 bytes/baseline SHA256 exact PASS"
     },
     "B07_http": {
-      "status": "IN_PROGRESS",
+      "status": "PASS",
       "local_tests": 103,
       "run": 39886316687,
       "evidence": "系統工程/Family/W7/evidence/B07/http_progress.json",
-      "host_mode": "private_background_job_result_polling"
+      "host_mode": "private_background_job_result_polling",
+      "https_checks": 16,
+      "cleanup": "PASS",
+      "independent_readback": "PASS",
+      "artifact": 12472934584
     }
   },
-  "review_note": "B01～B06 PASS；B07核心與入口已實作，103測試通過；主機背景登入流程仍待驗收，整項不簽PASS。",
+  "review_note": "B01～B06 PASS；B07帳號核心及HTTPS入口103測試/16項真實整合PASS；仍待真人啟用、常駐私有設定、MCP/OAuth及長期授權，整項不簽PASS。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 6,

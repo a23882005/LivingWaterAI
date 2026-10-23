@@ -24,7 +24,7 @@ B07仍為IN_PROGRESS，正式進度6/23，Production HOLD、交易NONE。
 
 ## 驗收範圍
 
-本機103項通過（含五項直接執行實際頁面JavaScript的中斷重試/查詢測試及三項私有背景工作測試）。主機HTTPS與Drive實測結果另存evidence/B07/http_progress.json；未通過前不宣稱入口完成驗收。
+本機103項通過（含五項直接執行實際頁面JavaScript的中斷重試/查詢測試及三項私有背景工作測試）。主機run39886316687 / job120195204049 SUCCESS，16項HTTPS→Drive驗收全數PASS，過程沒有HTTP重試。原8192-byte TEMP已精確還原，獨立Drive下載SHA256亦一致；臨時入口及私有工作檔清理成功。完整證據見evidence/B07/http_progress.json。
 
 HTTP新連線沿用cookie只是服務端驗證，不是ChatGPT跨對話驗收。後續MCP需完整OAuth discovery、authorization code/PKCE、精確redirect與client驗證、token issuer/audience/expiry/scope核驗。實際ChatGPT連接與真人首次啟用仍須獨立完成。
 

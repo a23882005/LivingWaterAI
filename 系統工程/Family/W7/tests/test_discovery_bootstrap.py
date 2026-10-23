@@ -1,6 +1,7 @@
 """Executable HTTP boundary checks; CI must provide PHP."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -29,8 +30,9 @@ spec.loader.exec_module(publisher)
 def test_http_boundary(method,path,extra,status):
     if not shutil.which('php'): pytest.skip('PHP required in CI')
     server={'HTTPS':'on','HTTP_HOST':'www.happihelp.com','REQUEST_METHOD':method,'REQUEST_URI':path,**extra}
-    script="$_SERVER=json_decode("+json.dumps(json.dumps(server))+",true);register_shutdown_function(function(){fwrite(STDERR,(string)http_response_code());});require "+json.dumps(str(W7/'public_discovery/index.php'))+";"
-    out=subprocess.run(['php','-r',script],capture_output=True,text=True,check=True)
+    script="$_SERVER=json_decode(getenv('FAMILY_TEST_SERVER'),true);register_shutdown_function(function(){fwrite(STDERR,(string)http_response_code());});require getenv('FAMILY_TEST_GATEWAY');"
+    env={**os.environ,'FAMILY_TEST_SERVER':json.dumps(server),'FAMILY_TEST_GATEWAY':str(W7/'public_discovery/index.php')}
+    out=subprocess.run(['php','-r',script],env=env,capture_output=True,text=True,check=True)
     assert out.stderr==str(status)
     data=json.loads(out.stdout)
     if status==200 and 'issuer' in data:

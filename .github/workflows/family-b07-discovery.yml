@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/family-b07-discovery.yml'
       - '系統工程/Family/W7/public_discovery/**'
+      - '系統工程/Family/W7/tests/test_discovery_bootstrap.py'
       - '系統工程/Family/W7/deployment/publish_discovery.py'
   workflow_dispatch:
 permissions:

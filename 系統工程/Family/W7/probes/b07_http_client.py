@@ -64,7 +64,7 @@ def verify():
             except urllib.error.HTTPError as e:
                 with e:result=(e.code,e.headers,e.read(32768))
             last_status=result[0]
-            if last_status not in (502,503,504) or attempt==2:return result
+            if last_status not in (500,502,503,504) or attempt==2:return result
             transient_statuses.append(last_status)
             print(json.dumps({'retry_http_status':last_status,'attempt':attempt+1}),flush=True)
             time.sleep(2)

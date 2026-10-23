@@ -79,6 +79,7 @@ def install(root):
             os.chmod(staging / name, 0o644)
         os.chmod(staging, 0o755)
         target.mkdir(mode=0o755, exist_ok=True)
+        os.chmod(target, 0o755)
         try:
             for name in NAMES + ('manifest.json',):
                 os.replace(staging / name, target / name)

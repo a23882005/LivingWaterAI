@@ -1,6 +1,6 @@
 {
   "schema": "Family-B07-oauth-https-progress-v1",
-  "status": "FIRST_RUN_TIMEOUT_REPAIR_PENDING",
+  "status": "PASS_SYNTHETIC_HTTPS_DRIVE_ONLY",
   "first_run": 39905273785,
   "first_job": 120255680420,
   "ci_tests": 153,
@@ -26,5 +26,23 @@
   "independent_temp_sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
   "artifact_id": 12481655146,
   "artifact_sha256": "edcca79bc22a5d3306c1ef3feff368f78c27b3017e50fe0fce7c35dd8e1db4f0",
-  "repair": "Skip unchanged Close journal writes; retain fresh DB/hash/journal checks, real state transitions, backup, pending commit, readback, recovery."
+  "repair": "Skip unchanged Close journal writes; retain fresh DB/hash/journal checks, real state transitions, backup, pending commit, readback, recovery.",
+  "repair_run": {
+    "run_id": 39907089509,
+    "job_id": 120262198216,
+    "source_commit": "afc7abaf4fd01946c561b79a996701916b1f7f72",
+    "conclusion": "success",
+    "ci_tests": 154,
+    "end_to_end_checks": 14,
+    "token_exchange_seconds": 85.426,
+    "cleanup": "PASS_PRIVATE_ENTRY_AND_JOBS_REMOVED",
+    "restored_sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+    "artifact_id": 12482405198,
+    "artifact_sha256": "ec73a4d2fcf9bca08de70a76f2cf1c59d8d203c88edbf78cc9e7465821acc8d8"
+  },
+  "limitations": [
+    "Synthetic HTTPS only; not actual ChatGPT authorization",
+    "Token exchange remains slow; actual client timeout compatibility unproven",
+    "Real enrollment and Google long-term authorization pending"
+  ]
 }

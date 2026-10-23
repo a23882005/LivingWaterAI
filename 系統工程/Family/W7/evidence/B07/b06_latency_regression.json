@@ -1,0 +1,49 @@
+{
+  "schema": "Family-B07-latency-B06-regression-v1",
+  "source_commit": "afc7abaf4fd01946c561b79a996701916b1f7f72",
+  "run_id": 39907089439,
+  "attempt": 2,
+  "job_id": 120267393120,
+  "status": "PASS",
+  "tests": 51,
+  "reports": [
+    {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "verify",
+      "status": "PASS",
+      "stage": "complete",
+      "prior_cleanup": {
+        "state": "CLEAN"
+      },
+      "crash_exit": 73,
+      "lost_ack_dedup": true,
+      "parallel_value": 4,
+      "unique_receipts": 3,
+      "exact_restore": true,
+      "old_epoch_rejected": true,
+      "header_closed": true,
+      "cleanup": {
+        "state": "RESTORED",
+        "bytes": 8192,
+        "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8"
+      }
+    },
+    {
+      "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+      "mode": "cleanup",
+      "status": "PASS",
+      "stage": "complete",
+      "cleanup": {
+        "state": "CLEAN"
+      }
+    }
+  ],
+  "first_attempt": {
+    "job_id": 120261416473,
+    "status": "FAIL",
+    "error": "TimeoutError in parallel worker",
+    "cleanup": "PASS"
+  },
+  "artifact_id": 12482310859,
+  "artifact_sha256": "0a4558571dc8dcc8ed5fb6b9d7b05692de6c080ba820f7caa99d8c11dd991ea5"
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "Family-B07-oauth-https-proof-v1",
+  "status": "PASS",
+  "scope": "SYNTHETIC_HTTPS_DRIVE_ONLY",
+  "checks": [
+    "account_page",
+    "initial_login",
+    "first_password_change",
+    "normal_login",
+    "oauth_discovery",
+    "resource_discovery",
+    "explicit_consent_page",
+    "authorization_direct_reply",
+    "exact_redirect_state_issuer",
+    "standard_token_response",
+    "mcp_session_identity",
+    "refresh_direct_response",
+    "logout",
+    "mcp_revoked_after_logout"
+  ],
+  "count": 14,
+  "timings": {
+    "token_exchange_seconds": 85.426
+  }
+}

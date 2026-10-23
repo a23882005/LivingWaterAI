@@ -44,3 +44,11 @@ run39905273785/job120255680420：153項CI PASS；登入/首次改密碼/正常�
 修復：Coordinator只省略已讀回且完全不變的Close journal重寫，以及commit後重複Close；保留每次新讀DB/hash/journal、Read/Update/Close實際轉換、備份、pending、同ID寫回及復原。完整本機166項PASS，將重驗B06真實Drive與HTTPS，不因單元測試就宣稱逾時解決。
 
 代理已實際進入ChatGPT登入帳號的Plugins→Add custom MCP server→Advanced OAuth settings，讀到User-Defined OAuth Client、callback、none token auth與手動endpoint/PKCE欄位。測試URL僅作未提交表單檢視；沒有建立插件、沒有完成授權、沒有跨對話驗收。正式callback於提交前需再次核對。
+
+## HTTPS修補後驗收
+
+run39907089509/job120262198216 SUCCESS，來源afc7abaf4fd01946c561b79a996701916b1f7f72。Python3.9 154項PASS，合成HTTPS完整14項PASS，包含標準token直接回覆、MCP身分、refresh、登出撤銷401。token交換85.426秒，仍偏慢；未證明實際ChatGPT客戶端可接受此延遲。隔離入口與私有測試檔移除，8192-byte TEMP還原原始SHA256；artifact12482405198／ec73a4d2fcf9bca08de70a76f2cf1c59d8d203c88edbf78cc9e7465821acc8d8。
+
+正式私有設定仍disabled；沒有真人帳號啟用，沒有提交ChatGPT連接，Google長期授權未完成。B07仍IN_PROGRESS，正式6/23。
+
+共同I/O修補重驗 run39907089439 第二次 job120267393120 SUCCESS：51單元測試，真實Drive中斷exit73、lost-ack去重、parallel_value4／unique_receipts3、old_epoch拒絕、Close表頭、精確還原PASS；二次cleanup CLEAN。首次並行worker TimeoutError及成功還原仍保留歷史，不覆寫成通過。

@@ -1,0 +1,135 @@
+name: Family B07 HTTPS account entry
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-account-http.yml'
+      - '系統工程/Family/W7/account_http.py'
+      - '系統工程/Family/W7/account_login.html'
+      - '系統工程/Family/W7/tests/test_account_http.py'
+      - '系統工程/Family/W7/probes/b07_http_*.py'
+      - '系統工程/Family/W7/probes/b07_account_gateway.php'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b04-temp-drive-writer
+  cancel-in-progress: false
+jobs:
+  https:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - run: python -m pytest 系統工程/Family/W7/tests/test_account_http.py 系統工程/Family/W7/tests/test_accounts.py 系統工程/Family/W7/tests/test_drive_service_transport.py 系統工程/Family/W7/tests/test_resource_io.py 系統工程/Family/W7/tests/test_drive_resource_backend.py 系統工程/Family/W7/tests/test_resource_headers.py 系統工程/Family/W7/tests/test_source_resources.py -q --junitxml=build/family-b07-http/results.xml
+      - name: Build isolated private account service
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+          FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+          FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+          FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+        run: python 系統工程/Family/W7/probes/b07_http_client.py build
+      - name: Prepare exclusive private directory
+        id: private
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            folder="$(dirname "${LW_DIR%/}")/.family-b07-http-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$folder"
+            mkdir "$folder"
+            chmod 700 "$folder"
+      - name: Upload private service
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b07-http/private/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-b07-http-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Upload gated HTTPS entry
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-b07-http/public/index.php
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/family-b07-http-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Initialize synthetic Drive account image
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          command_timeout: 10m
+          script: |
+            set -eu
+            folder="$(dirname "${LW_DIR%/}")/.family-b07-http-$LW_RUN-$LW_ATTEMPT"
+            chmod 600 "$folder/config.json" "$folder/gateway.json"
+            php -l "${LW_DIR%/}/family-b07-http-$LW_RUN-$LW_ATTEMPT/index.php" >/dev/null
+            python3 "$folder/b07_http_worker.py" init
+      - name: Verify browser boundary through HTTPS and Drive
+        run: python 系統工程/Family/W7/probes/b07_http_client.py verify
+      - name: Hide endpoint, restore TEMP, remove private test files
+        if: always() && steps.private.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          command_timeout: 15m
+          script: |
+            set -eu
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            folder="$(dirname "${LW_DIR%/}")/.family-b07-http-$LW_RUN-$LW_ATTEMPT"
+            probe="${LW_DIR%/}/family-b07-http-$LW_RUN-$LW_ATTEMPT"
+            rm -f -- "$probe/index.php"
+            if [ -f "$folder/config.json" ] && [ -f "$folder/b07_http_worker.py" ]; then
+              python3 "$folder/b07_http_worker.py" cleanup
+            fi
+            # Exact exclusive run directories only; no shared website paths.
+            python3 - "$folder" "$probe" "$LW_RUN-$LW_ATTEMPT" <<'PY'
+            import pathlib,shutil,sys
+            private,public,run=map(str,sys.argv[1:])
+            assert pathlib.Path(private).name=='.family-b07-http-'+run
+            assert pathlib.Path(public).name=='family-b07-http-'+run
+            for path in [private,public]:
+                if pathlib.Path(path).exists():shutil.rmtree(path)
+            print('FAMILY_B07_HTTP_CLEANUP_PASS')
+            PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-b07-http-${{ github.run_id }}
+          path: |
+            build/family-b07-http/proof.json
+            build/family-b07-http/results.xml

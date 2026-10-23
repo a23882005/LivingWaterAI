@@ -1,3 +1,11 @@
+## 2026-10-23 品牌公開說明頁部署完成
+
+- 本人新增 Family-Drive 介紹、隱私權政策與服務條款，固定公開路徑 `/family-info/`、`/family-info/privacy.html`、`/family-info/terms.html`。
+- 程式 a19f628618f02fa0b2523ceafb1929d5928b87d6；run39954347660/job120416326346 SUCCESS。三頁HTTP200、UTF-8、SHA256逐檔一致；瀏覽器三頁與導覽確認。暫存清理PASS。
+- 首次run39954152904因新目錄受umask077影響而403，保留失敗紀錄；補0755後通過嚴格umask首次/重複部署驗證。修改前私有備份、拒絕未知目錄、既有總經首頁保留。
+- 指揮官截圖已見happihelp.com授權網域及舊首頁儲存；下一步將Google品牌三個網址改填新三頁，觀察Audience發布按鈕及後續提示。未宣告Google發布/驗證或長期授權完成。
+- 正式6/23，B07 IN_PROGRESS；Production HOLD、交易NONE、W4取消、RM17凍結。後續仍需真人安全啟用、正式服務接線、實際ChatGPT跨對話及Google長期授權。
+
 # B07 OAuth／MCP 接線進展
 
 狀態：IN_PROGRESS；W7正式6/23。Production HOLD、交易NONE。

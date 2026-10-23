@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "pages": [
+    {
+      "url": "https://www.happihelp.com/family-info/",
+      "http_status": 200,
+      "sha256": "934f0f83e5a239ffebfbc08c01b47b9cab68a5f4cdd29aba5b980475d3764206"
+    },
+    {
+      "url": "https://www.happihelp.com/family-info/privacy.html",
+      "http_status": 200,
+      "sha256": "4096ff1866cfca2cf58f314b93c6ace64da1497d219b8e3514929b1772f94ab1"
+    },
+    {
+      "url": "https://www.happihelp.com/family-info/terms.html",
+      "http_status": 200,
+      "sha256": "c8804a74841b5f3d6e1a5d657c8d696fe3ac264df061a2fd65c88229a63fa75b"
+    }
+  ],
+  "schema": "Family-B07-branding-v1",
+  "date": "2026-10-23",
+  "code_commit": "a19f628618f02fa0b2523ceafb1929d5928b87d6",
+  "run_id": 39954347660,
+  "job_id": 120416326346,
+  "cleanup": "PASS",
+  "browser": "All three pages and navigation verified; desktop screenshot inspected",
+  "local_checks": [
+    "static links and UTF-8",
+    "first and repeat deployment",
+    "private backup before replacement",
+    "unknown target refused",
+    "unrelated root preserved",
+    "strict umask 077 yields public directory 0755 and files 0644"
+  ],
+  "first_attempt": {
+    "run_id": 39954152904,
+    "status": "FAILED_HTTP_403",
+    "cause": "new target directory inherited umask 077; corrected explicit chmod 0755",
+    "cleanup": "PASS"
+  },
+  "scope": "Public informational pages only; B07 IN_PROGRESS, formal 6/23; Google console URLs not yet entered/published; runtime remains disabled"
+}

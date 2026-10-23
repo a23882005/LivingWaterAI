@@ -46,7 +46,8 @@
     "B07_oauth_code": "ffc42ea610f930a59cba9bbc33c3c047830f5cc4",
     "B07_private_runtime": "fc81ee553a2b46d6ba7988c2480d630364bbf191",
     "B07_https_oauth": "92838009813eb96e391d7de6a8bb721af9968316",
-    "B07_latency_repair": "afc7abaf4fd01946c561b79a996701916b1f7f72"
+    "B07_latency_repair": "afc7abaf4fd01946c561b79a996701916b1f7f72",
+    "B07_branding": "a19f628618f02fa0b2523ceafb1929d5928b87d6"
   },
   "evidence": [
     "evidence/A01/",
@@ -83,7 +84,8 @@
     "evidence/B07/private_runtime.json",
     "evidence/B07/oauth_https_progress.json",
     "evidence/B07/oauth_https_proof.json",
-    "evidence/B07/b06_latency_regression.json"
+    "evidence/B07/b06_latency_regression.json",
+    "evidence/B07/branding.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -594,7 +596,7 @@
       "exact_restore": true
     }
   },
-  "review_note": "B01～B06原PASS沿用；B07 Drive OAuth、主機持久私有設定及14項合成HTTPS OAuth驗證PASS。實際ChatGPT客戶端仍未驗收；token交換85.426秒偏慢。真人安全啟用、正式路由接線、跨對話與Google長期授權未完成；B07仍IN_PROGRESS／6/23。",
+  "review_note": "B01～B06原PASS沿用；B07 Drive OAuth、主機持久私有設定及14項合成HTTPS OAuth驗證PASS。實際ChatGPT客戶端仍未驗收；token交換85.426秒偏慢。真人安全啟用、正式路由接線、跨對話與Google長期授權未完成；B07仍IN_PROGRESS／6/23。 B07公開介紹/隱私權/條款三頁HTTPS與來源SHA256及瀏覽器導覽PASS；待指揮官填入Google品牌欄位，尚未確認發布。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 6,
@@ -635,5 +637,47 @@
     "decision": "指揮官2026-10-23明示",
     "existing_reference": ".github/workflows/v703-site-deploy-1100.yml",
     "scope": "沿用既有部署能力，Family測試接線；正式Production仍HOLD"
+  },
+  "B07_branding": {
+    "status": "PASS",
+    "pages": [
+      {
+        "url": "https://www.happihelp.com/family-info/",
+        "http_status": 200,
+        "sha256": "934f0f83e5a239ffebfbc08c01b47b9cab68a5f4cdd29aba5b980475d3764206"
+      },
+      {
+        "url": "https://www.happihelp.com/family-info/privacy.html",
+        "http_status": 200,
+        "sha256": "4096ff1866cfca2cf58f314b93c6ace64da1497d219b8e3514929b1772f94ab1"
+      },
+      {
+        "url": "https://www.happihelp.com/family-info/terms.html",
+        "http_status": 200,
+        "sha256": "c8804a74841b5f3d6e1a5d657c8d696fe3ac264df061a2fd65c88229a63fa75b"
+      }
+    ],
+    "schema": "Family-B07-branding-v1",
+    "date": "2026-10-23",
+    "code_commit": "a19f628618f02fa0b2523ceafb1929d5928b87d6",
+    "run_id": 39954347660,
+    "job_id": 120416326346,
+    "cleanup": "PASS",
+    "browser": "All three pages and navigation verified; desktop screenshot inspected",
+    "local_checks": [
+      "static links and UTF-8",
+      "first and repeat deployment",
+      "private backup before replacement",
+      "unknown target refused",
+      "unrelated root preserved",
+      "strict umask 077 yields public directory 0755 and files 0644"
+    ],
+    "first_attempt": {
+      "run_id": 39954152904,
+      "status": "FAILED_HTTP_403",
+      "cause": "new target directory inherited umask 077; corrected explicit chmod 0755",
+      "cleanup": "PASS"
+    },
+    "scope": "Public informational pages only; B07 IN_PROGRESS, formal 6/23; Google console URLs not yet entered/published; runtime remains disabled"
   }
 }

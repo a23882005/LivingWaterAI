@@ -9,7 +9,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from actions_drive_write_probe import Drive, TEST_ID, TEMP_FOLDER, BACKUP_FOLDER
 from b06_drive_integration import initialize, clean, header
-from drive_service_transport import GoogleDriveTransport
+from drive_service_transport import GoogleDriveTransport, ServiceTransportError
 from drive_resource_backend import DriveResourceBackend
 a = importlib.import_module('帳號管理')
 BUILD = Path('build/family-b07-oauth-live')
@@ -98,6 +98,10 @@ def main(mode):
     except Exception as error:
         # Never emit exception text, token, provider body, password or DB image.
         report['error_type'] = type(error).__name__
+        if isinstance(error, ServiceTransportError):
+            safe = str(error)
+            if safe in {'PROVIDER_REJECTED','PROVIDER_RESPONSE_TOO_LARGE','PROVIDER_UNAVAILABLE','INVALID_TOKEN_RESPONSE','INVALID_PROVIDER_JSON'} or (safe.startswith('PROVIDER_HTTP_') and safe[14:].isdigit()):
+                report['provider_error'] = safe
     (BUILD/(mode+'.json')).write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report))
     return 0 if report['status']=='PASS' else 1

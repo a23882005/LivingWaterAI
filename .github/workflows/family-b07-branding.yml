@@ -1,0 +1,98 @@
+name: Family B07 public branding pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-b07-branding.yml'
+      - '系統工程/Family/W7/public_branding/**'
+      - '系統工程/Family/W7/deployment/publish_branding.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b07-branding
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Validate and prepare public pages
+        run: python 系統工程/Family/W7/deployment/publish_branding.py build
+      - name: Prepare exclusive private staging directory
+        id: staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            stage="$(dirname "${LW_DIR%/}")/.family-branding-stage-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$stage"
+            mkdir -m 700 "$stage"
+      - name: Upload static pages and installer
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-branding/private/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-branding-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 3
+          command_timeout: 90s
+      - name: Publish isolated informational pages
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-branding-stage-$LW_RUN-$LW_ATTEMPT"
+            python3 "$stage/publish_branding.py" install "${LW_DIR%/}"
+      - name: Verify three public HTTPS pages against source hashes
+        run: python 系統工程/Family/W7/deployment/publish_branding.py verify https://www.happihelp.com
+      - name: Remove exclusive staging files
+        if: always() && steps.staging.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            python3 - "$parent/.family-branding-stage-$LW_RUN-$LW_ATTEMPT" "$LW_RUN-$LW_ATTEMPT" <<'PY'
+            import pathlib,shutil,sys
+            folder=pathlib.Path(sys.argv[1])
+            assert folder.name=='.family-branding-stage-'+sys.argv[2]
+            assert not folder.is_symlink()
+            if folder.exists():shutil.rmtree(folder)
+            print('BRANDING_STAGING_CLEANUP_PASS')
+            PY
+      - name: Remove runner staging files
+        if: always()
+        run: rm -rf -- build/family-branding/private

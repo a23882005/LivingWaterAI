@@ -47,7 +47,8 @@
     "B07_private_runtime": "fc81ee553a2b46d6ba7988c2480d630364bbf191",
     "B07_https_oauth": "92838009813eb96e391d7de6a8bb721af9968316",
     "B07_latency_repair": "afc7abaf4fd01946c561b79a996701916b1f7f72",
-    "B07_branding": "a19f628618f02fa0b2523ceafb1929d5928b87d6"
+    "B07_branding": "a19f628618f02fa0b2523ceafb1929d5928b87d6",
+    "B07_private_entry_base": "1fd20c6068fb4c7319fd3edd61c42d9661d95925"
   },
   "evidence": [
     "evidence/A01/",
@@ -95,7 +96,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "接續正式服務接線與真人安全啟用、實際ChatGPT OAuth跨對話及Google長期授權。token交換85.426秒仍需以實際客戶端驗收；不得把合成HTTPS PASS代替真人與ChatGPT驗收。",
+  "next_action": "部署正式專用gateway及真人安全啟用；取得實際ChatGPT client/redirect、驗證token交換與跨對話。私有路由組裝已本機149項相關測試通過，未公開啟用。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -679,5 +680,16 @@
       "cleanup": "PASS"
     },
     "scope": "Public informational pages only; B07 IN_PROGRESS, formal 6/23; Google console URLs not yet entered/published; runtime remains disabled"
+  },
+  "B07_private_entry_preparation": {
+    "status": "LOCAL_TESTED_NOT_DEPLOYED",
+    "new_tests": 15,
+    "related_tests_passed": 149,
+    "runtime_run": 39985989631,
+    "runtime_job": 120525205726,
+    "runtime_status": "PRIVATE_PERSISTENT_DISABLED",
+    "public_entry": false,
+    "human_enrollment": false,
+    "actual_chatgpt_acceptance": false
   }
 }

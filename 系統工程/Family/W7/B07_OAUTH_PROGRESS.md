@@ -1,3 +1,12 @@
+## 2026-10-24 私有帳號與路由組裝進展（尚未公開啟用）
+
+- 新授權部署 run39985989631/job120525205726 SUCCESS；來源1fd20c6068fb4c7319fd3edd61c42d9661d95925。12項部署測試、固定key、私有設定讀回與暫存清理PASS；主機仍PRIVATE_PERSISTENT_DISABLED。
+- private_account_service.py 從私有runtime載入既有key與正式B06帳號映射；帳號服務只取得accounts，拒絕表頭不一致、不可信鎖路徑、多主機writer與遺失key。建構不讀寫Drive、不初始化真人帳號、不載入合成測試清理程式。
+- load_router 從私有entry.json組裝既有AccountHTTP/OAuthService/AccountRouter。origin、固定connection_scope、精確base與已驗證client/redirect必須由部署設定提供。沒有示範client上線，也未新增公開入口。
+- 新增15項測試；涵蓋新模組、帳號、OAuth、MCP、HTTP、B06及Drive transport的149項本機測試全數PASS。嘗試整個W7目錄時有兩項舊測試因本地子集缺W5模組無法收集，此次不宣稱整個W7測試通過。
+- 下一步：部署專用gateway、真人安全啟用、取得實際ChatGPT client/redirect並做跨對話驗收；85.426秒既有token交換仍需實際客戶端驗證。
+- 正式6/23；B07 IN_PROGRESS；Production HOLD、交易NONE、W4取消、RM17凍結。
+
 ## 2026-10-23 品牌公開說明頁部署完成
 
 - 本人新增 Family-Drive 介紹、隱私權政策與服務條款，固定公開路徑 `/family-info/`、`/family-info/privacy.html`、`/family-info/terms.html`。

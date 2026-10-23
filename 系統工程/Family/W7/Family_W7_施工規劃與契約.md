@@ -1,3 +1,5 @@
+【2026-10-23 B07施工更新】帳號核心、固定4小時/撤銷/管理權與Drive傳輸已實作，80測試及run39878171428真實Drive驗證PASS；空帳號庫已在根目錄綁定。B07仍IN_PROGRESS，6/23；本人續安全啟用/HTTPS入口、MCP/OAuth跨對話及Google長期授權。詳B07_ACCOUNT_CORE.md及evidence/B07/core_progress.json。
+
 【2026-10-23施工狀態更新】B01～B06完成，6/23；現接B07帳號/登入及服務接線。B06完成共同I/O、49項測試與真實Drive中斷/並行/還原驗收；證據B06_ACCEPTANCE.md及evidence/B06/closeout.json。原契約完成條件不變。
 
 【2026-10-23施工狀態更新】B01～B05完成，5/23；現接B06統一讀寫管理。B05證據見B05_PROGRESS.md與evidence/B05/closeout.json。原契約完成條件不變；下方舊狀態保留歷史。

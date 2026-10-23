@@ -1,0 +1,54 @@
+{
+  "schema": "Family-B07-core-progress-v1",
+  "status": "CORE_PASS_B07_IN_PROGRESS",
+  "commit": "429d472ed8b0f09b639bc685a3086bc1d6a01af0",
+  "run_id": 39878171428,
+  "job_id": 120168827497,
+  "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39878171428",
+  "conclusion": "success",
+  "tests": 80,
+  "new_account_tests": 20,
+  "new_transport_tests": 11,
+  "existing_regressions": 49,
+  "live": {
+    "schema": "Family-B07-core-live-v1",
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "status": "PASS",
+    "stage": "complete",
+    "prior_cleanup": {
+      "state": "CLEAN"
+    },
+    "fixed_four_hours": true,
+    "checks": [
+      "initial_change",
+      "password_change",
+      "login",
+      "fresh_manager_resume",
+      "b06_session_guard",
+      "fixed_four_hours",
+      "logout_revocation"
+    ],
+    "cleanup": {
+      "state": "RESTORED",
+      "bytes": 8192,
+      "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+      "baseline_backup": "1jIcjWkwcZUXMAjTOUPhbgwvzZu8rUVxl"
+    }
+  },
+  "cleanup": {
+    "schema": "Family-B07-core-live-v1",
+    "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+    "status": "PASS",
+    "stage": "complete",
+    "cleanup": {
+      "state": "CLEAN"
+    }
+  },
+  "artifact_id": 12469387343,
+  "artifact_sha256": "d1e26b21b5fea6d9ad35ca0bd3b1a95162348a272dac9a61bfddf1a17e5d1759",
+  "account_db": "ROOT_BOUND_EMPTY_NO_REAL_CREDENTIALS",
+  "account_schema_sha256": "b45466f67ae537201302707b96287afad52e3e57d774dc8ee855dc6c955c774e",
+  "private_config_sha256": "0c9274e4bc0e65c83c02b414ce151bddce60beaa0594b5155a650e9e7a615d6b",
+  "boundary": "No live HTTPS enrollment/MCP OAuth/cross-chat acceptance or long-term Google publishing change yet; B07 IN_PROGRESS, 6/23",
+  "independent_temp_readback": "8192 bytes/baseline SHA256 exact PASS"
+}

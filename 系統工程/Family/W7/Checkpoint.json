@@ -70,7 +70,8 @@
     "evidence/B05/closeout.json",
     "B06_RESOURCE_IO.md",
     "B06_ACCEPTANCE.md",
-    "evidence/B06/closeout.json"
+    "evidence/B06/closeout.json",
+    "系統工程/Family/W7/evidence/B07/core_progress.json"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -80,7 +81,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "本人接B07：建立帳號管理.py與帳號庫，接B06 session_guard/可信帳號服務，完成固定四小時、換人/改密碼/管理權、跨對話及服務OAuth設定；之後循序B08～B23→W8。",
+  "next_action": "本人續B07：帳號核心/Drive傳輸/空帳號庫已建且80測試及真實Drive驗證PASS；接安全首次啟用、HTTPS登入管理入口、MCP/OAuth與跨對話實際通道、Google長期授權及常駐私有設定。完整B07尚未結案，進度6/23；完成後再B08。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -475,9 +476,63 @@
       "resource_config_readback": "5 bound mappings, 1 pending B07; six journal exact bytes/parents PASS",
       "boundary": "Single writer host; B07 supplies real session/token service, B18/B21 formal Action queue binding, B23/W8 four-family end-to-end",
       "independent_temp_readback": "8192 bytes/SHA256 exact baseline PASS"
+    },
+    "B07_core": {
+      "schema": "Family-B07-core-progress-v1",
+      "status": "CORE_PASS_B07_IN_PROGRESS",
+      "commit": "429d472ed8b0f09b639bc685a3086bc1d6a01af0",
+      "run_id": 39878171428,
+      "job_id": 120168827497,
+      "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/39878171428",
+      "conclusion": "success",
+      "tests": 80,
+      "new_account_tests": 20,
+      "new_transport_tests": 11,
+      "existing_regressions": 49,
+      "live": {
+        "schema": "Family-B07-core-live-v1",
+        "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+        "status": "PASS",
+        "stage": "complete",
+        "prior_cleanup": {
+          "state": "CLEAN"
+        },
+        "fixed_four_hours": true,
+        "checks": [
+          "initial_change",
+          "password_change",
+          "login",
+          "fresh_manager_resume",
+          "b06_session_guard",
+          "fixed_four_hours",
+          "logout_revocation"
+        ],
+        "cleanup": {
+          "state": "RESTORED",
+          "bytes": 8192,
+          "sha256": "7c75b192ff45bb0d71f88f0b6f16bfb59fc1a73d53a7aa29ad9e9471238872a8",
+          "baseline_backup": "1jIcjWkwcZUXMAjTOUPhbgwvzZu8rUVxl"
+        }
+      },
+      "cleanup": {
+        "schema": "Family-B07-core-live-v1",
+        "scope": "APPROVED_TEMP_SYNTHETIC_ONLY",
+        "status": "PASS",
+        "stage": "complete",
+        "cleanup": {
+          "state": "CLEAN"
+        }
+      },
+      "artifact_id": 12469387343,
+      "artifact_sha256": "d1e26b21b5fea6d9ad35ca0bd3b1a95162348a272dac9a61bfddf1a17e5d1759",
+      "account_db": "ROOT_BOUND_EMPTY_NO_REAL_CREDENTIALS",
+      "account_schema_sha256": "b45466f67ae537201302707b96287afad52e3e57d774dc8ee855dc6c955c774e",
+      "private_config_sha256": "0c9274e4bc0e65c83c02b414ce151bddce60beaa0594b5155a650e9e7a615d6b",
+      "boundary": "No live HTTPS enrollment/MCP OAuth/cross-chat acceptance or long-term Google publishing change yet; B07 IN_PROGRESS, 6/23",
+      "independent_temp_readback": "8192 bytes/baseline SHA256 exact PASS"
     }
   },
-  "review_note": "B06依v1.6.0共同I/O完成條件驗收PASS；6/23。B07接帳號庫/登入與正式服務身分，B18/B21接Action，B23/W8四戶端到端。",
+  "review_note": "B01～B06 PASS；B07核心80項與真實Drive測試PASS，正式空帳號庫已綁定；尚欠安全入口/服務接線/長期授權，不簽整項PASS。",
   "w7_progress": {
     "scheme": "B01-B23",
     "completed": 6,

@@ -466,6 +466,21 @@ def month_delta(f):
     return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
                '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
 
+def sahm_from_published(f):
+    """Read the published official Sahm Rule first; independent U3 calculation is diagnostic fallback."""
+    try:
+        r=latest(f,'m18','SAHMREALTIME')
+        r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
+        return r
+    except Exception as published_exc:
+        print('SAHM_PUBLISHED_FAILED',type(published_exc).__name__,str(published_exc)[:450],flush=True)
+        try:
+            return sahm_from_unrate(f)
+        except Exception as calc_exc:
+            raise RuntimeError(
+                'SAHMREALTIME official series failed: '+str(published_exc)[:180]+
+                ' | verified U3 calculation failed: '+str(calc_exc)[:180]) from calc_exc
+
 def sahm_from_unrate(f):
     try:
         s=f.fred('UNRATE').sort_index()
@@ -733,7 +748,7 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
-      'm18':lambda:sahm_from_unrate(f),
+      'm18':lambda:sahm_from_published(f),
       'm19':lambda:latest(f,'m19','UNRATE'),
       'm20':lambda:nfp(f),
       'm05':lambda:core_cpi(f),

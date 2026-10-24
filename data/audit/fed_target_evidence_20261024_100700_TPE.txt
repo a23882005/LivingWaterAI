@@ -1,0 +1,240 @@
+Federal Reserve Board - Open Market Operations (https://www.federalreserve.gov/monetarypolicy/openmarket.htm)
+【turn207view0】 [wordlim: 200] Crawled: today; Content type: text/html; Source: open({"ref_id":"https://www.federalreserve.gov/monetarypolicy/openmarket.htm","lineno":null}); Total lines: 237
+L0: 【0†Skip to main content】 【1†Board of Governors of the Federal Reserve System The Federal Reserve, the central bank of the United States, provides the nation with a safe, flexible, and stable monetary and financial system.】
+L1: 
+L2: ## Policy Tools
+L3: 
+L4: Please enable JavaScript if it is disabled in your browser or access the information through the links provided below.
+L5: ### Open Market Operations
+L6: Open market operations (OMOs)--the purchase and sale of securities in the open market by a central bank--are a key tool used by the Federal Reserve in the implementation of monetary policy. The short-term objective for open market operations is specified by the 【2†Federal Open Market Committee】 (FOMC).
+L7: Before the global financial crisis, the Federal Reserve used OMOs to adjust the supply of reserve balances so as to keep the federal funds rate--the interest rate at which depository institutions lend reserve balances to other depository institutions overnight--around the target established by the FOMC.
+L8: The Federal Reserve's approach to the implementation of monetary policy has evolved considerably since the financial crisis, and particularly so since late 2008 when the FOMC established a near-zero target range for the federal funds rate.
+L9: From the end of 2008 through October 2014, the Federal Reserve greatly expanded its holding of longer-term securities through open market purchases with the goal of putting downward pressure on longer-term interest rates and thus supporting economic activity and job creation by making financial conditions more accommodative.
+L10: During the policy normalization process that commenced in December 2015, the Federal Reserve first used overnight reverse repurchase agreements (ON RRPs)--a type of OMO--as a supplementary policy tool, as necessary, to help control the federal funds rate and keep it in the target range set by the FOMC.
+L11: In September 2019, the Federal Reserve used term and overnight repurchase agreements (repo) to ensure that the supply of reserves remain ample even during periods of sharp increases in non-reserve liabilities, and to mitigate the risk of money market pressures that could adversely affect policy implementation.
+L12: The Federal Reserve continued to offer overnight repos and, amid the COVID-related stress around March 2020, term and overnight repos played an important role in ensuring that the supply of reserves remained ample and supporting the smooth functioning of short-term U.S. dollar funding markets.
+L13: Since 2021, Federal Reserve has conducted domestic standing repo (SRP) operations against eligible securities. SRP operations limit upward pressure and help provide a ceiling on rates to support the monetary policy implementation and smooth market functioning.
+L14: For additional information, see: 【3†http://www.federalreserve.gov/monetarypolicy/bst_openmarketops.htm】
+L15: The Federal Reserve Bank of New York publishes a detailed explanation of OMOs each year in its 【4†Annual Report†www.newyorkfed.org】. For a description of open market operations during the 1990s, see the 【5†article】 in the Federal Reserve Bulletin (102 KB PDF).
+L16: For additional information on how the Federal Reserve will use ON RRPs during the policy normalization process, see: 【6†http://www.federalreserve.gov/monetarypolicy/overnight-reverse-repurchase-agreements.htm】
+L17: #### FOMC's target federal funds rate or range, change 【7†(basis points)】 and level
+L18: 
+L19: 
+L20: 
+L21: 【8†2026】 | 【9†2025】 | 【10†2024】 | 【11†2023】 | 【12†2022】 | 【13†2020】 | 【14†2019】 | 【15†2018】 | 【16†2017】 | 【17†2016】 | 【18†2015】 | 【19†2008】 | 【20†2007】 | 【21†2006】 | 【22†2005】 | 【23†2004】 | 【24†2003】 | 【25†Historical Archive】
+L22: 
+L23: 
+L24: 
+L25: #### 2026
+L26: 
+L27: Date  | Increase  | Decrease  | Level (%)
+L28: --- | --- | --- | ---
+L29: September 17  | 25  | 0  | 3.75-4.00
+L30: 
+L31: 【26†Back to year navigation】
+L32: #### 2025
+L33: 
+L34: Date  | Increase  | Decrease  | Level (%)
+L35: --- | --- | --- | ---
+L36: December 11  | 0  | 25  | 3.50-3.75
+L37: October 30  | 0  | 25  | 3.75-4.00
+L38: September 18  | 0  | 25  | 4.00-4.25
+L39: 
+L40: 【26†Back to year navigation】
+L41: 
+L42: 
+L43: 
+L44: #### 2024
+L45: 
+L46: Date  | Increase  | Decrease  | Level (%)
+L47: --- | --- | --- | ---
+L48: December 19  | 0  | 25  | 4.25-4.50
+L49: November 8  | 0  | 25  | 4.50-4.75
+L50: September 19  | 0  | 50  | 4.75-5.00
+L51: 
+L52: 【26†Back to year navigation】
+L53: #### 2023
+L54: 
+L55: Date  | Increase  | Decrease  | Level (%)
+L56: --- | --- | --- | ---
+L57: July 27  | 25  | 0  | 5.25-5.50
+L58: May 4  | 25  | 0  | 5.00-5.25
+L59: March 23  | 25  | 0  | 4.75-5.00
+L60: February 2  | 25  | 0  | 4.50-4.75
+L61: 
+L62: 【26†Back to year navigation】
+L63: #### 2022
+L64: 
+L65: Date  | Increase  | Decrease  | Level (%)
+L66: --- | --- | --- | ---
+L67: December 15  | 50  | 0  | 4.25-4.50
+L68: November 3  | 75  | 0  | 3.75-4.00
+L69: September 22  | 75  | 0  | 3.00-3.25
+L70: July 28  | 75  | 0  | 2.25-2.50
+L71: June 16  | 75  | 0  | 1.50-1.75
+L72: May 5  | 50  | 0  | 0.75-1.00
+L73: March 17  | 25  | 0  | 0.25-0.50
+L74: 
+L75: 【26†Back to year navigation】
+L76: #### 2020
+L77: 
+L78: Date  | Increase  | Decrease  | Level (%)
+L79: --- | --- | --- | ---
+L80: March 16  | 0  | 100  | 0-0.25
+L81: March 4【27†*】  | 0  | 50  | 1.00-1.25
+L82: 
+L83: 【26†Back to year navigation】
+L84: 
+L85: 
+L86: 
+L87: #### 2019
+L88: 
+L89: Date  | Increase  | Decrease  | Level (%)
+L90: --- | --- | --- | ---
+L91: October 31  | 0  | 25  | 1.50-1.75
+L92: September 19  | 0  | 25  | 1.75-2.00
+L93: August 1  | 0  | 25  | 2.00-2.25
+L94: 
+L95: 【26†Back to year navigation】
+L96: #### 2018
+L97: 
+L98: Date  | Increase  | Decrease  | Level (%)
+L99: --- | --- | --- | ---
+L100: December 20  | 25  | 0  | 2.25-2.50
+L101: September 27  | 25  | 0  | 2.00-2.25
+L102: June 14  | 25  | 0  | 1.75-2.00
+L103: March 22  | 25  | 0  | 1.50-1.75
+L104: 
+L105: 【26†Back to year navigation】
+L106: 
+L107: 
+L108: 
+L109: #### 2017
+L110: 
+L111: Date  | Increase  | Decrease  | Level (%)
+L112: --- | --- | --- | ---
+L113: December 14  | 25  | 0  | 1.25-1.50
+L114: June 15  | 25  | 0  | 1.00-1.25
+L115: March 16  | 25  | 0  | 0.75-1.00
+L116: 
+L117: 【26†Back to year navigation】
+L118: #### 2016
+L119: 
+L120: Date  | Increase  | Decrease  | Level (%)
+L121: --- | --- | --- | ---
+L122: December 15  | 25  | 0  | 0.50-0.75
+L123: 
+L124: 【26†Back to year navigation】
+L125: 
+L126: 
+L127: 
+L128: #### 2015
+L129: 
+L130: Date  | Increase  | Decrease  | Level (%)
+L131: --- | --- | --- | ---
+L132: December 17  | 25  | 0  | 0.25-0.50
+L133: 
+L134: 【26†Back to year navigation】
+L135: #### 2008
+L136: 
+L137: Date  | Increase  | Decrease  | Level (%)
+L138: --- | --- | --- | ---
+L139: December 16  | ...  | 75-100  | 0-0.25
+L140: October 29  | ...  | 50  | 1.00
+L141: October 8  | ...  | 50  | 1.50
+L142: April 30  | ...  | 25  | 2.00
+L143: March 18  | ...  | 75  | 2.25
+L144: January 30  | ...  | 50  | 3.00
+L145: January 22  | ...  | 75  | 3.50
+L146: 
+L147: 【26†Back to year navigation】
+L148: #### 2007
+L149: 
+L150: Date  | Increase  | Decrease  | Level (%)
+L151: --- | --- | --- | ---
+L152: December 11  | ...  | 25  | 4.25
+L153: October 31  | ...  | 25  | 4.50
+L154: September 18  | ...  | 50  | 4.75
+L155: 
+L156: 【26†Back to year navigation】
+L157: 
+L158: 
+L159: 
+L160: #### 2006
+L161: 
+L162: Date  | Increase  | Decrease  | Level (%)
+L163: --- | --- | --- | ---
+L164: June 29  | 25  | ...  | 5.25
+L165: May 10  | 25  | ...  | 5.00
+L166: March 28  | 25  | ...  | 4.75
+L167: January 31  | 25  | ...  | 4.50
+L168: 
+L169: 【26†Back to year navigation】
+L170: #### 2005
+L171: 
+L172: Date  | Increase  | Decrease  | Level (%)
+L173: --- | --- | --- | ---
+L174: December 13  | 25  | ...  | 4.25
+L175: November 1  | 25  | ...  | 4.00
+L176: September 20  | 25  | ...  | 3.75
+L177: August 9  | 25  | ...  | 3.50
+L178: June 30  | 25  | ...  | 3.25
+L179: May 3  | 25  | ...  | 3.00
+L180: March 22  | 25  | ...  | 2.75
+L181: February 2  | 25  | ...  | 2.50
+L182: 
+L183: 【26†Back to year navigation】
+L184: #### 2004
+L185: 
+L186: Date  | Increase  | Decrease  | Level (%)
+L187: --- | --- | --- | ---
+L188: December 14  | 25  | ...  | 2.25
+L189: November 10  | 25  | ...  | 2.00
+L190: September 21  | 25  | ...  | 1.75
+L191: August 10  | 25  | ...  | 1.50
+L192: June 30  | 25  | ...  | 1.25
+L193: 
+L194: 【26†Back to year navigation】
+L195: #### 2003
+L196: 
+L197: Date  | Increase  | Decrease  | Level (%)
+L198: --- | --- | --- | ---
+L199: June 25  | ...  | 25  | 1.00
+L200: 
+L201: 【26†Back to year navigation】
+L202: 
+L203: Basis points: 1/100 percentage point 【28†Return to Text】
+L204: 
+L205: * On July 10, 2024, this date was corrected from March 3, 2020, to March 4, 2020. 【29†Return to Text】
+L206: 
+L207: 【30†Back to Top】
+L208: 
+L209: Last Update: September 16, 2026
+L210: ###### Board of Governors of the Federal Reserve System
+L211: 
+L212:   * 【31†About the Fed】
+L213:   * 【32†News & Events】
+L214:   * 【33†Monetary Policy】
+L215:   * 【34†Supervision & Regulation】
+L216:   * 【35†Financial Stability】
+L217:   * 【36†Payment Systems】
+L218:   * 【37†Economic Research】
+L219:   * 【38†Data】
+L220:   * 【39†Consumers & Communities】
+L221:   * 【40†Connect with the Board】
+L222: ###### Tools and Information
+L223: 
+L224:   * 【41†Contact】
+L225:   * 【42†Publications】
+L226:   * 【43†Freedom of Information (FOIA)】
+L227:   * 【44†Office of Inspector General†oig.federalreserve.gov】
+L228:   * 【45†Budget & Performance】 | 【46†Audit】
+L229:   * 【47†No FEAR Act】
+L230:   * 【48†Español】
+L231:   * 【49†Website Policies】 | 【50†Privacy Program】
+L232:   * 【51†Accessibility】
+L233: 【52†Federal Reserve Facebook Page†www.facebook.com】 【53†Federal Reserve Instagram Page†www.instagram.com】 【54†Federal Reserve YouTube Page†www.youtube.com】 【55†Federal Reserve Flickr Page†www.flickr.com】 【56†Federal Reserve LinkedIn Page†www.linkedin.com】 【57†Federal Reserve Threads Page†www.threads.net】 【58†Link to Federal Reserve Bluesky Page†bsky.app】 【59†Subscribe to RSS】 【60†Subscribe to Email】
+L234: 
+L235: Board of Governors of the Federal Reserve System
+L236: 20th Street and Constitution Avenue N.W., Washington, DC 20551
+

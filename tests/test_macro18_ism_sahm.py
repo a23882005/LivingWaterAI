@@ -35,15 +35,14 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(r['observation_date'],'2026-09-01')
             self.assertEqual(fake.fredattempts['ISM_'+key][-1]['result'],'OK')
 
-    def test_ism_rejects_wrong_month(self):
+    def test_ism_rejects_wrong_month_after_release(self):
         fake=SimpleNamespace(timeout=10,s=SimpleNamespace(get=lambda *a,**k:FakeResponse(
             '<html><h1>August 2026 ISM® Manufacturing PMI® Report</h1>'
             '<h2>Manufacturing PMI® at 54.6%</h2><p>'+'A'*500+'</p></html>')),
             job_series=set(),fredattempts=defaultdict(list))
         with patch.object(macro.dt,'datetime',FixedDatetime):
-            # September is rejected, August fallback is accepted and accurately dated.
-            r=macro.ism_official(fake,'m04')
-        self.assertEqual(r['observation_date'],'2026-08-01')
+            with self.assertRaisesRegex(RuntimeError,'month/year/type heading mismatch'):
+                macro.ism_official(fake,'m04')
         self.assertEqual(fake.fredattempts['ISM_m04'][0]['result'],'FAILED')
 
     def test_sahm_published_series_preferred(self):

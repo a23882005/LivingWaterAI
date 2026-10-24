@@ -1,6 +1,6 @@
 {
   "region": "global",
-  "generated_utc": "2026-10-23T23:17:10.278221+00:00",
+  "generated_utc": "2026-10-24T23:12:54.996395+00:00",
   "universe_source": "config/ib_global_symbols.txt",
   "data_source": "Yahoo Finance via yfinance",
   "items": {
@@ -8,127 +8,127 @@
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 4056,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "VT": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 4611,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "QQQ": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6743,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "SGOV": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 1609,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "TLT": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6099,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "IEF": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6099,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "SPLB": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 4434,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "SPSB": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 4228,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "SOXX": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6358,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "PPH": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6723,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "NVDA": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6743,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "MSFT": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6743,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "GOOGL": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 5581,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "VALL.L": {
       "status": "OK",
-      "latest_observation": "2026-10-22",
-      "rows": 46,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "latest_observation": "2026-10-23",
+      "rows": 47,
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "VWRA.L": {
       "status": "OK",
-      "latest_observation": "2026-10-22",
-      "rows": 1832,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "latest_observation": "2026-10-23",
+      "rows": 1833,
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "NATO.CN": {
       "status": "OK",
-      "latest_observation": "2026-10-22",
-      "rows": 1237,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "latest_observation": "2026-10-23",
+      "rows": 1238,
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "DRAM": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 142,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "GOOG": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 5581,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "SMH": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 6637,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "ZTS": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 3453,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     },
     "IBKR": {
       "status": "OK",
       "latest_observation": "2026-10-23",
       "rows": 4900,
-      "last_verified_utc": "2026-10-23T23:17:10.278221+00:00"
+      "last_verified_utc": "2026-10-24T23:12:54.996395+00:00"
     }
   }
 }

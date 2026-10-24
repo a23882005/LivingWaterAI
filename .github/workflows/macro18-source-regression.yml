@@ -1,0 +1,92 @@
+name: Macro18 source regression (draft only)
+on:
+  push:
+    branches:
+      - fix/macro18-sahm-source-20261024
+      - fix/v703-combined-debug-20261024
+  pull_request:
+    paths:
+      - '系統工程/總經V70/總經爬蟲18項.py'
+      - 'tests/test_macro18_ism_sahm.py'
+      - '.github/workflows/macro18-source-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install requests pandas yfinance pypdf
+      - name: Compile original macro source and regression test
+        run: python -m py_compile '系統工程/總經V70/總經爬蟲18項.py' tests/test_macro18_ism_sahm.py
+      - name: ISM/Sahm source unit regression
+        run: python -m unittest discover -s tests -p 'test_macro18_ism_sahm.py' -v
+      - name: Existing source-response regression
+        run: python -m unittest discover -s tests -p 'test_macro18_source_response.py' -v
+      - name: Live read of official ISM and FRED monthly series (no publish)
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('macro_live',Path('系統工程/總經V70/總經爬蟲18項.py'))
+          mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+          f=mod.Fetcher()
+          failures=[]
+          for key,reader in [('m04',lambda:mod.ism_official(f,'m04')),('m15',lambda:mod.ism_official(f,'m15')),('m18',lambda:mod.sahm_from_published(f))]:
+              try:
+                  f.job_series=set()
+                  row=reader()
+                  print('LIVE_OK',key,row['value'],row['observation_date'],row['source_url'],flush=True)
+                  if row['status']!='OK': failures.append(key+': '+row['status'])
+              except Exception as e:
+                  print('LIVE_FAILED',key,type(e).__name__,str(e)[:650],flush=True)
+                  failures.append(key+': '+type(e).__name__)
+          if failures: raise SystemExit('Live sources not yet ready: '+', '.join(failures))
+          PY
+
+      - name: Full 18-indicator crawler dry run (isolated no publish)
+        timeout-minutes: 8
+        run: |
+          python -u '系統工程/總經V70/總經爬蟲18項.py' --out build/macro18-source-smoke --cache data/18_macro_verification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('build/macro18-source-smoke/18_macro_verification.json').read_text(encoding='utf-8'))
+          rows=p['items']
+          for k in ('m04','m15','m18'):
+              r=rows[k]
+              print('FULL_CRAWLER',k,r.get('value'),r.get('observation_date'),r.get('attempt_result'),r.get('retrieval_error'),flush=True)
+              assert r.get('attempt_result')=='SUCCESS',k
+              assert r.get('status')=='OK',k
+          assert len(rows)==19,len(rows)
+          print('FULL_CRAWLER_INDEPENDENT18_PASS')
+          PY
+
+      - name: LEI PNC and policy regression from PR27
+        run: |
+          python '系統工程/總經V70/總經爬蟲18項.py' --self-test
+          python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
+          python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+      - name: Integrated V70-3-27 build checks
+        run: |
+          python scripts/build_daily_v703_site.py --macro build/macro18-source-smoke/18_macro_verification.json --html '系統工程/總經V70/V70-3-27.html' --out build/v703-integrated-test
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('build/v703-integrated-test/V70_macro_latest.json')
+          x=json.loads(p.read_text())
+          print('INTEGRATION_BUILD_READY',x.get('verification',{}).get('ready'))
+          assert x.get('verification',{}).get('ready') is True
+          PY
+
+      - name: Install Chromium for integrated snapshot tests
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install chromium --with-deps
+      - name: PR27 snapshot browser regression
+        run: python -m unittest discover -s tests -p 'test_v703_snapshot_frontend.py' -v

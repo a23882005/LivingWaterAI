@@ -445,6 +445,9 @@
             }
             const today=v703DateNowUTC();
             const problems=[];
+            if(window.v703FeedLoadIssue)problems.push(window.v703FeedLoadIssue);
+            if(window.v703SourceBatch && !v703SnapshotCurrent(window.v703SourceBatch.asOf))
+                problems.push('整批快照過期／時間無效：禁止正式配置，保留歷史證據供診斷');
             const configs = Array.isArray(macroConfig) ? macroConfig : [];
             for (const cfg of configs) {
                 // All numeric macro indicators used by the scoring engine or CAP are mandatory.
@@ -453,6 +456,9 @@
                 const src=document.getElementById('v703-source-'+cfg.id);
                 const n=val && val.value.trim()!=='' ? Number(val.value) : NaN;
                 const rawDate=dt?.value || '';
+                const original=window.v703VerifiedInputSnapshot?.[cfg.id];
+                if(original && (n!==Number(original.value)||rawDate!==original.dataDate||src?.value!==original.source))
+                    problems.push(cfg.id+':數值／日期／來源與原始快照不符');
                 const date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? new Date(rawDate+'T00:00:00Z') : null;
                 if(!Number.isFinite(n)) {problems.push(cfg.id+':無有效數值');continue;}
                 if(!date || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10)!==rawDate || date>today) {
@@ -464,8 +470,12 @@
                 // ETF P/E uses its verified reference timestamp (<=7 days), not the
                 // historical holdings/valuation observation date as a freshness proxy.
                 const peReference=['m03_qqq','m03_spy','m03_vt'].includes(cfg.id);
+                if(peReference && window.v703VerifyPEReference && original)
+                    window.v703PEReferenceVerified[cfg.id]=window.v703VerifyPEReference(cfg.id,{...original,value:n,dataDate:rawDate,source:src?.value},window.v703FeedDocument);
                 if(peReference && window.v703PEReferenceVerified?.[cfg.id]!==true) {
-                    problems.push(cfg.id+':ETF本益比缺少7天內有效驗證');
+                    const verified=Date.parse(String(original?.lastVerifiedAt||original?.last_verified_at||original?.last_verified_time||''));
+                    const reason=!Number.isFinite(verified)?'核實時間缺失／無效':Date.now()-verified>7*86400000?'核實時間過期（超過7天）':verified>Date.now()+5*60000?'核實時間位於未來':'證據缺失／與數值或來源不符';
+                    problems.push(cfg.id+':ETF本益比'+reason);
                     continue;
                 }
                 if(cfg.id==='m06_rate'){
@@ -484,6 +494,7 @@
         // passes the loader's schema, provenance, date, freshness and quality checks.
         window.v703FeedVerified = false;
         window.v703CanPublishFormalAllocation = function() {
+            if(window.v703FeedDocument && window.v703RenderRawData)window.v703RenderRawData(window.v703FeedDocument);
             const current=v703SnapshotCurrent(window.v703SourceBatch?.asOf) && v703InputsMatchSnapshot();
             const dates=window.v703DemoMode!==true && window.v703ValidateDates();
             window.v703VerifiedDataDates=dates;
@@ -3327,27 +3338,40 @@ if (recBlack) {
  const summary=document.getElementById('v703-raw-data-status');
  if(!node||!body)return;
  const labels={m07:'VIX（市場波動）',m01:'10年期減2年期公債殖利率',m06:'實質政策利率缺口',m06_rate:'名目政策利率',m06_inf:'通膨率輸入',m06_rstar:'中性利率估計',m06_output_gap:'產出缺口',m08:'10年期實質公債殖利率',m03_qqq:'QQQ估值參考本益比',m03_spy:'SPY估值參考本益比',m03_vt:'VT估值參考本益比',m02:'高收益債信用利差',m04:'ISM製造業PMI',m05:'核心CPI年增率',m09:'美元指數DXY',m10:'WTI近月期貨價格',m12:'MOVE債券波動指數',m13:'5年期損益兩平通膨率',m17:'5年期損益兩平通膨率月變化',m14:'淨流動性13週變化',m15:'ISM服務業PMI',m16:'領先經濟指標年增率',m18:'Sahm Rule失業率指標',m19:'U3失業率',m20:'非農新增就業3個月平均',s03:'短期VIX（與VIX重複）',s04:'CNN Fear & Greed市場情緒',s05:'NYSE股票高於50日均線比例'};
- const familyStatus=(r)=>{
+ const familyStatus=(r,id,feed,current=false)=>{
   if(!r||r.value===null||r.value===undefined||String(r.value).trim()===''||!r.dataDate)return '缺資料';
   const flag=String(r.status||'').toUpperCase();
   if(/EXPIRED|STALE/.test(flag))return '過期';
+  if(current){
+   if(!v703SnapshotCurrent(feed.asOf))return '過期';
+   if(id==='m06_rate'){
+    const issues=v703PolicyIssues(r);
+    if(issues.length)return issues.every(x=>x==='policy verification time')?'過期':'缺資料';
+   }
+   if(['m03_qqq','m03_spy','m03_vt'].includes(id) && window.v703VerifyPEReference && !window.v703VerifyPEReference(id,r,feed))return '缺資料';
+   const date=new Date(r.dataDate+'T00:00:00Z');
+   if(!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==r.dataDate)return '缺資料';
+   if(v703ObservationStale(id==='s03'?'m07':id,date,v703DateNowUTC()))return '過期';
+  }
   if(['OK','USABLE'].includes(flag))return '正常';
   return '缺資料';
  };
- try{
-  const feed=JSON.parse(node.textContent||'{}');
+ window.v703RenderRawData=function(feed){try{
   const entries=Object.entries(feed.indicators||{});
   if(entries.length===0){
    if(summary) summary.textContent='目前沒有可用數值；資料狀態：缺資料。';
    return;
   }
-  const counts={'正常':0,'過期':0,'缺資料':0};
-  for(const [,r] of entries)counts[familyStatus(r)]++;
-  if(summary)summary.textContent='指標狀態：正常 '+counts['正常']+'｜過期 '+counts['過期']+'｜缺資料 '+counts['缺資料'];
+  const counts={'正常':0,'過期':0,'缺資料':0},currentCounts={'正常':0,'過期':0,'缺資料':0};
+  for(const [id,r] of entries){counts[familyStatus(r,id,feed)]++;currentCounts[familyStatus(r,id,feed,true)]++;}
+  const historical=!v703SnapshotCurrent(feed.asOf);
+  if(summary)summary.textContent='傳輸欄位 '+entries.length+'（非獨立計分指標數）｜上次建置：正常 '+counts['正常']+'｜過期 '+counts['過期']+'｜缺資料 '+counts['缺資料']+
+    (historical?'｜目前：歷史快照；整批快照超過26小時或時間無效，禁止正式配置。':
+     '｜目前逐項檢查：正常 '+currentCounts['正常']+'｜過期 '+currentCounts['過期']+'｜缺資料 '+currentCounts['缺資料']+'；正式可用性以完整載入驗證為準。');
   body.replaceChildren();
   for(const [id,r] of entries){
    const tr=document.createElement('tr');tr.className='align-top';
-   const status=familyStatus(r);
+   const status='上次建置：'+familyStatus(r,id,feed)+'｜目前：'+(historical?'過期（整批快照）':familyStatus(r,id,feed,true));
    const shownValue=(r.value===null||r.value===undefined||String(r.value).trim()==='')?'—':String(r.value)+(r.unit?' '+r.unit:'');
    const vals=[id+'｜'+(labels[id]||'其他指標'),shownValue,r.dataDate||'—',status];
    for(const value of vals){const td=document.createElement('td');td.className='border border-slate-700 p-2';td.style.border='1px solid #475569';td.textContent=value;tr.appendChild(td);}
@@ -3357,7 +3381,8 @@ if (recBlack) {
   if(summary) summary.textContent='指標狀態：缺資料。';
   const placeholder=document.getElementById('v703-raw-data-placeholder');
   if(placeholder) placeholder.textContent='目前無法顯示數值；圖表與指標定義仍可查看。';
- }
+ }};
+ window.v703RenderRawData(JSON.parse(node.textContent||'{}'));
 })();
 </script>
 
@@ -3418,6 +3443,20 @@ if (recBlack) {
    if(auditContradiction||!explicitForward||!matchesValue||!matchesSource)return false;
    if(/\bTTM\b/i.test(evidenceLabel))return false;
    return true;
+ }
+ window.v703VerifyPEReference=verifiedPE;
+ // Preserve the exact selected document for historical diagnostics. This does
+ // not approve the batch: the loader and formal allocation gate still validate it.
+ function retainSnapshotEvidence(doc){
+   const data=doc?.indicators||doc?.macroIndicators||doc?.macro||{};
+   window.v703FeedDocument=JSON.parse(JSON.stringify(doc));
+   window.v703VerifiedInputSnapshot=JSON.parse(JSON.stringify(data));
+   window.v703SourceBatch={asOf:doc.asOf,batchDateTaipei:doc.batchDateTaipei||null,sourceSnapshot:doc.sourceSnapshot||null,verified:false};
+   window.v703MonthlyReleaseCalendar=doc.monthlyReleaseCalendar?.schema==='V70.3/monthly-official-release-calendar-v1' && doc.sourceSnapshot?.officialReleaseCalendar
+     ? JSON.parse(JSON.stringify(doc.monthlyReleaseCalendar.items||{})):null;
+   window.v703PEReferenceVerified=Object.create(null);
+   for(const id of peIds)window.v703PEReferenceVerified[id]=verifiedPE(id,data[id],doc);
+   if(typeof window.v703RenderRawData==='function')window.v703RenderRawData(doc);
  }
  function showBanner(doc,mode){
    if(!banner)return;
@@ -3573,8 +3612,12 @@ if (recBlack) {
  }
  async function loadFeed(){
    status.textContent='正在讀取最新總經快照…';
+   let selectedDoc=null;
+   window.v703FeedLoadIssue='';
    try{
      const doc=await fetchFeedDocument();
+     selectedDoc=doc;
+     retainSnapshotEvidence(doc);
     // V70-3-27 feed v3：18項主資料＋8個補充原始欄＋m06衍生值；不得使用 MISSING/STALE 冒充正式數值。
      if(!doc.verification || doc.verification.ready!==true){
        const n=doc?.verification?.valid??0, total=doc?.verification?.totalRequired??22;
@@ -3677,22 +3720,21 @@ if (recBlack) {
    }catch(err){
      sourceMode='hold';
      window.v703FeedVerified=false;
-     window.v703SourceBatch=null;
      window.v703CreditGateBlocked=true;
-     window.v703PEReferenceVerified=Object.create(null);
-     window.v703MonthlyReleaseCalendar=null;
+     window.v703FeedLoadIssue='快照載入未通過：'+String(err.message||err);
      // Keep embedded observations visible if any metadata gate fails.
      // Their scores are for research display; the formal allocation stays blocked.
      window.v703DemoMode=false;
      seedHtmlDefaults();
   try{v703ApplyM06Derived();}catch(e){}
-     let recovered=0,doc=null,data=null;
+     let recovered=0,doc=selectedDoc,data=null;
      try{
        const node=document.getElementById('v70-embedded-feed');
-       doc=node?JSON.parse(node.textContent||'{}'):null;
+       if(!doc)doc=node?JSON.parse(node.textContent||'{}'):null;
        data=doc?.indicators||doc?.macroIndicators||doc?.macro||null;
      }catch(e){}
      if(data&&typeof data==='object'){
+       retainSnapshotEvidence(doc);
        // Keep HTML defaults intact; refresh each field from the embedded snapshot when numeric.
        for(const cfg of macroConfig){
          const r=data[cfg.id],input=document.getElementById('in_'+cfg.id);
@@ -3709,7 +3751,7 @@ if (recBlack) {
          if(score)score.textContent=Number.isFinite(risk)?risk.toFixed(1):'NA';
        }
        if(doc?.leiHistory&&data.m16&&typeof window.v703ApplyLEIHistory==='function')window.v703ApplyLEIHistory(doc.leiHistory,data.m16);
-       showBanner(doc,'資料待驗證');
+       showBanner(doc,v703SnapshotCurrent(doc.asOf)?'資料待驗證':'歷史快照：整批過期／時間無效，禁止正式配置');
      }else{
        for(const cfg of macroConfig){
          const input=document.getElementById('in_'+cfg.id);
@@ -3725,14 +3767,14 @@ if (recBlack) {
      const inputCount=scoringForComplete2.filter(cfg=>{const el=document.getElementById('in_'+cfg.id);return el&&el.value.trim()!==''&&Number.isFinite(Number(el.value));}).length;
             window.v703DataComplete=inputCount===scoringForComplete2.length;
      window.v703VerifiedDataDates=false;
-     window.v703DateIssues=['快照驗證未完成：'+String(err.message||err)];
+     window.v703ValidateDates();
      window.v703Latest=null;
      try{v703ApplyM06Derived();}catch(e){}
             if(typeof calcTotal==='function')calcTotal();
      // calcTotal reruns date checks; keep the formal allocation gate closed.
      window.v703CreditGateBlocked=true;
      window.v703VerifiedDataDates=false;
-     window.v703DateIssues=['快照驗證未完成：'+String(err.message||err)];
+     window.v703ValidateDates();
      window.v703Latest=null;
      if(typeof window.v703Recompute==='function')window.v703Recompute();
      status.textContent=inputCount

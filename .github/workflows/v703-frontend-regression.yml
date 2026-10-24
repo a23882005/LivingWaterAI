@@ -11,6 +11,8 @@ on:
       - 'tests/policy_case_matrix.py'
       - 'tests/test_v703_policy*.py'
       - 'tests/v703_browser_fixture.py'
+      - 'tests/test_v703_snapshot_frontend.py'
+      - 'tests/fixtures/v703_20261022_snapshot.json'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/validate_v703_publication.py'
       - '系統工程/總經V70/V70-3-27.html'
@@ -139,6 +141,7 @@ jobs:
         run: |
           mkdir -p build/w7-browser
           set -o pipefail
+          python -m unittest discover -s tests -p 'test_v703_snapshot_frontend.py' -v 2>&1 | tee build/w7-browser/snapshot-cases.log
           python -u - <<'PYTEST' 2>&1 | tee build/w7-browser/cases.log
           import sys,json,copy,datetime
           sys.path.insert(0,'tests')

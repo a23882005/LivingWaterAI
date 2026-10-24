@@ -523,9 +523,10 @@ def ism_official(f, key):
     # Official dated roundup is a second source when the main report layout differs.
     if key=='m04':
         period=target
+        released=period+1
         url=(f'https://www.ismworld.org/supply-management-news-and-reports/'
              f'news-publications/inside-supply-management-magazine/blog/'
-             f'{period.year}/{period.year}-{period.month+1:02d}/'
+             f'{released.year}/{released.year}-{released.month:02d}/'
              f'ism-pmi-reports-roundup-{months[period.month-1]}-{period.year}-manufacturing/')
         try:
             response=f.s.get(url,timeout=(5,f.timeout))

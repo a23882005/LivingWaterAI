@@ -477,7 +477,9 @@ def ism_official(f, key):
     # Latest released ISM report is normally previous calendar month.
     target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
     attempts=[]
-    for period in (target,target-1):
+    # Once this month's release window passes, never accept an older PMI as newly retrieved.
+    candidates=(target,) if now.day>7 else (target,target-1)
+    for period in candidates:
         slug=months[period.month-1]
         url=f'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/{family}/{slug}/'
         response=None

@@ -1,31 +1,31 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-10-22T18:18:12.042095+08:00",
+  "asOf": "2026-10-24T19:58:32.459072+08:00",
   "indicators": {
     "m07": {
-      "value": 17.31,
-      "dataDate": "2026-10-20",
+      "value": 19.03,
+      "dataDate": "2026-10-22",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m01": {
-      "value": 0.32,
-      "dataDate": "2026-10-21",
+      "value": 0.31,
+      "dataDate": "2026-10-23",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV"
     },
     "m08": {
-      "value": 2.76,
-      "dataDate": "2026-10-21",
+      "value": 2.66,
+      "dataDate": "2026-10-23",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m02": {
-      "value": 3.33,
-      "dataDate": "2026-10-20",
+      "value": 3.4,
+      "dataDate": "2026-10-22",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
@@ -45,43 +45,43 @@
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 101.651001,
-      "dataDate": "2026-10-22",
+      "value": 101.809998,
+      "dataDate": "2026-10-23",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 99.279999,
-      "dataDate": "2026-10-22",
+      "value": 103.269997,
+      "dataDate": "2026-10-23",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 95.940002,
-      "dataDate": "2026-10-21",
+      "value": 103.309998,
+      "dataDate": "2026-10-23",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
     },
     "m13": {
-      "value": 2.4,
-      "dataDate": "2026-10-21",
+      "value": 2.48,
+      "dataDate": "2026-10-23",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m17": {
-      "value": 0.07,
-      "dataDate": "2026-10-21",
+      "value": 0.14,
+      "dataDate": "2026-10-23",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m14": {
-      "value": -77.286,
-      "dataDate": "2026-10-14",
+      "value": -103.371,
+      "dataDate": "2026-10-21",
       "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "unit": "USD bn",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元"

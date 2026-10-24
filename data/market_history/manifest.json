@@ -1,34 +1,34 @@
 {
-  "generated_at_utc": "2026-10-22T10:18:13.282479+00:00",
+  "generated_at_utc": "2026-10-24T11:58:33.161484+00:00",
   "source": "yfinance (unofficial Yahoo Finance wrapper)",
   "price_basis": "Close=unadjusted; Adj Close=provider-adjusted; dividend cashflows separate",
   "warning": "Adjusted Close is not a tax-adjusted, investor-specific total return",
   "items": {
     "VOO": {
       "status": "OK",
-      "observation_date": "2026-10-21",
-      "rows": 4054,
+      "observation_date": "2026-10-23",
+      "rows": 4056,
       "cache_file": "data/market_history/VOO.csv",
       "adjusted_price_max_drawdown": -0.3399300838142858
     },
     "SPY": {
       "status": "OK",
-      "observation_date": "2026-10-21",
-      "rows": 4278,
+      "observation_date": "2026-10-23",
+      "rows": 4280,
       "cache_file": "data/market_history/SPY.csv",
       "adjusted_price_max_drawdown": -0.33717249020383333
     },
     "VT": {
       "status": "OK",
-      "observation_date": "2026-10-21",
-      "rows": 4278,
+      "observation_date": "2026-10-23",
+      "rows": 4280,
       "cache_file": "data/market_history/VT.csv",
       "adjusted_price_max_drawdown": -0.3423619643283622
     },
     "QQQ": {
       "status": "OK",
-      "observation_date": "2026-10-21",
-      "rows": 4278,
+      "observation_date": "2026-10-23",
+      "rows": 4280,
       "cache_file": "data/market_history/QQQ.csv",
       "adjusted_price_max_drawdown": -0.3511872651879714
     }

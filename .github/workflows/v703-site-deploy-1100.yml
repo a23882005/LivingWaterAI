@@ -19,6 +19,7 @@ on:
       - 'tests/test_bank_macro_monthly.py'
       - 'tests/test_v703_research_charts.py'
       - '.github/workflows/v703-site-deploy-1100.yml'
+      - 'tests/test_macro18_ism_sahm.py'
       - 'data/18_macro_verification.json'
       - 'data/8_macro_supplement_verified.json'
       - 'data/v703_official_monthly_release_calendar.json'

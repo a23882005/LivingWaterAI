@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - fix/macro18-sahm-source-20261024
+      - fix/v703-combined-debug-20261024
   pull_request:
     paths:
       - '系統工程/總經V70/總經爬蟲18項.py'
@@ -64,4 +65,21 @@ jobs:
               assert r.get('status')=='OK',k
           assert len(rows)==19,len(rows)
           print('FULL_CRAWLER_INDEPENDENT18_PASS')
+          PY
+
+      - name: LEI PNC and policy regression from PR27
+        run: |
+          python '系統工程/總經V70/總經爬蟲18項.py' --self-test
+          python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
+          python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+      - name: Integrated V70-3-27 build checks
+        run: |
+          python scripts/build_daily_v703_site.py --html '系統工程/總經V70/V70-3-27.html' --out build/v703-integrated-test
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('build/v703-integrated-test/V70_macro_latest.json')
+          x=json.loads(p.read_text())
+          print('INTEGRATION_BUILD_READY',x.get('verification',{}).get('ready'))
+          assert x.get('verification',{}).get('ready') is True
           PY

@@ -32,6 +32,16 @@ Drive 正式資料來源檔 ID：`194zJSkEKRxbfkxUcGKiTCT5a4GEe2nVG`。
 - 本專案只登入 MOU 本人帳號，只讀寫 mou.db 與 MOU 本人配置報告；其他家人個人資料與報告隔離，公用 DB／公用報告模板依功能使用。
 - MOU 正式報告資料夾位於 Google Drive W6／mou_正式配置報告。個人 DB ID、client ID 與私有資料夾 ID 留在有權限控管的 Drive Sources 檔。
 
-## W7 驗收狀態
+## W7 驗收狀態與 Arthur 當期問題（2026-10-25）
 
-指揮官已完成 Joseph 家人版 Project 實際使用測試並確認通過。W7 整體目標標記為 **PASS／CLOSED（Owner UAT）**；目前停在 W7，依指揮官指示不進入 W8。正式細節以 W7 契約與私人驗收紀錄為準。
+2026-10-24 指揮官對 Joseph 家人版 Project 的實際使用驗收，依原始紀錄維持 **Owner UAT PASS**。這是 **Joseph 的既有驗收紀錄**，不自動涵蓋 Arthur、Lilian、MOU 各自真人登入、4 小時及跨對話驗證。
+
+實際 W7 施工 Checkpoint.json 仍列 **B07 IN_PROGRESS，B01～B06 6/23 PASS、Production HOLD、交易 NONE**。Owner UAT 歷史裁決與 B07 技術施工 Gate 應分開列示；未經正式驗證不將 B07 標為 PASS。依既有指示暫不進入 W8。
+
+2026-10-25 Arthur Project 截圖反映「AR 帳號尚無有效登入工作階段／登入服務仍待啟用」。排查重點是正式身分驗證服務與 ChatGPT Project 工具接線、真人 AR 啟用、重開對話驗收，而非只修改 Instructions 文字。Arthur 專案要求：開場說明用途並提示輸入密碼，無須重輸固定帳號 AR；同一對話登入有效 4 小時；**新對話或執行環境重置須重新登入**；未登入可查公開總經與新聞，但個人 DB／報告必須通過實際 auth 驗證。密碼不得回顯或存入聊天紀錄、檔案。
+
+Arthur 私人兩份正式文件僅存 Google Drive 根目錄，避免將 DB 路徑與 client_id 公開寫入 GitHub：
+- [Arthur_Project_Instructions.txt（Drive）](https://drive.google.com/file/d/18h6TYSQiCFtUeWF9osnxwM0_Za2KT1-8/view)
+- [Arthur_Project_Sources.txt（Drive）](https://drive.google.com/file/d/1Q43U_uI24HM0BVw_h1rGjJk9xR7Wn4Hy/view)
+
+交付驗收：真人 AR 密碼登入 → 讀取 Arthur 本人快照 → 新對話要求重新登入 → 四小時到期重新登入 → 錯誤密碼／跨戶讀取拒絕 → 報告保存讀回，逐項留實跑證據。

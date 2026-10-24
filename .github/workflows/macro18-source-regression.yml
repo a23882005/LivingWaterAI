@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - fix/macro18-sahm-source-20261024
+  pull_request:
+    paths:
+      - '系統工程/總經V70/總經爬蟲18項.py'
+      - 'tests/test_macro18_ism_sahm.py'
+      - '.github/workflows/macro18-source-regression.yml'
   workflow_dispatch:
 permissions:
   contents: read

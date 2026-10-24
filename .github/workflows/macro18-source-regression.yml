@@ -38,6 +38,7 @@ jobs:
           failures=[]
           for key,reader in [('m04',lambda:mod.ism_official(f,'m04')),('m15',lambda:mod.ism_official(f,'m15')),('m18',lambda:mod.sahm_from_published(f))]:
               try:
+                  f.job_series=set()
                   row=reader()
                   print('LIVE_OK',key,row['value'],row['observation_date'],row['source_url'],flush=True)
                   if row['status']!='OK': failures.append(key+': '+row['status'])

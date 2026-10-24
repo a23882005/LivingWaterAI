@@ -2,7 +2,7 @@
   "schema": "Family-W7-checkpoint-v2",
   "owner": "Family中PM本人",
   "mode": "sequential",
-  "contract_version": "v1.6.0",
+  "contract_version": "v1.6.1",
   "current_work": "W7-B07",
   "completed": [
     "H2接任核對",
@@ -86,7 +86,8 @@
     "evidence/B07/oauth_https_progress.json",
     "evidence/B07/oauth_https_proof.json",
     "evidence/B07/b06_latency_regression.json",
-    "evidence/B07/branding.json"
+    "evidence/B07/branding.json",
+    "B07_SIMPLE_ENTRY_PROGRESS.md"
   ],
   "issues": [
     "10/22原FRED回應body未留存：已確認解析失敗，無法據舊日誌斷定供應商回傳頁面的種類；新診斷記status/content-type/hash。",
@@ -96,7 +97,7 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "完成正式HTTP gateway、核實首位真人管理者帳號並短效安全啟用、首次改密碼、token延遲與實際ChatGPT跨對話驗收。OAuth用戶端已私有部署；B07仍IN_PROGRESS。",
+  "next_action": "依Joseph v1.11簡易帳密方案，續接B07帳號改密碼/管理與共同I/O可信身分，驗即時撤銷、真人登入及跨對話接續；02唯讀入口與15項合成測試完成，B07仍IN_PROGRESS。",
   "next_owner": "Family中PM本人",
   "controls": {
     "production": "HOLD",
@@ -595,6 +596,16 @@
       "job_id": 120267393120,
       "tests": 51,
       "exact_restore": true
+    },
+    "B07_simple_entry": {
+      "status": "PARTIAL_PASS",
+      "synthetic_tests": 15,
+      "source": "Joseph Sources v1.11 unchanged login",
+      "formal_snapshot": "PM authorized read-only PASS; not real-user login",
+      "real_user_login": "PENDING",
+      "coordinator_binding": "PENDING",
+      "contract": "v1.6.1",
+      "combined_regression": "118/118 PASS"
     }
   },
   "review_note": "B01～B06原PASS沿用；B07 Drive OAuth、主機持久私有設定及14項合成HTTPS OAuth驗證PASS。實際ChatGPT客戶端仍未驗收；token交換85.426秒偏慢。真人安全啟用、正式路由接線、跨對話與Google長期授權未完成；B07仍IN_PROGRESS／6/23。 B07公開介紹/隱私權/條款三頁HTTPS與來源SHA256及瀏覽器導覽PASS；待指揮官填入Google品牌欄位，尚未確認發布。",

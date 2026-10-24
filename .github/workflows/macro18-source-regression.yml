@@ -27,3 +27,22 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_macro18_ism_sahm.py' -v
       - name: Existing source-response regression
         run: python -m unittest discover -s tests -p 'test_macro18_source_response.py' -v
+      - name: Live read of official ISM and FRED monthly series (no publish)
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('macro_live',Path('系統工程/總經V70/總經爬蟲18項.py'))
+          mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+          f=mod.Fetcher()
+          failures=[]
+          for key,reader in [('m04',lambda:mod.ism_official(f,'m04')),('m15',lambda:mod.ism_official(f,'m15')),('m18',lambda:mod.sahm_from_published(f))]:
+              try:
+                  row=reader()
+                  print('LIVE_OK',key,row['value'],row['observation_date'],row['source_url'],flush=True)
+                  if row['status']!='OK': failures.append(key+': '+row['status'])
+              except Exception as e:
+                  print('LIVE_FAILED',key,type(e).__name__,str(e)[:650],flush=True)
+                  failures.append(key+': '+type(e).__name__)
+          if failures: raise SystemExit('Live sources not yet ready: '+', '.join(failures))
+          PY

@@ -737,7 +737,7 @@
     "account_created": false
   },
   "Joseph_menu_v1_13": {
-    "status": "CODE_AND_LOCAL_SYNTHETIC_TESTS_PASS_LIVE_BINDING_PENDING",
+    "status": "CANONICAL_FILENAME_FIX_COMMITTED_LOCAL_CHECKS_PASS_LIVE_BINDING_PENDING",
     "date": "2026-10-24",
     "menu_items": 14,
     "tests_passed": 43,
@@ -754,6 +754,16 @@
       "private report folder/server lock configuration",
       "human project installation and end-to-end acceptance"
     ],
-    "progress": "W7 B07 IN_PROGRESS, 6/23; B16 pending"
+    "progress": "W7 B07 IN_PROGRESS, 6/23; B16 pending",
+    "filename_correction": {
+      "commit": "e5f7c5a7f6b26f1764100457ca829aeea43cab73",
+      "canonical_pdf_example": "Joseph_配置報告_20261024_153045_TW.pdf",
+      "same_second_second_report": "Joseph_配置報告_20261024_153045_TW_02.pdf",
+      "multi_image_rule": "When multiple artifacts use the same extension, each receives a distinct artifact suffix while keeping the same Taiwan timestamp.",
+      "drive_folder_metadata": "owner-only destination verified in Google Drive; exact private path and folder ID are recorded only in Joseph Project Instructions/Sources v1.13.2.",
+      "focused_verification": "standalone fake-transport publish/readback, Taiwan timestamp, same-second collision, exact parent binding, and py_compile PASS.",
+      "pytest_suite": "NOT_RUN_IN_THIS_RUNTIME: pytest is unavailable; the prior 43/43 result is from the pre-correction revision.",
+      "live_report_publish": "NOT_RUN: trusted renderer and private runtime folder/writer-lock injection remain pending."
+    }
   }
 }

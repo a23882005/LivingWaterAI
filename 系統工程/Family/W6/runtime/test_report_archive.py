@@ -65,11 +65,29 @@ def test_taiwan_date_boundary_and_timezone_required():
     with pytest.raises(ValueError): report_basename(datetime(2026,10,24))
 
 
+def test_saved_single_report_uses_exact_taiwan_timestamp_filename_and_bound_folder(env):
+    store,auth,drive=env
+    manifest=publish(store,auth,when=datetime(2026,10,24,7,30,45,tzinfo=timezone.utc))
+    artifact=manifest['files'][0]
+    assert artifact['name']=='Joseph_配置報告_20261024_153045_TW.pdf'
+    assert drive.files[artifact['id']]['parents']==[store.folder_id]
+
+
+def test_multiple_same_extension_outputs_keep_timestamp_and_distinct_suffixes(env):
+    store,auth,drive=env
+    manifest=publish(store,auth,artifacts={
+        'report.pdf':b'pdf', 'page_01.png':b'page1', 'page_02.png':b'page2'})
+    names={f['name'] for f in manifest['files']}
+    assert 'Joseph_配置報告_20261024_080000_TW.pdf' in names
+    assert 'Joseph_配置報告_20261024_080000_TW_page_01.png' in names
+    assert 'Joseph_配置報告_20261024_080000_TW_page_02.png' in names
+
+
 def test_preserves_old_files_same_second_collision_and_previous(env):
     store,auth,drive=env
     first=publish(store,auth); before=copy.deepcopy(drive.files)
     second=publish(store,auth,'r2')
-    assert '_02_' in second['files'][0]['name']
+    assert second['files'][0]['name']=='Joseph_配置報告_20261024_080000_TW_02.pdf'
     for fid,value in before.items(): assert drive.files[fid] == value
     assert previous_report(store,auth)['run_id']=='r2'
     assert previous_report(store,auth,date='2026-10-24')['run_id']=='r2'

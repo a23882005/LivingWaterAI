@@ -38,6 +38,15 @@ def report_basename(created_at):
     return 'Joseph_配置報告_' + created_at.astimezone(TAIPEI).strftime('%Y%m%d_%H%M%S_TW')
 
 
+def _artifact_filename(base, artifact, extension_counts):
+    stem, extension = artifact.rsplit('.', 1)
+    # A single primary output uses the requested canonical form exactly:
+    # Joseph_配置報告_YYYYMMDD_HHMMSS_TW.pdf. When several artifacts share an
+    # extension (for example page images), retain each one with a clear suffix.
+    suffix = '' if extension_counts[extension] == 1 else '_' + stem
+    return f'{base}{suffix}.{extension}'
+
+
 class DriveReportStore:
     def __init__(self, transport, *, folder_id, lock_path, client_id=CLIENT_ID):
         if client_id != CLIENT_ID or not re.fullmatch(r'[A-Za-z0-9_-]+', folder_id):
@@ -154,15 +163,20 @@ def publish_report(store, auth, *, run_id, artifacts, data_as_of, analysis_versi
         names = {r['name'] for r in store.list()}
         suffix, candidate = 1, base
         def used(stem):
-            return any(n.startswith(stem + '_') or n == stem + '.manifest.json' for n in names)
+            return any(n.startswith(stem + '_') or n.startswith(stem + '.') for n in names)
         while used(candidate):
             suffix += 1
             candidate = base + f'_{suffix:02}'
         files = []
+        extension_counts = {}
+        for artifact in artifacts:
+            extension = artifact.rsplit('.', 1)[1]
+            extension_counts[extension] = extension_counts.get(extension, 0) + 1
         for artifact, data in sorted(artifacts.items()):
             if auth.require_login() != 'JO':
                 raise PermissionError('REPORT_OWNER_MISMATCH')
-            files.append(store.create(candidate + '_' + artifact, data, 'artifact', key))
+            files.append(store.create(_artifact_filename(candidate, artifact, extension_counts),
+                                      data, 'artifact', key))
         manifest = {'schema': 'Family.ReportArchive.v1', 'state': 'COMPLETE',
             'client_id': store.client_id, 'run_id': run_id, 'fingerprint': fingerprint,
             'created_at': created_at.astimezone(TAIPEI).isoformat(), 'sequence': suffix,

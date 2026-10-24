@@ -488,14 +488,14 @@ def ism_official(f, key):
             response.raise_for_status()
             if not response.text or len(response.text)<400:
                 raise ValueError('ISM page empty or truncated')
-            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\\b[^>]*>.*?</\\1>',' ',response.text,flags=re.I|re.S)))
-            body=re.sub(r'\\s+',' ',body)
+            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b[^>]*>.*?</\1>',' ',response.text,flags=re.I|re.S)))
+            body=re.sub(r'\s+',' ',body)
             month_name=slug.capitalize()
-            heading=rf'{month_name}\\s+{period.year}\\s+ISM\\s*®?\\s*{label}\\s+PMI'
+            heading=rf'{month_name}\s+{period.year}\s+ISM\s*®?\s*{label}\s+PMI'
             if not re.search(heading,body,re.I):
                 raise ValueError('ISM report month/year/type heading mismatch')
             # Anchor to exact sector headline; avoid New Orders or Prices.
-            headline=rf'{label}\\s+PMI\\s*®?\\s*(?:at|registered)\\s+(\\d{{1,2}}(?:\\.\\d+)?)\\s*(?:%|percent)'
+            headline=rf'{label}\s+PMI\s*®?\s*(?:at|registered)\s+(\d{{1,2}}(?:\.\d+)?)\s*(?:%|percent)'
             match=re.search(headline,body,re.I)
             if not match:
                 raise ValueError('ISM headline PMI not found')

@@ -660,10 +660,11 @@ def parse_lei_pnc(text, source):
     """Read explicitly stated annual growth; never derive it from mixed index vintages."""
     text=re.sub(r'\s+',' ',text).replace('−','-').replace('–','-')
     release=re.search(r'\b(\d{1,2} [A-Z][a-z]+ 20\d{2})\b',text)
-    observed=re.search(r'\(LEI\)\s+(?:slipped|slid|rose|fell|increased|decreased)\b.{0,100}?\bin ([A-Z][a-z]+)\b',text)
+    observed=re.search(r'\(LEI\)\s+(?:slipped|slid|rose|fell|increased|decreased|was unchanged)\b.{0,100}?\bin ([A-Z][a-z]+)\b',text)
     growth=re.search(r'\byear(?:[- ]earlier| ago) growth rate\b.{0,80}?\bto\s+([+-]?\d+(?:\.\d+)?)\s*%',text,re.I)
     if not release or not observed or not growth:
-        raise ValueError('PNC LEI PDF lacks explicit observation month / annual growth / release date')
+        missing=[name for name,match in [('observation month',observed),('annual growth',growth),('release date',release)] if not match]
+        raise ValueError('PNC LEI PDF lacks explicit '+', '.join(missing))
     published=dt.datetime.strptime(release.group(1),'%d %B %Y').date()
     month=dt.datetime.strptime(observed.group(1),'%B').month
     year=published.year-(month>published.month)
@@ -1114,6 +1115,16 @@ def selftest():
     try:
         parse_lei_pnc('18 September 2026 (LEI) slipped 0.1% in August. Six-month growth rate to -0.7%.',LEI_PNC_ROOT)
         raise AssertionError('Must not mistake six-month growth for annual growth')
+    except ValueError:
+        pass
+    # Exact excerpts from the 22 October report: monthly level and six-month
+    # growth must not displace its explicitly stated annual growth.
+    october='22 October 2026 The Conference Board Leading Economic Index (LEI) was unchanged in September at 99.6 (2016=100). The LEI’s six-month growth rate improved to 0.6% between March and September. The year earlier growth rate improved for the ninth straight month to -0.5%.'
+    r=parse_lei_pnc(october,LEI_PNC_ROOT+'PNC_Economics_Research_LEI_22_October_2026.pdf')
+    assert (r['publication_date'],r['observation_date'],r['value'])==('2026-10-22','2026-09-01',-0.5)
+    try:
+        parse_lei_pnc(october.split('The year earlier')[0],LEI_PNC_ROOT)
+        raise AssertionError('Monthly level and six-month growth are not YoY')
     except ValueError:
         pass
     assert all(k not in LABELS for k in ('m06','m03_qqq','m03_spy','m03_vt'))

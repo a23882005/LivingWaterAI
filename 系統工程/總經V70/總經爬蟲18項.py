@@ -490,6 +490,8 @@ def ism_official(f, key):
                 raise ValueError('ISM page empty or truncated')
             body=unescape(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b[^>]*>.*?</\1>',' ',response.text,flags=re.I|re.S)))
             body=re.sub(r'\s+',' ',body)
+            if 'The content you are looking for is no longer available' in body:
+                raise ValueError('ISM report removed from public URL; official source unavailable')
             month_name=slug.capitalize()
             heading=rf'{month_name}\s+{period.year}\s+ISM\s*®?\s*{label}\s+PMI'
             if not re.search(heading,body,re.I):

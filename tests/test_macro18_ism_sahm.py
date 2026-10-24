@@ -41,7 +41,7 @@ class SourceTests(unittest.TestCase):
             '<h2>Manufacturing PMI® at 54.6%</h2><p>'+'A'*500+'</p></html>')),
             job_series=set(),fredattempts=defaultdict(list))
         with patch.object(macro.dt,'datetime',FixedDatetime):
-            with self.assertRaisesRegex(RuntimeError,'month/year/type heading mismatch'):
+            with self.assertRaisesRegex(RuntimeError,'date or sector headline mismatch'):
                 macro.ism_official(fake,'m04')
         self.assertEqual(fake.fredattempts['ISM_m04'][0]['result'],'FAILED')
 

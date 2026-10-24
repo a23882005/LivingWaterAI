@@ -48,7 +48,8 @@
     "B07_https_oauth": "92838009813eb96e391d7de6a8bb721af9968316",
     "B07_latency_repair": "afc7abaf4fd01946c561b79a996701916b1f7f72",
     "B07_branding": "a19f628618f02fa0b2523ceafb1929d5928b87d6",
-    "B07_private_entry_base": "1fd20c6068fb4c7319fd3edd61c42d9661d95925"
+    "B07_private_entry_base": "1fd20c6068fb4c7319fd3edd61c42d9661d95925",
+    "Joseph_menu_baseline": "8fb00213c24e7162f1a836dbd70da6552f5cca82"
   },
   "evidence": [
     "evidence/A01/",
@@ -734,5 +735,25 @@
     "status": "CHINESE_IDENTITY_CODE_TESTED_ENROLLMENT_PENDING",
     "local_tests_passed": 99,
     "account_created": false
+  },
+  "Joseph_menu_v1_13": {
+    "status": "CODE_AND_LOCAL_SYNTHETIC_TESTS_PASS_LIVE_BINDING_PENDING",
+    "date": "2026-10-24",
+    "menu_items": 14,
+    "tests_passed": 43,
+    "scope": [
+      "new menu routing",
+      "login resume",
+      "complete menu after result",
+      "macro direct link",
+      "immutable dated Drive report archive",
+      "previous report retrieval"
+    ],
+    "remaining": [
+      "trusted renderer parameterization",
+      "private report folder/server lock configuration",
+      "human project installation and end-to-end acceptance"
+    ],
+    "progress": "W7 B07 IN_PROGRESS, 6/23; B16 pending"
   }
 }

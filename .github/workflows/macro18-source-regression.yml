@@ -83,3 +83,10 @@ jobs:
           print('INTEGRATION_BUILD_READY',x.get('verification',{}).get('ready'))
           assert x.get('verification',{}).get('ready') is True
           PY
+
+      - name: Install Chromium for integrated snapshot tests
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install chromium --with-deps
+      - name: PR27 snapshot browser regression
+        run: python -m unittest discover -s tests -p 'test_v703_snapshot_frontend.py' -v

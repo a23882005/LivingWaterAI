@@ -17,6 +17,11 @@ class FakeResponse:
     def __init__(self,text): self.text=text
     def raise_for_status(self): pass
 
+RealDatetime=dt.datetime
+class FixedDatetime(RealDatetime):
+    @classmethod
+    def now(cls,tz=None): return RealDatetime(2026,10,24,tzinfo=tz)
+
 class SourceTests(unittest.TestCase):
     def test_ism_both_sectors_official_headlines(self):
         for key,sector,value in [('m04','Manufacturing',54.5),('m15','Services',54.9)]:
@@ -24,8 +29,7 @@ class SourceTests(unittest.TestCase):
                 '<html><h1>September 2026 ISM® '+sector+' PMI® Report</h1>'
                 '<h2>'+sector+' PMI® at '+str(value)+'%</h2><p>'+'A'*500+'</p></html>')),
                 job_series=set(),fredattempts=defaultdict(list))
-            with patch.object(macro.dt,'datetime',wraps=dt.datetime) as mock_dt:
-                mock_dt.now.return_value=dt.datetime(2026,10,24,tzinfo=dt.timezone.utc)
+            with patch.object(macro.dt,'datetime',FixedDatetime):
                 r=macro.ism_official(fake,key)
             self.assertEqual(float(r['value']),value)
             self.assertEqual(r['observation_date'],'2026-09-01')
@@ -36,8 +40,7 @@ class SourceTests(unittest.TestCase):
             '<html><h1>August 2026 ISM® Manufacturing PMI® Report</h1>'
             '<h2>Manufacturing PMI® at 54.6%</h2><p>'+'A'*500+'</p></html>')),
             job_series=set(),fredattempts=defaultdict(list))
-        with patch.object(macro.dt,'datetime',wraps=dt.datetime) as mock_dt:
-            mock_dt.now.return_value=dt.datetime(2026,10,24,tzinfo=dt.timezone.utc)
+        with patch.object(macro.dt,'datetime',FixedDatetime):
             # September is rejected, August fallback is accepted and accurately dated.
             r=macro.ism_official(fake,'m04')
         self.assertEqual(r['observation_date'],'2026-08-01')

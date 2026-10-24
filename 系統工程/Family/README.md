@@ -22,3 +22,16 @@
 報告命名修正已在 GitHub commit `d18681f951c68a01618138290cb1ace6288020e3`。正式 renderer、私有資料夾／writer lock 注入及 Project 端到端仍待完成；詳細狀態以 Drive 正式紀錄為準。
 
 Drive 正式資料來源檔 ID：`194zJSkEKRxbfkxUcGKiTCT5a4GEe2nVG`。
+
+
+## MOU 專案文件
+
+- 專案指示：[MOU_Project_Instructions.txt（Google Drive）](https://drive.google.com/file/d/1rzj5FP6re6dfhme2Mos9DRthygqM3zMM/view)
+- 資料來源：[MOU_Project_Sources.txt（Google Drive）](https://drive.google.com/file/d/1LoB6o4hWgj94Sy4yTV3bdiiybzRqGesF/view)
+- 版本：專案指示 v1.0.0；資料來源 v1.0.0，2026-10-24。
+- 本專案只登入 MOU 本人帳號，只讀寫 mou.db 與 MOU 本人配置報告；其他家人個人資料與報告隔離，公用 DB／公用報告模板依功能使用。
+- MOU 正式報告資料夾位於 Google Drive W6／mou_正式配置報告。個人 DB ID、client ID 與私有資料夾 ID 留在有權限控管的 Drive Sources 檔。
+
+## W7 驗收狀態
+
+指揮官已完成 Joseph 家人版 Project 實際使用測試並確認通過。W7 整體目標標記為 **PASS／CLOSED（Owner UAT）**；目前停在 W7，依指揮官指示不進入 W8。正式細節以 W7 契約與私人驗收紀錄為準。

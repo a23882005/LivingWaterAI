@@ -466,6 +466,107 @@ def month_delta(f):
     return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
                '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
 
+def ism_official(f, key):
+    """Official ISM monthly headline PMI only; reject wrong month and subindex."""
+    from html import unescape
+    months=('january','february','march','april','may','june',
+            'july','august','september','october','november','december')
+    family='pmi' if key=='m04' else 'services'
+    label='Manufacturing' if key=='m04' else 'Services'
+    now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    # Latest released ISM report is normally previous calendar month.
+    target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
+    attempts=[]
+    # Once this month's release window passes, never accept an older PMI as newly retrieved.
+    candidates=(target,) if now.day>7 else (target,target-1)
+    for period in candidates:
+        slug=months[period.month-1]
+        url=f'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/{family}/{slug}/'
+        response=None
+        try:
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('ISM fetch deadline exceeded')
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            if not response.text or len(response.text)<400:
+                raise ValueError('ISM page empty or truncated')
+            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b[^>]*>.*?</\1>',' ',response.text,flags=re.I|re.S)))
+            body=re.sub(r'\s+',' ',body)
+            if 'The content you are looking for is no longer available' in body:
+                raise ValueError('ISM report removed from public URL; official source unavailable')
+            month_name=slug.capitalize()
+            date_heading=rf'{month_name}\s+{period.year}'
+            sector_heading=rf'{label}\s+PMI'
+            if not re.search(date_heading,body,re.I) or not re.search(sector_heading,body,re.I):
+                raise ValueError('ISM report date or sector headline mismatch')
+            # Anchor to exact sector headline; avoid New Orders or Prices.
+            headline=rf'{label}\s+PMI\s*®?\s*(?:at|registered)\s+(\d{{1,2}}(?:\.\d+)?)\s*(?:%|percent)'
+            match=re.search(headline,body,re.I)
+            if not match:
+                raise ValueError('ISM headline PMI not found')
+            value=float(match.group(1))
+            if not 0<=value<=100: raise ValueError('ISM PMI out of valid range')
+            stamp=dt.datetime.now(dt.timezone.utc).isoformat()
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL','result':'OK',
+                'verified_at':stamp,'observation_date':f'{period.year:04d}-{period.month:02d}-01'})
+            return row(key,value,f'{period.year:04d}-{period.month:02d}-01',url,
+                       'ISM official monthly report headline PMI',detail=label+' headline; not subindex')
+        except Exception as exc:
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'error':str(exc)[:220]})
+            attempts.append(slug+': '+str(exc)[:150])
+    # Official dated roundup is a second source when the main report layout differs.
+    if key=='m04':
+        period=target
+        released=period+1
+        url=(f'https://www.ismworld.org/supply-management-news-and-reports/'
+             f'news-publications/inside-supply-management-magazine/blog/'
+             f'{released.year}/{released.year}-{released.month:02d}/'
+             f'ism-pmi-reports-roundup-{months[period.month-1]}-{period.year}-manufacturing/')
+        try:
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(
+                r'<(script|style)\b[^>]*>.*?</\1>',' ',response.text,flags=re.I|re.S)))
+            body=re.sub(r'\s+',' ',body)
+            if not re.search(rf'{months[period.month-1]}\s+Manufacturing',body,re.I):
+                raise ValueError('ISM roundup report month/sector mismatch')
+            match=re.search(r'Manufacturing\s+PMI.{0,90}?(?:at|of|to)\s*(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',body,re.I)
+            if not match: raise ValueError('ISM roundup headline value not found')
+            value=float(match.group(1))
+            if not 0<=value<=100: raise ValueError('ISM roundup PMI out of range')
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({
+                'provider':'ISM_OFFICIAL_ROUNDUP','result':'OK',
+                'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'observation_date':f'{period.year:04d}-{period.month:02d}-01'})
+            return row(key,value,f'{period.year:04d}-{period.month:02d}-01',
+                url,'Official ISM dated monthly roundup headline PMI')
+        except Exception as exc:
+            attempts.append('official roundup: '+str(exc)[:140])
+    raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
+
+def sahm_from_published(f):
+    """Read the published official Sahm Rule first; independent U3 calculation is diagnostic fallback."""
+    try:
+        r=latest(f,'m18','SAHMREALTIME')
+        r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
+        return r
+    except Exception as published_exc:
+        print('SAHM_PUBLISHED_FAILED',type(published_exc).__name__,str(published_exc)[:450],flush=True)
+        try:
+            return sahm_from_unrate(f)
+        except Exception as calc_exc:
+            raise RuntimeError(
+                'SAHMREALTIME official series failed: '+str(published_exc)[:180]+
+                ' | verified U3 calculation failed: '+str(calc_exc)[:180]) from calc_exc
+
 def sahm_from_unrate(f):
     try:
         s=f.fred('UNRATE').sort_index()
@@ -660,10 +761,11 @@ def parse_lei_pnc(text, source):
     """Read explicitly stated annual growth; never derive it from mixed index vintages."""
     text=re.sub(r'\s+',' ',text).replace('−','-').replace('–','-')
     release=re.search(r'\b(\d{1,2} [A-Z][a-z]+ 20\d{2})\b',text)
-    observed=re.search(r'\(LEI\)\s+(?:slipped|slid|rose|fell|increased|decreased)\b.{0,100}?\bin ([A-Z][a-z]+)\b',text)
+    observed=re.search(r'\(LEI\)\s+(?:slipped|slid|rose|fell|increased|decreased|was unchanged)\b.{0,100}?\bin ([A-Z][a-z]+)\b',text)
     growth=re.search(r'\byear(?:[- ]earlier| ago) growth rate\b.{0,80}?\bto\s+([+-]?\d+(?:\.\d+)?)\s*%',text,re.I)
     if not release or not observed or not growth:
-        raise ValueError('PNC LEI PDF lacks explicit observation month / annual growth / release date')
+        missing=[name for name,match in [('observation month',observed),('annual growth',growth),('release date',release)] if not match]
+        raise ValueError('PNC LEI PDF lacks explicit '+', '.join(missing))
     published=dt.datetime.strptime(release.group(1),'%d %B %Y').date()
     month=dt.datetime.strptime(observed.group(1),'%B').month
     year=published.year-(month>published.month)
@@ -733,7 +835,9 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
-      'm18':lambda:sahm_from_unrate(f),
+      'm04':lambda:ism_official(f,'m04'),
+      'm15':lambda:ism_official(f,'m15'),
+      'm18':lambda:sahm_from_published(f),
       'm19':lambda:latest(f,'m19','UNRATE'),
       'm20':lambda:nfp(f),
       'm05':lambda:core_cpi(f),
@@ -1114,6 +1218,14 @@ def selftest():
     try:
         parse_lei_pnc('18 September 2026 (LEI) slipped 0.1% in August. Six-month growth rate to -0.7%.',LEI_PNC_ROOT)
         raise AssertionError('Must not mistake six-month growth for annual growth')
+    except ValueError:
+        pass
+    october='22 October 2026 The Conference Board Leading Economic Index (LEI) was unchanged in September at 99.6 (2016=100). The LEI’s six-month growth rate improved to 0.6% between March and September. The year earlier growth rate improved for the ninth straight month to -0.5%.'
+    r=parse_lei_pnc(october,LEI_PNC_ROOT+'PNC_Economics_Research_LEI_22_October_2026.pdf')
+    assert (r['publication_date'],r['observation_date'],r['value'])==('2026-10-22','2026-09-01',-0.5)
+    try:
+        parse_lei_pnc(october.split('The year earlier')[0],LEI_PNC_ROOT)
+        raise AssertionError('Monthly level and six-month growth are not YoY')
     except ValueError:
         pass
     assert all(k not in LABELS for k in ('m06','m03_qqq','m03_spy','m03_vt'))

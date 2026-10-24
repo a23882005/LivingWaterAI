@@ -47,3 +47,21 @@ jobs:
                   failures.append(key+': '+type(e).__name__)
           if failures: raise SystemExit('Live sources not yet ready: '+', '.join(failures))
           PY
+
+      - name: Full 18-indicator crawler dry run (isolated no publish)
+        timeout-minutes: 8
+        run: |
+          python -u '系統工程/總經V70/總經爬蟲18項.py' --out build/macro18-source-smoke --cache data/18_macro_verification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('build/macro18-source-smoke/18_macro_verification.json').read_text(encoding='utf-8'))
+          rows=p['items']
+          for k in ('m04','m15','m18'):
+              r=rows[k]
+              print('FULL_CRAWLER',k,r.get('value'),r.get('observation_date'),r.get('attempt_result'),r.get('retrieval_error'),flush=True)
+              assert r.get('attempt_result')=='SUCCESS',k
+              assert r.get('status')=='OK',k
+          assert len(rows)==19,len(rows)
+          print('FULL_CRAWLER_INDEPENDENT18_PASS')
+          PY

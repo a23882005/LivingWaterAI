@@ -54,7 +54,7 @@
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
-          "notes": "官方現行政策表直接顯示3.75%–4.00%；稽核檔data/audit/fed_target_evidence_20261024_100800_TPE.txt，SHA256=c7eb3b6e5c43f1213462f95f1930295011bc0c944de4171f50629c0926ca45b4。"
+          "notes": "官方現行政策表直接顯示3.75%–4.00%；稽核檔data/audit/fed_target_evidence_20261024_100700_TPE.txt，SHA256=c7eb3b6e5c43f1213462f95f1930295011bc0c944de4171f50629c0926ca45b4。"
         },
         {
           "site": "FRED DFEDTARL",

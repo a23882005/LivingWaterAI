@@ -1,10 +1,9 @@
-"""Joseph v1.13 menu, conversation-local login resume and result presentation.
+"""Family v1.14 menu, conversation-local login resume and result presentation.
 
 Business handlers are explicitly supplied by the trusted entry. Selecting an
 unbound operation preserves it for the same conversation. No investment rules.
 """
-VERSION = '1.13'
-GREETING = 'Joseph，您好 🌿 我能協助您查看持倉、檢視配置、閱讀總經與新聞，以及產生配置報告。'
+VERSION = '1.14'
 LOGIN_PROMPT = '請輸入您的密碼，登入您個人的活水 AI 系統。'
 MACRO_URL = 'https://happihelp.com/'
 ITEMS = (
@@ -25,16 +24,16 @@ ITEMS = (
 )
 
 
-def render_menu():
-    lines = ['🌿 Joseph 的活水 AI', '您的家人版專屬投資AI', '']
+def render_menu(project_name):
+    lines = [f'🌿 {project_name} 的活水 AI', '您的家人版專屬投資AI', '']
     lines += [f'{icon} {i:02}｜{label}' for i, (icon, label, *_) in enumerate(ITEMS, 1)]
     lines += ['', '💬 輸入編號，或直接說需求，若選03/04 可直接提供目前配置截圖，更為方便']
     return '\n'.join(lines)
 
 
-def complete_work(result):
+def complete_work(result, project_name):
     """For menu and direct requests: deliver result first, then the full menu."""
-    return {'status': 'COMPLETED', 'result': result, 'menu': render_menu()}
+    return {'status': 'COMPLETED', 'result': result, 'menu': render_menu(project_name)}
 
 
 def route(number):
@@ -74,9 +73,11 @@ def report_handlers(auth, store, renderer=None):
     return handlers
 
 
-class JosephMenu:
-    def __init__(self, auth, *, handlers=None):
+class FamilyMenu:
+    def __init__(self, auth, *, project_name, login_account, handlers=None):
         self.auth = auth
+        self.project_name = project_name
+        self.login_account = login_account
         self.handlers = dict(handlers or {})
         self.pending = None
 
@@ -84,15 +85,18 @@ class JosephMenu:
         try:
             self.auth.require_login()
         except PermissionError:
-            return {'status': 'LOGIN_REQUIRED', 'text': GREETING + '\n' + LOGIN_PROMPT}
-        return {'status': 'READY', 'text': GREETING, 'menu': render_menu()}
+            return {'status': 'LOGIN_REQUIRED',
+                    'text': f'{self.project_name}，您好 🌿 我能協助您查看持倉、檢視配置、閱讀總經與新聞，以及產生配置報告。\n{LOGIN_PROMPT}'}
+        return {'status': 'READY',
+                'text': f'{self.project_name}，您好 🌿 我能協助您查看持倉、檢視配置、閱讀總經與新聞，以及產生配置報告。',
+                'menu': render_menu(self.project_name)}
 
     def login(self, password):
-        self.auth.login('JO', password)
+        self.auth.login(self.login_account, password)
         if self.pending is not None:
             number, payload = self.pending
             return self.select(number, payload=payload)
-        return {'status': 'READY', 'menu': render_menu()}
+        return {'status': 'READY', 'menu': render_menu(self.project_name)}
 
     def select(self, number, *, payload=None):
         choice = route(number)
@@ -101,10 +105,11 @@ class JosephMenu:
             raise ValueError('INVALID_MENU_PAYLOAD')
         if choice['operation'] == 'macro_link':
             self.pending = None
-            return complete_work({'text': '請直接查看活水 AI 總經網站', 'url': MACRO_URL})
+            return complete_work({'text': '請直接查看活水 AI 總經網站', 'url': MACRO_URL},
+                                 self.project_name)
         if choice['operation'] == 'account' and payload.get('action') == 'logout':
             self.pending = None
-            return complete_work(self.auth.logout())
+            return complete_work(self.auth.logout(), self.project_name)
         if choice['private'] or payload.get('use_private_portfolio'):
             try:
                 self.auth.require_login()
@@ -116,8 +121,8 @@ class JosephMenu:
         if handler is None:
             self.pending = (choice['number'], dict(payload))
             return {'status': 'HANDLER_PENDING', 'operation': choice['operation'],
-                    'rule': choice['rule'], 'menu': render_menu()}
+                    'rule': choice['rule'], 'menu': render_menu(self.project_name)}
         # Never cache passwords or any authentication payload in pending state.
         self.pending = None
         result = handler(payload)
-        return complete_work(result)
+        return complete_work(result, self.project_name)

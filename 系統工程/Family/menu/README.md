@@ -20,6 +20,6 @@
 |13|產生我的最新配置報告|`generate_report`|[11_產生配置報告.md](11_產生配置報告.md)|
 |14|帳號：登出／修改密碼|`account`|[14_帳號管理.md](14_帳號管理.md)|
 
-程式：`../W7/joseph_menu.py`。`welcome()`先介紹並請輸入密碼；`login()`驗證後接續待辦；`select()`依新編號分流；`complete_work()`供選單及直接需求交付結果後完整顯示選單。私人功能由JosephLogin驗證，公開07直接回網站。
+程式：`../W7/family_menu.py`。入口提供`project_name`與`login_account`建立`FamilyMenu`；登入帳號由各專案Sources指定。`welcome()`先介紹並請輸入密碼；`login()`交由注入的auth驗證後接續待辦；`select()`依新編號分流；`complete_work()`供選單及直接需求交付結果後完整顯示選單。私人功能由呼叫端提供的auth驗證，公開07直接回網站。
 12／13共用`report_handlers()`接W6 `report_archive.py`。以Asia/Taipei時間命名，逐次新檔保存、同秒加序號、同run同內容去重、不同內容拒絕；產物讀回通過後才完成manifest，成功報告可查上次或指定日期。報告引擎、私有folder與同一writer lock由正式設定注入，不提供示範正式路徑。
 驗收範圍：本輪路由、登入接續、選單呈現、報告日期命名與Drive協定合成測試。正式renderer／私有報告folder設定與真人端到端併入B07/B16，W7仍6/23。

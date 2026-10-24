@@ -74,7 +74,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
       - name: Integrated V70-3-27 build checks
         run: |
-          python scripts/build_daily_v703_site.py --html '系統工程/總經V70/V70-3-27.html' --out build/v703-integrated-test
+          python scripts/build_daily_v703_site.py --macro build/macro18-source-smoke/18_macro_verification.json --html '系統工程/總經V70/V70-3-27.html' --out build/v703-integrated-test
           python - <<'PY'
           import json
           from pathlib import Path

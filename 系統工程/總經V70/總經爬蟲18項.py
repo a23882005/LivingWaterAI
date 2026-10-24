@@ -466,6 +466,57 @@ def month_delta(f):
     return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
                '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
 
+def ism_official(f, key):
+    """Official ISM monthly headline PMI only; reject wrong month and subindex."""
+    from html import unescape
+    months=('january','february','march','april','may','june',
+            'july','august','september','october','november','december')
+    family='pmi' if key=='m04' else 'services'
+    label='Manufacturing' if key=='m04' else 'Services'
+    now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
+    # Latest released ISM report is normally previous calendar month.
+    target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
+    attempts=[]
+    for period in (target,target-1):
+        slug=months[period.month-1]
+        url=f'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/{family}/{slug}/'
+        response=None
+        try:
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('ISM fetch deadline exceeded')
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            if not response.text or len(response.text)<400:
+                raise ValueError('ISM page empty or truncated')
+            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\\b[^>]*>.*?</\\1>',' ',response.text,flags=re.I|re.S)))
+            body=re.sub(r'\\s+',' ',body)
+            month_name=slug.capitalize()
+            heading=rf'{month_name}\\s+{period.year}\\s+ISM\\s*®?\\s*{label}\\s+PMI'
+            if not re.search(heading,body,re.I):
+                raise ValueError('ISM report month/year/type heading mismatch')
+            # Anchor to exact sector headline; avoid New Orders or Prices.
+            headline=rf'{label}\\s+PMI\\s*®?\\s*(?:at|registered)\\s+(\\d{{1,2}}(?:\\.\\d+)?)\\s*(?:%|percent)'
+            match=re.search(headline,body,re.I)
+            if not match:
+                raise ValueError('ISM headline PMI not found')
+            value=float(match.group(1))
+            if not 0<=value<=100: raise ValueError('ISM PMI out of valid range')
+            stamp=dt.datetime.now(dt.timezone.utc).isoformat()
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL','result':'OK',
+                'verified_at':stamp,'observation_date':f'{period.year:04d}-{period.month:02d}-01'})
+            return row(key,value,f'{period.year:04d}-{period.month:02d}-01',url,
+                       'ISM official monthly report headline PMI',detail=label+' headline; not subindex')
+        except Exception as exc:
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'error':str(exc)[:220]})
+            attempts.append(slug+': '+str(exc)[:150])
+    raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
+
 def sahm_from_published(f):
     """Read the published official Sahm Rule first; independent U3 calculation is diagnostic fallback."""
     try:
@@ -748,6 +799,8 @@ def run(outdir,overrides_path=None,cache_path=None):
       'm13':lambda:breakeven_5y(f),
       'm17':lambda:month_delta(f),
       'm14':lambda:netliq(f),
+      'm04':lambda:ism_official(f,'m04'),
+      'm15':lambda:ism_official(f,'m15'),
       'm18':lambda:sahm_from_published(f),
       'm19':lambda:latest(f,'m19','UNRATE'),
       'm20':lambda:nfp(f),

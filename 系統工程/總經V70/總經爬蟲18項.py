@@ -520,6 +520,35 @@ def ism_official(f, key):
                 'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),
                 'error':str(exc)[:220]})
             attempts.append(slug+': '+str(exc)[:150])
+    # Official dated roundup is a second source when the main report layout differs.
+    if key=='m04':
+        period=target
+        url=(f'https://www.ismworld.org/supply-management-news-and-reports/'
+             f'news-publications/inside-supply-management-magazine/blog/'
+             f'{period.year}/{period.year}-{period.month+1:02d}/'
+             f'ism-pmi-reports-roundup-{months[period.month-1]}-{period.year}-manufacturing/')
+        try:
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            body=unescape(re.sub(r'<[^>]+>',' ',re.sub(
+                r'<(script|style)\b[^>]*>.*?</\1>',' ',response.text,flags=re.I|re.S)))
+            body=re.sub(r'\s+',' ',body)
+            if not re.search(rf'{months[period.month-1]}\s+Manufacturing',body,re.I):
+                raise ValueError('ISM roundup report month/sector mismatch')
+            match=re.search(r'Manufacturing\s+PMI.{0,90}?(?:at|of|to)\s*(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',body,re.I)
+            if not match: raise ValueError('ISM roundup headline value not found')
+            value=float(match.group(1))
+            if not 0<=value<=100: raise ValueError('ISM roundup PMI out of range')
+            series='ISM_'+key
+            f.job_series.add(series)
+            f.fredattempts.setdefault(series,[]).append({
+                'provider':'ISM_OFFICIAL_ROUNDUP','result':'OK',
+                'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'observation_date':f'{period.year:04d}-{period.month:02d}-01'})
+            return row(key,value,f'{period.year:04d}-{period.month:02d}-01',
+                url,'Official ISM dated monthly roundup headline PMI')
+        except Exception as exc:
+            attempts.append('official roundup: '+str(exc)[:140])
     raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
 
 def sahm_from_published(f):

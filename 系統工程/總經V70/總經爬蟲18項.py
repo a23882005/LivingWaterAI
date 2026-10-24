@@ -495,9 +495,10 @@ def ism_official(f, key):
             if 'The content you are looking for is no longer available' in body:
                 raise ValueError('ISM report removed from public URL; official source unavailable')
             month_name=slug.capitalize()
-            heading=rf'{month_name}\s+{period.year}\s+ISM\s*®?\s*{label}\s+PMI'
-            if not re.search(heading,body,re.I):
-                raise ValueError('ISM report month/year/type heading mismatch')
+            date_heading=rf'{month_name}\s+{period.year}'
+            sector_heading=rf'{label}\s+PMI'
+            if not re.search(date_heading,body,re.I) or not re.search(sector_heading,body,re.I):
+                raise ValueError('ISM report date or sector headline mismatch')
             # Anchor to exact sector headline; avoid New Orders or Prices.
             headline=rf'{label}\s+PMI\s*®?\s*(?:at|registered)\s+(\d{{1,2}}(?:\.\d+)?)\s*(?:%|percent)'
             match=re.search(headline,body,re.I)

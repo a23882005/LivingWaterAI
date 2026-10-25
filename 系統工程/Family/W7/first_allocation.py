@@ -11,10 +11,11 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
-import io
 import json
 import re
 import sqlite3
+import tempfile
+from pathlib import Path
 
 
 OPERATION = 'first_allocation_snapshot'
@@ -66,8 +67,12 @@ def normalize_request(data):
     style = data.get('long_term_style')
     if not isinstance(style, dict) or set(style) != {'stock_weight', 'bond_weight'}:
         raise ValueError('LONG_TERM_STYLE_REQUIRED')
-    sw = _amount(style['stock_weight'])
-    bw = _amount(style['bond_weight'])
+    try:
+        sw, bw = (Decimal(str(style[k])) for k in ('stock_weight', 'bond_weight'))
+    except (InvalidOperation, ValueError, TypeError):
+        raise ValueError('LONG_TERM_STYLE_INVALID') from None
+    if not sw.is_finite() or not bw.is_finite():
+        raise ValueError('LONG_TERM_STYLE_INVALID')
     if sw > 1 or bw > 1 or sw + bw != 1:
         raise ValueError('LONG_TERM_STYLE_INVALID')
     holdings = data.get('holdings')
@@ -210,7 +215,7 @@ def make_writer(client_id, account_key):
                  data_state,source_kind,source_reference,reconciled_at_utc)
                 values(?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                 (snapshot_id,client_id,account_key,currency,when,1,run_id,minor,
-                 'USER_REPORTED','REPORTED','USER_CONFIRMED',ref,when))
+                 'USER_REPORTED','REPORTED','USER_CONFIRMED',ref,None))
             item('CASH',account_key,'reported_amount_minor',minor,unit='MINOR',currency=currency)
             item('CASH',account_key,'settled_verified',str(row['settled_verified']).lower(),
                  source='USER_CONFIRMED')
@@ -249,22 +254,26 @@ def first_allocation_handler(coordinator, *, principal, resource, client_id, acc
         request_id = _text(payload.get('request_id'), 'REQUEST_ID', 128)
         record = normalize_request(payload.get('confirmed_record'))
         before = coordinator.snapshot(resource, principal)
-        with sqlite3.connect(':memory:') as check_db:
-            check_db.deserialize(before['data'])
-            _identity(check_db, client_id)
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path=Path(tmp)/'before.db'
+            db_path.write_bytes(before['data'])
+            with sqlite3.connect(db_path) as check_db:
+                _identity(check_db, client_id)
         data = {'client_id':client_id,'request_id':request_id,'confirmed_record':record}
         committed = coordinator.update(resource, principal, request_id, before['epoch'],OPERATION,data)
         result=committed['result']
         if result.get('status') != 'STORED' or result.get('client_id') != client_id:
             raise RuntimeError('INITIAL_SNAPSHOT_WRITE_FAILED')
         after=coordinator.snapshot(resource,principal)
-        with sqlite3.connect(':memory:') as read_db:
-            read_db.deserialize(after['data'])
-            _identity(read_db,client_id)
-            run = read_db.execute('''select content_hash from portfolio_snapshot_run
-                where client_id=? and run_id=?''', (client_id,result['run_id'])).fetchone()
-            count=read_db.execute('''select count(*) from portfolio_snapshot_item
-                where client_id=? and run_id=?''',(client_id,result['run_id'])).fetchone()[0]
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path=Path(tmp)/'after.db'
+            db_path.write_bytes(after['data'])
+            with sqlite3.connect(db_path) as read_db:
+                _identity(read_db,client_id)
+                run = read_db.execute('''select content_hash from portfolio_snapshot_run
+                    where client_id=? and run_id=?''', (client_id,result['run_id'])).fetchone()
+                count=read_db.execute('''select count(*) from portfolio_snapshot_item
+                    where client_id=? and run_id=?''',(client_id,result['run_id'])).fetchone()[0]
         if not run or run[0] != result['content_hash'] or count != result['items']:
             raise RuntimeError('FIRST_ALLOCATION_READBACK_FAILED')
         return {'status':STATUS,'client_id':client_id,'run_id':result['run_id'],

@@ -1,5 +1,20 @@
-最後修改日期時間：2026/10/25 16:31（台灣時間）
+最後修改日期時間：2026/10/25 17:11（台灣時間）
 # Family 家人版四戶正式專案文件索引
+
+## 2026/10/25｜Family 中PM全案總PM三ZIP正式交接（Drive私有TEMP）
+
+**W7 Owner裁定全線 PASS/CLOSED，下一階段 W8 全面整合測試與 Debug，完成後循既有 Master WBS → Gate D → 四Project部署 → 試用修復 → Gate E。** 新對話接任人即Family中PM／全案總PM，本人負責工程、測試修Bug、Gate與檔案治理；既有 W7 PASS 不重開。
+
+三包保存在 Google Drive 根目錄既有 owner-only TEMP；GitHub **僅列非敏感的交接檔名與校驗碼**，實際私人來源、個人DB、憑證不進公開庫：
+
+| 交接包 | 內容 | ZIP SHA-256 |
+|---|---|---|
+| `Family_W8_交接_ZIP1_總PM責任_20261025.zip` | 總PM職權與責任、目前W7裁定和完成/未完成 | `375cd6d57697a28c4e310bbade585f70421314a254d100eac9e3839ffc70f33e` |
+| `Family_W8_交接_ZIP2_成果檔案定位_20261025.zip` | 八份Owner核定TXT原件、各Drive ID及SHA、核實的程式位置、正式治理導航 | `95bcbd4ae6ecc128c08853676bd967420013a411a976edcf9b427b7da63ad47f` |
+| `Family_W8_交接_ZIP3_全面測試Debug與後續工序_20261025.zip` | W8端對端測試、Bug定位修復、回歸驗收、Gate D至Gate E | `1387086363bf7c717c40c9d20793182e2c0d17484e9c3dd66529dfafd50982e9` |
+
+三包已在Google Drive原始TEMP父目錄上傳、遠端重新取得，大小/CRC/Manifest與SHA-256核對通過。沿用本頁上方正式八份Project版本：七份v1.16.4＋Arthur Sources v1.16.5（16:16 Owner更新），v1.17已被取代。W8尚待實際驗收，不能以本次交接宣稱W8 PASS；交易授權NONE，Production HOLD。完整私有包連結與ID已寫Family工程/檔案管理及MasterWBS。
+
 
 ## 2026/10/25 16:31 指揮官最新版指定：恢復八份原始 TXT
 

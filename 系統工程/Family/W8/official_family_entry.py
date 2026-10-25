@@ -1,0 +1,124 @@
+"""W8 official Family entry: authenticated B06 Drive DB -> W5 -> handlers.
+
+All resource IDs and account-to-client bindings come from private service
+configuration. This module contains no family DB IDs, secrets, market fixtures,
+or trade permission. Processing copies of database bytes are short-lived;
+Google Drive remains the sole official customer-record store.
+"""
+import hashlib
+import importlib.util
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+FAMILY = Path(__file__).resolve().parents[1]
+
+
+def _read_existing_w5(db_path, expected_client_id):
+    path = FAMILY / "W5" / "family_input.py"
+    spec = importlib.util.spec_from_file_location("official_family_w5_reader", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("W5_READER_NOT_FOUND")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.read_snapshot(db_path, expected_client_id=expected_client_id)
+
+
+class OfficialFamilyEntry:
+    """Operator-bound, real Drive personal resource; always account-scoped."""
+
+    def __init__(self, *, auth, login_account, client_id, coordinator,
+                 principal_provider, analysis_provider=None):
+        if (not isinstance(login_account, str) or not login_account.strip()
+            or not isinstance(client_id, str) or not client_id.startswith("fam_")
+            or not callable(principal_provider)):
+            raise ValueError("OFFICIAL_FAMILY_BINDING_REQUIRED")
+        self.auth = auth
+        self.login_account = login_account
+        self.client_id = client_id
+        self.coordinator = coordinator
+        self.principal_provider = principal_provider
+        self.analysis_provider = analysis_provider
+
+    def _principal(self):
+        user = self.auth.require_login()
+        if not isinstance(user, str) or user.casefold() != self.login_account.casefold():
+            raise PermissionError("FAMILY_PROJECT_ACCOUNT_MISMATCH")
+        principal = self.principal_provider()
+        subject = getattr(principal, "subject", None)
+        if not isinstance(subject, str) or not subject.startswith("account:") or (
+            subject.split(":", 1)[1].casefold() != self.login_account.casefold()
+        ):
+            raise PermissionError("OFFICIAL_DB_PRINCIPAL_MISMATCH")
+        # Coordinator performs the durable session revocation/ACL check again.
+        return principal
+
+    def current_snapshot(self):
+        principal = self._principal()
+        # The server-owned B06 resource table binds "personal" to exactly the
+        # authorized member's official Google Drive SQLite ID.
+        response = self.coordinator.snapshot("personal", principal)
+        raw, sha = response.get("data"), response.get("sha256")
+        if (not isinstance(raw, bytes)
+            or not raw.startswith(b"SQLite format 3\\0")
+            or hashlib.sha256(raw).hexdigest() != sha):
+            raise RuntimeError("OFFICIAL_DB_READBACK_MISMATCH")
+        with TemporaryDirectory(prefix="family-official-reader-") as folder:
+            db = Path(folder) / "current.db"
+            db.write_bytes(raw)
+            snapshot = _read_existing_w5(db, self.client_id)
+        if snapshot.get("source_sha256") != sha or snapshot.get("client_id") != self.client_id:
+            raise PermissionError("OFFICIAL_CLIENT_SNAPSHOT_MISMATCH")
+        return snapshot
+
+    def read_portfolio(self, payload):
+        # No caller-supplied Drive ID, db_path or client ID is accepted.
+        if any(x in payload for x in ("db_path", "file_id", "client_id", "source_db")):
+            raise PermissionError("CALLER_RESOURCE_OVERRIDE_REJECTED")
+        snapshot = self.current_snapshot()
+        return {"status": "OK", "data_provenance": "SOURCE_BACKED",
+                "source_sha256": snapshot["source_sha256"],
+                "client_id": snapshot["client_id"], "snapshot": snapshot,
+                "trade_authorization": "NONE"}
+
+    def deployment_pace(self, payload):
+        """Never turn a raw DB filename into an invented V70/V82 decision.
+
+        analysis_provider is the operator-owned W2/W3/market/funding producer,
+        not a callback inferred from user text. It returns a prepared trusted
+        request and existing FamilyRunner, both bound to the same DB SHA.
+        """
+        current = self.read_portfolio(payload)
+        if self.analysis_provider is None:
+            return {"status": "DATA_UNAVAILABLE", "code": "OFFICIAL_ANALYSIS_INPUT_NOT_CONNECTED",
+                    "data_provenance": "SOURCE_BACKED",
+                    "client_id": self.client_id,
+                    "source_sha256": current["source_sha256"],
+                    "message": "已讀取本人正式持倉；待接入本人正式目標、已確認資金及當期市場資料才能計算加碼金額。",
+                    "trade_authorization": "NONE"}
+        request, runner = self.analysis_provider(current["snapshot"], dict(payload))
+        if (not isinstance(request, dict)
+            or request.get("client_id") != self.client_id
+            or request.get("client_snapshot", {}).get("payload", {}).get("source_sha256") != current["source_sha256"]):
+            raise PermissionError("OFFICIAL_ANALYSIS_SOURCE_MISMATCH")
+        context = runner.context_provider()
+        if (context.get("client_id") != self.client_id
+            or context.get("native_binding", {}).get("data_provenance") != "SOURCE_BACKED"):
+            raise PermissionError("OFFICIAL_ANALYSIS_PROVENANCE_REQUIRED")
+        decision = runner.analyze(request)
+        if decision.get("status") != "OK":
+            return {"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
+                    "client_id": self.client_id, "source_sha256": current["source_sha256"],
+                    "issue_codes": decision.get("issue_codes", []),
+                    "trade_authorization": "NONE"}
+        if decision.get("client_id") != self.client_id or decision.get("data_provenance") != "SOURCE_BACKED":
+            raise PermissionError("OFFICIAL_RESULT_CLIENT_MISMATCH")
+        # Preserve upstream HOLD and action semantics. Do not relabel staging
+        # or promote calculation to a live authorized investment execution.
+        return {"status": "OK", "client_id": self.client_id,
+                "source_sha256": current["source_sha256"],
+                "data_provenance": "SOURCE_BACKED",
+                "analysis": decision, "trade_authorization": "NONE"}
+
+    def handlers(self):
+        return {"read_portfolio": self.read_portfolio,
+                "deployment_pace": self.deployment_pace}

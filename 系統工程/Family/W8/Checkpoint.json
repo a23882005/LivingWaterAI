@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T05:03:00+08:00",
+  "updated_at": "2026-10-26T06:20:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -92,6 +92,20 @@
       "limitations": "service runtime has not installed handler and trusted current W2/W3/V70/market/funding producer. Not yet real AVGO V82/mentor calculated output; no claim of installed ChatGPT Project functionality",
       "production": "HOLD",
       "trading": "NONE"
+    },
+    {
+      "id": "W8-R05",
+      "title": "Four real DB reads + private OAuth MCP host installation",
+      "status": "PARTIAL_PASS_REAL_HOST",
+      "real_db_read": "4/4 PASS; SHA 4/4 unchanged; 0 DB writes",
+      "real_job": 40238773435,
+      "mcp_tests": "44/44 PASS",
+      "mcp_job": 40239180927,
+      "private_host_install": "PASS",
+      "host_job": 40239393887,
+      "pr": 37,
+      "merge_commit": "458f60aea066423276e5f0957cf3cfe296d6f66c",
+      "boundary": "Public PHP discovery remains inactive. Live MOU menu04 personal V70/V82/V75 result not yet verified."
     }
   ],
   "defects": [

@@ -74,11 +74,14 @@ def report_handlers(auth, store, renderer=None):
 
 
 class FamilyMenu:
-    def __init__(self, auth, *, project_name, login_account, handlers=None):
+    def __init__(self, auth, *, project_name, login_account, handlers=None, completion_checks=None):
         self.auth = auth
         self.project_name = project_name
         self.login_account = login_account
         self.handlers = dict(handlers or {})
+        # Trusted entry supplies a verifier for the full 01 target/deployment/save receipt.
+        # Interview completion by itself must not finish the first allocation.
+        self.completion_checks = dict(completion_checks or {})
         self.pending = None
 
     def welcome(self):
@@ -120,9 +123,27 @@ class FamilyMenu:
         handler = self.handlers.get(choice['operation'])
         if handler is None:
             self.pending = (choice['number'], dict(payload))
+            if choice['operation'] == 'first_allocation':
+                return {'status': 'FIRST_ALLOCATION_ENGINE_NOT_CONNECTED',
+                        'pending_operation': 'first_allocation', 'rule': choice['rule'],
+                        'next_stage': 'CONNECT_TRUSTED_FIRST_ALLOCATION_HANDLER'}
             return {'status': 'HANDLER_PENDING', 'operation': choice['operation'],
                     'rule': choice['rule'], 'menu': render_menu(self.project_name)}
         # Never cache passwords or any authentication payload in pending state.
         self.pending = None
-        result = handler(payload)
+        try:
+            result = handler(payload)
+        except Exception:
+            if choice['operation'] == 'first_allocation':
+                self.pending = (choice['number'], dict(payload))
+            raise
+        if choice['operation'] == 'first_allocation':
+            verifier = self.completion_checks.get('first_allocation')
+            # The trusted verifier must check confirmed target, deployment result,
+            # and successful read-back of the saved first-allocation record.
+            if verifier is None or verifier(result) is not True:
+                self.pending = (choice['number'], dict(payload))
+                return {'status': 'FIRST_ALLOCATION_IN_PROGRESS',
+                        'pending_operation': 'first_allocation', 'result': result,
+                        'next_stage': 'VERIFY_TARGET_DEPLOYMENT_AND_SAVE'}
         return complete_work(result, self.project_name)

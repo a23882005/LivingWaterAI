@@ -13,6 +13,7 @@ on:
       - '系統工程/總經V70/V70-3-11.html'
       - 'scripts/build_v703_feed.py'
       - 'scripts/probe_extra8.py'
+      - 'scripts/probe_v703_six_gaps.py'
       - 'tests/**'
       - 'requirements.txt'
       - 'data/verified_overrides.json'
@@ -91,6 +92,11 @@ jobs:
       - name: Run source probe before QA
         continue-on-error: true
         run: python scripts/probe_extra8.py
+      - name: Probe six missing sources (diagnostic only)
+        continue-on-error: true
+        env:
+          CME_FEDWATCH_BEARER: ${{ secrets.CME_FEDWATCH_BEARER }}
+        run: python scripts/probe_v703_six_gaps.py
       - name: QA 24-item collector and adapter
         run: |
           python -m py_compile "系統工程/總經V70/總經爬蟲程式16項.py" scripts/build_v703_feed.py

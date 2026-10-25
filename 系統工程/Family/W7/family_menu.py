@@ -10,8 +10,8 @@ ITEMS = (
     ('🌱', '第一次建倉', 'first_allocation', '01_第一次建倉.md', True),
     ('📋', '查看我的資料與持倉', 'read_portfolio', None, True),
     ('🧭', '檢視與調整目標配置', 'adjust_target', '03_目標配置調整.md', True),
-    ('🎇', '尋找新標的物', 'research_candidates', '04_尋找新標的物.md', False),
     ('⚖️', '評估現在各標的物投入速度', 'deployment_pace', '04_買賣與持倉調整.md', True),
+    ('🎇', '尋找新標的物', 'research_candidates', '04_尋找新標的物.md', False),
     ('💰', '安排新增投資資金', 'new_funding', '05_新增資金安排.md', True),
     ('🌐', '查看目前總體經濟情況', 'macro_link', '07_總經網站.md', False),
     ('📰', '查看今日重大財經新聞', 'market_news', None, False),
@@ -27,7 +27,7 @@ ITEMS = (
 def render_menu(project_name):
     lines = [f'🌿 {project_name} 的活水 AI', '您的家人版專屬投資AI', '']
     lines += [f'{icon} {i:02}｜{label}' for i, (icon, label, *_) in enumerate(ITEMS, 1)]
-    lines += ['', '💬 輸入編號，或直接說需求，若選03/04 可直接提供目前配置截圖，更為方便']
+    lines += ['', '💬 輸入編號，或直接說需求，若選03/05 可直接提供目前配置截圖，更為方便']
     return '\n'.join(lines)
 
 

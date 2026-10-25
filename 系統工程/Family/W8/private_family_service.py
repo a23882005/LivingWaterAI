@@ -22,8 +22,27 @@ from private_runtime import private_directory, read_private, validate
 from resource_headers import validate_policies
 from 資料存取管理 import Coordinator
 from official_family_entry import OfficialFamilyEntry, RESOURCE_BY_ACCOUNT
+from official_mutations import make_writer
+import copy
 
 API = "https://www.googleapis.com/drive/v3/files/"
+
+# All five write operations share the same verified B07 principal and B06
+# same-file-id backup/transaction/readback mechanism.
+MUTATION_TOOLS = {
+    "family_first_allocation": "first_allocation",
+    "family_adjust_target": "adjust_target",
+    "family_new_funding": "new_funding",
+    "family_update_profile": "update_profile",
+    "family_record_event": "record_event",
+}
+MUTATION_LABELS = {
+    "family_first_allocation": "保存本人已確認的第一次建倉資料與持倉快照。",
+    "family_adjust_target": "正式保存本人確認的投資標的與目標權重。",
+    "family_new_funding": "正式保存本人確認的新增資金來源與金額。",
+    "family_update_profile": "正式更新本人確認的生活需求與投資資料。",
+    "family_record_event": "記錄本人確認的交易或資金異動事件，保留事件歷史。",
+}
 
 
 class _SessionAuth:
@@ -73,6 +92,17 @@ class OfficialBusinessTools:
                  "question": {"type": "string", "minLength": 1, "maxLength": 600}},
                  "required": ["question"], "additionalProperties": False},
              "annotations": {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": False}}
+        ] + [
+            {"name": name, "description": MUTATION_LABELS[name],
+             "inputSchema": {
+                 "type": "object",
+                 "properties": {
+                     "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+                     "record": {"type": "object"},
+                 },
+                 "required": ["request_id", "record"], "additionalProperties": False},
+             "annotations": {"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False}}
+            for name in MUTATION_TOOLS
         ]
 
     def call(self, principal, name, arguments):
@@ -114,6 +144,40 @@ class OfficialBusinessTools:
             # W5 input must be compiled from verified W2/market/funding,
             # never from generated fake budgets; official data is always read.
             return entry.deployment_pace({"question": arguments["question"].strip()})
+        if name in MUTATION_TOOLS:
+            # Explicit user-confirmed records only; server derives the family
+            # resource and client ID from the authenticated session and DB.
+            if (set(arguments) != {"request_id", "record"}
+                or not isinstance(arguments["request_id"], str)
+                or not 1 <= len(arguments["request_id"]) <= 128
+                or not isinstance(arguments["record"], dict)):
+                raise ValueError("INVALID_MUTATION_ARGUMENTS")
+            operation = MUTATION_TOOLS[name]
+            request_id = arguments["request_id"]
+            record = copy.deepcopy(arguments["record"])
+            if operation == "first_allocation":
+                # Prevent conflicting idempotency between receipt and snapshot.
+                record["request_id"] = request_id
+            before = self.coordinator.snapshot(key, principal)
+            saved = self.coordinator.update(
+                key, principal, request_id, before["epoch"], operation,
+                {"client_id": client_id, "record": record})
+            data = saved["result"]
+            if data.get("status") != "STORED":
+                raise RuntimeError("OFFICIAL_MUTATION_NOT_STORED")
+            after = self.coordinator.snapshot(key, principal)
+            if _client_id_from_official_bytes(after["data"]) != client_id:
+                raise PermissionError("OFFICIAL_MUTATION_CLIENT_MISMATCH")
+            if (not saved["duplicate"] and
+                after["sha256"] == before["sha256"]):
+                raise RuntimeError("OFFICIAL_MUTATION_NOT_PERSISTED")
+            return {
+                "status": "SAVED", "operation": operation,
+                "source": "OFFICIAL_GOOGLE_DRIVE",
+                "client_id": client_id, "result": data,
+                "duplicate_request": saved["duplicate"],
+                "source_sha256": after["sha256"],
+                "readback_verified": True, "trade_authorization": "NONE"}
         raise ValueError("UNKNOWN_OFFICIAL_TOOL")
 
 
@@ -134,7 +198,16 @@ def load_official_router(root, *, transport_factory=GoogleDriveTransport):
     headers = resource["headers"]
     assert all(key in headers for key in RESOURCE_BY_ACCOUNT.values())
     backend = DriveResourceBackend(transport, resource["resources"], resource["backup_folder"])
+    # Generic handler keys are fixed server-side and are never caller-controlled.
+    # The client ID embedded in the trusted payload is checked against the
+    # member's real SQLite identity inside the B06 transaction.
+    write_handlers = {
+        op: (lambda db, payload, op=op:
+             make_writer(op, payload["client_id"])(db, payload))
+        for op in MUTATION_TOOLS.values()
+    }
     coordinator = Coordinator(headers, policies, backend, root / "resource-locks",
-                              handlers={}, session_guard=router.oauth.session_guard)
+                              handlers=write_handlers,
+                              session_guard=router.oauth.session_guard)
     router.mcp = AccountMCP(router.oauth, business_tools=OfficialBusinessTools(router.oauth, coordinator))
     return router

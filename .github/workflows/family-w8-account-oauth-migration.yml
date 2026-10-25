@@ -1,6 +1,9 @@
 name: Family W8 official account OAuth schema
 on:
   workflow_dispatch:
+  push:
+    branches: [w8-four-family-public-runtime-20261026]
+    paths: ['.github/workflows/family-w8-account-oauth-migration.yml']
 permissions:
   contents: read
 concurrency:

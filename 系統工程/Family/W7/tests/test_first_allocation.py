@@ -188,3 +188,22 @@ def test_01_without_ratio_does_not_invent_any_long_term_target():
     fields={x['field_key'] for x in snap['tables']['portfolio_snapshot_item']}
     assert 'stock_weight' not in fields and 'bond_weight' not in fields
     assert snap['tables']['final_target_allocation']==[]
+
+
+def test_01_with_actual_b06_transaction_and_receipt_deduplication():
+    """Exercise the real B06 transaction/authorizer rather than only a fake adapter."""
+    from 資料存取管理 import transaction
+    file=fixture()
+    payload={'client_id':C,'request_id':'req-b06-1',
+             'confirmed_record':normalize_request(record())}
+    before=file.read_bytes()
+    updated, result, duplicate=transaction(
+        before, 'account:TEST', 'req-b06-1', OPERATION, payload,
+        make_writer(C,ACCOUNT))
+    assert duplicate is False and result['status']=='STORED'
+    file.write_bytes(updated)
+    assert read_snapshot(file,expected_client_id=C)['tables']['cash_balance_snapshot'][0]['reported_cash_minor']==5000000
+    unchanged, again, duplicate=transaction(
+        updated,'account:TEST','req-b06-1',OPERATION,payload,
+        make_writer(C,ACCOUNT))
+    assert duplicate is True and unchanged==updated and again==result

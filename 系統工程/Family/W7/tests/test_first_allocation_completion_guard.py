@@ -14,6 +14,7 @@ class Auth:
     def require_login(self):
         if not self.active:
             raise PermissionError("LOGIN")
+        return "AR"
 
     def login(self, user, password):
         if user != "AR" or password != "synthetic":

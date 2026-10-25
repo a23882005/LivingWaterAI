@@ -153,7 +153,7 @@ def test_01_wrong_client_rejected_and_db_unchanged():
 def test_01_menu_closes_only_on_trusted_save_receipt():
     file=fixture(); c=FakeCoordinator(file)
     class Auth:
-        def require_login(self):return C
+        def require_login(self):return 'synthetic'
     h=first_allocation_handler(c,principal=object(),resource='personal',client_id=C,account_key=ACCOUNT)
     menu=FamilyMenu(Auth(),project_name='Synthetic',login_account='synthetic',
                     handlers={'first_allocation':h},

@@ -26,6 +26,7 @@ def main():
     private_meta(d,CONFIG_ID,PRIVATE_PARENT)
     cfg=json.loads(d.call(api+CONFIG_ID+"?alt=media",raw=True))
     checks=0
+    stage="INIT"
     for account,resource in RESOURCE_BY_ACCOUNT.items():
         fid=cfg["headers"][resource]["file_id"]
         original=d.call(api+fid+"?alt=media",raw=True)
@@ -70,6 +71,8 @@ def main():
             ]
             working=original
             for idx,(operation,payload) in enumerate(versions):
+                global STAGE
+                STAGE=operation
                 working,result,duplicate=transaction(
                     working,"account:"+account,
                     "schema-test-%s-%s"%(account,idx),operation,payload,
@@ -88,6 +91,10 @@ def main():
 if __name__=="__main__":
     try:main()
     except Exception as exc:
+        # SQLite constraint diagnostics contain schema and column names only.
+        # Never print DB contents, identifiers, account values or owner holdings.
+        code = getattr(exc, "sqlite_errorname", None)
         print(json.dumps({"status":"FAIL","type":type(exc).__name__,
+                          "sqlite_code":code,"stage":globals().get("STAGE","unknown"),
                           "live_db_writes":0}))
         raise SystemExit(1)

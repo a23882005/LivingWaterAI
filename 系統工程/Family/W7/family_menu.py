@@ -79,8 +79,8 @@ class FamilyMenu:
         self.project_name = project_name
         self.login_account = login_account
         self.handlers = dict(handlers or {})
-        # Trusted entry supplies a verifier for the full 01 target/deployment/save receipt.
-        # Interview completion by itself must not finish the first allocation.
+        # Trusted entry verifies the 01 current-holdings/cash/interview save receipt.
+        # Long-term targets and Loop 2 deployment are separate menu workflows.
         self.completion_checks = dict(completion_checks or {})
         self.pending = None
 
@@ -139,11 +139,11 @@ class FamilyMenu:
             raise
         if choice['operation'] == 'first_allocation':
             verifier = self.completion_checks.get('first_allocation')
-            # The trusted verifier must check confirmed target, deployment result,
-            # and successful read-back of the saved first-allocation record.
+            # The trusted verifier checks an actual first-allocation save/readback.
+            # No target allocation or Loop 2 run is necessary for menu 01.
             if verifier is None or verifier(result) is not True:
                 self.pending = (choice['number'], dict(payload))
                 return {'status': 'FIRST_ALLOCATION_IN_PROGRESS',
                         'pending_operation': 'first_allocation', 'result': result,
-                        'next_stage': 'VERIFY_TARGET_DEPLOYMENT_AND_SAVE'}
+                        'next_stage': 'VERIFY_CURRENT_HOLDINGS_CASH_AND_INTERVIEW_SAVE'}
         return complete_work(result, self.project_name)

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-25T18:04:00+08:00",
+  "updated_at": "2026-10-26T05:03:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -77,6 +77,21 @@
       "investment_data_changed": false,
       "limit": "已驗證真實Drive原檔寫入管道；尚待指揮官截圖確認後實際更新持倉記錄、DB記帳與報告閉環",
       "note": "禁止將未變更位元組之寫回驗證誤記為持倉修改或十四項功能完成"
+    },
+    {
+      "id": "W8-R04",
+      "name": "正式本人DB讀取及選單02/04投資分析入口",
+      "type": "CODE_MERGED_AND_REAL_DATA_GAP_VERIFIED",
+      "status": "PASS_CODE_REVIEW_AND_CI__PENDING_REAL_SERVICE_E2E",
+      "pull_request": "https://github.com/a23882005/LivingWaterAI/pull/36",
+      "main_merge_sha": "c8436d3355f1cb157b6508ebf67713b0523d6f88",
+      "code_path": "系統工程/Family/W8/official_family_entry.py",
+      "routing": "build_official_family_menu + handle_stock_question",
+      "real_source": "B06 Coordinator.snapshot('personal', SessionPrincipal) -> actual Google Drive SQLite bytes -> W5 read_snapshot()",
+      "verification": "GitHub Actions compilation + Family menu and report regression all SUCCESS; MOU official DB inspected read-only, 12 portfolio_position, 0 cash_balance_snapshot, 0 final_target_allocation, 0 funding_evaluation",
+      "limitations": "service runtime has not installed handler and trusted current W2/W3/V70/market/funding producer. Not yet real AVGO V82/mentor calculated output; no claim of installed ChatGPT Project functionality",
+      "production": "HOLD",
+      "trading": "NONE"
     }
   ],
   "defects": [
@@ -95,6 +110,14 @@
       "repair": "_require_own_session嚴格驗證本人帳號；welcome、login、私人select、logout套用；修正原測試假驗證器，使正式身分契約一致",
       "test_status": "CI 48/48+42/42 PASS; PR#35 merged",
       "end_to_end_status": "PENDING"
+    },
+    {
+      "id": "W8-BUG-003",
+      "module": "系統工程/Family/W8/official_family_entry.py",
+      "problem": "Existing W7 menu 04 lacks official personal DB -> W5 runner handler and natural-language stock question entry",
+      "repair": "W8 official read using existing B06 and W5; secure identity/client/SHA; 02/04 handlers, AVGO natural-language 04 routing, fail-closed missing official source",
+      "test_status": "CI code compilation and existing regressions PASS",
+      "end_to_end_status": "PENDING_RUNTIME_BINDING"
     }
   ],
   "outstanding": [
@@ -112,7 +135,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "在可核對來源資料/截圖的情況下，採真正本人DB修改、備份、原ID寫回與SHA讀回；繼續整合四戶14項handler與正式報表，不以合成測試代替實務使用驗收。",
+  "next_action": "Install new W8 official handler in already approved family service runtime, inject trusted B06 principal/coordinator and current confirmed W2/W3/V70/funding market producer; end-to-end query AVGO as MOU, formal DB live read and analyze; record result then Gate D.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

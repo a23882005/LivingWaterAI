@@ -1,0 +1,34 @@
+name: Family W8 official entry syntax
+on:
+  push:
+    branches: [main, 'w8-official-data-entry-*']
+    paths:
+      - '.github/workflows/family-w8-official-entry.yml'
+      - '系統工程/Family/W8/official_family_entry.py'
+  pull_request:
+    paths:
+      - '.github/workflows/family-w8-official-entry.yml'
+      - '系統工程/Family/W8/official_family_entry.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  code-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile official entry, existing W5 and W7 entrypoints
+        run: |
+          python -m py_compile \
+            系統工程/Family/W8/official_family_entry.py \
+            系統工程/Family/W5/family_input.py \
+            系統工程/Family/W5/family_runner.py \
+            系統工程/Family/W7/family_menu.py
+      - name: Record execution boundary
+        run: echo 'Code compilation only. Formal Drive member DB read has been verified separately by the Family PM; end-to-end Project binding and V70/V82/V75 execution remain W8 pending. No mock trades.' >> "$GITHUB_STEP_SUMMARY"

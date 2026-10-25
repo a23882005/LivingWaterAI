@@ -146,6 +146,11 @@ class FamilyMenu:
             if choice['operation'] == 'first_allocation':
                 self.pending = (choice['number'], dict(payload))
             raise
+        if (choice['operation'] == 'deployment_pace'
+            and isinstance(result, dict) and result.get('status') == 'DATA_UNAVAILABLE'):
+            return {'status': 'DATA_UNAVAILABLE', 'result': result,
+                    'pending_operation': 'deployment_pace',
+                    'menu': render_menu(self.project_name)}
         if choice['operation'] == 'first_allocation':
             verifier = self.completion_checks.get('first_allocation')
             # The trusted verifier checks an actual first-allocation save/readback.

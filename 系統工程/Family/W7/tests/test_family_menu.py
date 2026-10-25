@@ -147,3 +147,19 @@ def test_w8_valid_project_login_and_own_handler_execution():
     assert result['status'] == 'COMPLETED'
     assert result['result']['owned_by'] == 'AR'
     assert result['menu'] == render_menu('Arthur')
+
+
+def test_w8_real_input_missing_does_not_claim_completed_execution():
+    auth = Auth()
+    auth.active = True
+    auth.login_user = 'JO'
+    ui = make_menu(auth, handlers={
+        'deployment_pace': lambda _: {
+            'status': 'DATA_UNAVAILABLE',
+            'code': 'OFFICIAL_ANALYSIS_INPUT_INCOMPLETE',
+            'missing': ['final_target_allocation']}})
+    got = ui.select('04')
+    assert got['status'] == 'DATA_UNAVAILABLE'
+    assert got['result']['missing'] == ['final_target_allocation']
+    assert got['pending_operation'] == 'deployment_pace'
+    assert got['menu'] == render_menu('Joseph')

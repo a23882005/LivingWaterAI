@@ -84,9 +84,17 @@ class FamilyMenu:
         self.completion_checks = dict(completion_checks or {})
         self.pending = None
 
+    def _require_own_session(self):
+        """An authenticated session must belong to this exact Family project."""
+        actual = self.auth.require_login()
+        if (not isinstance(actual, str)
+            or actual.casefold() != self.login_account.casefold()):
+            raise PermissionError('FAMILY_PROJECT_ACCOUNT_MISMATCH')
+        return actual
+
     def welcome(self):
         try:
-            self.auth.require_login()
+            self._require_own_session()
         except PermissionError:
             return {'status': 'LOGIN_REQUIRED',
                     'text': f'{self.project_name}，您好 🌿 我能協助您查看持倉、檢視配置、閱讀總經與新聞，以及產生配置報告。\n{LOGIN_PROMPT}'}
@@ -96,6 +104,7 @@ class FamilyMenu:
 
     def login(self, password):
         self.auth.login(self.login_account, password)
+        self._require_own_session()
         if self.pending is not None:
             number, payload = self.pending
             return self.select(number, payload=payload)
@@ -110,16 +119,16 @@ class FamilyMenu:
             self.pending = None
             return complete_work({'text': '請直接查看活水 AI 總經網站', 'url': MACRO_URL},
                                  self.project_name)
-        if choice['operation'] == 'account' and payload.get('action') == 'logout':
-            self.pending = None
-            return complete_work(self.auth.logout(), self.project_name)
         if choice['private'] or payload.get('use_private_portfolio'):
             try:
-                self.auth.require_login()
+                self._require_own_session()
             except PermissionError:
                 self.pending = (choice['number'], dict(payload))
                 return {'status': 'LOGIN_REQUIRED', 'text': LOGIN_PROMPT,
                         'pending_operation': choice['operation']}
+        if choice['operation'] == 'account' and payload.get('action') == 'logout':
+            self.pending = None
+            return complete_work(self.auth.logout(), self.project_name)
         handler = self.handlers.get(choice['operation'])
         if handler is None:
             self.pending = (choice['number'], dict(payload))

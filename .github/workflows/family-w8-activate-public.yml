@@ -1,0 +1,185 @@
+name: Family W8 four-member public HTTPS gateway
+on:
+  workflow_dispatch:
+  push:
+    branches: [w8-four-family-public-runtime-20261026]
+    paths: ['.github/workflows/family-w8-activate-public.yml']
+permissions:
+  contents: read
+concurrency:
+  group: family-w8-public-gateway
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate PHP source
+        run: |
+          php -l 系統工程/Family/W8/public_gateway/index.php
+          python -m py_compile 系統工程/Family/W8/cgi_request.py
+          mkdir -p build/family-w8-gateway
+          cp 系統工程/Family/W8/public_gateway/index.php build/family-w8-gateway/index.php
+      - name: Prepare locked private upload folder
+        id: stage
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            parent="$(dirname "${LW_DIR%/}")"
+            name=".family-w8-gateway-stage-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$parent/$name"
+            mkdir -m 700 "$parent/$name"
+      - name: Upload PHP candidate
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-w8-gateway/index.php
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-w8-gateway-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 2
+          command_timeout: 90s
+      - name: Validate host candidate with real private Python routing before activation
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-w8-gateway-stage-$LW_RUN-$LW_ATTEMPT"
+            dest="${LW_DIR%/}/family-connect"
+            test -f "$stage/index.php" && test -f "$dest/index.php"
+            test ! -L "$dest" && test ! -L "$stage/index.php"
+            php -l "$stage/index.php"
+            cp "$stage/index.php" "$dest/index.w8-candidate.php"
+            chmod 600 "$dest/index.w8-candidate.php"
+            php -r '$_SERVER=["HTTPS"=>"on","HTTP_HOST"=>"www.happihelp.com","REQUEST_METHOD"=>"GET","REQUEST_URI"=>"/family-connect/oauth/.well-known/oauth-authorization-server","REMOTE_ADDR"=>"127.0.0.1"]; include $argv[1];' "$dest/index.w8-candidate.php" > "$stage/metadata.json"
+            python3 - "$stage/metadata.json" <<'PY'
+            import json,sys
+            d=json.load(open(sys.argv[1]))
+            assert d.get('issuer')=='https://www.happihelp.com/family-connect/oauth'
+            assert d.get('code_challenge_methods_supported')==['S256']
+            print('PRIVATE_PHP_TO_PYTHON_OAUTH_METADATA_PASS')
+            PY
+            rm "$dest/index.w8-candidate.php" "$stage/metadata.json"
+      - name: Activate verified PHP gateway and snapshot old discovery
+        id: activate
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-w8-gateway-stage-$LW_RUN-$LW_ATTEMPT"
+            dest="${LW_DIR%/}/family-connect"
+            archive="$parent/.family-w8-gateway-before-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$archive"
+            mkdir -m 700 "$archive"
+            cp "$dest/index.php" "$archive/index.php"
+            cp "$dest/manifest.json" "$archive/manifest.json"
+            test -f "$dest/.htaccess"
+            cp "$dest/.htaccess" "$archive/.htaccess"
+            chmod 600 "$archive"/*
+            cp "$stage/index.php" "$dest/.w8-next.php"
+            chmod 644 "$dest/.w8-next.php"
+            mv "$dest/.w8-next.php" "$dest/index.php"
+            python3 - "$dest" <<'PY'
+            import json,hashlib,os,sys
+            from pathlib import Path
+            root=Path(sys.argv[1])
+            files={n:hashlib.sha256((root/n).read_bytes()).hexdigest()
+                for n in ('index.php','.htaccess')}
+            temp=root/'.w8-manifest-next.json'
+            temp.write_text(json.dumps({'schema':'family-w8-https-gateway-v1',
+                'files':files},sort_keys=True)+'\n')
+            os.chmod(temp,0o644)
+            os.replace(temp,root/'manifest.json')
+            print('FOUR_FAMILY_PUBLIC_GATEWAY_ACTIVATED')
+            PY
+      - name: Check real public HTTPS login and OAuth/MCP contract
+        run: |
+          python - <<'PY'
+          import urllib.request,urllib.error,json
+          base='https://www.happihelp.com/family-connect'
+          def call(path,method='GET',data=None):
+              req=urllib.request.Request(base+path,data=data,method=method,
+                  headers={'Cache-Control':'no-cache','Content-Type':'application/json'})
+              try:response=urllib.request.urlopen(req,timeout=40)
+              except urllib.error.HTTPError as e:response=e
+              with response:
+                  code=response.status
+                  headers=dict(response.headers)
+                  body=response.read(120000)
+              return code,headers,body
+          code,heads,body=call('/oauth/.well-known/oauth-authorization-server')
+          assert code==200,(code,body[:100])
+          assert json.loads(body)['issuer']==base+'/oauth'
+          code,heads,body=call('/mcp/.well-known/oauth-protected-resource')
+          assert code==200 and json.loads(body)['resource']==base+'/mcp'
+          code,heads,body=call('/')
+          assert code==200 and b'<html' in body.lower()
+          code,heads,body=call('/mcp',method='POST',data=b'{"jsonrpc":"2.0","id":1,"method":"tools/list"}')
+          assert code==401,(code,body[:100])
+          print('FOUR_FAMILY_PUBLIC_HTTPS_ENTRY_PASS')
+          PY
+      - name: Rollback public gateway on failed HTTP verification
+        if: failure() && steps.activate.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            archive="$parent/.family-w8-gateway-before-$LW_RUN-$LW_ATTEMPT"
+            dest="${LW_DIR%/}/family-connect"
+            test -f "$archive/index.php" && test -f "$archive/manifest.json"
+            cp "$archive/index.php" "$dest/.w8-revert.php"
+            chmod 644 "$dest/.w8-revert.php"
+            mv "$dest/.w8-revert.php" "$dest/index.php"
+            cp "$archive/manifest.json" "$dest/manifest.json"
+            echo 'PUBLIC_GATEWAY_ROLLED_BACK'
+      - name: Clean private staging
+        if: always() && steps.stage.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            path="$parent/.family-w8-gateway-stage-$LW_RUN-$LW_ATTEMPT"
+            case "$path" in "$parent"/.family-w8-gateway-stage-*) ;;
+              *) exit 1 ;;
+            esac
+            test ! -L "$path"
+            if test -d "$path"; then rm -rf "$path"; fi

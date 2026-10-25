@@ -59,7 +59,7 @@ class OfficialFamilyEntry:
         response = self.coordinator.snapshot("personal", principal)
         raw, sha = response.get("data"), response.get("sha256")
         if (not isinstance(raw, bytes)
-            or not raw.startswith(b"SQLite format 3\\0")
+            or not raw.startswith(b"SQLite format 3" + bytes([0]))
             or hashlib.sha256(raw).hexdigest() != sha):
             raise RuntimeError("OFFICIAL_DB_READBACK_MISMATCH")
         with TemporaryDirectory(prefix="family-official-reader-") as folder:

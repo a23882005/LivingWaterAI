@@ -11,6 +11,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 FAMILY = Path(__file__).resolve().parents[1]
+# Names match the existing, approved B06 private resource catalog and policy.
+# Never build a resource key from a user-supplied alias or request payload.
+RESOURCE_BY_ACCOUNT = {
+    "MOU": "family.mou",
+    "JO": "family.joseph",
+    "AR": "family.arthur",
+    "LI": "family.lilian",
+}
+
 
 
 def _read_existing_w5(db_path, expected_client_id):
@@ -28,12 +37,16 @@ class OfficialFamilyEntry:
 
     def __init__(self, *, auth, login_account, client_id, coordinator,
                  principal_provider, analysis_provider=None):
-        if (not isinstance(login_account, str) or not login_account.strip()
+        if (not isinstance(login_account, str)
+            or login_account not in RESOURCE_BY_ACCOUNT
             or not isinstance(client_id, str) or not client_id.startswith("fam_")
-            or not callable(principal_provider)):
+            or not callable(principal_provider)): 
             raise ValueError("OFFICIAL_FAMILY_BINDING_REQUIRED")
         self.auth = auth
         self.login_account = login_account
+        self.resource_key = RESOURCE_BY_ACCOUNT[login_account]
+        if self.resource_key not in coordinator.headers:
+            raise ValueError("OFFICIAL_RESOURCE_BINDING_MISSING")
         self.client_id = client_id
         self.coordinator = coordinator
         self.principal_provider = principal_provider
@@ -56,7 +69,7 @@ class OfficialFamilyEntry:
         principal = self._principal()
         # The server-owned B06 resource table binds "personal" to exactly the
         # authorized member's official Google Drive SQLite ID.
-        response = self.coordinator.snapshot("personal", principal)
+        response = self.coordinator.snapshot(self.resource_key, principal)
         raw, sha = response.get("data"), response.get("sha256")
         if (not isinstance(raw, bytes)
             or not raw.startswith(b"SQLite format 3" + bytes([0]))
@@ -72,6 +85,8 @@ class OfficialFamilyEntry:
 
     def read_portfolio(self, payload):
         # No caller-supplied Drive ID, db_path or client ID is accepted.
+        if not isinstance(payload, dict):
+            raise ValueError("INVALID_OFFICIAL_INPUT")
         if any(x in payload for x in ("db_path", "file_id", "client_id", "source_db")):
             raise PermissionError("CALLER_RESOURCE_OVERRIDE_REJECTED")
         snapshot = self.current_snapshot()

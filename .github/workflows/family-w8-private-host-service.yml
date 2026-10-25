@@ -1,0 +1,125 @@
+name: Family W8 private host service install
+on:
+  workflow_dispatch:
+  push:
+    branches: [w8-real-resource-routes-20261026]
+    paths:
+      - '.github/workflows/family-w8-private-host-service.yml'
+permissions:
+  contents: read
+concurrency:
+  group: family-w8-private-host-service
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+      LW_RUN: ${{ github.run_id }}
+      LW_ATTEMPT: ${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Prepare code-only private package
+        run: |
+          set -eu
+          mkdir -p build/family-w8-payload/Family/W7 build/family-w8-payload/Family/W5 build/family-w8-payload/Family/W8
+          for n in private_account_service.py account_http.py account_login.html account_mcp.py account_oauth.py account_router.py oauth_http.py private_runtime.py private_service_config.py drive_resource_backend.py drive_service_transport.py 帳號管理.py 資料存取管理.py resource_headers.py; do
+            cp "系統工程/Family/W7/$n" build/family-w8-payload/Family/W7/
+          done
+          cp 系統工程/Family/W5/family_input.py build/family-w8-payload/Family/W5/
+          cp 系統工程/Family/W8/official_family_entry.py 系統工程/Family/W8/private_family_service.py build/family-w8-payload/Family/W8/
+          python -m py_compile build/family-w8-payload/Family/W7/*.py build/family-w8-payload/Family/W5/*.py build/family-w8-payload/Family/W8/*.py
+          tar -czf build/family-w8-app.tar.gz -C build/family-w8-payload Family
+      - name: Prepare private SSH staging
+        id: staging
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            case "$LW_RUN-$LW_ATTEMPT" in *[!0-9-]*) exit 1 ;; esac
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-w8-stage-$LW_RUN-$LW_ATTEMPT"
+            test ! -e "$stage"
+            mkdir -m 700 "$stage"
+      - name: Upload code package outside public_html
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/family-w8-app.tar.gz
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../.family-w8-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 1
+          command_timeout: 90s
+      - name: Verify private service wiring and install code atomically
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            umask 077
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-w8-stage-$LW_RUN-$LW_ATTEMPT"
+            test -f "$stage/family-w8-app.tar.gz"
+            new="$(mktemp -d "$parent/.family-w8-new.XXXXXXXX")"
+            tar -xzf "$stage/family-w8-app.tar.gz" -C "$new"
+            python3 - "$new/Family/W8" "$parent/.family-b07-service" <<'PY'
+            import sys
+            from pathlib import Path
+            sys.path.insert(0,sys.argv[1])
+            from private_family_service import load_official_router
+            router=load_official_router(Path(sys.argv[2]))
+            assert router.mcp.business_tools is not None
+            assert len(router.mcp.business_tools.specs())==2
+            print('PRIVATE_HOST_OFFICIAL_MCP_LOAD_PASS')
+            PY
+            target="$parent/.family-w8-app"
+            backup="$parent/.family-w8-code-before-$LW_RUN-$LW_ATTEMPT"
+            if test -e "$target"; then
+              test -d "$target" && test ! -L "$target"
+              test ! -e "$backup"
+              mv "$target" "$backup"
+            fi
+            mv "$new" "$target"
+            chmod 700 "$target" "$target/Family" "$target/Family/W7" "$target/Family/W5" "$target/Family/W8"
+            echo 'PRIVATE_HOST_CODE_INSTALL_PASS'
+      - name: Remove ephemeral code staging
+        if: always() && steps.staging.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,LW_RUN,LW_ATTEMPT
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            stage="$parent/.family-w8-stage-$LW_RUN-$LW_ATTEMPT"
+            case "$stage" in "$parent"/.family-w8-stage-*) ;;
+              *) exit 1 ;;
+            esac
+            if test -d "$stage" && test ! -L "$stage"; then rm -rf "$stage"; fi
+      - name: Confirm no private DB mutation
+        if: always()
+        run: |
+          rm -rf build/family-w8-payload build/family-w8-app.tar.gz
+          echo 'Private code-only installation. No family DB writes, no public gateway publication.' >> "$GITHUB_STEP_SUMMARY"

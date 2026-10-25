@@ -1,0 +1,53 @@
+name: Family W8 authenticated MCP integration
+on:
+  workflow_dispatch:
+  push:
+    branches: [w8-real-resource-routes-20261026, main]
+    paths:
+      - '.github/workflows/family-w8-mcp-integration.yml'
+      - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W8/private_family_service.py'
+      - '系統工程/Family/W8/official_family_entry.py'
+  pull_request:
+    paths:
+      - '.github/workflows/family-w8-mcp-integration.yml'
+      - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W8/private_family_service.py'
+      - '系統工程/Family/W8/official_family_entry.py'
+permissions:
+  contents: read
+jobs:
+  mcp-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m pip install pytest==8.4.2
+      - name: Compile and import existing host runtime plus W8 official bridge
+        run: |
+          python -m py_compile \
+            系統工程/Family/W7/account_mcp.py \
+            系統工程/Family/W8/private_family_service.py \
+            系統工程/Family/W8/official_family_entry.py
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,'系統工程/Family/W8')
+          from private_family_service import OfficialBusinessTools, load_official_router
+          specs=OfficialBusinessTools.specs()
+          assert [v['name'] for v in specs]==['family_portfolio','family_deployment_pace']
+          assert callable(load_official_router)
+          print('OFFICIAL_BUSINESS_RUNTIME_IMPORT_PASS')
+          PY
+      - name: Existing W7 authentication and MCP regression
+        run: |
+          python -m pytest 系統工程/Family/W7/tests/test_account_mcp.py 系統工程/Family/W7/tests/test_account_router.py -q
+      - name: Existing W8 menu routing regression
+        run: python -m pytest 系統工程/Family/W7/tests/test_family_menu.py -q
+      - name: Record scope
+        if: always()
+        run: echo 'Business router and tests; separately verify official Drive files with the real read-only workflow. No account provisioning or investment DB updates.' >> "$GITHUB_STEP_SUMMARY"

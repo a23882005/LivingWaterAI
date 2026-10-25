@@ -1,0 +1,42 @@
+name: Family W8 real official DB readonly
+on:
+  workflow_dispatch:
+  push:
+    branches: [w8-real-resource-routes-20261026, main]
+    paths:
+      - '.github/workflows/family-w8-live-official-readonly.yml'
+      - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/probes/live_official_readonly.py'
+permissions:
+  contents: read
+concurrency:
+  group: family-w8-official-db-readonly
+  cancel-in-progress: false
+jobs:
+  official-drive-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+      FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+      FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile official runtime and reader
+        run: |
+          python -m py_compile \
+            系統工程/Family/W8/official_family_entry.py \
+            系統工程/Family/W8/probes/live_official_readonly.py \
+            系統工程/Family/W5/family_input.py
+      - name: Read all four official Drive SQLite resources and verify unchanged
+        run: python 系統工程/Family/W8/probes/live_official_readonly.py
+      - name: Confirm write-free scope
+        if: always()
+        run: |
+          echo 'Official Drive resources READ ONLY; this job has no Drive write, copy, restore, or update call.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No stock orders or account balances are emitted in logs.' >> "$GITHUB_STEP_SUMMARY"

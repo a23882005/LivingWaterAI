@@ -1,0 +1,39 @@
+name: Family W8 report isolation regression
+on:
+  push:
+    branches: [main, 'w8-*']
+    paths:
+      - '.github/workflows/family-w8-report-isolation.yml'
+      - '系統工程/Family/W6/runtime/report_archive.py'
+      - '系統工程/Family/W6/runtime/test_report_archive.py'
+      - '系統工程/Family/W7/family_menu.py'
+      - '系統工程/Family/W7/tests/test_family_menu.py'
+  pull_request:
+    paths:
+      - '.github/workflows/family-w8-report-isolation.yml'
+      - '系統工程/Family/W6/runtime/report_archive.py'
+      - '系統工程/Family/W6/runtime/test_report_archive.py'
+      - '系統工程/Family/W7/family_menu.py'
+      - '系統工程/Family/W7/tests/test_family_menu.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-four-family-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest==9.1.1
+      - name: Compile production modules
+        run: python -m py_compile 系統工程/Family/W6/runtime/report_archive.py 系統工程/Family/W7/family_menu.py
+      - name: Four-family report archive and menu
+        run: python -m pytest 系統工程/Family/W6/runtime/test_report_archive.py 系統工程/Family/W7/tests/test_family_menu.py -q
+      - name: State actual test scope
+        if: always()
+        run: echo 'W8 synthetic four-family tests only; no production credentials, private DB writes, or ChatGPT GUI attestation. Production HOLD; trading NONE.' >> "$GITHUB_STEP_SUMMARY"

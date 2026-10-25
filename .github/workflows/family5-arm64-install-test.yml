@@ -1,0 +1,39 @@
+name: Family5 APK Android 12 ARM64 Install Test
+on:
+  push:
+    branches: [family5-apk-build-20261025]
+    paths: [.github/workflows/family5-arm64-install-test.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  android12-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact v0.3 APK previously distributed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p tested
+          gh run download 40146896648 -n Family5-v0.3-Android12-ARM64-APK --dir tested
+          test -s tested/Family5_v0.3_Android12_ARM64.apk
+          sha256sum tested/Family5_v0.3_Android12_ARM64.apk
+      - name: Install on Android 12 ARM64 virtual device
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 32
+          arch: arm64-v8a
+          target: default
+          emulator-boot-timeout: 600
+          disable-animations: true
+          script: |
+            adb shell getprop ro.product.cpu.abi
+            adb shell getprop ro.build.version.sdk
+            adb install tested/Family5_v0.3_Android12_ARM64.apk
+            adb shell pm path tw.livingwater.family5.offline
+            adb shell am start -W -n tw.livingwater.family5.offline/tw.livingwater.family5.MainActivity
+            sleep 5
+            adb logcat -d -s AndroidRuntime:E Python:E | tail -80

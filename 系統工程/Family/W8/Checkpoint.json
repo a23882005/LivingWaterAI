@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-25T17:33:43+08:00",
+  "updated_at": "2026-10-25T17:49:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -33,6 +33,30 @@
       "github_url": "https://github.com/a23882005/LivingWaterAI/actions/runs/40181143475",
       "status": "PASS_SYNTHETIC_ONLY",
       "limits": "真人ChatGPT Project 14項端對端、正式DB寫入與遠端回讀、V70/V82/V75運算、正式報表Renderer與部署尚待W8驗收"
+    },
+    {
+      "id": "W8-R02",
+      "name": "14項選單本人帳號隔離與建倉聯動回歸",
+      "type": "synthetic CI",
+      "status": "PASS_SYNTHETIC_ONLY",
+      "github_runs": [
+        {
+          "id": 40182116338,
+          "result": "48/48 PASS",
+          "suite": "report archive + family menu"
+        },
+        {
+          "id": 40182116350,
+          "result": "42/42 PASS",
+          "suite": "family menu + first allocation + completion guards"
+        }
+      ],
+      "ci_total_tests_passed": 90,
+      "ci_total_tests_failed": 0,
+      "pull_request": "https://github.com/a23882005/LivingWaterAI/pull/35",
+      "merged_main_sha": "f1cbbfe5669f530ced55315521c71b8c5bf2ae35",
+      "scope": "Authenticated member name must equal Project's bound account; private handler, welcome, sign-in continuation and logout guarded; macro #07 remains public.",
+      "limits": "合成測試驗證；真實跨對話登入、DB遠端讀寫及各項投資引擎仍待後續W8驗收"
     }
   ],
   "defects": [
@@ -42,6 +66,14 @@
       "problem": "報告歸檔硬綁Joseph登入及報告名稱，其他家人無法各自報告",
       "repair": "可信服務端注入四戶登入/客戶綁定、專屬報告前綴，保留Joseph既有預設",
       "test_status": "CI 43/43 PASS",
+      "end_to_end_status": "PENDING"
+    },
+    {
+      "id": "W8-BUG-002",
+      "module": "系統工程/Family/W7/family_menu.py",
+      "problem": "私人選單僅要求登入狀態而未核對登入帳號與所屬Project帳號；跨戶登入狀態可能進入錯誤Project私人handler",
+      "repair": "_require_own_session嚴格驗證本人帳號；welcome、login、私人select、logout套用；修正原測試假驗證器，使正式身分契約一致",
+      "test_status": "CI 48/48+42/42 PASS; PR#35 merged",
       "end_to_end_status": "PENDING"
     }
   ],
@@ -60,5 +92,5 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "按W8原契約逐戶執行入口/14項閉環、資料存取及報表正式端到端；真Bug逐一修復重測。"
+  "next_action": "由Family中PM本人繼續W8：可信14項handler注入、四戶Project登入四小時/跨對話、正式本人DB I/O和報表產生/回讀與V70/V82/V75/Mentor全鏈，驗證後記Gate。"
 }

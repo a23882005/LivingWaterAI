@@ -16,6 +16,7 @@ BASE = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(BASE / "W7"))
 sys.path.insert(0, str(BASE / "W7" / "deployment"))
 sys.path.insert(0, str(BASE / "W5"))
+sys.path.insert(0, str(BASE / "W8"))
 from deployment.provision_private_runtime import CONFIG_ID, PRIVATE_PARENT, private_meta
 from drive_service_transport import GoogleDriveTransport
 from family_input import read_snapshot

@@ -1,0 +1,34 @@
+name: Family W8 host gateway preflight
+on:
+  push:
+    branches: [w8-four-family-public-runtime-20261026]
+    paths: ['.github/workflows/family-w8-host-capability.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-capabilities:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR
+          script: |
+            set -eu
+            case "${LW_DIR%/}" in public_html|*/public_html) ;; *) exit 1 ;; esac
+            parent="$(dirname "${LW_DIR%/}")"
+            php -r '$disabled=array_map("trim",explode(",",ini_get("disable_functions")));foreach(["proc_open","exec","shell_exec"] as $name){echo $name."=".((function_exists($name)&&!in_array($name,$disabled,true))?"YES":"NO")."\n";}echo "PHP=".PHP_VERSION."\n";'
+            python3 -c 'import sys,ssl,sqlite3;print("PYTHON_MAJOR_MINOR=%d.%d"%sys.version_info[:2]);print("SQLITE_MODULE=YES")'
+            test -f "$parent/.family-b07-service/entry.json"
+            test -f "$parent/.family-b07-service/server.key"
+            test -f "$parent/.family-w8-app/Family/W8/private_family_service.py"
+            echo 'PRIVATE_RUNTIME_AND_CODE_EXIST=YES'
+            test -f "${LW_DIR%/}/family-connect/index.php"
+            echo 'EXISTING_DISCOVERY_GATEWAY=YES'

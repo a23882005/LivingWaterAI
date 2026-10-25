@@ -329,8 +329,8 @@ def first_allocation(db, client, record):
            value_text,value_integer_minor,currency_code,source_kind,source_reference,recorded_at_utc)
           VALUES(?,?,?,?,?,?,'KNOWN',?,?,?,?, 'OWNER_VERIFIED',?,?)""",
           (client,run_id,i,domain,entity,field,kind,
-           int(value) if kind=="INTEGER_MINOR" else value,
-           None if kind=="INTEGER_MINOR" else None,cur,ref,now()))
+           None if kind=="INTEGER_MINOR" else value,
+           int(value) if kind=="INTEGER_MINOR" else None,cur,ref,now()))
     return {"status":"STORED","operation":"first_allocation","account_key":account,
             "run_id":run_id,"position_rows_added":saved,"cash_currencies":len(cash),
             "unconfirmed_quantities_retained_in_history":len(holdings)-saved,"trade_authorization":"NONE"}

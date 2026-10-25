@@ -1,6 +1,9 @@
 name: Family W8 four-member public HTTPS gateway
 on:
   workflow_dispatch:
+  push:
+    branches: [w8-four-family-public-runtime-20261026]
+    paths: ['.github/workflows/family-w8-activate-public.yml']
 permissions:
   contents: read
 concurrency:

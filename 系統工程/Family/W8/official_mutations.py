@@ -89,17 +89,22 @@ def target(db, client, data):
     stamp = now()
     db.execute("""INSERT INTO final_target_version
         (client_id,target_key,version_no,previous_version_no,lifecycle_state,completeness_state,
-        origin_kind,origin_source_kind,origin_source_ref,created_at_utc,
-        confirmed_by,confirmation_source_kind,confirmation_source_ref,confirmed_at_utc)
-        VALUES(?,?,?,?,'CONFIRMED','COMPLETE','CLIENT_INPUT','OWNER_VERIFIED',?,?,
-               'AUTHORIZED_REPRESENTATIVE','OWNER_VERIFIED',?,?)""",
-        (client,target_key,version,version-1 if version>1 else None,ref,stamp,ref,stamp))
+        origin_kind,origin_source_kind,origin_source_ref,created_at_utc)
+        VALUES(?,?,?,?,'DRAFT','COMPLETE','CLIENT_INPUT','OWNER_VERIFIED',?,?)""",
+        (client,target_key,version,version-1 if version>1 else None,ref,stamp))
     for key,weight in parsed:
         db.execute("""INSERT INTO final_target_allocation
           (client_id,target_key,version_no,instrument_key,weight_units,allocation_state,
            allocation_source_kind,allocation_source_ref,created_at_utc)
           VALUES(?,?,?,?,?,'ACCEPTED','OWNER_VERIFIED',?,?)""",
           (client,target_key,version,key,weight,ref,stamp))
+    # Formal schema requires draft -> allocation rows -> atomic confirmation.
+    db.execute("""UPDATE final_target_version
+       SET lifecycle_state='CONFIRMED',confirmed_by='AUTHORIZED_REPRESENTATIVE',
+           confirmation_source_kind='OWNER_VERIFIED',confirmation_source_ref=?,
+           confirmed_at_utc=?
+       WHERE client_id=? AND target_key=? AND version_no=? AND lifecycle_state='DRAFT'""",
+       (ref,stamp,client,target_key,version))
     return {"status":"STORED","operation":"adjust_target","version":version,
             "allocations":len(parsed),"weight_units":1000000,"client_id":client,
             "trade_authorization":"NONE"}

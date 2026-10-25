@@ -177,3 +177,14 @@ def test_01_invalid_input_rejected(change):
 def test_01_false_completion_receipt_rejected():
     assert not completion_check({'status':'INTERVIEW_COMPLETE'})
     assert not completion_check({'status':STATUS,'save_receipt':{'verified':True}})
+
+
+def test_01_without_ratio_does_not_invent_any_long_term_target():
+    file=fixture();coordinator=FakeCoordinator(file)
+    payload=record();payload.pop('long_term_style')
+    out=run(coordinator,payload)
+    assert completion_check(out)
+    snap=read_snapshot(file,expected_client_id=C)
+    fields={x['field_key'] for x in snap['tables']['portfolio_snapshot_item']}
+    assert 'stock_weight' not in fields and 'bond_weight' not in fields
+    assert snap['tables']['final_target_allocation']==[]

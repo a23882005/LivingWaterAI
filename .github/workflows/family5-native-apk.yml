@@ -1,0 +1,124 @@
+name: Family5 Native Offline APK v0.4
+on:
+  push:
+    branches: [family5-apk-build-20261025]
+    paths:
+      - family5_apk/native/**
+      - .github/workflows/family5-native-apk.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble isolated Java native project
+        run: |
+          set -euo pipefail
+          mkdir -p family5_apk/native_work
+          unzip -q family5_apk/source.zip -d family5_apk/native_work
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('family5_apk/native_work')
+          java=root/'app/src/main/java/tw/livingwater/family5/MainActivity.java'
+          s=java.read_text()
+          for imp in ['import com.chaquo.python.android.AndroidPlatform;\n',
+                      'import com.chaquo.python.AndroidPlatform;\n',
+                      'import com.chaquo.python.PyObject;\n',
+                      'import com.chaquo.python.Python;\n']:
+              s=s.replace(imp,'')
+          s=s.replace('private PyObject engine;','')
+          s=s.replace('if (!Python.isStarted()) Python.start(new AndroidPlatform(this));','')
+          s=s.replace('engine = Python.getInstance().getModule("family_offline");','')
+          s=s.replace('new JSONObject(engine.callAttr("api", dbPath, operation, json).toString())',
+                      'OfflineEngine.api(dbPath, operation, json)')
+          s=s.replace('livingwater_family5.db','livingwater_family5_native_v04.db')
+          s=s.replace('單機版・單人使用｜Python＋SQLite','單機版・單人使用｜Android＋SQLite')
+          assert 'Python.' not in s and 'PyObject' not in s
+          assert 'OfflineEngine.api' in s
+          java.write_text(s)
+          root.joinpath('app/src/main/java/tw/livingwater/family5/OfflineEngine.java').write_bytes(
+              Path('family5_apk/native/OfflineEngine.java').read_bytes())
+          root.joinpath('build.gradle').write_text(
+              "plugins {\n    id 'com.android.application' version '8.7.3' apply false\n}\n")
+          root.joinpath('app/build.gradle').write_text("""
+          plugins { id 'com.android.application' }
+          android {
+            namespace 'tw.livingwater.family5'
+            compileSdk 35
+            defaultConfig {
+              applicationId 'tw.livingwater.family5.nativev04'
+              minSdk 26
+              targetSdk 32
+              versionCode 4
+              versionName '0.4.0-family5'
+            }
+            compileOptions {
+              sourceCompatibility JavaVersion.VERSION_17
+              targetCompatibility JavaVersion.VERSION_17
+            }
+          }
+          """)
+          PY
+          test -f family5_apk/native_work/app/src/main/java/tw/livingwater/family5/OfflineEngine.java
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Compile Android v0.4
+        working-directory: family5_apk/native_work
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Verify signature and no native Python libraries
+        run: |
+          set -euo pipefail
+          f=family5_apk/native_work/app/build/outputs/apk/debug/app-debug.apk
+          bt="$ANDROID_HOME/build-tools/35.0.0"
+          test -s "$f"
+          "$bt/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$f"
+          "$bt/zipalign" -c -v 4 "$f"
+          "$bt/aapt" dump badging "$f" | grep -E "^(package:|sdkVersion:|targetSdkVersion:)"
+          if unzip -Z1 "$f" | grep -q '^lib/'; then echo "Unexpected native shared objects"; exit 1; fi
+          unzip -t "$f" | tail -1
+          mkdir -p family5_apk/native_out
+          cp "$f" family5_apk/native_out/Family5_Native_Offline_v0.4.apk
+          sha256sum family5_apk/native_out/Family5_Native_Offline_v0.4.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Family5-Native-v0.4-APK
+          path: family5_apk/native_out/Family5_Native_Offline_v0.4.apk
+          retention-days: 21
+  android12-install:
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Family5-Native-v0.4-APK
+          path: tested
+      - name: Enable emulator acceleration
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
+      - name: Verify direct install and launch on Android 12 x86_64
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 32
+          arch: x86_64
+          target: default
+          emulator-boot-timeout: 360
+          disable-animations: true
+          script: |
+            adb shell getprop ro.build.version.sdk
+            adb shell getprop ro.product.cpu.abi
+            adb install tested/Family5_Native_Offline_v0.4.apk
+            adb shell pm path tw.livingwater.family5.nativev04
+            adb shell am start -W -n tw.livingwater.family5.nativev04/tw.livingwater.family5.MainActivity
+            sleep 5
+            adb shell pidof tw.livingwater.family5.nativev04
+            if adb logcat -d -s AndroidRuntime:E | grep -q 'FATAL EXCEPTION'; then exit 1; fi

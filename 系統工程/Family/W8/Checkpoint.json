@@ -1,0 +1,64 @@
+{
+  "schema": "Family-W8-Checkpoint-v1",
+  "owner": "Family中PM（總PM）",
+  "updated_at": "2026-10-25T17:33:43+08:00",
+  "current_work": "W8 全面整合測試與 Debug",
+  "status": "IN_PROGRESS",
+  "upstream": {
+    "W7": "PASS/CLOSED (2026/10/25 Owner decision)",
+    "source": "系統工程/Family/W7/Checkpoint.json"
+  },
+  "versions": {
+    "MOU": "Instructions v1.16.4 / Sources v1.16.4",
+    "Joseph": "Instructions v1.16.4 / Sources v1.16.4",
+    "Arthur": "Instructions v1.16.4 / Sources v1.16.5",
+    "Lilian": "Instructions v1.16.4 / Sources v1.16.4"
+  },
+  "handoff": {
+    "zip_sha256_verified": 3,
+    "manifest_files_verified": 23,
+    "zip_crc_verified": 3,
+    "status": "PASS_LOCAL_BYTES",
+    "source": "Google Drive root/TEMP, ZIP1/ZIP2/ZIP3"
+  },
+  "batches": [
+    {
+      "id": "W8-R01",
+      "name": "四戶報告歸檔與選單合成回歸",
+      "type": "synthetic CI",
+      "tests_passed": 43,
+      "tests_failed": 0,
+      "py_compile": "PASS",
+      "github_run_id": 40181143475,
+      "github_url": "https://github.com/a23882005/LivingWaterAI/actions/runs/40181143475",
+      "status": "PASS_SYNTHETIC_ONLY",
+      "limits": "真人ChatGPT Project 14項端對端、正式DB寫入與遠端回讀、V70/V82/V75運算、正式報表Renderer與部署尚待W8驗收"
+    }
+  ],
+  "defects": [
+    {
+      "id": "W8-BUG-001",
+      "module": "系統工程/Family/W6/runtime/report_archive.py",
+      "problem": "報告歸檔硬綁Joseph登入及報告名稱，其他家人無法各自報告",
+      "repair": "可信服務端注入四戶登入/客戶綁定、專屬報告前綴，保留Joseph既有預設",
+      "test_status": "CI 43/43 PASS",
+      "end_to_end_status": "PENDING"
+    }
+  ],
+  "outstanding": [
+    "四戶正式身分及四小時跨對話真人驗證",
+    "四戶14選單逐項可信handler",
+    "四戶個人DB讀寫保存遠端讀回",
+    "V70/V82/債券V75/Mentor計算",
+    "四戶報表Renderer到Google Drive歸檔並讀回",
+    "W8整體正式Gate驗收",
+    "Gate D→四戶部署→試用修復→Gate E"
+  ],
+  "controls": {
+    "production": "HOLD",
+    "trading": "NONE",
+    "android_ios_device_uat": "DEFERRED"
+  },
+  "next_owner": "Family中PM本人",
+  "next_action": "按W8原契約逐戶執行入口/14項閉環、資料存取及報表正式端到端；真Bug逐一修復重測。"
+}

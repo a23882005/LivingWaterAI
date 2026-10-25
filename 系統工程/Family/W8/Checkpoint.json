@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-25T17:49:00+08:00",
+  "updated_at": "2026-10-25T18:04:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -57,6 +57,26 @@
       "merged_main_sha": "f1cbbfe5669f530ced55315521c71b8c5bf2ae35",
       "scope": "Authenticated member name must equal Project's bound account; private handler, welcome, sign-in continuation and logout guarded; macro #07 remains public.",
       "limits": "合成測試驗證；真實跨對話登入、DB遠端讀寫及各項投資引擎仍待後續W8驗收"
+    },
+    {
+      "id": "W8-R03",
+      "name": "四戶正式Google Drive SQLite實際原ID寫回及遠端讀回",
+      "status": "PASS_REAL_DRIVE_IO_UNCHANGED_BYTES",
+      "type": "REAL_OFFICIAL_DRIVE_DB",
+      "coverage": [
+        "MOU",
+        "Joseph",
+        "Arthur",
+        "Lilian"
+      ],
+      "read": "4/4 success",
+      "source_integrity": "4/4 SQLite PRAGMA integrity_check=ok; 0 FK failures",
+      "private_backup": "4/4 before write, owner-only Family_Private_Backup",
+      "write": "4/4 success, same official Drive file ID, original bytes",
+      "remote_readback": "4/4 success, same file size and SHA-256",
+      "investment_data_changed": false,
+      "limit": "已驗證真實Drive原檔寫入管道；尚待指揮官截圖確認後實際更新持倉記錄、DB記帳與報告閉環",
+      "note": "禁止將未變更位元組之寫回驗證誤記為持倉修改或十四項功能完成"
     }
   ],
   "defects": [
@@ -92,5 +112,13 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "由Family中PM本人繼續W8：可信14項handler注入、四戶Project登入四小時/跨對話、正式本人DB I/O和報表產生/回讀與V70/V82/V75/Mentor全鏈，驗證後記Gate。"
+  "next_action": "在可核對來源資料/截圖的情況下，採真正本人DB修改、備份、原ID寫回與SHA讀回；繼續整合四戶14項handler與正式報表，不以合成測試代替實務使用驗收。",
+  "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
+  "owner_decision_20261025": {
+    "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
+    "accepted_by": "Family中PM",
+    "data_owner": "指揮官",
+    "production": "HOLD until Gate D",
+    "trade_execution": "NONE"
+  }
 }

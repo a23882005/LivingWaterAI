@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T06:20:00+08:00",
+  "updated_at": "2026-10-26T06:57:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -106,6 +106,47 @@
       "pr": 37,
       "merge_commit": "458f60aea066423276e5f0957cf3cfe296d6f66c",
       "boundary": "Public PHP discovery remains inactive. Live MOU menu04 personal V70/V82/V75 result not yet verified."
+    },
+    {
+      "id": "W8-R06",
+      "name": "四戶共用HTTPS正式OAuth/MCP公開服務啟用",
+      "status": "PASS_HTTPS_PUBLIC_OAUTH_GATEWAY__INCOMPLETE_FOUR_PROJECT_E2E",
+      "branch": "w8-four-family-public-runtime-20261026",
+      "pr": 38,
+      "merge_sha": "7f244be833a52d3ab897cd84cd79bcb13926dbf6",
+      "host_capability_action": 40241365375,
+      "private_code_install_action": 40241723086,
+      "account_oauth_schema_action": 40241804625,
+      "public_gateway_action": 40242023529,
+      "tested": {
+        "host_php": "8.2.35",
+        "host_python": "3.9",
+        "php_proc_open": "YES",
+        "account_schema": "3 OAuth tables present, B06 writer PASS",
+        "account_rows": "4 original accounts unchanged, prior login session rows unchanged",
+        "live_https": [
+          "OAuth metadata 200",
+          "resource metadata 200",
+          "login page 200",
+          "MCP unauthorized POST 401"
+        ],
+        "four_official_sqlite": "4/4 SHA-256 unchanged after activation",
+        "customer_db_writes": 0
+      },
+      "real_host_status": "PUBLIC_ENTRY_ACTIVE_READ_ONLY_PORTFOLIO_CAPABILITY",
+      "implemented_mcp": [
+        "family_session",
+        "family_portfolio",
+        "family_deployment_pace"
+      ],
+      "remaining": [
+        "4 live signed-in OAuth sessions and ChatGPT Project connector activation",
+        "11 further menu operations as executable handlers",
+        "confirmed Final Target and available funding data",
+        "live V70/V82/V75/Mentor engine decision and true report generation"
+      ],
+      "production": "HOLD_FOR_FULL_W8_GATE",
+      "trade_authorization": "NONE"
     }
   ],
   "defects": [
@@ -149,7 +190,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "Install new W8 official handler in already approved family service runtime, inject trusted B06 principal/coordinator and current confirmed W2/W3/V70/funding market producer; end-to-end query AVGO as MOU, formal DB live read and analyze; record result then Gate D.",
+  "next_action": "完成四戶真人OAuth/ChatGPT Project應用綁定，逐項打通14 menu工作、正式W2目標和已確認資金及計算與報表，親自驗收後才能Gate D/E。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

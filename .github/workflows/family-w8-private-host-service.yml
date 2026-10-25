@@ -2,9 +2,14 @@ name: Family W8 private host service install
 on:
   workflow_dispatch:
   push:
-    branches: [w8-four-family-fourteen-handlers-20261026]
+    branches: [main]
     paths:
       - '.github/workflows/family-w8-private-host-service.yml'
+      - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W8/private_family_service.py'
+      - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/official_mutations.py'
+      - '系統工程/Family/W8/cgi_request.py'
 permissions:
   contents: read
 concurrency:

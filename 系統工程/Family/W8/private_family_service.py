@@ -36,6 +36,19 @@ MUTATION_TOOLS = {
     "family_update_profile": "update_profile",
     "family_record_event": "record_event",
 }
+REPORT_FOLDERS = {
+    "MOU": "mou_正式配置報告",
+    "JO": "Joseph_正式配置報告",
+    "AR": "Arthur_正式配置報告",
+    "LI": "Lilian_正式配置報告",
+}
+REPORT_PREFIXES = {
+    "MOU": "mou_配置報告_", "JO": "Joseph_配置報告_",
+    "AR": "Arthur_配置報告_", "LI": "Lilian_配置報告_",
+}
+MACRO_URL = "https://happihelp.com/"
+ACCOUNT_URL = "https://www.happihelp.com/family-connect/manage"
+
 MUTATION_LABELS = {
     "family_first_allocation": "保存本人已確認的第一次建倉資料與持倉快照。",
     "family_adjust_target": "正式保存本人確認的投資標的與目標權重。",
@@ -93,6 +106,19 @@ class OfficialBusinessTools:
                  "required": ["question"], "additionalProperties": False},
              "annotations": {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": False}}
         ] + [
+            {"name":"family_macro",
+             "description":"查看活水AI正式總體經濟報告網站。",
+             "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":True}},
+            {"name":"family_account",
+             "description":"開啟本人正式帳號管理、改密碼與登出介面。",
+             "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":True}},
+            {"name":"family_previous_report",
+             "description":"依已登入的家人身分尋找Google Drive正式歷史配置報告。",
+             "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":False}}
+        ] + [
             {"name": name, "description": MUTATION_LABELS[name],
              "inputSchema": {
                  "type": "object",
@@ -104,6 +130,40 @@ class OfficialBusinessTools:
              "annotations": {"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False}}
             for name in MUTATION_TOOLS
         ]
+
+
+    def _previous_report(self, account):
+        # Only the server-mapped identity may choose the folder; never trust
+        # an external Drive ID, folder name, client ID or user-provided path.
+        from urllib.parse import urlencode
+        drive = self.coordinator.backend.call
+        target = REPORT_FOLDERS[account]
+        base = "https://www.googleapis.com/drive/v3/files?"
+        folder_q = "name = '" + target + "' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+        listing = drive(base + urlencode({"q":folder_q,
+            "fields":"files(id,name,mimeType),nextPageToken","pageSize":100}))
+        folders = listing.get("files",[])
+        if len(folders) != 1 or listing.get("nextPageToken"):
+            return {"status":"DATA_UNAVAILABLE","code":"OFFICIAL_REPORT_FOLDER_UNAVAILABLE",
+                    "trade_authorization":"NONE"}
+        folder_id=folders[0]["id"]
+        query = "'" + folder_id + "' in parents and trashed = false"
+        items = drive(base + urlencode({"q":query,"fields":"files(id,name,mimeType,createdTime),nextPageToken",
+            "orderBy":"createdTime desc","pageSize":100}))
+        if items.get("nextPageToken"):
+            return {"status":"DATA_UNAVAILABLE","code":"REPORT_LIST_TOO_LARGE",
+                    "trade_authorization":"NONE"}
+        result=[]
+        for entry in items.get("files",[]):
+            name=entry.get("name","")
+            if (name.startswith(REPORT_PREFIXES[account])
+                and entry.get("mimeType") in ("text/html","application/pdf")
+                and name.lower().endswith((".html",".pdf"))):
+                result.append({"name":name,"created_at":entry.get("createdTime"),
+                    "url":"https://drive.google.com/file/d/" + entry["id"] + "/view"})
+            if len(result)>=2:break
+        return {"status":"OK" if result else "NO_REPORT_YET","reports":result,
+                "source":"OFFICIAL_GOOGLE_DRIVE", "trade_authorization":"NONE"}
 
     def call(self, principal, name, arguments):
         if not isinstance(arguments, dict):
@@ -122,6 +182,15 @@ class OfficialBusinessTools:
         entry = OfficialFamilyEntry(
             auth=auth, login_account=account, client_id=client_id,
             coordinator=self.coordinator, principal_provider=lambda: principal)
+        if name in ("family_macro", "family_account"):
+            if arguments:
+                raise ValueError("INVALID_LINK_ARGUMENTS")
+            return {"status":"OK", "url":MACRO_URL if name=="family_macro" else ACCOUNT_URL,
+                    "trade_authorization":"NONE"}
+        if name == "family_previous_report":
+            if arguments:
+                raise ValueError("INVALID_REPORT_ARGUMENTS")
+            return self._previous_report(account)
         if name == "family_portfolio":
             if arguments:
                 raise ValueError("INVALID_PORTFOLIO_ARGUMENTS")

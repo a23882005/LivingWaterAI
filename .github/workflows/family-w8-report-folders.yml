@@ -1,0 +1,28 @@
+name: Family W8 real report folders
+on:
+  push:
+    branches: [w8-family-macro-account-tools-20261026]
+    paths:
+      - '系統工程/Family/W8/probes/live_reports_readonly.py'
+      - '.github/workflows/family-w8-report-folders.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-report-folders:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      FAMILY_DRIVE_CLIENT_ID: ${{ secrets.FAMILY_DRIVE_CLIENT_ID }}
+      FAMILY_DRIVE_CLIENT_SECRET: ${{ secrets.FAMILY_DRIVE_CLIENT_SECRET }}
+      FAMILY_DRIVE_REFRESH_TOKEN: ${{ secrets.FAMILY_DRIVE_REFRESH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m py_compile 系統工程/Family/W8/probes/live_reports_readonly.py
+      - name: Read four official Drive report folders without modifications
+        run: python 系統工程/Family/W8/probes/live_reports_readonly.py

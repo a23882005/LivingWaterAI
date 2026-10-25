@@ -6,11 +6,17 @@ on:
       - '.github/workflows/family-menu-tests.yml'
       - '系統工程/Family/W7/family_menu.py'
       - '系統工程/Family/W7/tests/test_family_menu.py'
+      - '系統工程/Family/W7/first_allocation.py'
+      - '系統工程/Family/W7/tests/test_first_allocation.py'
+      - '系統工程/Family/W7/tests/test_first_allocation_completion_guard.py'
   pull_request:
     paths:
       - '.github/workflows/family-menu-tests.yml'
       - '系統工程/Family/W7/family_menu.py'
       - '系統工程/Family/W7/tests/test_family_menu.py'
+      - '系統工程/Family/W7/first_allocation.py'
+      - '系統工程/Family/W7/tests/test_first_allocation.py'
+      - '系統工程/Family/W7/tests/test_first_allocation_completion_guard.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -26,5 +32,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest==9.1.1
-      - run: python -m pytest 系統工程/Family/W7/tests/test_family_menu.py -q
+      - run: python -m pytest 系統工程/Family/W7/tests/test_family_menu.py 系統工程/Family/W7/tests/test_first_allocation.py 系統工程/Family/W7/tests/test_first_allocation_completion_guard.py -q
       - run: echo 'Synthetic menu tests only; no private DB, Drive credentials, or deployment.' >> "$GITHUB_STEP_SUMMARY"

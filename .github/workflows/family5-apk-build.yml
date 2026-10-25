@@ -23,6 +23,14 @@ jobs:
           # Chaquopy 17.x AndroidPlatform belongs to com.chaquo.python.android.
           sed -i 's/import com.chaquo.python.AndroidPlatform;/import com.chaquo.python.android.AndroidPlatform;/' family5_apk/project/app/src/main/java/tw/livingwater/family5/MainActivity.java
           grep -q 'import com.chaquo.python.android.AndroidPlatform;' family5_apk/project/app/src/main/java/tw/livingwater/family5/MainActivity.java
+          # Android 12 (SM-T865N) direct installation compatibility build.
+          sed -i "s/applicationId 'tw.livingwater.family5'/applicationId 'tw.livingwater.family5.offline'/" family5_apk/project/app/build.gradle
+          sed -i 's/targetSdk 35/targetSdk 32/' family5_apk/project/app/build.gradle
+          sed -i 's/versionCode 2/versionCode 3/' family5_apk/project/app/build.gradle
+          sed -i "s/versionName '0.2.0-family5'/versionName '0.3.0-family5'/" family5_apk/project/app/build.gradle
+          sed -i "s/abiFilters 'arm64-v8a', 'x86_64'/abiFilters 'arm64-v8a'/" family5_apk/project/app/build.gradle
+          grep -q "applicationId 'tw.livingwater.family5.offline'" family5_apk/project/app/build.gradle
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -44,15 +52,22 @@ jobs:
       - name: Compile signed debug APK
         working-directory: family5_apk/project
         run: gradle --no-daemon --stacktrace :app:assembleDebug
-      - name: Verify output APK
+      - name: Verify Android installer requirements, signature, and 64-bit device ABI
         run: |
+          set -euo pipefail
           f=family5_apk/project/app/build/outputs/apk/debug/app-debug.apk
+          bt="$ANDROID_HOME/build-tools/35.0.0"
           test -s "$f"
+          "$bt/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$f"
+          "$bt/zipalign" -c -v 4 "$f"
+          "$bt/aapt" dump badging "$f" | grep -E "^(package:|sdkVersion:|targetSdkVersion:|native-code:)"
           unzip -t "$f" | tail -1
-          sha256sum "$f"
+          mkdir -p family5_apk/output
+          cp "$f" family5_apk/output/Family5_v0.3_Android12_ARM64.apk
+          sha256sum family5_apk/output/Family5_v0.3_Android12_ARM64.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Family5-Android-APK-debug
-          path: family5_apk/project/app/build/outputs/apk/debug/app-debug.apk
+          name: Family5-v0.3-Android12-ARM64-APK
+          path: family5_apk/output/Family5_v0.3_Android12_ARM64.apk
           if-no-files-found: error
           retention-days: 14

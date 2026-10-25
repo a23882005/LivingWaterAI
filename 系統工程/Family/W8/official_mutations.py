@@ -226,3 +226,113 @@ def make_writer(operation, client_id):
         identity(db,client_id)
         return WRITERS[operation](db,client_id,payload.get("record",{}))
     return write
+
+
+def first_allocation(db, client, record):
+    """Real-source initial positions/cash with a durable history snapshot.
+
+    User-confirmed market value never turns into a fabricated share quantity.
+    Account currency is inferred only from explicitly confirmed owner input.
+    """
+    if record.get("interview_confirmed") is not True:
+        raise ValueError("CONFIRMED_INTERVIEW_REQUIRED")
+    ref=require_text(record.get("confirmation_reference"),"CONFIRMATION_REFERENCE",240)
+    as_of=timestamp(record.get("as_of_utc"))
+    answers=record.get("mentor_answers")
+    if not isinstance(answers,dict) or not answers:
+        raise ValueError("MENTOR_ANSWERS_REQUIRED")
+    holdings,cash=record.get("holdings"),record.get("cash")
+    if not isinstance(holdings,list) or not isinstance(cash,list) or not (holdings or cash):
+        raise ValueError("ASSETS_REQUIRED")
+    account=require_text(record.get("account_key","INITIAL"),"ACCOUNT_KEY",80)
+    if not re.fullmatch(r"[A-Za-z0-9_-]+",account):
+        raise ValueError("INVALID_ACCOUNT_KEY")
+    currency=(cash[0].get("currency") if cash else holdings[0].get("currency"))
+    currency=require_text(currency,"CURRENCY",3).upper()
+    if not re.fullmatch(r"[A-Z]{3}",currency):
+        raise ValueError("INVALID_CURRENCY")
+    if db.execute("SELECT 1 FROM currency_registry WHERE currency_code=?",(currency,)).fetchone() is None:
+        raise ValueError("CURRENCY_NOT_REGISTERED")
+    if not existing(db,"portfolio_account",client,"account_key",account):
+        db.execute("""INSERT INTO portfolio_account
+            (client_id,account_key,account_label,account_currency,account_state,source_kind,
+             source_reference,as_of_utc,created_at_utc)
+            VALUES(?,?,?,?,'KNOWN','OWNER_VERIFIED',?, ?, ?)""",
+            (client,account,require_text(record.get("account_label","本人投資帳戶"),"ACCOUNT_LABEL",120),
+             currency,ref,as_of,now()))
+    run_id="FIRST01-"+sha256((client+":"+require_text(record.get("request_id"),"REQUEST_ID",120)).encode()).hexdigest()[:32]
+    db.execute("""INSERT INTO portfolio_snapshot_run
+      (client_id,run_id,as_of_utc,version_no,run_state,data_state,source_kind,source_reference,created_at_utc)
+      VALUES(?,?,?,1,'DRAFT','PARTIAL','OWNER_VERIFIED',?,?)""",
+       (client,run_id,as_of,ref,now()))
+    items=[("PROFILE","MENTOR","interview_answers_json",json.dumps(answers,ensure_ascii=False,sort_keys=True),"TEXT",None)]
+    seen=set()
+    saved=0
+    for h in holdings:
+        if not isinstance(h,dict):raise ValueError("INVALID_HOLDING")
+        ticker=require_text(h.get("ticker"),"TICKER",40).upper()
+        hcur=require_text(h.get("currency"),"CURRENCY",3).upper()
+        exchange=require_text(h.get("exchange","UNKNOWN"),"EXCHANGE",30).upper()
+        label=require_text(h.get("display_name"),"DISPLAY_NAME",160)
+        if not re.fullmatch("[A-Z0-9.^_-]+",ticker) or not re.fullmatch("[A-Z]{3}",hcur):
+            raise ValueError("INVALID_HOLDING_IDENTITY")
+        key=(ticker,exchange,hcur)
+        if key in seen:raise ValueError("DUPLICATE_HOLDING")
+        seen.add(key)
+        existing_keys=db.execute("""SELECT instrument_key FROM portfolio_instrument
+             WHERE client_id=? AND ticker=? AND exchange_code=? AND quote_currency=?""",
+             (client,ticker,exchange,hcur)).fetchall()
+        if len(existing_keys)>1: raise ValueError("AMBIGUOUS_INSTRUMENT")
+        instrument=existing_keys[0][0] if existing_keys else "USER01-"+sha256(
+            (client+":"+ticker+":"+exchange+":"+hcur).encode()).hexdigest()[:24]
+        if not existing_keys:
+            db.execute("""INSERT INTO portfolio_instrument
+               (client_id,instrument_key,instrument_type,ticker,exchange_code,instrument_label,
+                quote_currency,identity_state,source_kind,source_reference,as_of_utc,created_at_utc)
+               VALUES(?,?,'STOCK',?,?,?,?,'KNOWN','OWNER_VERIFIED',?,?,?)""",
+              (client,instrument,ticker,exchange,label,hcur,ref,as_of,now()))
+        quantity=h.get("confirmed_quantity")
+        if quantity is not None:
+            qty=positive(quantity,"QUANTITY")
+            qty=format(qty,'f')
+            db.execute("""INSERT INTO portfolio_position
+               (client_id,account_key,instrument_key,as_of_utc,quantity_decimal,cost_state,
+                cost_source_kind,position_source_kind,position_source_reference,recorded_at_utc)
+               VALUES(?,?,?,?,?,'UNKNOWN','NOT_PROVIDED','OWNER_VERIFIED',?,?)""",
+              (client,account,instrument,as_of,qty,ref,now()))
+            saved+=1
+        if h.get("reported_market_value") is not None:
+            mv=str(positive(h["reported_market_value"],"MARKET_VALUE",allow_zero=True))
+            items.append(("HOLDING",instrument,"reported_market_value",mv,"DECIMAL_TEXT",hcur))
+    for entry in cash:
+        if not isinstance(entry,dict):raise ValueError("INVALID_CASH")
+        cur=require_text(entry.get("currency"),"CURRENCY",3).upper()
+        if not re.fullmatch("[A-Z]{3}",cur):raise ValueError("INVALID_CURRENCY")
+        if not db.execute("SELECT 1 FROM currency_registry WHERE currency_code=?",(cur,)).fetchone():
+            raise ValueError("CURRENCY_NOT_REGISTERED")
+        if not db.execute("""SELECT 1 FROM cash_account_scope
+          WHERE client_id=? AND account_key=? AND currency_code=?""",(client,account,cur)).fetchone():
+            db.execute("""INSERT INTO cash_account_scope
+              (client_id,account_key,currency_code,account_currency_state,source_kind,
+               source_reference,created_at_utc) VALUES(?,?,?,?,'OWNER_VERIFIED',?,?)""",
+              (client,account,cur,"MATCHED" if cur==currency else "ADDITIONAL_CURRENCY_VERIFIED",ref,now()))
+        amount=minor_units(entry.get("reported_amount"))
+        db.execute("""INSERT INTO cash_balance_snapshot
+          (cash_snapshot_id,client_id,account_key,currency_code,as_of_utc,version,source_snapshot_id,
+           reported_cash_minor,reported_cash_basis,data_state,source_kind,source_reference)
+          VALUES(?,?,?,?,?,1,?,?,'UNKNOWN','NEEDS_REVIEW','OWNER_VERIFIED',?)""",
+          (run_id+"-CASH-"+cur,client,account,cur,as_of,run_id,amount,ref))
+        items.append(("CASH",account,"reported_amount_minor",str(amount),"INTEGER_MINOR",cur))
+    for i,(domain,entity,field,value,kind,cur) in enumerate(items,1):
+        db.execute("""INSERT INTO portfolio_snapshot_item
+          (client_id,run_id,item_no,domain_code,entity_key,field_key,value_state,value_type,
+           value_text,value_integer_minor,currency_code,source_kind,source_reference,recorded_at_utc)
+          VALUES(?,?,?,?,?,?,'KNOWN',?,?,?,?, 'OWNER_VERIFIED',?,?)""",
+          (client,run_id,i,domain,entity,field,kind,
+           int(value) if kind=="INTEGER_MINOR" else value,
+           None if kind=="INTEGER_MINOR" else None,cur,ref,now()))
+    return {"status":"STORED","operation":"first_allocation","account_key":account,
+            "run_id":run_id,"position_rows_added":saved,"cash_currencies":len(cash),
+            "unconfirmed_quantities_retained_in_history":len(holdings)-saved,"trade_authorization":"NONE"}
+
+WRITERS["first_allocation"]=first_allocation

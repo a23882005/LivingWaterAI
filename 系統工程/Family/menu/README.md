@@ -8,8 +8,8 @@
 |01|第一次建倉|`first_allocation`|[01_第一次建倉.md](01_第一次建倉.md)|
 |02|查看我的資料與持倉|`read_portfolio`|依Sources同版路由與正式handler|
 |03|檢視與調整目標配置|`adjust_target`|[03_目標配置調整.md](03_目標配置調整.md)|
-|04|尋找新標的物|`research_candidates`|[04_尋找新標的物.md](04_尋找新標的物.md)|
-|05|評估現在各標的物投入速度|`deployment_pace`|[04_買賣與持倉調整.md](04_買賣與持倉調整.md)|
+|04|評估現在各標的物投入速度|`deployment_pace`|[04_買賣與持倉調整.md](04_買賣與持倉調整.md)|
+|05|尋找新標的物|`research_candidates`|[04_尋找新標的物.md](04_尋找新標的物.md)|
 |06|安排新增投資資金|`new_funding`|[05_新增資金安排.md](05_新增資金安排.md)|
 |07|查看目前總體經濟情況|`macro_link`|[07_總經網站.md](07_總經網站.md)|
 |08|查看今日重大財經新聞|`market_news`|依Sources同版路由與正式handler|

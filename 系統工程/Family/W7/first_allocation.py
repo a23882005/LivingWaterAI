@@ -64,17 +64,22 @@ def normalize_request(data):
         raise ValueError('MENTOR_ANSWERS_REQUIRED')
     if len(canonical(answers).encode('utf-8')) > 20000:
         raise ValueError('MENTOR_ANSWERS_TOO_LARGE')
+    # A preferred ratio is optional for onboarding. Record one when the
+    # owner supplies it; never invent a 60/40 target for another family.
     style = data.get('long_term_style')
-    if not isinstance(style, dict) or set(style) != {'stock_weight', 'bond_weight'}:
-        raise ValueError('LONG_TERM_STYLE_REQUIRED')
-    try:
-        sw, bw = (Decimal(str(style[k])) for k in ('stock_weight', 'bond_weight'))
-    except (InvalidOperation, ValueError, TypeError):
-        raise ValueError('LONG_TERM_STYLE_INVALID') from None
-    if not sw.is_finite() or not bw.is_finite():
-        raise ValueError('LONG_TERM_STYLE_INVALID')
-    if sw > 1 or bw > 1 or sw + bw != 1:
-        raise ValueError('LONG_TERM_STYLE_INVALID')
+    normalized_style = None
+    if style is not None:
+        if not isinstance(style, dict) or set(style) != {'stock_weight', 'bond_weight'}:
+            raise ValueError('LONG_TERM_STYLE_INVALID')
+        try:
+            sw, bw = (Decimal(str(style[k])) for k in ('stock_weight', 'bond_weight'))
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValueError('LONG_TERM_STYLE_INVALID') from None
+        if not sw.is_finite() or not bw.is_finite() or sw < 0 or bw < 0:
+            raise ValueError('LONG_TERM_STYLE_INVALID')
+        if sw > 1 or bw > 1 or sw + bw != 1:
+            raise ValueError('LONG_TERM_STYLE_INVALID')
+        normalized_style = {'stock_weight':str(sw), 'bond_weight':str(bw)}
     holdings = data.get('holdings')
     cash = data.get('cash')
     if not isinstance(holdings, list) or not isinstance(cash, list) or not holdings and not cash:
@@ -124,7 +129,7 @@ def normalize_request(data):
     return {'interview_confirmed':True,
             'as_of_utc':when, 'confirmation_reference':ref,
             'mentor_answers':answers,
-            'long_term_style':{'stock_weight':str(sw), 'bond_weight':str(bw)},
+            'long_term_style':normalized_style,
             'holdings':recorded_holdings, 'cash':recorded_cash}
 
 
@@ -175,8 +180,9 @@ def make_writer(client_id, account_key):
         def item(domain, entity, field, value, *, unit=None, currency=None, source='USER_CONFIRMED'):
             items.append((domain,entity,field,str(value),unit,currency,source))
         item('PROFILE','MENTOR','interview_answers_json',canonical(normalized['mentor_answers']))
-        item('PROFILE','LONG_TERM','stock_weight',normalized['long_term_style']['stock_weight'])
-        item('PROFILE','LONG_TERM','bond_weight',normalized['long_term_style']['bond_weight'])
+        if normalized['long_term_style'] is not None:
+            item('PROFILE','LONG_TERM','stock_weight',normalized['long_term_style']['stock_weight'])
+            item('PROFILE','LONG_TERM','bond_weight',normalized['long_term_style']['bond_weight'])
         for row in normalized['holdings']:
             ticker, exchange, currency = row['ticker'], row['exchange'], row['currency']
             found = db.execute('''select instrument_key from portfolio_instrument

@@ -1,0 +1,75 @@
+name: V70.3 Chromium Six-Indicator Source Probe
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/probe-chromium-six.yml'
+permissions:
+  contents: read
+jobs:
+  chromium-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser
+        run: |
+          pip install 'playwright>=1.48,<2'
+          python -m playwright install --with-deps chromium
+      - name: Test public sites using real Chromium
+        run: |
+          python - <<'PY'
+          import asyncio,datetime,json,re,pathlib
+          from playwright.async_api import async_playwright
+          targets=[
+           ('m06','CME','https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html'),
+           ('m06','Taiwan_MacroMicro','https://www.macromicro.me/'),
+           ('m03_qqq','Invesco','https://www.invesco.com/qqq-etf/en/about.html'),
+           ('m03_qqq','Taiwan_TradingView','https://tw.tradingview.com/symbols/NASDAQ-QQQ/'),
+           ('m03_spy','StateStreet','https://www.ssga.com/us/en/individual/etfs/spdr-sp-500-etf-trust-spy'),
+           ('m03_spy','Taiwan_TradingView','https://tw.tradingview.com/symbols/AMEX-SPY/'),
+           ('m03_vt','Vanguard','https://investor.vanguard.com/investment-products/etfs/profile/vt'),
+           ('m03_vt','Taiwan_MoneyDJ','https://www.moneydj.com/'),
+           ('m16','ConferenceBoard','https://www.conference-board.org/topics/us-leading-indicators'),
+           ('m16','Taiwan_MacroMicro','https://www.macromicro.me/'),
+           ('s05','Barchart','https://www.barchart.com/stocks/quotes/%24MMFI'),
+           ('s05','TradingView','https://www.tradingview.com/symbols/INDEX-MMFI/')
+          ]
+          async def main():
+           results=[]
+           async with async_playwright() as p:
+            browser=await p.chromium.launch(headless=True,args=['--no-sandbox'])
+            context=await browser.new_context(locale='en-US',viewport={'width':1350,'height':900},user_agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36')
+            for code,source,url in targets:
+             item={'code':code,'source':source,'url':url,'status':'UNVERIFIED','value':None,'observed_date':None}
+             page=await context.new_page()
+             try:
+              response=await page.goto(url,wait_until='domcontentloaded',timeout=22000)
+              await page.wait_for_timeout(1300)
+              text=await page.locator('body').inner_text(timeout=9000)
+              item.update(http=response.status if response else None,final_url=page.url,title=(await page.title())[:180],text_length=len(text),text_excerpt=text[:550].replace('\\n',' '),pe_contexts=[text[max(0,m.start()-65):m.end()+125].replace('\\n',' ') for m in list(re.finditer(r'P/E Ratio|Price.Earnings|Trailing P/E|50.Day Moving Average|Leading Economic Index|FedWatch',text,re.I))[:5]])
+              item['status']='PAGE_TEXT_AVAILABLE_UNVERIFIED' if response and response.ok and len(text)>150 else 'BLOCKED_OR_EMPTY'
+             except Exception as exc:
+              item['status']='FETCH_ERROR'
+              item['error']=(type(exc).__name__+': '+str(exc))[:300]
+             finally:
+              await page.close()
+             print(json.dumps(item,ensure_ascii=False),flush=True)
+             results.append(item)
+            await browser.close()
+           out=pathlib.Path('build/chromium_six_probe.json')
+           out.parent.mkdir(parents=True,exist_ok=True)
+           out.write_text(json.dumps({'generated_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'browser connectivity and text only, NOT verified numeric values','items':results},ensure_ascii=False,indent=2))
+          asyncio.run(main())
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chromium-six-source-probe
+          path: build/chromium_six_probe.json
+          if-no-files-found: warn

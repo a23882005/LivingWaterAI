@@ -43,7 +43,7 @@ def test_project_identity_and_account_are_configuration(login_account, project_n
 def test_private_intent_resumes_after_login_and_full_menu_follows():
     seen = []
     ui = make_menu(handlers={'deployment_pace': lambda p: seen.append(p) or 'DONE'})
-    assert ui.select('05', payload={'value': 7})['status'] == 'LOGIN_REQUIRED'
+    assert ui.select('04', payload={'value': 7})['status'] == 'LOGIN_REQUIRED'
     assert seen == []
     result = ui.login('synthetic')
     assert result['result'] == 'DONE' and seen == [{'value': 7}]
@@ -58,7 +58,7 @@ def test_macro_direct_before_login_without_handler_or_database():
 
 def test_menu_mapping_and_direct_request_completion():
     assert [route(i)['operation'] for i in (4,5,6,11,12,13,14)] == [
-        'research_candidates','deployment_pace','new_funding','record_event',
+        'deployment_pace','research_candidates','new_funding','record_event',
         'previous_report','generate_report','account']
     assert len([l for l in render_menu('Joseph').splitlines() if '｜' in l]) == 14
     assert complete_work('direct request', 'Joseph')['menu'] == render_menu('Joseph')
@@ -71,8 +71,8 @@ def test_invalid_selection(selection):
 
 def test_research_private_screenshot_scope_requires_auth():
     ui = make_menu(handlers={'research_candidates': lambda p:'RESEARCH'})
-    assert ui.select(4)['result'] == 'RESEARCH'
-    assert ui.select(4, payload={'use_private_portfolio':True})['status'] == 'LOGIN_REQUIRED'
+    assert ui.select(5)['result'] == 'RESEARCH'
+    assert ui.select(5, payload={'use_private_portfolio':True})['status'] == 'LOGIN_REQUIRED'
 
 
 def test_unbound_request_is_retained():

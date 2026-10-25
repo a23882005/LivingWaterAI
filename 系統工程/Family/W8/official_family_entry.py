@@ -130,3 +130,39 @@ class OfficialFamilyEntry:
     def handlers(self):
         return {"read_portfolio": self.read_portfolio,
                 "deployment_pace": self.deployment_pace}
+
+
+def build_official_family_menu(*, auth, project_name, login_account, client_id,
+                               coordinator, principal_provider, analysis_provider=None,
+                               other_handlers=None, completion_checks=None):
+    """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
+    path = FAMILY / "W7" / "family_menu.py"
+    spec = importlib.util.spec_from_file_location("official_family_menu", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("FAMILY_MENU_NOT_FOUND")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    official = OfficialFamilyEntry(
+        auth=auth, login_account=login_account, client_id=client_id,
+        coordinator=coordinator, principal_provider=principal_provider,
+        analysis_provider=analysis_provider)
+    handlers = dict(other_handlers or {})
+    # Reserved operations always use the official resource, not external caller
+    # supplied handlers. Other options remain under existing operator routing.
+    handlers.update(official.handlers())
+    return module.FamilyMenu(
+        auth, project_name=project_name, login_account=login_account,
+        handlers=handlers, completion_checks=completion_checks)
+
+
+def handle_stock_question(menu, question):
+    """Natural language 'AVGO/博通週一能否加碼' enters official menu 04."""
+    if not isinstance(question, str) or not question.strip():
+        raise ValueError("INVESTMENT_QUESTION_REQUIRED")
+    text = question.strip()
+    # Transactions are separate from analysis: do not record an execution
+    # merely because the person asks whether to buy or add to a position.
+    if any(term in text for term in ("加碼", "買點", "投入速度", "能買", "該買",
+                                    "何時買", "是否買", "買入時機", "進場")):
+        return menu.select(4, payload={"question": text})
+    raise ValueError("INVESTMENT_INTENT_NOT_MATCHED")

@@ -88,12 +88,20 @@ class OfficialFamilyEntry:
         request and existing FamilyRunner, both bound to the same DB SHA.
         """
         current = self.read_portfolio(payload)
-        if self.analysis_provider is None:
-            return {"status": "DATA_UNAVAILABLE", "code": "OFFICIAL_ANALYSIS_INPUT_NOT_CONNECTED",
+        missing = [
+            name for name in ("final_target_allocation", "cash_balance_snapshot",
+                              "funding_evaluation")
+            if not current["snapshot"]["tables"].get(name)
+        ]
+        if self.analysis_provider is None or missing:
+            if self.analysis_provider is None:
+                missing.append("official_market_and_approved_engine_request")
+            return {"status": "DATA_UNAVAILABLE", "code": "OFFICIAL_ANALYSIS_INPUT_INCOMPLETE",
                     "data_provenance": "SOURCE_BACKED",
                     "client_id": self.client_id,
                     "source_sha256": current["source_sha256"],
-                    "message": "已讀取本人正式持倉；待接入本人正式目標、已確認資金及當期市場資料才能計算加碼金額。",
+                    "missing": missing,
+                    "message": "已讀取本人正式持倉；將依已確認的目標、資金與最新市場來源補齊引擎計算所需欄位。",
                     "trade_authorization": "NONE"}
         request, runner = self.analysis_provider(current["snapshot"], dict(payload))
         if (not isinstance(request, dict)

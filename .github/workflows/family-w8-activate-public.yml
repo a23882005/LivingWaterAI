@@ -69,7 +69,7 @@ jobs:
             php -l "$stage/index.php"
             cp "$stage/index.php" "$dest/index.w8-candidate.php"
             chmod 600 "$dest/index.w8-candidate.php"
-            php -r '$root="'+"$dest/index.w8-candidate.php"+'"; $_SERVER=["HTTPS"=>"on","HTTP_HOST"=>"www.happihelp.com","REQUEST_METHOD"=>"GET","REQUEST_URI"=>"/family-connect/oauth/.well-known/oauth-authorization-server","REMOTE_ADDR"=>"127.0.0.1"]; include $root;' > "$stage/metadata.json"
+            php -r '$_SERVER=["HTTPS"=>"on","HTTP_HOST"=>"www.happihelp.com","REQUEST_METHOD"=>"GET","REQUEST_URI"=>"/family-connect/oauth/.well-known/oauth-authorization-server","REMOTE_ADDR"=>"127.0.0.1"]; include $argv[1];' "$dest/index.w8-candidate.php" > "$stage/metadata.json"
             python3 - "$stage/metadata.json" <<'PY'
             import json,sys
             d=json.load(open(sys.argv[1]))

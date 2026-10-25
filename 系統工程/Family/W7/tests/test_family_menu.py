@@ -8,7 +8,7 @@ from family_menu import FamilyMenu, render_menu, route, complete_work, report_ha
 
 
 class Auth:
-    def __init__(self): self.active = False; self.login_user = None
+    def __init__(self): self.active = False; self.login_user = 'JO'
     def require_login(self):
         if not self.active: raise PermissionError('LOGIN')
         return self.login_user
@@ -112,3 +112,38 @@ def test_swapped_04_deployment_still_requires_auth_and_05_public_research():
     ui = make_menu(handlers={'deployment_pace': lambda p:'DEPLOY', 'research_candidates':lambda p:'RESEARCH'})
     assert ui.select(4)['status'] == 'LOGIN_REQUIRED'
     assert ui.select(5)['result'] == 'RESEARCH'
+
+
+@pytest.mark.parametrize('foreign', ['MOU', 'AR', 'LI'])
+def test_w8_foreign_login_never_reads_joseph_private_handler(foreign):
+    auth = Auth()
+    auth.active, auth.login_user = True, foreign
+    touched = []
+    ui = make_menu(auth, handlers={'read_portfolio': lambda p:touched.append(p) or 'LEAK'})
+    assert ui.welcome()['status'] == 'LOGIN_REQUIRED'
+    attempt = ui.select(2)
+    assert attempt['status'] == 'LOGIN_REQUIRED'
+    assert attempt['pending_operation'] == 'read_portfolio'
+    assert touched == []
+    assert ui.select(7)['result']['url'] == 'https://happihelp.com/'
+
+
+def test_w8_cross_project_logout_rejected_without_revoking_other_account():
+    auth = Auth()
+    auth.active, auth.login_user = True, 'AR'
+    ui = make_menu(auth, project_name='Joseph', login_account='JO')
+    result = ui.select(14, payload={'action':'logout'})
+    assert result['status'] == 'LOGIN_REQUIRED'
+    assert auth.active is True and auth.login_user == 'AR'
+
+
+def test_w8_valid_project_login_and_own_handler_execution():
+    auth = Auth()
+    ui = make_menu(auth, project_name='Arthur', login_account='AR',
+                   handlers={'read_portfolio': lambda _: {'owned_by': 'AR'}})
+    assert ui.select(2)['status'] == 'LOGIN_REQUIRED'
+    auth.active, auth.login_user = True, 'AR'
+    result = ui.select(2)
+    assert result['status'] == 'COMPLETED'
+    assert result['result']['owned_by'] == 'AR'
+    assert result['menu'] == render_menu('Arthur')

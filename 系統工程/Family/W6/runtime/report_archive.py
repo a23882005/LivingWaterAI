@@ -17,6 +17,8 @@ API = 'https://www.googleapis.com/drive/v3/files'
 UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files/'
 TAIPEI = timezone(timedelta(hours=8))
 CLIENT_ID = 'fam_2c96026b72544e828b98be640399432e'
+# The trusted entry binds each authenticated family member to their own Drive folder.
+PROJECT_REPORT_NAMES = {'JO': 'Joseph', 'MOU': 'MOU', 'AR': 'Arthur', 'LI': 'Lilian'}
 EXTENSIONS = {'html', 'pdf', 'xlsx', 'zip', 'png', 'json'}
 MIMES = {'html': 'text/html', 'pdf': 'application/pdf',
          'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -32,10 +34,12 @@ def _sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def report_basename(created_at):
+def report_basename(created_at, report_name='Joseph'):
+    if report_name not in PROJECT_REPORT_NAMES.values():
+        raise ValueError('INVALID_REPORT_MEMBER')
     if not isinstance(created_at, datetime) or created_at.utcoffset() is None:
         raise ValueError('TIMEZONE_REQUIRED')
-    return 'Joseph_配置報告_' + created_at.astimezone(TAIPEI).strftime('%Y%m%d_%H%M%S_TW')
+    return report_name + '_配置報告_' + created_at.astimezone(TAIPEI).strftime('%Y%m%d_%H%M%S_TW')
 
 
 def _artifact_filename(base, artifact, extension_counts):
@@ -48,23 +52,32 @@ def _artifact_filename(base, artifact, extension_counts):
 
 
 class DriveReportStore:
-    def __init__(self, transport, *, folder_id, lock_path, client_id=CLIENT_ID):
-        if client_id != CLIENT_ID or not re.fullmatch(r'[A-Za-z0-9_-]+', folder_id):
+    def __init__(self, transport, *, folder_id, lock_path, client_id=CLIENT_ID,
+                 login_account='JO'):
+        # Binding must come from trusted server configuration, never request payload.
+        if (login_account not in PROJECT_REPORT_NAMES
+            or not isinstance(client_id, str)
+            or not re.fullmatch(r'fam_[0-9a-f]{32}', client_id)
+            or (login_account == 'JO') != (client_id == CLIENT_ID)
+            or not isinstance(folder_id, str)
+            or not re.fullmatch(r'[A-Za-z0-9_-]+', folder_id)):
             raise ValueError('INVALID_REPORT_BINDING')
         self.call, self.folder_id, self.client_id = transport.call, folder_id, client_id
+        self.login_account = login_account
+        self.report_name = PROJECT_REPORT_NAMES[login_account]
         self.lock_path = Path(lock_path)
         if not self.lock_path.is_absolute():
             raise ValueError('ABSOLUTE_SERVER_LOCK_REQUIRED')
 
     @contextmanager
     def locked(self, auth):
-        if auth.require_login() != 'JO':
+        if auth.require_login() != self.login_account:
             raise PermissionError('REPORT_OWNER_MISMATCH')
         # Reuse the configured single-host writer lock. It must already exist.
         with self.lock_path.open('rb') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             try:
-                if auth.require_login() != 'JO':
+                if auth.require_login() != self.login_account:
                     raise PermissionError('REPORT_OWNER_MISMATCH')
                 meta = self.call(API + '/' + self.folder_id + '?fields=id,mimeType,trashed')
                 if (meta.get('id') != self.folder_id or meta.get('trashed')
@@ -146,7 +159,7 @@ def publish_report(store, auth, *, run_id, artifacts, data_as_of, analysis_versi
             or not isinstance(data, bytes) or not data or len(data) > 64 * 1024 * 1024):
             raise ValueError('INVALID_REPORT_ARTIFACT')
     created_at = created_at or datetime.now(timezone.utc)
-    base = report_basename(created_at)
+    base = report_basename(created_at, store.report_name)
     key = _sha((store.client_id + '\0' + run_id).encode())
     fingerprint = _sha(_canonical({'artifacts': {k: _sha(v) for k, v in artifacts.items()},
                                     'data_as_of': data_as_of, 'analysis_version': analysis_version}))
@@ -173,7 +186,7 @@ def publish_report(store, auth, *, run_id, artifacts, data_as_of, analysis_versi
             extension = artifact.rsplit('.', 1)[1]
             extension_counts[extension] = extension_counts.get(extension, 0) + 1
         for artifact, data in sorted(artifacts.items()):
-            if auth.require_login() != 'JO':
+            if auth.require_login() != store.login_account:
                 raise PermissionError('REPORT_OWNER_MISMATCH')
             files.append(store.create(_artifact_filename(candidate, artifact, extension_counts),
                                       data, 'artifact', key))
@@ -181,7 +194,7 @@ def publish_report(store, auth, *, run_id, artifacts, data_as_of, analysis_versi
             'client_id': store.client_id, 'run_id': run_id, 'fingerprint': fingerprint,
             'created_at': created_at.astimezone(TAIPEI).isoformat(), 'sequence': suffix,
             'data_as_of': data_as_of, 'analysis_version': analysis_version, 'files': files}
-        if auth.require_login() != 'JO':
+        if auth.require_login() != store.login_account:
             raise PermissionError('REPORT_OWNER_MISMATCH')
         store.create(candidate + '.manifest.json', _canonical(manifest), 'manifest', key)
         return manifest

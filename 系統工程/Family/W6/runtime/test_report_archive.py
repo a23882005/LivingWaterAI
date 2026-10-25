@@ -160,3 +160,58 @@ def test_incomplete_manifest_is_not_visible_and_previous_is_preserved(env):
 def test_same_timestamp_previous_uses_collision_sequence_not_run_name(env):
     store,auth,drive=env; publish(store,auth,'z_first'); publish(store,auth,'a_second')
     assert previous_report(store,auth)['run_id']=='a_second'
+
+
+# W8: Four-family archive isolation regression, using synthetic client IDs only.
+@pytest.mark.parametrize(('account', 'client_id', 'report_name'), [
+    ('JO', 'fam_2c96026b72544e828b98be640399432e', 'Joseph'),
+    ('MOU', 'fam_' + '1' * 32, 'MOU'),
+    ('AR', 'fam_' + '2' * 32, 'Arthur'),
+    ('LI', 'fam_' + '3' * 32, 'Lilian'),
+])
+def test_w8_each_member_uses_own_name_id_and_login(tmp_path, account, client_id, report_name):
+    lock = tmp_path / 'writer.lock'
+    lock.touch()
+    drive = Drive()
+
+    class MemberAuth:
+        def __init__(self, logged_in_as): self.logged_in_as = logged_in_as
+        def require_login(self): return self.logged_in_as
+
+    store = DriveReportStore(
+        drive, folder_id='folder', lock_path=lock,
+        client_id=client_id, login_account=account)
+    authorized = MemberAuth(account)
+    result = publish(store, authorized)
+    artifact = result['files'][0]
+    assert artifact['name'] == report_name + '_配置報告_20261024_080000_TW.pdf'
+    assert drive.files[artifact['id']]['appProperties']['family_client'] == client_id
+    assert previous_report(store, authorized)['run_id'] == 'r1'
+
+    # A valid session belonging to another family is never accepted.
+    wrong_user = 'LI' if account != 'LI' else 'JO'
+    calls_before = len(drive.calls)
+    with pytest.raises(PermissionError, match='REPORT_OWNER_MISMATCH'):
+        previous_report(store, MemberAuth(wrong_user))
+    assert len(drive.calls) == calls_before
+
+
+@pytest.mark.parametrize(('account', 'client_id'), [
+    ('MOU', 'fam_2c96026b72544e828b98be640399432e'),
+    ('JO', 'fam_' + 'a' * 32),
+    ('AR', 'bad-client-id'),
+    ('OTHER', 'fam_' + '4' * 32),
+])
+def test_w8_bad_member_binding_rejected_before_drive(tmp_path, account, client_id):
+    lock = tmp_path / 'writer.lock'
+    lock.touch()
+    drive = Drive()
+    with pytest.raises(ValueError, match='INVALID_REPORT_BINDING'):
+        DriveReportStore(drive, folder_id='folder', lock_path=lock,
+                         client_id=client_id, login_account=account)
+    assert drive.calls == []
+
+
+def test_w8_unknown_report_name_cannot_be_used():
+    with pytest.raises(ValueError, match='INVALID_REPORT_MEMBER'):
+        report_basename(datetime(2026, 10, 24, tzinfo=timezone.utc), '../other')

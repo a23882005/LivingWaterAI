@@ -1,0 +1,51 @@
+name: Family5 Android APK Build
+on:
+  push:
+    branches: [family5-apk-build-20261025]
+    paths:
+      - family5_apk/source.zip
+      - .github/workflows/family5-apk-build.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract isolated fifth-family source
+        run: |
+          mkdir -p family5_apk/project
+          unzip -q family5_apk/source.zip -d family5_apk/project
+          test -f family5_apk/project/app/build.gradle
+          test -f family5_apk/project/app/src/main/python/family_offline.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Python unit tests
+        working-directory: family5_apk/project
+        run: python -m unittest discover -s tests -v
+      - name: Compile signed debug APK
+        working-directory: family5_apk/project
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Verify output APK
+        run: |
+          f=family5_apk/project/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$f"
+          unzip -t "$f" | tail -1
+          sha256sum "$f"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Family5-Android-APK-debug
+          path: family5_apk/project/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14

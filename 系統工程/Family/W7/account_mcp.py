@@ -65,7 +65,7 @@ class AccountMCP:
                 tool_name,arguments=params.get('name'),params.get('arguments',{})
                 if tool_name=='family_session' and arguments=={}:
                     data={'user_id':principal.subject[len('account:'):], 'access_expires_at':principal.expires_at}
-                elif self.business_tools is not None and tool_name in ('family_portfolio','family_deployment_pace'):
+                elif self.business_tools is not None and tool_name in {spec['name'] for spec in self.business_tools.specs()}:
                     try:
                         data=self.business_tools.call(principal,tool_name,arguments)
                     except (PermissionError,ValueError):

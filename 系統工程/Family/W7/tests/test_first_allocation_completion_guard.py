@@ -55,12 +55,12 @@ def test_01_claimed_saved_without_trusted_verifier_remains_pending():
     assert got["status"] == "FIRST_ALLOCATION_IN_PROGRESS"
 
 
-def test_01_verifier_must_explicitly_confirm_full_save_readback():
+def test_01_verifier_must_explicitly_confirm_initial_record_save_readback():
     seen = []
     def verifier(result):
         seen.append(result)
-        return result.get("target_receipt") == "T" and result.get("deployment_receipt") == "D" and result.get("save_readback") == "OK"
-    handler = lambda p: {"target_receipt": "T", "deployment_receipt": "D", "save_readback": "OK"}
+        return result.get("save_receipt",{}).get("verified") is True and result.get("loop2_executed") is False
+    handler = lambda p: {"save_receipt": {"verified": True}, "loop2_executed": False}
     ui = menu({"first_allocation": handler}, {"first_allocation": verifier})
     got = ui.select(1)
     assert got["status"] == "COMPLETED"

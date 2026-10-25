@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-24T13:41:39.106036Z",
+  "asOf": "2026-10-25T03:21:26.982476Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -32,14 +32,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-24T11:56:25.443561+00:00",
+      "lastVerifiedAt": "2026-10-25T01:30:23.504615+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:56:25.443561+00:00",
+              "verified_at": "2026-10-25T01:30:23.504615+00:00",
               "observation_date": "2026-10-22"
             }
           ]
@@ -76,14 +76,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-24T11:57:02.198961+00:00",
+      "lastVerifiedAt": "2026-10-25T01:30:59.655397+00:00",
       "sourceEvidence": {
         "series": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:02.198961+00:00",
+              "verified_at": "2026-10-25T01:30:59.655397+00:00",
               "observation_date": "2026-10-22"
             }
           ]
@@ -109,14 +109,14 @@
       "method": "FRED CPILFESL 同一數列 YoY",
       "status": "OK",
       "detail": "比較基期 2025-09-01",
-      "lastVerifiedAt": "2026-10-24T11:57:03.744362+00:00",
+      "lastVerifiedAt": "2026-10-25T01:31:01.199796+00:00",
       "sourceEvidence": {
         "series": {
           "CPILFESL": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:03.744362+00:00",
+              "verified_at": "2026-10-25T01:31:01.199796+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -186,14 +186,14 @@
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
       "detail": "開始=2026-07-22, 結束=2026-10-21, 單位十億美元; Fed Δ=6.226000, TGA Δ=109.736000, RRP Δ=-0.139000; 淨流動性 Δ=-103.371000",
-      "lastVerifiedAt": "2026-10-24T11:57:05.027673+00:00",
+      "lastVerifiedAt": "2026-10-25T01:31:02.821687+00:00",
       "sourceEvidence": {
         "series": {
           "RRPONTSYD": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:06.998710+00:00",
+              "verified_at": "2026-10-25T01:31:04.856390+00:00",
               "observation_date": "2026-10-23"
             }
           ],
@@ -201,7 +201,7 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:05.027673+00:00",
+              "verified_at": "2026-10-25T01:31:02.821687+00:00",
               "observation_date": "2026-10-21"
             }
           ],
@@ -209,7 +209,7 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:05.994408+00:00",
+              "verified_at": "2026-10-25T01:31:03.888137+00:00",
               "observation_date": "2026-10-21"
             }
           ]
@@ -257,14 +257,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-24T11:57:12.421383+00:00",
+      "lastVerifiedAt": "2026-10-25T01:31:09.563802+00:00",
       "sourceEvidence": {
         "series": {
           "UNRATE": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:12.421383+00:00",
+              "verified_at": "2026-10-25T01:31:09.563802+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -279,14 +279,14 @@
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
-      "lastVerifiedAt": "2026-10-24T11:57:13.440951+00:00",
+      "lastVerifiedAt": "2026-10-25T01:31:10.580408+00:00",
       "sourceEvidence": {
         "series": {
           "PAYEMS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:57:13.440951+00:00",
+              "verified_at": "2026-10-25T01:31:10.580408+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -301,14 +301,14 @@
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",
-      "lastVerifiedAt": "2026-10-24T11:56:25.443561+00:00",
+      "lastVerifiedAt": "2026-10-25T01:30:23.504615+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T11:56:25.443561+00:00",
+              "verified_at": "2026-10-25T01:30:23.504615+00:00",
               "observation_date": "2026-10-22"
             }
           ]
@@ -858,7 +858,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-24T11:57:09.223831+00:00"
+      "retrieved_at": "2026-10-25T01:31:06.220557+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -869,7 +869,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-24T11:57:10.189826+00:00"
+      "retrieved_at": "2026-10-25T01:31:07.094684+00:00"
     },
     {
       "observation_date": "2026-09-01",
@@ -880,7 +880,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-24T11:57:11.194352+00:00"
+      "retrieved_at": "2026-10-25T01:31:08.041699+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -1004,13 +1004,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-24T21:41:39+08:00",
+  "dataUpdatedAt": "2026-10-25T11:21:26+08:00",
   "sourceSnapshot": {
-    "macro18": "302aea8478b1ab1f106234e532d63b3a18abc5fb",
+    "macro18": "a0a240530088d90aef705916a24cc0de4b4be707",
     "macro8": "dc9f0f369036b5ebc153e88f2977498fc38453f5",
     "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-10-24T19:57:13.718577+08:00",
+    "macro18GeneratedAt": "2026-10-25T09:31:10.757883+08:00",
     "macro8GeneratedAt": "2026-10-24T10:07:00+08:00"
   }
 }

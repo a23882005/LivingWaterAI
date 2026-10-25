@@ -22,7 +22,7 @@ OPERATION = 'first_allocation_snapshot'
 STATUS = 'FIRST_ALLOCATION_SAVED'
 REQUIRED_TABLES = ('family_member_identity', 'portfolio_account',
                    'portfolio_instrument', 'portfolio_position',
-                   'cash_balance_snapshot', 'portfolio_snapshot_run',
+                   'cash_account_scope', 'cash_balance_snapshot', 'portfolio_snapshot_run',
                    'portfolio_snapshot_item')
 
 
@@ -216,6 +216,18 @@ def make_writer(client_id, account_key):
             currency = row['currency']
             minor = int(_amount(row['reported_amount'])*100)
             snapshot_id = run_id + '-CASH-' + currency
+            scope = db.execute('''select client_id from cash_account_scope
+                where account_key=? and currency_code=?''',
+                (account_key,currency)).fetchall()
+            if len(scope)>1 or scope and scope[0][0] != client_id:
+                raise PermissionError('CASH_SCOPE_CROSS_CLIENT_OR_DUPLICATE')
+            if not scope:
+                db.execute('''insert into cash_account_scope
+                    (client_id,account_key,currency_code,account_currency_state,
+                     source_kind,source_reference,created_at_utc)
+                    values(?,?,?,?,?,?,?)''',
+                    (client_id,account_key,currency,'USER_REPORTED',
+                     'USER_CONFIRMED',ref,when))
             db.execute('''insert into cash_balance_snapshot
                 (cash_snapshot_id,client_id,account_key,currency_code,as_of_utc,version,
                  source_snapshot_id,reported_cash_minor,reported_cash_basis,

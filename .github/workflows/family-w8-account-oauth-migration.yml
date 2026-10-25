@@ -1,0 +1,51 @@
+name: Family W8 official account OAuth schema
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-b04-temp-drive-writer
+  cancel-in-progress: false
+jobs:
+  migrate-accounts-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+    steps:
+      - name: Check and apply existing B07 OAuth migration via private B06 writer
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR
+          script: |
+            set -eu
+            parent="$(dirname "${LW_DIR%/}")"
+            test -d "$parent/.family-w8-app/Family/W8"
+            python3 - "$parent/.family-w8-app/Family/W8" "$parent/.family-b07-service" <<'PY'
+            import sys
+            from pathlib import Path
+            sys.path.insert(0,sys.argv[1])
+            from private_family_service import load_official_router
+            router=load_official_router(Path(sys.argv[2]))
+            needed={'oauth_code','oauth_grant','oauth_token'}
+            def scan(db):
+                names={r[0] for r in db.execute("select name from sqlite_master where type='table'")}
+                return {'account': 'account' in names,
+                        'login_session':'login_session' in names,
+                        'oauth_complete':needed<=names,
+                        'oauth_existing':len(needed&names)}
+            before=router.oauth.manager.store.read(scan)
+            assert before['account'] and before['login_session']
+            if not before['oauth_complete']:
+                # Uses official B06 writer's verified backup, transaction,
+                # same Drive file ID, and readback. Four customer DBs untouched.
+                router.oauth.migrate()
+            after=router.oauth.manager.store.read(scan)
+            assert after['oauth_complete']
+            print('OFFICIAL_ACCOUNT_OAUTH_SCHEMA_PASS')
+            print('FOUR_CUSTOMER_DATABASES_UNCHANGED_BY_THIS_JOB')
+            PY

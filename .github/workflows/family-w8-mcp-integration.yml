@@ -2,18 +2,20 @@ name: Family W8 authenticated MCP integration
 on:
   workflow_dispatch:
   push:
-    branches: [w8-real-resource-routes-20261026, main]
+    branches: [w8-real-resource-routes-20261026, w8-four-family-fourteen-handlers-20261026, main]
     paths:
       - '.github/workflows/family-w8-mcp-integration.yml'
       - '系統工程/Family/W7/account_mcp.py'
       - '系統工程/Family/W8/private_family_service.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/official_mutations.py'
   pull_request:
     paths:
       - '.github/workflows/family-w8-mcp-integration.yml'
       - '系統工程/Family/W7/account_mcp.py'
       - '系統工程/Family/W8/private_family_service.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/official_mutations.py'
 permissions:
   contents: read
 jobs:
@@ -33,13 +35,14 @@ jobs:
           python -m py_compile \
             系統工程/Family/W7/account_mcp.py \
             系統工程/Family/W8/private_family_service.py \
-            系統工程/Family/W8/official_family_entry.py
+            系統工程/Family/W8/official_family_entry.py \
+            系統工程/Family/W8/official_mutations.py
           python - <<'PY'
           import sys
           sys.path.insert(0,'系統工程/Family/W8')
           from private_family_service import OfficialBusinessTools, load_official_router
           specs=OfficialBusinessTools.specs()
-          assert [v['name'] for v in specs]==['family_portfolio','family_deployment_pace']
+          assert [v['name'] for v in specs]==['family_portfolio','family_deployment_pace', 'family_first_allocation', 'family_adjust_target', 'family_new_funding', 'family_update_profile', 'family_record_event']
           assert callable(load_official_router)
           print('OFFICIAL_BUSINESS_RUNTIME_IMPORT_PASS')
           PY

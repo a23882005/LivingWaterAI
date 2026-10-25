@@ -121,7 +121,8 @@ def normalize_request(data):
         money_seen.add(currency)
         recorded_cash.append({'currency':currency, 'reported_amount':str(_amount(row.get('reported_amount'))),
                               'settled_verified':row.get('settled_verified') is True})
-    return {'as_of_utc':when, 'confirmation_reference':ref,
+    return {'interview_confirmed':True,
+            'as_of_utc':when, 'confirmation_reference':ref,
             'mentor_answers':answers,
             'long_term_style':{'stock_weight':str(sw), 'bond_weight':str(bw)},
             'holdings':recorded_holdings, 'cash':recorded_cash}

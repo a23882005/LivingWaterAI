@@ -1,34 +1,33 @@
-# Family 家人版專案參考索引
+最後修改日期時間：2026/10/25 16:31（台灣時間）
+# Family 家人版四戶正式專案文件索引
 
-## 最新工程裁定｜2026/10/25
+## 2026/10/25 16:31 指揮官最新版指定：恢復八份原始 TXT
 
-**指揮官正式確認 W7 全面 PASS／CLOSED。** MOU、Joseph、Arthur、Lilian 四位家人專案承接同一W7正式結案成果。此前 B07 IN_PROGRESS／6/23 等皆屬歷史進度，現行以本日Owner最終裁決為準；詳見 [W7 Checkpoint.json](W7/Checkpoint.json)。
+本次以指揮官重新上傳的八份 TXT 為唯一文件版本基準：
+- MOU／Joseph／Lilian：Instructions v1.16.4、Sources v1.16.4。
+- Arthur：Instructions v1.16.4、Sources **v1.16.5（指揮官 16:16 更新版）**。
 
-**下一階段：W8 全面整合測試與程式 Debug。** 由 Family 中PM（總PM）承接全案整合測試與修復，涵蓋各戶14項選單、有效登入會話、資料庫讀寫讀回、建倉／配置／V70／V82／債券V75、報告生成及異常回歸。W8各項成果與Gate後續另依實測記錄；保持交易授權NONE。這是最新Owner驗收決定，保留歷史測試證據，不捏造新測試數量。
+2026/10/25 下午原 Google Drive 的八份 v1.17 已被覆寫回以上指定版本；沿用每份原始 Google Drive File ID，逐份遠端讀回。v1.17 為已取代的歷史版本，留存私人備份，不得覆蓋 Owner 當前指定版本。
 
-四位家人專案的 **Sources.txt** 已於 2026/10/25 原 Google Drive ID 更新至 **v1.16.5**，各檔新增「W7全面PASS／下一階段W8測試Debug」簡短進度紀錄並讀回通過；原 Instructions v1.16.4 不變，使用者選單及身分資料均維持原版。
+**GitHub 是公開儲存庫。** 私人 Sources（含個人 DB 及報告位置、client_id）保持在有權限控管的 Google Drive；GitHub 只提供可查核的版本／SHA-256／連結與正式工程程式，避免公佈家人私人資源。
 
+## 四戶正式檔案及原始 SHA-256
 
-最後修改日期時間：2026/10/25 12:44（台灣時間）
+| 專案 | Instructions | SHA-256 | Sources | SHA-256 |
+|---|---|---|---|---|
+| MOU | [v1.16.4](https://drive.google.com/file/d/1rzj5FP6re6dfhme2Mos9DRthygqM3zMM/view) | `37be5a1b6525e42618c16402b6d1600d1375b8af615c03ea629dcb509df9a5e0` | [v1.16.4](https://drive.google.com/file/d/1LoB6o4hWgj94Sy4yTV3bdiiybzRqGesF/view) | `43fdd14c982f727a48461f44f804b01bcf79ee5c127db52ac8bc09894367739b` |
+| Joseph | [v1.16.4](https://drive.google.com/file/d/1qjVWts4u-IuIM9I5vTgXc6sfcZ_2LAVw/view) | `f4a018a3a6466717001b5c1a245d8641c511b59a4c6d13e84ed843833b6e9cac` | [v1.16.4](https://drive.google.com/file/d/194zJSkEKRxbfkxUcGKiTCT5a4GEe2nVG/view) | `b24fcda67cb037dea8140eb42c7ba8a2e163515ed0a69f17a809ab396494dee8` |
+| Arthur | [v1.16.4](https://drive.google.com/file/d/18h6TYSQiCFtUeWF9osnxwM0_Za2KT1-8/view) | `caf985b19b337278fd5361b791aa79340d58f80ace9488c980eec8551cba6923` | [v1.16.5](https://drive.google.com/file/d/1Q43U_uI24HM0BVw_h1rGjJk9xR7Wn4Hy/view) | `f647900e58ced5b6a33e48a291f6742f1f34aa76674f5865d1a9b97552ed10cc` |
+| Lilian | [v1.16.4](https://drive.google.com/file/d/1TPKp1zY9ZVWb0WLsdCuWMwHa_fmdoUqU/view) | `e4339e3c2e57a31889a3b8c5ac994c8950bab7cbc0f4a871b92c02ccbed46733` | [v1.16.4](https://drive.google.com/file/d/1jIUWODZ5OWBBCtF2i7rjhrpaN62yycZb/view) | `09aec2f423de2f3eecf071dd9a331c75926480ee5087922c78d58ed7b4451167` |
 
-本檔為公開的專案設定索引。各人完整 Instructions 與 Sources 保存在 Google Drive 正式檔；GitHub 不公開個人資料庫、client_id、帳號驗證資料庫與私人報告資料夾的位置。
+SHA-256 來自指揮官本次八份實際附件原始位元組；若 Google Drive 檔案變動，應先確認是否為最新 Owner 授權修改，不能把舊版 v1.17 自動當新版。
 
-## 四個家人專案文件
+## 使用與工程狀態（沿用先前定案）
 
-| 專案 | Instructions（Google Drive） | Sources（Google Drive） |
-|---|---|---|
-| MOU | [MOU_Project_Instructions.txt](https://drive.google.com/file/d/1rzj5FP6re6dfhme2Mos9DRthygqM3zMM/view) | [MOU_Project_Sources.txt](https://drive.google.com/file/d/1LoB6o4hWgj94Sy4yTV3bdiiybzRqGesF/view) |
-| Joseph | [Joseph_Project_Instructions.txt](https://drive.google.com/file/d/1qjVWts4u-IuIM9I5vTgXc6sfcZ_2LAVw/view) | [Joseph_Project_Sources.txt](https://drive.google.com/file/d/194zJSkEKRxbfkxUcGKiTCT5a4GEe2nVG/view) |
-| Arthur | [Arthur_Project_Instructions.txt](https://drive.google.com/file/d/18h6TYSQiCFtUeWF9osnxwM0_Za2KT1-8/view) | [Arthur_Project_Sources.txt](https://drive.google.com/file/d/1Q43U_uI24HM0BVw_h1rGjJk9xR7Wn4Hy/view) |
-| Lilian | [Lilian_Project_Instructions.txt](https://drive.google.com/file/d/1TPKp1zY9ZVWb0WLsdCuWMwHa_fmdoUqU/view) | [Lilian_Project_Sources.txt](https://drive.google.com/file/d/1jIUWODZ5OWBBCtF2i7rjhrpaN62yycZb/view) |
+- 每位家人使用自己的 Project 與 DB，十四項選單不變。
+- 登入成功後四小時有效；新對話先查現有有效登入狀態，未到期無須重新輸入密碼；實際功能仍以可信驗證會話為準。
+- 已確認資料直接走現有寫入流程、成功後讀回；發生真實錯誤才針對該步修復。
+- **W7 Owner 最終裁定 PASS／CLOSED**；參考 [W7 Checkpoint](W7/Checkpoint.json)。下一工序 W8 全面整合測試與程式 Debug，由 Family 中PM（總PM）執行。
+- 不自動證券下單；正式 DB 留 Google Drive，不將私人原件公佈於 GitHub。
 
-## 2026/10/25 指揮官核定的操作原則（目標版本 v1.16.4）
-
-1. 登入成功起四小時有效；換新對話時，只要能驗證同一有效登入會話，就直接沿用，不重新索取密碼。四小時到期再重新登入。
-2. 使用者提出需求後，沿用已確認資料、現有程式與現有功能；第一次建倉直接保存已確認資料，完成後讀回。
-3. 實際遇到登入、讀寫或授權故障時，只針對當前故障處理；不因其他工程尚在施工就停下正常工作。
-4. 保留本人資料隔離、真正的身分驗證、寫入後讀回確認與使用者自行下單的既有原則；十四項選單不變。
-
-**版本同步狀態：** 2026/10/25 Google Drive 八份正式原檔皆以相同原 ID 更新為 v1.16.4，逐份遠端讀回確認。GitHub 保留非敏感版索引，私人資料仍以 Drive 原檔為準。
-
-**技術狀態：** 目前 Python 驗證物件仍以單一執行環境為有效範圍；跨對話四小時登入沿用，需以實際共享且可驗證的會話機制完成後才能宣告功能實測通過。
+以上為版本/檔案治理同步，不代表本輪對四人 Projects GUI 的安裝或 W8 實測已完成。

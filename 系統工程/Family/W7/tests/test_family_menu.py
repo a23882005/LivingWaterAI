@@ -94,3 +94,21 @@ def test_archive_binding_requires_renderer_qa():
     handlers = report_handlers(auth, object(), lambda p: {'qa_passed':False})
     with pytest.raises(ValueError, match='REPORT_QA_REQUIRED'):
         handlers['generate_report']({})
+
+
+def test_swapped_04_05_routes_and_privacy_are_exact():
+    assert route('04') == {
+        'number':4, 'label':'評估現在各標的物投入速度',
+        'operation':'deployment_pace','rule':'04_買賣與持倉調整.md','private':True}
+    assert route('05') == {
+        'number':5, 'label':'尋找新標的物',
+        'operation':'research_candidates','rule':'04_尋找新標的物.md','private':False}
+    menu = render_menu('Arthur')
+    assert menu.index('04｜評估現在各標的物投入速度') < menu.index('05｜尋找新標的物')
+    assert '選03/05' in menu
+
+
+def test_swapped_04_deployment_still_requires_auth_and_05_public_research():
+    ui = make_menu(handlers={'deployment_pace': lambda p:'DEPLOY', 'research_candidates':lambda p:'RESEARCH'})
+    assert ui.select(4)['status'] == 'LOGIN_REQUIRED'
+    assert ui.select(5)['result'] == 'RESEARCH'

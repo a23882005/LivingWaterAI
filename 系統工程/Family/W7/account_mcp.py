@@ -7,7 +7,8 @@ import json
 from account_oauth import OAuthError,SCOPE
 
 class AccountMCP:
-    def __init__(self,oauth):self.oauth=oauth
+    def __init__(self, oauth, business_tools=None):
+        self.oauth, self.business_tools = oauth, business_tools
 
     def handle(self,method,headers,raw=b''):
         headers={k.lower():v for k,v in headers.items()}
@@ -56,11 +57,27 @@ class AccountMCP:
                     'inputSchema':{'type':'object','properties':{},'additionalProperties':False},
                     'annotations':{'readOnlyHint':True,'destructiveHint':False,'openWorldHint':False},
                     'securitySchemes':[{'type':'oauth2','scopes':[SCOPE]}]}]}
+                if self.business_tools is not None:
+                    result['tools'].extend(self.business_tools.specs())
             elif name=='tools/call':
-                if set(params)-{'name','arguments','_meta'} or params.get('name')!='family_session' or params.get('arguments',{})!={}:
+                if set(params)-{'name','arguments','_meta'} or not isinstance(params.get('arguments',{}),dict):
                     return 200,out,json.dumps({'jsonrpc':'2.0','id':rid,'error':{'code':-32602,'message':'Invalid tool arguments'}}).encode()
-                data={'user_id':principal.subject[len('account:'):], 'access_expires_at':principal.expires_at}
-                result={'content':[{'type':'text','text':json.dumps(data)}],'structuredContent':data,'isError':False}
+                tool_name,arguments=params.get('name'),params.get('arguments',{})
+                if tool_name=='family_session' and arguments=={}:
+                    data={'user_id':principal.subject[len('account:'):], 'access_expires_at':principal.expires_at}
+                elif self.business_tools is not None and tool_name in ('family_portfolio','family_deployment_pace'):
+                    try:
+                        data=self.business_tools.call(principal,tool_name,arguments)
+                    except (PermissionError,ValueError):
+                        return 200,out,json.dumps({'jsonrpc':'2.0','id':rid,'error':{'code':-32602,'message':'Invalid tool arguments'}}).encode()
+                    except Exception:
+                        # Never reflect Google Drive/provider exceptions, tokens,
+                        # private row values or internal file paths in an error.
+                        data={'status':'SERVICE_RETRY','trade_authorization':'NONE'}
+                else:
+                    return 200,out,json.dumps({'jsonrpc':'2.0','id':rid,'error':{'code':-32602,'message':'Invalid tool arguments'}}).encode()
+                result={'content':[{'type':'text','text':json.dumps(data,ensure_ascii=False)}],
+                        'structuredContent':data,'isError':data.get('status')=='SERVICE_RETRY' if isinstance(data,dict) else False}
             else:return 200,out,json.dumps({'jsonrpc':'2.0','id':rid,'error':{'code':-32601,'message':'Method not found'}}).encode()
             return 200,out,json.dumps({'jsonrpc':'2.0','id':rid,'result':result},ensure_ascii=False).encode()
         except (ValueError,TypeError,KeyError,UnicodeError):

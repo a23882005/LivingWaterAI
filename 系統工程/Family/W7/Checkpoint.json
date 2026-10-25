@@ -3,7 +3,7 @@
   "owner": "Family中PM本人",
   "mode": "sequential",
   "contract_version": "v1.6.1",
-  "current_work": "W7-B07",
+  "current_work": "W7-CLOSED → W8",
   "completed": [
     "H2接任核對",
     "W7-A01來源重現、有限重試修補、本機驗證及雙端工作版本保存讀回",
@@ -28,9 +28,7 @@
     "W7-B05 169項覆核、40份共用來源表頭、六DB表頭同目錄落位與外置ACL/讀回驗收PASS",
     "W7-B06共同I/O/Drive adapter驗收PASS：49測試、真實中斷/並行/備份/同ID回存/精確還原、資源設定讀回"
   ],
-  "in_progress": [
-    "W7-B07登入、固定四小時、本人改密碼/管理權、跨對話session及服務授權接線"
-  ],
+  "in_progress": [],
   "source_versions": {
     "main": "220e76b13d356f459b254fbe99ffa121d78f5338",
     "handoff": "20261022-H3",
@@ -98,15 +96,15 @@
     "B10: P70-5及macro_source_bridge未驗26小時期限，正式消費入口需接A段既定有效期契約。",
     "B20/B22: 原WORK12 pretax明確排除BNDW；保留Lilian假設資料，不移除算法限制或宣稱已有含息績效。"
   ],
-  "next_action": "依Joseph v1.11簡易帳密方案，續接B07帳號改密碼/管理與共同I/O可信身分，驗即時撤銷、真人登入及跨對話接續；02唯讀入口與15項合成測試完成，B07仍IN_PROGRESS。",
-  "next_owner": "Family中PM本人",
+  "next_action": "進入W8全面整合測試與程式Debug：四人14項選單、4小時跨對話登入、各戶DB讀寫讀回、建倉、資產配置、V70／V82／債券V75、報告與異常回歸；由Family中PM總PM統一執行與記錄。",
+  "next_owner": "Family中PM（總PM）",
   "controls": {
     "production": "HOLD",
     "trading": "NONE",
     "W4": "CANCELLED",
     "RM17": "FROZEN"
   },
-  "current_work_status": "IN_PROGRESS",
+  "current_work_status": "PASS_BY_OWNER",
   "verification": {
     "new_tests": "5/5 PASS",
     "existing_d009_tests": "9/9 PASS",
@@ -612,18 +610,16 @@
   "review_note": "B01～B06原PASS沿用；B07 Drive OAuth、主機持久私有設定及14項合成HTTPS OAuth驗證PASS。實際ChatGPT客戶端仍未驗收；token交換85.426秒偏慢。真人安全啟用、正式路由接線、跨對話與Google長期授權未完成；B07仍IN_PROGRESS／6/23。 B07公開介紹/隱私權/條款三頁HTTPS與來源SHA256及瀏覽器導覽PASS；待指揮官填入Google品牌欄位，尚未確認發布。",
   "w7_progress": {
     "scheme": "B01-B23",
-    "completed": 6,
+    "completed": 23,
     "total": 23,
-    "current": "W7-B07",
+    "current": "W7-CLOSED",
     "completed_ids": [
       "W7-B01",
       "W7-B02",
       "W7-B03",
       "W7-B04",
       "W7-B05",
-      "W7-B06"
-    ],
-    "remaining_ids": [
+      "W7-B06",
       "W7-B07",
       "W7-B08",
       "W7-B09",
@@ -642,7 +638,8 @@
       "W7-B22",
       "W7-B23"
     ],
-    "rule": "唯一正式進度；每項依契約完成條件與證據裁定"
+    "remaining_ids": [],
+    "rule": "2026/10/25 Owner正式裁定W7全面PASS；原技術階段6/23等保留於w7_historical_progress_before_owner_decision，非本輪新增23/23獨立測試。"
   },
   "deployment_route": {
     "executor": "GitHub Actions",
@@ -765,5 +762,49 @@
       "pytest_suite": "NOT_RUN_IN_THIS_RUNTIME: pytest is unavailable; the prior 43/43 result is from the pre-correction revision.",
       "live_report_publish": "NOT_RUN: trusted renderer and private runtime folder/writer-lock injection remain pending."
     }
+  },
+  "owner_final_decision": {
+    "date": "2026-10-25",
+    "taiwan_time": "2026/10/25 12:42",
+    "status": "PASS",
+    "closure": "CLOSED",
+    "source": "指揮官2026/10/25明確正式裁定W7全面PASS",
+    "scope": "Family W7四人共同交付（MOU／Joseph／Arthur／Lilian）",
+    "next_stage": "W8全面整合測試與程式Debug",
+    "note": "以Owner最新驗收裁決為現行W7狀態；歷史測試記錄保留。本次未重新執行W7全部技術測試；W8尚待實際驗收。"
+  },
+  "w7_historical_progress_before_owner_decision": {
+    "scheme": "B01-B23",
+    "completed": 6,
+    "total": 23,
+    "current": "W7-B07",
+    "completed_ids": [
+      "W7-B01",
+      "W7-B02",
+      "W7-B03",
+      "W7-B04",
+      "W7-B05",
+      "W7-B06"
+    ],
+    "remaining_ids": [
+      "W7-B07",
+      "W7-B08",
+      "W7-B09",
+      "W7-B10",
+      "W7-B11",
+      "W7-B12",
+      "W7-B13",
+      "W7-B14",
+      "W7-B15",
+      "W7-B16",
+      "W7-B17",
+      "W7-B18",
+      "W7-B19",
+      "W7-B20",
+      "W7-B21",
+      "W7-B22",
+      "W7-B23"
+    ],
+    "rule": "唯一正式進度；每項依契約完成條件與證據裁定"
   }
 }

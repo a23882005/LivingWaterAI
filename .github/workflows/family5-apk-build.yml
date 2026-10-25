@@ -20,6 +20,9 @@ jobs:
           unzip -q family5_apk/source.zip -d family5_apk/project
           test -f family5_apk/project/app/build.gradle
           test -f family5_apk/project/app/src/main/python/family_offline.py
+          # Chaquopy 17.x AndroidPlatform belongs to com.chaquo.python.android.
+          sed -i 's/import com.chaquo.python.AndroidPlatform;/import com.chaquo.python.android.AndroidPlatform;/' family5_apk/project/app/src/main/java/tw/livingwater/family5/MainActivity.java
+          grep -q 'import com.chaquo.python.android.AndroidPlatform;' family5_apk/project/app/src/main/java/tw/livingwater/family5/MainActivity.java
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

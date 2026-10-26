@@ -31,6 +31,57 @@ def _iso(value):
     return out.astimezone(timezone.utc)
 
 
+class NativeSourceAssemblyError(ValueError):
+    def __init__(self, missing):
+        self.missing=tuple(missing)
+        super().__init__('NATIVE_SOURCE_INPUTS_REQUIRED:'+','.join(missing))
+
+
+def assemble_native_input(request, context, native_sources):
+    """Assemble original contracts from trusted producer outputs in one pass.
+
+    No fixture/default financial values enter this function. Report all absent
+    source sections together, then let the original FamilyRunner validate the
+    financial contracts and invoke the original engines.
+    """
+    bundle_keys=('stock_request','bond_request','stock_evidence','producer_contract',
+                 'stock_source_fields','bond_evidence','asset_framework','physical_sgov')
+    context_keys=('funding_source','valuation_source','v70_source','c7_source','technical_source')
+    sources=deepcopy(native_sources)
+    if not isinstance(sources,dict):raise NativeSourceAssemblyError(['native_sources'])
+    bundle=sources.get('native_bundle',{})
+    source_context=sources.get('trusted_context',{})
+    mapping=sources.get('native_binding',{})
+    missing=['native_bundle.'+k for k in bundle_keys
+             if not isinstance(bundle,dict) or not isinstance(bundle.get(k),dict) or not bundle[k]]
+    missing+=['trusted_context.'+k for k in context_keys
+              if not isinstance(source_context,dict) or not isinstance(source_context.get(k),dict) or not source_context[k]]
+    missing+=['native_binding.'+k for k in ('native_owner','stock_instrument','bond_instruments')
+              if not isinstance(mapping,dict) or not isinstance(mapping.get(k),dict) or not mapping[k]]
+    if missing:raise NativeSourceAssemblyError(missing)
+    if mapping.get('data_provenance')!='SOURCE_BACKED':
+        raise ValueError('NATIVE_ASSEMBLY_SOURCE_BACKED_REQUIRED')
+    req=deepcopy(request);ctx=deepcopy(context)
+    from family_input import digest
+    from family_boundary import prepare_input
+    ctx.update({k:deepcopy(source_context[k]) for k in context_keys})
+    req['native_bundle']={k:deepcopy(bundle[k]) for k in bundle_keys}
+    for name in ('valuation','v70','c7','technical'):
+        req[name+'_source_digest' if name!='valuation' else 'valuation_digest']=digest(ctx[name+'_source'])
+    prepared=prepare_input(req,trusted_context=ctx)
+    ctx['native_binding']={**deepcopy(mapping),
+        'schema_version':'Family.W5.NativeBinding.v1',
+        'family_owner':deepcopy(req['owner']),
+        'data_provenance':'SOURCE_BACKED',
+        'source_reference':sources.get('source_reference'),
+        'bundle_digest':digest(req['native_bundle']),
+        'target_binding_digest':prepared.payload['target_binding']['binding_digest'],
+        'request_digest':prepared.input_digest}
+    if not ctx['native_binding']['source_reference']:
+        raise NativeSourceAssemblyError(['source_reference'])
+    return req,ctx
+
+
 class OnDemandAnalysisProvider:
     """Prepare one deterministic run without making up missing market context."""
 
@@ -107,6 +158,9 @@ class OnDemandAnalysisProvider:
                 account_key=request['owner']['account'],
                 owner_decision=self.official_holdings_decision,
                 evaluation_at=request['evaluation_at'])
+        if 'native_sources' in pack:
+            if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
+            request,context=assemble_native_input(request,context,pack['native_sources'])
         binding = context.get("native_binding", {})
         if (binding.get("schema_version") != "Family.W5.NativeBinding.v1"
                 or binding.get("data_provenance") != "SOURCE_BACKED"

@@ -177,6 +177,8 @@ def build_w6_current_data(source, market, engine):
         "engine_result_sha256":_sha(engine),
         # Four-panel six-stage radar belongs to approved C/Mentor output only.
         "approved_radar":engine.get("approved_report_radar"),
+        "verified_sections":engine.get("approved_w6_section_content"),
+        "target_version":target[0]["version_no"],
         "data_provenance":"SOURCE_BACKED",
         "report_content_state":"CALCULATION_READY__W6_RENDER_AND_QA_REQUIRED",
         "trade_authorization":"NONE"}

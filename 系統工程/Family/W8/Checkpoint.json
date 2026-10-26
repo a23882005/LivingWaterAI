@@ -413,6 +413,59 @@
         "runtime": "CHATGPT_ON_DEMAND",
         "external_python_host": "NONE"
       }
+    },
+    {
+      "id": "W8-R15",
+      "name": "ChatGPT按需選單01/03/06/10/11官方SQLite工作副本接線",
+      "status": "CODE_MERGED__CI_95_OF_95_PASS__DRIVE_PERSISTENCE_E2E_PENDING",
+      "verified_at_taipei": "2026/10/27 00:58",
+      "pr": 49,
+      "merge_commit": "fd2fb37f83f954f51d56b0377e414dabc10c7eea",
+      "ci": [
+        {
+          "workflow": "Family W8 post-trade regression",
+          "run_id": 40364158578,
+          "status": "SUCCESS",
+          "unit_tests": "95/95"
+        },
+        {
+          "workflow": "Family menu unit tests",
+          "run_id": 40364158191,
+          "status": "SUCCESS"
+        },
+        {
+          "workflow": "Family W8 report isolation regression",
+          "run_id": 40364158973,
+          "status": "SUCCESS"
+        }
+      ],
+      "changed_paths": [
+        "系統工程/Family/W8/on_demand_mutations.py",
+        "系統工程/Family/W8/on_demand_project.py",
+        "系統工程/Family/W7/family_menu.py",
+        "系統工程/Family/W8/tests/test_on_demand_mutations.py",
+        ".github/workflows/family-w8-post-trade-regression.yml"
+      ],
+      "verified": [
+        "Login account and immutable source SHA guarded before candidate creation",
+        "Uses approved official_mutations make_writer in independent SQLite working copy",
+        "Candidate sealed via SQLite backup and original downloaded DB remains byte-identical",
+        "All five mutation operations enter W7 menu after opt-in trusted stage directory",
+        "W7 returns DB_WRITEBACK_REQUIRED rather than COMPLETED for local staged edits",
+        "No family official DB bytes overwritten in synthetic CI"
+      ],
+      "next_real_gate": [
+        "Obtain connector-registered reference for newly generated official SQLite candidate",
+        "Complete same-ID Google Drive update, SHA256/SQL row readback for four family members as required",
+        "Run end-to-end 04 market inputs and 13 real W6 report delivery through member Projects",
+        "Gate D/E Owner signoff"
+      ],
+      "controls": {
+        "production": "HOLD",
+        "trading": "NONE",
+        "on_demand": "CHATGPT_ONLY",
+        "external_host": "NONE"
+      }
     }
   ],
   "defects": [

@@ -101,12 +101,12 @@ class OnDemandWriteback:
                 raise ValueError('LOCAL_FILE_CHANGED')
 
     def authorize_update(self, plan, fresh_remote, backup_remote, backup_file_id,
-                         *, candidate_file_uri=None):
+                         *, candidate_file_uri=None, local_upload_supported=False):
         """Check the source backup and bind the actual connector artifact.
 
-        A local path is NOT a Google Drive file_uri. The ChatGPT executor must
-        produce a current-turn artifact reference for the exact sealed candidate,
-        then pass its tool-returned sediment://file_... URI explicitly.
+        Current Work tools host-upload absolute local paths. Enable that route
+        only after the executor verifies its active tool schema and transport.
+        Older executors may still supply a current-turn sediment reference.
         This check remains a preflight, not a distributed compare-and-swap.
         """
         self._plan(plan)
@@ -121,9 +121,14 @@ class OnDemandWriteback:
                     'candidate_sha256': plan['candidate']['sha256'],
                     'candidate_size': plan['candidate']['size'],
                     'trade_authorization': 'NONE'}
-        if (not isinstance(candidate_file_uri, str)
-                or not re.fullmatch(r'sediment://file_[A-Za-z0-9_-]+',
-                                    candidate_file_uri)):
+        local = (local_upload_supported is True
+                 and isinstance(candidate_file_uri, str)
+                 and Path(candidate_file_uri).is_absolute()
+                 and candidate_file_uri == plan['candidate']['path'])
+        registered = (isinstance(candidate_file_uri, str)
+                      and re.fullmatch(r'sediment://file_[A-Za-z0-9_-]+',
+                                       candidate_file_uri))
+        if not (local or registered):
             raise ValueError('VALID_CONNECTOR_FILE_URI_REQUIRED')
         return {'status': 'READY_NOT_PERSISTED',
                 'backup_file_id': backup_file_id,

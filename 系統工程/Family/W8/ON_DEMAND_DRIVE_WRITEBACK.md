@@ -1,4 +1,4 @@
-最後修改日期時間：2026/10/27 00:12（台灣時間）
+最後修改日期時間：2026/10/27（台灣時間）
 # W8｜四戶共用 ChatGPT 按需 SQLite 原位寫回
 
 正式位置：`系統工程/Family/W8/on_demand_drive_io.py`。
@@ -18,8 +18,8 @@
 2. 按既有業務程式修改獨立工作副本。COMMIT 並關閉所有寫入連線；若使用 WAL，呼叫 `seal_working_copy(工作檔, 全新封存檔)` 透過 SQLite backup API 包含已提交 WAL。不得僅複製主檔而丟掉 WAL。
 3. `plan = writer.prepare(原影像路徑, 封存候選路徑)`。結果只為 STAGED_NOT_PERSISTED，不是正式保存。
 4. Drive `copy_file` 備份原 File ID 到已核定私人備份位置。重新下載備份與原檔到兩個新路徑。
-5. `preflight = writer.authorize_update(plan, 新下載原檔, 新下載備份, 備份FileID)`：此時僅回傳 `CONNECTOR_FILE_REFERENCE_REQUIRED` 及候選檔 SHA／大小，**不提供可直接呼叫的 update_file_args**。原檔或備份 SHA 變動即拒絕，不覆蓋別人的更新。由當次 ChatGPT 程式輸出候選 SQLite 檔案，透過實際可用的檔案產出功能取得該候選檔對應的**工具回傳 file_uri（例如 sediment://file_...）**；不可以自行憑路徑拼裝 URI，也不能把其它家人的檔案參照混用。若本次環境無法取得有效檔案參照，明確回報尚未保存，切勿直接改用外部常駐主機。
-6. `ready = writer.authorize_update(plan, 新下載原檔, 新下載備份, 備份FileID, candidate_file_uri=實際取得的候選file_uri)`，成功才回 `READY_NOT_PERSISTED`。呼叫當前 Google Drive `update_file(**ready['update_file_args'])`，`fileId` 維持本人原ID，`file_uri` 必須是**連接器可辨認的檔案參照**，絕非本地 `/mnt/data/...` 路徑；當前接口不接受原始本地路徑。此步不代表已保存成功，仍須第7、8步實際遠端讀回。不得將候選 SQLite 以 `upload_file` 產生成第二份正式DB。
+5. `preflight = writer.authorize_update(plan, 新下載原檔, 新下載備份, 備份FileID)` 先檢查來源與備份 SHA。未提供候選檔參照時回 `CONNECTOR_FILE_REFERENCE_REQUIRED`，不會產生更新參數。
+6. 先核實本次執行環境的工具 schema。2026/10/27 Work 的 Google Drive `upload_file.file_uri` 及 `update_file.file_uri` 支援由執行環境上傳**本機絕對路徑**：已以合成 SQLite 完成新檔、備份、原ID更新與獨立下載 SHA/SQL 驗證。這個能力由當次工具提供，不能推定所有 ChatGPT 環境相同。當次能力已確認時，使用 `writer.authorize_update(..., candidate_file_uri=plan['candidate']['path'], local_upload_supported=True)`；它會再次檢查候選內容、原件、備份、身分，並要求路徑精確等於封存候選。舊環境仍支援工具真正回傳的 `sediment://file_...` 參照；不要自行拼裝。`READY_NOT_PERSISTED` 後執行 `update_file(**ready['update_file_args'])`，保留本人原 File ID，接著完成第7、8步。當次工具無此上傳能力時，保留待寫回狀態。不得用新 DB ID 替換正式原ID。
 7. `update_file` 明確成功後，再 `fetch` 同一原 ID，物化到另一個全新路徑。`writer.verify_readback(plan, 新下載遠端路徑, 原FileID, checks)` 比對 SHA-256、SQLite integrity_check、foreign_key_check、本人身分與此次修改逐欄值。`checks` 是可信業務程式產生的 SELECT／參數／精確預期列；不得接受使用者提供任意 SQL。
 8. 僅 PERSISTED_REMOTE_VERIFIED 才回報完成。記錄原／後 SHA、備份 ID、原 File ID、欄位驗證、時間及 request 來源，私人資料證據留在核定 Drive 位置。
 
@@ -35,6 +35,9 @@
 
 已確認持股成本／長期股債比例／本人可投資金額的保存，使用同目錄 confirmed_asset_facts.py 的 append_confirmed_asset_facts(db,本人client_id,facts)，僅在獨立副本且 foreign_keys=ON 的交易內執行。facts 只放本次已確認資料與查證報價；此函式不代替 Drive 寫回。讀取最新本人已確認快照用 read_latest_confirmed_asset_facts(db,本人client_id)，依日期選最新非假設快照並驗證 CONFIRM 快照 hash；不把舊歷史當現況，不把股債偏好當逐標的 final_target。缺少此函式要求的必要欄位時沿用其他既有業務流程，不猜值。
 
-選單12／13報告歸檔同理：`on_demand_report_delivery.prepare_report_delivery` 只建立本地成果與SHA；必須從當次檔案輸出取得PDF／HTML／ZIP的真實檔案參照，使用 `bind_connector_uploads(plan, file_uri_by_artifact)` 產生 `upload_file` 的正確欄位 `file_uri、parent_folder_id、file_name、mime_type`。當前 `upload_file` 回傳檔名可能是 `file_name`，不是 `name`；以實際回傳ID重新讀取每份遠端檔案、校驗 SHA，最後上傳清單並讀回，才可宣告 `PERSISTED_REMOTE_VERIFIED`。未知值不硬補，四戶資料絕不交叉。
+選單12／13報告歸檔同理：`prepare_report_delivery` 先封存本地成果及SHA。當次工具確認支援本機上傳時，將每個 `uploads` 項的 `artifact` 對應到其 `path`，呼叫 `bind_connector_uploads(plan, refs, local_upload_supported=True)`；程式逐檔重驗大小與SHA，拒絕調換、修改或未核定路徑，再產生 `upload_file` 的 `file_uri、parent_folder_id、file_name、mime_type`。舊環境仍能使用真實工具回傳的檔案參照。`upload_file` 回傳檔名可能是 `file_name`，不是 `name`；必須以真實ID逐份下載驗SHA，最後上傳清單並讀回，才宣告 `PERSISTED_REMOTE_VERIFIED`。未知值不硬補，四戶資料絕不交叉。
+
+本次傳輸驗證是非家人資料的合成SQLite，原/備份8192 bytes、SHA `b3dffb88aa258f4f44c5b7a41991a4f50208dd7e2aa95794f2b2c4dd5f08283b`；同ID更新後另行下載8192 bytes、SHA `384e9528ca2395833038ea01b47d74a17b8ea59391c5f622b38465dfec067c55`，SQL revision由1變2，備份仍為1。此證據解除本次Work環境的傳輸阻礙；四戶正式業務寫入與Project端對端分別驗收。
+
 
 測試：在 W8 目錄執行 `PYTHONPATH=. python -m unittest discover -s tests -v`。測試資料為合成四戶，不含正式持倉或私人識別碼。

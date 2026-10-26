@@ -51,7 +51,7 @@ class W6CurrentDataTests(unittest.TestCase):
         source,market,engine=baseline()
         out=M.build_w6_current_data(source,market,engine)
         self.assertEqual(out["current_total_twd"],"2100")
-        self.assertEqual({x["代碼"] for x in out["drift"]},
+        self.assertEqual({x["標的"] for x in out["drift"]},
                          {"VT","QQQ","TWD_CASH"})
         self.assertEqual(sum(Decimal(x["權重"]) for x in out["actual"]),Decimal(1))
         self.assertEqual(sum(Decimal(x["權重"]) for x in out["target"]),Decimal(1))

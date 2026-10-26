@@ -652,6 +652,60 @@
         "trade_authorization": "NONE",
         "external_python_host": "NONE"
       }
+    },
+    {
+      "id": "W8-R20",
+      "name": "04 verified snapshot and same-run result lineage into existing W6 assembler",
+      "status": "MAIN_MERGED__CI_126_PASS__W6_BOUNDARY_REGRESSION_PASS__LIVE_NATIVE_PRODUCER_PENDING",
+      "pr": 55,
+      "merge_commit": "41cee831ba9f3903bfec489f07330fcdaeaf6d52",
+      "changed_paths": [
+        "系統工程/Family/W8/official_family_entry.py",
+        "系統工程/Family/W8/on_demand_analysis.py",
+        "系統工程/Family/W8/tests/test_official_target_readiness.py",
+        "系統工程/Family/W8/tests/test_on_demand_analysis.py"
+      ],
+      "ci": [
+        {
+          "run_id": 40389043006,
+          "name": "Family W8 official entry syntax",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 40389043162,
+          "name": "Family W8 post-trade regression",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 40389042986,
+          "name": "Family W8 authenticated MCP integration",
+          "conclusion": "success"
+        }
+      ],
+      "verified": [
+        "OnDemandAnalysisProvider requires request's full client_snapshot payload equal the current verified DB snapshot, beyond matching source SHA text",
+        "04 checks successful native result client/provenance/run_id/evaluation_at and rejects conflicting source DB SHA, then binds verified SHA without modifying the upstream result",
+        "04 output directly accepted by existing W6 current-data assembler in regression; source/run/time mismatch and producer-mutated holdings rejected",
+        "Local and GitHub same workflow 126/126 PASS; 4 changed files read back exactly after merge",
+        "Existing P70-5 read_macro_snapshot successfully reads official family-macro-feed-v3 with 28 indicators and ready=true"
+      ],
+      "macro_observation": {
+        "as_of": "2026-10-26T06:15:25.082732Z",
+        "source_path": "系統工程/總經V70/V70_macro_latest.json",
+        "sha256": "7e37e2c862e7e80888660da1a83c1ef6ceb4b43b6c038562f52299a0494e2b12",
+        "scope": "Existing canonical source read; no crawler rerun, no new tactical amounts inferred"
+      },
+      "remaining": [
+        "Current verified per-member W2/C7/V70 tactical/V82/V75 input producer and real native engine execution",
+        "Official confirmed 11 database persistence and 13/12 full reports",
+        "Four Projects 56 real E2E cases, Gate D/E"
+      ],
+      "controls": {
+        "runtime": "CHATGPT_ON_DEMAND",
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "official_member_db_writes": 0
+      }
     }
   ],
   "defects": [
@@ -695,7 +749,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "R19 resolved current Work local-file transport via explicit verified host upload; continue 04 actual source-backed native producer, 11 true authorized business persistence, 13 approved W6 current four-member reports, 4x14 Project E2E and Gate D/E. Existing W6/W7 PASS retained.",
+  "next_action": "Continue current source-backed 04 native W2/C7/V70/V82/V75/Mentor producer, followed by confirmed member persistence, W6 reports and 4x14 Project E2E. R20 resolved snapshot/result lineage at 04->13 boundary; W6/W7 existing PASS retained.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

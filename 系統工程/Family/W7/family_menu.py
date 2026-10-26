@@ -178,6 +178,28 @@ class FamilyMenu:
             return {'status':'DB_WRITEBACK_REQUIRED','result':result,
                     'pending_operation':choice['operation'],
                     'menu':render_menu(self.project_name)}
+        # Public research and news require current web evidence from
+        # ChatGPT's available tools; do not label an outstanding lookup as
+        # completed. Likewise a password change is pending until the shared
+        # account DB has actually been updated and read back.
+        if (choice['operation'] in ('research_candidates','market_news',
+                                    'holding_news','account')
+            and isinstance(result, dict)
+            and result.get('status') in ('TOOL_FETCH_REQUIRED','NEEDS_CRITERIA',
+                                          'DATA_UNAVAILABLE',
+                                          'ACCOUNT_CHANGE_WRITEBACK_REQUIRED',
+                                          'STAGED_NOT_PERSISTED',
+                                          'CONNECTOR_FILE_REFERENCE_REQUIRED',
+                                          'READY_NOT_PERSISTED')):
+            status = ('ACCOUNT_CHANGE_WRITEBACK_REQUIRED'
+                      if choice['operation']=='account' and
+                      result.get('status') in ('STAGED_NOT_PERSISTED',
+                                               'CONNECTOR_FILE_REFERENCE_REQUIRED',
+                                               'READY_NOT_PERSISTED')
+                      else result['status'])
+            return {'status':status,'result':result,
+                    'pending_operation':choice['operation'],
+                    'menu':render_menu(self.project_name)}
         if choice['operation'] == 'first_allocation':
             verifier = self.completion_checks.get('first_allocation')
             # The trusted verifier checks an actual first-allocation save/readback.

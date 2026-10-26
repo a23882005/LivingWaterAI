@@ -19,8 +19,8 @@ $path = $_SERVER['REQUEST_URI'] ?? '';
 if (!in_array($method, ['GET','POST'],true) || !is_string($path)
     || strlen($path) > 10000 || !str_starts_with($path, '/family-connect')
     || preg_match('/[\r\n\x00]/', $path)) fail_service(400);
-$body = file_get_contents('php://input', false, null, 0, 8193);
-if (!is_string($body) || strlen($body) > 8192) fail_service(413);
+$body = file_get_contents('php://input', false, null, 0, 131073);
+if (!is_string($body) || strlen($body) > 131072) fail_service(413);
 $parent = dirname(dirname(__DIR__));
 $script = $parent . '/.family-w8-app/Family/W8/cgi_request.py';
 if (!is_file($script) || is_link($script) || !is_readable($script)) fail_service(503);
@@ -42,12 +42,17 @@ $request=json_encode([
     'body'=>base64_encode($body),
     'peer'=>substr($_SERVER['REMOTE_ADDR'] ?? '',0,80)
 ],JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_SUBSTITUTE);
-if(!is_string($request) || strlen($request)>16384) fail_service(413);
+if(!is_string($request) || strlen($request)>196608) fail_service(413);
 $desc=[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']];
 $env=['PATH'=>'/usr/local/bin:/usr/bin:/bin','PYTHONDONTWRITEBYTECODE'=>'1'];
 $proc=@proc_open(['python3',$script],$desc,$pipes,$parent,$env);
 if(!is_resource($proc)) fail_service(503);
-fwrite($pipes[0],$request);
+$offset=0;$length=strlen($request);
+while($offset<$length){
+    $n=fwrite($pipes[0],substr($request,$offset,16384));
+    if($n===false || $n===0){fclose($pipes[0]);fail_service(503);}
+    $offset+=$n;
+}
 fclose($pipes[0]);
 // The Python router has a bounded response; cap output to avoid memory spikes.
 $out=stream_get_contents($pipes[1],2097153);

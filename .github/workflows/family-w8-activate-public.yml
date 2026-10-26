@@ -2,8 +2,8 @@ name: Family W8 four-member public HTTPS gateway
 on:
   workflow_dispatch:
   push:
-    branches: [w8-four-family-public-runtime-20261026]
-    paths: ['.github/workflows/family-w8-activate-public.yml']
+    branches: [main]
+    paths: ['.github/workflows/family-w8-activate-public.yml', '系統工程/Family/W8/public_gateway/index.php']
 permissions:
   contents: read
 concurrency:
@@ -143,7 +143,13 @@ jobs:
           assert code==200 and b'<html' in body.lower()
           code,heads,body=call('/mcp',method='POST',data=b'{"jsonrpc":"2.0","id":1,"method":"tools/list"}')
           assert code==401,(code,body[:100])
+          # Actual public HTTPS input must accept realistic holdings payloads.
+          code,heads,body=call('/mcp',method='POST',data=b'x'*32768)
+          assert code==401,('LARGE_BODY_SHOULD_REACH_AUTH',code)
+          code,heads,body=call('/mcp',method='POST',data=b'x'*131073)
+          assert code==413,('OVERSIZE_BODY_SHOULD_BE_REJECTED',code)
           print('FOUR_FAMILY_PUBLIC_HTTPS_ENTRY_PASS')
+          print('FOUR_FAMILY_128K_INPUT_BOUNDARY_PASS')
           PY
       - name: Rollback public gateway on failed HTTP verification
         if: failure() && steps.activate.outcome == 'success'

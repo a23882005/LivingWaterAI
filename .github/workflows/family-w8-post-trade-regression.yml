@@ -6,6 +6,8 @@ on:
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/tests/test_on_demand_project.py'
+      - '系統工程/Family/W8/on_demand_project.py'
       - '系統工程/Family/W8/tests/test_w6_member_render.py'
       - '系統工程/Family/W8/w6_member_render.py'
       - '系統工程/Family/W8/tests/test_on_demand_w6.py'
@@ -57,3 +59,6 @@ jobs:
       - name: Run pinned W6 member renderer guard tests
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_w6_member_render.py' -v
+      - name: Run no-host family login and W5 resource tests
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_project.py' -v

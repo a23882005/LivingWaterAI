@@ -294,6 +294,42 @@
       "remaining": "Approved V70/V82/V75 producer, event-to-position/cash projection, current W6 renderer, four-project E2E",
       "production": "HOLD",
       "trade_authorization": "NONE"
+    },
+    {
+      "id": "W8-R12",
+      "name": "11成交事件後本人持倉及現金快照接線",
+      "status": "CODE_COMMITTED__LOCAL_TESTS_PASS__FOUR_OFFICIAL_DB_E2E_PENDING",
+      "commits": {
+        "new_module": "c54b317f7b76050f5fb4d7a347a85af2108101f8",
+        "record_event": "563799a08dbc8a9100170c431f33328efbd86e9a",
+        "current_projection": "b739999d485cedae13b9c51e2130615bf6849300",
+        "event_lineage": "aa02635976aa3d8505fd7a1e7a85b75fb2e221da",
+        "partial_state": "03efd561f427e2f96b9ef12b870cacac909e4e4a",
+        "test": "f667509e4b8ac09d0d8f2ff822463307877a4178",
+        "ci_workflow": "77298b3ac518345e10f264e656b257071b0ad770"
+      },
+      "code_paths": [
+        "系統工程/Family/W8/post_trade_state.py",
+        "系統工程/Family/W8/official_mutations.py",
+        "系統工程/Family/W8/official_family_entry.py",
+        "系統工程/Family/W8/tests/test_post_trade_state.py",
+        ".github/workflows/family-w8-post-trade-regression.yml"
+      ],
+      "local_official_schema_copy_tests": "6/6 PASS on an isolated COPY of Arthur.db (positive, zero closure, cash partial vs verified, duplicate, rollback); actual official DB unchanged",
+      "synthetic_projection_tests": "6/6 PASS on local source; GitHub test file committed, CI execution outcome not independently retrieved",
+      "interfaces": "Only owner-confirmed post_trade_state appended within existing B06 Coordinator update; null means event-only, no inferred position or cash. Zero closure in sealed existing snapshot item, positive quantity in immutable history, cash source/settlement audited in cash_balance_snapshot/funding_evaluation; current W8 reader overlays as a verified projection.",
+      "limitations": [
+        "Full W5/V70/V82/V75 trusted market producer missing",
+        "Current W6 v16 report.mjs contains Joseph-specific content and cannot be treated as four-family formal renderer",
+        "Four ChatGPT Projects have not been tested from within their user sessions",
+        "Complete brokerage reconciliations and actual family confirmed post-trade statements pending"
+      ],
+      "controls": {
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "hostinger_or_render_family_runtime": "NOT_USED",
+        "runtime": "CHATGPT_ON_DEMAND_WHEN_FAMILY_ASKS"
+      }
     }
   ],
   "defects": [
@@ -337,7 +373,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Read three verified Google Drive root/TEMP Family_W8_20261026 ZIP1/ZIP2/ZIP3 (no other ZIP required), honor Owner-approved GitHub/ChatGPT on-demand/Drive architecture, then personally complete unfinished W8 04/11/13 plus four-family 14-item live Project E2E and Gate D/E. Do not relaunch Hostinger as official Python runtime.",
+  "next_action": "Finish official W6 four-family parameterized renderer, on-demand trusted V70/V82/V75/Mentor input producer and real 4x14 ChatGPT Project E2E before Gate D/E. Existing W6/W7 PASS remains.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

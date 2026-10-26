@@ -115,7 +115,7 @@ def append_post_trade(db, client, event_id, payload, stamp):
     if position_rows:
         ver=(db.execute("SELECT MAX(version_no) FROM portfolio_snapshot_run WHERE client_id=? AND as_of_utc=?",(client,asof)).fetchone()[0] or 0)+1
         db.execute("""INSERT INTO portfolio_snapshot_run(client_id,run_id,as_of_utc,version_no,run_state,data_state,source_kind,source_reference,created_at_utc)
-                     VALUES(?,?,?,?,'DRAFT','VERIFIED','OWNER_VERIFIED',?,?)""",(client,run,asof,ver,ref,stamp))
+                     VALUES(?,?,?,?,'DRAFT','PARTIAL','OWNER_VERIFIED',?,?)""",(client,run,asof,ver,ref,stamp))
         for i,(acct,inst,qty) in enumerate(position_rows,1):
             db.execute("""INSERT INTO portfolio_snapshot_item(client_id,run_id,item_no,domain_code,entity_key,field_key,value_state,value_type,value_text,unit,source_observed_at_utc,source_kind,source_reference,recorded_at_utc)
                          VALUES(?,?,?,?,?,'quantity_decimal','KNOWN','DECIMAL_TEXT',?,'shares',?,'OWNER_VERIFIED',?,?)""",

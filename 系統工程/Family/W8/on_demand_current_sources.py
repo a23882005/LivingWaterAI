@@ -147,6 +147,7 @@ def build_current_sources(snapshot,db_path,*,repo_root=REPO,evaluation_at=None):
     return {'schema_version':'Family.W8.CurrentNativeSources.v1','status':'SOURCE_INPUTS_READ',
             'client_id':client,'source_db_sha256':original_hash,'evaluation_at':when,
             'confirmed_target_details':targets,'strategic':strategic,
+            'official_asset_facts':facts,
             'funding_latest':funding,'funding_planning_rows':planning,'macro':macro,'v70':v70,
             'market_observations':observations,
             'monetary_tactical_amounts':None,'monetary_amount_reason':'C7_VERIFIED_INVESTMENT_POOL_BASE_REQUIRED',

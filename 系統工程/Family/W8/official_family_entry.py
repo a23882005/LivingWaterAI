@@ -6,6 +6,7 @@ or trade permission. Processing copies of database bytes are short-lived;
 Google Drive remains the sole official customer-record store.
 """
 import hashlib
+import json
 import importlib.util
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -81,6 +82,22 @@ class OfficialFamilyEntry:
             snapshot = _read_existing_w5(db, self.client_id)
         if snapshot.get("source_sha256") != sha or snapshot.get("client_id") != self.client_id:
             raise PermissionError("OFFICIAL_CLIENT_SNAPSHOT_MISMATCH")
+        # Project the latest sealed owner-confirmed post-trade quantities,
+        # including explicit zero closures. The original W1 history remains
+        # immutable and available separately for provenance/auditing.
+        from post_trade_state import DOMAIN, effective_positions
+        tables = snapshot["tables"]
+        if any(x.get("domain_code") == DOMAIN for x in tables.get("portfolio_snapshot_item", [])):
+            from copy import deepcopy
+            snapshot = deepcopy(snapshot)
+            before = snapshot["payload_digest"]
+            snapshot["position_history"] = snapshot["tables"]["portfolio_position"]
+            snapshot["tables"]["portfolio_position"] = effective_positions(snapshot["tables"])
+            snapshot["historical_payload_digest"] = before
+            snapshot["payload_digest"] = hashlib.sha256(json.dumps(
+                snapshot["tables"], ensure_ascii=False, sort_keys=True,
+                separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+            snapshot["position_projection"] = "W8_POST_TRADE_CURRENT_V1"
         return snapshot
 
     def read_portfolio(self, payload):

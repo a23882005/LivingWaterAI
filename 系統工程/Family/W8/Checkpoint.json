@@ -706,6 +706,91 @@
         "trade_authorization": "NONE",
         "official_member_db_writes": 0
       }
+    },
+    {
+      "id": "W8-R21",
+      "name": "Three real market sources: original numeric computation and source rejection/fallback evidence",
+      "status": "OBSERVATION_NUMERIC_RUN_COMPLETE__CI_PASS__FULL_FAMILY_RUN_PENDING",
+      "pr": 56,
+      "merge_commit": "3901df4e52bff1856d53a24ebdde25590a194e7b",
+      "program": "系統工程/Family/W8/probes/validate_observed_market_sources.py",
+      "ci": {
+        "run_id": 40391643415,
+        "conclusion": "SUCCESS",
+        "existing_regression_tests": 126
+      },
+      "actual_source_calls": {
+        "provider": "IBKR",
+        "history_requests": 3,
+        "request_period": "FIVE_YEARS",
+        "returned_bars": [
+          851,
+          1253,
+          1253
+        ]
+      },
+      "observational_computation": {
+        "instruments": 3,
+        "selected_rows": 7071,
+        "parts": [
+          "Hash-locked original calculate_td9",
+          "Original numeric analytics.technical",
+          "Original V82.evaluate_technical with incomplete canonical predicates kept UNKNOWN"
+        ],
+        "selected_sources": [
+          {
+            "symbol": "2454",
+            "source": "IBKR",
+            "rows": 851,
+            "last_observation": "2026-10-22"
+          },
+          {
+            "symbol": "VT",
+            "source": "existing verified GitHub yfinance cache",
+            "rows": 4611,
+            "last_observation": "2026-10-23"
+          },
+          {
+            "symbol": "SGOV",
+            "source": "existing verified GitHub yfinance cache",
+            "rows": 1609,
+            "last_observation": "2026-10-23"
+          }
+        ],
+        "rejected_ib_sources": [
+          {
+            "symbol": "VT",
+            "invalid_ohlc_bars": 19,
+            "reason": "Chart end precedes last bar and OHLC contradictions"
+          },
+          {
+            "symbol": "SGOV",
+            "invalid_ohlc_bars": 157,
+            "reason": "Future chart end and OHLC contradictions"
+          }
+        ],
+        "scope": "Source-backed observed-price numerical calculations; not formal deployment predicates, not complete FamilyRunner/V75/Mentor"
+      },
+      "evidence": {
+        "location": "Owner-private Drive root/TEMP/Family_W8_20261027_live_source_verified.json",
+        "size_bytes": 2121121,
+        "sha256": "01b16a2ebf8fd27a06355b82e27ce647ab5edb582b2e2604c317f9924611eadc",
+        "remote_readback": "EXACT_BYTES_AND_SHA256_MATCH"
+      },
+      "runtime": {
+        "jsonschema": "4.23.0 installed in scoped scratch dependency directory; matched W5 lock"
+      },
+      "remaining": [
+        "Current complete W2/C7/funding/V70 tactical source producer and actual V82/V75/Mentor same-run result",
+        "Provider price basis, official session metadata and approved named predicates",
+        "Official 11 persistence, 13/12 complete member reports, four Projects 56 E2E, Gate D/E"
+      ],
+      "controls": {
+        "official_family_db_writes": 0,
+        "production": "HOLD",
+        "trading": "NONE",
+        "formal_deployment_eligible": false
+      }
     }
   ],
   "defects": [
@@ -749,7 +834,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Continue current source-backed 04 native W2/C7/V70/V82/V75/Mentor producer, followed by confirmed member persistence, W6 reports and 4x14 Project E2E. R20 resolved snapshot/result lineage at 04->13 boundary; W6/W7 existing PASS retained.",
+  "next_action": "Continue actual same-run W2/C7/funding/V70 tactical inputs for 04 and approved V82/V75/Mentor. R21 completed source-backed observed numerical computation and persisted exact source evidence; full FamilyRunner and member Project E2E remain pending.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

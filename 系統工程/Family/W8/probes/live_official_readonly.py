@@ -90,6 +90,16 @@ def main():
             assert report_source["reporting_flags"]["w6_v16_renderer_data_complete"] is False
             assert all(entry["evidence_tier"] != "HYPOTHETICAL_ONLY"
                        for entry in report_source["actual_user_evidence"])
+            # An authenticated MOU snapshot must not render under another Family
+            # alias, even if a caller happens to supply its actual client ID.
+            foreign = next(x for x in RESOURCE_BY_ACCOUNT if x != account)
+            try:
+                build_report_source(snapshot,account=foreign,
+                                    expected_client_id=client_id)
+            except PermissionError:
+                pass
+            else:
+                raise AssertionError("REPORT_CROSS_FAMILY_ALIAS_ACCEPTED")
         again = transport.call(API + file_id + "?alt=media", raw=True)
         assert hashlib.sha256(again).hexdigest() == sha
         inspected += 1

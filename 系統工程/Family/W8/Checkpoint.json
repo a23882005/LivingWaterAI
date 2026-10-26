@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T09:08:34+08:00",
+  "updated_at": "2026-10-26T09:16:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -218,7 +218,17 @@
         "系統工程/Family/W8/probes/live_research_readonly.py"
       ],
       "limits": "No verified ETF cost/long-term performance comparison, no current stock/ETF valuation, no W2 research handoff or final V82 buy signal. Candidate research can report evidence but cannot infer fund quality or price.",
-      "family_db_writes": 0
+      "family_db_writes": 0,
+      "report_engine_source_verified": {
+        "google_drive_folder": "W6",
+        "source_package": "W6_工程驗收完成_完整交付_20261021.zip",
+        "formal_gate": "W6_ENGINEERING_GATE=PASS_WITH_DECLARED_SOURCE_GAPS",
+        "renderer": "sources/rebuild/src_v16/{report.mjs,render.mjs,reader.mjs,validate.mjs}",
+        "output_history": "Joseph W6 v16 30 physical pages, HTML/PDF/21 chapter-era master dynamically paginated",
+        "limits": "W6 renderer consumes a past Joseph-specific report_data.json and Playwright/Chromium. Must bind four users' current verified canonical inputs; cannot copy old Joseph numbers or claim current report.",
+        "formal_output_eligible": false,
+        "source_provenance": "Owner-controlled Google Drive W6 engineering accepted ZIP, read/checked 2026-10-26"
+      }
     }
   ],
   "defects": [
@@ -262,7 +272,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "05 已在正式主機可主動呼叫公開證據研究，進一步接W2 research/ETF品質比較；13 必須使用根目錄CR-HTML-001 v1.24.1 21頁母模板與W6正式圖片Renderer，補齊真實資料及存檔；04 原生V70/V82/V75/Mentor需完成已核定目標資金/市場producer；四戶真人 ChatGPT Project oauth 14項實測後Gate D/E。",
+  "next_action": "Reuse accepted W6 v16 renderer from private Drive (30 actual pages content-driven; not generic 21 fixed), build four-member current report_data mapping with W1/W2/market source and Playwright host runner, archive to each official folder; W2/V70/V82/V75/Mentor source gaps and actual ChatGPT OAuth UAT remain. W7 PASS CLOSED.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

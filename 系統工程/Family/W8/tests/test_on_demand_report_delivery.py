@@ -64,6 +64,59 @@ class ReportDeliveryTests(unittest.TestCase):
                       "id":"manifest_id","parent_id":FOLDER}, manifest["manifest_bytes"])
         self.assertEqual(result["status"],"PERSISTED_REMOTE_VERIFIED")
 
+    def test_supported_html_import_exact_remote_readback(self):
+        plan=self.plan()
+        ready=M.prepare_verified_html_import(plan,"index.html")
+        args=ready["import_args"]
+        self.assertEqual(ready["status"],"HTML_IMPORT_READY_NOT_PERSISTED")
+        self.assertEqual(args["upload_mode"],"keep_source_file_type")
+        self.assertEqual(args["parent_folder_id"],FOLDER)
+        self.assertTrue(args["source_file"].endswith(".html"))
+        uploaded={"success":True,"converted":False,"mimeType":"text/html",
+                  "title":args["title"],"parentId":FOLDER,
+                  "fileId":"synthetic_html_file"}
+        result=M.verify_imported_html(
+            ready,uploaded,Path(args["source_file"]).read_bytes())
+        self.assertEqual(result["status"],"HTML_REMOTE_VERIFIED_PARTIAL")
+        self.assertFalse(result["report_complete"])
+        self.assertEqual(result["sha256"],ready["source_sha256"])
+
+    def test_html_import_rejects_binary_artifacts(self):
+        plan=self.plan()
+        with self.assertRaisesRegex(ValueError,"REPORT_HTML_ONLY"):
+            M.prepare_verified_html_import(plan,"report.pdf")
+
+    def test_html_import_rejects_modified_local_stage(self):
+        plan=self.plan()
+        html=next(x for x in plan["uploads"] if x["artifact"]=="index.html")
+        Path(html["path"]).write_text("tampered",encoding="utf-8")
+        with self.assertRaisesRegex(ValueError,"REPORT_HTML_STAGE_CHANGED"):
+            M.prepare_verified_html_import(plan,"index.html")
+
+    def test_html_import_requires_exact_remote_folder_and_bytes(self):
+        plan=self.plan()
+        ready=M.prepare_verified_html_import(plan,"report.html")
+        args=ready["import_args"]
+        proof={"success":True,"converted":False,"mimeType":"text/html",
+               "title":args["title"],"parentId":"other_family",
+               "fileId":"synthetic_html_file"}
+        remote=Path(args["source_file"]).read_bytes()
+        with self.assertRaisesRegex(PermissionError,"HTML_IMPORT_REMOTE_BINDING_MISMATCH"):
+            M.verify_imported_html(ready,proof,remote)
+        proof["parentId"]=FOLDER
+        with self.assertRaisesRegex(RuntimeError,"HTML_IMPORT_REMOTE_BYTES_MISMATCH"):
+            M.verify_imported_html(ready,proof,b"not real remote bytes")
+
+    def test_html_only_does_not_mark_pdf_or_archive_complete(self):
+        plan=self.plan()
+        ready=M.prepare_verified_html_import(plan)
+        args=ready["import_args"]
+        proof={"success":True,"converted":False,"mimeType":"text/html",
+               "title":args["title"],"parentId":FOLDER,"fileId":"single_html"}
+        result=M.verify_imported_html(ready,proof,Path(args["source_file"]).read_bytes())
+        self.assertNotEqual(result["status"],"PERSISTED_REMOTE_VERIFIED")
+        self.assertNotIn("manifest_file_id",result)
+
     def test_native_drive_upload_receipts_file_name(self):
         plan=self.plan()
         refs={row["artifact"]:"sediment://file_unit_"+str(i)

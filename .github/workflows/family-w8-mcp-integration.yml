@@ -8,6 +8,8 @@ on:
       - '系統工程/Family/W7/account_mcp.py'
       - '系統工程/Family/W7/account_router.py'
       - '系統工程/Family/W8/cgi_request.py'
+      - '系統工程/Family/W8/public_gateway/index.php'
+      - '.github/workflows/family-w8-activate-public.yml'
       - '系統工程/Family/W7/tests/test_account_mcp.py'
       - '系統工程/Family/W7/tests/test_account_router.py'
       - '系統工程/Family/W8/private_family_service.py'
@@ -19,6 +21,8 @@ on:
       - '系統工程/Family/W7/account_mcp.py'
       - '系統工程/Family/W7/account_router.py'
       - '系統工程/Family/W8/cgi_request.py'
+      - '系統工程/Family/W8/public_gateway/index.php'
+      - '.github/workflows/family-w8-activate-public.yml'
       - '系統工程/Family/W7/tests/test_account_mcp.py'
       - '系統工程/Family/W7/tests/test_account_router.py'
       - '系統工程/Family/W8/private_family_service.py'
@@ -38,6 +42,8 @@ jobs:
         with:
           python-version: '3.9'
       - run: python -m pip install pytest==8.4.2
+      - name: Check official public PHP gateway syntax
+        run: php -l 系統工程/Family/W8/public_gateway/index.php
       - name: Compile and import existing host runtime plus W8 official bridge
         run: |
           python -m py_compile \

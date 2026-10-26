@@ -64,6 +64,40 @@ class ReportDeliveryTests(unittest.TestCase):
                       "id":"manifest_id","parent_id":FOLDER}, manifest["manifest_bytes"])
         self.assertEqual(result["status"],"PERSISTED_REMOTE_VERIFIED")
 
+    def test_native_drive_upload_receipts_file_name(self):
+        plan=self.plan()
+        refs={row["artifact"]:"sediment://file_unit_"+str(i)
+              for i,row in enumerate(plan["uploads"])}
+        ready=M.bind_connector_uploads(plan,refs)
+        self.assertEqual(ready["status"],"UPLOAD_READY_NOT_PERSISTED")
+        self.assertEqual(len(ready["requests"]),len(plan["uploads"]))
+        for request in ready["requests"]:
+            args=request["upload_file_args"]
+            self.assertTrue(args["file_uri"].startswith("sediment://file_"))
+            self.assertEqual(args["parent_folder_id"],FOLDER)
+        receipts,remote=self.complete_artifacts(plan)
+        for receipt in receipts:
+            receipt["file_name"]=receipt.pop("name")
+        manifest=M.prepare_verified_manifest(plan,receipts,remote)
+        self.assertEqual(manifest["status"],
+                         "ARTIFACTS_REMOTE_VERIFIED__MANIFEST_PENDING")
+        result=M.verify_published_manifest(
+            manifest,{"success":True,"file_name":manifest["manifest_filename"],
+                      "id":"manifest_id","parent_id":FOLDER},
+            manifest["manifest_bytes"])
+        self.assertEqual(result["status"],"PERSISTED_REMOTE_VERIFIED")
+
+    def test_raw_paths_cannot_be_uploaded_as_connector_references(self):
+        plan=self.plan()
+        refs={row["artifact"]:row["path"] for row in plan["uploads"]}
+        with self.assertRaisesRegex(ValueError,"VALID_REPORT_CONNECTOR_FILE_URI_REQUIRED"):
+            M.bind_connector_uploads(plan,refs)
+
+    def test_no_ready_upload_without_full_artifact_references(self):
+        plan=self.plan()
+        with self.assertRaisesRegex(ValueError,"REPORT_ARTIFACT_REFERENCES_INCOMPLETE"):
+            M.bind_connector_uploads(plan,{})
+
     def test_cross_family_report_rejected(self):
         with self.assertRaisesRegex(ValueError,"W6_QA_AND_MEMBER_REQUIRED"):
             self.plan(client_id="fam_"+"b"*32)

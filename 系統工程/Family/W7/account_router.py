@@ -17,7 +17,7 @@ class AccountRouter:
         h={k.lower():v for k,v in headers.items()}
         empty=[('Content-Type','application/json'),('Cache-Control','no-store')]
         if h.get('host')!=self.account.host or h.get('origin') not in (None,self.account.origin):return 403,empty,b'{}'
-        if len(raw)>8192 or len(path)>10000:return 413,empty,b'{}'
+        if len(raw)>131072 or len(path)>10000:return 413,empty,b'{}'
         p=urlsplit(path)
         if p.scheme or p.netloc or p.fragment or '%' in p.path or '//' in p.path or '/.' in p.path.replace('/.well-known/','/well-known/'):
             return 400,empty,b'{}'

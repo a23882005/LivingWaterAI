@@ -285,11 +285,12 @@
         "9656011801dd1675ab2001b0dc6645c4cfa07c56",
         "eb51d99b67eeadc9ed654227533c32f53b3ce0c9",
         "dde50484bd54d1193cd4933e4a34a40af0e06128",
-        "bc2d4773b28b0c369faa0ef3f5ebb4bc137e9bdc"
+        "bc2d4773b28b0c369faa0ef3f5ebb4bc137e9bdc",
+        "524cf48ab24c5bdd4dfcabf20d12c674c14a7f8e"
       ],
       "scope": "Approved input and lineage binding, not a new strategy or report renderer",
       "local_guard_cases": "4/4 isolated predicate checks PASS",
-      "repository_unittest": "committed, execution pending",
+      "repository_unittest": "source-check unit tests expanded (wrong renderer digest rejection); tests committed, not yet executed in full GitHub CI",
       "remaining": "Approved V70/V82/V75 producer, event-to-position/cash projection, current W6 renderer, four-project E2E",
       "production": "HOLD",
       "trade_authorization": "NONE"

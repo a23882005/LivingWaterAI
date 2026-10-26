@@ -13,8 +13,8 @@ from private_family_service import load_official_router
 
 def main():
     try:
-        b = sys.stdin.buffer.read(16385)
-        if len(b) > 16384:
+        b = sys.stdin.buffer.read(196609)
+        if len(b) > 196608:
             raise ValueError("REQUEST_TOO_LARGE")
         req = json.loads(b.decode("utf-8"))
         if not isinstance(req, dict) or set(req) != {"method", "path", "headers", "body", "peer"}:
@@ -27,7 +27,7 @@ def main():
             or not isinstance(req["body"], str)):
             raise ValueError("INVALID_REQUEST")
         raw = base64.b64decode(req["body"], validate=True)
-        if len(raw) > 8192:
+        if len(raw) > 131072:
             raise ValueError("BODY_TOO_LARGE")
         # All server configuration is private and fixed relative to this script.
         root = Path(__file__).resolve().parents[3] / ".family-b07-service"

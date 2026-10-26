@@ -19,7 +19,7 @@ def version(state="CONFIRMED"):
 
 def allocation(weight=1000000):
     return {"target_key": "MAIN", "version_no": 1,
-            "allocation_state": "ACCEPTED", "weight_units": weight}
+            "allocation_state": "ACCEPTED", "instrument_key": "VT", "weight_units": weight}
 
 
 def entry(versions, allocations, provider=None):
@@ -66,6 +66,29 @@ class TargetReadinessTest(unittest.TestCase):
         self.assertEqual(result["status"], "OK")
         self.assertEqual(result["analysis"]["output"], "verified")
         self.assertEqual(result["trade_authorization"], "NONE")
+
+    def test_latest_confirmed_incomplete_cannot_reuse_old_target(self):
+        versions=[version(), dict(version(),version_no=2)]
+        rows=[allocation(), dict(allocation(),version_no=2,weight_units=500000)]
+        result=entry(versions,rows).deployment_pace({})
+        self.assertIn("confirmed_final_target_version",result["missing"])
+
+    def test_pending_rows_cannot_be_ignored_because_accepted_sum_is_one(self):
+        rows=[allocation(), dict(allocation(),instrument_key="QQQ",
+                                 weight_units=100000,allocation_state="PENDING")]
+        result=entry([version()],rows).deployment_pace({})
+        self.assertIn("confirmed_final_target_version",result["missing"])
+
+    def test_multiple_confirmed_target_purposes_do_not_pick_arbitrarily(self):
+        versions=[version(),dict(version(),target_key="RETIREMENT")]
+        rows=[allocation(),dict(allocation(),target_key="RETIREMENT")]
+        result=entry(versions,rows).deployment_pace({})
+        self.assertIn("single_confirmed_target_purpose",result["missing"])
+
+    def test_newer_draft_does_not_override_confirmed_target(self):
+        versions=[version(),dict(version("DRAFT"),version_no=2)]
+        result=entry(versions,[allocation()]).deployment_pace({})
+        self.assertNotIn("confirmed_final_target_version",result["missing"])
 
     def test_confirmed_target_still_needs_provider(self):
         result = entry([version()], [allocation()]).deployment_pace({})

@@ -1,4 +1,4 @@
-最後修改日期時間：2026/10/26 11:47（台灣時間）
+最後修改日期時間：2026/10/26 12:08（台灣時間）
 # Family 家人版四戶正式專案文件索引
 
 ## 🚩 2026/10/26｜Owner 最新優先架構裁決（高於下方舊Hostinger接線記錄）
@@ -6,6 +6,20 @@
 **已核定：GitHub 存正式程式 → 家人在 ChatGPT Project 提問時由 ChatGPT 按需取得並執行程式 → Google Drive 讀寫該家人正式 DB／報告 → 回覆。** 家人版不需要24小時常駐 Python 伺服器；**Hostinger 不是指定的家人版程式執行主機**，OAuth／MCP 外部常駐後端也不是Owner核定的必備方案。先前為解決W8接線而自行導入Hostinger屬中PM架構偏離；後續不再擅自擴充。既有真實歷史測試成績維持原紀錄，與最新版正式施工目標分別標示；本次沒有擅自停用既有網站，也沒有更動個人DB。
 
 正式約束與責任全文：[W8／正式架構裁決_ChatGPT按需執行.md](W8/正式架構裁決_ChatGPT按需執行.md)。後續W8必須以ChatGPT當次實際可用程式工具為準逐項接通，不能單憑GitHub有程式就聲稱已在Project執行。
+
+## 2026/10/26｜Family 中PM／總PM新對話三ZIP交接（最新接棒，取代下方舊20261025交接）
+
+已依Owner指揮官要求，在Google Drive根目錄現有私有 **TEMP** 上傳下列新三包並獨立**重新下載比對3/3 SHA-256與ZIP CRC PASS**：
+
+|順序|最新ZIP|驗證SHA-256|
+|---|---|---|
+|1｜總PM責任與Owner最高架構|`Family_W8_20261026_ZIP1_總PM職責與最高架構.zip`|`1995fcb08775ba77b1dedcce1300aa18fdf0889674c7072ad1a23a203a2d83d8`|
+|2｜已完成工程、十四選單、程式/正式DB及證據位置|`Family_W8_20261026_ZIP2_已完成工程與正式檔案位置.zip`|`3a7ad7988641bc57a3108641103ea76f700bb8a35d8b9b8758be34221e665cd0`|
+|3｜剩餘W8施工、4×14驗收、Gate D/E|`Family_W8_20261026_ZIP3_剩餘工序與Gate驗收.zip`|`0fd2dcd8298d08f1fb01822bf142434c5122a1d035703e49ac5d8a0a892cb4d7`|
+
+下一棒**中PM＝Family全專案總PM＝自己直接完成剩餘工程的執行者**，先依1→2→3讀取正式TEMP新三包及live main/Checkpoint，**最優先服從本頁上方Owner按需架構**（GitHub程式、ChatGPT使用者提問時按需執行、Google Drive本人DB及報告；**不准自行設Hostinger為執行主機或24h常駐**）；完成04 V70/V82/V75/Mentor、11成交後真實資料、13正式W6報告與四戶14項端對端、Gate D/E。**W7已PASS/CLOSED、W8仍IN_PROGRESS**。不得用舊Hostinger測試當作最新按需Project端對端通過。
+
+GitHub導航：[`W8/20261026_中PM總PM三ZIP正式交接索引.md`](W8/20261026_中PM總PM三ZIP正式交接索引.md)。舊10/25交接保留歷史，不應誤選。
 
 ## 2026/10/25｜Family 中PM全案總PM三ZIP正式交接（Drive私有TEMP）
 

@@ -6,6 +6,8 @@ on:
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/tests/test_w6_current_data.py'
+      - '系統工程/Family/W8/w6_current_data.py'
       - '系統工程/Family/W8/tests/test_on_demand_analysis.py'
       - '系統工程/Family/W8/on_demand_analysis.py'
       - '系統工程/Family/W8/formal_report_source.py'
@@ -42,3 +44,6 @@ jobs:
       - name: Run on-demand native W5 contract tests
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_analysis.py' -v
+      - name: Run W6 current data assembly regressions
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_w6_current_data.py' -v

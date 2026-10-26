@@ -106,7 +106,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        approved_w6_archive=None, approved_w6_renderer=None,
                        report_store=None, other_handlers=None,
                        completion_checks=None, official_report_folder_id=None,
-                       report_staging_dir=None):
+                       report_staging_dir=None, mutation_staging_dir=None):
     """Return the existing W7 menu without using a permanent Python host."""
     auth=FamilyLoginAdapter(family_login,login_account,client_id)
     coordinator=OnDemandReadCoordinator(
@@ -116,6 +116,19 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     handlers=dict(other_handlers or {})
+    if mutation_staging_dir is not None:
+        mutations=_load(ROOT/"on_demand_mutations.py",
+                        "family_w8_on_demand_mutations")
+        stager=mutations.OnDemandMutationStager(
+            auth=auth,login_account=login_account,client_id=client_id,
+            family_alias=family_alias,official_drive_file_id=official_drive_file_id,
+            downloaded_db_path=downloaded_db_path,
+            verified_drive_sha256=verified_drive_sha256,
+            staging_dir=mutation_staging_dir)
+        writes=mutations.mutation_handlers(stager)
+        if set(writes)&set(handlers):
+            raise ValueError("CONFLICTING_FAMILY_MUTATION_HANDLERS")
+        handlers.update(writes)
     # The legacy W6 report store uses a direct REST transport. Under the
     # Owner-approved ChatGPT execution model, hand verified upload receipts
     # back to the tool executor instead of pretending Python uploaded files.

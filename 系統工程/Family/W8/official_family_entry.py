@@ -170,7 +170,9 @@ class OfficialFamilyEntry:
             # No caller-controlled target selector: the W5 trusted source
             # should determine scope, never guess among independent purposes.
             missing.append("single_confirmed_target_purpose")
-        if self.analysis_provider is None or missing:
+        externally_bound = (getattr(self.analysis_provider,
+            "supports_external_target_source", False) is True)
+        if self.analysis_provider is None or (missing and not externally_bound):
             if self.analysis_provider is None:
                 missing.append("official_market_and_approved_engine_request")
             intake = getattr(self, "current_source_provider", None)

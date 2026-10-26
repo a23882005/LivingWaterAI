@@ -3,6 +3,8 @@ from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from hashlib import sha256
+from pathlib import Path
 from family_input import digest
 from funding_guard import amount, owner_key
 
@@ -35,9 +37,43 @@ def one(rows,field):
 def nonempty(value):return isinstance(value,str) and bool(value.strip())
 
 
-def validate_target(target,client_id,evaluation_at):
-    """Validate an existing W2-18 record; never create/confirm a target."""
+def validate_target(target,client_id,evaluation_at,*,approved_document_source=None):
+    """Validate an existing W2 record or independently bound approved-document view.
+
+    The document view records source availability, not a fictional signing event.
+    Its independent trusted proof is required; the legacy W2 path is unchanged.
+    """
     require(isinstance(target,dict),'TARGET_REQUIRED','confirmed_target','W2','DATA_UNAVAILABLE')
+    if target.get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
+        source=approved_document_source or {}
+        require(source.get('schema_version')=='Family.W5.ApprovedDocumentTargetSource.v1'
+                and source.get('client_id')==client_id and source.get('data_provenance')=='SOURCE_BACKED',
+                'APPROVED_TARGET_TRUSTED_SOURCE_REQUIRED','approved_document_source')
+        require(source.get('target_view_digest')==digest(target),
+                'APPROVED_TARGET_VIEW_MISMATCH','confirmed_target')
+        path=Path(source.get('local_source_path',''))
+        require(path.is_absolute() and path.is_file(),
+                'APPROVED_TARGET_SOURCE_FILE_REQUIRED','approved_document_source')
+        require(sha256(path.read_bytes()).hexdigest()==source.get('source_sha256'),
+                'APPROVED_TARGET_SOURCE_CHANGED','approved_document_source')
+        require(timestamp(source.get('source_available_at'),'approved_target.available_at')<=evaluation_at,
+                'APPROVED_TARGET_FUTURE_SOURCE','approved_document_source')
+        record=target.get('payload',{});draft=record.get('draft',{})
+        require(draft.get('identity',{}).get('client_id')==client_id,
+                'TARGET_CLIENT_MISMATCH','confirmed_target')
+        require(record.get('status')=='APPROVED_DOCUMENT_VIEW'
+                and record.get('confirmation_evidence',{}).get('action')=='READ_EXISTING_APPROVAL',
+                'APPROVED_TARGET_ORIGIN_REQUIRED','confirmed_target')
+        require(target.get('target_hash')==record.get('target_hash')==draft.get('draft_hash')
+                ==digest({k:v for k,v in draft.items() if k!='draft_hash'}),
+                'TARGET_HASH_MISMATCH','confirmed_target')
+        require(type(target.get('target_version')) is int and target['target_version']>0
+                and record.get('version')==target['target_version'],
+                'TARGET_VERSION_INVALID','confirmed_target')
+        require(target.get('confirmation_run_id')==draft.get('identity',{}).get('run_id')
+                and nonempty(target.get('confirmation_run_id')),
+                'TARGET_CONFIRMATION_RUN_MISMATCH','confirmed_target')
+        return deepcopy(target)
     record=target.get('payload')
     require(isinstance(record,dict),'TARGET_PAYLOAD_REQUIRED','confirmed_target.payload','W2')
     draft=record.get('draft',{});identity=draft.get('identity',{})
@@ -59,10 +95,29 @@ def validate_target(target,client_id,evaluation_at):
     return deepcopy(target)
 
 
-def bind_owner(snapshot,owner,evaluation_at):
+def bind_owner(snapshot,owner,evaluation_at,*,approved_account_scope=None):
     tables=snapshot['tables'];client=snapshot['client_id'];key=owner_key(owner)
     require(key[0]==client,'OWNER_CLIENT_MISMATCH','owner.client_id')
     account=one([r for r in tables['portfolio_account'] if r['account_key']==owner['account']], 'portfolio_account')
+    if approved_account_scope is not None:
+        scope=approved_account_scope;source=scope.get('source',{})
+        require(scope.get('schema_version')=='Family.W5.DocumentAccountScope.v1'
+                and scope.get('scope_kind')=='MEMBER_LOCAL_BROKER_CATEGORY_ANALYSIS_ONLY'
+                and scope.get('trade_authorization')=='NONE'
+                and scope.get('owner')==owner and scope.get('original_account_row')==account
+                and scope.get('source_snapshot_digest')==snapshot['payload_digest'],
+                'DOCUMENT_ACCOUNT_SCOPE_MISMATCH','approved_account_scope')
+        require(source.get('client_id')==client and source.get('data_provenance')=='SOURCE_BACKED',
+                'DOCUMENT_ACCOUNT_CLIENT_MISMATCH','approved_account_scope')
+        path=Path(source.get('local_source_path',''))
+        require(path.is_absolute() and path.is_file()
+                and sha256(path.read_bytes()).hexdigest()==source.get('source_sha256'),
+                'DOCUMENT_ACCOUNT_SOURCE_CHANGED','approved_account_scope')
+        require(timestamp(source.get('source_available_at'),'account_source.available_at')<=evaluation_at,
+                'DOCUMENT_ACCOUNT_FUTURE_SOURCE','approved_account_scope')
+        return {'owner':deepcopy(owner),'w1_funding_purpose':'INVESTMENT_CANDIDATE',
+                'source_rows':[deepcopy(account)],'approved_document_category_scope':deepcopy(scope),
+                'cash_verified':False,'holdings_completeness_verified':False}
     require(account.get('account_state')=='KNOWN','ACCOUNT_UNKNOWN','portfolio_account.account_state','W1','DATA_UNAVAILABLE')
     own=one([r for r in tables['account_ownership'] if r['account_key']==owner['account']],'account_ownership')
     require(own.get('owner_client_id')==client and own.get('ownership_state')=='VERIFIED','ACCOUNT_OWNER_MISMATCH','account_ownership','W1')
@@ -126,9 +181,11 @@ def prepare_input(request,*,trusted_context):
         require(isinstance(rows,list),'SNAPSHOT_TABLE_TYPE',table,'W1')
         for row in rows:
             if 'client_id' in row:require(row['client_id']==req['client_id'],'CROSS_CLIENT_ROW',table,'W1')
-    target=validate_target(req.get('confirmed_target'),req['client_id'],at)
+    target=validate_target(req.get('confirmed_target'),req['client_id'],at,
+        approved_document_source=ctx.get('approved_document_target_source'))
     require(str(target['target_version'])==versions['target'] and target['target_hash']==ctx.get('target_hash'),'TARGET_VERSION_CONFLICT','confirmed_target','W2')
-    owner=bind_owner(payload,req.get('owner',{}),at)
+    owner=bind_owner(payload,req.get('owner',{}),at,
+        approved_account_scope=ctx.get('approved_document_account_scope'))
     positions=position_view(payload,req['owner']['account'],at,ctx.get('holdings_completeness'))
     macro=req.get('macro_snapshot',{})
     require(macro.get('digest')==digest(macro.get('payload'))==versions['market'],'MACRO_DIGEST_MISMATCH','macro_snapshot','W3')

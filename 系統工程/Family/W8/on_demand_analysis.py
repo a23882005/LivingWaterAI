@@ -34,6 +34,10 @@ def _iso(value):
 class OnDemandAnalysisProvider:
     """Prepare one deterministic run without making up missing market context."""
 
+    # External W2/document sources are checked by original FamilyRunner after
+    # this provider binds their request to the current official DB snapshot.
+    supports_external_target_source = True
+
     def __init__(self, trusted_source_producer, *,
                  repo_root=PROJECT_ROOT, runner_factory=None):
         if not callable(trusted_source_producer):

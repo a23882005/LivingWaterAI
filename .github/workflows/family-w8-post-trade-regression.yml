@@ -1,0 +1,28 @@
+name: Family W8 post-trade regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - '系統工程/Family/W8/post_trade_state.py'
+      - '系統工程/Family/W8/official_mutations.py'
+      - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/tests/test_post_trade_state.py'
+      - '.github/workflows/family-w8-post-trade-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile Family W8 touched modules
+        run: |
+          python -m py_compile '系統工程/Family/W8/post_trade_state.py' '系統工程/Family/W8/official_mutations.py' '系統工程/Family/W8/official_family_entry.py'
+      - name: Run synthetic transaction projection tests
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_post_trade_state.py' -v

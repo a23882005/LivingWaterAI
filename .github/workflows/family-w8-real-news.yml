@@ -1,0 +1,31 @@
+name: Family W8 real finance RSS
+on:
+  push:
+    branches: [w8-family-real-news-20261026]
+    paths:
+      - '系統工程/Family/W8/official_news.py'
+      - '.github/workflows/family-w8-real-news.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rss:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m py_compile 系統工程/Family/W8/official_news.py
+      - name: Fetch actual public financial headlines with publication timestamps
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0,"系統工程/Family/W8")
+          from official_news import market_news,feed
+          data=market_news()
+          assert data["status"]=="OK" and len(data["headlines"])>0
+          assert all(x["published_at_utc"] and x["url"].startswith("https://") for x in data["headlines"])
+          print("FAMILY_REAL_FINANCE_RSS_PASS",len(data["headlines"]))
+          PY

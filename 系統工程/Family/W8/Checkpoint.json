@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T08:11:00+08:00",
+  "updated_at": "2026-10-26T08:09:44+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -196,7 +196,9 @@
         "12 latest actual Drive report read",
         "14 account management link"
       ],
-      "note": "Live real Drive report folders 4/4; existing reports 2; news verified actual RSS with dates; external ChatGPT Project OAuth session activation not verified."
+      "note": "Live real Drive report folders 4/4; existing reports 2; news verified actual RSS with dates; external ChatGPT Project OAuth session activation not verified.",
+      "host_news_result": "SUCCESS",
+      "main_news_merge": "23bc30c9979687c79ecd24637c8b977bec6f888d"
     }
   ],
   "defects": [

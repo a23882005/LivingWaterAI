@@ -105,7 +105,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                        trusted_w6_current_input_producer=None,
                        approved_w6_archive=None, approved_w6_renderer=None,
                        report_store=None, other_handlers=None,
-                       completion_checks=None):
+                       completion_checks=None, official_report_folder_id=None,
+                       report_staging_dir=None):
     """Return the existing W7 menu without using a permanent Python host."""
     auth=FamilyLoginAdapter(family_login,login_account,client_id)
     coordinator=OnDemandReadCoordinator(
@@ -114,6 +115,58 @@ def build_project_menu(*, family_login, project_name, login_account,
         official_file_id=official_drive_file_id,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
+    handlers=dict(other_handlers or {})
+    # The legacy W6 report store uses a direct REST transport. Under the
+    # Owner-approved ChatGPT execution model, hand verified upload receipts
+    # back to the tool executor instead of pretending Python uploaded files.
+    if report_store is None and official_report_folder_id is not None:
+        def previous_report_lookup(payload):
+            if not isinstance(payload,dict) or set(payload)-{"date"}:
+                raise ValueError("INVALID_REPORT_LOOKUP_OPTIONS")
+            date=payload.get("date")
+            if date is not None:
+                from datetime import date as date_type
+                if not isinstance(date,str) or date_type.fromisoformat(date).isoformat()!=date:
+                    raise ValueError("INVALID_REPORT_LOOKUP_DATE")
+            auth.require_login()
+            return {"status":"DRIVE_LOOKUP_REQUIRED",
+                    "folder_id":official_report_folder_id,
+                    "member_alias":family_alias,
+                    "date":date,"trade_authorization":"NONE"}
+        handlers["previous_report"]=previous_report_lookup
+
+        if (trusted_w6_current_input_producer is not None
+                and (approved_w6_archive is not None
+                     or approved_w6_renderer is not None)
+                and report_staging_dir is not None):
+            entry=official.OfficialFamilyEntry(
+                auth=auth, login_account=login_account, client_id=client_id,
+                coordinator=coordinator, principal_provider=coordinator.principal)
+            source_module=_load(ROOT/"formal_report_source.py",
+                                "family_w8_nohost_formal_source")
+            report_module=_load(ROOT/"on_demand_w6.py",
+                                "family_w8_nohost_current_report")
+            delivery_module=_load(ROOT/"on_demand_report_delivery.py",
+                                  "family_w8_nohost_report_delivery")
+            renderer=report_module.OnDemandW6Renderer(
+                trusted_w6_current_input_producer, approved_w6_renderer,
+                approved_w6_archive=approved_w6_archive)
+
+            def stage_latest_report(payload):
+                snapshot=entry.current_snapshot()
+                source=source_module.build_report_source(
+                    snapshot,account=login_account,expected_client_id=client_id)
+                rendered=renderer(source,payload)
+                return delivery_module.prepare_report_delivery(
+                    rendered,account=login_account,client_id=client_id,
+                    folder_id=official_report_folder_id,
+                    output_dir=report_staging_dir)
+            handlers["generate_report"]=stage_latest_report
+        # Menu handlers here stage reports only; the upstream no-host W6
+        # injection must not also attempt the legacy synchronous Drive store.
+        trusted_w6_current_input_producer=None
+        approved_w6_archive=None
+        approved_w6_renderer=None
     return official.build_official_family_menu(
         auth=auth,project_name=project_name,login_account=login_account,
         client_id=client_id,coordinator=coordinator,
@@ -123,5 +176,5 @@ def build_project_menu(*, family_login, project_name, login_account,
         approved_w6_archive=approved_w6_archive,
         approved_w6_renderer=approved_w6_renderer,
         report_store=report_store,
-        other_handlers=other_handlers,
+        other_handlers=handlers,
         completion_checks=completion_checks)

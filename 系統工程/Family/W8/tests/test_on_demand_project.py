@@ -85,8 +85,10 @@ class ChatGPTRuntimeTest(unittest.TestCase):
         menu=self.menu(client_id=self.client)
         menu.login("synthetic-secret")
         bad_hash=hashlib.sha256(b"wrong").hexdigest()
+        bad_menu=self.menu(verified_drive_sha256=bad_hash)
+        bad_menu.login("synthetic-secret")
         with self.assertRaisesRegex(RuntimeError,"FAMILY_DRIVE_SOURCE_CHANGED"):
-            self.menu(verified_drive_sha256=bad_hash).select(2)
+            bad_menu.select(2)
 
     def test_unknown_portfolio_not_fake_deployed(self):
         menu=self.menu()

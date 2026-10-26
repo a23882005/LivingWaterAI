@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T10:00:13+08:00",
+  "updated_at": "2026-10-26T11:48:27+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -319,7 +319,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "Continue W6 accepted v16 actual renderer generic member binding with strict source-as-of checks; add secure 13 render->QA->Drive archive per member; finish 04 native V70/V82/V75/Mentor confirmed target/funding/market producer; four ChatGPT Project signed-in end-to-end tests before final W8 Gate.",
+  "next_action": "Stop expanding Hostinger as Family Python runtime. In the Owner-approved GitHub code → ChatGPT user-triggered code tools → member's Google Drive SQLite/report flow, verify executable tool access and complete four Project 14-menu end-to-end with official V70/V82/bondV75/Mentor and W6 renderer. Report genuine unsupported execution boundaries; seek Owner approval before changing architecture.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -327,5 +327,22 @@
     "data_owner": "指揮官",
     "production": "HOLD until Gate D",
     "trade_execution": "NONE"
+  },
+  "owner_architecture_decision_20261026": {
+    "status": "OWNER_APPROVED__OVERRIDES_EARLIER_UNAUTHORIZED_HOSTINGER_ARCHITECTURE",
+    "official_design": "GitHub stores formal code; ChatGPT Project on user query executes code via available runtime tools; Google Drive stores each member's authoritative SQLite/report data.",
+    "runtime_cadence": "USER_TRIGGERED_ONLY__NO_ALWAYS_ON_HOST_OR_BACKGROUND_MONITORING",
+    "hostinger": "NOT_OWNER_DESIGNATED_FAMILY_PYTHON_RUNTIME; previous Hostinger/HTTPS/OAuth installation is historical, do not expand or treat as prerequisite",
+    "oauth": "Not a mandatory Family engine premise; adapt authentication to verified ChatGPT on-demand tools and existing Owner four-hour requirement.",
+    "affected_members": [
+      "MOU",
+      "Joseph",
+      "Arthur",
+      "Lilian"
+    ],
+    "historical_tests": "Keep evidence honestly; historical technical PASS does not establish current owner-approved on-demand Project E2E.",
+    "changes_this_round": "Governance documents only; no Python runtime migration, no DB writes, no website deactivation.",
+    "formal_record_path": "系統工程/Family/W8/正式架構裁決_ChatGPT按需執行.md",
+    "accountable": "Family中PM／總PM; no unauthorized architecture deviations or new hosting."
   }
 }

@@ -151,6 +151,21 @@ class FamilyMenu:
             return {'status': 'DATA_UNAVAILABLE', 'result': result,
                     'pending_operation': 'deployment_pace',
                     'menu': render_menu(self.project_name)}
+        # A locally rendered report is not a completed Drive publication.
+        # The ChatGPT tool executor must upload/read back every artifact,
+        # publish the manifest last and verify its remote bytes.
+        if (choice['operation'] == 'generate_report'
+            and isinstance(result, dict)
+            and result.get('status') == 'STAGED_NOT_PERSISTED'):
+            return {'status': 'REPORT_UPLOAD_REQUIRED', 'result': result,
+                    'pending_operation': 'generate_report',
+                    'menu': render_menu(self.project_name)}
+        if (choice['operation'] == 'previous_report'
+            and isinstance(result, dict)
+            and result.get('status') == 'DRIVE_LOOKUP_REQUIRED'):
+            return {'status': 'REPORT_LOOKUP_REQUIRED', 'result': result,
+                    'pending_operation': 'previous_report',
+                    'menu': render_menu(self.project_name)}
         if choice['operation'] == 'first_allocation':
             verifier = self.completion_checks.get('first_allocation')
             # The trusted verifier checks an actual first-allocation save/readback.

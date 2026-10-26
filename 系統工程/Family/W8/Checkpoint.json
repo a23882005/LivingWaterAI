@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T06:57:00+08:00",
+  "updated_at": "2026-10-26T08:11:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -147,6 +147,56 @@
       ],
       "production": "HOLD_FOR_FULL_W8_GATE",
       "trade_authorization": "NONE"
+    },
+    {
+      "id": "W8-R07",
+      "name": "正式五項金融資料寫入工具合併並部署",
+      "status": "PASS_CODE_AND_HOST__CUSTOMER_WRITE_EVENT_PENDING",
+      "pr": 39,
+      "merge_sha": "37da5e01a9f08e06462978542f3b16aa91ba7956",
+      "workflows": {
+        "official_db_transaction_copy": 40245008509,
+        "mcp": 40246635120,
+        "host_main": 40246831040
+      },
+      "coverage": [
+        "01 first allocation",
+        "03 confirmed target",
+        "06 confirmed funding",
+        "10 profile",
+        "11 evidence-backed event"
+      ],
+      "validation": "Official SQLite schemas 4 families / 20 valid commits verified; MCP regression PASS; Hostinger main code deployment PASS",
+      "note": "Official DB writes await explicit signed-in family confirmed record; prior source balances/positions not overwritten."
+    },
+    {
+      "id": "W8-R08",
+      "name": "四戶總經/歷史報告/帳號管理及公開新聞工具正式上線",
+      "status": "PASS_CODE_AND_REAL_SOURCES__CUSTOMER_SESSION_PENDING",
+      "pull_requests": [
+        40,
+        41
+      ],
+      "merge_commits": [
+        "6e9295033f198b2ae8218a90c628596c2246d1d2",
+        "23bc30c9979687c79ecd24637c8b977bec6f888d"
+      ],
+      "workflows": {
+        "real_report_folders": 40247127524,
+        "mcp_report": 40247175982,
+        "host_report": 40247218790,
+        "real_news_rss": 40247550924,
+        "mcp_news": 40247609446,
+        "host_news": 40247683277
+      },
+      "coverage": [
+        "07 macro link",
+        "08 timely real news",
+        "09 own-portfolio news",
+        "12 latest actual Drive report read",
+        "14 account management link"
+      ],
+      "note": "Live real Drive report folders 4/4; existing reports 2; news verified actual RSS with dates; external ChatGPT Project OAuth session activation not verified."
     }
   ],
   "defects": [
@@ -190,7 +240,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "完成四戶真人OAuth/ChatGPT Project應用綁定，逐項打通14 menu工作、正式W2目標和已確認資金及計算與報表，親自驗收後才能Gate D/E。",
+  "next_action": "接通05正式新標的研究與13符合W6既定模板的新報告Renderer/歸檔；04連上W2確認目標與資金及V70/V82/V75/Mentor正式引擎；以四戶本人ChatGPT Projects實測OAuth及14項完整閉環後裁定W8/Gate D。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

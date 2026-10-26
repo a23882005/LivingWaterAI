@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T08:09:44+08:00",
+  "updated_at": "2026-10-26T09:08:34+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -199,6 +199,26 @@
       "note": "Live real Drive report folders 4/4; existing reports 2; news verified actual RSS with dates; external ChatGPT Project OAuth session activation not verified.",
       "host_news_result": "SUCCESS",
       "main_news_merge": "23bc30c9979687c79ecd24637c8b977bec6f888d"
+    },
+    {
+      "id": "W8-R09",
+      "name": "四戶選單05本人持倉＋真正新標的新聞來源研究",
+      "status": "PASS_SOURCE_RESEARCH_AND_HOST_DEPLOY__STRATEGY_CANDIDATE_GATE_PENDING",
+      "pr": 42,
+      "merge_commit": "a44a47654d0bc767eea08bb18a6adea66e436883",
+      "official_live_actions": {
+        "four_family_source_and_live_rss": 40252188691,
+        "mcp_contract": 40252587462,
+        "hostinger_deployment": 40252587396
+      },
+      "result": "4/4 official SQLite read and SHA unchanged; live public RSS cited headlines; member holdings overlap; source-only 05 current capability",
+      "code_paths": [
+        "系統工程/Family/W8/official_research.py",
+        "系統工程/Family/W8/private_family_service.py",
+        "系統工程/Family/W8/probes/live_research_readonly.py"
+      ],
+      "limits": "No verified ETF cost/long-term performance comparison, no current stock/ETF valuation, no W2 research handoff or final V82 buy signal. Candidate research can report evidence but cannot infer fund quality or price.",
+      "family_db_writes": 0
     }
   ],
   "defects": [
@@ -242,7 +262,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "接通05正式新標的研究與13符合W6既定模板的新報告Renderer/歸檔；04連上W2確認目標與資金及V70/V82/V75/Mentor正式引擎；以四戶本人ChatGPT Projects實測OAuth及14項完整閉環後裁定W8/Gate D。",
+  "next_action": "05 已在正式主機可主動呼叫公開證據研究，進一步接W2 research/ETF品質比較；13 必須使用根目錄CR-HTML-001 v1.24.1 21頁母模板與W6正式圖片Renderer，補齊真實資料及存檔；04 原生V70/V82/V75/Mentor需完成已核定目標資金/市場producer；四戶真人 ChatGPT Project oauth 14項實測後Gate D/E。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

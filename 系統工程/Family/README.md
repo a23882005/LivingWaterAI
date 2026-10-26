@@ -1,4 +1,4 @@
-最後修改日期時間：2026/10/26 12:08（台灣時間）
+最後修改日期時間：2026/10/27 03:05（台灣時間）
 # Family 家人版四戶正式專案文件索引
 
 ## 🚩 2026/10/26｜Owner 最新優先架構裁決（高於下方舊Hostinger接線記錄）
@@ -6,6 +6,22 @@
 **已核定：GitHub 存正式程式 → 家人在 ChatGPT Project 提問時由 ChatGPT 按需取得並執行程式 → Google Drive 讀寫該家人正式 DB／報告 → 回覆。** 家人版不需要24小時常駐 Python 伺服器；**Hostinger 不是指定的家人版程式執行主機**，OAuth／MCP 外部常駐後端也不是Owner核定的必備方案。先前為解決W8接線而自行導入Hostinger屬中PM架構偏離；後續不再擅自擴充。既有真實歷史測試成績維持原紀錄，與最新版正式施工目標分別標示；本次沒有擅自停用既有網站，也沒有更動個人DB。
 
 正式約束與責任全文：[W8／正式架構裁決_ChatGPT按需執行.md](W8/正式架構裁決_ChatGPT按需執行.md)。後續W8必須以ChatGPT當次實際可用程式工具為準逐項接通，不能單憑GitHub有程式就聲稱已在Project執行。
+
+## 2026/10/27｜Family中PM＝全專案總PM｜最新正式三ZIP交接
+
+**這是最新交接，優先於下方2026/10/26及2026/10/25舊交接歷史。** 指揮官已核定由新對話的Family中PM／總PM**親自完成**W8剩餘施工、04投資計算、11真正SQLite同ID寫回、13本期正式PDF/HTML、四戶14項Project真實驗收、Gate D/E及所有工程與檔案治理。Owner授權相關工程繼續，無需重做已通過Gate，不再無故新發包。
+
+三包均已上傳至指揮官私有Google Drive**根目錄既有TEMP**，且**下載讀回3／3 ZIP CRC、各檔 SHA及全ZIP SHA全部PASS**：
+
+|順序|正式ZIP檔名|SHA-256|
+|---|---|---|
+|ZIP1 總PM權責與最高架構|Family_W8_20261027_ZIP1_中PM總PM職責與最高架構.zip|b19ae57f6aabc53cacf74c65516698e4459a3d32e7ff851c7f5b3d282818ae29|
+|ZIP2 已完成工程與程式證據|Family_W8_20261027_ZIP2_已完成工程與程式證據位置.zip|c96ec15ab0ac556e1cd25d630b53c5dc301e03dab7f37f2fab01f49e9de45b06|
+|ZIP3 未完工序與四戶Gate|Family_W8_20261027_ZIP3_剩餘工序與四戶Gate驗收.zip|77a330ddd33aa2a9ae762a1cf3b9bae6cfa64342aa0a9dcad29432c7199ef1e7|
+
+[2026/10/27正式交接詳細索引](W8/20261027_中PM總PM三ZIP正式交接索引.md)，以及[當期W8 Checkpoint](W8/Checkpoint.json)；各家人正式私有資料不進公開Repo。
+
+**新確認工具突破：**當次ChatGPT可使用 files__manage_library 把本機真正ZIP／SQLite新檔直接上傳Google Drive/TEMP，真實讀回已核實；但是**overwrite=true對既有Drive檔明確回overwrite_not_supported**，因此**四戶正式SQLite同原File ID更新/遠端讀回仍未PASS**。不要因三ZIP已存就誤稱原DB能覆寫或Gate D/E已通過。W7 PASS/CLOSED、W6工程PASS_WITH_DECLARED_SOURCE_GAPS保留；W8仍IN_PROGRESS、Production HOLD、交易NONE。
 
 ## 2026/10/26｜Family 中PM／總PM新對話三ZIP交接（最新接棒，取代下方舊20261025交接）
 

@@ -166,6 +166,18 @@ class FamilyMenu:
             return {'status': 'REPORT_LOOKUP_REQUIRED', 'result': result,
                     'pending_operation': 'previous_report',
                     'menu': render_menu(self.project_name)}
+        # For ChatGPT one-shot execution, a locally written SQLite candidate
+        # is not the authoritative Google Drive database. Never call it saved
+        # until the original remote file was updated and read back.
+        if (choice['operation'] in ('first_allocation','adjust_target',
+                                    'new_funding','update_profile','record_event')
+            and isinstance(result, dict)
+            and result.get('status') in ('STAGED_NOT_PERSISTED',
+                                          'READY_NOT_PERSISTED',
+                                          'CONNECTOR_FILE_REFERENCE_REQUIRED')):
+            return {'status':'DB_WRITEBACK_REQUIRED','result':result,
+                    'pending_operation':choice['operation'],
+                    'menu':render_menu(self.project_name)}
         if choice['operation'] == 'first_allocation':
             verifier = self.completion_checks.get('first_allocation')
             # The trusted verifier checks an actual first-allocation save/readback.

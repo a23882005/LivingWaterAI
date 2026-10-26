@@ -93,7 +93,7 @@ jobs:
             from private_family_service import load_official_router
             router=load_official_router(Path(sys.argv[2]))
             assert router.mcp.business_tools is not None
-            assert len(router.mcp.business_tools.specs())==12
+            assert len(router.mcp.business_tools.specs())==13
             print('PRIVATE_HOST_OFFICIAL_MCP_LOAD_PASS')
             PY
             target="$parent/.family-w8-app"

@@ -6,6 +6,8 @@ on:
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/tests/test_on_demand_w6.py'
+      - '系統工程/Family/W8/on_demand_w6.py'
       - '系統工程/Family/W8/tests/test_w6_current_data.py'
       - '系統工程/Family/W8/w6_current_data.py'
       - '系統工程/Family/W8/tests/test_on_demand_analysis.py'
@@ -47,3 +49,6 @@ jobs:
       - name: Run W6 current data assembly regressions
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_w6_current_data.py' -v
+      - name: Run approved W6 data-to-renderer handoff tests
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_w6.py' -v

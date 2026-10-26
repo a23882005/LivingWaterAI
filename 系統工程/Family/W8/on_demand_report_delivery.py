@@ -107,6 +107,80 @@ def prepare_report_delivery(rendered, *, account, client_id, folder_id,
 
 
 
+
+def prepare_verified_html_import(plan, artifact="index.html"):
+    """Build the supported direct local-HTML -> Drive import_document call.
+
+    Unlike generic Drive upload_file, import_document can accept local HTML
+    paths in the active ChatGPT executor when keep_source_file_type is chosen.
+    This is ONLY an HTML transport, not a PDF/ZIP/SQLite binary uploader.
+    It never claims the report as complete before all required artifacts and
+    final manifest have independently passed remote readback.
+    """
+    if not isinstance(plan, dict) or plan.get("status")!="STAGED_NOT_PERSISTED":
+        raise ValueError("REPORT_STAGE_REQUIRED")
+    if artifact not in ("index.html","report.html"):
+        raise ValueError("REPORT_HTML_ONLY")
+    found=[x for x in plan.get("uploads",[]) if x.get("artifact")==artifact]
+    if len(found)!=1:
+        raise ValueError("REPORT_HTML_ARTIFACT_REQUIRED")
+    row=found[0]
+    local=Path(row["path"]).resolve(strict=True)
+    if (local.suffix.lower()!=".html" or row.get("mime")!="text/html"
+        or local.stat().st_size!=row["bytes"]
+        or _digest(local.read_bytes())!=row["sha256"]):
+        raise ValueError("REPORT_HTML_STAGE_CHANGED")
+    return {
+        "status":"HTML_IMPORT_READY_NOT_PERSISTED",
+        "artifact":artifact,
+        "source_sha256":row["sha256"],
+        "expected_name":row["name"],
+        "folder_id":plan["receipt"]["folder_id"],
+        "tool":"mcp__Google_Drive__import_document",
+        "import_args":{
+            "source_file":str(local),
+            "title":row["name"],
+            "upload_mode":"keep_source_file_type",
+            "parent_folder_id":plan["receipt"]["folder_id"],
+        },
+        "trade_authorization":"NONE",
+    }
+
+
+def verify_imported_html(plan, import_response, freshly_fetched_remote_bytes):
+    """Verify the HTML returned by import_document and separately fetched.
+
+    HTML can be reported as independently stored but never as the COMPLETE
+    Family W6 report until PDF/ZIP and the archive manifest are also verified.
+    """
+    if (not isinstance(plan,dict)
+        or plan.get("status")!="HTML_IMPORT_READY_NOT_PERSISTED"):
+        raise ValueError("HTML_IMPORT_PLAN_REQUIRED")
+    response=import_response.get("result",import_response) if isinstance(import_response,dict) else None
+    if (not isinstance(response,dict)
+        or response.get("success") is not True
+        or response.get("converted") is not False
+        or response.get("mimeType")!="text/html"
+        or response.get("title")!=plan["expected_name"]
+        or response.get("parentId")!=plan["folder_id"]
+        or not _string(response.get("fileId"))
+        or not re.fullmatch(r"[A-Za-z0-9_-]+",response["fileId"])):
+        raise PermissionError("HTML_IMPORT_REMOTE_BINDING_MISMATCH")
+    if (not isinstance(freshly_fetched_remote_bytes,bytes)
+        or _digest(freshly_fetched_remote_bytes)!=plan["source_sha256"]):
+        raise RuntimeError("HTML_IMPORT_REMOTE_BYTES_MISMATCH")
+    return {
+        "status":"HTML_REMOTE_VERIFIED_PARTIAL",
+        "file_id":response["fileId"],
+        "name":plan["expected_name"],
+        "mime":"text/html",
+        "sha256":plan["source_sha256"],
+        "bytes":len(freshly_fetched_remote_bytes),
+        "folder_id":plan["folder_id"],
+        "report_complete":False,
+        "trade_authorization":"NONE",
+    }
+
 def bind_connector_uploads(plan, file_uri_by_artifact):
     """Create actual Google Drive upload_file tool args, never local-path args.
 

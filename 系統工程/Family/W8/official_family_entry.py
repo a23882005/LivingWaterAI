@@ -149,7 +149,7 @@ class OfficialFamilyEntry:
 
 def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                coordinator, principal_provider, analysis_provider=None,
-                               other_handlers=None, completion_checks=None):
+                               other_handlers=None, completion_checks=None, report_store=None, report_renderer=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
     path = FAMILY / "W7" / "family_menu.py"
     spec = importlib.util.spec_from_file_location("official_family_menu", path)
@@ -162,6 +162,10 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
         coordinator=coordinator, principal_provider=principal_provider,
         analysis_provider=analysis_provider)
     handlers = dict(other_handlers or {})
+    if report_renderer is not None and report_store is None:
+        raise ValueError('OFFICIAL_REPORT_STORE_REQUIRED')
+    if report_store is not None:
+        handlers.update(module.report_handlers(auth, report_store, renderer=report_renderer))
     # Reserved operations always use the official resource, not external caller
     # supplied handlers. Other options remain under existing operator routing.
     handlers.update(official.handlers())

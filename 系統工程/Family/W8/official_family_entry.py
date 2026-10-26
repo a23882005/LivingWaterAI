@@ -108,6 +108,24 @@ class OfficialFamilyEntry:
                               "funding_evaluation")
             if not current["snapshot"]["tables"].get(name)
         ]
+        targets = current["snapshot"]["tables"].get("final_target_version", [])
+        allocations = current["snapshot"]["tables"].get("final_target_allocation", [])
+        confirmed = False
+        for version in targets:
+            if (version.get("lifecycle_state") != "CONFIRMED"
+                    or version.get("completeness_state") != "COMPLETE"):
+                continue
+            weights = [a for a in allocations
+                       if a.get("target_key") == version.get("target_key")
+                       and a.get("version_no") == version.get("version_no")
+                       and a.get("allocation_state") == "ACCEPTED"]
+            if weights and all(type(a.get("weight_units")) is int
+                               and a["weight_units"] > 0 for a in weights
+                               ) and sum(a["weight_units"] for a in weights) == 1000000:
+                confirmed = True
+                break
+        if not confirmed:
+            missing.append("confirmed_final_target_version")
         if self.analysis_provider is None or missing:
             if self.analysis_provider is None:
                 missing.append("official_market_and_approved_engine_request")

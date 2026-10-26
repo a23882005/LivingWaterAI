@@ -22,6 +22,7 @@ from drive_service_transport import GoogleDriveTransport
 from family_input import read_snapshot
 from resource_headers import validate_policies, authorize, VerifiedPrincipal
 from official_family_entry import RESOURCE_BY_ACCOUNT
+from formal_report_source import build_report_source
 
 API = "https://www.googleapis.com/drive/v3/files/"
 PAIRS = tuple(RESOURCE_BY_ACCOUNT.items())
@@ -77,6 +78,18 @@ def main():
             snapshot = read_snapshot(path, expected_client_id=client_id)
             assert snapshot["source_sha256"] == sha
             assert snapshot["client_id"] == client_id
+            report_source = build_report_source(snapshot,
+                                                account=account,
+                                                expected_client_id=client_id)
+            assert report_source["client_id"] == client_id
+            assert report_source["source_db_sha256"] == sha
+            assert report_source["snapshot_payload_sha256"] == snapshot["payload_digest"]
+            assert report_source["digest"] and len(report_source["digest"]) == 64
+            assert report_source["report_scope"] == "AUTHENTICATED_HISTORICAL_OR_REPORTED_INPUT"
+            assert report_source["reporting_flags"]["deployable_cash_certified"] is False
+            assert report_source["reporting_flags"]["w6_v16_renderer_data_complete"] is False
+            assert all(entry["evidence_tier"] != "HYPOTHETICAL_ONLY"
+                       for entry in report_source["actual_user_evidence"])
         again = transport.call(API + file_id + "?alt=media", raw=True)
         assert hashlib.sha256(again).hexdigest() == sha
         inspected += 1

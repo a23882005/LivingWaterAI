@@ -504,6 +504,57 @@
         "runtime": "CHATGPT_ON_DEMAND",
         "external_python_host": "NONE"
       }
+    },
+    {
+      "id": "W8-R17",
+      "title": "No-host public research/news/account routing + menu13 HTML Drive import plans",
+      "status": "GITHUB_CODE_MERGED__CI_PASS__FOUR_PROJECT_LIVE_E2E_PENDING",
+      "date_taipei": "2026/10/27 01:48",
+      "pull_requests": [
+        {
+          "number": 51,
+          "commit": "f0c5311a03c0590ea61e680dbd935e42e0e1dbc9",
+          "ci_run": 40371417236,
+          "tests": "109/109 PASS",
+          "other_ci": [
+            40371417163,
+            40371417167
+          ]
+        },
+        {
+          "number": 52,
+          "commit": "2c4e5d511726d5cdbe924174c70c991b287aae92",
+          "ci_run": 40371946598,
+          "tests": "109/109 PASS"
+        }
+      ],
+      "changes": [
+        "Menu05 candidate research: verified family holdings, requested tickers/themes, tool-source pending without fresh web search",
+        "Menu08 public market headlines: no assumed Python internet; trusted current ChatGPT source search and freshness checks",
+        "Menu09 current-holdings headline research: strictly selected from authenticated current positions",
+        "Menu14 account actions: options and logout supported, password changes explicitly marked pending durable account DB writeback",
+        "Menu13 staged report includes concrete prepare_verified_html_import args for supported HTML reader artifacts; PDF/ZIP remain pending"
+      ],
+      "verified": [
+        "Main updated and GitHub Actions checked",
+        "Synthetic tests preserve per-client data and no trading authority",
+        "Never misreports pending news as completed research nor local report stage as Drive saved"
+      ],
+      "remaining": [
+        "Actual ChatGPT search source injection for 05/08/09 in all four Projects",
+        "Four-hour cross-chat verified durable session and account password-change DB readback",
+        "04 source-backed W5/V70/V82/bondV75/Mentor actual same-run inputs",
+        "13 four-family real W6 report, PDF/ZIP and authenticated same-folder Drive manifest complete",
+        "Original SQLite DB binary writeback via supported connector and 56 E2E Gate D/E"
+      ],
+      "controls": {
+        "runtime": "CHATGPT_ON_DEMAND",
+        "code": "GITHUB",
+        "authoritative_db_reports": "GOOGLE_DRIVE",
+        "external_python_host": "NONE",
+        "production": "HOLD",
+        "trade_authorization": "NONE"
+      }
     }
   ],
   "defects": [

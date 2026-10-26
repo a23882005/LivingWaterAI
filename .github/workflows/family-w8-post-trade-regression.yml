@@ -12,6 +12,8 @@ on:
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/tests/test_on_demand_mutations.py'
+      - '系統工程/Family/W8/on_demand_mutations.py'
       - '系統工程/Family/W8/tests/test_nohost_report_menu.py'
       - '系統工程/Family/W8/tests/test_on_demand_report_delivery.py'
       - '系統工程/Family/W8/on_demand_drive_io.py'
@@ -82,3 +84,6 @@ jobs:
           PYTHONPATH: 系統工程/Family/W8
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_drive_io.py' -v
+      - name: Run all five one-shot mutation handlers
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_mutations.py' -v

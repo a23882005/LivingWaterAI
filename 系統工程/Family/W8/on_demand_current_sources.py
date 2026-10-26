@@ -15,6 +15,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+from copy import deepcopy
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[2]
@@ -35,6 +36,54 @@ def _time(value):
     out=datetime.fromisoformat(value.replace('Z','+00:00'))
     if out.utcoffset() is None:raise ValueError('SOURCE_TIMEZONE_REQUIRED')
     return out.astimezone(timezone.utc)
+
+
+def read_official_holdings(snapshot):
+    """Read existing ledger and sealed source quantities without a new DB.
+
+    Keep source layers explicit: a screenshot intake time is not an observation
+    time, and an instrument absent from the old registry is still a real source
+    holding. No absent position, cash balance or account mapping becomes zero.
+    """
+    tables=snapshot['tables'];client=snapshot['client_id']
+    instruments={r['instrument_key']:r for r in tables['portfolio_instrument']}
+    ledger=[]
+    for row in tables.get('portfolio_position',[]):
+        instrument=instruments.get(row['instrument_key'],{})
+        ledger.append({'symbol':instrument.get('ticker'),
+            'instrument_key':row['instrument_key'],'account_key':row['account_key'],
+            'quantity':row.get('quantity_decimal'),'observed_at':row.get('as_of_utc'),
+            'source_kind':'PORTFOLIO_POSITION','source_row':deepcopy(row)})
+    runs=[r for r in tables.get('portfolio_snapshot_run',[])
+          if r.get('run_state')=='SEALED' and r.get('source_kind')!='USER_HYPOTHETICAL']
+    runs.sort(key=lambda r:(r['as_of_utc'],r.get('version_no',0)),reverse=True)
+    source=[];corrections=[]
+    if runs:
+        run=runs[0]
+        items=[r for r in tables.get('portfolio_snapshot_item',[]) if r['run_id']==run['run_id']]
+        for item in items:
+            if item.get('client_id')!=client:raise PermissionError('OFFICIAL_HOLDINGS_CLIENT_MISMATCH')
+            field=item['field_key']
+            if field=='quantity' and item.get('domain_code')=='OWNER_SCREENSHOT_SOURCE':
+                source.append({'symbol':item['entity_key'],
+                    'quantity':item.get('value_text') if item['value_state']=='KNOWN' else None,
+                    'quantity_state':item['value_state'],'source_row':deepcopy(item),
+                    'observed_at':item.get('source_observed_at_utc'),
+                    'received_at':run['as_of_utc'],'source_run_id':run['run_id']})
+            elif field=='accepted_W6_broker_holdings_json' and item['value_state']=='KNOWN':
+                for row in json.loads(item['value_text']):
+                    source.append({**deepcopy(row),'source_row':deepcopy(item),
+                        'observed_at':item.get('source_observed_at_utc'),
+                        'received_at':run['as_of_utc'],'source_run_id':run['run_id']})
+            elif field=='owner_correction_json' and item['value_state']=='KNOWN':
+                corrections.append({'payload':json.loads(item['value_text']),
+                    'source_row':deepcopy(item)})
+    registered={r.get('ticker') for r in instruments.values()}
+    return {'client_id':client,'source_db_sha256':snapshot['source_sha256'],
+        'ledger_positions':ledger,'latest_sealed_source_positions':source,
+        'owner_corrections':corrections,
+        'source_symbols_missing_from_instrument_registry':sorted({r['symbol'] for r in source}-registered),
+        'source_layers_preserved':True,'database_written':False}
 
 
 def run_original_v70(repo_root,strategic,*,evaluation_at):
@@ -148,6 +197,7 @@ def build_current_sources(snapshot,db_path,*,repo_root=REPO,evaluation_at=None):
             'client_id':client,'source_db_sha256':original_hash,'evaluation_at':when,
             'confirmed_target_details':targets,'strategic':strategic,
             'official_asset_facts':facts,
+            'official_holdings':read_official_holdings(snapshot),
             'funding_latest':funding,'funding_planning_rows':planning,'macro':macro,'v70':v70,
             'market_observations':observations,
             'monetary_tactical_amounts':None,'monetary_amount_reason':'C7_VERIFIED_INVESTMENT_POOL_BASE_REQUIRED',

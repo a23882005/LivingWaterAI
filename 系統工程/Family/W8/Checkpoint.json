@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T12:05:48+08:00",
+  "updated_at": "2026-10-27T03:05:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -708,5 +708,39 @@
     ],
     "guardrails": "Handoff recorded only. No family customer DB updates, no OAuth/Hostinger deployment or deactivation, no Gate PASS change.",
     "next_actions": "Next Family middle PM personally execute actual ChatGPT code tools + GitHub + Drive on-demand workflow, complete 04 verified engines, 11 transactions/current-positions mapping, 13 W6 real renderer and all four Project 14-menu E2E; no new unauthorized architecture."
+  },
+  "handoff_20261027": {
+    "status": "COMPLETE_THREE_ZIPS_UPLOADED_TO_GOOGLE_DRIVE_TEMP_AND_EXACT_READBACK_3_OF_3",
+    "created_taipei": "2026/10/27 03:03",
+    "owner": "Family中PM acting as whole-project PM and hands-on W8 executor",
+    "next_owner": "Next conversation Family中PM (entire Family project Total PM)",
+    "drive_destination": "Existing Google Drive root/TEMP (owner-private)",
+    "artifacts": [
+      {
+        "name": "Family_W8_20261027_ZIP1_中PM總PM職責與最高架構.zip",
+        "sha256": "b19ae57f6aabc53cacf74c65516698e4459a3d32e7ff851c7f5b3d282818ae29",
+        "size_bytes": 12331,
+        "drive_readback": "ZIP_CRC_AND_SHA256_AND_ALL_MEMBERS_PASS"
+      },
+      {
+        "name": "Family_W8_20261027_ZIP2_已完成工程與程式證據位置.zip",
+        "sha256": "c96ec15ab0ac556e1cd25d630b53c5dc301e03dab7f37f2fab01f49e9de45b06",
+        "size_bytes": 17160,
+        "drive_readback": "ZIP_CRC_AND_SHA256_AND_ALL_MEMBERS_PASS"
+      },
+      {
+        "name": "Family_W8_20261027_ZIP3_剩餘工序與四戶Gate驗收.zip",
+        "sha256": "77a330ddd33aa2a9ae762a1cf3b9bae6cfa64342aa0a9dcad29432c7199ef1e7",
+        "size_bytes": 19605,
+        "drive_readback": "ZIP_CRC_AND_SHA256_AND_ALL_MEMBERS_PASS"
+      }
+    ],
+    "live_repo_status": "W7_OWNER_PASS_CLOSED__W6_PASS_WITH_DECLARED_SOURCE_GAPS__W8_IN_PROGRESS__PRODUCTION_HOLD__TRADE_NONE",
+    "current_completed": "W8 R01-R18 verified repository progress; PR46-53 merged; latest 117/117 unit CI pass; no 4x14 live PASS declared",
+    "next_work": "Complete actual same-ID Drive SQLite writeback and readback; run 04 true W5/V70/V82/bondV75/Mentor source-backed engine; 11 post-trade true DB persistence; 13 approved W6 current PDF/HTML and remote archive; 4x14 Family Project E2E; Gate D then E; govern Github/Drive",
+    "new_connector_proof": "files__manage_library upload container_path to /Google Drive/TEMP/<file>.zip supports real ZIP and raw SQLite new-file uploads; Drive fresh fetch SHA/CRC PASS; overwrite:true for existing Drive file returns overwrite_not_supported so official original-File-ID writeback remains unverified",
+    "prohibitions": "GitHub code + ChatGPT user-triggered on-demand + Google Drive four private DB/report; do not introduce Hostinger/Render Python host, 24/7 runtime or duplicate official DB; no customer trade action; no unrelated file access.",
+    "privacy": "Handoff archives omit raw customer DB, passwords, tokens and other sensitive content.",
+    "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   }
 }

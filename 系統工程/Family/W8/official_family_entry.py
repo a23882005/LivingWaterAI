@@ -184,7 +184,7 @@ class OfficialFamilyEntry:
                     "source_sha256": current["source_sha256"],
                     "missing": missing,
                     "current_source_inputs": sources,
-                    "message": ("已讀取本人目標與資金狀態，並完成V70原程式比例計算；逐檔投入金額待完整來源齊備後產生。"
+                    "message": ("已讀取本人目標與資金狀態，並完成V70原程式比例計算；另列本人標的的技術數值與債券風險分項結果、觀測日期及待補資料。逐檔投入金額待完整來源齊備後產生。"
                         if sources and (sources.get("v70") or {}).get("status")=="V70_DATA_READY"
                         else "已讀取本人正式持倉；將依已確認的目標、資金與最新市場來源補齊引擎計算所需欄位。"),
                     "trade_authorization": "NONE"}

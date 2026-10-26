@@ -99,6 +99,21 @@ class TargetReadinessTest(unittest.TestCase):
         self.assertNotIn("confirmed_final_target_version", result["missing"])
         self.assertIn("official_market_and_approved_engine_request", result["missing"])
 
+    def test_missing_native_request_still_returns_bound_current_inputs(self):
+        obj=entry([version()],[allocation()])
+        obj.current_source_provider=lambda snapshot:{'client_id':CLIENT,'source_db_sha256':'digest',
+            'status':'SOURCE_INPUTS_READ','v70':{'status':'V70_DATA_READY'},
+            'monetary_tactical_amounts':None,'full_native_bundle_ready':False}
+        out=obj.deployment_pace({})
+        self.assertEqual(out['status'],'DATA_UNAVAILABLE')
+        self.assertEqual(out['current_source_inputs']['v70']['status'],'V70_DATA_READY')
+        self.assertIsNone(out['current_source_inputs']['monetary_tactical_amounts'])
+        obj.current_source_provider=lambda snapshot:{'client_id':CLIENT,'source_db_sha256':'digest','v70':None}
+        self.assertEqual(obj.deployment_pace({})['status'],'DATA_UNAVAILABLE')
+        obj.current_source_provider=lambda snapshot:{'client_id':'fam_'+'b'*32,'source_db_sha256':'digest'}
+        with self.assertRaisesRegex(PermissionError,'OFFICIAL_CURRENT_SOURCE_MISMATCH'):
+            obj.deployment_pace({})
+
     def test_analysis_result_feeds_existing_w6_data_builder(self):
         # Reproduce the actual 04 -> W6 boundary; no hand-added DB hash.
         spec=importlib.util.spec_from_file_location('w6_lineage_fixture',

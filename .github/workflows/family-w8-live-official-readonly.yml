@@ -2,10 +2,11 @@ name: Family W8 real official DB readonly
 on:
   workflow_dispatch:
   push:
-    branches: [w8-real-resource-routes-20261026, main]
+    branches: [w8-real-resource-routes-20261026, w8-member-report-source-20261026, main]
     paths:
       - '.github/workflows/family-w8-live-official-readonly.yml'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/formal_report_source.py'
       - '系統工程/Family/W8/probes/live_official_readonly.py'
 permissions:
   contents: read
@@ -31,6 +32,7 @@ jobs:
         run: |
           python -m py_compile \
             系統工程/Family/W8/official_family_entry.py \
+            系統工程/Family/W8/formal_report_source.py \
             系統工程/Family/W8/probes/live_official_readonly.py \
             系統工程/Family/W5/family_input.py
       - name: Read all four official Drive SQLite resources and verify unchanged

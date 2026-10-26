@@ -12,8 +12,25 @@ SRC = Path(__file__).with_name("w6_current_data.py")
 
 
 class OnDemandW6Renderer:
-    def __init__(self, trusted_current_input_producer, approved_w6_renderer):
-        if not callable(trusted_current_input_producer) or not callable(approved_w6_renderer):
+    def __init__(self, trusted_current_input_producer, approved_w6_renderer=None,
+                 *, approved_w6_archive=None):
+        if not callable(trusted_current_input_producer):
+            raise ValueError("W6_TRUSTED_PRODUCER_AND_APPROVED_RENDERER_REQUIRED")
+        if approved_w6_archive is not None:
+            if approved_w6_renderer is not None:
+                raise ValueError("W6_RENDERER_SOURCE_CONFLICT")
+            path = Path(__file__).with_name("w6_member_render.py")
+            spec = importlib.util.spec_from_file_location("family_w8_member_renderer", path)
+            if spec is None or spec.loader is None:
+                raise RuntimeError("W6_APPROVED_RENDERER_NOT_FOUND")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            # The renderer rechecks the approved v16 ZIP SHA before every job.
+            archive = Path(approved_w6_archive)
+            if not archive.is_file():
+                raise ValueError("W6_APPROVED_ARCHIVE_REQUIRED")
+            approved_w6_renderer = lambda current: module.render_current_w6(current, archive)
+        if not callable(approved_w6_renderer):
             raise ValueError("W6_TRUSTED_PRODUCER_AND_APPROVED_RENDERER_REQUIRED")
         self.producer = trusted_current_input_producer
         self.renderer = approved_w6_renderer

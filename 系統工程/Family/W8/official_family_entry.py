@@ -165,6 +165,11 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
     if report_renderer is not None and report_store is None:
         raise ValueError('OFFICIAL_REPORT_STORE_REQUIRED')
     if report_store is not None:
+        # Report destinations are bound to the same authenticated member and
+        # canonical client as the portfolio. Never trust an arbitrary folder.
+        if (report_store.login_account != login_account
+                or report_store.client_id != client_id):
+            raise PermissionError('OFFICIAL_REPORT_OWNER_MISMATCH')
         handlers.update(module.report_handlers(auth, report_store, renderer=report_renderer))
     # Reserved operations always use the official resource, not external caller
     # supplied handlers. Other options remain under existing operator routing.

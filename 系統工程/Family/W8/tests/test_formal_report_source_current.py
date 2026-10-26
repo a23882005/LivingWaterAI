@@ -62,6 +62,25 @@ class ReportSourceTests(unittest.TestCase):
         self.assertEqual(detail[0]["allocations"][0]["weight_fraction"],"1")
         self.assertFalse(result["reporting_flags"]["w6_v16_renderer_data_complete"])
 
+    def test_incomplete_newest_confirmed_does_not_revert_to_old_target(self):
+        data=sample()
+        old=data["tables"]["final_target_version"][0]
+        newest=dict(old,version_no=3,lifecycle_state="CONFIRMED",
+                    completeness_state="INCOMPLETE")
+        data["tables"]["final_target_version"].append(newest)
+        result=MOD.build_report_source(data,account="JO",expected_client_id=CLIENT)
+        self.assertFalse(result["reporting_flags"]["confirmed_target_available"])
+        self.assertEqual(result["current_confirmed_target_details"],[])
+
+    def test_pending_rows_in_latest_confirmation_reject_current_target(self):
+        data=sample()
+        data["tables"]["final_target_allocation"].append({
+            "client_id":CLIENT,"target_key":"MAIN","version_no":1,
+            "instrument_key":"QQQ","weight_units":100000,
+            "allocation_state":"PENDING"})
+        result=MOD.build_report_source(data,account="JO",expected_client_id=CLIENT)
+        self.assertFalse(result["reporting_flags"]["confirmed_target_available"])
+
     def test_other_family_rejected(self):
         with self.assertRaisesRegex(PermissionError,"REPORT_IDENTITY_MISMATCH"):
             MOD.build_report_source(sample(),account="AR",expected_client_id=CLIENT)

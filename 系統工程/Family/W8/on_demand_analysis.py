@@ -50,14 +50,21 @@ class OnDemandAnalysisProvider:
                 or not re.fullmatch(r"[0-9a-f]{64}",
                                     str(snapshot.get("source_sha256", "")))):
             raise ValueError("ON_DEMAND_VERIFIED_DB_SNAPSHOT_REQUIRED")
-        if (not isinstance(payload, dict)
-                or set(payload) != {"question"}
-                or not isinstance(payload.get("question"), str)
-                or not payload["question"].strip()):
+        if not isinstance(payload, dict) or set(payload) - {"question"}:
             raise ValueError("ON_DEMAND_QUESTION_REQUIRED")
+        # Selecting the visible menu item "04" is itself a valid request.
+        # Use its standard current-holdings question; never fabricate market
+        # prices or budgets. Explicit malformed questions remain invalid.
+        if not payload:
+            question = "請評估我目前持有標的的投入速度"
+        else:
+            question = payload.get("question")
+            if not isinstance(question, str) or not question.strip():
+                raise ValueError("ON_DEMAND_QUESTION_REQUIRED")
+            question = question.strip()
         # The ChatGPT/operator-bound provider gets the W5 source once for this
         # exact DB version. It cannot pick a different family or a different DB.
-        pack = self.producer(deepcopy(snapshot), {"question": payload["question"]})
+        pack = self.producer(deepcopy(snapshot), {"question": question})
         if not isinstance(pack, dict):
             raise ValueError("ON_DEMAND_SOURCE_PACK_REQUIRED")
         request = pack.get("request")

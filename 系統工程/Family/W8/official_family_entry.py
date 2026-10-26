@@ -134,22 +134,41 @@ class OfficialFamilyEntry:
         ]
         targets = current["snapshot"]["tables"].get("final_target_version", [])
         allocations = current["snapshot"]["tables"].get("final_target_allocation", [])
-        confirmed = False
+        # An older confirmed target must not silently replace a newer,
+        # confirmed-but-incomplete version of the same target purpose.
+        # Consider ALL rows of the latest confirmed version, not merely
+        # the accepted subset; otherwise one accepted 100% plus a pending
+        # allocation could incorrectly pass.
+        latest = {}
         for version in targets:
-            if (version.get("lifecycle_state") != "CONFIRMED"
-                    or version.get("completeness_state") != "COMPLETE"):
+            if version.get("lifecycle_state") != "CONFIRMED":
+                continue
+            key, no = version.get("target_key"), version.get("version_no")
+            if not isinstance(key, str) or not key or type(no) is not int or no < 1:
+                raise ValueError("OFFICIAL_CONFIRMED_TARGET_ID_INVALID")
+            if key not in latest or no > latest[key]["version_no"]:
+                latest[key] = version
+        valid = []
+        for version in latest.values():
+            if version.get("completeness_state") != "COMPLETE":
                 continue
             weights = [a for a in allocations
-                       if a.get("target_key") == version.get("target_key")
-                       and a.get("version_no") == version.get("version_no")
-                       and a.get("allocation_state") == "ACCEPTED"]
-            if weights and all(type(a.get("weight_units")) is int
-                               and a["weight_units"] > 0 for a in weights
-                               ) and sum(a["weight_units"] for a in weights) == 1000000:
-                confirmed = True
-                break
-        if not confirmed:
+                       if a.get("target_key") == version["target_key"]
+                       and a.get("version_no") == version["version_no"]]
+            instruments = [a.get("instrument_key") for a in weights]
+            if (weights and len(instruments) == len(set(instruments))
+                    and all(isinstance(k, str) and k for k in instruments)
+                    and all(a.get("allocation_state") == "ACCEPTED"
+                            and type(a.get("weight_units")) is int
+                            and a["weight_units"] > 0 for a in weights)
+                    and sum(a["weight_units"] for a in weights) == 1000000):
+                valid.append(version)
+        if not valid:
             missing.append("confirmed_final_target_version")
+        elif len(valid) != 1:
+            # No caller-controlled target selector: the W5 trusted source
+            # should determine scope, never guess among independent purposes.
+            missing.append("single_confirmed_target_purpose")
         if self.analysis_provider is None or missing:
             if self.analysis_provider is None:
                 missing.append("official_market_and_approved_engine_request")

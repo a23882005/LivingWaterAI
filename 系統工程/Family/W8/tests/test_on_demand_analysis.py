@@ -48,6 +48,23 @@ class OnDemandTests(unittest.TestCase):
         self.assertEqual(runner.context_provider()["client_id"],CLIENT)
         self.assertEqual(runner.analyze(req)["status"],"OK")
 
+    def test_bare_menu_04_uses_standard_holdings_question(self):
+        seen=[]
+        def trusted_producer(snapshot, asked):
+            seen.append(dict(asked))
+            return deepcopy(pack())
+        provider=MOD.OnDemandAnalysisProvider(
+            trusted_producer, runner_factory=runner_factory)
+        request,runner=provider(snapshot(),{})
+        self.assertEqual(len(seen),1)
+        self.assertEqual(seen[0]["question"],
+                         "請評估我目前持有標的的投入速度")
+        self.assertEqual(runner.analyze(request)["status"],"OK")
+
+    def test_explicit_blank_question_cannot_bypass_validation(self):
+        with self.assertRaisesRegex(ValueError,"ON_DEMAND_QUESTION_REQUIRED"):
+            self.provider(pack())(snapshot(),{"question":"  "})
+
     def test_other_family_rejected(self):
         p=pack();p["request"]["client_id"]="fam_"+"b"*32
         with self.assertRaisesRegex(PermissionError,"ON_DEMAND_SOURCE_OR_CLIENT_MISMATCH"):

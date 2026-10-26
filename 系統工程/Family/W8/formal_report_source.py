@@ -131,10 +131,21 @@ def _confirmed_target_details(tables):
     """Only active, fully accepted million-unit confirmed targets enter W6."""
     allocations=tables.get("final_target_allocation", [])
     instruments={row["instrument_key"]:row for row in tables.get("portfolio_instrument", [])}
-    latest={}
+    # Resolve the latest confirmed revision FIRST, then check its content.
+    # Never silently fall back to an older complete revision when the latest
+    # confirmed one has an incomplete or invalid allocation.
+    last_confirmed={}
     for version in tables.get("final_target_version", []):
-        if (version.get("lifecycle_state")!="CONFIRMED"
-                or version.get("completeness_state")!="COMPLETE"):
+        if version.get("lifecycle_state")!="CONFIRMED":
+            continue
+        key,no=version.get("target_key"),version.get("version_no")
+        if not isinstance(key,str) or not key or type(no) is not int or no<1:
+            raise ValueError("W6_TARGET_VERSION_INVALID")
+        if key not in last_confirmed or no>last_confirmed[key]["version_no"]:
+            last_confirmed[key]=version
+    latest={}
+    for version in last_confirmed.values():
+        if version.get("completeness_state")!="COMPLETE":
             continue
         key=(version["target_key"],version["version_no"])
         rows=[row for row in allocations if (row.get("target_key"),row.get("version_no"))==key]

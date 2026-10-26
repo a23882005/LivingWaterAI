@@ -33,6 +33,27 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'VALID_CONNECTOR_FILE_URI_REQUIRED'):
             self.io.authorize_update(self.plan,self.fresh,self.backup,
                                      'synthetic-backup',candidate_file_uri=str(self.candidate))
+    def test_host_uploaded_candidate_keeps_original_id(self):
+        ready=self.io.authorize_update(self.plan,self.fresh,self.backup,
+            'synthetic-backup',candidate_file_uri=str(self.candidate),
+            local_upload_supported=True)
+        self.assertEqual(ready['update_file_args']['file_uri'],str(self.candidate))
+        self.assertEqual(ready['update_file_args']['fileId'],self.binding.file_id)
+        self.assertEqual(ready['status'],'READY_NOT_PERSISTED')
+    def test_host_upload_rejects_another_file_even_identical_bytes(self):
+        for path in (self.remote,Path('candidate.db')):
+            with self.assertRaisesRegex(ValueError,'VALID_CONNECTOR_FILE_URI_REQUIRED'):
+                self.io.authorize_update(self.plan,self.fresh,self.backup,
+                    'synthetic-backup',candidate_file_uri=str(path),local_upload_supported=True)
+    def test_host_upload_rechecks_candidate_and_original(self):
+        for path in (self.candidate,self.fresh):
+            with self.subTest(path=path):
+                raw=path.read_bytes()
+                with sqlite3.connect(path) as c:c.execute('UPDATE values_test SET n=9')
+                with self.assertRaises((ValueError,RuntimeError)):
+                    self.io.authorize_update(self.plan,self.fresh,self.backup,
+                        'synthetic-backup',candidate_file_uri=str(self.candidate),local_upload_supported=True)
+                path.write_bytes(raw)
     def test_missing_artifact_reference_is_not_ready_to_write(self):
         waiting=self.io.authorize_update(self.plan,self.fresh,self.backup,'synthetic-backup')
         self.assertEqual(waiting['status'],'CONNECTOR_FILE_REFERENCE_REQUIRED')

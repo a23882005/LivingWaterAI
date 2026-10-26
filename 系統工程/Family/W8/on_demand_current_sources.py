@@ -136,12 +136,19 @@ def build_current_sources(snapshot,db_path,*,repo_root=REPO,evaluation_at=None):
         except (RuntimeError,OSError,subprocess.TimeoutExpired) as e:
             missing.append(str(e))
         if v70 and v70['status']!='V70_DATA_READY':missing.append('v70_original_data_validation')
+    observations=None
+    try:
+        observations=_module('on_demand_market_observations').build_member_market_observations(
+            snapshot,targets,macro,repo_root=repo_root,evaluation_at=when)
+    except ImportError as e:
+        missing.append('OBSERVATION_RUNTIME_DEPENDENCY_REQUIRED:'+str(e))
     if hashlib.sha256(path.read_bytes()).hexdigest()!=original_hash:
         raise RuntimeError('CURRENT_SOURCE_DB_CHANGED_DURING_READ')
     return {'schema_version':'Family.W8.CurrentNativeSources.v1','status':'SOURCE_INPUTS_READ',
             'client_id':client,'source_db_sha256':original_hash,'evaluation_at':when,
             'confirmed_target_details':targets,'strategic':strategic,
             'funding_latest':funding,'funding_planning_rows':planning,'macro':macro,'v70':v70,
+            'market_observations':observations,
             'monetary_tactical_amounts':None,'monetary_amount_reason':'C7_VERIFIED_INVESTMENT_POOL_BASE_REQUIRED',
             'missing':missing,'full_native_bundle_ready':False,
             'data_provenance':'SOURCE_BACKED','trade_authorization':'NONE'}

@@ -22,6 +22,8 @@ on:
       - '系統工程/Family/W8/tests/test_on_demand_project.py'
       - '系統工程/Family/W8/on_demand_project.py'
       - '系統工程/Family/W8/on_demand_current_sources.py'
+      - '系統工程/Family/W8/on_demand_market_observations.py'
+      - '系統工程/Family/W8/tests/test_market_observations.py'
       - '系統工程/Family/W8/v70_original_runtime.cjs'
       - '系統工程/Family/W8/tests/test_current_native_sources.py'
       - '系統工程/Family/W8/tests/test_on_demand_public.py'
@@ -104,3 +106,7 @@ jobs:
         env:
           NODE_PATH: ${{ runner.temp }}/family-v70/node_modules
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_current_native_sources.py' -v
+      - name: Prepare pinned original numeric and V75 runtime dependencies
+        run: python -m pip install -r '系統工程/Family/W5/requirements.lock'
+      - name: Run member-scoped original market calculations
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_market_observations.py' -v

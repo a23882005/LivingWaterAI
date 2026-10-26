@@ -330,6 +330,49 @@
         "hostinger_or_render_family_runtime": "NOT_USED",
         "runtime": "CHATGPT_ON_DEMAND_WHEN_FAMILY_ASKS"
       }
+    },
+    {
+      "id": "W8-R13",
+      "name": "ChatGPT按需12/13報告Google Drive上傳與遠端驗證閉環",
+      "status": "CODE_MERGED__64_UNIT_TESTS_PASS__FAMILY_LIVE_E2E_PENDING",
+      "pr": 46,
+      "merge_commit": "d5fb1c42e49c0e99e889cad52ea61f18101e8534",
+      "ci": {
+        "post_trade_regression": {
+          "run_id": 40351029444,
+          "result": "SUCCESS",
+          "tests": "64/64"
+        },
+        "family_menu": {
+          "run_id": 40351029497,
+          "result": "SUCCESS"
+        },
+        "report_isolation": {
+          "run_id": 40351029534,
+          "result": "SUCCESS"
+        }
+      },
+      "paths": [
+        "系統工程/Family/W8/on_demand_report_delivery.py",
+        "系統工程/Family/W8/on_demand_project.py",
+        "系統工程/Family/W7/family_menu.py",
+        "系統工程/Family/W8/tests/test_on_demand_report_delivery.py",
+        "系統工程/Family/W8/tests/test_nohost_report_menu.py"
+      ],
+      "verified": [
+        "Stage PDF/HTML artifacts only after W6 QA; stage status never misreported as saved",
+        "Drive remote parent + SHA256 for every uploaded artifact; COMPLETE manifest requires final remote readback",
+        "Menu12 emits Drive lookup required when no synchronous report store; Menu13 requires verified Drive upload after local rendering",
+        "No external Python hosting, no service always-on, no family DB mutation during CI"
+      ],
+      "remaining": [
+        "Four ChatGPT Projects real end-to-end on-demand 14 choices each",
+        "Full 04 live W5/V70/V82/BondV75/Mentor verified market input handoff",
+        "Official member report 13 PDF/HTML archive/readback with real source and permission",
+        "Production Gate D/E Owner acceptance"
+      ],
+      "production": "HOLD",
+      "trade_authorization": "NONE"
     }
   ],
   "defects": [

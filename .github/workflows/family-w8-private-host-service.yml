@@ -38,7 +38,7 @@ jobs:
             cp "系統工程/Family/W7/$n" build/family-w8-payload/Family/W7/
           done
           cp 系統工程/Family/W5/family_input.py build/family-w8-payload/Family/W5/
-          cp 系統工程/Family/W8/official_family_entry.py 系統工程/Family/W8/private_family_service.py 系統工程/Family/W8/official_mutations.py 系統工程/Family/W8/cgi_request.py build/family-w8-payload/Family/W8/
+          cp 系統工程/Family/W8/official_family_entry.py 系統工程/Family/W8/private_family_service.py 系統工程/Family/W8/official_mutations.py 系統工程/Family/W8/official_news.py 系統工程/Family/W8/cgi_request.py build/family-w8-payload/Family/W8/
           python -m py_compile build/family-w8-payload/Family/W7/*.py build/family-w8-payload/Family/W5/*.py build/family-w8-payload/Family/W8/*.py
           tar -czf build/family-w8-app.tar.gz -C build/family-w8-payload Family
       - name: Prepare private SSH staging

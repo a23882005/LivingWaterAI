@@ -24,6 +24,7 @@ from 資料存取管理 import Coordinator
 from official_family_entry import OfficialFamilyEntry, RESOURCE_BY_ACCOUNT
 from official_mutations import make_writer
 from official_news import market_news, holding_news
+from official_research import research_candidates
 import copy
 
 API = "https://www.googleapis.com/drive/v3/files/"
@@ -119,6 +120,13 @@ class OfficialBusinessTools:
              "description":"依已登入的家人身分尋找Google Drive正式歷史配置報告。",
              "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
              "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":False}},
+            {"name":"family_research_candidates",
+             "description":"從本人正式持倉與最新來源研究使用者選定的產業或候選ETF/股票，不產生未驗證買點。",
+             "inputSchema":{"type":"object","properties":{
+                 "theme":{"type":"string","maxLength":160},
+                 "tickers":{"type":"array","maxItems":8,"items":{"type":"string","maxLength":15}}},
+                 "additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":True}},
             {"name":"family_market_news",
              "description":"讀取最近三日國內外財經、台股與半導體公開新聞。",
              "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
@@ -202,6 +210,11 @@ class OfficialBusinessTools:
             if arguments:
                 raise ValueError("INVALID_REPORT_ARGUMENTS")
             return self._previous_report(account)
+        if name == "family_research_candidates":
+            if set(arguments)-{"theme","tickers"}:
+                raise ValueError("INVALID_RESEARCH_ARGUMENTS")
+            return research_candidates(entry.current_snapshot(),
+                theme=arguments.get("theme"),tickers=arguments.get("tickers"))
         if name == "family_market_news":
             if arguments:
                 raise ValueError("INVALID_NEWS_ARGUMENTS")

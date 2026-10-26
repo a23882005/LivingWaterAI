@@ -7,6 +7,8 @@ on:
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
       - '系統工程/Family/W8/tests/test_post_trade_state.py'
+      - '系統工程/Family/W8/tests/test_report_store_binding.py'
+      - '系統工程/Family/W8/tests/test_official_target_readiness.py'
       - '.github/workflows/family-w8-post-trade-regression.yml'
   workflow_dispatch:
 permissions:
@@ -26,3 +28,7 @@ jobs:
       - name: Run synthetic transaction projection tests
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_post_trade_state.py' -v
+      - name: Run on-demand investment and report binding tests
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_official_target_readiness.py' -v
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_report_store_binding.py' -v

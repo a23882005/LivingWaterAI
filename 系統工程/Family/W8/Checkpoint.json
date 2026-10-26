@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T06:27:41+08:00",
+  "updated_at": "2026-10-27T06:53:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -975,7 +975,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Continue same Draft PR59 / family/w8-complete-04-joseph-mou only. Target and member-local brokerage-category input binding is implemented and actual original runner advances to HOLDINGS_COMPLETENESS_UNKNOWN for both. Reconcile real approved member source scope and quantities, assemble remaining complete native/funding/valuation/technical input contexts and execute full original FamilyRunner→Mentor. No other members, report work, Hostinger/Render, new small PASS batches or merge before full intended evidence.",
+  "next_action": "Total PM personally completes the existing PR59 native input assembly and full original FamilyRunner → Mentor for Joseph and MOU. Existing holdings are official by explicit Owner decision. The concrete remaining engineering issue is absent native_bundle and associated source contexts; do not return to Owner for the same holdings confirmation.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1070,8 +1070,8 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "WIP_SINGLE_BRANCH__TARGET_AND_CATEGORY_INPUTS_IMPLEMENTED__HOLDINGS_COMPLETENESS_UNKNOWN",
-    "owner_instruction": "Family Total PM personally complete menu 04 for Joseph and MOU only, from real member sources through original FamilyRunner and Mentor. Stop report and other-member work; no new small component/test-count milestones.",
+    "status": "IN_PROGRESS__OFFICIAL_HOLDINGS_ACCEPTED__NATIVE_INPUT_MAPPING_REQUIRED",
+    "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
       "MOU"
@@ -1085,33 +1085,38 @@
     "actual_family_runner_attempts": {
       "Joseph": {
         "status": "DATA_UNAVAILABLE",
-        "first_issue": "HOLDINGS_COMPLETENESS_UNKNOWN",
-        "target_and_category_checks": "PASSED"
+        "first_issue": "NATIVE_INPUT_MAPPING_REQUIRED",
+        "field_path": "native_bundle",
+        "target_and_category_checks": "PASSED",
+        "holdings_check": "PASSED_WITH_OWNER_OFFICIAL_HOLDINGS_DECISION",
+        "native_bundle_supplied": false
       },
       "MOU": {
         "status": "DATA_UNAVAILABLE",
-        "first_issue": "HOLDINGS_COMPLETENESS_UNKNOWN",
-        "target_and_category_checks": "PASSED"
+        "first_issue": "NATIVE_INPUT_MAPPING_REQUIRED",
+        "field_path": "native_bundle",
+        "target_and_category_checks": "PASSED",
+        "holdings_check": "PASSED_WITH_OWNER_OFFICIAL_HOLDINGS_DECISION",
+        "native_bundle_supplied": false
       }
     },
     "actual_v70": "MOU explicit approved 80/20 source run executed original HTML; original output state retained",
     "remaining_field_groups": [
-      "Source-backed holdings scope and latest quantity reconciliation, without promoting partial screenshots to whole-account completeness",
-      "Complete native_bundle plus funding/valuation/technical input context assembly in the same work branch",
-      "Verified NAV/settled funding and SGOV roles where still unknown in existing sources",
-      "Actual full original C7/V82/V75/FamilyRunner result and native Mentor for both selected members"
+      "Assemble current analysis holdings directly from the accepted existing official source rows, including stored snapshot quantities; preserve lineage and recorded observation dates, without another Owner confirmation",
+      "Implement complete native_bundle plus native_binding/funding/valuation/technical/c7 source context in the same branch",
+      "Execute full original C7/V70/V82/V75/FamilyRunner and Mentor for both members"
     ],
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 750927,
-      "sha256": "39982651751a0c57e726b45dc2933091820263e51834df1062f5aa80561fcada",
+      "bytes": 781281,
+      "sha256": "97e2fd4058d1e53406fdf0c7aa264cad71abae8f8216597be3198e5a9bac6f44",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH"
     },
     "governance_backups": {
-      "engineering": "1HvbYk7nCe3wEWKsEYP1obybQ3wBUz-XnD6U_BxtTQdw",
-      "files": "1fAydo12mt_JP-ZrB3P2umW-zXY-Fsp9dHbJlWyEL-9M",
-      "wbs": "1HjuLuwcsDNSMuV3GMj6vIARp_K50Ve-A-VfO39NVTBg"
+      "engineering": "1N-b8RMS0ud579xvuLmJu9vbn2PernbYMdcCkJRZcH5w",
+      "files": "1khFH96SfJgp_TIHe1aHgEOCm7FoqynwYEA7ZDUNoWFQ",
+      "wbs": "1aDdaj_7x8dBxpZf-Mwamn6eovAGXD59BEPKY0_JaPM4"
     },
     "full_04_complete": false,
     "original_native_mentor_reached": false,
@@ -1121,22 +1126,33 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "cc33751578653fafede5339eca9f0c65f66e248d",
+    "work_head": "7219343720a41523e6529bbaec03208a804818a9",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
       "Original Family boundary accepts independently bound existing approved document views; original W2 path unchanged",
       "Member-local brokerage category scope bound to original document and existing DB account row; no external account number, available cash or holdings completeness inferred",
-      "Trusted on-demand producer allowed to submit independent verified target sources to original runner instead of being skipped solely on missing W1 target tables"
+      "Trusted on-demand producer allowed to submit independent verified target sources to original runner instead of being skipped solely on missing W1 target tables",
+      "Owner official-holdings decision bound to exact member/Drive DB bytes/account, routed project menu → on-demand provider → original FamilyRunner; no new portfolio or DB mutation"
     ],
     "validation": {
+      "local_affected_tests": "52 PASS",
       "ci_success_runs": [
-        40411839415,
-        40411839632,
-        40411839098
+        40415565784,
+        40415565649,
+        40415565707
       ],
-      "affected_original_boundary_runner_c7": "PASS",
-      "branch_source_readback": "6_OF_6_EXACT"
+      "actual_member_runs": "Both pass existing target/category/holdings boundary and report NATIVE_INPUT_MAPPING_REQUIRED because the request has no native_bundle"
+    },
+    "owner_holdings_decision": {
+      "statement": "現在有的就是正式持倉，不用再弄一個什麼暫時的。現在有的就是正式的。",
+      "scope": [
+        "Joseph",
+        "MOU"
+      ],
+      "source_reference": "Owner explicit instruction in current conversation on 2026-10-27",
+      "recorded_at": "2026-10-27T06:49:35+08:00",
+      "effect": "Use existing official holdings; prior completeness-confirmation stop superseded"
     }
   }
 }

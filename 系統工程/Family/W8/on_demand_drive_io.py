@@ -7,6 +7,7 @@ serialized by the caller; source rechecking is not a distributed atomic lock.
 from dataclasses import dataclass
 from pathlib import Path
 import hashlib
+import re
 import sqlite3
 
 ACCOUNTS = frozenset(('MOU', 'JO', 'AR', 'LI'))
@@ -99,11 +100,14 @@ class OnDemandWriteback:
             if current != plan[part]:
                 raise ValueError('LOCAL_FILE_CHANGED')
 
-    def authorize_update(self, plan, fresh_remote, backup_remote, backup_file_id):
-        """Call immediately before update_file after Drive backup and fresh downloads.
+    def authorize_update(self, plan, fresh_remote, backup_remote, backup_file_id,
+                         *, candidate_file_uri=None):
+        """Check the source backup and bind the actual connector artifact.
 
-        Returned args use the verified absolute local path, NOT an invented URI.
-        This is preflight only, not a guarantee against an independent writer.
+        A local path is NOT a Google Drive file_uri. The ChatGPT executor must
+        produce a current-turn artifact reference for the exact sealed candidate,
+        then pass its tool-returned sediment://file_... URI explicitly.
+        This check remains a preflight, not a distributed compare-and-swap.
         """
         self._plan(plan)
         if not backup_file_id or backup_file_id == self.binding.file_id:
@@ -111,9 +115,21 @@ class OnDemandWriteback:
         for path in (fresh_remote, backup_remote):
             if inspect(path, self.binding)['sha256'] != plan['source']['sha256']:
                 raise RuntimeError('STALE_SOURCE_OR_BACKUP_MISMATCH')
-        return {'status': 'READY_NOT_PERSISTED', 'backup_file_id': backup_file_id,
+        if candidate_file_uri is None:
+            return {'status': 'CONNECTOR_FILE_REFERENCE_REQUIRED',
+                    'backup_file_id': backup_file_id,
+                    'candidate_sha256': plan['candidate']['sha256'],
+                    'candidate_size': plan['candidate']['size'],
+                    'trade_authorization': 'NONE'}
+        if (not isinstance(candidate_file_uri, str)
+                or not re.fullmatch(r'sediment://file_[A-Za-z0-9_-]+',
+                                    candidate_file_uri)):
+            raise ValueError('VALID_CONNECTOR_FILE_URI_REQUIRED')
+        return {'status': 'READY_NOT_PERSISTED',
+                'backup_file_id': backup_file_id,
+                'candidate_sha256': plan['candidate']['sha256'],
                 'update_file_args': {'fileId': self.binding.file_id,
-                    'file_uri': plan['candidate']['path'],
+                    'file_uri': candidate_file_uri,
                     'mime_type': 'application/vnd.sqlite3'}}
 
     def verify_readback(self, plan, remote, remote_file_id, checks):

@@ -106,6 +106,38 @@ def prepare_report_delivery(rendered, *, account, client_id, folder_id,
     }
 
 
+
+def bind_connector_uploads(plan, file_uri_by_artifact):
+    """Create actual Google Drive upload_file tool args, never local-path args.
+
+    The executor obtains these refs from generated current-turn artifacts.
+    Uploaded bytes are still verified through fresh Drive readback before
+    manifest completion; URI presence alone never proves persistence.
+    """
+    if plan.get("status") != "STAGED_NOT_PERSISTED":
+        raise ValueError("REPORT_STAGE_REQUIRED")
+    if (not isinstance(file_uri_by_artifact, dict)
+            or set(file_uri_by_artifact) != {r["artifact"] for r in plan["uploads"]}):
+        raise ValueError("REPORT_ARTIFACT_REFERENCES_INCOMPLETE")
+    output=[]
+    used=set()
+    for item in plan["uploads"]:
+        uri=file_uri_by_artifact[item["artifact"]]
+        if (not isinstance(uri,str)
+                or not re.fullmatch(r"sediment://file_[A-Za-z0-9_-]+", uri)
+                or uri in used):
+            raise ValueError("VALID_REPORT_CONNECTOR_FILE_URI_REQUIRED")
+        used.add(uri)
+        output.append({"artifact":item["artifact"],
+                       "expected_sha256":item["sha256"],
+                       "upload_file_args":{"file_uri":uri,
+                                          "parent_folder_id":plan["receipt"]["folder_id"],
+                                          "file_name":item["name"],
+                                          "mime_type":item["mime"]}})
+    return {"status":"UPLOAD_READY_NOT_PERSISTED",
+            "requests":output, "trade_authorization":"NONE"}
+
+
 def prepare_verified_manifest(plan, receipts, readbacks):
     """Return the manifest bytes only after real Drive artifact readbacks.
 
@@ -124,7 +156,11 @@ def prepare_verified_manifest(plan, receipts, readbacks):
     verified = []
     used = set()
     for row, proof in zip(rows, receipts):
-        if (not isinstance(proof, dict) or proof.get("name") != row["name"]
+        # Current Google Drive upload_file returns file_name (or title)
+        # rather than the legacy, hand-normalized proof["name"].
+        name = (proof.get("file_name") or proof.get("name") or proof.get("title")
+                if isinstance(proof,dict) else None)
+        if (not isinstance(proof, dict) or name != row["name"]
                 or proof.get("parent_id") != official
                 or not proof.get("success")):
             raise PermissionError("REPORT_REMOTE_FOLDER_OR_RECEIPT_MISMATCH")
@@ -164,8 +200,10 @@ def verify_published_manifest(manifest_plan, receipt, freshly_fetched_bytes):
     """Final success requires separately uploaded and fetched Drive manifest."""
     if manifest_plan.get("status") != "ARTIFACTS_REMOTE_VERIFIED__MANIFEST_PENDING":
         raise ValueError("REPORT_MANIFEST_PLAN_REQUIRED")
+    actual_name = (receipt.get("file_name") or receipt.get("name") or receipt.get("title")
+                   if isinstance(receipt,dict) else None)
     if (not isinstance(receipt, dict) or receipt.get("success") is not True
-            or receipt.get("name") != manifest_plan["manifest_filename"]
+            or actual_name != manifest_plan["manifest_filename"]
             or receipt.get("parent_id") != manifest_plan["folder_id"]
             or not _string(receipt.get("id"))):
         raise PermissionError("REPORT_MANIFEST_REMOTE_RECEIPT_MISMATCH")

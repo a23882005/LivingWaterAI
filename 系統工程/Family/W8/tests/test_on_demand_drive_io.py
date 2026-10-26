@@ -23,10 +23,21 @@ class Tests(unittest.TestCase):
         self.checks=[('SELECT n FROM values_test',(),[(2,)])]
     def tearDown(self):self.tmp.cleanup()
     def test_happy(self):
-        args=self.io.authorize_update(self.plan,self.fresh,self.backup,'synthetic-backup')
-        self.assertEqual(args['update_file_args']['file_uri'],str(self.candidate))
+        uri='sediment://file_unit_generated_artifact'
+        args=self.io.authorize_update(self.plan,self.fresh,self.backup,
+                                      'synthetic-backup',candidate_file_uri=uri)
+        self.assertEqual(args['update_file_args']['file_uri'],uri)
         self.assertEqual(args['status'],'READY_NOT_PERSISTED')
         self.assertEqual(self.io.verify_readback(self.plan,self.remote,'synthetic-original',self.checks)['status'],'PERSISTED_REMOTE_VERIFIED')
+    def test_local_path_cannot_be_used_as_connector_uri(self):
+        with self.assertRaisesRegex(ValueError,'VALID_CONNECTOR_FILE_URI_REQUIRED'):
+            self.io.authorize_update(self.plan,self.fresh,self.backup,
+                                     'synthetic-backup',candidate_file_uri=str(self.candidate))
+    def test_missing_artifact_reference_is_not_ready_to_write(self):
+        waiting=self.io.authorize_update(self.plan,self.fresh,self.backup,'synthetic-backup')
+        self.assertEqual(waiting['status'],'CONNECTOR_FILE_REFERENCE_REQUIRED')
+        self.assertNotIn('update_file_args',waiting)
+        self.assertEqual(waiting['candidate_sha256'],self.plan['candidate']['sha256'])
     def test_four_accounts(self):
         for name in ('MOU','JO','AR','LI'):Binding(name,'fam_'+'a'*32,'synthetic-'+name,name)
     def test_wrong_login(self):

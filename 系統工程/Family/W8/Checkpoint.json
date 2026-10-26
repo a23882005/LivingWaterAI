@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T11:48:27+08:00",
+  "updated_at": "2026-10-26T12:05:48+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -318,8 +318,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "Family中PM本人",
-  "next_action": "Stop expanding Hostinger as Family Python runtime. In the Owner-approved GitHub code → ChatGPT user-triggered code tools → member's Google Drive SQLite/report flow, verify executable tool access and complete four Project 14-menu end-to-end with official V70/V82/bondV75/Mentor and W6 renderer. Report genuine unsupported execution boundaries; seek Owner approval before changing architecture.",
+  "next_owner": "Family中PM（總PM）下一對話接任者本人",
+  "next_action": "Read three verified Google Drive root/TEMP Family_W8_20261026 ZIP1/ZIP2/ZIP3 (no other ZIP required), honor Owner-approved GitHub/ChatGPT on-demand/Drive architecture, then personally complete unfinished W8 04/11/13 plus four-family 14-item live Project E2E and Gate D/E. Do not relaunch Hostinger as official Python runtime.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -344,5 +344,39 @@
     "changes_this_round": "Governance documents only; no Python runtime migration, no DB writes, no website deactivation.",
     "formal_record_path": "系統工程/Family/W8/正式架構裁決_ChatGPT按需執行.md",
     "accountable": "Family中PM／總PM; no unauthorized architecture deviations or new hosting."
+  },
+  "handoff_20261026": {
+    "status": "COMPLETE_3_ZIPS_DRIVE_TEMP_READBACK_AND_SHA_PASS",
+    "next_owner": "Family中PM（總PM）本人",
+    "owner_policy": "GitHub code → ChatGPT user-triggered on-demand execution → Google Drive authoritative Family SQLite/report; no Hostinger as designated Family Python runtime; no always-on service.",
+    "drive_folder": "Root/TEMP (owner-only)",
+    "artifacts": [
+      {
+        "name": "Family_W8_20261026_ZIP1_總PM職責與最高架構.zip",
+        "sha256": "1995fcb08775ba77b1dedcce1300aa18fdf0889674c7072ad1a23a203a2d83d8",
+        "size_bytes": 12371,
+        "drive_readback": "EXACT_SHA256_AND_CRC_PASS"
+      },
+      {
+        "name": "Family_W8_20261026_ZIP2_已完成工程與正式檔案位置.zip",
+        "sha256": "3a7ad7988641bc57a3108641103ea76f700bb8a35d8b9b8758be34221e665cd0",
+        "size_bytes": 14042,
+        "drive_readback": "EXACT_SHA256_AND_CRC_PASS"
+      },
+      {
+        "name": "Family_W8_20261026_ZIP3_剩餘工序與Gate驗收.zip",
+        "sha256": "0fd2dcd8298d08f1fb01822bf142434c5122a1d035703e49ac5d8a0a892cb4d7",
+        "size_bytes": 13857,
+        "drive_readback": "EXACT_SHA256_AND_CRC_PASS"
+      }
+    ],
+    "original_git_head_at_pack": "67c651f9b2cd3729414504824e3df16f1869689b",
+    "chapters": [
+      "ZIP1 formal PM accountability, ownership, no 24h runtime architecture, gates and governance",
+      "ZIP2 actual source locations, existing proofs and official Drive member/report mappings",
+      "ZIP3 remaining W8 full-system work plan and 4x14 live validation, Gate D/E and blockers"
+    ],
+    "guardrails": "Handoff recorded only. No family customer DB updates, no OAuth/Hostinger deployment or deactivation, no Gate PASS change.",
+    "next_actions": "Next Family middle PM personally execute actual ChatGPT code tools + GitHub + Drive on-demand workflow, complete 04 verified engines, 11 transactions/current-positions mapping, 13 W6 real renderer and all four Project 14-menu E2E; no new unauthorized architecture."
   }
 }

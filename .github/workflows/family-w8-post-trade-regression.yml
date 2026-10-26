@@ -21,6 +21,9 @@ on:
       - '系統工程/Family/W8/on_demand_report_delivery.py'
       - '系統工程/Family/W8/tests/test_on_demand_project.py'
       - '系統工程/Family/W8/on_demand_project.py'
+      - '系統工程/Family/W8/on_demand_current_sources.py'
+      - '系統工程/Family/W8/v70_original_runtime.cjs'
+      - '系統工程/Family/W8/tests/test_current_native_sources.py'
       - '系統工程/Family/W8/tests/test_on_demand_public.py'
       - '系統工程/Family/W8/on_demand_public.py'
       - '系統工程/Family/W8/tests/test_w6_member_render.py'
@@ -92,3 +95,12 @@ jobs:
       - name: Run Family no-host public and account entrypoint tests
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_public.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare one-shot original V70 DOM runtime
+        run: npm install --prefix "$RUNNER_TEMP/family-v70" jsdom@26.1.0
+      - name: Run current W1 funding intake and original V70 calculation
+        env:
+          NODE_PATH: ${{ runner.temp }}/family-v70/node_modules
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_current_native_sources.py' -v

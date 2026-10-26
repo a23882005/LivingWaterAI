@@ -147,7 +147,7 @@ def build_report_source(snapshot, *, account, expected_client_id):
     source={"schema_version":"Family.W8.FormalReportSource.v1",
             "client_id":expected_client_id,"member_alias":family[account],
             "source_db_sha256":snapshot.get("source_sha256"),
-            "snapshot_payload_sha256":snapshot.get("digest"),
+            "snapshot_payload_sha256":snapshot.get("payload_digest"),
             "report_scope":"AUTHENTICATED_HISTORICAL_OR_REPORTED_INPUT",
             "actual_position_records":positions,
             "actual_user_evidence":actual,

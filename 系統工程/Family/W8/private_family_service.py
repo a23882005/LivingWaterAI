@@ -23,6 +23,7 @@ from resource_headers import validate_policies
 from 資料存取管理 import Coordinator
 from official_family_entry import OfficialFamilyEntry, RESOURCE_BY_ACCOUNT
 from official_mutations import make_writer
+from official_news import market_news, holding_news
 import copy
 
 API = "https://www.googleapis.com/drive/v3/files/"
@@ -117,7 +118,17 @@ class OfficialBusinessTools:
             {"name":"family_previous_report",
              "description":"依已登入的家人身分尋找Google Drive正式歷史配置報告。",
              "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
-             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":False}}
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":False}},
+            {"name":"family_market_news",
+             "description":"讀取最近三日國內外財經、台股與半導體公開新聞。",
+             "inputSchema":{"type":"object","properties":{},"additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":True}},
+            {"name":"family_holding_news",
+             "description":"從本人正式資料庫確認目前持有的股票，查詢相關近期新聞。",
+             "inputSchema":{"type":"object","properties":{
+                 "ticker":{"type":"string","maxLength":24}},
+                 "additionalProperties":False},
+             "annotations":{"readOnlyHint":True,"destructiveHint":False,"openWorldHint":True}}
         ] + [
             {"name": name, "description": MUTATION_LABELS[name],
              "inputSchema": {
@@ -191,6 +202,14 @@ class OfficialBusinessTools:
             if arguments:
                 raise ValueError("INVALID_REPORT_ARGUMENTS")
             return self._previous_report(account)
+        if name == "family_market_news":
+            if arguments:
+                raise ValueError("INVALID_NEWS_ARGUMENTS")
+            return market_news()
+        if name == "family_holding_news":
+            if set(arguments)-{"ticker"}:
+                raise ValueError("INVALID_NEWS_ARGUMENTS")
+            return holding_news(entry.current_snapshot(),ticker=arguments.get("ticker"))
         if name == "family_portfolio":
             if arguments:
                 raise ValueError("INVALID_PORTFOLIO_ARGUMENTS")

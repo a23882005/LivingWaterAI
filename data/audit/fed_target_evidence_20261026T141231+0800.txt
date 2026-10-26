@@ -1,0 +1,13 @@
+retrieved_at=2026-10-26T14:12:31+08:00
+retrieval_method=OpenAI web open; extracted response text retained verbatim below
+url=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+content_type=text/html (extracted text)
+
+2026
+Date | Increase | Decrease | Level (%)
+September 17 | 25 | 0 | 3.75-4.00
+
+Cross-checks retrieved in the same verification batch:
+https://fred.stlouisfed.org/series/DFEDTARL — 2026-10-25: 3.75
+https://fred.stlouisfed.org/series/DFEDTARU — 2026-10-25: 4.00
+https://alfred.stlouisfed.org/series?seid=DFEDTARU — 2026-10-25: 4.00

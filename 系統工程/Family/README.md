@@ -7,6 +7,14 @@
 
 正式約束與責任全文：[W8／正式架構裁決_ChatGPT按需執行.md](W8/正式架構裁決_ChatGPT按需執行.md)。後續W8必須以ChatGPT當次實際可用程式工具為準逐項接通，不能單憑GitHub有程式就聲稱已在Project執行。
 
+## 2026/10/27｜W8當期入口：本人W1來源與原生V70按需計算
+
+`W8/on_demand_project.py` 的第04項目前可透過 `on_demand_current_sources.py` 讀取本人最新已確認目標、同一最新真實快照的股債基準，以及既有 `cash_available_view`／`funding_planning_view` 的原始資金狀態。`v70_original_runtime.cjs` 在本次執行環境使用 Node＋jsdom@26.1.0，直接執行原 `總經V70/V70-3-27.html` 與同目錄正式feed，沿用原分數、日期驗證及配置公式；只讀本機來源，沒有額外網站或常駐主機。執行者可在本次暫存環境安裝jsdom，並將 `NODE_PATH` 指向該node_modules。
+
+來源與原程式SHA、原本的候選／未回測狀態、資料驗證結果完整保留；UI預設人生情境不當作家人已填資料。缺少本人確認基準時不套預設60／40；可用現金不當成全投資組合NAV，資金未知不補零或估算可買股數。第04項在完整原生request未齊時回傳 `DATA_UNAVAILABLE` 並附已讀回的 `current_source_inputs`，供當次ChatGPT交代已完成的資料與V70比例計算。
+
+當期工程狀態以 [W8/Checkpoint.json](W8/Checkpoint.json) 為準。R19已驗證本次Work的SQLite同ID傳輸；R20已修復04→13版本綁定；R21已完成三檔觀測資料的原程式數值運算。完整V82／V75／Mentor同輪輸入、正式四戶報告與56項Project端對端、Gate D/E仍接續驗收；W6/W7既有PASS保留。
+
 ## 2026/10/27｜Family中PM＝全專案總PM｜最新正式三ZIP交接
 
 **這是最新交接，優先於下方2026/10/26及2026/10/25舊交接歷史。** 指揮官已核定由新對話的Family中PM／總PM**親自完成**W8剩餘施工、04投資計算、11真正SQLite同ID寫回、13本期正式PDF/HTML、四戶14項Project真實驗收、Gate D/E及所有工程與檔案治理。Owner授權相關工程繼續，無需重做已通過Gate，不再無故新發包。

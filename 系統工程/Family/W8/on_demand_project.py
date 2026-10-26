@@ -11,6 +11,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import importlib.util
 import re
+import sqlite3
 
 
 ROOT=Path(__file__).resolve().parent
@@ -116,6 +117,16 @@ def build_project_menu(*, family_login, project_name, login_account,
         official_file_id=official_drive_file_id,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
+    source_module=_load(ROOT/"on_demand_current_sources.py","family_w8_current_sources")
+    def current_source_provider(snapshot):
+        try:
+            return source_module.build_current_sources(snapshot,downloaded_db_path)
+        except sqlite3.OperationalError:
+            return {"status":"CURRENT_SOURCE_SCHEMA_UNAVAILABLE",
+                    "client_id":snapshot["client_id"],
+                    "source_db_sha256":snapshot["source_sha256"],
+                    "missing":["official_target_funding_views_and_snapshot_schema"],
+                    "trade_authorization":"NONE"}
     handlers=dict(other_handlers or {})
     # The on-demand runtime owns the public research/news tool handoff as
     # well as the authenticated current-holdings-only source for menu 09.
@@ -213,5 +224,6 @@ def build_project_menu(*, family_login, project_name, login_account,
         approved_w6_archive=approved_w6_archive,
         approved_w6_renderer=approved_w6_renderer,
         report_store=report_store,
+        current_source_provider=current_source_provider,
         other_handlers=handlers,
         completion_checks=completion_checks)

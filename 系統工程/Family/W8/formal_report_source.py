@@ -103,6 +103,65 @@ def _actual_user_evidence(tables):
     return actual,hypothetical
 
 
+def _latest_cash_by_account(tables):
+    """Select one latest dated cash observation per account/currency; never sum history."""
+    latest={}
+    for row in tables.get("cash_balance_snapshot", []):
+        key=(row["account_key"], row["currency_code"])
+        order=(str(row.get("as_of_utc","")), int(row.get("version") or 0),
+               str(row.get("cash_snapshot_id","")))
+        if key not in latest or order>latest[key][0]:
+            latest[key]=(order,row)
+    result=[]
+    for (account, currency), (_, row) in sorted(latest.items()):
+        result.append({
+            "account_key":account, "currency":currency,
+            "as_of_utc":row.get("as_of_utc"),
+            "reported_cash_minor":row.get("reported_cash_minor"),
+            "reported_cash_basis":row.get("reported_cash_basis"),
+            "normalized_settled_minor":row.get("normalized_settled_minor"),
+            "pending_payable_minor":row.get("pending_payable_minor"),
+            "reserved_minor":row.get("reserved_minor"),
+            "data_state":row.get("data_state","UNKNOWN"),
+            "source_reference":row.get("source_reference")})
+    return result
+
+
+def _confirmed_target_details(tables):
+    """Only active, fully accepted million-unit confirmed targets enter W6."""
+    allocations=tables.get("final_target_allocation", [])
+    instruments={row["instrument_key"]:row for row in tables.get("portfolio_instrument", [])}
+    latest={}
+    for version in tables.get("final_target_version", []):
+        if (version.get("lifecycle_state")!="CONFIRMED"
+                or version.get("completeness_state")!="COMPLETE"):
+            continue
+        key=(version["target_key"],version["version_no"])
+        rows=[row for row in allocations if (row.get("target_key"),row.get("version_no"))==key]
+        if (not rows or any(row.get("allocation_state")!="ACCEPTED"
+                            or type(row.get("weight_units")) is not int
+                            or row["weight_units"]<=0 for row in rows)
+                or sum(row["weight_units"] for row in rows)!=1000000):
+            continue
+        identities=[row["instrument_key"] for row in rows]
+        if len(identities)!=len(set(identities)) or any(k not in instruments for k in identities):
+            raise ValueError("W6_TARGET_INSTRUMENT_INCONSISTENT")
+        candidate={"target_key":key[0],"version_no":key[1],
+                   "confirmed_at_utc":version.get("confirmed_at_utc"),
+                   "confirmation_source_reference":version.get("confirmation_source_ref"),
+                   "allocations":[{
+                       "instrument_key":row["instrument_key"],
+                       "ticker":instruments[row["instrument_key"]].get("ticker"),
+                       "label":instruments[row["instrument_key"]].get("instrument_label"),
+                       "weight_units":row["weight_units"],
+                       "weight_fraction":str(Decimal(row["weight_units"])/Decimal(1000000))
+                   } for row in sorted(rows,key=lambda r:r["instrument_key"])]}
+        prior=latest.get(key[0])
+        if prior is None or candidate["version_no"]>prior["version_no"]:
+            latest[key[0]]=candidate
+    return [latest[key] for key in sorted(latest)]
+
+
 def build_report_source(snapshot, *, account, expected_client_id):
     if not isinstance(snapshot,dict) or snapshot.get("schema_version")!="Family.W5.W1Snapshot.v1":
         raise ValueError("VERIFIED_W5_SNAPSHOT_REQUIRED")
@@ -137,7 +196,9 @@ def build_report_source(snapshot, *, account, expected_client_id):
             confirmations[key]={"target_key":key[0],"version_no":key[1],
                                 "confirmed_at_utc":row.get("confirmed_at_utc"),
                                 "allocation_count":len(weights)}
-    available=bool(confirmations)
+    target_details=_confirmed_target_details(tables)
+    available=bool(target_details)
+    latest_cash=_latest_cash_by_account(tables)
     snapshot_cash=tables.get("cash_balance_snapshot",[])
     # Report cash amount as reported. Never equate it to settled, free-to-buy cash.
     cash=[{"account_key":x["account_key"],"currency":x["currency_code"],
@@ -155,6 +216,8 @@ def build_report_source(snapshot, *, account, expected_client_id):
             "hypothetical_evidence_separate":hypothetical,
             "cash_reports":cash,
             "formal_confirmed_targets":list(confirmations.values()),
+            "current_confirmed_target_details":target_details,
+            "current_cash_by_account_currency":latest_cash,
             "reporting_flags":{
                 "current_live_market_valuation_verified":False,
                 "confirmed_target_available":available,

@@ -85,7 +85,14 @@ class OfficialFamilyEntry:
         # Project the latest sealed owner-confirmed post-trade quantities,
         # including explicit zero closures. The original W1 history remains
         # immutable and available separately for provenance/auditing.
-        from post_trade_state import DOMAIN, effective_positions
+        projection_path = Path(__file__).with_name("post_trade_state.py")
+        projection_spec = importlib.util.spec_from_file_location(
+            "family_post_trade_state", projection_path)
+        if projection_spec is None or projection_spec.loader is None:
+            raise RuntimeError("POST_TRADE_MODULE_MISSING")
+        projection = importlib.util.module_from_spec(projection_spec)
+        projection_spec.loader.exec_module(projection)
+        DOMAIN, effective_positions = projection.DOMAIN, projection.effective_positions
         tables = snapshot["tables"]
         if any(x.get("domain_code") == DOMAIN for x in tables.get("portfolio_snapshot_item", [])):
             from copy import deepcopy

@@ -373,6 +373,46 @@
       ],
       "production": "HOLD",
       "trade_authorization": "NONE"
+    },
+    {
+      "id": "W8-R14",
+      "name": "正式目標版本選取及Google Drive檔案傳遞修正",
+      "status": "CODE_MERGED__CI_PASS__FAMILY_GUI_E2E_AND_GENERATED_BINARY_WRITEBACK_PENDING",
+      "updated_at_taipei": "2026-10-27 00:23",
+      "pull_requests": [
+        {
+          "number": 47,
+          "merge_commit": "35da31caca53fbd82b7d70e363ce27d885711640",
+          "ci_run": 40355495700,
+          "unit_tests": "68/68 PASS",
+          "meaning": "Formal confirmed LONG_TERM target accepted; ambiguous targets rejected"
+        },
+        {
+          "number": 48,
+          "merge_commit": "72bd8a9e86a8b251e668288a53bd1c038b3132b9",
+          "ci_run": 40356612401,
+          "unit_tests": "89/89 PASS",
+          "meaning": "Legacy local-path file_uri and native receipt-shape bugs repaired"
+        }
+      ],
+      "verified": [
+        "Four official family SQLite files fetched read-only; no permanent data modification",
+        "Lilian latest confirmed long-term target used by W6 report adapter; prior hardcoded MAIN assumption removed",
+        "Synthetic on-demand data and report upload stages pass GitHub CI",
+        "Connector fetched-file file_uri string can be uploaded using authenticated reference; temporary probe deleted"
+      ],
+      "limits": [
+        "Current Google Drive upload/update connector accepts registered references from a connector fetch/export; a locally generated candidate is not automatically a connector-registered file reference",
+        "A local Library staging file reference was rejected by Google Drive update; raw text Sources not modified, existing four backups retained",
+        "Four authentic ChatGPT Project GUI sessions and real official binary writeback/readback remain outstanding",
+        "Main W5 market source/funding producer and report renderer still need live source-backed E2E; no fabricated target or settled cash"
+      ],
+      "controls": {
+        "production": "HOLD",
+        "trading": "NONE",
+        "runtime": "CHATGPT_ON_DEMAND",
+        "external_python_host": "NONE"
+      }
     }
   ],
   "defects": [

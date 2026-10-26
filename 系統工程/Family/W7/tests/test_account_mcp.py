@@ -35,7 +35,9 @@ def test_duplicate_json(app):
     a,h=app;assert a.handle('POST',h,b'{"jsonrpc":"2.0","jsonrpc":"1.0"}')[0]==400
 
 def test_bounds(app):
-    a,h=app;assert a.handle('POST',h,b'x'*8193)[0]==413
+    a,h=app;assert a.handle('POST',h,b'x'*131073)[0]==413
+    body={'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-06-18','padding':'x'*50000}}
+    assert a.handle('POST',h,json.dumps(body).encode())[0]==200
     assert a.handle('GET',h)[0]==405
 
 def test_notification(app):

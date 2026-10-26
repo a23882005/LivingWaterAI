@@ -9,7 +9,16 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import json
 import re
-from post_trade_state import append_post_trade
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+_POST_TRADE = Path(__file__).with_name("post_trade_state.py")
+_SPEC = spec_from_file_location("family_w8_post_trade_state", _POST_TRADE)
+if _SPEC is None or _SPEC.loader is None:
+    raise RuntimeError("POST_TRADE_MODULE_MISSING")
+_MODULE = module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+append_post_trade = _MODULE.append_post_trade
 
 TIME = "%Y-%m-%dT%H:%M:%SZ"
 

@@ -192,7 +192,8 @@ class OfficialFamilyEntry:
 def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                coordinator, principal_provider, analysis_provider=None,
                                other_handlers=None, completion_checks=None, report_store=None, report_renderer=None,
-                               trusted_analysis_source_producer=None):
+                               trusted_analysis_source_producer=None,
+                               trusted_w6_current_input_producer=None, approved_w6_renderer=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
     path = FAMILY / "W7" / "family_menu.py"
     spec = importlib.util.spec_from_file_location("official_family_menu", path)
@@ -217,6 +218,21 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
         coordinator=coordinator, principal_provider=principal_provider,
         analysis_provider=analysis_provider)
     handlers = dict(other_handlers or {})
+    if trusted_w6_current_input_producer is not None or approved_w6_renderer is not None:
+        if report_renderer is not None:
+            raise ValueError("CONFLICTING_REPORT_RENDERERS")
+        if (trusted_w6_current_input_producer is None
+                or approved_w6_renderer is None):
+            raise ValueError("W6_TRUSTED_PRODUCER_AND_APPROVED_RENDERER_REQUIRED")
+        path = Path(__file__).with_name("on_demand_w6.py")
+        spec = importlib.util.spec_from_file_location(
+            "family_w8_on_demand_w6", path)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("ON_DEMAND_W6_RENDERER_MODULE_MISSING")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        report_renderer = module.OnDemandW6Renderer(
+            trusted_w6_current_input_producer, approved_w6_renderer)
     if report_renderer is not None and report_store is None:
         raise ValueError('OFFICIAL_REPORT_STORE_REQUIRED')
     if report_store is not None:

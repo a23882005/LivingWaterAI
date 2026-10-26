@@ -181,8 +181,8 @@ def verify_imported_html(plan, import_response, freshly_fetched_remote_bytes):
         "trade_authorization":"NONE",
     }
 
-def bind_connector_uploads(plan, file_uri_by_artifact):
-    """Create actual Google Drive upload_file tool args, never local-path args.
+def bind_connector_uploads(plan, file_uri_by_artifact, *, local_upload_supported=False):
+    """Bind registered references or verified host-upload local artifact paths.
 
     The executor obtains these refs from generated current-turn artifacts.
     Uploaded bytes are still verified through fresh Drive readback before
@@ -197,10 +197,16 @@ def bind_connector_uploads(plan, file_uri_by_artifact):
     used=set()
     for item in plan["uploads"]:
         uri=file_uri_by_artifact[item["artifact"]]
-        if (not isinstance(uri,str)
-                or not re.fullmatch(r"sediment://file_[A-Za-z0-9_-]+", uri)
-                or uri in used):
+        local = (local_upload_supported is True and isinstance(uri,str)
+                 and Path(uri).is_absolute() and uri == item["path"])
+        registered = (isinstance(uri,str)
+                      and re.fullmatch(r"sediment://file_[A-Za-z0-9_-]+", uri))
+        if not (local or registered) or uri in used:
             raise ValueError("VALID_REPORT_CONNECTOR_FILE_URI_REQUIRED")
+        stage=Path(item["path"])
+        if (not stage.is_file() or stage.stat().st_size != item["bytes"]
+                or _digest(stage.read_bytes()) != item["sha256"]):
+            raise ValueError("REPORT_ARTIFACT_STAGE_CHANGED")
         used.add(uri)
         output.append({"artifact":item["artifact"],
                        "expected_sha256":item["sha256"],

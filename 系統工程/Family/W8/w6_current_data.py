@@ -63,10 +63,22 @@ def build_w6_current_data(source, market, engine):
     observed=_utc(market.get("market_as_of"))
     if observed>evaluated:
         raise ValueError("W6_FUTURE_MARKET")
-    target=[x for x in source.get("current_confirmed_target_details",[])
-            if x.get("target_key")=="MAIN"]
-    if len(target)!=1:
+    # Formal targets are keyed by the member's approved W1 target_key.
+    # Lilian, for example, uses LONG_TERM, not the provisional MAIN name.
+    # Never silently take the first or an older confirmed target when there
+    # are multiple distinct confirmed target purposes.
+    targets=source.get("current_confirmed_target_details",[])
+    if not isinstance(targets,list):
         raise ValueError("W6_FINAL_TARGET_NOT_CONFIRMED")
+    key=market.get("confirmed_target_key")
+    if key is not None and (not isinstance(key,str) or not key.strip()):
+        raise ValueError("W6_TARGET_KEY_INVALID")
+    target=[x for x in targets if isinstance(x,dict)
+            and (key is None or x.get("target_key")==key)]
+    if not target:
+        raise ValueError("W6_FINAL_TARGET_NOT_CONFIRMED")
+    if len(target)!=1:
+        raise ValueError("W6_MULTIPLE_CONFIRMED_TARGETS_REQUIRE_KEY")
     allocations=target[0].get("allocations",[])
     if not allocations or sum(int(x["weight_units"]) for x in allocations)!=1000000:
         raise ValueError("W6_FINAL_TARGET_NOT_COMPLETE")
@@ -178,6 +190,7 @@ def build_w6_current_data(source, market, engine):
         # Four-panel six-stage radar belongs to approved C/Mentor output only.
         "approved_radar":engine.get("approved_report_radar"),
         "verified_sections":engine.get("approved_w6_section_content"),
+        "target_key":target[0]["target_key"],
         "target_version":target[0]["version_no"],
         "data_provenance":"SOURCE_BACKED",
         "report_content_state":"CALCULATION_READY__W6_RENDER_AND_QA_REQUIRED",

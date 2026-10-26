@@ -22,6 +22,7 @@ def test_mcp_challenge_points_to_working_metadata(router):
     s,hs,_=router.handle('POST','/entry/mcp',{'Host':'family.example','Content-Type':'application/json'},b'{}')
     assert s==401
     assert 'https://family.example/entry/mcp/.well-known/oauth-protected-resource' in dict(hs)['WWW-Authenticate']
+    assert router.handle('POST','/entry/mcp',{'Host':'family.example','Content-Type':'application/json'},b'x'*50000)[0] == 401
     s,_,b=router.handle('GET','/entry/mcp/.well-known/oauth-protected-resource',{'Host':'family.example'})
     assert s==200 and json.loads(b)['resource']=='https://family.example/entry/mcp'
 

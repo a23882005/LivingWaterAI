@@ -50,6 +50,9 @@ def append_post_trade(db, client, event_id, payload, stamp):
     identities=db.execute("SELECT client_id FROM family_member_identity").fetchall()
     if len(identities)!=1 or identities[0][0]!=client:
         raise PermissionError("POST_TRADE_CLIENT_MISMATCH")
+    if not db.execute("SELECT 1 FROM portfolio_event WHERE client_id=? AND event_id=?",
+                      (client,event_id)).fetchone():
+        raise ValueError("POST_TRADE_EVENT_NOT_RECORDED")
     pk=set()
     position_rows=[]
     for p in pos:
@@ -117,6 +120,12 @@ def append_post_trade(db, client, event_id, payload, stamp):
             db.execute("""INSERT INTO portfolio_snapshot_item(client_id,run_id,item_no,domain_code,entity_key,field_key,value_state,value_type,value_text,unit,source_observed_at_utc,source_kind,source_reference,recorded_at_utc)
                          VALUES(?,?,?,?,?,'quantity_decimal','KNOWN','DECIMAL_TEXT',?,'shares',?,'OWNER_VERIFIED',?,?)""",
                          (client,run,i,DOMAIN,acct+"|"+inst,qty,asof,ref,stamp))
+            db.execute("""INSERT INTO portfolio_snapshot_lineage
+                (client_id,run_id,item_no,origin_domain,origin_record_key,
+                 origin_effective_at_utc,origin_received_at_utc,
+                 origin_source_reference,origin_evidence_state)
+                VALUES(?,?,?,'PORTFOLIO_EVENT',?,?,?,?, 'VERIFIED')""",
+                (client,run,i,event_id,asof,stamp,ref))
             if Decimal(qty)>0:
                 db.execute("""INSERT INTO portfolio_position(client_id,account_key,instrument_key,as_of_utc,quantity_decimal,cost_state,cost_source_kind,position_source_kind,position_source_reference,recorded_at_utc)
                              VALUES(?,?,?,?,?,'UNKNOWN','NOT_PROVIDED','OWNER_VERIFIED',?,?)""",
@@ -147,7 +156,7 @@ def effective_positions(tables):
             current[key]=(row["as_of_utc"],0,row["quantity_decimal"],dict(row))
     sealed={x["run_id"] for x in tables.get("portfolio_snapshot_run",[]) if x.get("run_state")=="SEALED"}
     for x in tables.get("portfolio_snapshot_item",[]):
-        if x.get("domain_code")!=DOMAIN or x.get("field_key")!="quantity_decimal" or x.get("run_id") not in sealed:
+        if x.get("domain_code")!=DOMAIN or x.get("field_key")!="quantity_decimal" or x.get("value_state")!="KNOWN" or x.get("run_id") not in sealed:
             continue
         key=x["entity_key"].split("|",1)
         if len(key)!=2:raise ValueError("POST_TRADE_POSITION_KEY_INVALID")

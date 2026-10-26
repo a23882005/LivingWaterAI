@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T04:52:10+08:00",
+  "updated_at": "2026-10-27T05:51:21+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -975,7 +975,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Family Total PM personally continue C7 same-run verified target/NAV/funding plus canonical V82/V75 and Mentor, then 11 official state persistence and original W6 reports/12 readback, four Projects 56 real E2E and Gate D/E. R23 connects actual member source observations and original numeric/predicate computation into 04; complete 04/Gate status remains pending.",
+  "next_action": "Only Joseph and MOU menu 04. Directly assemble existing approved document targets and official DB sources into complete original engine inputs, remove TARGET_REQUIRED source/view gap, run original C7/V70/V82/V75/FamilyRunner through Mentor, and record field-level unresolved source gaps. Do not return to report work, other members, hosting, standalone observations or small regression-count milestones.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1068,5 +1068,55 @@
     "prohibitions": "GitHub code + ChatGPT user-triggered on-demand + Google Drive four private DB/report; do not introduce Hostinger/Render Python host, 24/7 runtime or duplicate official DB; no customer trade action; no unrelated file access.",
     "privacy": "Handoff archives omit raw customer DB, passwords, tokens and other sensitive content.",
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
+  },
+  "active_04_focus": {
+    "status": "IN_PROGRESS__TWO_MEMBERS_ONLY__SOURCE_RECOVERED__NATIVE_INPUT_BINDING_PENDING",
+    "owner_instruction": "Family Total PM personally complete menu 04 for Joseph and MOU only, from real member sources through original FamilyRunner and Mentor. Stop report and other-member work; no new small component/test-count milestones.",
+    "members": [
+      "Joseph",
+      "MOU"
+    ],
+    "scope": "Existing approved source mapping and full native request assembly; no Hostinger/Render or additional investment engine",
+    "source_recovery": {
+      "approved_target_documents_found": true,
+      "Joseph": "Allocation v2.1; 12 functional role rows totaling 100%; fixed 4m pool superseded by Owner all-broker-assets scope",
+      "MOU": "Allocation v3.0; 13 target rows totaling 100%; explicit strategic 80/20; historical 837000 reference retained as historical"
+    },
+    "actual_family_runner_attempts": {
+      "Joseph": {
+        "status": "DATA_UNAVAILABLE",
+        "first_issue": "TARGET_REQUIRED"
+      },
+      "MOU": {
+        "status": "DATA_UNAVAILABLE",
+        "first_issue": "TARGET_REQUIRED"
+      }
+    },
+    "actual_v70": "MOU explicit approved 80/20 source run executed original HTML; original output state retained",
+    "remaining_field_groups": [
+      "Approved document target to W2-compatible confirmed source/view with preserved original evidence",
+      "Current complete investment-pool NAV; historical known subtotal remains separate",
+      "Settled available/unsettled/reserved and actual account/domain mappings; original C7 numeric-only three-domain contract compatibility",
+      "Canonical stock/bond evidence and SGOV role separation",
+      "Complete original C7/V82/V75/FamilyRunner and native Mentor output"
+    ],
+    "evidence": {
+      "drive_id": "1Mq1RHUbuZTe8e3ZgHOfQzJx8Zk-kmPG3",
+      "name": "Family_04_Joseph_MOU_source_recovery.json",
+      "bytes": 689150,
+      "sha256": "8127905d1a0957acd6569b6ca097be3e87a3fe61264ddf3f9cdb0cd066c30be1",
+      "fresh_remote_readback": "EXACT_SHA256_AND_SIZE_MATCH"
+    },
+    "governance_backups": {
+      "engineering": "1M6l369rGTuQCHaupK4dNapsCsa7ye1nHOV1sVnFqstg",
+      "files": "15ERGIy6wjxzxmzgD0g_INTp8dB6tSzB7HGsiAZVha0k",
+      "wbs": "1wpi4TxfCVSk0JJr_p511xZ_IgHQi1nKIYiUhuzMW3_4"
+    },
+    "full_04_complete": false,
+    "original_native_mentor_reached": false,
+    "official_db_writes": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_executor": "Same Family Total PM, hands-on; no delegation"
   }
 }

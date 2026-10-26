@@ -18,7 +18,7 @@ def snapshot():
 def pack():
     return {
         "request":{"client_id":CLIENT,"run_id":"r001","evaluation_at":"2026-10-26T07:00:00Z",
-                   "client_snapshot":{"payload":{"source_sha256":SHA}},
+                   "client_snapshot":{"payload":snapshot()},
                    "trade_authorization":"NONE"},
         "trusted_context":{"client_id":CLIENT,"trade_authorization":"NONE",
                            "native_binding":{"schema_version":"Family.W5.NativeBinding.v1",
@@ -82,6 +82,23 @@ class OnDemandTests(unittest.TestCase):
         p=pack();p["source_metadata"]["market_as_of"]="2026-10-28T06:00:00Z"
         with self.assertRaisesRegex(ValueError,"ON_DEMAND_FUTURE_MARKET_SOURCE"):
             self.provider(p)(snapshot(),{"question":"買"})
+
+    def test_current_sha_cannot_hide_altered_holdings(self):
+        p=pack();p["request"]["client_snapshot"]["payload"]["tables"]={
+            "portfolio_position":[{"quantity_decimal":"999"}]}
+        with self.assertRaisesRegex(PermissionError,"ON_DEMAND_SNAPSHOT_CONTENT_MISMATCH"):
+            self.provider(p)(snapshot(),{})
+
+    def test_producer_cannot_mutate_verified_snapshot(self):
+        original=snapshot()
+        def mutate(snap, question):
+            snap["tables"]["portfolio_position"]=[{"quantity_decimal":"999"}]
+            p=pack();p["request"]["client_snapshot"]["payload"]=snap
+            return p
+        provider=MOD.OnDemandAnalysisProvider(mutate,runner_factory=runner_factory)
+        with self.assertRaisesRegex(PermissionError,"ON_DEMAND_SNAPSHOT_CONTENT_MISMATCH"):
+            provider(original,{})
+        self.assertEqual(original,snapshot())
 
     def test_trade_permission_rejected(self):
         p=pack();p["trusted_context"]["trade_authorization"]="EXECUTE"

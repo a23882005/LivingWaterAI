@@ -83,6 +83,10 @@ class OnDemandAnalysisProvider:
                 or metadata.get("source_db_sha256") != sha
                 or req_sha != sha):
             raise PermissionError("ON_DEMAND_SOURCE_OR_CLIENT_MISMATCH")
+        # Bind the actual data, not just the producer's repeated source SHA.
+        # Otherwise a pack can carry stale holdings under the current DB label.
+        if request["client_snapshot"]["payload"] != snapshot:
+            raise PermissionError("ON_DEMAND_SNAPSHOT_CONTENT_MISMATCH")
         binding = context.get("native_binding", {})
         if (binding.get("schema_version") != "Family.W5.NativeBinding.v1"
                 or binding.get("data_provenance") != "SOURCE_BACKED"

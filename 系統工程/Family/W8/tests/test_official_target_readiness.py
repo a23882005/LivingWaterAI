@@ -57,14 +57,17 @@ class TargetReadinessTest(unittest.TestCase):
                         "native_binding": {"data_provenance": "SOURCE_BACKED"}}
             def analyze(self, request):
                 return {"status": "OK", "client_id": CLIENT,
-                        "data_provenance": "SOURCE_BACKED", "output": "verified"}
+                        "data_provenance": "SOURCE_BACKED", "output": "verified",
+                        "run_id":"r1","evaluation_at":"2026-10-27T00:00:00Z"}
         def provider(snapshot, payload):
             return ({"client_id": CLIENT,
+                     "run_id":"r1","evaluation_at":"2026-10-27T00:00:00Z",
                      "client_snapshot": {"payload": {"source_sha256": "digest"}}},
                     Runner())
         result = entry([version()], [allocation()], provider).deployment_pace({})
         self.assertEqual(result["status"], "OK")
         self.assertEqual(result["analysis"]["output"], "verified")
+        self.assertEqual(result["analysis"]["source_db_sha256"],"digest")
         self.assertEqual(result["trade_authorization"], "NONE")
 
     def test_latest_confirmed_incomplete_cannot_reuse_old_target(self):
@@ -95,6 +98,36 @@ class TargetReadinessTest(unittest.TestCase):
         self.assertEqual(result["status"], "DATA_UNAVAILABLE")
         self.assertNotIn("confirmed_final_target_version", result["missing"])
         self.assertIn("official_market_and_approved_engine_request", result["missing"])
+
+    def test_analysis_result_feeds_existing_w6_data_builder(self):
+        # Reproduce the actual 04 -> W6 boundary; no hand-added DB hash.
+        spec=importlib.util.spec_from_file_location('w6_lineage_fixture',
+            ROOT/'tests/test_w6_current_data.py')
+        fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
+        source,market,engine=fixture.baseline()
+        upstream={k:v for k,v in engine.items() if k!='source_db_sha256'}
+        class Runner:
+            def context_provider(self):
+                return {'client_id':CLIENT,'native_binding':{'data_provenance':'SOURCE_BACKED'}}
+            def analyze(self,request):return upstream
+        request={'client_id':CLIENT,'run_id':engine['run_id'],
+                 'evaluation_at':engine['evaluation_at'],
+                 'client_snapshot':{'payload':{'source_sha256':fixture.SHA}}}
+        obj=entry([version()],[allocation()],lambda *args:(request,Runner()))
+        base=obj.read_portfolio({});base['source_sha256']=fixture.SHA
+        obj.read_portfolio=lambda _:base
+        result=obj.deployment_pace({})
+        current=fixture.M.build_w6_current_data(source,market,result['analysis'])
+        self.assertEqual(current['current_total_twd'],'2100')
+        self.assertEqual(current['run_id'],engine['run_id'])
+        self.assertNotIn('source_db_sha256',upstream)
+        for patch,code in [({'source_db_sha256':'0'*64},'OFFICIAL_RESULT_SOURCE_MISMATCH'),
+                           ({'run_id':'another-run'},'OFFICIAL_RESULT_RUN_MISMATCH'),
+                           ({'evaluation_at':'2026-10-01T00:00:00Z'},'OFFICIAL_RESULT_RUN_MISMATCH')]:
+            original=dict(upstream);upstream.update(patch)
+            with self.subTest(patch=patch),self.assertRaisesRegex(PermissionError,code):
+                obj.deployment_pace({})
+            upstream.clear();upstream.update(original)
 
 
 if __name__ == "__main__":

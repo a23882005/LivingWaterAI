@@ -196,6 +196,16 @@ class OfficialFamilyEntry:
                     "trade_authorization": "NONE"}
         if decision.get("client_id") != self.client_id or decision.get("data_provenance") != "SOURCE_BACKED":
             raise PermissionError("OFFICIAL_RESULT_CLIENT_MISMATCH")
+        for key in ("run_id", "evaluation_at"):
+            if not request.get(key) or decision.get(key) != request[key]:
+                raise PermissionError("OFFICIAL_RESULT_RUN_MISMATCH")
+        if (decision.get("source_db_sha256") is not None
+                and decision["source_db_sha256"] != current["source_sha256"]):
+            raise PermissionError("OFFICIAL_RESULT_SOURCE_MISMATCH")
+        # FamilyRunner keeps original engine output unchanged. Bind its result
+        # to the verified DB here so W6 can consume the same-run analysis
+        # without an operator manually reconstructing its provenance fields.
+        decision = dict(decision, source_db_sha256=current["source_sha256"])
         # Preserve upstream HOLD and action semantics. Do not relabel staging
         # or promote calculation to a live authorized investment execution.
         return {"status": "OK", "client_id": self.client_id,

@@ -183,10 +183,21 @@ def build_project_menu(*, family_login, project_name, login_account,
                 source=source_module.build_report_source(
                     snapshot,account=login_account,expected_client_id=client_id)
                 rendered=renderer(source,payload)
-                return delivery_module.prepare_report_delivery(
+                plan=delivery_module.prepare_report_delivery(
                     rendered,account=login_account,client_id=client_id,
                     folder_id=official_report_folder_id,
                     output_dir=report_staging_dir)
+                # Google Drive import_document supports the exact generated
+                # HTML bytes. Give ChatGPT concrete per-artifact tool arguments
+                # in the same menu 13 response, without inventing upload URI.
+                html_available={row["artifact"] for row in plan["uploads"]}
+                plan["html_imports"]={
+                    item:delivery_module.prepare_verified_html_import(plan,item)
+                    for item in ("index.html","report.html")
+                    if item in html_available}
+                # PDF/ZIP + manifest remain independently pending; never
+                # elevate these partial HTML transfer plans to report PASS.
+                return plan
             handlers["generate_report"]=stage_latest_report
         # Menu handlers here stage reports only; the upstream no-host W6
         # injection must not also attempt the legacy synchronous Drive store.

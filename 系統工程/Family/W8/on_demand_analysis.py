@@ -39,12 +39,17 @@ class OnDemandAnalysisProvider:
     supports_external_target_source = True
 
     def __init__(self, trusted_source_producer, *,
-                 repo_root=PROJECT_ROOT, runner_factory=None):
+                 repo_root=PROJECT_ROOT, runner_factory=None,
+                 official_holdings_decision=None, official_file_id=None):
         if not callable(trusted_source_producer):
             raise ValueError("TRUSTED_W2_W3_PRODUCER_REQUIRED")
         self.producer = trusted_source_producer
         self.repo_root = Path(repo_root)
         self.runner_factory = runner_factory
+        self.official_holdings_decision = deepcopy(official_holdings_decision)
+        self.official_file_id = official_file_id
+        if official_holdings_decision is not None and not official_file_id:
+            raise ValueError('OFFICIAL_HOLDINGS_FILE_ID_REQUIRED')
 
     def __call__(self, snapshot, payload):
         if (not isinstance(snapshot, dict)
@@ -91,6 +96,17 @@ class OnDemandAnalysisProvider:
         # Otherwise a pack can carry stale holdings under the current DB label.
         if request["client_snapshot"]["payload"] != snapshot:
             raise PermissionError("ON_DEMAND_SNAPSHOT_CONTENT_MISMATCH")
+        if self.official_holdings_decision is not None:
+            proof_spec=importlib.util.spec_from_file_location(
+                'family_w8_official_holdings',Path(__file__).with_name('approved_target_input.py'))
+            proof_module=importlib.util.module_from_spec(proof_spec)
+            proof_spec.loader.exec_module(proof_module)
+            context = deepcopy(context)
+            context['holdings_completeness'] = proof_module.bind_official_holdings(
+                snapshot, official_file_id=self.official_file_id,
+                account_key=request['owner']['account'],
+                owner_decision=self.official_holdings_decision,
+                evaluation_at=request['evaluation_at'])
         binding = context.get("native_binding", {})
         if (binding.get("schema_version") != "Family.W5.NativeBinding.v1"
                 or binding.get("data_provenance") != "SOURCE_BACKED"

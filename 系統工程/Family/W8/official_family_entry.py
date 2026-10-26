@@ -233,6 +233,7 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                coordinator, principal_provider, analysis_provider=None,
                                other_handlers=None, completion_checks=None, report_store=None, report_renderer=None,
                                trusted_analysis_source_producer=None,
+                               official_holdings_decision=None, official_drive_file_id=None,
                                trusted_w6_current_input_producer=None, approved_w6_renderer=None,
                                approved_w6_archive=None, current_source_provider=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
@@ -253,7 +254,9 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
         provider_module = importlib.util.module_from_spec(provider_spec)
         provider_spec.loader.exec_module(provider_module)
         analysis_provider = provider_module.OnDemandAnalysisProvider(
-            trusted_analysis_source_producer)
+            trusted_analysis_source_producer,
+            official_holdings_decision=official_holdings_decision,
+            official_file_id=official_drive_file_id)
     official = OfficialFamilyEntry(
         auth=auth, login_account=login_account, client_id=client_id,
         coordinator=coordinator, principal_provider=principal_provider,

@@ -106,3 +106,46 @@ def bind_document_account_scope(snapshot, target_pack, *, account_key, broker,
         'scope_kind':'MEMBER_LOCAL_BROKER_CATEGORY_ANALYSIS_ONLY',
         'external_broker_account_id':None,'cash_verified':False,
         'holdings_completeness_verified':False,'trade_authorization':'NONE'}
+
+
+def bind_official_holdings(snapshot, *, official_file_id, account_key,
+                          owner_decision, evaluation_at):
+    """Apply an operator-recorded Owner decision to the existing official DB.
+
+    The decision is trusted executor context, not a menu payload. It accepts
+    existing holdings as the analysis baseline, without creating a portfolio,
+    changing quantities, dating old observations anew, or asserting cash.
+    The receipt is bound to one member, official File ID and exact DB bytes.
+    """
+    client=snapshot.get('client_id')
+    decision=deepcopy(owner_decision)
+    if (snapshot.get('schema_version')!='Family.W5.W1Snapshot.v1'
+        or snapshot.get('data_provenance')!='SOURCE_BACKED'
+        or snapshot.get('payload_digest')!=_digest(snapshot.get('tables'))
+        or not re.fullmatch(r'[0-9a-f]{64}',str(snapshot.get('source_sha256','')))):
+        raise ValueError('OFFICIAL_HOLDINGS_SNAPSHOT_REQUIRED')
+    if (decision.get('schema_version')!='Family.W8.OwnerOfficialHoldingsDecision.v1'
+        or decision.get('action')!='ACCEPT_EXISTING_OFFICIAL_HOLDINGS'
+        or not decision.get('source_reference') or not decision.get('statement')
+        or decision.get('client_id')!=client
+        or decision.get('official_file_id')!=official_file_id
+        or decision.get('source_db_sha256')!=snapshot['source_sha256']):
+        raise PermissionError('OFFICIAL_HOLDINGS_OWNER_DECISION_MISMATCH')
+    at=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
+    decided=datetime.fromisoformat(decision['recorded_at'].replace('Z','+00:00'))
+    if at.utcoffset() is None or decided.utcoffset() is None or decided>at:
+        raise ValueError('OFFICIAL_HOLDINGS_DECISION_TIME_INVALID')
+    accounts=snapshot['tables'].get('portfolio_account',[])
+    if sum(r.get('account_key')==account_key and r.get('client_id')==client for r in accounts)!=1:
+        raise ValueError('OFFICIAL_HOLDINGS_ACCOUNT_REQUIRED')
+    return {'state':'COMPLETE','account_key':account_key,
+        'snapshot_digest':snapshot['payload_digest'],
+        'as_of':decision['recorded_at'],
+        'as_of_basis':'OWNER_ACCEPTANCE_RECORDED_AT__POSITION_OBSERVATIONS_UNCHANGED',
+        'source_reference':decision['source_reference'],
+        'schema_version':'Family.W8.OfficialHoldingsAcceptance.v1',
+        'client_id':client,'official_file_id':official_file_id,
+        'source_db_sha256':snapshot['source_sha256'],
+        'owner_decision':decision,'owner_decision_digest':_digest(decision),
+        'holdings_status':'OFFICIAL','cash_settlement_asserted':False,
+        'database_written':False,'trade_authorization':'NONE'}

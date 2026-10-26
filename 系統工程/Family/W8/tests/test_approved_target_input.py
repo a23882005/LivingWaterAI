@@ -78,5 +78,34 @@ class ApprovedTargetTest(unittest.TestCase):
         with self.assertRaisesRegex(BoundaryError,'SCOPE_MISMATCH'):
             bind_owner(snap,req['owner'],datetime(2026,10,27,tzinfo=timezone.utc),approved_account_scope=scope)
 
+    def test_owner_accepts_existing_official_holdings_without_new_portfolio(self):
+        req,ctx=fixture(self.client);snap=req['client_snapshot']['payload']
+        snap['schema_version']='Family.W5.W1Snapshot.v1'
+        snap['data_provenance']='SOURCE_BACKED';snap['source_sha256']='a'*64
+        snap['payload_digest']=M._digest(snap['tables'])
+        before=deepcopy(snap)
+        decision={'schema_version':'Family.W8.OwnerOfficialHoldingsDecision.v1',
+            'action':'ACCEPT_EXISTING_OFFICIAL_HOLDINGS','client_id':self.client,
+            'official_file_id':'official-db','source_db_sha256':'a'*64,
+            'source_reference':'OWNER_DECISION_CURRENT_CONVERSATION',
+            'statement':'現在有的就是正式持倉',
+            'recorded_at':'2026-10-27T00:00:00Z'}
+        proof=M.bind_official_holdings(snap,official_file_id='official-db',
+            account_key='ACCOUNT_1',owner_decision=decision,
+            evaluation_at='2026-10-27T01:00:00Z')
+        from family_boundary import position_view
+        positions=position_view(snap,'ACCOUNT_1',datetime(2026,10,27,1,tzinfo=timezone.utc),proof)
+        self.assertEqual(len(positions),1)
+        self.assertEqual(snap,before)
+        self.assertFalse(proof['cash_settlement_asserted'])
+        self.assertFalse(proof['database_written'])
+        for key,value in [('client_id','another'),('official_file_id','another'),
+                          ('source_db_sha256','b'*64)]:
+            changed=deepcopy(decision);changed[key]=value
+            with self.assertRaisesRegex(PermissionError,'OWNER_DECISION_MISMATCH'):
+                M.bind_official_holdings(snap,official_file_id='official-db',
+                    account_key='ACCOUNT_1',owner_decision=changed,
+                    evaluation_at='2026-10-27T01:00:00Z')
+
 
 if __name__=='__main__':unittest.main()

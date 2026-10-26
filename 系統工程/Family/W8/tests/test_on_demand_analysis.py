@@ -3,6 +3,8 @@ import importlib.util
 from pathlib import Path
 import unittest
 from copy import deepcopy
+import hashlib
+import json
 
 PATH = Path(__file__).resolve().parents[1] / "on_demand_analysis.py"
 SPEC = importlib.util.spec_from_file_location("w8_on_demand_analysis_test", PATH)
@@ -99,6 +101,36 @@ class OnDemandTests(unittest.TestCase):
         with self.assertRaisesRegex(PermissionError,"ON_DEMAND_SNAPSHOT_CONTENT_MISMATCH"):
             provider(original,{})
         self.assertEqual(original,snapshot())
+
+    def test_recorded_owner_decision_reaches_runner_as_official_holdings(self):
+        snap=snapshot();snap['data_provenance']='SOURCE_BACKED'
+        snap['tables']={'portfolio_account':[{'client_id':CLIENT,'account_key':'IB'}],
+                        'portfolio_position':[]}
+        snap['payload_digest']=hashlib.sha256(json.dumps(snap['tables'],sort_keys=True,
+            ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+        p=pack();p['request']['client_snapshot']['payload']=deepcopy(snap)
+        p['request']['owner']={'account':'IB'}
+        decision={'schema_version':'Family.W8.OwnerOfficialHoldingsDecision.v1',
+            'action':'ACCEPT_EXISTING_OFFICIAL_HOLDINGS','client_id':CLIENT,
+            'official_file_id':'original-db','source_db_sha256':SHA,
+            'source_reference':'OWNER_CURRENT_CONVERSATION',
+            'statement':'現在有的就是正式持倉','recorded_at':'2026-10-26T06:00:00Z'}
+        before=deepcopy(p)
+        provider=MOD.OnDemandAnalysisProvider(lambda *_:deepcopy(p),
+            runner_factory=runner_factory,official_holdings_decision=decision,
+            official_file_id='original-db')
+        req,runner=provider(snap,{})
+        proof=runner.context_provider()['holdings_completeness']
+        self.assertEqual(proof['holdings_status'],'OFFICIAL')
+        self.assertEqual(proof['snapshot_digest'],snap['payload_digest'])
+        self.assertFalse(proof['cash_settlement_asserted'])
+        self.assertEqual(p,before)
+        decision['official_file_id']='different-db'
+        provider=MOD.OnDemandAnalysisProvider(lambda *_:deepcopy(p),
+            runner_factory=runner_factory,official_holdings_decision=decision,
+            official_file_id='original-db')
+        with self.assertRaisesRegex(PermissionError,'OWNER_DECISION_MISMATCH'):
+            provider(snap,{})
 
     def test_trade_permission_rejected(self):
         p=pack();p["trusted_context"]["trade_authorization"]="EXECUTE"

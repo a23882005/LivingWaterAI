@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T03:05:00+08:00",
+  "updated_at": "2026-10-27T04:28:00+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -791,6 +791,71 @@
         "trading": "NONE",
         "formal_deployment_eligible": false
       }
+    },
+    {
+      "id": "W8-R22",
+      "name": "04 current confirmed member sources and original V70 JavaScript runtime",
+      "status": "MAIN_MERGED__CI_135_PASS__FOUR_DB_READ_ONLY_VERIFIED__FULL_NATIVE_PENDING",
+      "pr": 57,
+      "merge_commit": "0eaa9a35eb5eb3ac8f343a85c2e508a52f4c4c94",
+      "changed_paths": [
+        ".github/workflows/family-w8-post-trade-regression.yml",
+        "系統工程/Family/README.md",
+        "系統工程/Family/W8/official_family_entry.py",
+        "系統工程/Family/W8/on_demand_project.py",
+        "系統工程/Family/W8/tests/test_official_target_readiness.py",
+        "系統工程/Family/W8/on_demand_current_sources.py",
+        "系統工程/Family/W8/v70_original_runtime.cjs",
+        "系統工程/Family/W8/tests/test_current_native_sources.py"
+      ],
+      "ci": {
+        "regression_run": 40394742255,
+        "tests": 135,
+        "conclusion": "SUCCESS",
+        "other_success_runs": [
+          40394742153,
+          40394742586
+        ]
+      },
+      "verified": [
+        "Fixed member DB SHA and client-scoped current sources: target, same latest SEALED strategic base, cash/funding views and official macro feed",
+        "Original V70 HTML JavaScript actually executed in one-shot jsdom runtime; no rewritten scores; original candidate/unverified status preserved",
+        "Four actual official member DBs re-downloaded read-only; SQLite integrity/FK, W5 snapshot and unchanged source SHA PASS",
+        "Arthur existing confirmed 80/20 and target yield V70_DATA_READY; other member required-source gaps preserved",
+        "8/8 merged files read back exactly; three Drive governance documents backed up, scoped updated and exact note readback PASS"
+      ],
+      "evidence": {
+        "drive_file_id": "1S7eUzCbFXHiKqKGBzV3dOKZommZJU40Y",
+        "location": "Owner-private root/TEMP/Family_W8_20261027_current_sources_evidence.json",
+        "bytes": 230552,
+        "sha256": "578e807be2bbcd5e0df88744c319c0b1fd09254275bf2bf67e58ab1c9ee4047e",
+        "remote_readback": "EXACT_SHA256_MATCH"
+      },
+      "governance_backups": {
+        "engineering": "1dGIKvUdzRRbW2CPNtqsh4vkrNpfehx4PB_GSMmTh9iE",
+        "files": "1tEh6C8zbqIfo5DpK0YvynCzSwsfDAEg-RJtrcHyYpBo",
+        "wbs": "1q3AAcR9sDAaHMF9UPJL7KYm4m-sPy19BKU_ZbeFffrs"
+      },
+      "member_source_status": {
+        "MOU": "MISSING_CONFIRMED_TARGET_STRATEGIC_BASE_SETTLED_FUNDING",
+        "Joseph": "MISSING_CONFIRMED_TARGET_STRATEGIC_BASE_SETTLED_FUNDING",
+        "Arthur": "V70_DATA_READY__SETTLED_FUNDING_NEEDS_REVIEW",
+        "Lilian": "CONFIRMED_TARGET_PRESENT__STRATEGIC_BASE_AND_SETTLED_FUNDING_MISSING"
+      },
+      "remaining": [
+        "Locate already approved missing member source facts without inferred defaults",
+        "Verified C7 investment pool, complete V82/bondV75/Mentor same-run native execution",
+        "11 official confirmed state persistence and 13 W6/12 report readback",
+        "Four actual Project 56 E2E cases and Gate D/E"
+      ],
+      "controls": {
+        "official_member_db_writes": 0,
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "runtime": "CHATGPT_ON_DEMAND",
+        "full_native_bundle_ready": false,
+        "real_member_project_e2e": "PENDING"
+      }
     }
   ],
   "defects": [
@@ -834,7 +899,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Continue actual same-run W2/C7/funding/V70 tactical inputs for 04 and approved V82/V75/Mentor. R21 completed source-backed observed numerical computation and persisted exact source evidence; full FamilyRunner and member Project E2E remain pending.",
+  "next_action": "Continue approved 04 complete C7/V82/V75/Mentor native bundle using confirmed existing member sources, then 11 official state persistence, original W6 reports and 12 remote readback, four Projects 56 E2E and Gate D/E. R22 original V70 and current source intake merged and verified; no whole-04 or Gate PASS claimed.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

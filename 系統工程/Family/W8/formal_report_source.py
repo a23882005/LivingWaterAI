@@ -112,7 +112,8 @@ def build_report_source(snapshot, *, account, expected_client_id):
     if account not in family:
         raise PermissionError("REPORT_ACCOUNT_UNKNOWN")
     identity=snapshot.get("identity",{})
-    if identity.get("client_id")!=expected_client_id:
+    if (identity.get("client_id")!=expected_client_id
+        or identity.get("family_alias")!=family[account]):
         raise PermissionError("REPORT_IDENTITY_MISMATCH")
     tables=snapshot.get("tables")
     if not isinstance(tables,dict):

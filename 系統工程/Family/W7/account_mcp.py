@@ -15,7 +15,7 @@ class AccountMCP:
         out={'Cache-Control':'no-store','Content-Type':'application/json'}
         if method!='POST':return 405,out,b''
         if headers.get('content-type','').split(';')[0].strip()!='application/json':return 415,out,b''
-        if len(raw)>8192:return 413,out,b''
+        if len(raw)>131072:return 413,out,b''
         # Same-origin browser calls only; server-to-server clients omit Origin.
         from urllib.parse import urlsplit
         p=urlsplit(self.oauth.resource);origin=p.scheme+'://'+p.netloc

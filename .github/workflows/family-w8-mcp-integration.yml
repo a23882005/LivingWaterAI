@@ -2,10 +2,14 @@ name: Family W8 authenticated MCP integration
 on:
   workflow_dispatch:
   push:
-    branches: [w8-real-resource-routes-20261026, w8-four-family-fourteen-handlers-20261026, main]
+    branches: [w8-real-resource-routes-20261026, w8-four-family-fourteen-handlers-20261026, w8-family-full-holdings-mcp-size-20261026, main]
     paths:
       - '.github/workflows/family-w8-mcp-integration.yml'
       - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W7/account_router.py'
+      - '系統工程/Family/W8/cgi_request.py'
+      - '系統工程/Family/W7/tests/test_account_mcp.py'
+      - '系統工程/Family/W7/tests/test_account_router.py'
       - '系統工程/Family/W8/private_family_service.py'
       - '系統工程/Family/W8/official_family_entry.py'
       - '系統工程/Family/W8/official_mutations.py'
@@ -13,6 +17,10 @@ on:
     paths:
       - '.github/workflows/family-w8-mcp-integration.yml'
       - '系統工程/Family/W7/account_mcp.py'
+      - '系統工程/Family/W7/account_router.py'
+      - '系統工程/Family/W8/cgi_request.py'
+      - '系統工程/Family/W7/tests/test_account_mcp.py'
+      - '系統工程/Family/W7/tests/test_account_router.py'
       - '系統工程/Family/W8/private_family_service.py'
       - '系統工程/Family/W8/official_family_entry.py'
       - '系統工程/Family/W8/official_mutations.py'
@@ -34,6 +42,8 @@ jobs:
         run: |
           python -m py_compile \
             系統工程/Family/W7/account_mcp.py \
+            系統工程/Family/W7/account_router.py \
+            系統工程/Family/W8/cgi_request.py \
             系統工程/Family/W8/private_family_service.py \
             系統工程/Family/W8/official_family_entry.py \
             系統工程/Family/W8/official_mutations.py

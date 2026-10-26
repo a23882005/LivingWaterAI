@@ -42,7 +42,7 @@ jobs:
           sys.path.insert(0,'系統工程/Family/W8')
           from private_family_service import OfficialBusinessTools, load_official_router
           specs=OfficialBusinessTools.specs()
-          assert [v['name'] for v in specs]==['family_portfolio','family_deployment_pace','family_macro','family_account','family_previous_report', 'family_market_news','family_holding_news','family_research_candidates', 'family_first_allocation', 'family_adjust_target', 'family_new_funding', 'family_update_profile', 'family_record_event']
+          assert [v['name'] for v in specs]==['family_portfolio','family_deployment_pace','family_macro','family_account','family_previous_report', 'family_market_news','family_research_candidates','family_holding_news', 'family_first_allocation', 'family_adjust_target', 'family_new_funding', 'family_update_profile', 'family_record_event']
           assert callable(load_official_router)
           print('OFFICIAL_BUSINESS_RUNTIME_IMPORT_PASS')
           PY

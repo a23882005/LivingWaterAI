@@ -466,6 +466,44 @@
         "on_demand": "CHATGPT_ONLY",
         "external_host": "NONE"
       }
+    },
+    {
+      "id": "W8-R16",
+      "name": "W6 16-page HTML full-size ChatGPT → Google Drive direct import/readback",
+      "status": "HTML_DELIVERY_CONNECTOR_PASS__PR50_CI_100_OF_100_PASS__FULL_W6_ARCHIVE_PENDING",
+      "pr": 50,
+      "merge_commit": "a9906af21cdd373228597172de778b854f850de5",
+      "ci": {
+        "run_id": 40368506535,
+        "conclusion": "SUCCESS",
+        "tests": "100/100"
+      },
+      "remote_proof": {
+        "artifact": "W6 synthetic reader HTML (no family data)",
+        "byte_count": 9126125,
+        "sha256": "758aef5f23ab41a6f16f28519130f813004c2ae8a2c4120921cd35570accd696",
+        "upload_method": "Google Drive import_document(upload_mode=keep_source_file_type)",
+        "mime_type": "text/html",
+        "converted": false,
+        "remote_download_sha256": "758aef5f23ab41a6f16f28519130f813004c2ae8a2c4120921cd35570accd696",
+        "remote_bytes_exact_match": true,
+        "remote_test_file_deleted": true
+      },
+      "changes": [
+        "W8/on_demand_report_delivery.py: prepare_verified_html_import() + verify_imported_html()",
+        "W8/tests/test_on_demand_report_delivery.py: 5 new HTML import and negative regression tests"
+      ],
+      "limits": [
+        "This proves complete 16-page HTML reader transfer on synthetic data, not official four-family report delivery",
+        "PDF/ZIP and raw SQLite binary writeback require a compatible current-turn authenticated file bridge; no such live proof yet",
+        "Full W6 formal report COMPLETE manifest and 04 live source-backed V70/V82/V75 remain pending"
+      ],
+      "controls": {
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "runtime": "CHATGPT_ON_DEMAND",
+        "external_python_host": "NONE"
+      }
     }
   ],
   "defects": [

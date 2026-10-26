@@ -188,7 +188,31 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
         if (report_store.login_account != login_account
                 or report_store.client_id != client_id):
             raise PermissionError('OFFICIAL_REPORT_OWNER_MISMATCH')
-        handlers.update(module.report_handlers(auth, report_store, renderer=report_renderer))
+        checked_renderer = None
+        if report_renderer is not None:
+            def checked_renderer(payload):
+                if not isinstance(payload, dict) or any(
+                    key in payload for key in ("client_id", "file_id", "db_path", "source_db")
+                ):
+                    raise PermissionError("REPORT_SOURCE_OVERRIDE_REJECTED")
+                snapshot = official.current_snapshot()
+                source_path = FAMILY / "W8" / "formal_report_source.py"
+                source_spec = importlib.util.spec_from_file_location(
+                    "family_w8_formal_report_source", source_path)
+                if source_spec is None or source_spec.loader is None:
+                    raise RuntimeError("OFFICIAL_REPORT_SOURCE_NOT_FOUND")
+                source_module = importlib.util.module_from_spec(source_spec)
+                source_spec.loader.exec_module(source_module)
+                source = source_module.build_report_source(
+                    snapshot, account=login_account, expected_client_id=client_id)
+                output = report_renderer(source, dict(payload))
+                if (not isinstance(output, dict)
+                    or output.get("client_id") != client_id
+                    or output.get("source_digest") != source["digest"]
+                    or output.get("source_db_sha256") != snapshot["source_sha256"]):
+                    raise PermissionError("REPORT_OUTPUT_SOURCE_MISMATCH")
+                return output
+        handlers.update(module.report_handlers(auth, report_store, renderer=checked_renderer))
     # Reserved operations always use the official resource, not external caller
     # supplied handlers. Other options remain under existing operator routing.
     handlers.update(official.handlers())

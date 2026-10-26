@@ -58,6 +58,41 @@ class W6CurrentDataTests(unittest.TestCase):
         self.assertEqual(sum(Decimal(x["差異TWD"]) for x in out["drift"]),Decimal(0))
         self.assertIn("RENDER_AND_QA_REQUIRED",out["report_content_state"])
 
+    def test_lilian_long_term_target_is_selected(self):
+        source,market,engine=baseline()
+        source["current_confirmed_target_details"][0]["target_key"]="LONG_TERM"
+        source["digest"]=M._sha({k:v for k,v in source.items() if k!="digest"})
+        report=M.build_w6_current_data(source,market,engine)
+        self.assertEqual(report["target_key"],"LONG_TERM")
+        self.assertEqual(report["target_version"],2)
+        self.assertEqual(len(report["target"]),2)
+
+    def test_multiple_distinct_confirmed_purposes_are_not_arbitrarily_chosen(self):
+        source,market,engine=baseline()
+        other=deepcopy(source["current_confirmed_target_details"][0])
+        other["target_key"]="LONG_TERM"
+        source["current_confirmed_target_details"].append(other)
+        source["digest"]=M._sha({k:v for k,v in source.items() if k!="digest"})
+        with self.assertRaisesRegex(ValueError,"W6_MULTIPLE_CONFIRMED_TARGETS_REQUIRE_KEY"):
+            M.build_w6_current_data(source,market,engine)
+
+    def test_verified_operator_can_choose_exact_target_key(self):
+        source,market,engine=baseline()
+        other=deepcopy(source["current_confirmed_target_details"][0])
+        other["target_key"]="LONG_TERM"
+        other["version_no"]=3
+        source["current_confirmed_target_details"].append(other)
+        source["digest"]=M._sha({k:v for k,v in source.items() if k!="digest"})
+        market["confirmed_target_key"]="LONG_TERM"
+        report=M.build_w6_current_data(source,market,engine)
+        self.assertEqual((report["target_key"],report["target_version"]),("LONG_TERM",3))
+
+    def test_bad_target_key_cannot_select_anything(self):
+        source,market,engine=baseline()
+        market["confirmed_target_key"]="NOT_CONFIRMED"
+        with self.assertRaisesRegex(ValueError,"W6_FINAL_TARGET_NOT_CONFIRMED"):
+            M.build_w6_current_data(source,market,engine)
+
     def test_other_client_engine_rejected(self):
         s,m,e=baseline();e["client_id"]="fam_"+"b"*32
         with self.assertRaisesRegex(PermissionError,"W6_SAME_CLIENT"):

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T04:28:00+08:00",
+  "updated_at": "2026-10-27T04:52:10+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -856,6 +856,82 @@
         "full_native_bundle_ready": false,
         "real_member_project_e2e": "PENDING"
       }
+    },
+    {
+      "id": "W8-R23",
+      "name": "04 member-scoped original numeric and V75 observational source intake",
+      "status": "MAIN_MERGED__CI_144_PASS__LIVE_MEMBER_SOURCE_OBSERVATIONS_COMPLETE__FULL_NATIVE_PENDING",
+      "pr": 58,
+      "merge_commit": "8cb836c1658713b05919716e20899bad65a5ef80",
+      "changed_paths": [
+        ".github/workflows/family-w8-post-trade-regression.yml",
+        "系統工程/Family/W8/on_demand_current_sources.py",
+        "系統工程/Family/W8/official_family_entry.py",
+        "系統工程/Family/W8/on_demand_market_observations.py",
+        "系統工程/Family/W8/tests/test_market_observations.py"
+      ],
+      "ci": {
+        "regression_run": 40399016573,
+        "tests": 144,
+        "conclusion": "SUCCESS",
+        "other_success_runs": [
+          40399016288,
+          40399016302
+        ]
+      },
+      "actual_read_only_source_run": {
+        "official_db_snapshot_baseline": "R22 downloaded official member DBs; SHA unchanged during read",
+        "member_series": 15,
+        "unique_provider_symbols": 12,
+        "observations": 65405,
+        "observed_date": "2026-10-23",
+        "bond_predicate_evaluations": 30,
+        "methods": [
+          "Hash-locked original calculate_td9",
+          "Original analytics.technical",
+          "V82.evaluate_technical with canonical votes UNKNOWN",
+          "V75.PRED-001..010 for supported bond symbols only"
+        ],
+        "scope": "Observed provider price numerics; exact symbol cache match does not attest canonical instrument/session/adjustment metadata",
+        "canonical_deployment_eligible": false
+      },
+      "verified": [
+        "Same-source member 04 current-source input now includes market observations and original predicate results",
+        "Reject manifest count/date mismatch, invalid OHLCV, future verification and changed source bytes",
+        "No NATO/NATO.CN alias inference; stock observations do not receive bond predicates",
+        "HY OAS percent to basis points explicitly x100; MOVE point value retained; missing 5bd changes not filled",
+        "Original V75 raw output retains native defaults; source coverage PARTIAL/MISSING and outer freshness unverified, deployment eligibility false",
+        "144/144 local and GitHub CI PASS; 5/5 merged files exact readback",
+        "Three governance documents backed up, updated and full note readback PASS"
+      ],
+      "evidence": {
+        "drive_file_id": "1IhUScHhGfvCQ77PJuilpz0a_8sXbanHv",
+        "name": "Family_W8_20261027_member_native_observations.json",
+        "size_bytes": 326745,
+        "sha256": "85eefb5c1b458fddb0bbc225a6d0fbed76ead20cf458a93929ea9dd5cebd2782",
+        "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
+        "pre_provenance_label_backup": "1yKnNA1B6jMnxrDZrihwm9RS0lKLT1gvv"
+      },
+      "governance_backups": {
+        "engineering": "19X8qHRLb4bshH3R50_CuMsXcqrulidXfY3LMCkIjcCc",
+        "files": "1sfLwq92rJSyjdM47g-9MnNctLVEpo6cRxWekSnZnqV8",
+        "wbs": "1PbXLWpGkGxKyNSeddnTCFS4LcORw_M3UDMV5fs6BYu8"
+      },
+      "source_discovery": "Approved W6 archive contains historical Joseph report weights; mapping explicitly has no W2 confirmed record and only provisional known subtotal. Retain original evidence and locate existing confirmed upstream source without inventing confirmation or NAV.",
+      "remaining": [
+        "Complete verified same-run C7 target/NAV/funding sources and canonical V82/V75 producer",
+        "Full FamilyRunner/V75 deployment/Mentor run",
+        "11 required official state persistence, original W6 reports and 12 remote readback",
+        "Four Projects 56 actual E2E cases and Gate D/E"
+      ],
+      "controls": {
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "official_member_db_writes": 0,
+        "runtime": "CHATGPT_ON_DEMAND",
+        "external_host": "NONE",
+        "full_native_bundle_ready": false
+      }
     }
   ],
   "defects": [
@@ -899,7 +975,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Continue approved 04 complete C7/V82/V75/Mentor native bundle using confirmed existing member sources, then 11 official state persistence, original W6 reports and 12 remote readback, four Projects 56 E2E and Gate D/E. R22 original V70 and current source intake merged and verified; no whole-04 or Gate PASS claimed.",
+  "next_action": "Family Total PM personally continue C7 same-run verified target/NAV/funding plus canonical V82/V75 and Mentor, then 11 official state persistence and original W6 reports/12 readback, four Projects 56 real E2E and Gate D/E. R23 connects actual member source observations and original numeric/predicate computation into 04; complete 04/Gate status remains pending.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

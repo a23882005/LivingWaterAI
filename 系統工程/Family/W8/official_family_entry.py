@@ -37,7 +37,7 @@ class OfficialFamilyEntry:
     """Operator-bound, real Drive personal resource; always account-scoped."""
 
     def __init__(self, *, auth, login_account, client_id, coordinator,
-                 principal_provider, analysis_provider=None):
+                 principal_provider, analysis_provider=None, current_source_provider=None):
         if (not isinstance(login_account, str)
             or login_account not in RESOURCE_BY_ACCOUNT
             or not isinstance(client_id, str) or not client_id.startswith("fam_")
@@ -52,6 +52,7 @@ class OfficialFamilyEntry:
         self.coordinator = coordinator
         self.principal_provider = principal_provider
         self.analysis_provider = analysis_provider
+        self.current_source_provider = current_source_provider
 
     def _principal(self):
         user = self.auth.require_login()
@@ -172,12 +173,20 @@ class OfficialFamilyEntry:
         if self.analysis_provider is None or missing:
             if self.analysis_provider is None:
                 missing.append("official_market_and_approved_engine_request")
+            intake = getattr(self, "current_source_provider", None)
+            sources = intake(current["snapshot"]) if intake is not None else None
+            if sources is not None and (sources.get("client_id") != self.client_id
+                    or sources.get("source_db_sha256") != current["source_sha256"]):
+                raise PermissionError("OFFICIAL_CURRENT_SOURCE_MISMATCH")
             return {"status": "DATA_UNAVAILABLE", "code": "OFFICIAL_ANALYSIS_INPUT_INCOMPLETE",
                     "data_provenance": "SOURCE_BACKED",
                     "client_id": self.client_id,
                     "source_sha256": current["source_sha256"],
                     "missing": missing,
-                    "message": "已讀取本人正式持倉；將依已確認的目標、資金與最新市場來源補齊引擎計算所需欄位。",
+                    "current_source_inputs": sources,
+                    "message": ("已讀取本人目標與資金狀態，並完成V70原程式比例計算；逐檔投入金額待完整來源齊備後產生。"
+                        if sources and (sources.get("v70") or {}).get("status")=="V70_DATA_READY"
+                        else "已讀取本人正式持倉；將依已確認的目標、資金與最新市場來源補齊引擎計算所需欄位。"),
                     "trade_authorization": "NONE"}
         request, runner = self.analysis_provider(current["snapshot"], dict(payload))
         if (not isinstance(request, dict)
@@ -223,7 +232,7 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                other_handlers=None, completion_checks=None, report_store=None, report_renderer=None,
                                trusted_analysis_source_producer=None,
                                trusted_w6_current_input_producer=None, approved_w6_renderer=None,
-                               approved_w6_archive=None):
+                               approved_w6_archive=None, current_source_provider=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
     path = FAMILY / "W7" / "family_menu.py"
     spec = importlib.util.spec_from_file_location("official_family_menu", path)
@@ -246,7 +255,7 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
     official = OfficialFamilyEntry(
         auth=auth, login_account=login_account, client_id=client_id,
         coordinator=coordinator, principal_provider=principal_provider,
-        analysis_provider=analysis_provider)
+        analysis_provider=analysis_provider, current_source_provider=current_source_provider)
     handlers = dict(other_handlers or {})
     if (trusted_w6_current_input_producer is not None
             or approved_w6_renderer is not None or approved_w6_archive is not None):

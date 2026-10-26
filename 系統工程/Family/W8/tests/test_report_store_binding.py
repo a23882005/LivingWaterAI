@@ -3,6 +3,7 @@ import importlib.util
 import pathlib
 import unittest
 from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("official_family_entry", ROOT / "official_family_entry.py")
@@ -45,6 +46,21 @@ class ReportStoreBindingTests(unittest.TestCase):
         self.assertIn("generate_report", menu.handlers)
         with self.assertRaisesRegex(PermissionError, "REPORT_SOURCE_OVERRIDE_REJECTED"):
             menu.select(13, payload={"client_id": "another_family"})
+
+    def test_report_rejects_renderer_using_wrong_source(self):
+        store = SimpleNamespace(login_account="JO", client_id="fam_"+"a"*32)
+        cid = "fam_"+"a"*32
+        snap = {"schema_version": "Family.W5.W1Snapshot.v1",
+                "client_id": cid,
+                "identity": {"client_id": cid, "family_alias": "Joseph"},
+                "source_sha256": "test_sha", "payload_digest": "test_payload",
+                "tables": {}}
+        menu = self.make_menu(store, renderer=lambda source, payload: {
+            "client_id": cid, "source_db_sha256": "test_sha",
+            "source_digest": "WRONG"})
+        with patch.object(ENTRY.OfficialFamilyEntry, "current_snapshot", return_value=snap):
+            with self.assertRaisesRegex(PermissionError, "REPORT_OUTPUT_SOURCE_MISMATCH"):
+                menu.select(13, payload={})
 
     def test_renderer_requires_store(self):
         with self.assertRaisesRegex(ValueError, "OFFICIAL_REPORT_STORE_REQUIRED"):

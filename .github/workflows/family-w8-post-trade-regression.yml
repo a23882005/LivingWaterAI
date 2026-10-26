@@ -14,6 +14,8 @@ on:
       - '系統工程/Family/W8/official_family_entry.py'
       - '系統工程/Family/W8/tests/test_nohost_report_menu.py'
       - '系統工程/Family/W8/tests/test_on_demand_report_delivery.py'
+      - '系統工程/Family/W8/on_demand_drive_io.py'
+      - '系統工程/Family/W8/tests/test_on_demand_drive_io.py'
       - '系統工程/Family/W8/on_demand_report_delivery.py'
       - '系統工程/Family/W8/tests/test_on_demand_project.py'
       - '系統工程/Family/W8/on_demand_project.py'
@@ -75,3 +77,8 @@ jobs:
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_report_delivery.py' -v
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_nohost_report_menu.py' -v
+      - name: Run current connector file_uri DB writeback tests
+        env:
+          PYTHONPATH: 系統工程/Family/W8
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_drive_io.py' -v

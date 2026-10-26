@@ -1,0 +1,64 @@
+"""Run existing approved W6 report engine on verified same-run Family data.
+
+ChatGPT invokes this only when a member asks to generate a report. The W6
+renderer is supplied by the trusted operator from the previously accepted
+W6 v16 delivery; this module does not create another report template.
+"""
+from copy import deepcopy
+from pathlib import Path
+import importlib.util
+
+SRC = Path(__file__).with_name("w6_current_data.py")
+
+
+class OnDemandW6Renderer:
+    def __init__(self, trusted_current_input_producer, approved_w6_renderer):
+        if not callable(trusted_current_input_producer) or not callable(approved_w6_renderer):
+            raise ValueError("W6_TRUSTED_PRODUCER_AND_APPROVED_RENDERER_REQUIRED")
+        self.producer = trusted_current_input_producer
+        self.renderer = approved_w6_renderer
+
+    def __call__(self, formal_source, payload):
+        if not isinstance(payload,dict) or set(payload) - {"date", "language"}:
+            raise ValueError("W6_REPORT_OPTIONS_INVALID")
+        if not isinstance(formal_source,dict) or formal_source.get("trade_authorization")!="NONE":
+            raise ValueError("W6_FORMAL_SOURCE_REQUIRED")
+        inputs=self.producer(deepcopy(formal_source),dict(payload))
+        if (not isinstance(inputs,dict)
+                or set(inputs)!={"market","engine"}
+                or not isinstance(inputs["market"],dict)
+                or not isinstance(inputs["engine"],dict)):
+            raise ValueError("W6_CURRENT_INPUTS_MISSING")
+        spec=importlib.util.spec_from_file_location("family_w8_w6_current_data", SRC)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("W6_CURRENT_DATA_MODULE_MISSING")
+        module=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        current=module.build_w6_current_data(formal_source,inputs["market"],inputs["engine"])
+        # Approved W6 v16 renderer must use this payload, not its archived
+        # Joseph report_data.json or old values embedded in demo content.
+        output=self.renderer(deepcopy(current))
+        if not isinstance(output,dict):
+            raise ValueError("W6_RENDERER_RESULT_REQUIRED")
+        if (output.get("qa_passed") is not True
+                or output.get("renderer_contract")!="Family.W6.v16.parameterized"
+                or output.get("client_id")!=current["client_id"]
+                or output.get("source_db_sha256")!=current["source_db_sha256"]
+                or output.get("source_digest")!=current["source_digest"]
+                or output.get("w6_current_digest")!=current["digest"]
+                or output.get("run_id")!=current["run_id"]
+                or output.get("data_as_of")!=current["market_as_of"]
+                or not isinstance(output.get("analysis_version"),str)
+                or not output["analysis_version"].strip()):
+            raise ValueError("W6_FORMAL_OUTPUT_QA_OR_SOURCE_MISMATCH")
+        files=output.get("artifacts")
+        if (not isinstance(files,dict) or not files
+                or "report.pdf" not in files
+                or "index.html" not in files):
+            raise ValueError("W6_FORMAL_ARTIFACTS_INCOMPLETE")
+        for name, data in files.items():
+            if (not isinstance(name,str) or not name
+                    or not isinstance(data,bytes) or not data
+                    or len(data)>64*1024*1024):
+                raise ValueError("W6_FORMAL_ARTIFACT_INVALID")
+        return output

@@ -555,6 +555,57 @@
         "production": "HOLD",
         "trade_authorization": "NONE"
       }
+    },
+    {
+      "id": "W8-R18",
+      "name": "04 latest confirmed target selection and bare menu 4 source-backed entry",
+      "status": "MAIN_MERGED__CI_PASS__PRODUCTION_E2E_PENDING",
+      "pr": 53,
+      "merge_commit": "3e33be2f2ff4df9ae1d7e3a1762b55472b23963f",
+      "ci": {
+        "w8_post_trade_regression": {
+          "run_id": 40375497361,
+          "result": "SUCCESS",
+          "test_count": "117/117"
+        },
+        "w8_syntax": {
+          "run_id": 40375497289,
+          "result": "SUCCESS"
+        },
+        "w8_authenticated_integration": {
+          "run_id": 40375497277,
+          "result": "SUCCESS"
+        }
+      },
+      "verified": [
+        "04 considers only latest CONFIRMED version by target purpose and rejects invalid/pending allocation rows",
+        "04 does not fall back to an older confirmed revision when the newest confirmed revision fails completeness",
+        "04 rejects multiple valid distinct confirmed target purposes without trusted selection",
+        "03 draft version does not override earlier valid confirmed version",
+        "W6 13 no longer silently falls back to previous complete target when newest confirmed version is incomplete",
+        "Selecting bare menu 04 supplies standard current-holdings evaluation question to original W5 provider without inventing data"
+      ],
+      "changes": [
+        "系統工程/Family/W8/on_demand_analysis.py",
+        "系統工程/Family/W8/official_family_entry.py",
+        "系統工程/Family/W8/formal_report_source.py",
+        "系統工程/Family/W8/tests/test_official_target_readiness.py",
+        "系統工程/Family/W8/tests/test_formal_report_source_current.py",
+        "系統工程/Family/W8/tests/test_on_demand_analysis.py"
+      ],
+      "remaining": [
+        "Live source-backed W3/W5 native bundle and current V70/V82/V75 inputs for 04 still require operator-provided verified sources",
+        "Actual W6 four-family PDF/ZIP and Google Drive remote readback",
+        "SQLite generated binary same-ID writeback via connector",
+        "Four Family Projects 14-option E2E and Gate D/E"
+      ],
+      "binary_bridge_note": "Supported Drive HTML import with local HTML is proven. Direct PDF/ZIP/SQLite binary source import/upload is not supported through currently available connector; attempts to use MIME-mismatched temporary import were not accepted for final binary upload and must not be used for production.",
+      "controls": {
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "external_host": "NONE",
+        "runtime": "CHATGPT_ON_DEMAND"
+      }
     }
   ],
   "defects": [

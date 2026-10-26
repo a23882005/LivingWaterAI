@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-26T09:16:00+08:00",
+  "updated_at": "2026-10-26T10:00:13+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -229,6 +229,53 @@
         "formal_output_eligible": false,
         "source_provenance": "Owner-controlled Google Drive W6 engineering accepted ZIP, read/checked 2026-10-26"
       }
+    },
+    {
+      "id": "W8-R10",
+      "name": "四戶長持倉正式 HTTPS 128KB 接通與完整W6本人來源資料綁定",
+      "status": "PASS_REAL_INPUT_TRANSPORT_AND_W6_SOURCE__REPORT_RENDER_E2E_PENDING",
+      "github_pulls": [
+        {
+          "number": 43,
+          "merge_sha": "847e168d2143df444354152a2ee228ee27ed54f7"
+        },
+        {
+          "number": 44,
+          "merge_sha": "a327ce911d97ed6de1951371ef24300979796328"
+        },
+        {
+          "number": 45,
+          "merge_sha": "c42a000822078c855738997a5c51c72d65f1ddce"
+        }
+      ],
+      "official_actions": {
+        "private_mcp_regression": 40255449445,
+        "host_private_install": 40255587868,
+        "public_https_input_boundary": 40255861547,
+        "four_family_report_source": 40256817300
+      },
+      "verified": [
+        "MCP 50KB authenticated request passes; over 128KB rejected",
+        "HTTPS 32KB reaches OAuth 401, does not fail 8KB prematurely; >128KB returns 413",
+        "Hostinger Python private app and public PHP deployed from main",
+        "Four formal SQLite sources converted to W6 evidence source 4/4; CLIENT_ALIAS cross-family negative PASS",
+        "Real holdings/owner screenshot vs hypothetical kept in separate source categories",
+        "No client data inserted into GitHub, no family holdings/amounts changed"
+      ],
+      "paths": [
+        "系統工程/Family/W7/account_mcp.py",
+        "系統工程/Family/W7/account_router.py",
+        "系統工程/Family/W8/cgi_request.py",
+        "系統工程/Family/W8/public_gateway/index.php",
+        "系統工程/Family/W8/formal_report_source.py",
+        "系統工程/Family/W8/probes/live_official_readonly.py"
+      ],
+      "limits": [
+        "W6 v16 Joseph hardcoded report content cannot be reused for other families until renderer binds four current report sources",
+        "Final target allocation and available funding need verified source before actionable V82/V75 decision",
+        "ChatGPT Project four-user signed-in calls and full latest report generation/archive not yet verified"
+      ],
+      "trade_authorization": "NONE"
     }
   ],
   "defects": [
@@ -272,7 +319,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM本人",
-  "next_action": "Reuse accepted W6 v16 renderer from private Drive (30 actual pages content-driven; not generic 21 fixed), build four-member current report_data mapping with W1/W2/market source and Playwright host runner, archive to each official folder; W2/V70/V82/V75/Mentor source gaps and actual ChatGPT OAuth UAT remain. W7 PASS CLOSED.",
+  "next_action": "Continue W6 accepted v16 actual renderer generic member binding with strict source-as-of checks; add secure 13 render->QA->Drive archive per member; finish 04 native V70/V82/V75/Mentor confirmed target/funding/market producer; four ChatGPT Project signed-in end-to-end tests before final W8 Gate.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

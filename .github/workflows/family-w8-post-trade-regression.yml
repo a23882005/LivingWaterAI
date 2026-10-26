@@ -6,7 +6,9 @@ on:
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
+      - '系統工程/Family/W8/formal_report_source.py'
       - '系統工程/Family/W8/tests/test_post_trade_state.py'
+      - '系統工程/Family/W8/tests/test_formal_report_source_current.py'
       - '系統工程/Family/W8/tests/test_report_store_binding.py'
       - '系統工程/Family/W8/tests/test_official_target_readiness.py'
       - '.github/workflows/family-w8-post-trade-regression.yml'
@@ -32,3 +34,6 @@ jobs:
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_official_target_readiness.py' -v
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_report_store_binding.py' -v
+      - name: Run current W6 source test
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_formal_report_source_current.py' -v

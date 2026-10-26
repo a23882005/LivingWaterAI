@@ -150,6 +150,26 @@ class ReportDeliveryTests(unittest.TestCase):
         plan=self.plan()
         with self.assertRaisesRegex(ValueError,"REPORT_ARTIFACT_REFERENCES_INCOMPLETE"):
             M.bind_connector_uploads(plan,{})
+    def test_host_upload_binds_exact_staged_artifacts(self):
+        plan=self.plan()
+        refs={row['artifact']:row['path'] for row in plan['uploads']}
+        ready=M.bind_connector_uploads(plan,refs,local_upload_supported=True)
+        self.assertEqual(ready['status'],'UPLOAD_READY_NOT_PERSISTED')
+        for row,request in zip(plan['uploads'],ready['requests']):
+            self.assertEqual(request['upload_file_args']['file_uri'],row['path'])
+            self.assertEqual(request['upload_file_args']['parent_folder_id'],FOLDER)
+    def test_host_upload_rejects_swapped_artifacts(self):
+        plan=self.plan()
+        refs={row['artifact']:row['path'] for row in plan['uploads']}
+        refs['report.pdf']=refs['index.html']
+        with self.assertRaisesRegex(ValueError,'VALID_REPORT_CONNECTOR_FILE_URI_REQUIRED'):
+            M.bind_connector_uploads(plan,refs,local_upload_supported=True)
+    def test_host_upload_rejects_modified_stage(self):
+        plan=self.plan()
+        refs={row['artifact']:row['path'] for row in plan['uploads']}
+        Path(refs['report.pdf']).write_bytes(b'%PDF-1.4 tampered\n')
+        with self.assertRaisesRegex(ValueError,'REPORT_ARTIFACT_STAGE_CHANGED'):
+            M.bind_connector_uploads(plan,refs,local_upload_supported=True)
 
     def test_cross_family_report_rejected(self):
         with self.assertRaisesRegex(ValueError,"W6_QA_AND_MEMBER_REQUIRED"):

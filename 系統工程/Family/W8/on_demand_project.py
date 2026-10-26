@@ -106,7 +106,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                        approved_w6_archive=None, approved_w6_renderer=None,
                        report_store=None, other_handlers=None,
                        completion_checks=None, official_report_folder_id=None,
-                       report_staging_dir=None, mutation_staging_dir=None):
+                       report_staging_dir=None, mutation_staging_dir=None,
+                       trusted_public_fetcher=None, trusted_account_change=None):
     """Return the existing W7 menu without using a permanent Python host."""
     auth=FamilyLoginAdapter(family_login,login_account,client_id)
     coordinator=OnDemandReadCoordinator(
@@ -116,6 +117,18 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     handlers=dict(other_handlers or {})
+    # The on-demand runtime owns the public research/news tool handoff as
+    # well as the authenticated current-holdings-only source for menu 09.
+    public_module=_load(ROOT/"on_demand_public.py","family_w8_public_menu")
+    public_entry=official.OfficialFamilyEntry(
+        auth=auth,login_account=login_account,client_id=client_id,
+        coordinator=coordinator,principal_provider=coordinator.principal)
+    public=public_module.public_handlers(
+        public_entry,auth,trusted_public_fetcher=trusted_public_fetcher,
+        trusted_account_change=trusted_account_change)
+    if set(public)&set(handlers):
+        raise ValueError("CONFLICTING_FAMILY_PUBLIC_HANDLERS")
+    handlers.update(public)
     if mutation_staging_dir is not None:
         mutations=_load(ROOT/"on_demand_mutations.py",
                         "family_w8_on_demand_mutations")

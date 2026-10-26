@@ -21,6 +21,8 @@ on:
       - '系統工程/Family/W8/on_demand_report_delivery.py'
       - '系統工程/Family/W8/tests/test_on_demand_project.py'
       - '系統工程/Family/W8/on_demand_project.py'
+      - '系統工程/Family/W8/tests/test_on_demand_public.py'
+      - '系統工程/Family/W8/on_demand_public.py'
       - '系統工程/Family/W8/tests/test_w6_member_render.py'
       - '系統工程/Family/W8/w6_member_render.py'
       - '系統工程/Family/W8/tests/test_on_demand_w6.py'
@@ -87,3 +89,6 @@ jobs:
       - name: Run all five one-shot mutation handlers
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_mutations.py' -v
+      - name: Run Family no-host public and account entrypoint tests
+        run: |
+          python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_on_demand_public.py' -v

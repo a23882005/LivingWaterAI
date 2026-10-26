@@ -606,6 +606,52 @@
         "external_host": "NONE",
         "runtime": "CHATGPT_ON_DEMAND"
       }
+    },
+    {
+      "id": "W8-R19",
+      "name": "Work host-upload same-ID SQLite and PDF/HTML/ZIP manifest transport",
+      "status": "MAIN_MERGED__CI_123_PASS__SYNTHETIC_REMOTE_TRANSPORT_PASS__MEMBER_E2E_PENDING",
+      "pr": 54,
+      "merge_commit": "b4241c80e0149e247a3f0d835d154038864581a5",
+      "ci": {
+        "run_id": 40386962251,
+        "result": "SUCCESS",
+        "local_same_workflow_tests": 123
+      },
+      "changed_paths": [
+        "系統工程/Family/W8/ON_DEMAND_DRIVE_WRITEBACK.md",
+        "系統工程/Family/W8/on_demand_drive_io.py",
+        "系統工程/Family/W8/on_demand_report_delivery.py",
+        "系統工程/Family/W8/tests/test_on_demand_drive_io.py",
+        "系統工程/Family/W8/tests/test_on_demand_report_delivery.py"
+      ],
+      "verified": [
+        "Google Drive Work file_uri host upload takes exact absolute local candidate path after active tool capability verification",
+        "Synthetic SQLite original ID retained through copy backup/update/fresh fetch; SHA and SQL revision 1->2 exact; backup remains revision 1",
+        "Synthetic PDF/HTML/ZIP remote upload/readback and manifest-last readback return PERSISTED_REMOTE_VERIFIED scoped to transport only",
+        "Reject swapped files, altered stage and unverified local upload; retain legacy registered references",
+        "Approved W6 engineering archive downloaded with exact pinned SHA and ZIP CRC PASS",
+        "Three formal Drive governance documents backed up before scoped edit and read back"
+      ],
+      "remote_evidence": {
+        "location": "Owner-private Google Drive root/TEMP/Family_W8_R19_20261027_transport_evidence.json",
+        "sha256": "bfee06f13d27fb5478052092b941fb413a7bdbebeda87120e560c71d0b2bc81d",
+        "bytes": 5390,
+        "fresh_readback": "EXACT_SHA256_MATCH"
+      },
+      "official_member_db_writes": 0,
+      "remaining": [
+        "04 current source-backed producer and native V70/V82/bondV75/Mentor real execution",
+        "11 actual confirmed trades persisted to official member DB when supplied",
+        "13 current four-member approved W6 reports and 12 readback",
+        "Four real ChatGPT Projects 56-option E2E, durable session, Gate D/E"
+      ],
+      "controls": {
+        "runtime": "CHATGPT_ON_DEMAND",
+        "production": "HOLD",
+        "trade_authorization": "NONE",
+        "external_python_host": "NONE"
+      }
     }
   ],
   "defects": [
@@ -649,7 +695,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Finish official W6 four-family parameterized renderer, on-demand trusted V70/V82/V75/Mentor input producer and real 4x14 ChatGPT Project E2E before Gate D/E. Existing W6/W7 PASS remains.",
+  "next_action": "R19 resolved current Work local-file transport via explicit verified host upload; continue 04 actual source-backed native producer, 11 true authorized business persistence, 13 approved W6 current four-member reports, 4x14 Project E2E and Gate D/E. Existing W6/W7 PASS retained.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",

@@ -107,6 +107,15 @@ class NoHostReportMenus(unittest.TestCase):
         self.assertEqual(result["result"]["status"],"STAGED_NOT_PERSISTED")
         self.assertTrue(all(Path(item["path"]).exists()
                             for item in result["result"]["uploads"]))
+        html_plan=result["result"]["html_imports"]["index.html"]
+        self.assertEqual(html_plan["status"],"HTML_IMPORT_READY_NOT_PERSISTED")
+        self.assertEqual(html_plan["tool"],"mcp__Google_Drive__import_document")
+        self.assertEqual(html_plan["import_args"]["upload_mode"],"keep_source_file_type")
+        self.assertEqual(html_plan["import_args"]["parent_folder_id"],
+                         "unit_approved_folder")
+        self.assertTrue(Path(html_plan["import_args"]["source_file"]).is_file())
+        self.assertNotIn("report.pdf",result["result"]["html_imports"])
+        self.assertNotEqual(result["result"]["status"],"PERSISTED_REMOTE_VERIFIED")
 
 
 if __name__=="__main__":

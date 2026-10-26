@@ -9,6 +9,7 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import json
 import re
+from post_trade_state import append_post_trade
 
 TIME = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -214,8 +215,14 @@ def record_event(db,client,data):
             (client,event_id,i,row["entity_kind"],row.get("entity_key"),field,val,typ,ccy,source_ref,stamp))
     # This records the actual, evidenced transaction/correction for review.
     # It does not invent settled cash, filled shares or change positions.
+    # If the owner also supplies the actual post-trade positions/cash, append
+    # the exact resulting snapshot in this same B06 write transaction.
+    # Otherwise keep the event only, with no fabricated cash or filled shares.
+    synced = append_post_trade(db, client, event_id,
+                               data.get("post_trade_state"), stamp)
     return {"status":"STORED","operation":"record_event","event_id":event_id,
-            "changes":len(changes),"position_updated":False,"trade_authorization":"NONE"}
+            "changes":len(changes),"position_updated":bool(synced and synced["positions"]),
+            "post_trade_sync":synced,"trade_authorization":"NONE"}
 
 
 WRITERS={"adjust_target":target,"new_funding":funding,"update_profile":profile,

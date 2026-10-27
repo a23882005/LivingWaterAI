@@ -1,0 +1,18 @@
+fed-target-evidence-v1
+retrieved_at=2026-10-28T01:18:10+08:00
+last_verified_at=2026-10-28T01:18:10+08:00
+result=CURRENT_CONFIRMED
+policy_source=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+policy_source_excerpt=2026 table: September 17 | Increase 25 | Decrease 0 | Level 3.75-4.00. Last Update: September 16, 2026.
+effective_date=2026-09-17
+publication_date=2026-09-16
+lower_bound=3.75
+upper_bound=4.00
+midpoint=3.875
+lower_source=https://fred.stlouisfed.org/series/DFEDTARL
+lower_source_excerpt=2026-10-27: 3.75; Updated Oct 27, 2026 7:01 AM CDT.
+upper_source=https://fred.stlouisfed.org/series/DFEDTARU
+upper_source_excerpt=2026-10-27: 4.00; Updated Oct 27, 2026 7:01 AM CDT.
+meeting_context=https://www.federalreserve.gov/monetarypolicy/fomcminutes20260916.htm
+meeting_context_excerpt=Effective September 17, 2026, maintain the federal funds rate in a target range of 3-3/4 to 4 percent.
+capture_note=Evidence text is a verbatim factual extraction of the four pages opened during this run; the SHA256 is computed from this exact UTF-8 file after creation.

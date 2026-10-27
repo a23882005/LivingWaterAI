@@ -204,9 +204,17 @@ class AssetSourceProducer:
         req['client_snapshot']['as_of']=when
         # Refresh the actual W3 feed independently; no old result is re-labelled.
         from market_bridge import read_macro_snapshot
-        macro=read_macro_snapshot(self.root,source_commit=self.source_commit)
+        macro=read_macro_snapshot(self.root,source_commit=self.source_commit,capture_bound=True)
         req['macro_snapshot']=macro
+        req['evaluation_at']=datetime.now(timezone.utc).isoformat()
+        if macro.get('capture_receipt'):ctx['macro_capture_digest']=digest(macro['capture_receipt'])
         req['expected_versions']['market']=ctx['expected_versions']['market']=macro['digest']
+        if req.get('confirmed_target',{}).get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
+            from approved_target_input import enrich_document_target_view
+            view,proof=enrich_document_target_view(req['confirmed_target'],ctx['approved_document_target_source'])
+            req['confirmed_target']=view;ctx['approved_document_target_source']=proof;ctx['target_hash']=view['target_hash']
+            if ctx.get('approved_document_account_scope'):
+                ctx['approved_document_account_scope']['source']=deepcopy(proof)
         prepared=prepare_input(req,trusted_context=ctx)
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')

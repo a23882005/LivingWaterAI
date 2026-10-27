@@ -22,6 +22,18 @@ class FormalSourceTest(unittest.TestCase):
         self.assertEqual(row['freshness'],'UNKNOWN');self.assertEqual(row['pit_status'],'UNVERIFIABLE')
         self.assertEqual(row['as_of'],'2026-10-23')
         self.assertEqual(forward_observations(self.snapshot(),'VWRA','2026-10-27T21:00:00Z'),[])
+    def test_checked_capture_is_a_known_by_bound_not_formal_pit(self):
+        s=self.snapshot();s['capture_receipt']={'schema_version':'Family.W5.SourceCaptureBound.v1',
+            'captured_at':'2026-10-27T20:00:00Z','source_sha256':s['source_sha256'],
+            'payload_digest':s['digest'],'basis':'EXACT_SOURCE_BYTES_READ_AND_HASH_CHECKED'}
+        result=forward_observations(s,'VT','2026-10-27T21:00:00Z')[0]
+        self.assertTrue(result['known_by_capture_verified'])
+        self.assertEqual(result['pit_status'],'UNVERIFIABLE');self.assertIsNone(result['available_at'])
+        self.assertIn('field_available_at/PIT',result['missing_contracts'])
+        s['capture_receipt']['captured_at']='2026-10-27T22:00:00Z'
+        self.assertFalse(forward_observations(s,'VT','2026-10-27T21:00:00Z')[0]['known_by_capture_verified'])
+        s['capture_receipt']['captured_at']='2026-10-27T20:00:00Z';s['capture_receipt']['payload_digest']='tampered'
+        self.assertFalse(forward_observations(s,'VT','2026-10-27T21:00:00Z')[0]['known_by_capture_verified'])
     def test_wrong_metric_label_is_not_forward_pe(self):
         s=self.snapshot();s['payload']['indicators']['m03_vt']['sourceEvidence']['label']='Trailing PE';s['digest']=digest(s['payload'])
         with self.assertRaisesRegex(ValueError,'DEFINITION_OR_SOURCE'):forward_observations(s,'VT','2026-10-27T21:00:00Z')

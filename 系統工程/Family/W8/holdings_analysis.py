@@ -16,6 +16,7 @@ from family_input import digest
 from family_boundary import prepare_input
 from analysis_requirements import audit as audit_requirements
 from core_analysis_inputs import issuer_inputs
+from formal_mode_analysis import build_formal_conclusion
 from v10_source_observations import forward_observations,macro_observations
 
 STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
@@ -139,6 +140,8 @@ def explain(row):
         if mapping:
             text+=f"行情參考市場 {mapping['reference_exchange']}／{mapping['quote_currency']}，持倉原交易所欄位未因此改寫。"
         quality=obs.get('history_quality',{})
+        if quality.get('excluded_unverified_session_rows'):
+            text+='來源另有同UTC日期資料，尚未核實市場最終收盤，已隔離；本分析只使用上列歷史截止日。'
         if quality.get('invalid_source_rows'):
             if quality['scope'].startswith('CLOSE_ONLY'):
                 text+=(f"原檔有 {len(quality['invalid_source_rows'])} 列 OHLC 關係異常；本輪僅將 "
@@ -171,6 +174,12 @@ def explain(row):
             '未將這些值轉成Forward預估或基本面改善判斷。')
     if row.get('requirements'):
         text+='必要結果尚缺：'+','.join(row['requirements']['required_missing'])+'；選填缺項另列，不混入完成門檻。'
+    if row.get('formal_conclusion'):
+        conclusion=row['formal_conclusion']
+        text+=(f"四模式：Base可進入={conclusion['four_modes']['Base']['entry_eligibility']}，"
+            f"Left={conclusion['market_predicates']['left']}、Right={conclusion['market_predicates']['right']}、Trend={conclusion['market_predicates']['runaway_up']}；"
+            f"原模式選擇={conclusion['selected_mode']}，正式階段={conclusion['formal_stage']}。"
+            '右側／Runaway不成立不等於禁止Base／Left；部署缺口所缺欄位：'+','.join(conclusion['deployment_gap']['missing_fields'])+'。')
     text+=f"尚有 {len(row['issues'])} 項明列缺項。持股分析說明；不是完整部署 Mentor，未計算買賣金額或授權交易。"
     return text
 
@@ -244,6 +253,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                         (f"; its rolling minimum is {required} bars" if required else '; required sample/denominator is unavailable')),
                         'This indicator is not replaced by zero or a neutral signal',source=observed['source_path']))
             quality=observed.get('history_quality',{})
+            if quality.get('excluded_unverified_session_rows'):
+                problems.append(issue('market.unverified_same_day_session',
+                    'Source includes '+str(quality['excluded_unverified_session_rows'])+'; these rows were retained in source but excluded from analysis',
+                    'Independent prior-session components execute; same-day final-close state remains unverified',source=observed['source_path']))
             if quality.get('invalid_source_rows'):
                 problems.append(issue('market.history_quality.invalid_source_rows',
                     f"Source has {len(quality['invalid_source_rows'])} invalid OHLC bars; analysis scope is {quality['scope']} with {quality['used_rows']} observations from {quality['analysis_start']}",
@@ -323,6 +336,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
         row['position_valuation_allowed']=False
+        if row.get('core_observation'):
+            row['formal_conclusion']=build_formal_conclusion(producer.root,row,request)
+            row['call_trace']+=row['formal_conclusion']['call_trace']
         row['analysis_explanation']=explain(row);rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)
@@ -356,7 +372,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
     report['manifest']=[{'instrument_id':r['instrument_id'],'field_path':key,
         'source_db_sha256':holdings['source_db_sha256'],'output_digest':digest(r.get(key)),
-        'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation')]
+        'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation','formal_conclusion')]
     grouped={}
     for problem in report['issues']:
         field=problem['field_path'];group=(field if field.startswith(('valuation.','fundamentals.')) else

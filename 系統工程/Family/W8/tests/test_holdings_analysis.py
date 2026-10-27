@@ -1,6 +1,6 @@
 """Analysis A preserves real native facts without entering deployment B."""
 from copy import deepcopy
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -46,6 +46,9 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.request={'client_id':self.client,'owner':self.owner,'run_id':'SYNTHETIC_RUN',
             'evaluation_at':'2026-10-27T12:00:00Z','client_snapshot':{'payload':self.snapshot},
             'expected_versions':{},'trade_authorization':'NONE'}
+        manifest=json.loads((ROOT/'data/market_history/global/manifest.json').read_text())
+        latest=max(datetime.fromisoformat(r['last_verified_utc'].replace('Z','+00:00')) for r in manifest['items'].values() if r.get('status')=='OK')
+        self.request['evaluation_at']=max(datetime.fromisoformat(self.request['evaluation_at'].replace('Z','+00:00')),latest+timedelta(seconds=1)).isoformat()
         self.context={'client_id':self.client,'expected_versions':{},'approved_document_target_source':{
             'local_source_path':str(p),'source_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
             'source_reference':'SYNTHETIC_PROJECT_SOURCE'}}

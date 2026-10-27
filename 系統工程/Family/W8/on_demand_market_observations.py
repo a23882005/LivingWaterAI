@@ -327,11 +327,18 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             dates = [r['Date'] for r in source_rows]
             if dates != sorted(set(dates)):
                 raise ValueError('CACHE_DATE_ORDER')
-            rows = [];invalid_rows=[];last_invalid=-1;close_only=False
+            rows = [];invalid_rows=[];last_invalid=-1;close_only=False;excluded_sessions=[]
             for source_index,row in enumerate(source_rows):
                 day = date.fromisoformat(row['Date'])
-                if day >= _time(evaluation_at).date():
+                if day > _time(evaluation_at).date():
                     raise ValueError('CACHE_FORMING_OR_FUTURE_BAR')
+                if day == _time(evaluation_at).date():
+                    # Without a bound market-calendar/final-close receipt,
+                    # preserve this bar as unverified. It must not erase the
+                    # independent prior-session history or become a final bar.
+                    excluded_sessions.append({'date':row['Date'],'source_row':source_index+2,
+                        'reason':'SAME_UTC_DATE_FINAL_SESSION_RECEIPT_NOT_VERIFIED'})
+                    continue
                 try:
                     vals = {k: float(row[k]) for k in ('Open', 'High', 'Low', 'Close', 'Volume')}
                     valid=(all(math.isfinite(v) for v in vals.values()) and vals['Low'] > 0
@@ -359,6 +366,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'excluded_prefix_rows':0 if close_only else last_invalid+1,'invalid_source_rows':invalid_rows,
                 'source_values_modified':False,'middle_rows_removed':False,
                 'full_source_history_valid':not invalid_rows,
+                'excluded_unverified_session_rows':excluded_sessions,
+                'source_latest_observation':source_rows[-1]['Date'],
                 'scope':'CLOSE_ONLY__INVALID_OHLC_NOT_CONSUMED' if close_only else 'CONTIGUOUS_VALID_WINDOW__ANALYSIS_ONLY' if invalid_rows else 'SOURCE_HISTORY'}
             if close_only:
                 if any(not math.isfinite(r.get('Close',float('nan'))) or r['Close']<=0 for r in rows):
@@ -373,14 +382,14 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             if result.get('approved_technical'):
                 binding={'symbol':symbol,'provider_symbol':provider_symbol,'source_sha256':_hash(raw),
                     'manifest_sha256':_hash(alternate_raw if alternate_entry else manifest_raw),
-                    'source_db_sha256':snapshot['source_sha256'],'observed_session':dates[-1],
+                    'source_db_sha256':snapshot['source_sha256'],'observed_session':rows[-1]['Date'],
                     'evaluated_at':evaluation_at,'provider_verified_at':entry['last_verified_utc']}
                 result['approved_technical']['source_binding']=binding
                 for slots in result['observed_named_signals'].values():
                     for slot in slots:
                         slot['source_ids_and_digests']=deepcopy(binding)
                         slot['numeric_context_reference']='approved_technical.numeric_decimal'
-            assets.append({'instrument_key': key, 'symbol': symbol, 'observed_date': dates[-1],
+            assets.append({'instrument_key': key, 'symbol': symbol, 'observed_date': rows[-1]['Date'],
                 'provider_symbol':provider_symbol,'analysis_identity_mapping':identity_mapping,
                 'observed_close': rows[-1]['Close'], 'rows': len(rows),'history_quality':history_quality,
                 'source_path': str(cache.relative_to(Path(repo_root).resolve())) if cache.is_relative_to(Path(repo_root).resolve()) else str(cache),

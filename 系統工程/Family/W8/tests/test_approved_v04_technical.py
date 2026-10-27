@@ -1,7 +1,7 @@
 """Owner-approved source producer: boundaries, cold start, isolation and votes."""
 from pathlib import Path
 from decimal import Decimal
-from datetime import date,timedelta
+from datetime import date,datetime,timedelta
 from unittest.mock import patch
 from types import SimpleNamespace
 import hashlib,json,sys,tempfile,unittest
@@ -134,8 +134,10 @@ class ApprovedTechnicalTest(unittest.TestCase):
             'portfolio_instrument':[{'instrument_key':'SYNTHETIC_SGOV','ticker':'SGOV',
                 'identity_state':'KNOWN','instrument_type':'ETF'}]}}
         raw={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-10-01T00:00:00Z','verification':{'ready':False}}
+        receipt=json.loads((ROOT/'data/market_history/global/manifest.json').read_text())['items']['SGOV']['last_verified_utc']
+        at=(datetime.fromisoformat(receipt.replace('Z','+00:00'))+timedelta(seconds=1)).isoformat()
         observed=M.build_member_market_observations(snapshot,[],{'payload':raw,'digest':digest(raw)},
-            repo_root=ROOT,evaluation_at='2026-10-27T12:00:00Z',approved_rule_profile=self.profile,
+            repo_root=ROOT,evaluation_at=at,approved_rule_profile=self.profile,
             verified_asset_types={'SGOV':'BOND_ETF'})
         self.assertEqual(len(observed['assets']),1)
         self.assertEqual(observed['assets'][0]['approved_technical'],{})

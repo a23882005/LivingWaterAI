@@ -18,6 +18,77 @@ def _digest(obj):
         separators=(',', ':'),allow_nan=False).encode()).hexdigest()
 
 
+def read_document_target_money(text,source_line):
+    """Read only the exact approved table row and its currency-labelled header.
+
+    A displayed approximate conversion remains secondary evidence. An absent
+    row/amount never becomes zero; no current NAV or FX is manufactured.
+    """
+    lines=text.splitlines();found=[]
+    for index,line in enumerate(lines):
+        if line!=source_line:continue
+        cells=[v.strip().replace('**','') for v in line.strip().strip('|').split('|')]
+        header=None
+        for prior in reversed(lines[max(0,index-30):index]):
+            if not prior.strip():break
+            cols=[v.strip().replace('**','') for v in prior.strip().strip('|').split('|')]
+            if len(cols)==len(cells) and any('目標' in c for c in cols) and not any(re.fullmatch(r':?-+:?',c) for c in cols):
+                # Skip other data rows; a header must name the asset and amount.
+                if any(c in ('標的','子桶','資產') for c in cols):header=cols;break
+        if header is None:continue
+        for position,(label,value) in enumerate(zip(header,cells)):
+            if not ('目標金額' in label or '目標台幣' in label or '目標美元' in label):continue
+            currency='TWD' if 'NT$' in label or '台幣' in label or 'NT$' in value else 'USD' if 'US$' in label or '美元' in label or 'US$' in value else None
+            if currency is None:continue
+            cleaned=value.replace('NT$','').replace('US$','').replace(',','').strip()
+            if not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?',cleaned):continue
+            amount=Decimal(cleaned)
+            if not amount.is_finite() or amount<0:continue
+            found.append({'value_state':'KNOWN','amount':str(amount),'currency':currency,
+                'source_row':source_line,'source_column':label,'source_column_index':position,
+                'scope':'EXISTING_APPROVED_TARGET__NOT_CURRENT_NAV'})
+    unique={(r['amount'],r['currency']) for r in found}
+    if len(unique)==1:return found[0]
+    return {'value_state':'UNKNOWN','amount':None,'currency':None,
+        'reason':'APPROVED_TABLE_AMOUNT_OR_CURRENCY_MISSING' if not unique else 'APPROVED_TABLE_AMOUNT_AMBIGUOUS'}
+
+
+def enrich_document_target_view(target,proof):
+    """Repair a read-only source mapping, retaining the same approved weights.
+
+    No signing event, approval version or DB row is created. The new view hash
+    is derived from the unchanged source; the old view is retained in lineage.
+    """
+    if target.get('source_kind')!='EXISTING_APPROVED_DOCUMENT':return deepcopy(target),deepcopy(proof)
+    path=Path(proof['local_source_path']);raw=path.read_bytes()
+    if sha256(raw).hexdigest()!=proof['source_sha256'] or _digest(target)!=proof['target_view_digest']:
+        raise PermissionError('APPROVED_TARGET_SOURCE_OR_VIEW_CHANGED')
+    text=raw.decode('utf-8-sig');view=deepcopy(target);record=view['payload'];draft=record['draft'];changed=False
+    for line in draft['target_lines']:
+        original=line.get('original_document_row')
+        if not original or original not in text.splitlines():raise PermissionError('APPROVED_TARGET_ROW_NOT_IN_SOURCE')
+        money=read_document_target_money(text,original)
+        current=line.get('target_amount',{})
+        if current.get('value_state')=='KNOWN':
+            if money.get('value_state')=='KNOWN' and (Decimal(str(current['amount']))!=Decimal(money['amount']) or current['currency']!=money['currency']):
+                raise ValueError('APPROVED_TARGET_AMOUNT_SOURCE_CONFLICT')
+            continue
+        if money['value_state']=='KNOWN':line['target_amount']=money;changed=True
+    amounts=[r['target_amount'] for r in draft['target_lines']]
+    currencies={a.get('currency') for a in amounts}
+    if all(a.get('value_state')=='KNOWN' for a in amounts) and len(currencies)==1:
+        denominator={'value_state':'KNOWN','amount':str(sum((Decimal(a['amount']) for a in amounts),Decimal(0))),
+            'currency':next(iter(currencies)),'scope':'SUM_OF_APPROVED_TARGET_AMOUNTS__NOT_CURRENT_MARKET_NAV'}
+        if draft.get('denominator')!=denominator:draft['denominator']=denominator;changed=True
+    if not changed:return view,deepcopy(proof)
+    draft['source_mapping_lineage']={'previous_view_digest':_digest(target),'previous_target_hash':target['target_hash'],
+        'source_sha256':proof['source_sha256'],'operation':'READ_EXISTING_EXPLICIT_AMOUNTS','approval_unchanged':True}
+    draft['draft_hash']=_digest({k:v for k,v in draft.items() if k!='draft_hash'})
+    record['target_hash']=view['target_hash']=draft['draft_hash']
+    mapped=deepcopy(proof);mapped['target_view_digest']=_digest(view)
+    return view,mapped
+
+
 def build_approved_target_view(*, client_id, source_path, source_reference,
         source_available_at, target_version, allocation_version, rows, mappings):
     """Return a lossless target view plus independently trusted source proof.
@@ -50,8 +121,7 @@ def build_approved_target_view(*, client_id, source_path, source_reference,
         if mapping['instrument_id'] in ids:raise ValueError('TARGET_DUPLICATE_INSTRUMENT_ROLE')
         ids.add(mapping['instrument_id']);total+=weight
         lines.append({**deepcopy(mapping),'weight':{'value':float(weight),'value_state':'KNOWN'},
-            'target_amount':{'value_state':'UNKNOWN','amount':None,'currency':None,
-                'reason':'CURRENT_COMPLETE_INVESTMENT_POOL_NAV_REQUIRED'},
+            'target_amount':read_document_target_money(text,line),
             'source_reference_ids':[source_reference],
             'original_document_row':line})
     if total!=1:raise ValueError('TARGET_DOCUMENT_TOTAL_NOT_ONE')

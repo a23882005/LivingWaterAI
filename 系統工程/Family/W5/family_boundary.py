@@ -197,6 +197,9 @@ def prepare_input(request,*,trusted_context):
     positions=position_view(payload,req['owner']['account'],at,ctx.get('holdings_completeness'),
         approved_account_scope=ctx.get('approved_document_account_scope'))
     macro=req.get('macro_snapshot',{})
+    if macro.get('capture_receipt') is not None:
+        require(digest(macro['capture_receipt'])==ctx.get('macro_capture_digest'),
+            'MACRO_CAPTURE_BINDING_MISMATCH','macro_snapshot.capture_receipt','W3')
     require(macro.get('digest')==digest(macro.get('payload'))==versions['market'],'MACRO_DIGEST_MISMATCH','macro_snapshot','W3')
     require(macro.get('asOf')==macro.get('payload',{}).get('asOf'),'MACRO_ASOF_MISMATCH','macro_snapshot.asOf','W3')
     require(timestamp(macro.get('asOf'),'macro_snapshot.asOf')<=at,'FUTURE_MACRO','macro_snapshot.asOf','W3')

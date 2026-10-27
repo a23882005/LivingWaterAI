@@ -48,6 +48,17 @@ def forward_observations(snapshot,symbol,evaluated_at):
     level=('CHEAP' if value<14 else 'NORMAL' if value<18 else 'PRICEY' if value<20
         else 'EXPENSIVE' if value<23 else 'EXTREME_CANDIDATE')
     freshness,pit,missing=valuation_validity(row,at)
+    capture=snapshot.get('capture_receipt',{})
+    capture_verified=False
+    if row.get('available_at') is None and capture.get('schema_version')=='Family.W5.SourceCaptureBound.v1':
+        bound=datetime.fromisoformat(capture['captured_at'].replace('Z','+00:00'))
+        capture_verified=(bound.utcoffset() is not None and bound<=at
+            and capture.get('source_sha256')==snapshot.get('source_sha256')
+            and capture.get('payload_digest')==snapshot.get('digest')
+            and capture.get('basis')=='EXACT_SOURCE_BYTES_READ_AND_HASH_CHECKED')
+        # A checked capture proves these bytes existed before this analysis.
+        # It does not establish the field's release/revision availability, so
+        # it cannot replace available_at or promote formal PIT validity.
     return [{'metric_name':'FORWARD_PE','current':str(value),'unit':'multiple',
         'valuation_level':level,'classification_scope':'AUTHORIZED_RANGE_OBSERVATION__VALIDITY_REQUIRED',
         'source_reference':row['source'],'source_sha256':snapshot['source_sha256'],
@@ -55,6 +66,9 @@ def forward_observations(snapshot,symbol,evaluated_at):
         'as_of':row['dataDate'],'observed_date_text':row['dataDate'],'data_quality':'OK',
         'freshness':freshness,'pit_status':pit,'frequency':row.get('frequency'),
         'available_at':row.get('available_at'),'published_at':row.get('published_at'),
+        'availability_bound':deepcopy(capture) if capture_verified else None,
+        'known_by_capture_verified':capture_verified,
+        'pit_scope':'SOURCE_AVAILABILITY_CONTRACT__CAPTURE_IS_NOT_A_PIT_SUBSTITUTE',
         'valid_until':row.get('valid_until'),'method':row.get('method'),
         'missing_contracts':missing,
         'scope':'EXISTING_VERIFIED_V70_FORWARD_VALUE__NO_INVENTED_FRESHNESS',

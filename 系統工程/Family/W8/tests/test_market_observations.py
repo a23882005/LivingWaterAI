@@ -156,6 +156,21 @@ class ObservationsTest(unittest.TestCase):
             M.build_member_market_observations(self.snapshot,[],self.macro,
                 repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',official_holdings=holdings)
 
+    def test_unverified_same_day_bar_does_not_erase_prior_history(self):
+        self.rows.append({**self.rows[-1],'Date':'2026-10-02'})
+        self.write();self.manifest['items']['SGOV'].update(rows=len(self.rows),latest_observation='2026-10-02');self.write_manifest()
+        raw=self.path.read_bytes()
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=self.build()
+        self.assertEqual(len(out['assets']),1)
+        row=out['assets'][0];self.assertEqual(row['observed_date'],'2026-09-28')
+        self.assertEqual(row['rows'],28);self.assertEqual(row['history_quality']['source_latest_observation'],'2026-10-02')
+        self.assertEqual(len(row['history_quality']['excluded_unverified_session_rows']),1)
+        self.assertEqual(raw,self.path.read_bytes());self.assertFalse(row['formal_identity_verified'])
+        self.rows[-1]['Date']='2026-10-03';self.write()
+        self.manifest['items']['SGOV']['latest_observation']='2026-10-03';self.write_manifest()
+        self.assertEqual(self.build()['missing'][0]['code'],'CACHE_FORMING_OR_FUTURE_BAR')
+
     def test_bad_ohlc_rejected(self):
         self.rows[-1]['High']=1;self.write()
         out=self.build();self.assertEqual(out['missing'][0]['code'],'CACHE_OHLCV_INVALID')

@@ -16,6 +16,7 @@ from family_input import digest
 from family_boundary import prepare_input
 from analysis_requirements import audit as audit_requirements
 from core_analysis_inputs import issuer_inputs
+from v10_source_observations import forward_observations,macro_observations
 
 STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
 CATALOG_BLOB='4cd333be719252034b6b9d6e8a787c838db816c4'
@@ -200,6 +201,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             'market':observed,'valuation_observations':deepcopy(dated_valuation) if symbol=='VT' else [],
             'core_observation':None,'primary_framework':cls['primary_framework'],
             'issuer_facts':read_issuer_facts(producer.issuer_facts_sources.get(symbol),symbol,request['evaluation_at']),
+            'macro_observations':macro_observations(request['macro_snapshot'],request['evaluation_at'])
+                if request.get('macro_snapshot') else None,
             'issues':problems,'source_refs':[
                 {'source_kind':'OFFICIAL_MEMBER_DB','sha256':holdings['source_db_sha256'],
                     'source_reference':deepcopy(source.get('source_row'))},
@@ -251,7 +254,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'emv_14':'Original EMV14; not formal EMV(3,3)',
                 'above_ma20_and_reclaim_ma20':'Existing W5 base facts; not canonical event votes'}
             if observed.get('approved_technical'):
-                row['numeric_semantics']['approved_v04']='Owner-approved Decimal(50) producer; no display rounding in predicate comparisons'
+                row['numeric_semantics']['approved_v10']='Owner-approved Decimal(50) producer; no display rounding in predicate comparisons'
                 row['numeric_semantics']['kd_k_9_3_and_kd_d_9_3_3']='Legacy observations retained; approved KD_SMA3_SMA3 is separately bound in approved_technical'
                 row['numeric_semantics']['emv_14']='Legacy EMV14 retained; approved EMV_ARMS_SMA3_SMA3_SCALE1E8 is separately bound'
             row['unknown_resolution']=[{'field_path':'technical.'+key,'category':2,
@@ -268,6 +271,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             if 'V82_GLOBAL_ETF_CORE' in cls.get('analysis_capabilities',[]):
                 issuer=row['issuer_facts']
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'])
+                current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'])+current_metrics \
+                    if request.get('macro_snapshot') else current_metrics
                 row['valuation_observations']=current_metrics
                 row['fundamental_fields']=fundamental_fields
                 row['native_product_identity']['engine_route']='V82_GLOBAL_ETF_CORE'

@@ -21,11 +21,11 @@ def slot(out,group,name):return next(r for r in out['signals'][group] if r['name
 
 
 class ApprovedTechnicalTest(unittest.TestCase):
-    def setUp(self):self.profile=A.load_profile(HERE/'owner_approved_v04.json')
+    def setUp(self):self.profile=A.load_profile(HERE/'owner_approved_v10.json')
     def produce(self,rows=None,**kwargs):return A.produce(rows or history(),profile=self.profile,**kwargs)
     def test_profile_rejects_unapproved_or_changed_spec(self):
         with tempfile.TemporaryDirectory() as tmp:
-            p=Path(tmp)/'profile.json';receipt=json.loads((HERE/'owner_approved_v04.json').read_text())
+            p=Path(tmp)/'profile.json';receipt=json.loads((HERE/'owner_approved_v10.json').read_text())
             receipt['approval_status']='CANDIDATE';p.write_text(json.dumps(receipt))
             with self.assertRaisesRegex(ValueError,'APPROVAL'):A.load_profile(p)
     def test_manifest_contains_all32_slots_and_no_fabricated_guidance(self):
@@ -140,5 +140,26 @@ class ApprovedTechnicalTest(unittest.TestCase):
         self.assertEqual(len(observed['assets']),1)
         self.assertEqual(observed['assets'][0]['approved_technical'],{})
         self.assertTrue(observed['assets'][0]['v75_original_predicates'])
+    def test_v10_authority_and_all_reduction_maturity_slots_are_present(self):
+        out=self.produce()
+        self.assertEqual(out['spec_version'],'1.0')
+        self.assertEqual(out['source_commit'],'16318bb078f5d5328b7994fdd54001b4c0c94ced')
+        self.assertEqual(out['approval_status'],'APPROVED_FOR_IMPLEMENTATION')
+        self.assertEqual([x['id'] for x in out['technical_reduction_signals']],['S'+str(i) for i in range(1,10)])
+        self.assertEqual([x['id'] for x in out['left_maturity_signals']],['M'+str(i) for i in range(1,9)])
+        self.assertEqual(out['low_td9_score_times4'],'0')
+    def test_failed_breakout_fires_once_and_does_not_grant_sell_permission(self):
+        rows=history(73)
+        rows[69].update(Close='99',Low='98',High='100')
+        rows[70].update(Close='101',Low='100',High='102')
+        rows[71].update(Close='99.4',Low='99',High='102')
+        rows[72].update(Close='99.3',Low='99',High='100')
+        fake={'confirmed_swing_highs':lambda xs:[SimpleNamespace(index=50)],
+              'confirmed_swing_lows':lambda xs:[]}
+        with patch.object(A,'_originals',return_value=(fake,None)):
+            first=self.produce(rows[:72]);later=self.produce(rows)
+        self.assertEqual(first['technical_reduction_signals'][7]['truth'],'TRUE')
+        self.assertEqual(later['technical_reduction_signals'][7]['truth'],'FALSE')
+        self.assertIn('CONDITIONS_ONLY',first['technical_reduction_scope'])
 
 if __name__=='__main__':unittest.main()

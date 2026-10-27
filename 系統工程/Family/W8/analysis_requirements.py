@@ -95,6 +95,10 @@ def audit(row,source):
                     reason='Approved classifier is computed in approved_technical.timeframes.'+timeframe+
                         '; official calendar/session completeness is not verified',
                     numeric_observation=approved['timeframes'][timeframe])
+            if row.get('macro_observations') and field in ('macro_state','credit_liquidity_state'):
+                entry.update(gap_kind='SOURCE_CONTRACT_MISSING',
+                    reason='V1.0 V70 band/credit logic is computed; comparable prior/session history and official event coverage remain missing',
+                    numeric_observation=row['macro_observations']['credit'])
         entries.append(entry)
     required=[r for r in entries if r['global_outcome_required'] and r['status']!='RESOLVED']
     inapplicable=[]

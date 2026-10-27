@@ -189,7 +189,7 @@ class AssetSourceProducer:
         self.approved_rule_profile=None
         if flow=='HOLDINGS_ANALYSIS':
             from approved_v04_technical import load_profile
-            self.approved_rule_profile=load_profile(HERE/'owner_approved_v04.json')
+            self.approved_rule_profile=load_profile(HERE/'owner_approved_v10.json')
         # Retain the existing single-source configuration without copying one
         # product's evidence into any other product's route.
         if product_source is not None:self.product_sources.setdefault('VT',deepcopy(product_source))

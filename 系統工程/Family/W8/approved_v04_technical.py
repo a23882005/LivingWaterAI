@@ -1,4 +1,4 @@
-"""Owner-approved v0.4 technical SOURCE producer for the existing V82 Core.
+"""Owner-approved v1.0 technical SOURCE producer for the existing V82 Core.
 
 No deployment, budget, news, company thesis or trading algorithm lives here.
 All 32 slots stay visible, with their exact version and source dependencies.
@@ -18,11 +18,14 @@ U='UNKNOWN';T='TRUE';F='FALSE'
 def load_profile(path):
     path=Path(path);raw=path.read_bytes();p=json.loads(raw)
     if (p.get('schema_version')!='Family.W8.OwnerApprovedRules.v1' or
-        p.get('approval_status')!='OWNER_APPROVED' or p.get('spec_version')!='0.4' or
-        p.get('spec_sha256')!='c2fa87aec822ae3f386f14cca18c41e094899182f544983e8ac95beda0b18766'):
-        raise ValueError('V04_OWNER_APPROVAL_OR_VERSION_MISMATCH')
+        p.get('approval_status')!='APPROVED_FOR_IMPLEMENTATION' or not p.get('spec_approved') or p.get('spec_version')!='1.0' or
+        p.get('spec_sha256')!='29bf4491d77c390f6014208932e6a45f9d27cad25747e8c183be2502c95f5fea'):
+        raise ValueError('V10_OWNER_APPROVAL_OR_VERSION_MISMATCH')
+    config=path.parent/'v82_formal_implementation_v10.json'
+    if hashlib.sha256(config.read_bytes()).hexdigest()!=p['formal_config_sha256']:
+        raise ValueError('V10_FORMAL_CONFIG_CHANGED')
     if hashlib.sha256(Path(n.__file__).read_bytes()).hexdigest()!=p['numeric_producer_sha256']:
-        raise ValueError('V04_NUMERIC_PRODUCER_CHANGED')
+        raise ValueError('V10_NUMERIC_PRODUCER_CHANGED')
     return {**p,'approval_receipt_sha256':hashlib.sha256(raw).hexdigest()}
 
 
@@ -53,9 +56,9 @@ def produce(rows,*,profile,is_etf=None,close_only=False):
 
 
 def _produce(rows,*,profile,is_etf,close_only):
-    if profile.get('approval_status')!='OWNER_APPROVED':raise ValueError('V04_APPROVAL_REQUIRED')
+    if profile.get('approval_status')!='APPROVED_FOR_IMPLEMENTATION':raise ValueError('V10_APPROVAL_REQUIRED')
     count=len(rows);t=count-1
-    if not rows:raise ValueError('V04_EMPTY_HISTORY')
+    if not rows:raise ValueError('V10_EMPTY_HISTORY')
     def series(key):
         return [None if close_only and key in ('Open','High','Low','Volume') else
             val(r.get('_source_decimal',{}).get(key,r.get(key))) for r in rows]
@@ -75,8 +78,8 @@ def _produce(rows,*,profile,is_etf,close_only):
         'evaluated_session':rows[-1]['Date']} for name in names] for g,names in NAMES.items()}
     def put(group,name,result,deps,section):
         slot=next(x for x in vectors[group] if x['name']==name)
-        slot.update(truth=truth(result),reason='APPROVED_V04_COMPUTED' if result is not None else
-            'MISSING_REQUIRED_INPUT_OR_REFERENCE',dependencies=deps,rule_ref='v0.4 '+section)
+        slot.update(truth=truth(result),reason='APPROVED_V10_COMPUTED' if result is not None else
+            'MISSING_REQUIRED_INPUT_OR_REFERENCE',dependencies=deps,rule_ref='v1.0 '+section)
     def chain(xs,indices,op='gt'):
         return both(*(cmp(at(xs,a),at(xs,b),op) for a,b in zip(indices,indices[1:])))
     legacy,_=_originals();pivots={'highs':[],'lows':[]}
@@ -149,6 +152,10 @@ def _produce(rows,*,profile,is_etf,close_only):
                 if kind=='NO_QUICK_RECLAIM':
                     if c[i]>=P:state='RECLAIMED';vote=False;break
                     if i==b+3:state='NO_RECLAIM_EVENT';vote=i==t;break
+                elif kind=='FAILED_BREAKOUT':
+                    if c[i]<D('.995')*P:state='FAILED_BREAKOUT_EVENT';vote=i==t;break
+                    vote=False
+                    if i==b+5:state='EXPIRED_NO_FAILURE';break
                 else:
                     if any(x is None for x in (at(l,i),at(h,i))):state='INVALIDATED_DATA';vote=None;break
                     if c[i]<D('.99')*P:state='FAILED';vote=False;break
@@ -208,7 +215,7 @@ def _produce(rows,*,profile,is_etf,close_only):
     if is_etf is True:
         slot=next(x for x in vectors['up_confirm'] if x['name']=='eps_guidance_not_worse')
         slot.update(truth='NOT_APPLICABLE',effective_vote=F,applicability='ETF_NOT_ISSUER',
-            reason='OWNER_APPROVED_V04_NONVOTING_SLOT__THRESHOLD_UNCHANGED',rule_ref='v0.4 TECH7')
+            reason='OWNER_APPROVED_V10_NONVOTING_SLOT__THRESHOLD_UNCHANGED',rule_ref='v1.0 TECH7')
     else:
         put('up_confirm','eps_guidance_not_worse',None,['same issuer/period/basis official guidance versions'],'C8')
     lows3=[]
@@ -247,11 +254,46 @@ def _produce(rows,*,profile,is_etf,close_only):
     off_low=cmp(at(c),D('1.01')*latest_low.value if latest_low else None,'ge')
     numeric={'kd_k':at(k),'kd_d':at(d),'emv_3_3':at(emv),'macd_dif':at(dif),'macd_dea':at(dea),
         'macd_histogram':at(hist),'rsi14':at(rsi),'atr14':at(atr),'ma20':at(ma[20])}
-    return {'schema_version':'Family.W8.ApprovedV04Technical.v1','profile_id':profile['profile_id'],
-        'spec_sha256':profile['spec_sha256'],'approval_status':'OWNER_APPROVED',
+    td=n.td_count(c)
+    breakdown=lambda period:both(cmp(at(c,t-1),at(ma[period],t-1),'ge'),cmp(at(c),at(ma[period]),'lt'))
+    death=n.cross(d,k)
+    contracting=both(chain(hist,[t-3,t-2,t-1,t]),cmp(at(hist),D(0),'gt'))
+    # A known non-divergent comparable pair is FALSE for S5; no comparable
+    # pair remains UNKNOWN, including the equality (divergent) boundary.
+    divergence=None if pair is None else not pair
+    high20=max(c[-21:-1]) if len(c)>=21 and None not in c[-21:-1] else None
+    no_gain=both(cmp(at(q),D(2),'ge'),cmp(abs(at(ret)) if at(ret) is not None else None,D('.005'),'le'),
+        cmp(at(c),D('.95')*high20 if high20 is not None else None,'ge'))
+    extreme_weak=both(None,cmp(at(c),at(ma[50]),'lt'),cmp(at(ma[50]),at(ma[50],t-5),'lt'))
+    reduction_values=[None if td is None else td[0] in (8,9),death,contracting,
+        cmp(at(emv),at(emv,t-1),'lt'),divergence,no_gain,either(breakdown(10),breakdown(20)),
+        episode_vote('FAILED_BREAKOUT',5),extreme_weak]
+    turn=both(cmp(at(k,t-2),at(k,t-1),'ge'),cmp(at(d,t-2),at(d,t-1),'ge'),
+        cmp(at(k),at(k,t-1),'gt'),cmp(at(d),at(d,t-1),'ge'))
+    price_not_lower=both(chain(l,[t-2,t-1,t],'le'),cmp(at(c),at(c,t-2),'ge'))
+    shrunk=both(cmp(at(c),at(c,t-1),'lt'),cmp(at(v),at(vma),'lt'))
+    candle_range=at(h)-at(l) if None not in (at(h),at(l)) else None
+    close_position=(at(c)-at(l))/candle_range if at(c) is not None and candle_range is not None and candle_range>0 else None
+    prev5low=min(l[-6:-1]) if len(l)>=6 and None not in l[-6:-1] else None
+    stop_candle=both(cmp(candle_range,D(0),'gt'),cmp(at(c),at(o),'ge'),
+        cmp(close_position,D('.75'),'ge'),cmp(at(l),prev5low,'lt'))
+    mature_values=[None if td is None else td[1] in (5,6,7,8,9),either(n.cross(k,d),turn),
+        both(cmp(at(hist,t-1),at(hist),'lt'),cmp(at(hist),D(0),'lt')),
+        cmp(at(dif),at(dif,t-1),'gt'),cmp(at(emv),at(emv,t-1),'gt'),cmp(at(rsi),at(rsi,t-1),'gt'),
+        price_not_lower,either(shrunk,stop_candle)]
+    reduction=[{'id':'S'+str(i),'truth':truth(value),'rule_ref':'V82 v1.0 TECH5.1',
+        'reason':'FORMAL_EXTREME_VALUATION_REQUIRED' if i==9 and value is None else
+        'REQUIRED_SOURCE_OR_REFERENCE_UNAVAILABLE' if value is None else 'COMPUTED'} for i,value in enumerate(reduction_values,1)]
+    maturity=[{'id':'M'+str(i),'truth':truth(value),'rule_ref':'V82 v1.0 TECH5.2'} for i,value in enumerate(mature_values,1)]
+    scores=[D(0),D('.5'),D('.8'),D(1),D('1.5'),D('1.8'),D(2),D('2.5'),D(3),D(4)]
+    return {'schema_version':'Family.W8.ApprovedV10Technical.v1','profile_id':profile['profile_id'],
+        'spec_sha256':profile['spec_sha256'],'approval_status':'APPROVED_FOR_IMPLEMENTATION','spec_version':'1.0','source_commit':profile['source_commit'],
         'approval_receipt_sha256':profile['approval_receipt_sha256'],'signals':vectors,
         'ma20_ok':truth(ma20_ok),'off_low':truth(off_low),
         'numeric_decimal':{key:str(value) if value is not None else None for key,value in numeric.items()},
+        'technical_reduction_signals':reduction,'left_maturity_signals':maturity,
+        'low_td9_score_times4':str(scores[td[1]]*4) if td else None,
+        'technical_reduction_scope':'CONDITIONS_ONLY__CLASSIFICATION_AND_SELL_PERMISSION_REMAIN_WITH_ORIGINAL_OWNER',
         'episode_trace':episode_trace,'timeframes':timeframes(rows,c),
         'call_trace':['OWNER_APPROVED_V04.reference_numeric','ORIGINAL.confirmed_swing_lows/highs','OWNER_APPROVED_V04.32_slot_source_producer'],
         'price_source_attestation':'SEPARATELY_REQUIRED__NOT_INFERRED_BY_RULE_APPROVAL',

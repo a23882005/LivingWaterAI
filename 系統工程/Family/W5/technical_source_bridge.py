@@ -75,7 +75,7 @@ def predicate_votes(rows):
         if value=='NOT_APPLICABLE':
             if (row['name']!='eps_guidance_not_worse' or row.get('effective_vote')!='FALSE'
                 or row.get('applicability')!='ETF_NOT_ISSUER'
-                or row.get('rule_profile')!='V82_COMPLETE_V04_OWNER_APPROVED'):
+                or row.get('rule_profile') not in ('V82_COMPLETE_V04_OWNER_APPROVED','V82_FORMAL_IMPLEMENTATION_V1_0')):
                 raise ValueError('UNAUTHORIZED_NONVOTING_TECHNICAL_SLOT')
             value='FALSE'
         values.append(value)

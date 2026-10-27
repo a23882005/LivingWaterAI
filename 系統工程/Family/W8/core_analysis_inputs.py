@@ -65,7 +65,7 @@ def unresolved_core_contracts(observed,broad_etf):
     if observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN')=='UNKNOWN':
         gaps.append(('ma20_ok','SOURCE_CONTRACT_MISSING',
             'Owner-approved 1% rule is available; required Close/MA20 sample is unavailable',
-            'Owner-approved v0.4 TECH4 MA20_OK'))
+            'V82 v1.0 TECH4 MA20_OK'))
     if broad_etf:
         gaps.append(('safety.etf_structure','SOURCE_CONTRACT_MISSING',
             'Product diversification establishes type/grade, not current ETF structural safety or event coverage','V82 Work4 ETF applicability'))

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T16:40:06.274Z",
+  "updated_at": "2026-10-27T17:21:48.037Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1070,7 +1070,7 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "IN_PROGRESS__HOLDINGS_ANALYSIS_EXECUTED__DEPLOYMENT_NOT_RUN",
+    "status": "IN_PROGRESS__IB_MARKET_GAPS_RECOVERED__26_PARTIAL_ANALYSES__DEPLOYMENT_NOT_RUN",
     "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
@@ -1102,23 +1102,24 @@
     },
     "actual_v70": "MOU explicit approved 80/20 source run executed original HTML; original output state retained",
     "remaining_field_groups": [
-      "Complete precise analysis source/identity gaps and other-account bindings retained in private per-position coverage",
-      "Full deployment B requires complete original native contracts and funding/account source facts; A does not invoke B",
-      "Original complete deployment and Work9 Mentor remain unaccepted; do not claim full menu04 completion"
+      "IB analysis now returns all 26 positions with actual partial computations; complete exact source/identity/history/algorithm-governance gaps retained per field",
+      "Other accounts remain separate scope; no additional account engineering in this round",
+      "Complete deployment B and native Work9 Mentor remain independent unaccepted work"
     ],
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 18703283,
-      "sha256": "190e0f73d08088c224af0d6fca6755304c9bf20194878fecef9bcd8fb10ab681",
+      "bytes": 19319450,
+      "sha256": "6c4dda29f21340f4b19a37684fbbbe99bb79461c95ec41abf5a2e6e1ca403b8c",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
-      "latest_section": "latest_holdings_analysis"
+      "latest_section": "latest_market_recovery",
+      "actual_runs_section": "latest_holdings_analysis.actual_formal_entry_runs"
     },
     "governance_backups": {
-      "engineering": "1xYqv_Mh8l24pZcXKEZ2hJIT0XLU18WLfeAvjK4sqjQU",
-      "files": "1GHo-voxf9NBgWiIrYZDB3juB4Ka18vDJ8n84ZJEgSRg",
-      "wbs": "17Wy78TjgLt4odSYrXY-tHJeazw9TndloY5sagFEsYNQ",
-      "evidence": "1pEg2vAt-mIjBPOvrEC8npeB-toLbaMUz"
+      "engineering": "1BzZQq_Ro6jvArqp-SnPbOT8oweZQ4vXPfVJIY41UmXQ",
+      "files": "15eA2TO7z7Zrnzqw_5aC23R-lqavrtfkL8VTkydMEPEI",
+      "wbs": "1sioVsJIpXLeXV67I2hF6sWv6FAGqtdycv3pBZk6dHlI",
+      "evidence": "1EV1tczcBT76NnpMWrifxnb2bXaG9L-z6"
     },
     "full_04_complete": false,
     "original_native_mentor_reached": false,
@@ -1128,7 +1129,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "2e5596056bc0da921c3044f9958ebceb28daaf10",
+    "work_head": "38cc2674753ae0cec4e882f6ea94d191c2934f11",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1158,7 +1159,7 @@
       "recorded_at": "2026-10-27T06:49:35+08:00",
       "effect": "Use existing official holdings; prior completeness-confirmation stop superseded"
     },
-    "integrated_main": "5de3eceedd1bbbd9d7bcc90d26764689f5aab84d",
+    "integrated_main": "750ceb0a658633cfec079be86dbc3877273c7d50",
     "latest_patch_validation": {
       "code_commit": "108b14add12f596e635c467d4c8573d0a9c08fc6",
       "local_affected_tests": 27,
@@ -1273,7 +1274,7 @@
       "spec_test_acceptance": "Partial T02/T03 and cash portions of T04/T05/T15 tested; T01-T15 full acceptance not complete"
     },
     "latest_holdings_analysis": {
-      "code_commit": "2e5596056bc0da921c3044f9958ebceb28daaf10",
+      "code_commit": "38cc2674753ae0cec4e882f6ea94d191c2934f11",
       "mode": "CASH_ZERO_SIMULATION",
       "entry": "build_project_menu -> menu04.deployment_pace -> AssetSourceProducer -> prepare_input -> original analysis components",
       "status": "ANALYSIS_PARTIAL",
@@ -1285,14 +1286,16 @@
       "coverage": {
         "Joseph": {
           "selected_ib": 10,
-          "partial": 7,
-          "history_blocked": 3,
+          "complete": 0,
+          "partial": 10,
+          "history_blocked": 0,
           "other_account_scope_blocked": 7
         },
         "MOU": {
           "selected_ib": 16,
-          "partial": 11,
-          "history_blocked": 5,
+          "complete": 0,
+          "partial": 16,
+          "history_blocked": 0,
           "other_account_scope_blocked": 1
         }
       },
@@ -1307,15 +1310,15 @@
       ],
       "work3_work4_called_in_A": false,
       "cash_trial": "Known source amounts retained; missing four cash fields only per-run validated overlay; no formal DB writes",
-      "local_affected_tests": 52,
+      "local_affected_tests": 60,
       "original_dependency_hashes": 115,
       "compile": "PASS",
       "ci_success_runs": [
-        40540903145,
-        40540902898,
-        40540903288,
-        40540902985,
-        40540903107
+        40548952054,
+        40548952200,
+        40548952043,
+        40548952715,
+        40548952046
       ],
       "source_limits": [
         "Provider cache identity/session/adjustment attestation incomplete",
@@ -1324,6 +1327,42 @@
         "Exact-symbol histories unavailable for listed positions",
         "Other account bindings not produced; holdings separately retained"
       ],
+      "official_db_changed": false,
+      "trade_action": "NO_TRADE",
+      "full_menu04_complete": false
+    },
+    "latest_market_recovery": {
+      "code_commit": "38cc2674753ae0cec4e882f6ea94d191c2934f11",
+      "prior_code_commit": "2e5596056bc0da921c3044f9958ebceb28daaf10",
+      "first_actual_fix": "Reviewed VWRA reference-listing alias and restored exact existing provider cache; original reader error and 71 invalid OHLC rows retained",
+      "source_window": "Original algorithms on 683-bar contiguous valid suffix 2024-02-13..2026-10-26; original prices unchanged",
+      "other_missing_sources": "Seven source-receipt histories imported; forming bars excluded, per-source SHA and completed observation dates bound; account data never shared",
+      "analysis_counts": {
+        "complete": 0,
+        "partial": 26,
+        "unavailable": 0
+      },
+      "limits": [
+        "Some alternative histories have only 46-50 completed bars; long-window indicators unavailable",
+        "One source ends 2026-10-14; no current-market claim",
+        "One OHLC-inconsistent source uses original Close-only components; dependent ATR/KD outputs unavailable",
+        "London provider currency-label conflict remains explicit",
+        "Formal identity/session/adjustment attestations, product mappings and unresolved named-predicate evidence remain per field"
+      ],
+      "local_unittest": 60,
+      "original_dependency_hashes": 115,
+      "compile": "PASS",
+      "ci_success_runs": [
+        40548952054,
+        40548952200,
+        40548952043,
+        40548952715,
+        40548952046
+      ],
+      "source_cache": "Private evidence contains original receipt tables, CSVs, manifest and replay harness",
+      "deployment_status": "NOT_RUN",
+      "canonical_result": null,
+      "mentor": null,
       "official_db_changed": false,
       "trade_action": "NO_TRADE",
       "full_menu04_complete": false

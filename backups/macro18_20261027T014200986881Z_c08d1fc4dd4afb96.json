@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-10-24T09:39:52.939125+08:00",
+  "generated_at": "2026-10-27T09:42:00.741076+08:00",
   "independent_indicators": {
     "excluded_duplicate": "s03 (same VIX as m07)",
     "summary": {
       "MISSING": 0,
-      "OK": 17,
-      "STALE": 1,
+      "OK": 18,
+      "STALE": 0,
       "USABLE": 0
     },
     "total": 18
@@ -13,7 +13,7 @@
   "items": {
     "m01": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:04.565394+00:00",
+      "attempted_at": "2026-10-27T01:41:12.283933+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "Matched observation date for nominal 10Y minus 2Y",
@@ -22,35 +22,35 @@
       "label": "10Y−2Y 殖利率曲線",
       "last_verified_at": null,
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "%",
-      "value": 0.31
+      "value": 0.32
     },
     "m02": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:42.174297+00:00",
+      "attempted_at": "2026-10-27T01:41:49.622624+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "",
       "error": "",
       "id": "m02",
       "label": "HY OAS",
-      "last_verified_at": "2026-10-24T01:39:42.480216+00:00",
+      "last_verified_at": "2026-10-27T01:41:49.818407+00:00",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "observation_date": "2026-10-22",
+      "observation_date": "2026-10-23",
       "retrieval_error": "",
       "source_attempts": {
         "BAMLH0A0HYM2": [
           {
-            "observation_date": "2026-10-22",
+            "observation_date": "2026-10-23",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:42.480216+00:00"
+            "verified_at": "2026-10-27T01:41:49.818407+00:00"
           }
         ]
       },
@@ -58,10 +58,10 @@
         "series": {
           "BAMLH0A0HYM2": [
             {
-              "observation_date": "2026-10-22",
+              "observation_date": "2026-10-23",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:42.480216+00:00"
+              "verified_at": "2026-10-27T01:41:49.818407+00:00"
             }
           ]
         }
@@ -69,11 +69,11 @@
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "status": "OK",
       "unit": "%",
-      "value": 3.4
+      "value": 3.38
     },
     "m04": {
-      "attempt_result": "FAILED",
-      "attempted_at": "2026-10-24T01:39:42.480464+00:00",
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-10-27T01:41:49.818673+00:00",
       "cache_used": false,
       "detail": "統計月份2026-09；8月54.6",
       "error": "",
@@ -82,8 +82,23 @@
       "last_verified_at": null,
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
       "observation_date": "2026-09-01",
-      "retrieval_error": "ISM 官方製造業發布頁需依版本核對，不能無來源抓任意網頁數字",
-      "source_attempts": {},
+      "retrieval_error": "",
+      "source_attempts": {
+        "ISM_m04": [
+          {
+            "attempted_at": "2026-10-27T01:41:50.537189+00:00",
+            "error": "ISM report date or sector headline mismatch",
+            "provider": "ISM_OFFICIAL",
+            "result": "FAILED"
+          },
+          {
+            "observation_date": "2026-09-01",
+            "provider": "ISM_OFFICIAL_ROUNDUP",
+            "result": "OK",
+            "verified_at": "2026-10-27T01:41:51.004468+00:00"
+          }
+        ]
+      },
       "source_evidence": null,
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
       "status": "OK",
@@ -92,14 +107,14 @@
     },
     "m05": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:42.480503+00:00",
+      "attempted_at": "2026-10-27T01:41:51.004549+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "比較基期 2025-09-01",
       "error": "",
       "id": "m05",
       "label": "Core CPI YoY",
-      "last_verified_at": "2026-10-24T01:39:43.418955+00:00",
+      "last_verified_at": "2026-10-27T01:41:51.307736+00:00",
       "method": "FRED CPILFESL 同一數列 YoY",
       "observation_date": "2026-09-01",
       "retrieval_error": "",
@@ -109,7 +124,7 @@
             "observation_date": "2026-09-01",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:43.418955+00:00"
+            "verified_at": "2026-10-27T01:41:51.307736+00:00"
           }
         ]
       },
@@ -120,7 +135,7 @@
               "observation_date": "2026-09-01",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:43.418955+00:00"
+              "verified_at": "2026-10-27T01:41:51.307736+00:00"
             }
           ]
         }
@@ -132,24 +147,24 @@
     },
     "m07": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:03.983260+00:00",
+      "attempted_at": "2026-10-27T01:41:11.958334+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "",
       "error": "",
       "id": "m07",
       "label": "VIX",
-      "last_verified_at": "2026-10-24T01:39:04.565105+00:00",
+      "last_verified_at": "2026-10-27T01:41:12.283663+00:00",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "observation_date": "2026-10-22",
+      "observation_date": "2026-10-23",
       "retrieval_error": "",
       "source_attempts": {
         "VIXCLS": [
           {
-            "observation_date": "2026-10-22",
+            "observation_date": "2026-10-23",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:04.565105+00:00"
+            "verified_at": "2026-10-27T01:41:12.283663+00:00"
           }
         ]
       },
@@ -157,10 +172,10 @@
         "series": {
           "VIXCLS": [
             {
-              "observation_date": "2026-10-22",
+              "observation_date": "2026-10-23",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:04.565105+00:00"
+              "verified_at": "2026-10-27T01:41:12.283663+00:00"
             }
           ]
         }
@@ -168,11 +183,11 @@
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "status": "OK",
       "unit": "",
-      "value": 19.03
+      "value": 19.45
     },
     "m08": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:22.928807+00:00",
+      "attempted_at": "2026-10-27T01:41:31.409860+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "10Y TIPS real yield",
@@ -181,7 +196,7 @@
       "label": "10Y 實質殖利率",
       "last_verified_at": null,
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
@@ -192,7 +207,7 @@
     },
     "m09": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:43.419706+00:00",
+      "attempted_at": "2026-10-27T01:41:51.308480+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
@@ -201,18 +216,18 @@
       "label": "DXY",
       "last_verified_at": null,
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "status": "OK",
       "unit": "",
-      "value": 101.751999
+      "value": 102.045998
     },
     "m10": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:44.648624+00:00",
+      "attempted_at": "2026-10-27T01:41:51.848913+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
@@ -221,18 +236,18 @@
       "label": "WTI",
       "last_verified_at": null,
       "method": "yfinance Yahoo Finance CL=F 日K Close",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "status": "OK",
       "unit": "USD/bbl",
-      "value": 103.440002
+      "value": 100.940002
     },
     "m12": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:44.809525+00:00",
+      "attempted_at": "2026-10-27T01:41:51.956473+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
@@ -241,18 +256,18 @@
       "label": "MOVE",
       "last_verified_at": null,
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
       "status": "OK",
       "unit": "",
-      "value": 103.312302
+      "value": 102.191399
     },
     "m13": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:45.033072+00:00",
+      "attempted_at": "2026-10-27T01:41:52.100489+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "5Y nominal minus 5Y TIPS real yield on same day",
@@ -261,35 +276,35 @@
       "label": "5Y Breakeven",
       "last_verified_at": null,
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "%",
-      "value": 2.48
+      "value": 2.47
     },
     "m14": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:45.047825+00:00",
+      "attempted_at": "2026-10-27T01:41:52.115033+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "開始=2026-07-22, 結束=2026-10-21, 單位十億美元; Fed Δ=6.226000, TGA Δ=109.736000, RRP Δ=-0.139000; 淨流動性 Δ=-103.371000",
       "error": "",
       "id": "m14",
       "label": "淨流動性 13週變化（$bn）",
-      "last_verified_at": "2026-10-24T01:39:45.690343+00:00",
+      "last_verified_at": "2026-10-27T01:41:53.092426+00:00",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "observation_date": "2026-10-21",
       "retrieval_error": "",
       "source_attempts": {
         "RRPONTSYD": [
           {
-            "observation_date": "2026-10-23",
+            "observation_date": "2026-10-26",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:47.247026+00:00"
+            "verified_at": "2026-10-27T01:41:55.003744+00:00"
           }
         ],
         "WALCL": [
@@ -297,7 +312,7 @@
             "observation_date": "2026-10-21",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:45.690343+00:00"
+            "verified_at": "2026-10-27T01:41:53.092426+00:00"
           }
         ],
         "WDTGAL": [
@@ -305,7 +320,7 @@
             "observation_date": "2026-10-21",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:46.349059+00:00"
+            "verified_at": "2026-10-27T01:41:53.306001+00:00"
           }
         ]
       },
@@ -313,10 +328,10 @@
         "series": {
           "RRPONTSYD": [
             {
-              "observation_date": "2026-10-23",
+              "observation_date": "2026-10-26",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:47.247026+00:00"
+              "verified_at": "2026-10-27T01:41:55.003744+00:00"
             }
           ],
           "WALCL": [
@@ -324,7 +339,7 @@
               "observation_date": "2026-10-21",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:45.690343+00:00"
+              "verified_at": "2026-10-27T01:41:53.092426+00:00"
             }
           ],
           "WDTGAL": [
@@ -332,7 +347,7 @@
               "observation_date": "2026-10-21",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:46.349059+00:00"
+              "verified_at": "2026-10-27T01:41:53.306001+00:00"
             }
           ]
         }
@@ -343,8 +358,8 @@
       "value": -103.371
     },
     "m15": {
-      "attempt_result": "FAILED",
-      "attempted_at": "2026-10-24T01:39:47.249502+00:00",
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-10-27T01:41:55.006353+00:00",
       "cache_used": false,
       "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4",
       "error": "",
@@ -353,8 +368,17 @@
       "last_verified_at": null,
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
       "observation_date": "2026-09-01",
-      "retrieval_error": "ISM 官方服務業發布頁需依版本核對，不能無來源抓任意網頁數字",
-      "source_attempts": {},
+      "retrieval_error": "",
+      "source_attempts": {
+        "ISM_m15": [
+          {
+            "observation_date": "2026-09-01",
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-10-27T01:41:55.178022+00:00"
+          }
+        ]
+      },
       "source_evidence": null,
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
       "status": "OK",
@@ -363,47 +387,47 @@
     },
     "m16": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:47.249521+00:00",
+      "attempted_at": "2026-10-27T01:41:55.178100+00:00",
       "cache_source": null,
       "cache_used": false,
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline; 2026-10-22 release deadline passed",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
       "error": "",
       "id": "m16",
       "label": "LEI YoY",
       "last_verified_at": null,
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "observation_date": "2026-08-01",
+      "observation_date": "2026-09-01",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
-      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
-      "status": "STALE",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+      "status": "OK",
       "unit": "%",
-      "value": -0.7
+      "value": -0.5
     },
     "m17": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:45.040464+00:00",
+      "attempted_at": "2026-10-27T01:41:52.107787+00:00",
       "cache_source": null,
       "cache_used": false,
-      "detail": "5Y breakeven change from 2026-09-23",
+      "detail": "5Y breakeven change from 2026-09-25",
       "error": "",
       "id": "m17",
       "label": "5Y Breakeven 近1月變化（pp）",
       "last_verified_at": null,
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "status": "OK",
       "unit": "pp",
-      "value": 0.14
+      "value": 0.13
     },
     "m18": {
-      "attempt_result": "FAILED",
-      "attempted_at": "2026-10-24T01:39:51.419804+00:00",
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-10-27T01:41:58.247568+00:00",
       "cache_used": false,
       "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率",
       "error": "",
@@ -412,14 +436,14 @@
       "last_verified_at": null,
       "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
       "observation_date": "2026-09-01",
-      "retrieval_error": "Sahm not calculable from official U3 history: Sahm missing recent monthly observations: 2025-10; 2025-10 CPS not collected per BLS: https://www.bls.gov/cps/methods/2025-federal-government-shutdown-impact-cps.htm",
+      "retrieval_error": "",
       "source_attempts": {
-        "UNRATE": [
+        "SAHMREALTIME": [
           {
             "observation_date": "2026-09-01",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:51.684422+00:00"
+            "verified_at": "2026-10-27T01:41:58.620538+00:00"
           }
         ]
       },
@@ -431,14 +455,14 @@
     },
     "m19": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:51.685472+00:00",
+      "attempted_at": "2026-10-27T01:41:58.620711+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "",
       "error": "",
       "id": "m19",
       "label": "U3 失業率",
-      "last_verified_at": "2026-10-24T01:39:51.684422+00:00",
+      "last_verified_at": "2026-10-27T01:41:59.473502+00:00",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "observation_date": "2026-09-01",
       "retrieval_error": "",
@@ -448,7 +472,7 @@
             "observation_date": "2026-09-01",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:51.684422+00:00"
+            "verified_at": "2026-10-27T01:41:59.473502+00:00"
           }
         ]
       },
@@ -459,7 +483,7 @@
               "observation_date": "2026-09-01",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:51.684422+00:00"
+              "verified_at": "2026-10-27T01:41:59.473502+00:00"
             }
           ]
         }
@@ -471,14 +495,14 @@
     },
     "m20": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:51.685611+00:00",
+      "attempted_at": "2026-10-27T01:41:59.473691+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "注意歷史值可能修訂",
       "error": "",
       "id": "m20",
       "label": "3個月平均非農新增就業（千人）",
-      "last_verified_at": "2026-10-24T01:39:52.690723+00:00",
+      "last_verified_at": "2026-10-27T01:42:00.668859+00:00",
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "observation_date": "2026-09-01",
       "retrieval_error": "",
@@ -488,7 +512,7 @@
             "observation_date": "2026-09-01",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:52.690723+00:00"
+            "verified_at": "2026-10-27T01:42:00.668859+00:00"
           }
         ]
       },
@@ -499,7 +523,7 @@
               "observation_date": "2026-09-01",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:52.690723+00:00"
+              "verified_at": "2026-10-27T01:42:00.668859+00:00"
             }
           ]
         }
@@ -511,24 +535,24 @@
     },
     "s03": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:03.983260+00:00",
+      "attempted_at": "2026-10-27T01:41:11.958334+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "同一 VIX 數列",
       "error": "",
       "id": "s03",
       "label": "VIX 短期",
-      "last_verified_at": "2026-10-24T01:39:04.565105+00:00",
+      "last_verified_at": "2026-10-27T01:41:12.283663+00:00",
       "method": "與 m07 同步",
-      "observation_date": "2026-10-22",
+      "observation_date": "2026-10-23",
       "retrieval_error": "",
       "source_attempts": {
         "VIXCLS": [
           {
-            "observation_date": "2026-10-22",
+            "observation_date": "2026-10-23",
             "provider": "FRED_OFFICIAL_API",
             "result": "OK",
-            "verified_at": "2026-10-24T01:39:04.565105+00:00"
+            "verified_at": "2026-10-27T01:41:12.283663+00:00"
           }
         ]
       },
@@ -536,10 +560,10 @@
         "series": {
           "VIXCLS": [
             {
-              "observation_date": "2026-10-22",
+              "observation_date": "2026-10-23",
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-24T01:39:04.565105+00:00"
+              "verified_at": "2026-10-27T01:41:12.283663+00:00"
             }
           ]
         }
@@ -547,11 +571,11 @@
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "status": "OK",
       "unit": "",
-      "value": 19.03
+      "value": 19.45
     },
     "s04": {
       "attempt_result": "SUCCESS",
-      "attempted_at": "2026-10-24T01:39:52.691566+00:00",
+      "attempted_at": "2026-10-27T01:42:00.669670+00:00",
       "cache_source": null,
       "cache_used": false,
       "detail": "來源為 CNN 非公開保證 API",
@@ -560,34 +584,23 @@
       "label": "CNN Fear & Greed",
       "last_verified_at": null,
       "method": "CNN 非官方可讀 JSON（可能變動）",
-      "observation_date": "2026-10-23",
+      "observation_date": "2026-10-26",
       "retrieval_error": "",
       "source_attempts": {},
       "source_evidence": null,
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "status": "OK",
       "unit": "",
-      "value": 20.980952
+      "value": 27.078891
     }
   },
   "lei_history": [
     {
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
-      "observation_date": "2026-06-01",
-      "publication_date": "2026-07-20",
-      "retrieved_at": "2026-10-24T01:39:48.551701+00:00",
-      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
-      "status": "OK",
-      "unit": "%",
-      "value": -1.4
-    },
-    {
-      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-07-01",
       "publication_date": "2026-08-20",
-      "retrieved_at": "2026-10-24T01:39:49.602852+00:00",
+      "retrieved_at": "2026-10-27T01:41:56.266361+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
       "status": "OK",
       "unit": "%",
@@ -598,19 +611,30 @@
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "observation_date": "2026-08-01",
       "publication_date": "2026-09-18",
-      "retrieved_at": "2026-10-24T01:39:50.415443+00:00",
+      "retrieved_at": "2026-10-27T01:41:57.281280+00:00",
       "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
       "status": "OK",
       "unit": "%",
       "value": -0.7
+    },
+    {
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "observation_date": "2026-09-01",
+      "publication_date": "2026-10-22",
+      "retrieved_at": "2026-10-27T01:41:58.247498+00:00",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+      "status": "OK",
+      "unit": "%",
+      "value": -0.5
     }
   ],
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "schema": "V70.3/18-macro-collector-v1",
   "summary": {
     "MISSING": 0,
-    "OK": 18,
-    "STALE": 1,
+    "OK": 19,
+    "STALE": 0,
     "USABLE": 0
   }
 }

@@ -69,16 +69,28 @@ def _macro_metrics(macro, evaluated_at):
 def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id):
     """Run original routines on validated rows; return no deployment decisions."""
     import pandas as pd
-    from technical_source_bridge import _originals, _aggregate, NAMES
+    from technical_source_bridge import _originals, _aggregate, NAMES, mapped_numeric_signals
     from verify_dependencies import verify
     verify(repo_root)
     legacy, numeric = _originals()
     frame = pd.DataFrame(rows)
     values = numeric.technical(frame)
     td9 = asdict(legacy['calculate_td9'](frame['Close'].tolist()))
-    # All canonical votes stay UNKNOWN until approved metadata and named rules
-    # are supplied. Numeric MA/MACD/TD9 facts cannot silently become votes.
-    vectors = {k: [{'truth': 'UNKNOWN'} for _ in names] for k, names in NAMES.items()}
+    # Reuse only the comparisons already mapped in the original source bridge.
+    # This observed view remains ineligible for deployment without its receipts.
+    vectors = {k: [{'name': name, 'truth': 'UNKNOWN',
+        'reason': 'NAMED_RULE_OR_SOURCE_REQUIRED'} for name in names] for k, names in NAMES.items()}
+    if len(rows) >= 2:
+        previous = numeric.technical(frame.iloc[:-1])
+        for group, name, truth, dependencies in mapped_numeric_signals(values, previous):
+            next(r for r in vectors[group] if r['name'] == name).update(
+                truth='TRUE' if truth else 'FALSE', reason='EXISTING_BRIDGE_NUMERIC_RULE',
+                dependencies=dependencies)
+    lows = legacy['confirmed_swing_lows'](frame['Low'].tolist())
+    if len(lows) >= 2:
+        next(r for r in vectors['right_signals'] if r['name'] == 'higher_low').update(
+            truth='TRUE' if lows[-1].value > lows[-2].value else 'FALSE',
+            reason='EXISTING_BRIDGE_NUMERIC_RULE', dependencies=['confirmed_lows[-2:]'])
     v82 = _aggregate(repo_root, vectors)
     runtime = Path(repo_root).resolve() / '系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
     if str(runtime) not in sys.path:
@@ -110,7 +122,8 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
             'input_freshness_verified': False,
             'original_default_freshness_is_not_attestation': True,
             'deployment_input_eligible': False}
-    return {'numeric': values, 'td9': td9, 'v82_original_aggregation': v82,
+    return {'numeric': values, 'td9': td9, 'observed_named_signals': vectors,
+        'v82_original_aggregation': v82,
         'v75_original_predicates': predicates, 'macro_metric_sources': sources,
         'v75_scope': 'OBSERVED_BOND_INPUTS' if is_bond else 'NOT_A_V75_SUPPORTED_BOND',
         'call_trace': ['ORIGINAL.calculate_td9', 'ORIGINAL.analytics.technical',
@@ -118,7 +131,8 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
         'formal_deployment_eligible': False, 'trade_authorization': 'NONE'}
 
 
-def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at):
+def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
+                                     official_holdings=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -131,7 +145,21 @@ These cache manifests attest row counts/dates, not exchange or price basis.
     tables = snapshot['tables']
     keys = {r['instrument_key'] for r in tables.get('portfolio_position', [])}
     keys.update(r['instrument_key'] for target in targets for r in target['allocations'])
-    instruments = [r for r in tables.get('portfolio_instrument', []) if r['instrument_key'] in keys]
+    instruments = [deepcopy(r) for r in tables.get('portfolio_instrument', []) if r['instrument_key'] in keys]
+    if official_holdings is not None:
+        if (official_holdings.get('client_id') != snapshot['client_id'] or
+                official_holdings.get('source_db_sha256') != snapshot['source_sha256'] or
+                official_holdings.get('snapshot_digest') != snapshot.get('payload_digest')):
+            raise PermissionError('OBSERVATION_HOLDINGS_SNAPSHOT_MISMATCH')
+        seen = {r.get('ticker') for r in instruments}
+        for row in official_holdings['analysis_security_positions']:
+            symbol = row['symbol']
+            if symbol in seen:
+                continue
+            instrument = deepcopy(row.get('instrument')) or {
+                'instrument_key': None, 'ticker': symbol, 'identity_state': 'SOURCE_SYMBOL_ONLY'}
+            instrument['holding_source_reference'] = row['source_row'].get('source_reference')
+            instruments.append(instrument);seen.add(symbol)
     assets, missing = [], []
     base = Path(repo_root).resolve() / 'data/market_history/global'
     manifest_path = base / 'manifest.json'
@@ -141,7 +169,7 @@ These cache manifests attest row counts/dates, not exchange or price basis.
     manifest = json.loads(manifest_raw)
     for instrument in instruments:
         key, symbol = instrument['instrument_key'], instrument.get('ticker')
-        if (instrument.get('identity_state') != 'KNOWN' or not isinstance(symbol, str)
+        if (instrument.get('identity_state') not in ('KNOWN', 'SOURCE_SYMBOL_ONLY') or not isinstance(symbol, str)
                 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,31}', symbol)):
             missing.append({'instrument_key': key, 'code': 'KNOWN_EXACT_SYMBOL_REQUIRED'})
             continue
@@ -181,6 +209,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'source_path': str(cache.relative_to(Path(repo_root).resolve())),
                 'source_sha256': _hash(raw), 'manifest_sha256': _hash(manifest_raw),
                 'provider_symbol_match_only': True, 'formal_identity_verified': False,
+                'instrument_registry_state': instrument.get('identity_state'),
+                'holding_source_reference': instrument.get('holding_source_reference'),
                 'source_gaps': ['EXCHANGE_CURRENCY_PROVIDER_ATTESTATION', 'PRICE_BASIS_AND_SPLITS',
                                 'OFFICIAL_SESSION_CLOSE_AND_AVAILABILITY', 'CANONICAL_NAMED_PREDICATES'],
                 **result})

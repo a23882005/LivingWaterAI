@@ -83,6 +83,25 @@ def _aggregate(repo_path,vectors):
     return {k:getattr(result,k).value for k in ('right_confirmation','runaway_up','runaway_down')}
 
 
+def mapped_numeric_signals(current, previous):
+    """The existing bridge's approved comparisons, shared by observed intake.
+
+    These are named numeric predicates only. Metadata, session receipts and
+    unresolved predicates retain their independent validation requirements.
+    """
+    out=[]
+    def pair(name):return _number(current.get(name)) and _number(previous.get(name))
+    if pair('macd_12_26'):
+        out.append(('right_signals','dif_up',current['macd_12_26']>previous['macd_12_26'],['DIF[t]','DIF[p]']))
+    if pair('macd_histogram'):
+        a,b=previous['macd_histogram'],current['macd_histogram']
+        out.append(('up_confirm','macd_bull_hist_expanding',a>0 and b>0 and abs(b)>abs(a),['H[p]','H[t]']))
+        out.append(('down_accel','macd_bear_hist_expanding',a<0 and b<0 and abs(b)>abs(a),['H[p]','H[t]']))
+    if all(_number(current.get(k)) for k in ('ma5','ma10','ma20')):
+        out.append(('up_confirm','ma5_gt_ma10_gt_ma20',current['ma5']>current['ma10']>current['ma20'],['MA5[t]','MA10[t]','MA20[t]']))
+    return out
+
+
 def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
     """Return partial facts and original aggregation, never deployment permission.
 
@@ -188,13 +207,11 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
             df=pd.DataFrame([{k:float(r[k]) for k in ('Close','High','Low','Volume')} for r in base])
             current=numeric.technical(df);previous=numeric.technical(df.iloc[:-1]);raw={'current':current,'previous':previous}
             def pair(name):return _number(current.get(name)) and _number(previous.get(name))
-            if pair('macd_12_26'):put('right_signals','dif_up',current['macd_12_26']>previous['macd_12_26'],['DIF[t]','DIF[p]'])
+            for group,name,value,deps in mapped_numeric_signals(current,previous):
+                put(group,name,value,deps)
             if pair('macd_histogram'):
                 a,b=previous['macd_histogram'],current['macd_histogram']
-                put('up_confirm','macd_bull_hist_expanding',a>0 and b>0 and abs(b)>abs(a),['H[p]','H[t]'])
-                put('down_accel','macd_bear_hist_expanding',a<0 and b<0 and abs(b)>abs(a),['H[p]','H[t]'])
                 known['macd_cross_positive']=a<=0 and b>0
-            if all(_number(current.get(k)) for k in ('ma5','ma10','ma20')):put('up_confirm','ma5_gt_ma10_gt_ma20',current['ma5']>current['ma10']>current['ma20'],['MA5[t]','MA10[t]','MA20[t]'])
             if pair('ma20'):
                 known['above_ma20']=float(base[-1]['Close'])>current['ma20']
                 known['reclaim_ma20']=float(base[-2]['Close'])<=previous['ma20'] and float(base[-1]['Close'])>current['ma20']

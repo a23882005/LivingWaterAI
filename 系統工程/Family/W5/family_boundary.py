@@ -133,10 +133,18 @@ def bind_owner(snapshot,owner,evaluation_at,*,approved_account_scope=None):
     return {'owner':deepcopy(owner),'w1_funding_purpose':purpose['purpose_code'],'source_rows':deepcopy([account,own,broker,domain,purpose])}
 
 
-def position_view(snapshot,account,evaluation_at,completeness):
+def position_view(snapshot,account,evaluation_at,completeness,*,approved_account_scope=None):
     """Never infer an empty portfolio from no rows. Completeness is caller evidence."""
     require(isinstance(completeness,dict) and completeness.get('state')=='COMPLETE' and nonempty(completeness.get('source_reference')),'HOLDINGS_COMPLETENESS_UNKNOWN','holdings_completeness','W1','DATA_UNAVAILABLE')
     require(completeness.get('snapshot_digest')==snapshot['payload_digest'] and completeness.get('account_key')==account and timestamp(completeness.get('as_of'),'holdings_completeness.as_of')<=evaluation_at,'HOLDINGS_SNAPSHOT_MISMATCH','holdings_completeness','W1')
+    if (completeness.get('schema_version')=='Family.W8.OfficialHoldingsAcceptance.v1'
+            and approved_account_scope is not None):
+        from official_holdings_source import build_official_position_view
+        try:
+            projected=build_official_position_view(snapshot,account,evaluation_at,completeness,approved_account_scope)
+        except (ValueError,PermissionError) as error:
+            raise BoundaryError(str(error),'official_holdings_source',status='DATA_UNAVAILABLE') from None
+        if projected is not None:return projected
     rows=snapshot['tables']['portfolio_position'];selected={}
     for row in rows:
         if row['account_key']!=account:continue
@@ -186,7 +194,8 @@ def prepare_input(request,*,trusted_context):
     require(str(target['target_version'])==versions['target'] and target['target_hash']==ctx.get('target_hash'),'TARGET_VERSION_CONFLICT','confirmed_target','W2')
     owner=bind_owner(payload,req.get('owner',{}),at,
         approved_account_scope=ctx.get('approved_document_account_scope'))
-    positions=position_view(payload,req['owner']['account'],at,ctx.get('holdings_completeness'))
+    positions=position_view(payload,req['owner']['account'],at,ctx.get('holdings_completeness'),
+        approved_account_scope=ctx.get('approved_document_account_scope'))
     macro=req.get('macro_snapshot',{})
     require(macro.get('digest')==digest(macro.get('payload'))==versions['market'],'MACRO_DIGEST_MISMATCH','macro_snapshot','W3')
     require(macro.get('asOf')==macro.get('payload',{}).get('asOf'),'MACRO_ASOF_MISMATCH','macro_snapshot.asOf','W3')

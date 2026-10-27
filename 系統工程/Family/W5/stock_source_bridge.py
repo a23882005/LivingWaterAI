@@ -16,8 +16,10 @@ def bind_stock_source(request, prepared, binding):
     mapping=binding.get('stock_instrument')
     require(isinstance(mapping,dict) and bool(mapping.get('source_reference')),
             'STOCK_INSTRUMENT_MAPPING_REQUIRED','native_binding.stock_instrument',status='DATA_UNAVAILABLE')
-    instrument=one([r for r in tables['portfolio_instrument']
-                    if r['instrument_key']==mapping.get('instrument_key')],'stock.portfolio_instrument')
+    positions=[p for p in prepared.payload['positions'] if p['instrument_key']==mapping.get('instrument_key')]
+    instrument=(one(positions,'stock.positions')['source_instrument'] if positions else
+        one([r for r in tables['portfolio_instrument']
+             if r['instrument_key']==mapping.get('instrument_key')],'stock.portfolio_instrument'))
     native=request['native_bundle']['stock_request']['asset_context']
     facts=request['native_bundle']['stock_evidence']
     require(mapping.get('account_key')==account and mapping.get('native_owner')==binding['native_owner'],
@@ -26,14 +28,17 @@ def bind_stock_source(request, prepared, binding):
             and facts['exchange']==instrument.get('exchange_code')
             and facts['currency']==instrument.get('quote_currency')==request['owner']['currency'],
             'STOCK_INSTRUMENT_MISMATCH','stock.asset_identity')
-    positions=[p for p in prepared.payload['positions'] if p['instrument_key']==instrument['instrument_key']]
     if positions:
         position=one(positions,'stock.positions')
         require(position['quantity_state']=='KNOWN','STOCK_QUANTITY_UNKNOWN','stock.position','W1','DATA_UNAVAILABLE')
-        when=timestamp(position['source_position']['as_of_utc'],'stock.position.as_of')
-        one([r for r in tables['portfolio_position'] if r['account_key']==account
-             and r['instrument_key']==instrument['instrument_key']
-             and timestamp(r['as_of_utc'],'stock.position.as_of')==when],'stock.latest_position')
+        if position['source_position'].get('source_kind') in ('SEALED_W6','OWNER_SCREENSHOT_SOURCE'):
+            require(position['source_position']['source_row'] in tables['portfolio_snapshot_item'],
+                    'STOCK_SEALED_SOURCE_MISMATCH','stock.position.source_row')
+        else:
+            when=timestamp(position['source_position']['as_of_utc'],'stock.position.as_of')
+            one([r for r in tables['portfolio_position'] if r['account_key']==account
+                 and r['instrument_key']==instrument['instrument_key']
+                 and timestamp(r['as_of_utc'],'stock.position.as_of')==when],'stock.latest_position')
         quantity=amount(position['quantity'])
         source=deepcopy(position['source_position'])
     else:
@@ -41,7 +46,8 @@ def bind_stock_source(request, prepared, binding):
         quantity=amount('0');source=None
     require(amount(native['confirmed_position_snapshot']['quantity'])==quantity,
             'STOCK_POSITION_QUANTITY_MISMATCH','stock.confirmed_position_snapshot.quantity')
-    policies=project_permissions(snapshot,account=account,evaluation_at=request['evaluation_at'])
+    policies=project_permissions(snapshot,account=account,evaluation_at=request['evaluation_at'],
+        positions=prepared.payload['positions'])
     policy=one([p for p in policies if p['instrument_key']==instrument['instrument_key']],'stock.policy')
     return {'schema_version':'Family.W5.StockSource.v1','client_id':request['client_id'],
             'account_key':account,'asset_id':native['asset']['asset_id'],

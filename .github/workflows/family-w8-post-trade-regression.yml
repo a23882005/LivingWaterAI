@@ -111,6 +111,8 @@ jobs:
         run: python -m pip install -r '系統工程/Family/W5/requirements.lock'
       - name: Run member-scoped original market calculations
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_market_observations.py' -v
+      - name: Run sealed official holdings source mapping
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_official_holdings_projection.py' -v
       - name: Run existing approved target input and original Family boundary
         env:
           PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests
@@ -118,3 +120,4 @@ jobs:
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_target_input.py' -v
           python -m pytest '系統工程/Family/W5/tests/test_family_boundary.py' '系統工程/Family/W5/tests/test_family_runner.py' '系統工程/Family/W5/tests/test_c7_engine.py' -q
           python -m pytest '系統工程/Family/W5/tests/test_family_technical.py' '系統工程/Family/W5/tests/test_technical_source_bridge.py' -q
+

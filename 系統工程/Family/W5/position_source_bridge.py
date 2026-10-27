@@ -30,10 +30,15 @@ def bind_position_values(request,prepared,context):
     for asset,row in sources.items():
         price=source['prices'][asset]
         require(price.get('unit')=='CURRENCY_PER_SHARE','VALUATION_PRICE_UNIT_REQUIRED','prices.'+asset+'.unit')
-        instrument=one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
-                        if r['instrument_key']==row['instrument_key']],'valuation.instrument')
+        positions=[p for p in prepared.payload['positions'] if p['instrument_key']==row['instrument_key']]
+        instrument=(one(positions,'valuation.positions')['source_instrument'] if positions else
+            one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
+                 if r['instrument_key']==row['instrument_key']],'valuation.instrument'))
         require(price.get('currency')==instrument['quote_currency'],'VALUATION_QUOTE_CURRENCY_MISMATCH','prices.'+asset)
         position=row['source_position']
+        require(position is None or position.get('as_of_utc') is not None,
+                'POSITION_OBSERVATION_TIME_REQUIRED','valuation.'+asset+'.quantity.as_of',
+                'W1','DATA_UNAVAILABLE')
         qty={'state':'KNOWN','value':row['confirmed_quantity'],'instrument_key':row['instrument_key'],
             'as_of':position['as_of_utc'] if position else context['holdings_completeness']['as_of'],
             'source_reference':request['client_snapshot']['digest']+':'+row['instrument_key']}

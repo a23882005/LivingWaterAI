@@ -64,6 +64,11 @@ class ObservationsTest(unittest.TestCase):
         self.assertFalse(result['formal_deployment_eligible'])
         self.assertIn('emv_14',result['numeric'])
         self.assertNotIn('emv_3_3',result['numeric'])
+        named={r['name']:r for group in result['observed_named_signals'].values() for r in group}
+        self.assertNotEqual(named['dif_up']['truth'],'UNKNOWN')
+        self.assertNotEqual(named['ma5_gt_ma10_gt_ma20']['truth'],'UNKNOWN')
+        self.assertEqual(named['atr_expanding_fast']['truth'],'UNKNOWN')
+        self.assertEqual(named['kd_golden_cross']['truth'],'UNKNOWN')
 
     def test_stock_does_not_receive_bond_predicates(self):
         result=M.evaluate_observed_history(self.rows,repo_root=ROOT,
@@ -84,6 +89,24 @@ class ObservationsTest(unittest.TestCase):
         self.manifest['items']['NATO.CN']=self.manifest['items'].pop('SGOV');self.write_manifest()
         out=self.build();self.assertEqual(out['assets'],[])
         self.assertEqual(out['missing'][0]['code'],'EXACT_SYMBOL_CACHE_UNAVAILABLE')
+
+    def test_sealed_symbol_missing_from_registry_is_still_observed(self):
+        self.snapshot['tables']['portfolio_position']=[]
+        self.snapshot['tables']['portfolio_instrument']=[]
+        self.snapshot['payload_digest']='bound-snapshot'
+        holdings={'client_id':'MEMBER','source_db_sha256':'a'*64,
+            'snapshot_digest':'bound-snapshot','analysis_security_positions':[
+                {'symbol':'SGOV','instrument':None,'source_row':{'source_reference':'SYNTHETIC_SEALED_SOURCE'}}]}
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',official_holdings=holdings)
+        self.assertEqual(out['assets'][0]['symbol'],'SGOV')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'SOURCE_SYMBOL_ONLY')
+        self.assertFalse(out['assets'][0]['formal_identity_verified'])
+        holdings['source_db_sha256']='b'*64
+        with self.assertRaisesRegex(PermissionError,'HOLDINGS_SNAPSHOT_MISMATCH'):
+            M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',official_holdings=holdings)
 
     def test_bad_ohlc_rejected(self):
         self.rows[-1]['High']=1;self.write()

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T18:32:27.655Z",
+  "updated_at": "2026-10-27T22:33:08.832Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1070,7 +1070,7 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "IN_PROGRESS__IB_MARKET_GAPS_RECOVERED__26_PARTIAL_ANALYSES__DEPLOYMENT_NOT_RUN",
+    "status": "IN_PROGRESS__FORMAL_V10_ANALYSIS_PARTIAL__DEPLOYMENT_NOT_RUN",
     "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
@@ -1102,24 +1102,24 @@
     },
     "actual_v70": "MOU explicit approved 80/20 source run executed original HTML; original output state retained",
     "remaining_field_groups": [
-      "IB analysis now returns all 26 positions with actual partial computations; complete exact source/identity/history/algorithm-governance gaps retained per field",
-      "Other accounts remain separate scope; no additional account engineering in this round",
-      "Complete deployment B and native Work9 Mentor remain independent unaccepted work"
+      "Complete source validity/availability/session/calendar/price-basis contracts and comparable fundamental direction",
+      "Complete credit prior histories, Treasury/Repo and official event coverage; preserve known numeric observations",
+      "Complete look-through exposure and remaining A outcome assembly; full original B deployment and Work9 Mentor remain separate"
     ],
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 21266050,
-      "sha256": "44502abf9b08cc06283380b58d9f24f33c4be662fa362731303d3aeaaf2e8c05",
+      "bytes": 22460701,
+      "sha256": "24ef20d592b3fa104431adf25fe20e4ba7d16ae8a9490f0cb196d4b8029aed50",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
       "latest_section": "latest_holdings_analysis",
       "actual_runs_section": "latest_holdings_analysis.actual_formal_entry_runs"
     },
     "governance_backups": {
-      "engineering": "1eFrroBIHtzbLfuu0TLopCIUBurp2l7urtYILVgdZlI4",
-      "files": "1YGHSWRyR6fJ7siZwIr912YgRH2ufg_YUrUEFzvRmD4Y",
-      "wbs": "1A-O832RkRt51whYoeBKQ_JuP0d7AOM_v2PoVFAh_PoI",
-      "evidence": "1qjGnvrZRpi6PpwaoZU-4cO0BxrWiDHKr"
+      "engineering": "1JsJa4QZGRSkveaFafsR-8FTAWLuDXfayNdkJ3iBi2aY",
+      "files": "1M2l2Ia1--sQunx2gTFRSehJTGG6XEyiIccTpNsQ4RqE",
+      "wbs": "1z00MDKu3twQlOsg_koz48Ay1VShYL1qfoX-OZ96pWLI",
+      "evidence": "1jXxw_ArT201ylXgiS2GxZi9NqFl67Wat"
     },
     "full_04_complete": false,
     "original_native_mentor_reached": false,
@@ -1129,7 +1129,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "470896d44692c84fcf5dfbcf4422c1be02f9baa0",
+    "work_head": "24b00f875d7efbad361a57f075803826d76b3c6b",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1159,7 +1159,7 @@
       "recorded_at": "2026-10-27T06:49:35+08:00",
       "effect": "Use existing official holdings; prior completeness-confirmation stop superseded"
     },
-    "integrated_main": "750ceb0a658633cfec079be86dbc3877273c7d50",
+    "integrated_main": "16318bb078f5d5328b7994fdd54001b4c0c94ced",
     "latest_patch_validation": {
       "code_commit": "108b14add12f596e635c467d4c8573d0a9c08fc6",
       "local_affected_tests": 27,
@@ -1212,9 +1212,9 @@
       "cash_zero_trial": "Supersedes prior no-zero cash handling only in isolated CASH_ZERO_SIMULATION; raw missing facts unchanged"
     },
     "latest_owner_instruction": {
-      "statement": "Split menu 04 into existing-holding analysis A and full deployment B, without new menu. A branches before Work4, executes independent native components, maps available facts and reports precise gaps. Existing cash retained; cash-only missing fields zero in this run. No repeated confirmation.",
-      "effect": "Latest amendment supersedes direct full Work9/Mentor prerequisite for A; full deployment contract unchanged",
-      "followup_question_status": "CLOSED_NO_FURTHER_QUESTIONS"
+      "statement": "V82 v1.0 added rules formally approved. Implement from main 16318bb formal archive in PR59. Valid 1% MA20 inputs produce TRUE/FALSE; no repeated approval request; tests are not trading authorization.",
+      "effect": "Supersedes historical Candidate/unapproved labels for adopted formulas; retain true source gaps and original engine contracts",
+      "followup_question_status": "CLOSED_NO_FURTHER_APPROVAL_QUESTIONS"
     },
     "latest_first_asset_trial": {
       "code_commit": "3efbb62555e5944280477b93a4c59cb7122ad5fc",
@@ -1421,7 +1421,71 @@
       "canonical_result": null,
       "mentor": null,
       "full04_complete": false,
-      "private_evidence_same_id_verified": true
+      "private_evidence_same_id_verified": true,
+      "superseded_by": "latest_formal_v10_implementation"
+    },
+    "latest_formal_v10_implementation": {
+      "code_commit": "24b00f875d7efbad361a57f075803826d76b3c6b",
+      "integration_commit": "48b0b0b5082b00e9be9f811db43f9957204eb65b",
+      "source_commit": "16318bb078f5d5328b7994fdd54001b4c0c94ced",
+      "spec_version": "1.0",
+      "spec_approved": true,
+      "status": "ANALYSIS_PARTIAL",
+      "source_directory": "系統工程/股票V80/文件歸檔/V82_v1.0_正式實作",
+      "source_package_sha256": "eaf7ac416f65cf07c998c6f79c678cb0bf152956a5b95e2052faf262bf20cf0f",
+      "source_document_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+      "normative_spec_sha256": "29bf4491d77c390f6014208932e6a45f9d27cad25747e8c183be2502c95f5fea",
+      "entry": "build_project_menu -> menu04 -> source-verified profile -> original V82 Core",
+      "executed_members": [
+        "Joseph",
+        "MOU"
+      ],
+      "vt_slots": {
+        "manifest": 32,
+        "known": 31,
+        "verified_etf_nonvoting": 1,
+        "unresolved": 0
+      },
+      "technical_source_modules": {
+        "named_slots": 32,
+        "reduction_conditions": 9,
+        "maturity_conditions": 8,
+        "timeframe_observations": true
+      },
+      "ma20_ok": "CALCULATED_FROM_APPROVED_1_PERCENT_RULE__NOT_FORCED_UNKNOWN",
+      "valuation_source_mapping": "Existing V70 VT Forward PE now consumed; explicit validity contracts are evaluated when present; missing facts remain unknown",
+      "credit_source_mapping": "HY/VIX/MOVE bands and v1.0 CMR credit logic executed; missing coverage and histories retained",
+      "source_route_scope": "Independently verified broad equity ETF first; bonds retain original V75; unverified products retain prior components",
+      "validation": {
+        "related_unit_methods_passed": 109,
+        "pinned_original_hashes_passed": 115,
+        "compile": "PASS",
+        "source_package_manifest": "42/42_PASS",
+        "ci_success_runs": [
+          40588192406,
+          40588192444,
+          40588192574,
+          40588192468,
+          40588192413
+        ]
+      },
+      "unrun_acceptance": {
+        "full_TECH_53": "NOT_CLAIMED",
+        "full_CMR_52": "NOT_RUN",
+        "global_68": "NOT_RUN",
+        "formal_owner_42": "NOT_RUN"
+      },
+      "coverage": {
+        "complete": 0,
+        "partial": 26,
+        "blocked": 0
+      },
+      "official_db_changed": false,
+      "deployment_status": "NOT_RUN",
+      "canonical_result": null,
+      "mentor": null,
+      "trade_action": "NO_TRADE",
+      "full04_complete": false
     }
   }
 }

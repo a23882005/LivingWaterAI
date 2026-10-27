@@ -103,6 +103,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        client_id, family_alias, downloaded_db_path,
                        official_drive_file_id, verified_drive_sha256,
                        trusted_analysis_source_producer=None,
+                       native_source_config=None,
                        official_holdings_decision=None,
                        trusted_w6_current_input_producer=None,
                        approved_w6_archive=None, approved_w6_renderer=None,
@@ -119,6 +120,15 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     source_module=_load(ROOT/"on_demand_current_sources.py","family_w8_current_sources")
+    if native_source_config is not None:
+        if trusted_analysis_source_producer is not None:
+            raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
+        native=_load(ROOT/'native_asset_source.py','family_w8_native_source')
+        config=dict(native_source_config)
+        if config.get('db_path') is not None and Path(config['db_path']).resolve()!=Path(downloaded_db_path).resolve():
+            raise PermissionError('NATIVE_PRODUCER_DB_OVERRIDE_REJECTED')
+        config['db_path']=downloaded_db_path
+        trusted_analysis_source_producer=native.AssetSourceProducer(**config)
     def current_source_provider(snapshot):
         try:
             return source_module.build_current_sources(snapshot,downloaded_db_path)

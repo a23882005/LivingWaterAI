@@ -196,15 +196,29 @@ class OfficialFamilyEntry:
             or request.get("client_snapshot", {}).get("payload", {}).get("source_sha256") != current["source_sha256"]):
             raise PermissionError("OFFICIAL_ANALYSIS_SOURCE_MISMATCH")
         context = runner.context_provider()
+        source_binding=context.get('source_production_binding',{})
+        source_failure_bound=(source_binding.get('schema_version')=='Family.W8.SourceProductionBinding.v1'
+            and source_binding.get('client_id')==self.client_id
+            and source_binding.get('source_db_sha256')==current['source_sha256']
+            and source_binding.get('run_id')==request.get('run_id')
+            and source_binding.get('data_provenance')=='SOURCE_BACKED')
         if (context.get("client_id") != self.client_id
-            or context.get("native_binding", {}).get("data_provenance") != "SOURCE_BACKED"):
+            or (context.get("native_binding", {}).get("data_provenance") != "SOURCE_BACKED"
+                and not source_failure_bound)):
             raise PermissionError("OFFICIAL_ANALYSIS_PROVENANCE_REQUIRED")
         decision = runner.analyze(request)
         if decision.get("status") != "OK":
-            return {"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
+            result={"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
                     "client_id": self.client_id, "source_sha256": current["source_sha256"],
                     "issue_codes": decision.get("issue_codes", []),
                     "trade_authorization": "NONE"}
+            if source_failure_bound:
+                result.update(source_production=decision.get('source_production'),
+                    call_trace=decision.get('call_trace',[]),mentor=decision.get('mentor'))
+                report=decision.get('source_production') or {}
+                result.update(analysis_summary=report.get('analysis_summary'),
+                    analysis_mode=report.get('analysis_mode'),cash_trial=report.get('cash_trial'))
+            return result
         if decision.get("client_id") != self.client_id or decision.get("data_provenance") != "SOURCE_BACKED":
             raise PermissionError("OFFICIAL_RESULT_CLIENT_MISMATCH")
         for key in ("run_id", "evaluation_at"):

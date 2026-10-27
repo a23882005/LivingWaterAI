@@ -26,9 +26,10 @@ from family_technical_bridge import bind_technical_source,apply_technical_source
 
 
 class FamilyRunner:
-    def __init__(self,repo_path,*,context_provider):
+    def __init__(self,repo_path,*,context_provider,native_source_report=None):
         self.repo_path=Path(repo_path).resolve()
         self.context_provider=context_provider
+        self.native_source_report=deepcopy(native_source_report)
         verify(self.repo_path)
         path=Path(__file__).parent/'vendor/w2/runtime/c_configuration_core/work21/recovery.py'
         spec=importlib.util.spec_from_file_location('w5_runner_w2_recovery',path)
@@ -95,6 +96,31 @@ class FamilyRunner:
     def analyze(self,request,*,timeout_seconds=30):
         frozen=deepcopy(request)
         try:
+            if self.native_source_report is not None:
+                ctx=deepcopy(self.context_provider())
+                prepare_input(frozen,trusted_context=ctx)
+                report=deepcopy(self.native_source_report)
+                require(report.get('schema_version')=='Family.W8.NativeSourceProduction.v1'
+                    and report.get('status')=='BLOCKED_BY_ORIGINAL_ADAPTER'
+                    and report.get('complete_native_bundle') is False
+                    and report.get('mentor') is None,
+                    'INVALID_NATIVE_SOURCE_FAILURE','source_production')
+                require(report.get('report_digest')==digest({k:v for k,v in report.items() if k!='report_digest'})
+                    and report.get('request_digest')==digest(frozen)
+                    and report.get('client_id')==frozen['client_id']
+                    and report.get('run_id')==frozen['run_id']
+                    and report.get('owner')==frozen['owner']
+                    and report.get('source_db_sha256')==frozen['client_snapshot']['payload']['source_sha256'],
+                    'NATIVE_SOURCE_FAILURE_BINDING_MISMATCH','source_production')
+                failure=report['first_failure']
+                result=self._error(frozen,'DATA_UNAVAILABLE',{
+                    'code':failure['code'],'field_path':failure.get('field_path'),
+                    'producer':failure['function'],'message':failure['raw_error']})
+                return {**result,'source_production':report,
+                    'call_trace':['W5.FamilyRunner.analyze:validate_source_failure',*report['call_trace']],
+                    'data_provenance':report.get('effective_input_provenance','SOURCE_BACKED'),
+                    'source_data_provenance':'SOURCE_BACKED',
+                    'mode':report.get('mode'),'runtime_mode':'REAL_DETERMINISTIC'}
             response=self.store.analyze(frozen,validate=self._validate,compute=self._compute,timeout_seconds=timeout_seconds)
             return {**response['result'],'replay_status':response['status']}
         except BoundaryError as error:

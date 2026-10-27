@@ -113,6 +113,10 @@ jobs:
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_market_observations.py' -v
       - name: Run sealed official holdings source mapping
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_official_holdings_projection.py' -v
+      - name: Run first-asset source and cash-only trial guards
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_native_asset_source.py' -v
+      - name: Validate cash-only simulation overlays
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_loop2_cash_scenario.py' -v
       - name: Run existing approved target input and original Family boundary
         env:
           PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests

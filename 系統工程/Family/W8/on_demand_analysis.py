@@ -161,6 +161,34 @@ class OnDemandAnalysisProvider:
         if 'native_sources' in pack:
             if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
             request,context=assemble_native_input(request,context,pack['native_sources'])
+        source_report=pack.get('source_production')
+        if source_report is not None:
+            if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
+            from family_input import digest
+            from family_runner import FamilyRunner
+            if (source_report.get('schema_version')!='Family.W8.NativeSourceProduction.v1'
+                or source_report.get('status')!='BLOCKED_BY_ORIGINAL_ADAPTER'
+                or source_report.get('client_id')!=client
+                or source_report.get('source_db_sha256')!=sha
+                or source_report.get('run_id')!=request.get('run_id')
+                or source_report.get('request_digest')!=digest(request)):
+                raise PermissionError('ON_DEMAND_SOURCE_FAILURE_BINDING_MISMATCH')
+            if source_report.get('mode')=='CASH_ZERO_SIMULATION':
+                from loop2_cash_scenario import validate_cash_overlay
+                for trial in source_report.get('cash_by_domain',{}).values():
+                    scenario=trial['scenario']
+                    validated=validate_cash_overlay(scenario['raw_cash'],scenario,
+                        snapshot=snapshot,owner=trial['owner'],authorization=scenario['authorization'],
+                        run_id=request['run_id'])
+                    if validated['issues'] or validated['effective_cash']!=trial['decimal_values']:
+                        raise PermissionError('ON_DEMAND_CASH_OVERLAY_INVALID')
+            context=deepcopy(context)
+            context['source_production_binding']={'schema_version':'Family.W8.SourceProductionBinding.v1',
+                'data_provenance':'SOURCE_BACKED','report_digest':source_report['report_digest'],
+                'effective_input_provenance':source_report.get('effective_input_provenance'),
+                'client_id':client,'source_db_sha256':sha,'run_id':request['run_id']}
+            return deepcopy(request),FamilyRunner(self.repo_root,context_provider=lambda:deepcopy(context),
+                native_source_report=source_report)
         binding = context.get("native_binding", {})
         if (binding.get("schema_version") != "Family.W5.NativeBinding.v1"
                 or binding.get("data_provenance") != "SOURCE_BACKED"

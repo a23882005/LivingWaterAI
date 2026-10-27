@@ -67,7 +67,22 @@ def _originals():
     return scope,numeric
 
 
-def _aggregate(repo_path,vectors):
+def predicate_votes(rows):
+    """Translate the explicitly approved ETF non-voting slot, never UNKNOWN."""
+    values=[]
+    for row in rows:
+        value=row['truth']
+        if value=='NOT_APPLICABLE':
+            if (row['name']!='eps_guidance_not_worse' or row.get('effective_vote')!='FALSE'
+                or row.get('applicability')!='ETF_NOT_ISSUER'
+                or row.get('rule_profile')!='V82_COMPLETE_V04_OWNER_APPROVED'):
+                raise ValueError('UNAUTHORIZED_NONVOTING_TECHNICAL_SLOT')
+            value='FALSE'
+        values.append(value)
+    return values
+
+
+def _aggregate(repo_path,vectors,ma20_ok='UNKNOWN'):
     from verify_dependencies import verify
     verify(repo_path)
     source=Path(repo_path).resolve()/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
@@ -78,8 +93,8 @@ def _aggregate(repo_path,vectors):
         from livingwater_v82_runtime.enums import PredicateTruth
     finally:sys.path.remove(str(source))
     if Path(native.__file__).resolve().parent!=source/'livingwater_v82_runtime':raise ValueError('RUNTIME_SOURCE_MISMATCH')
-    kwargs={k:[PredicateTruth(x['truth']) for x in vectors[k]] for k in NAMES}
-    result=evaluate_technical(**kwargs,ma20_ok=PredicateTruth.UNKNOWN)
+    kwargs={k:[PredicateTruth(x) for x in predicate_votes(vectors[k])] for k in NAMES}
+    result=evaluate_technical(**kwargs,ma20_ok=PredicateTruth(ma20_ok))
     return {k:getattr(result,k).value for k in ('right_confirmation','runaway_up','runaway_down')}
 
 

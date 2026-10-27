@@ -61,7 +61,11 @@ def unresolved_core_contracts(observed,broad_etf):
         ('safety.credit_liquidity','SOURCE_CONTRACT_MISSING','Verified credit/liquidity level, direction and speed are absent','V82 §38–40 / §62'),
         ('safety.material_events','SOURCE_CONTRACT_MISSING','Required-domain event coverage/checkpoint evidence is absent','V82 Work5 / §62'),
         ('hard_gate_predicates','SOURCE_CONTRACT_MISSING','No complete same-run original V82 safety predicate producer result is bound','V82 §39 / §62'),
-        ('ma20_ok','DEFINITION_OR_PRODUCER_UNRESOLVED','MA20 comparison is available; the significant-break predicate has no verified executable mapping. Close > MA20 is not a substitute','V82 §43-A / §24-C')]
+        ]
+    if observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN')=='UNKNOWN':
+        gaps.append(('ma20_ok','SOURCE_CONTRACT_MISSING',
+            'Owner-approved 1% rule is available; required Close/MA20 sample is unavailable',
+            'Owner-approved v0.4 TECH4 MA20_OK'))
     if broad_etf:
         gaps.append(('safety.etf_structure','SOURCE_CONTRACT_MISSING',
             'Product diversification establishes type/grade, not current ETF structural safety or event coverage','V82 Work4 ETF applicability'))

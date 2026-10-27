@@ -45,6 +45,14 @@ def audit(row,source):
     for n in (1,2,3):
         lows=obs.get('swings',{}).get('lows',[])
         if len(lows)>=n:known['previous_swing_low_'+str(n)]=lows[-n]['value']
+    approved=obs.get('approved_technical',{})
+    if approved:
+        nums=approved['numeric_decimal']
+        known['kd_state']={k:nums.get(k) for k in ('kd_k','kd_d')}
+        known['emv_state']=nums.get('emv_3_3')
+        # Computable daily observation is independent of missing calendar
+        # coverage. Weekly/monthly formal states retain the calendar gap.
+        known['daily_timeframe_state']=approved['timeframes']['daily']['state']
     def resolved(value):
         if value is None or value=='UNKNOWN' or value=={}:return False
         if isinstance(value,dict):return all(resolved(x) for x in value.values())
@@ -81,6 +89,12 @@ def audit(row,source):
             }.get(field,('DEPENDENCY_UNRESOLVED','Dependent original source or mapping is unresolved'))
             entry.update(gap_kind=cause[0],reason=cause[1],
                 program_location='W8.holdings_analysis.build_analysis_report / W8.analysis_requirements.audit')
+            if approved and field in ('weekly_timeframe_state','monthly_timeframe_state'):
+                timeframe=field.split('_')[0]
+                entry.update(gap_kind='SOURCE_SESSION_COVERAGE_UNVERIFIED',
+                    reason='Approved classifier is computed in approved_technical.timeframes.'+timeframe+
+                        '; official calendar/session completeness is not verified',
+                    numeric_observation=approved['timeframes'][timeframe])
         entries.append(entry)
     required=[r for r in entries if r['global_outcome_required'] and r['status']!='RESOLVED']
     inapplicable=[]

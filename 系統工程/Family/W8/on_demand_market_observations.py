@@ -66,7 +66,8 @@ def _macro_metrics(macro, evaluated_at):
     return metrics, sources
 
 
-def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id,formal_rule_source=None):
+def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id,formal_rule_source=None,
+                              approved_rule_profile=None,is_etf=None):
     """Run original routines on validated rows; return no deployment decisions."""
     import pandas as pd
     from technical_source_bridge import _originals, _aggregate, NAMES, mapped_numeric_signals
@@ -107,7 +108,12 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
     if formal_rule_source is not None:
         from formal_analysis_signals import map_formal_observations
         formal_signals=map_formal_observations(rows,values,previous,base_facts,swings,vectors,formal_rule_source)
-    v82 = _aggregate(repo_root, vectors)
+    approved={}
+    if approved_rule_profile is not None:
+        from approved_v04_technical import produce
+        approved=produce(rows,profile=approved_rule_profile,is_etf=is_etf)
+        vectors=approved['signals']
+    v82 = _aggregate(repo_root, vectors,approved.get('ma20_ok','UNKNOWN'))
     runtime = Path(repo_root).resolve() / '系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
     if str(runtime) not in sys.path:
         sys.path.insert(0, str(runtime))
@@ -139,7 +145,7 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
             'original_default_freshness_is_not_attestation': True,
             'deployment_input_eligible': False}
     return {'numeric': values, 'previous_numeric': previous, 'base_facts': base_facts,
-        'swings':swings,'formal_analysis_signals':formal_signals,
+        'swings':swings,'formal_analysis_signals':formal_signals,'approved_technical':approved,
         'td9': td9, 'observed_named_signals': vectors,
         'v82_original_aggregation': v82,
         'v75_original_predicates': predicates, 'macro_metric_sources': sources,
@@ -147,11 +153,11 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
         'call_trace': ['ORIGINAL.calculate_td9', 'ORIGINAL.analytics.technical',
                        'ORIGINAL.confirmed_swing_lows/highs']+
                        (['W8.formal_analysis_signals.map_formal_observations'] if formal_signals else [])+[
-                       'V82.evaluate_technical'] + (['V75.PRED-001..010'] if is_bond else []),
+                       'V82.evaluate_technical'] + approved.get('call_trace',[]) + (['V75.PRED-001..010'] if is_bond else []),
         'formal_deployment_eligible': False, 'trade_authorization': 'NONE'}
 
 
-def evaluate_close_history(rows, *, repo_root,formal_rule_source=None):
+def evaluate_close_history(rows, *, repo_root,formal_rule_source=None,approved_rule_profile=None,is_etf=None):
     """Execute only original Close-dependent routines when H/L/O is invalid.
 
     Unknown High/Low/Volume inputs are explicit NaN, never repaired prices.
@@ -182,10 +188,16 @@ def evaluate_close_history(rows, *, repo_root,formal_rule_source=None):
     if formal_rule_source is not None:
         from formal_analysis_signals import map_formal_observations
         formal_signals=map_formal_observations(rows,current,previous,facts,{},vectors,formal_rule_source)
+    approved={}
+    if approved_rule_profile is not None:
+        from approved_v04_technical import produce
+        approved=produce(rows,profile=approved_rule_profile,is_etf=is_etf,close_only=True)
+        vectors=approved['signals']
     return {'numeric':current,'previous_numeric':previous,'td9':asdict(legacy['calculate_td9'](frame['Close'].tolist())),
+        'approved_technical':approved,
         'formal_analysis_signals':formal_signals,
         'base_facts':facts,'swings':{'lows':[],'highs':[]},'observed_named_signals':vectors,
-        'v82_original_aggregation':_aggregate(repo_root,vectors),'v75_original_predicates':{},
+        'v82_original_aggregation':_aggregate(repo_root,vectors,approved.get('ma20_ok','UNKNOWN')),'v75_original_predicates':{},
         'component_gaps':{k:'INVALID_OHLCV__CLOSE_ONLY_COMPONENT_DOES_NOT_CONSUME_HIGH_LOW_VOLUME'
             for k in current if k not in independent},
         'call_trace':['ORIGINAL.calculate_td9','ORIGINAL.analytics.technical:Close_dependencies_only','V82.evaluate_technical'],
@@ -222,7 +234,8 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 
 
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
-                                     official_holdings=None,alternative_source_dir=None,formal_rule_source=None):
+                                     official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
+                                     approved_rule_profile=None,verified_asset_types=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -265,6 +278,12 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             raise ValueError('ALTERNATIVE_MARKET_MANIFEST_SCHEMA')
     for instrument in instruments:
         key, symbol = instrument['instrument_key'], instrument.get('ticker')
+        is_etf=(True if (verified_asset_types or {}).get(symbol)=='BROAD_ETF' else
+            instrument.get('instrument_type')=='ETF' if instrument.get('instrument_type') in ('ETF','STOCK') else None)
+        # First production route is restricted to independently proven broad
+        # stock ETFs. V75 bonds and unverified/derivative products retain their
+        # existing components; approval does not manufacture product identity.
+        routed_profile=(approved_rule_profile if (verified_asset_types or {}).get(symbol)=='BROAD_ETF' else None)
         if (instrument.get('identity_state') not in ('KNOWN', 'SOURCE_SYMBOL_ONLY') or not isinstance(symbol, str)
                 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,31}', symbol)):
             missing.append({'instrument_key': key, 'code': 'KNOWN_EXACT_SYMBOL_REQUIRED'})
@@ -327,7 +346,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                         if alternate_entry and alternate_entry.get('allow_close_only_analysis'):
                             close_only=True
                         else:raise ValueError('CACHE_OHLCV_INVALID')
-                rows.append({'Date': row['Date'], **vals})
+                rows.append({'Date': row['Date'], **vals,'_source_decimal':{
+                    key:row.get(key) for key in ('Open','High','Low','Close','Volume')}})
             if invalid_rows and not close_only:
                 # No middle rows are deleted, repaired or made up. Start a new
                 # analysis window strictly after the most recent bad source bar.
@@ -343,11 +363,23 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             if close_only:
                 if any(not math.isfinite(r.get('Close',float('nan'))) or r['Close']<=0 for r in rows):
                     raise ValueError('CLOSE_ONLY_SOURCE_CLOSE_INVALID')
-                result=evaluate_close_history(rows,repo_root=repo_root,formal_rule_source=formal_rule_source)
+                result=evaluate_close_history(rows,repo_root=repo_root,formal_rule_source=formal_rule_source,
+                    approved_rule_profile=routed_profile,is_etf=is_etf)
             else:result = evaluate_observed_history(rows, repo_root=repo_root, evaluation_at=evaluation_at,
-                macro=macro, asset_id=symbol,formal_rule_source=formal_rule_source)
+                macro=macro, asset_id=symbol,formal_rule_source=formal_rule_source,
+                approved_rule_profile=routed_profile,is_etf=is_etf)
             if cache.read_bytes() != raw:
                 raise ValueError('CACHE_CHANGED_DURING_CALCULATION')
+            if result.get('approved_technical'):
+                binding={'symbol':symbol,'provider_symbol':provider_symbol,'source_sha256':_hash(raw),
+                    'manifest_sha256':_hash(alternate_raw if alternate_entry else manifest_raw),
+                    'source_db_sha256':snapshot['source_sha256'],'observed_session':dates[-1],
+                    'evaluated_at':evaluation_at,'provider_verified_at':entry['last_verified_utc']}
+                result['approved_technical']['source_binding']=binding
+                for slots in result['observed_named_signals'].values():
+                    for slot in slots:
+                        slot['source_ids_and_digests']=deepcopy(binding)
+                        slot['numeric_context_reference']='approved_technical.numeric_decimal'
             assets.append({'instrument_key': key, 'symbol': symbol, 'observed_date': dates[-1],
                 'provider_symbol':provider_symbol,'analysis_identity_mapping':identity_mapping,
                 'observed_close': rows[-1]['Close'], 'rows': len(rows),'history_quality':history_quality,

@@ -186,6 +186,10 @@ class AssetSourceProducer:
         self.issuer_facts_source=issuer_facts_source
         self.product_sources=deepcopy(product_sources or {})
         self.issuer_facts_sources=deepcopy(issuer_facts_sources or {})
+        self.approved_rule_profile=None
+        if flow=='HOLDINGS_ANALYSIS':
+            from approved_v04_technical import load_profile
+            self.approved_rule_profile=load_profile(HERE/'owner_approved_v04.json')
         # Retain the existing single-source configuration without copying one
         # product's evidence into any other product's route.
         if product_source is not None:self.product_sources.setdefault('VT',deepcopy(product_source))
@@ -217,7 +221,10 @@ class AssetSourceProducer:
         holdings=project_official_holdings(snapshot,evaluation_at=when)
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings,
-            alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source)
+            alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
+            approved_rule_profile=self.approved_rule_profile,
+            verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
+                for symbol,proof in self.product_sources.items()})
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         if self.flow=='HOLDINGS_ANALYSIS':
@@ -485,7 +492,8 @@ class AssetSourceProducer:
         if str(path) not in sys.path:sys.path.insert(0,str(path))
         from livingwater_v82_runtime.core_rules import evaluate_core_rule_state,EvidenceFact
         from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
-        groups={k:[PredicateTruth(r['truth']) for r in values]
+        from technical_source_bridge import predicate_votes
+        groups={k:[PredicateTruth(value) for value in predicate_votes(values)]
                 for k,values in observed['observed_named_signals'].items()}
         gaps=unresolved_core_contracts(observed,broad_etf)
         safety=[EvidenceFact(name=g['field_path'],value='UNKNOWN',
@@ -496,7 +504,8 @@ class AssetSourceProducer:
             'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
             **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
             'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
-            'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth.UNKNOWN}
+            'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth(
+                observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN'))}
         result=evaluate_core_rule_state(**arguments)
         serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
             asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))

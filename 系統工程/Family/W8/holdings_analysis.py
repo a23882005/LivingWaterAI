@@ -106,6 +106,15 @@ def signal_gaps(observed):
     for group,rows in observed['observed_named_signals'].items():
         for row in rows:
             if row['truth']=='UNKNOWN':
+                if observed.get('approved_technical'):
+                    problem=issue('technical.signals.'+group+'.'+row['name'],
+                        row.get('reason','MISSING_REQUIRED_INPUT_OR_REFERENCE')+'; dependencies: '+
+                            ', '.join(row.get('dependencies',[])),
+                        'Approved rule is implemented; only this source-dependent predicate is unavailable',
+                        category=3,source=observed['source_path'])
+                    problem['gap_kind']='SOURCE_OR_CONFIRMED_REFERENCE_MISSING'
+                    out.append(problem)
+                    continue
                 reason=pending.get(row['name'],'Required named event evidence is absent: '+row['name'])
                 program_missing=row['name'].startswith(('emv_','kd_'))
                 problem=issue('technical.signals.'+group+'.'+row['name'],reason,
@@ -241,6 +250,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'kd_k_9_3_and_kd_d_9_3_3':'Original rolling smoothing; not approved canonical KD',
                 'emv_14':'Original EMV14; not formal EMV(3,3)',
                 'above_ma20_and_reclaim_ma20':'Existing W5 base facts; not canonical event votes'}
+            if observed.get('approved_technical'):
+                row['numeric_semantics']['approved_v04']='Owner-approved Decimal(50) producer; no display rounding in predicate comparisons'
+                row['numeric_semantics']['kd_k_9_3_and_kd_d_9_3_3']='Legacy observations retained; approved KD_SMA3_SMA3 is separately bound in approved_technical'
+                row['numeric_semantics']['emv_14']='Legacy EMV14 retained; approved EMV_ARMS_SMA3_SMA3_SCALE1E8 is separately bound'
             row['unknown_resolution']=[{'field_path':'technical.'+key,'category':2,
                 'resolution':'COMPUTED_WITH_ORIGINAL_ALGORITHM','function':'ORIGINAL.analytics.technical'}
                 for key,value in observed['numeric'].items() if value is not None]

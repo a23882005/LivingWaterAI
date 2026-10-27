@@ -47,15 +47,39 @@ def forward_observations(snapshot,symbol,evaluated_at):
     # VT/VWRA-type route. A trailing multiple never enters this mapper.
     level=('CHEAP' if value<14 else 'NORMAL' if value<18 else 'PRICEY' if value<20
         else 'EXPENSIVE' if value<23 else 'EXTREME_CANDIDATE')
+    freshness,pit,missing=valuation_validity(row,at)
     return [{'metric_name':'FORWARD_PE','current':str(value),'unit':'multiple',
         'valuation_level':level,'classification_scope':'AUTHORIZED_RANGE_OBSERVATION__VALIDITY_REQUIRED',
         'source_reference':row['source'],'source_sha256':snapshot['source_sha256'],
         'source_field':'V70.indicators.m03_vt','source_row':deepcopy(row),
         'as_of':row['dataDate'],'observed_date_text':row['dataDate'],'data_quality':'OK',
-        'freshness':'UNKNOWN','pit_status':'UNVERIFIABLE',
-        'missing_contracts':['frequency/valid_until_or_max_age','field_available_at/PIT'],
+        'freshness':freshness,'pit_status':pit,'frequency':row.get('frequency'),
+        'available_at':row.get('available_at'),'published_at':row.get('published_at'),
+        'valid_until':row.get('valid_until'),'method':row.get('method'),
+        'missing_contracts':missing,
         'scope':'EXISTING_VERIFIED_V70_FORWARD_VALUE__NO_INVENTED_FRESHNESS',
         'range_rule':'V82 §32.3 VT/VWRA forward-only 14/18/20/23'}]
+
+
+def valuation_validity(row,at):
+    """Use explicit source contracts, never turn retrieval time into PIT."""
+    missing=[];freshness='UNKNOWN';pit='UNVERIFIABLE'
+    def timestamp(key):
+        value=row.get(key)
+        if value is None:return None
+        try:
+            parsed=datetime.fromisoformat(value.replace('Z','+00:00'))
+            return parsed if parsed.utcoffset() is not None else None
+        except (TypeError,ValueError,AttributeError):return None
+    until=timestamp('valid_until');available=timestamp('available_at');published=timestamp('published_at')
+    order_valid=(available is not None and available<=at and
+        (published is None or published<=available) and date.fromisoformat(row['dataDate'])<=available.date())
+    if until is not None and row.get('frequency') and order_valid:
+        freshness='FRESH' if available<=until and at<=until else 'STALE'
+    if freshness=='UNKNOWN':missing.append('frequency/valid_until_or_max_age')
+    if order_valid:pit='VERIFIED'
+    else:missing.append('field_available_at/PIT')
+    return freshness,pit,missing
 
 
 def credit_logic(hy,vix,move,*,rapid=None,treasury=None,repo=None,official=None,direction_widening=None):

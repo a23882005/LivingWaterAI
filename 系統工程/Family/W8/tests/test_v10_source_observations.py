@@ -25,6 +25,21 @@ class FormalSourceTest(unittest.TestCase):
     def test_wrong_metric_label_is_not_forward_pe(self):
         s=self.snapshot();s['payload']['indicators']['m03_vt']['sourceEvidence']['label']='Trailing PE';s['digest']=digest(s['payload'])
         with self.assertRaisesRegex(ValueError,'DEFINITION_OR_SOURCE'):forward_observations(s,'VT','2026-10-27T21:00:00Z')
+    def test_valid_explicit_contract_reaches_original_native_valuation(self):
+        s=self.snapshot();row=s['payload']['indicators']['m03_vt']
+        row.update(frequency='DAILY',available_at='2026-10-27T00:59:00Z',valid_until='2026-10-27T22:00:00Z')
+        s['digest']=digest(s['payload']);metrics=forward_observations(s,'VT','2026-10-27T21:00:00Z')
+        self.assertEqual(metrics[0]['freshness'],'FRESH');self.assertEqual(metrics[0]['pit_status'],'VERIFIED')
+        root=HERE.parents[2];sys.path.insert(0,str(root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'))
+        from livingwater_v82_runtime.core_rules import resolve_valuation
+        result=resolve_valuation(metrics,['FORWARD_PE','TRAILING_PE','CAPE','PB','FCF_YIELD'])
+        self.assertEqual(result.level.value,'NORMAL');self.assertTrue(result.formal_output_eligible)
+    def test_expired_contract_is_stale_and_future_availability_is_not_verified(self):
+        s=self.snapshot();row=s['payload']['indicators']['m03_vt']
+        row.update(frequency='DAILY',available_at='2026-10-27T00:59:00Z',valid_until='2026-10-27T20:00:00Z')
+        s['digest']=digest(s['payload']);self.assertEqual(forward_observations(s,'VT','2026-10-27T21:00:00Z')[0]['freshness'],'STALE')
+        row['available_at']='2026-10-27T22:00:00Z';s['digest']=digest(s['payload'])
+        self.assertEqual(forward_observations(s,'VT','2026-10-27T21:00:00Z')[0]['pit_status'],'UNVERIFIABLE')
     def test_known_bands_survive_missing_credit_event_coverage(self):
         result=macro_observations(self.snapshot(),'2026-10-27T21:00:00Z')
         self.assertEqual(result['observed']['hy_oas']['value'],'338.00')

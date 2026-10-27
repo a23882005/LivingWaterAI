@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T21:15:25+08:00",
+  "updated_at": "2026-10-27T15:03:36.293Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1070,7 +1070,7 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "IN_PROGRESS__SEALED_SOURCE_POSITIONS_BOUND__NATIVE_BUNDLE_PRODUCER_INCOMPLETE",
+    "status": "IN_PROGRESS__FIRST_ASSET_BLOCKED_BY_ORIGINAL_C7_FUNDING_CONTRACT",
     "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
@@ -1109,16 +1109,16 @@
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 2656240,
-      "sha256": "8cdaf46f584b5da82291a3474cb5dfed4e1e3739c9e6e6ceced779c2f84e8016",
+      "bytes": 9835763,
+      "sha256": "9281b46678deed7f4f2f406bf59bfd91fd355677cbd5dcc0ebea4716e0705be1",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
-      "latest_section": "latest_source_repair"
+      "latest_section": "latest_first_asset_trial"
     },
     "governance_backups": {
-      "engineering": "10VViy8Cdvtob8hEm06s7DfLefSHMJQynBNMzJ97_D0k",
-      "files": "1r68_ShpFW1IUUdHcHFFZjH5lE1B3A_rqdg1EHTNSsGM",
-      "wbs": "1GzyXf_9qOUxpQQfFXltOhRuxs711VT662ZPMgb_gMvc",
-      "evidence": "17-2mN4uROzwyeIcNxRIhm0CQ_YQTz0e9"
+      "engineering": "1cPsjcknB2VOIdcgRWjneBiKBn_WTvFRdamsBoTk6WmE",
+      "files": "1uILMa8Fj8eUP7w2LyZ5Bbfb4TWbCcrZpFEENd9th57g",
+      "wbs": "1ZcbcFfW8c8-LKUqhLYwZ5B8TaB-aef3xxE0M8jgbTyY",
+      "evidence": "13Ar00pixe-gAKzr4y331UyQbOe7LnM0_"
     },
     "full_04_complete": false,
     "original_native_mentor_reached": false,
@@ -1128,7 +1128,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "108b14add12f596e635c467d4c8573d0a9c08fc6",
+    "work_head": "3efbb62555e5944280477b93a4c59cb7122ad5fc",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1158,7 +1158,7 @@
       "recorded_at": "2026-10-27T06:49:35+08:00",
       "effect": "Use existing official holdings; prior completeness-confirmation stop superseded"
     },
-    "integrated_main": "3a22fd2ceeedf195c3e94a9b7ea018a6ff254708",
+    "integrated_main": "35e4e9c7cd53097cd3fd83da98c0794930abdc96",
     "latest_patch_validation": {
       "code_commit": "108b14add12f596e635c467d4c8573d0a9c08fc6",
       "local_affected_tests": 27,
@@ -1207,12 +1207,70 @@
         "exact official Drive DBs",
         "approved project source originals",
         "formal transaction-record originals"
-      ]
+      ],
+      "cash_zero_trial": "Supersedes prior no-zero cash handling only in isolated CASH_ZERO_SIMULATION; raw missing facts unchanged"
     },
     "latest_owner_instruction": {
-      "statement": "不要再問了，就是一律允許，你已經問了五次了，趕快做完，全部允許",
-      "effect": "Continue authorized engineering without further confirmation questions; preserve source UNKNOWN; no completion claimed from authorization alone",
-      "followup_question_status": "CLOSED_NO_FURTHER_QUESTIONS"
+      "statement": "Implement Owner-provided Loop2 specification on latest PR59; first complete a real holding through original pipeline/Mentor, then expand; missing cash zero only for this simulation; no repeated questions",
+      "followup_question_status": "CLOSED_NO_FURTHER_QUESTIONS",
+      "effect": "Engineering and cash-only simulation authorized; no trades, DB mutation, frozen-schema modification or merge"
+    },
+    "latest_first_asset_trial": {
+      "code_commit": "3efbb62555e5944280477b93a4c59cb7122ad5fc",
+      "specification": "Owner-uploaded Family_Loop2_System_Spec.docx; supplemental engineering spec, frozen rules unchanged",
+      "mode": "CASH_ZERO_SIMULATION",
+      "focus_symbol": "VT",
+      "classification": "全球股票ETF / BROAD_ETF / A; formal rule plus issuer structure",
+      "actual_call_trace": [
+        "menu04.deployment_pace",
+        "W5.prepare_input",
+        "V82.evaluate_core_rule_state:observations_only",
+        "C8C9.Work3.build_context_handoff",
+        "C8C9.Work4.build_v82_runtime_input"
+      ],
+      "first_failure": {
+        "function": "C8C9.Work4.build_v82_runtime_input",
+        "code": "C8C9.W4.MONEY",
+        "field_path": "/c7_funding_context/contexts/0/bucket_new_investment_amount",
+        "raw_error": "C8C9.W4.MONEY: c7.contexts[0].bucket_new_investment_amount must be JSON number or decimal string"
+      },
+      "additional_contract_scope_issue": "TW_SUB_BROKERAGE broker/account absent; original three-domain contract has no unused-domain representation",
+      "source_checked": [
+        "Exact member DB funding tables (evaluation/assignment/source/domain empty)",
+        "Approved project originals and target proofs",
+        "Original C7 schema and Work4 validator"
+      ],
+      "cash": "Known cash retained; missing cash-only four fields zeroed per-run with isolated validated overlay; no noncash or investment-pool zero assumption",
+      "positions_scope": "Accepted selected IB account only, not all household assets",
+      "coverage": {
+        "Joseph": {
+          "positions": 10,
+          "native_complete": 0,
+          "mentor": null
+        },
+        "MOU": {
+          "positions": 16,
+          "native_complete": 0,
+          "mentor": null
+        }
+      },
+      "conservation_status": "NOT_REACHED",
+      "source_manifest": "PRIVATE_EVIDENCE_ONLY",
+      "native_bundle_complete": false,
+      "full_native_pipeline_complete": false,
+      "work9_mentor_complete": false,
+      "local_affected_unittest": 32,
+      "original_dependency_hashes": 115,
+      "compile": "PASS",
+      "ci_success_runs": [
+        40526645794,
+        40526645925,
+        40526645997
+      ],
+      "local_pytest": "NOT_RUN__PYTEST_UNAVAILABLE; existing GitHub CI success recorded separately",
+      "official_db_changed": false,
+      "trade_action": "NO_TRADE",
+      "spec_test_acceptance": "Partial T02/T03 and cash portions of T04/T05/T15 tested; T01-T15 full acceptance not complete"
     }
   }
 }

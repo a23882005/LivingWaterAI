@@ -158,6 +158,33 @@ class OnDemandAnalysisProvider:
                 account_key=request['owner']['account'],
                 owner_decision=self.official_holdings_decision,
                 evaluation_at=request['evaluation_at'])
+        if 'analysis_report' in pack:
+            if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
+            here=str(Path(__file__).resolve().parent)
+            if here not in sys.path:sys.path.insert(0,here)
+            from family_input import digest
+            from holdings_analysis import HoldingsAnalysisRunner,STATES
+            from loop2_cash_scenario import validate_cash_overlay
+            report=pack['analysis_report']
+            if (report.get('status') not in STATES
+                or report.get('client_id')!=client or report.get('run_id')!=request.get('run_id')
+                or metadata.get('run_id')!=request.get('run_id')
+                or report.get('source_db_sha256')!=sha
+                or report.get('request_digest')!=digest(request)
+                or request.get('trade_authorization','NONE')!='NONE'
+                or context.get('trade_authorization','NONE')!='NONE'):
+                raise PermissionError('ON_DEMAND_HOLDINGS_ANALYSIS_BINDING_MISMATCH')
+            trial=report['cash_trial'];scenario=trial['scenario']
+            validated=validate_cash_overlay(scenario['raw_cash'],scenario,snapshot=snapshot,
+                owner=trial['owner'],authorization=scenario['authorization'],run_id=request['run_id'])
+            if validated['effective_cash']!=trial['decimal_values']:
+                raise PermissionError('ON_DEMAND_CASH_OVERLAY_INVALID')
+            # A cash conflict is diagnostic and does not block independent A.
+            context=deepcopy(context)
+            context['holdings_analysis_binding']={'schema_version':'Family.W8.HoldingsAnalysisBinding.v1',
+                'client_id':client,'run_id':request['run_id'],'source_db_sha256':sha,
+                'report_digest':report['report_digest'],'source_data_provenance':'SOURCE_BACKED'}
+            return deepcopy(request),HoldingsAnalysisRunner(context=context,report=report)
         if 'native_sources' in pack:
             if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
             request,context=assemble_native_input(request,context,pack['native_sources'])

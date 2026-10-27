@@ -196,6 +196,20 @@ class OfficialFamilyEntry:
             or request.get("client_snapshot", {}).get("payload", {}).get("source_sha256") != current["source_sha256"]):
             raise PermissionError("OFFICIAL_ANALYSIS_SOURCE_MISMATCH")
         context = runner.context_provider()
+        analysis_binding=context.get('holdings_analysis_binding',{})
+        if analysis_binding:
+            if (analysis_binding.get('schema_version')!='Family.W8.HoldingsAnalysisBinding.v1'
+                or analysis_binding.get('client_id')!=self.client_id
+                or context.get('client_id')!=self.client_id
+                or analysis_binding.get('run_id')!=request.get('run_id')
+                or analysis_binding.get('source_db_sha256')!=current['source_sha256']
+                or analysis_binding.get('source_data_provenance')!='SOURCE_BACKED'):
+                raise PermissionError('OFFICIAL_HOLDINGS_ANALYSIS_BINDING_MISMATCH')
+            decision=runner.analyze(request)
+            if decision.get('report_digest')!=analysis_binding['report_digest']:
+                raise PermissionError('OFFICIAL_HOLDINGS_ANALYSIS_RESULT_MISMATCH')
+            # Family A statuses never promote a local component to Work9 canonical.
+            return {**decision,'source_sha256':current['source_sha256']}
         source_binding=context.get('source_production_binding',{})
         source_failure_bound=(source_binding.get('schema_version')=='Family.W8.SourceProductionBinding.v1'
             and source_binding.get('client_id')==self.client_id

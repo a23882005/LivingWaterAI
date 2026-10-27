@@ -75,18 +75,27 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
     legacy, numeric = _originals()
     frame = pd.DataFrame(rows)
     values = numeric.technical(frame)
+    previous = numeric.technical(frame.iloc[:-1]) if len(rows) >= 2 else {}
+    # Reuse W5's existing base-fact comparisons, independently of canonical
+    # event voting. A state above MA20 is not silently a reclaim event.
+    base_facts = {}
+    if values.get('ma20') is not None:
+        base_facts['above_ma20'] = rows[-1]['Close'] > values['ma20']
+        if len(rows) >= 2 and previous.get('ma20') is not None:
+            base_facts['reclaim_ma20'] = (rows[-2]['Close'] <= previous['ma20']
+                                        and rows[-1]['Close'] > values['ma20'])
     td9 = asdict(legacy['calculate_td9'](frame['Close'].tolist()))
     # Reuse only the comparisons already mapped in the original source bridge.
     # This observed view remains ineligible for deployment without its receipts.
     vectors = {k: [{'name': name, 'truth': 'UNKNOWN',
         'reason': 'NAMED_RULE_OR_SOURCE_REQUIRED'} for name in names] for k, names in NAMES.items()}
     if len(rows) >= 2:
-        previous = numeric.technical(frame.iloc[:-1])
         for group, name, truth, dependencies in mapped_numeric_signals(values, previous):
             next(r for r in vectors[group] if r['name'] == name).update(
                 truth='TRUE' if truth else 'FALSE', reason='EXISTING_BRIDGE_NUMERIC_RULE',
                 dependencies=dependencies)
     lows = legacy['confirmed_swing_lows'](frame['Low'].tolist())
+    highs = legacy['confirmed_swing_highs'](frame['High'].tolist())
     if len(lows) >= 2:
         next(r for r in vectors['right_signals'] if r['name'] == 'higher_low').update(
             truth='TRUE' if lows[-1].value > lows[-2].value else 'FALSE',
@@ -122,7 +131,11 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
             'input_freshness_verified': False,
             'original_default_freshness_is_not_attestation': True,
             'deployment_input_eligible': False}
-    return {'numeric': values, 'td9': td9, 'observed_named_signals': vectors,
+    return {'numeric': values, 'previous_numeric': previous, 'base_facts': base_facts,
+        'swings': {key: [dict(asdict(p), pivot_session=rows[p.index]['Date'],
+            confirmation_session=rows[p.index+2]['Date']) for p in points]
+            for key,points in [('lows',lows),('highs',highs)]},
+        'td9': td9, 'observed_named_signals': vectors,
         'v82_original_aggregation': v82,
         'v75_original_predicates': predicates, 'macro_metric_sources': sources,
         'v75_scope': 'OBSERVED_BOND_INPUTS' if is_bond else 'NOT_A_V75_SUPPORTED_BOND',
@@ -209,6 +222,9 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'source_path': str(cache.relative_to(Path(repo_root).resolve())),
                 'source_sha256': _hash(raw), 'manifest_sha256': _hash(manifest_raw),
                 'provider_symbol_match_only': True, 'formal_identity_verified': False,
+                'provider': manifest.get('data_source'),
+                'provider_verified_at': entry['last_verified_utc'],
+                'cache_validation': 'ROW_COUNT_DATE_ORDER_OHLCV_SHA256_VERIFIED',
                 'instrument_registry_state': instrument.get('identity_state'),
                 'holding_source_reference': instrument.get('holding_source_reference'),
                 'source_gaps': ['EXCHANGE_CURRENCY_PROVIDER_ATTESTATION', 'PRICE_BASIS_AND_SPLITS',

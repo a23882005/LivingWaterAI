@@ -161,12 +161,16 @@ class AssetSourceProducer:
     bundle. The member snapshot is freshly supplied by the official menu.
     """
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
-                 classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None):
+                 classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
+                 flow='HOLDINGS_ANALYSIS', analyze_all=True):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
         self.product_source=deepcopy(product_source)
+        if flow not in ('HOLDINGS_ANALYSIS','DEPLOYMENT'):
+            raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
+        self.flow=flow;self.analyze_all=analyze_all
 
     def __call__(self,snapshot,payload):
         if snapshot!=self.req['client_snapshot']['payload']:
@@ -184,16 +188,24 @@ class AssetSourceProducer:
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')
         held=found[0];asset_class=classification(self.symbol,self.class_source,self.product_source)
-        if asset_class['primary_class']!=FORMAL_CLASSES[0]:
+        if self.flow=='DEPLOYMENT' and asset_class['primary_class']!=FORMAL_CLASSES[0]:
             raise ValueError('CLASS_SPECIFIC_NATIVE_PRODUCER_REQUIRED')
         trial=cash_trial(snapshot,req['owner'],self.policy,db_path=self.db_path,run_id=run)
-        if trial['issues']:
+        if self.flow=='DEPLOYMENT' and trial['issues']:
             raise ValueError(trial['issues'][0]['code']+':'+trial['issues'][0]['field_path'])
         spec=importlib.util.spec_from_file_location('asset_source_market',HERE/'on_demand_market_observations.py')
         market=importlib.util.module_from_spec(spec);spec.loader.exec_module(market)
         holdings=project_official_holdings(snapshot,evaluation_at=when)
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings)
+        # A branches before constructing or loading any deployment adapter.
+        # It retains original source/owner checks but needs no new-money plan.
+        if self.flow=='HOLDINGS_ANALYSIS':
+            from holdings_analysis import build_analysis_report
+            report=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial)
+            return {'request':req,'trusted_context':ctx,'analysis_report':report,
+                'source_metadata':{'client_id':req['client_id'],'run_id':run,
+                    'source_db_sha256':snapshot['source_sha256']}}
         observed=next((r for r in observations['assets'] if r['symbol']==self.symbol),None)
         report={'schema_version':'Family.W8.NativeSourceProduction.v1','client_id':req['client_id'],
             'run_id':run,'owner':deepcopy(req['owner']),'source_db_sha256':snapshot['source_sha256'],
@@ -447,22 +459,23 @@ class AssetSourceProducer:
             cash_sources[domain]=trial
         return contexts,cash_sources
 
-    def core_observation(self, observed):
+    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True):
         path=self.root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
         if str(path) not in sys.path:sys.path.insert(0,str(path))
         from livingwater_v82_runtime.core_rules import evaluate_core_rule_state,EvidenceFact
         from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
         groups={k:[PredicateTruth(r['truth']) for r in values]
                 for k,values in observed['observed_named_signals'].items()}
-        result=evaluate_core_rule_state(valuation_metrics=[],
+        result=evaluate_core_rule_state(valuation_metrics=valuation_metrics or [],
             valuation_waterfall=['FORWARD_PE','TRAILING_PE','CAPE','PB','FCF_YIELD'],
             fundamental_fields=[],safety_facts=[EvidenceFact(name='formal_source_coverage',value='UNKNOWN',
                 requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
                 freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,source_reference=observed['source_path'])],
-            **groups,hard_gate_predicates=[PredicateTruth.UNKNOWN],theses=[],
+            **groups,hard_gate_predicates=[PredicateTruth.UNKNOWN],
+            theses=[] if broad_etf else [{'state':'UNKNOWN'}],
             structural_confirmation=PredicateTruth.UNKNOWN,ma20_ok=PredicateTruth.UNKNOWN)
         return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
                 default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
             'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
-            'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX',
+            'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',
             'etf_structure_safety':'UNKNOWN__RETAINED_IN_SAFETY_SUFFICIENCY'}

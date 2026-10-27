@@ -117,3 +117,4 @@ jobs:
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_target_input.py' -v
           python -m pytest '系統工程/Family/W5/tests/test_family_boundary.py' '系統工程/Family/W5/tests/test_family_runner.py' '系統工程/Family/W5/tests/test_c7_engine.py' -q
+          python -m pytest '系統工程/Family/W5/tests/test_family_technical.py' '系統工程/Family/W5/tests/test_technical_source_bridge.py' -q

@@ -99,10 +99,15 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
     snapshot_mode=meta.get('evaluation_mode')=='SNAPSHOT_AFTER_ACQUISITION'
     snapshot_at=None
     if snapshot_mode:
-        approved_times={'global':'2026-10-19T23:20:09Z','taiwan':'2026-10-20T07:14:26Z'}
-        snapshot_at=approved_times.get(meta.get('market_region'))
-        if meta.get('data_provenance')=='SYNTHETIC':snapshot_at=meta.get('artifact_written_at')
-        if snapshot_at is None or _time(snapshot_at)>now:issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
+        # Each downloaded artifact has its own availability boundary. A fixed
+        # October acquisition date cannot represent a later incremental file.
+        # This is acquisition timing only, never historical publication proof.
+        snapshot_at=meta.get('artifact_written_at')
+        try:
+            if snapshot_at is None or _time(snapshot_at)>now:
+                issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
+        except (ValueError,TypeError,AttributeError):
+            snapshot_at=None;issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
     required=('asset_id','symbol','exchange','currency','instrument_reference','source_reference','receipt_reference','calendar_reference','session_timezone','provider_price_basis','source_run')
     if any(not meta.get(k) for k in required):issues.append('SOURCE_METADATA_REQUIRED')
     if meta.get('producer_version')!=VERSION:issues.append('PRODUCER_VERSION_MISMATCH')
@@ -120,6 +125,7 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
             incomplete=True;continue
         if incomplete:issues.append('NONCONTIGUOUS_COMPLETED_BARS');break
         if snapshot_mode:
+            if snapshot_at is None:continue
             rec['available_at']=snapshot_at
             count+=1
             continue

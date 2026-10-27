@@ -1,0 +1,15 @@
+retrieval_time=2026-10-28T07:55:19+08:00
+policy_schema=fed-target-evidence-v1
+official_url=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+official_excerpt=2026 | Date September 17 | Increase 25 | Decrease 0 | Level 3.75-4.00 percent
+official_page_last_update=2026-09-16
+fred_lower_url=https://fred.stlouisfed.org/series/DFEDTARL
+fred_lower_latest=2026-10-27,3.75 percent
+fred_upper_url=https://fred.stlouisfed.org/series/DFEDTARU
+fred_upper_latest=2026-10-27,4.00 percent
+alfred_upper_url=https://alfred.stlouisfed.org/series?seid=DFEDTARU
+alfred_upper_latest=2026-10-27,4.00 percent
+computed_midpoint=3.875 percent
+effective_date=2026-09-17
+verification=CURRENT_CONFIRMED
+note=Official target-range table and same-date FRED/ALFRED lower/upper series agree. Effective date, publication/page update, retrieval time and verification time are recorded separately.

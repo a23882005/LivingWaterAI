@@ -14,6 +14,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   provision:
+    # Family architecture: GitHub code + Drive data + ChatGPT on-demand.
+    # Permanently prevent Hostinger deployment, including manual dispatch.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

@@ -333,7 +333,7 @@
       "unit": "倍 Forward",
       "observation_date": "2026-10-26",
       "source_url": "https://stockanalysis.com/etf/qqq/",
-      "method": "StockAnalysis明示Forward PE；Yahoo僅見TTM、官方未呈現數值、Portfolio Visualizer僅Trailing P/E後採用",
+      "method": "StockAnalysis明示Forward PE；前三站未提供可用Forward/FY1數值後採用",
       "status": "OK",
       "detail": "Forward PE 21.36（2026-10-26）；任何TTM值均未採用。",
       "retrieval_time": "2026-10-27T10:03:26+08:00",

@@ -1,0 +1,20 @@
+LivingWaterAI fed-target-evidence-v1 audit
+retrieval_time=2026-10-27T10:03:26+08:00
+last_verified_at=2026-10-27T10:03:26+08:00
+result=CURRENT_CONFIRMED
+primary_url=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+primary_excerpt=2026 policy table: September 17; level 3.75-4.00. Last Update: September 16, 2026.
+effective_date=2026-09-17
+publication_date=2026-09-16
+lower_bound=3.75
+upper_bound=4.00
+midpoint=3.875
+corroborating_lower_url=https://fred.stlouisfed.org/series/DFEDTARL
+corroborating_lower_observation_date=2026-10-26
+corroborating_lower_value=3.75
+corroborating_upper_url=https://fred.stlouisfed.org/series/DFEDTARU
+corroborating_upper_observation_date=2026-10-26
+corroborating_upper_value=4.00
+alfred_url=https://alfred.stlouisfed.org/series?seid=DFEDTARU
+alfred_result=BLOCKED
+alfred_note=Search retrieval did not resolve the requested series page; no value asserted.

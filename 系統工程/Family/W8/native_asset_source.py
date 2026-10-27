@@ -59,23 +59,33 @@ def classification(symbol, source, product_source=None):
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
-    if symbol=='VT' and product_source is not None:
+    if product_source is not None:
         raw=Path(product_source['local_path']).read_bytes()
         if sha256(raw).hexdigest()!=product_source['sha256']:
             raise ValueError('PRODUCT_STRUCTURE_SOURCE_CHANGED')
         product=json.loads(raw)
         facts=product.get('excerpts',[])
-        if (product.get('symbol')!='VT' or product.get('source_url')!=
-                'https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf'
-                or not all(x in facts for x in ('FTSE Global All Cap Index','Passively managed',
-                    'developed and emerging','large-, mid-, and small-capitalization'))):
-            raise ValueError('VT_OFFICIAL_STRUCTURE_EVIDENCE_REQUIRED')
+        contracts={
+            'VT':('https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf',
+                ('FTSE Global All Cap Index','Passively managed','developed and emerging',
+                 'large-, mid-, and small-capitalization')),
+            'VWRA':('https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating',
+                ('FTSE All-World Index','passive management','physical acquisition',
+                 'large and mid-sized','developed and emerging'))}
+        contract=contracts.get(symbol)
+        if (not contract or product.get('symbol')!=symbol or product.get('source_url')!=contract[0]
+                or not all(x in facts for x in contract[1])):
+            raise ValueError(symbol+'_OFFICIAL_STRUCTURE_EVIDENCE_REQUIRED')
+        if symbol=='VWRA' and (product.get('isin')!='IE00BK5BQT80' or
+                product.get('listing')!={'exchange':'XLON','currency':'USD','reuters':'VWRA.L'}):
+            raise ValueError('VWRA_INDEPENDENT_LISTING_EVIDENCE_REQUIRED')
         if '廣泛分散核心市場結構 → `A`' not in text:
             raise ValueError('FORMAL_BROAD_DIVERSIFIED_GRADE_RULE_REQUIRED')
         result.update(asset_type='BROAD_ETF',asset_grade='A',grade_evidence={
             'rule':'V82.md Canonical Asset Grade §2.1.1',
             'source_url':product['source_url'],'source_sha256':product_source['sha256'],
             'facts':deepcopy(facts),'basis':'GLOBAL_PASSIVE_DIVERSIFIED_STRUCTURE__NOT_TICKER_DEFAULT'})
+        result['analysis_capabilities']=['V82_GLOBAL_ETF_CORE']
     return result
 
 
@@ -162,7 +172,8 @@ class AssetSourceProducer:
     """
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
-                 flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None):
+                 flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
+                 product_sources=None,issuer_facts_sources=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -172,6 +183,13 @@ class AssetSourceProducer:
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
         self.flow=flow;self.analyze_all=analyze_all
         self.alternative_source_dir=alternative_source_dir
+        self.issuer_facts_source=issuer_facts_source
+        self.product_sources=deepcopy(product_sources or {})
+        self.issuer_facts_sources=deepcopy(issuer_facts_sources or {})
+        # Retain the existing single-source configuration without copying one
+        # product's evidence into any other product's route.
+        if product_source is not None:self.product_sources.setdefault('VT',deepcopy(product_source))
+        if issuer_facts_source is not None:self.issuer_facts_sources.setdefault('VT',deepcopy(issuer_facts_source))
 
     def __call__(self,snapshot,payload):
         if snapshot!=self.req['client_snapshot']['payload']:
@@ -188,7 +206,7 @@ class AssetSourceProducer:
         prepared=prepare_input(req,trusted_context=ctx)
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')
-        held=found[0];asset_class=classification(self.symbol,self.class_source,self.product_source)
+        held=found[0];asset_class=classification(self.symbol,self.class_source,self.product_sources.get(self.symbol))
         if self.flow=='DEPLOYMENT' and asset_class['primary_class']!=FORMAL_CLASSES[0]:
             raise ValueError('CLASS_SPECIFIC_NATIVE_PRODUCER_REQUIRED')
         trial=cash_trial(snapshot,req['owner'],self.policy,db_path=self.db_path,run_id=run)
@@ -199,7 +217,7 @@ class AssetSourceProducer:
         holdings=project_official_holdings(snapshot,evaluation_at=when)
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings,
-            alternative_source_dir=self.alternative_source_dir)
+            alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source)
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         if self.flow=='HOLDINGS_ANALYSIS':
@@ -461,23 +479,32 @@ class AssetSourceProducer:
             cash_sources[domain]=trial
         return contexts,cash_sources
 
-    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True):
+    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None):
+        from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
         path=self.root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
         if str(path) not in sys.path:sys.path.insert(0,str(path))
         from livingwater_v82_runtime.core_rules import evaluate_core_rule_state,EvidenceFact
         from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
         groups={k:[PredicateTruth(r['truth']) for r in values]
                 for k,values in observed['observed_named_signals'].items()}
-        result=evaluate_core_rule_state(valuation_metrics=valuation_metrics or [],
-            valuation_waterfall=['FORWARD_PE','TRAILING_PE','CAPE','PB','FCF_YIELD'],
-            fundamental_fields=[],safety_facts=[EvidenceFact(name='formal_source_coverage',value='UNKNOWN',
+        gaps=unresolved_core_contracts(observed,broad_etf)
+        safety=[EvidenceFact(name=g['field_path'],value='UNKNOWN',
                 requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
-                freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,source_reference=observed['source_path'])],
-            **groups,hard_gate_predicates=[PredicateTruth.UNKNOWN],
-            theses=[] if broad_etf else [{'state':'UNKNOWN'}],
-            structural_confirmation=PredicateTruth.UNKNOWN,ma20_ok=PredicateTruth.UNKNOWN)
+                freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
+                source_reference=observed['source_path']) for g in gaps if g['field_path'].startswith('safety.')]
+        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(GLOBAL_ETF_WATERFALL),
+            'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
+            **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
+            'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
+            'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth.UNKNOWN}
+        result=evaluate_core_rule_state(**arguments)
+        serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
+            asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))
         return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
                 default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
+            'actual_inputs':serialize(arguments),'input_gaps':gaps,
+            'valuation_path_audit':valuation_path_audit(valuation_metrics or []),
+            'structural_confirmation_applicability':'INAPPLICABLE_COMPANY_THESIS' if broad_etf else 'REQUIRED',
             'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
             'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',
             'etf_structure_safety':'UNKNOWN__RETAINED_IN_SAFETY_SUFFICIENCY'}

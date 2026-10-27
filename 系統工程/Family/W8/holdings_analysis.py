@@ -14,6 +14,8 @@ import re
 
 from family_input import digest
 from family_boundary import prepare_input
+from analysis_requirements import audit as audit_requirements
+from core_analysis_inputs import issuer_inputs
 
 STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
 CATALOG_BLOB='4cd333be719252034b6b9d6e8a787c838db816c4'
@@ -71,18 +73,31 @@ def vt_valuation_observations(context):
     return records
 
 
+def read_issuer_facts(source,symbol,evaluation_at):
+    if source is None:return None
+    raw=Path(source['local_path']).read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=source['sha256']:raise PermissionError('ISSUER_FACTS_SOURCE_CHANGED')
+    facts=json.loads(raw)
+    if facts.get('schema_version')!='Family.W8.IssuerFacts.v1' or facts.get('symbol')!=symbol:
+        raise ValueError('ISSUER_FACTS_IDENTITY_OR_SCHEMA_MISMATCH')
+    when=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
+    retrieved=datetime.fromisoformat(facts['retrieved_at'].replace('Z','+00:00'))
+    if retrieved>when or facts['as_of']>when.date().isoformat():raise ValueError('ISSUER_FACTS_IN_FUTURE')
+    return {**facts,'source_sha256':source['sha256']}
+
+
 def signal_gaps(observed):
     # These reasons are retained from the original reviewed partial bridge;
     # raw numeric alternatives remain visible and are not renamed as votes.
     pending={
-        'kd_golden_cross':'Original analytics uses rolling smoothing; formal KD smoothing is not approved by the bridge',
-        'kd_high_strong_not_breaking':'Formal KD smoothing and duration/event evidence absent',
-        'kd_low_weak':'Formal KD smoothing and duration/event evidence absent',
-        'emv_positive':'Formal EMV(3,3) absent; available EMV14 is a different series',
-        'emv_positive_or_improving':'Formal EMV(3,3) absent; EMV14 cannot substitute',
-        'emv_worsening':'Formal EMV(3,3) and duration evidence absent',
-        'macd_bear_hist_shrinking_or_positive':'Original bridge retains event-versus-state semantics as pending; two-completed-bar candidate is not executable',
-        'above_ma20':'Canonical reclaim event semantics pending in original bridge; above/reclaim base facts are calculated separately',
+        'kd_golden_cross':'V82 §24-A defines the crossing; pinned analytics uses rolling smoothing, whose compatibility with canonical KD(9,3,3) has not been verified',
+        'kd_high_strong_not_breaking':'Canonical KD series and high-persistence event producer are not connected',
+        'kd_low_weak':'Canonical KD series and weak-persistence event producer are not connected',
+        'emv_positive':'Formal EMV(3,3) producer is not implemented in the pinned analytics; available EMV14 is a different series',
+        'emv_positive_or_improving':'Formal EMV(3,3) producer is not connected; EMV14 cannot substitute',
+        'emv_worsening':'Formal EMV(3,3) and duration producer are not connected',
+        'macd_bear_hist_shrinking_or_positive':'Formal MACD inputs are absent for this history window',
+        'above_ma20':'At least one completed Close/MA20 pair required for the formal reclaim is absent',
         'rsi_improving_or_near_50':'Exact near-50/duration predicate is not produced; RSI14 values and change are available',
         'atr_expanding_fast':'FAST threshold is not approved; ATR14 itself is calculated',
         'new_20d_close_high':'Original bridge retains window/tie rule pending',
@@ -92,9 +107,12 @@ def signal_gaps(observed):
         for row in rows:
             if row['truth']=='UNKNOWN':
                 reason=pending.get(row['name'],'Required named event evidence is absent: '+row['name'])
-                out.append(issue('technical.signals.'+group+'.'+row['name'],reason,
+                program_missing=row['name'].startswith(('emv_','kd_'))
+                problem=issue('technical.signals.'+group+'.'+row['name'],reason,
                     'This predicate cannot vote in native confirmation; other computed facts remain available',
-                    category=4 if row['name'] in pending else 3,source=observed['source_path']))
+                    category=2 if program_missing else 4 if row['name'] in pending else 3,source=observed['source_path'])
+                problem['gap_kind']='PRODUCER_NOT_CONNECTED' if program_missing else 'SOURCE_OR_RULE_DEPENDENCY_UNRESOLVED'
+                out.append(problem)
     return out
 
 
@@ -127,6 +145,22 @@ def explain(row):
     if row.get('core_observation'):
         state=row['core_observation']['result']
         text+=f"原 V82 確認：{state['technical']}；估值={state['valuation']['level']}（{','.join(state['valuation']['reason_codes'])}）。"
+        groups=obs['observed_named_signals']
+        for group,label in [('up_price','Runaway Up價格結構'),('right_signals','右側確認'),
+                ('down_break','Runaway Down結構破壞'),('down_accel','下跌加速')]:
+            signals=groups[group]
+            values={truth:[s['name'] for s in signals if s['truth']==truth] for truth in ('TRUE','FALSE','UNKNOWN')}
+            text+=f"{label}：成立 {len(values['TRUE'])}、不成立 {len(values['FALSE'])}、不可判定 {len(values['UNKNOWN'])}。"
+            if group=='up_price' and len(values['FALSE'])==len(signals):
+                text+='三項原生價格結構均不成立，所以Core判定Runaway Up不成立；並非將缺項當False。'
+        text+='個股Thesis計分不適用本ETF；Core空Thesis輸出的NONE不代表ETF結構安全已通過。'
+    if row.get('issuer_facts'):
+        facts=row['issuer_facts'];metrics=facts['metrics']
+        text+=(f"官方 {facts['as_of']}：trailing P/E={metrics.get('TRAILING_PE',{}).get('value','UNKNOWN')}，P/B={metrics.get('PB',{}).get('value','UNKNOWN')}，"
+            f"ROE={metrics.get('ROE',{}).get('value','UNKNOWN')}%，盈餘成長率={metrics.get('EARNINGS_GROWTH',{}).get('value','UNKNOWN')}%；"
+            '未將這些值轉成Forward預估或基本面改善判斷。')
+    if row.get('requirements'):
+        text+='必要結果尚缺：'+','.join(row['requirements']['required_missing'])+'；選填缺項另列，不混入完成門檻。'
     text+=f"尚有 {len(row['issues'])} 項明列缺項。持股分析說明；不是完整部署 Mentor，未計算買賣金額或授權交易。"
     return text
 
@@ -142,7 +176,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     dated_valuation=vt_valuation_observations(context) if any(r['source_instrument'].get('ticker')=='VT' for r in positions) else []
     for position in positions:
         instrument=position['source_instrument'];symbol=instrument.get('ticker');source=position['source_position']
-        cls=classification(symbol,producer.class_source,producer.product_source if symbol=='VT' else None)
+        cls=classification(symbol,producer.class_source,producer.product_sources.get(symbol))
         observed=deepcopy(by_symbol.get(symbol));problems=[]
         row={'instrument_id':position['instrument_key'],'symbol':symbol,'owner':deepcopy(request['owner']),
             'holding':{'quantity':position['quantity'],'quantity_state':position['quantity_state'],
@@ -155,7 +189,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'engine_route':'V75_PREDICATES' if observed and observed['v75_original_predicates'] else 'V82_TECHNICAL_OBSERVATIONS',
                 'scope':'ANALYSIS_ONLY__NOT_DEPLOYMENT_IDENTITY_ATTESTATION'},
             'market':observed,'valuation_observations':deepcopy(dated_valuation) if symbol=='VT' else [],
-            'core_observation':None,'issues':problems,'source_refs':[
+            'core_observation':None,'primary_framework':cls['primary_framework'],
+            'issuer_facts':read_issuer_facts(producer.issuer_facts_sources.get(symbol),symbol,request['evaluation_at']),
+            'issues':problems,'source_refs':[
                 {'source_kind':'OFFICIAL_MEMBER_DB','sha256':holdings['source_db_sha256'],
                     'source_reference':deepcopy(source.get('source_row'))},
                 {'source_kind':'FORMAL_CLASSIFICATION','sha256':producer.class_source['sha256'],
@@ -216,23 +252,36 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if symbol=='VT' and cls['asset_type']=='BROAD_ETF':
-                row['core_observation']=producer.core_observation(observed,valuation_metrics=dated_valuation)
+            if 'V82_GLOBAL_ETF_CORE' in cls.get('analysis_capabilities',[]):
+                issuer=row['issuer_facts']
+                current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'])
+                row['valuation_observations']=current_metrics
+                row['fundamental_fields']=fundamental_fields
+                row['native_product_identity']['engine_route']='V82_GLOBAL_ETF_CORE'
+                row['core_observation']=producer.core_observation(observed,
+                    valuation_metrics=current_metrics,fundamental_fields=fundamental_fields)
                 row['call_trace'].append('V82.evaluate_core_rule_state')
-                row['unknown_resolution'] += [{'field_path':'valuation.'+v['metric_name']+'.current',
-                    'category':1,'resolution':'APPROVED_SOURCE_VALUE_NOW_MAPPED__DATED_NOT_CURRENT',
-                    'source_reference':v['source_reference'],'value':v['current']} for v in dated_valuation]
-                for field,reason in [
-                    ('valuation.FORWARD_PE.current','Approved project original records trailing P/E and P/B; forward P/E is absent'),
-                    ('valuation.TRAILING_PE.historical_median','Dated P/E is retained; corresponding historical median/percentile is absent'),
-                    ('valuation.PB.historical_median','Dated P/B is retained; corresponding historical median/percentile is absent'),
-                    ('valuation.current_freshness_and_pit','July issuer observations have no verified current freshness/PIT receipt'),
-                    ('fundamentals.aggregate_eps_growth.value','Current aggregate EPS growth fact is absent'),
-                    ('fundamentals.roe.value','Current aggregate ROE fact is absent'),
-                    ('fundamentals.aggregate_direction','Current dated fundamental direction evidence is absent'),
-                    ('safety.formal_source_coverage','Formal ETF structure/safety and hard-gate fact coverage is incomplete')]:
-                    problems.append(issue(field,reason,'Affected native judgement remains UNKNOWN; calculated technical facts are independent',
-                        source=context['approved_document_target_source']['source_reference']))
+                for candidate in row['core_observation']['valuation_path_audit']:
+                    for field in candidate['missing_fields']:
+                        problems.append(issue('valuation.'+candidate['metric']+'.'+field,
+                            'No verified input for this waterfall candidate; other legal candidates are evaluated independently',
+                            'Candidate unavailable; not a requirement that all optional valuation methods succeed',
+                            source=candidate['source_reference']))
+                for item in fundamental_fields:
+                    if item.get('field_value_state')=='UNKNOWN' or item.get('direction')=='UNKNOWN':
+                        field='value' if item.get('field_value_state')=='UNKNOWN' else 'direction'
+                        problems.append(issue('fundamentals.'+item['field_name']+'.'+field,
+                            'Issuer value is mapped' if field=='direction' else 'Required issuer context is absent',
+                            'Comparable period/method and direction evidence are required by native fundamentals; positive level alone is insufficient',
+                            source=item.get('source_reference')))
+                for gap in row['core_observation']['input_gaps']:
+                    problems.append(issue(gap['field_path'],gap['reason'],
+                        'Only dependent native outputs remain UNKNOWN; independent analysis continues',
+                        category=2 if gap['kind']=='DEFINITION_OR_PRODUCER_UNRESOLVED' else 3,
+                        source=gap['sot_section']))
+                if issuer:
+                    row['source_refs'].append({'source_kind':'ISSUER_FACTS','sha256':issuer['source_sha256'],
+                        'source_reference':issuer['source_url'],'observed_at':issuer['as_of']})
             elif not observed['v75_original_predicates']:
                 problems.append(issue('native_product_identity.asset_type',
                     'Registry product identity does not establish approved native subtype/grade; technical components are asset-independent',
@@ -240,7 +289,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             if cls['primary_class']=='UNKNOWN':
                 problems.append(issue('scenario_class','No approved Sxx membership for this instrument in the explicit mapping',
                     'Display classification is UNKNOWN; independent native numeric components still execute',category=1))
-            row['status']='ANALYSIS_PARTIAL' if problems else 'ANALYSIS_COMPLETE'
+            row['status']='ANALYSIS_PARTIAL'
             row['source_refs'] += [{'path':observed['source_path'],'sha256':observed['source_sha256'],
                 'observed_at':observed['observed_date'],'provider':observed['provider'],
                 'provider_verified_at':observed['provider_verified_at'],'validation':observed['cache_validation'],
@@ -253,6 +302,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['source_refs'] += [{'source_kind':'DATED_VALUATION','sha256':v['source_sha256'],
                 'source_reference':v['source_reference'],'observed_at':v['observed_date_text']}
                 for v in row['valuation_observations']]
+        row['requirements']=audit_requirements(row,producer.class_source)
+        if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
+        row['position_valuation_allowed']=False
         row['analysis_explanation']=explain(row);rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)
@@ -287,6 +339,15 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     report['manifest']=[{'instrument_id':r['instrument_id'],'field_path':key,
         'source_db_sha256':holdings['source_db_sha256'],'output_digest':digest(r.get(key)),
         'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation')]
+    grouped={}
+    for problem in report['issues']:
+        field=problem['field_path'];group=(field if field.startswith(('valuation.','fundamentals.')) else
+            '.'.join(field.split('.')[:2]))
+        item=grouped.setdefault(group,{'positions':[],'field_paths':[],'shared_producer':'W8 holding analysis source mapping'})
+        instrument_id=problem.get('instrument_id','CASH_SCENARIO')
+        if instrument_id not in item['positions']:item['positions'].append(instrument_id)
+        if field not in item['field_paths']:item['field_paths'].append(field)
+    report['common_gap_groups']=grouped
     report['manifest_digest']=digest(report['manifest']);report['report_digest']=digest(report)
     return report
 

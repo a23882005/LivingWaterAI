@@ -24,7 +24,14 @@ class HoldingAnalysisTest(unittest.TestCase):
         p=Path(self.tmp.name)/'synthetic-project.md'
         p.write_text('- VT：Vanguard 7/31 P/E20.8x、P/B3.3x\n')
         rule=Path(self.tmp.name)/'synthetic-rules.md'
-        rule.write_text('\n'.join(M.FORMAL_CLASSES)+'\n# 第四十九章｜VT／VWRA型\n')
+        runtime=ROOT/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
+        sys.path.insert(0,str(runtime))
+        from livingwater_v82_runtime.canonical_output import CANONICAL_FIELD_NAMES
+        rule.write_text('\n'.join(M.FORMAL_CLASSES)+'\n# 第四十九章｜VT／VWRA型\n'+
+            'MA_RECLAIM_N HISTOGRAM_CONTRACTING RSI<30 20日收盤新高\n'+
+            '\n'.join(f'|{n}|{field}|Synthetic|Synthetic|Synthetic|'+
+                ('Optional' if n in (5,22,23) else 'Required')+'|Yes|Synthetic policy|'
+                for n,field in enumerate(CANONICAL_FIELD_NAMES,1)))
         self.client='fam_'+'a'*32;self.owner={'client_id':self.client,'funding_domain':'US_BROKER',
             'broker':'SYNTHETIC_IB','account':'SYNTHETIC_IB_ACCOUNT','currency':'USD'}
         instrument={'instrument_key':'SYNTHETIC_VT','ticker':'VT','identity_state':'KNOWN','instrument_type':'ETF'}
@@ -94,6 +101,85 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual({v['metric_name']:v['current'] for v in facts},{'TRAILING_PE':'20.8','PB':'3.3'})
         self.assertTrue(all(v['freshness']=='UNKNOWN' and v['historical_median'] is None for v in facts))
         self.assertFalse(any(v['metric_name']=='FORWARD_PE' for v in facts))
+
+    def enable_product(self,symbol):
+        rule=Path(self.producer.class_source['local_path'])
+        rule.write_text(rule.read_text()+'\n廣泛分散核心市場結構 → `A`\n')
+        self.producer.class_source['sha256']=hashlib.sha256(rule.read_bytes()).hexdigest()
+        url=('https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf'
+            if symbol=='VT' else 'https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating')
+        facts=(['FTSE Global All Cap Index','Passively managed','developed and emerging',
+            'large-, mid-, and small-capitalization'] if symbol=='VT' else
+            ['FTSE All-World Index','passive management','physical acquisition','large and mid-sized','developed and emerging'])
+        path=Path(self.tmp.name)/(symbol+'.json')
+        path.write_text(json.dumps({'symbol':symbol,'source_url':url,'excerpts':facts,
+            'isin':'IE00BK5BQT80','listing':{'exchange':'XLON','currency':'USD','reuters':'VWRA.L'}}))
+        self.producer.product_sources[symbol]={'local_path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+
+    def test_verified_product_routes_to_core_and_ma20_comparison_is_not_gate(self):
+        self.enable_product('VT')
+        obs=self.observations();obs['assets'][0]['base_facts']['above_ma20']=True
+        row=self.report(obs)['analysis_result']['positions'][0]
+        core=row['core_observation']
+        self.assertEqual(row['native_product_identity']['engine_route'],'V82_GLOBAL_ETF_CORE')
+        self.assertEqual(core['actual_inputs']['ma20_ok'],'UNKNOWN')
+        self.assertIn('safety.material_events',[g['field_path'] for g in core['input_gaps']])
+        self.assertFalse(core['result']['permission']['new_buy_order_permission'])
+        self.assertEqual(row['requirements']['optional_unavailable'],['secondary_framework'])
+
+    def test_vwra_routes_only_with_its_independent_product_evidence(self):
+        self.enable_product('VWRA')
+        self.position['source_instrument']['ticker']='VWRA'
+        self.position['source_instrument']['quote_currency']='USD'
+        row=self.report()['analysis_result']['positions'][0]
+        self.assertIsNotNone(row['core_observation'])
+        self.assertEqual(row['valuation_observations'],[])
+        self.producer.product_sources['VWRA']=self.producer.product_sources.pop('VWRA')
+        self.producer.product_sources['VT']=self.producer.product_sources.pop('VWRA')
+        row=self.report()['analysis_result']['positions'][0]
+        self.assertIsNone(row['core_observation'])
+
+    def test_issuer_values_remove_only_their_actual_value_gaps_not_direction(self):
+        from core_analysis_inputs import issuer_inputs,valuation_path_audit
+        facts={'source_url':'SYNTHETIC_ISSUER','source_sha256':'f'*64,'as_of':'2026-09-30',
+            'metrics':{'TRAILING_PE':{'value':'20','unit':'multiple'},
+                'PB':{'value':'3','unit':'multiple'},'ROE':{'value':'15','unit':'percent'},
+                'EARNINGS_GROWTH':{'value':'10','unit':'percent'}}}
+        metrics,fields=issuer_inputs(facts)
+        self.assertTrue(all(f['field_value_state']=='KNOWN' for f in fields))
+        self.assertTrue(all(f['direction']=='UNKNOWN' for f in fields))
+        paths=valuation_path_audit(metrics)
+        self.assertNotIn('current',paths[1]['missing_fields'])
+        self.assertIn('own_historical_reference_or_authorized_range',paths[1]['missing_fields'])
+        self.assertEqual(paths[0]['metric'],'FORWARD_PE')
+        self.assertIn('current',paths[0]['missing_fields'])
+
+    def test_original_core_executes_legal_fallback_without_all_metrics(self):
+        self.enable_product('VT')
+        obs=self.observations()['assets'][0]
+        result=self.producer.core_observation(obs,valuation_metrics=[{
+            'metric_name':'PB','current':'3','historical_median':'3','data_quality':'OK',
+            'freshness':'FRESH','pit_status':'VERIFIED','unit':'multiple',
+            'source_reference':'SYNTHETIC_LEGAL_PB_SCALE','as_of':'2026-10-26'}])
+        self.assertEqual(result['result']['valuation']['primary_metric'],'PB')
+        self.assertEqual(result['result']['valuation']['level'],'NORMAL')
+        self.assertTrue(result['result']['valuation']['fallback_used'])
+        self.assertEqual(result['actual_inputs']['ma20_ok'],'UNKNOWN')
+
+    def test_formal_signal_mapping_preserves_false_and_unknown_independently(self):
+        from formal_analysis_signals import map_formal_observations
+        from technical_source_bridge import NAMES
+        vectors={k:[{'name':n,'truth':'UNKNOWN'} for n in names] for k,names in NAMES.items()}
+        rows=[{'Close':float(n)} for n in range(1,22)]
+        formal=map_formal_observations(rows,{'macd_histogram':-2,'rsi14':40},
+            {'macd_histogram':-1,'rsi14':45},{'reclaim_ma20':False},{},vectors,self.producer.class_source)
+        known={r['name']:r['truth'] for g in vectors.values() for r in g}
+        self.assertEqual(known['macd_bear_hist_shrinking_or_positive'],'FALSE')
+        self.assertEqual(known['above_ma20'],'FALSE')
+        self.assertEqual(known['new_20d_close_high'],'TRUE')
+        self.assertEqual(known['break_confirmed_swing_high'],'UNKNOWN')
+        self.assertEqual(known['kd_golden_cross'],'UNKNOWN')
+        self.assertFalse(formal['reduction_candidates_used'])
 
     def test_missing_history_retains_position_and_precise_blocker(self):
         report=self.report({'assets':[],'missing':[{'symbol':'VT','code':'EXACT_SYMBOL_CACHE_UNAVAILABLE'}]})

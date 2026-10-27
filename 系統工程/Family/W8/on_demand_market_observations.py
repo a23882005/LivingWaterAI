@@ -66,7 +66,7 @@ def _macro_metrics(macro, evaluated_at):
     return metrics, sources
 
 
-def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id):
+def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id,formal_rule_source=None):
     """Run original routines on validated rows; return no deployment decisions."""
     import pandas as pd
     from technical_source_bridge import _originals, _aggregate, NAMES, mapped_numeric_signals
@@ -100,6 +100,13 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
         next(r for r in vectors['right_signals'] if r['name'] == 'higher_low').update(
             truth='TRUE' if lows[-1].value > lows[-2].value else 'FALSE',
             reason='EXISTING_BRIDGE_NUMERIC_RULE', dependencies=['confirmed_lows[-2:]'])
+    swings={key:[dict(asdict(p),pivot_session=rows[p.index]['Date'],
+        confirmation_session=rows[p.index+2]['Date']) for p in points]
+        for key,points in [('lows',lows),('highs',highs)]}
+    formal_signals={}
+    if formal_rule_source is not None:
+        from formal_analysis_signals import map_formal_observations
+        formal_signals=map_formal_observations(rows,values,previous,base_facts,swings,vectors,formal_rule_source)
     v82 = _aggregate(repo_root, vectors)
     runtime = Path(repo_root).resolve() / '系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
     if str(runtime) not in sys.path:
@@ -132,19 +139,19 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
             'original_default_freshness_is_not_attestation': True,
             'deployment_input_eligible': False}
     return {'numeric': values, 'previous_numeric': previous, 'base_facts': base_facts,
-        'swings': {key: [dict(asdict(p), pivot_session=rows[p.index]['Date'],
-            confirmation_session=rows[p.index+2]['Date']) for p in points]
-            for key,points in [('lows',lows),('highs',highs)]},
+        'swings':swings,'formal_analysis_signals':formal_signals,
         'td9': td9, 'observed_named_signals': vectors,
         'v82_original_aggregation': v82,
         'v75_original_predicates': predicates, 'macro_metric_sources': sources,
         'v75_scope': 'OBSERVED_BOND_INPUTS' if is_bond else 'NOT_A_V75_SUPPORTED_BOND',
         'call_trace': ['ORIGINAL.calculate_td9', 'ORIGINAL.analytics.technical',
+                       'ORIGINAL.confirmed_swing_lows/highs']+
+                       (['W8.formal_analysis_signals.map_formal_observations'] if formal_signals else [])+[
                        'V82.evaluate_technical'] + (['V75.PRED-001..010'] if is_bond else []),
         'formal_deployment_eligible': False, 'trade_authorization': 'NONE'}
 
 
-def evaluate_close_history(rows, *, repo_root):
+def evaluate_close_history(rows, *, repo_root,formal_rule_source=None):
     """Execute only original Close-dependent routines when H/L/O is invalid.
 
     Unknown High/Low/Volume inputs are explicit NaN, never repaired prices.
@@ -171,7 +178,12 @@ def evaluate_close_history(rows, *, repo_root):
         facts['above_ma20']=rows[-1]['Close']>current['ma20']
         if previous.get('ma20') is not None:
             facts['reclaim_ma20']=rows[-2]['Close']<=previous['ma20'] and rows[-1]['Close']>current['ma20']
+    formal_signals={}
+    if formal_rule_source is not None:
+        from formal_analysis_signals import map_formal_observations
+        formal_signals=map_formal_observations(rows,current,previous,facts,{},vectors,formal_rule_source)
     return {'numeric':current,'previous_numeric':previous,'td9':asdict(legacy['calculate_td9'](frame['Close'].tolist())),
+        'formal_analysis_signals':formal_signals,
         'base_facts':facts,'swings':{'lows':[],'highs':[]},'observed_named_signals':vectors,
         'v82_original_aggregation':_aggregate(repo_root,vectors),'v75_original_predicates':{},
         'component_gaps':{k:'INVALID_OHLCV__CLOSE_ONLY_COMPONENT_DOES_NOT_CONSUME_HIGH_LOW_VOLUME'
@@ -210,7 +222,7 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 
 
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
-                                     official_holdings=None,alternative_source_dir=None):
+                                     official_holdings=None,alternative_source_dir=None,formal_rule_source=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -331,8 +343,9 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             if close_only:
                 if any(not math.isfinite(r.get('Close',float('nan'))) or r['Close']<=0 for r in rows):
                     raise ValueError('CLOSE_ONLY_SOURCE_CLOSE_INVALID')
-                result=evaluate_close_history(rows,repo_root=repo_root)
-            else:result = evaluate_observed_history(rows, repo_root=repo_root, evaluation_at=evaluation_at, macro=macro, asset_id=symbol)
+                result=evaluate_close_history(rows,repo_root=repo_root,formal_rule_source=formal_rule_source)
+            else:result = evaluate_observed_history(rows, repo_root=repo_root, evaluation_at=evaluation_at,
+                macro=macro, asset_id=symbol,formal_rule_source=formal_rule_source)
             if cache.read_bytes() != raw:
                 raise ValueError('CACHE_CHANGED_DURING_CALCULATION')
             assets.append({'instrument_key': key, 'symbol': symbol, 'observed_date': dates[-1],

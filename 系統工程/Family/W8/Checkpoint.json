@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T17:21:48.037Z",
+  "updated_at": "2026-10-27T18:32:27.655Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1109,17 +1109,17 @@
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 19319450,
-      "sha256": "6c4dda29f21340f4b19a37684fbbbe99bb79461c95ec41abf5a2e6e1ca403b8c",
+      "bytes": 21266050,
+      "sha256": "44502abf9b08cc06283380b58d9f24f33c4be662fa362731303d3aeaaf2e8c05",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
-      "latest_section": "latest_market_recovery",
+      "latest_section": "latest_holdings_analysis",
       "actual_runs_section": "latest_holdings_analysis.actual_formal_entry_runs"
     },
     "governance_backups": {
-      "engineering": "1BzZQq_Ro6jvArqp-SnPbOT8oweZQ4vXPfVJIY41UmXQ",
-      "files": "15eA2TO7z7Zrnzqw_5aC23R-lqavrtfkL8VTkydMEPEI",
-      "wbs": "1sioVsJIpXLeXV67I2hF6sWv6FAGqtdycv3pBZk6dHlI",
-      "evidence": "1EV1tczcBT76NnpMWrifxnb2bXaG9L-z6"
+      "engineering": "1eFrroBIHtzbLfuu0TLopCIUBurp2l7urtYILVgdZlI4",
+      "files": "1YGHSWRyR6fJ7siZwIr912YgRH2ufg_YUrUEFzvRmD4Y",
+      "wbs": "1A-O832RkRt51whYoeBKQ_JuP0d7AOM_v2PoVFAh_PoI",
+      "evidence": "1qjGnvrZRpi6PpwaoZU-4cO0BxrWiDHKr"
     },
     "full_04_complete": false,
     "original_native_mentor_reached": false,
@@ -1129,7 +1129,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "38cc2674753ae0cec4e882f6ea94d191c2934f11",
+    "work_head": "470896d44692c84fcf5dfbcf4422c1be02f9baa0",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1366,6 +1366,62 @@
       "official_db_changed": false,
       "trade_action": "NO_TRADE",
       "full_menu04_complete": false
+    },
+    "latest_core_analysis": {
+      "code_commit": "470896d44692c84fcf5dfbcf4422c1be02f9baa0",
+      "baseline": "38cc2674753ae0cec4e882f6ea94d191c2934f11",
+      "status": "ANALYSIS_PARTIAL__SOURCE_VERIFIED_CORE_ROUTING_EXECUTED",
+      "entry": "build_project_menu -> menu04 -> AssetSourceProducer -> prepare_input -> original numeric/technical components -> source-verified capability route -> V82.evaluate_core_rule_state",
+      "actual_vt_members": [
+        "Joseph",
+        "MOU"
+      ],
+      "independent_vwra_product_evidence": true,
+      "fixed": [
+        "Remove ticker-only Core entry; route by independently verified product identity/capabilities",
+        "Map six existing formal MACD/reclaim/confirmed-price-structure predicates",
+        "Map dated issuer valuation/fundamental facts; retain actual Core inputs",
+        "Replace unconditional missing notices with per-field waterfall/source/requirement diagnostics"
+      ],
+      "remaining_source_contracts": [
+        "Price identity, basis and session-close attestation",
+        "Metric-specific historical valuation reference, freshness and PIT",
+        "Comparable fundamental direction",
+        "Required event coverage/checkpoint"
+      ],
+      "remaining_program_contracts": [
+        "Canonical KD compatibility and EMV3,3 producer",
+        "Significant-MA20-break mapping without invented noise band",
+        "Formal timeframe and look-through exposure producers",
+        "V82 macro and credit/liquidity safety contract production"
+      ],
+      "validation": {
+        "affected_unittest_passed": 48,
+        "pinned_dependency_hashes_passed": 115,
+        "compile": "PASS",
+        "local_pytest": "NOT_AVAILABLE__NO_MODULE_NAMED_PYTEST",
+        "ci_success_runs": [
+          40559194959,
+          40559194864,
+          40559194880,
+          40559194838,
+          40559194868
+        ],
+        "remote_code_readback": "7/7_EXACT_MATCH"
+      },
+      "coverage": {
+        "complete": 0,
+        "partial": 26,
+        "totally_blocked": 0
+      },
+      "cash_trial": "Existing cash retained; missing available/unsettled/reserved only use authorized per-run zero overlay",
+      "official_db_changed": false,
+      "trade_action": "NO_TRADE",
+      "deployment_status": "NOT_RUN",
+      "canonical_result": null,
+      "mentor": null,
+      "full04_complete": false,
+      "private_evidence_same_id_verified": true
     }
   }
 }

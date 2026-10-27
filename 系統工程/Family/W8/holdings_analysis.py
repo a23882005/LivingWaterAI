@@ -107,6 +107,22 @@ def explain(row):
             f"MA20={num.get('ma20')}，MA50={num.get('ma50')}，RSI14={num.get('rsi14')}，"
             f"ATR14={num.get('atr14')}；TD9 高／低={obs['td9']['high_count']}/{obs['td9']['low_count']}。"
             f"原橋接事實：收盤高於MA20={facts.get('above_ma20','UNKNOWN')}，站回MA20={facts.get('reclaim_ma20','UNKNOWN')}。")
+        mapping=obs.get('analysis_identity_mapping')
+        if mapping:
+            text+=f"行情參考市場 {mapping['reference_exchange']}／{mapping['quote_currency']}，持倉原交易所欄位未因此改寫。"
+        quality=obs.get('history_quality',{})
+        if quality.get('invalid_source_rows'):
+            if quality['scope'].startswith('CLOSE_ONLY'):
+                text+=(f"原檔有 {len(quality['invalid_source_rows'])} 列 OHLC 關係異常；本輪僅將 "
+                    f"{quality['used_rows']} 根有效收盤交給原收盤價獨立算法，高低價／成交量相依元件不輸出；原價格未修改。")
+            else:
+                text+=(f"原檔有 {len(quality['invalid_source_rows'])} 列異常；本輪僅計算 "
+                    f"{quality['analysis_start']}～{quality['analysis_end']} 的 {quality['used_rows']} 根連續有效資料，原價格未修改。")
+        receipt=obs.get('alternative_source_receipt')
+        if receipt:
+            text+=f"替代來源僅提供 {obs['rows']} 根已完成資料；不足的長均線不補值。"
+            if receipt.get('provider_currency_label_conflict'):
+                text+='來源頁同時標示 Currency GBP／Price in USD，依明示美元價格列作分析參考，幣別標籤矛盾仍保留缺項。'
     else:text+='沒有通過本輪讀取檢查的同標的行情，未借用其他標的資料。'
     if row.get('core_observation'):
         state=row['core_observation']['result']
@@ -154,6 +170,37 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['status']='ANALYSIS_BLOCKED'
         else:
             row['call_trace']=deepcopy(observed['call_trace'])
+            receipt=observed.get('alternative_source_receipt')
+            if receipt:
+                problems.append(issue('market.history_length',
+                    f"Alternative source provides {observed['rows']} completed bars, ending {observed['observed_date']}; full history is not available from this table",
+                    'Calculations are explicitly limited to this source window; unavailable longer-period indicators stay unknown',
+                    source=receipt['source_url']))
+                if receipt.get('provider_currency_label_conflict'):
+                    problems.append(issue('market.provider_currency_label',
+                        'Provider labels Currency GBP and Price in USD; original USD listing checked separately, but the inconsistent label is unresolved',
+                        'Only displayed USD reference prices are analyzed; no FX conversion or formal currency attestation',
+                        source=receipt['source_url']))
+                latest=max((a['observed_date'] for a in observations['assets']),default=observed['observed_date'])
+                if observed['observed_date']<latest:
+                    problems.append(issue('market.latest_observation',
+                        f"This source ends {observed['observed_date']}, while another same-run public observation reaches {latest}",
+                        'Outputs describe the recorded historical date, not current-market confirmation',source=receipt['source_url']))
+            for field,value in observed['numeric'].items():
+                if value is None:
+                    match=re.fullmatch(r'(?:ma|volume_ratio_)(\d+)',field)
+                    required=int(match.group(1)) if match else None
+                    problems.append(issue('technical.numeric.'+field,
+                        observed.get('component_gaps',{}).get(field,
+                        f"Original algorithm returned unavailable with {observed['rows']} bars"+
+                        (f"; its rolling minimum is {required} bars" if required else '; required sample/denominator is unavailable')),
+                        'This indicator is not replaced by zero or a neutral signal',source=observed['source_path']))
+            quality=observed.get('history_quality',{})
+            if quality.get('invalid_source_rows'):
+                problems.append(issue('market.history_quality.invalid_source_rows',
+                    f"Source has {len(quality['invalid_source_rows'])} invalid OHLC bars; analysis scope is {quality['scope']} with {quality['used_rows']} observations from {quality['analysis_start']}",
+                    'Only explicitly independent components/window are evaluated; source history is not repaired or fully validated',
+                    source=observed['source_path']))
             row['numeric_semantics']={'rounding':'Original analytics.nfloat: six decimal places',
                 'kd_k_9_3_and_kd_d_9_3_3':'Original rolling smoothing; not approved canonical KD',
                 'emv_14':'Original EMV14; not formal EMV(3,3)',
@@ -198,6 +245,11 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'observed_at':observed['observed_date'],'provider':observed['provider'],
                 'provider_verified_at':observed['provider_verified_at'],'validation':observed['cache_validation'],
                 'formal_identity_verified':observed['formal_identity_verified']}]
+            if observed.get('analysis_identity_mapping'):
+                mapping=observed['analysis_identity_mapping']
+                row['source_refs'].append({'source_kind':'ISSUER_LISTING_ANALYSIS_REFERENCE',
+                    'url':mapping['source_url'],'sha256':mapping['catalog_sha256'],
+                    'provider_symbol':observed['provider_symbol'],'scope':mapping['scope']})
             row['source_refs'] += [{'source_kind':'DATED_VALUATION','sha256':v['source_sha256'],
                 'source_reference':v['source_reference'],'observed_at':v['observed_date_text']}
                 for v in row['valuation_observations']]

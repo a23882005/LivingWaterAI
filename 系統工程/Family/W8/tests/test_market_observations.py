@@ -76,6 +76,54 @@ class ObservationsTest(unittest.TestCase):
         self.assertEqual(result['v75_original_predicates'],{})
         self.assertEqual(result['v75_scope'],'NOT_A_V75_SUPPORTED_BOND')
 
+    def configure_vwra_alias(self):
+        folder=self.root/'系統工程/Family/W8';folder.mkdir(parents=True)
+        row={'provider_symbol':'VWRA.L','reference_exchange':'XLON','reference_timezone':'Europe/London',
+            'quote_currency':'USD','isin':'SYNTHETIC_ISIN','source_url':'https://issuer.example/synthetic',
+            'verified_on':'2026-10-01','history_policy':'CONTIGUOUS_VALID_SUFFIX_FOR_ANALYSIS_ONLY',
+            'scope':'ANALYSIS_REFERENCE_ONLY'}
+        (folder/'market_identity_aliases.json').write_text(json.dumps({
+            'schema_version':'Family.W8.AnalysisMarketAliases.v1','aliases':{'VWRA':row}}))
+        self.snapshot['tables']['portfolio_instrument'][0].update(ticker='VWRA',quote_currency='USD')
+        self.manifest['items']['VWRA.L']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'VWRA.L.csv';self.write()
+
+    def test_reviewed_alias_preserves_holding_symbol_and_currency_checks(self):
+        self.configure_vwra_alias();before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            asset=self.build()['assets'][0]
+        self.assertEqual(asset['symbol'],'VWRA');self.assertEqual(asset['provider_symbol'],'VWRA.L')
+        self.assertFalse(asset['analysis_identity_mapping']['held_exchange_inferred'])
+        self.assertEqual(self.snapshot,before)
+        self.snapshot['tables']['portfolio_instrument'][0]['quote_currency']='CHF'
+        self.assertEqual(self.build()['missing'][0]['code'],'ANALYSIS_MARKET_ALIAS_IDENTITY_MISMATCH')
+
+    def test_bad_prefix_uses_contiguous_suffix_without_repair_or_middle_row_deletion(self):
+        self.configure_vwra_alias();self.rows[0]['High']=1;self.write();before=self.path.read_bytes()
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:
+            asset=self.build()['assets'][0]
+        self.assertEqual(len(engine.call_args.args[0]),27)
+        self.assertEqual(asset['history_quality']['excluded_prefix_rows'],1)
+        self.assertEqual(asset['history_quality']['analysis_start'],'2026-09-02')
+        self.assertEqual(self.path.read_bytes(),before)
+        self.assertFalse(asset['history_quality']['source_values_modified'])
+
+    def test_bad_latest_bar_cannot_be_hidden_by_suffix_policy(self):
+        self.configure_vwra_alias();self.rows[-1]['High']=1;self.write()
+        with patch.object(M,'evaluate_observed_history') as engine:out=self.build()
+        engine.assert_not_called()
+        self.assertEqual(out['missing'][0]['code'],'CACHE_SAMPLE_INSUFFICIENT_AFTER_SOURCE_ERRORS')
+
+    def test_close_only_components_do_not_invent_high_low_or_atr(self):
+        first=M.evaluate_close_history(self.rows,repo_root=ROOT)
+        changed=deepcopy(self.rows)
+        for row in changed:row.update(High=-999,Low=999,Volume=-1)
+        second=M.evaluate_close_history(changed,repo_root=ROOT)
+        self.assertEqual(first['numeric'],second['numeric'])
+        self.assertIsNotNone(first['numeric']['ma20'])
+        self.assertIsNone(first['numeric']['atr14']);self.assertIsNone(first['numeric']['kd_k_9_3'])
+        self.assertEqual(first['observed_named_signals']['right_signals'][0]['truth'],'UNKNOWN')
+
     def test_exact_member_symbol_cache_and_source_hash(self):
         with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
             out=self.build()

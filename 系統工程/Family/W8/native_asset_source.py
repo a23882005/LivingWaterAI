@@ -162,7 +162,7 @@ class AssetSourceProducer:
     """
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
-                 flow='HOLDINGS_ANALYSIS', analyze_all=True):
+                 flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -171,6 +171,7 @@ class AssetSourceProducer:
         if flow not in ('HOLDINGS_ANALYSIS','DEPLOYMENT'):
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
         self.flow=flow;self.analyze_all=analyze_all
+        self.alternative_source_dir=alternative_source_dir
 
     def __call__(self,snapshot,payload):
         if snapshot!=self.req['client_snapshot']['payload']:
@@ -197,7 +198,8 @@ class AssetSourceProducer:
         market=importlib.util.module_from_spec(spec);spec.loader.exec_module(market)
         holdings=project_official_holdings(snapshot,evaluation_at=when)
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
-            evaluation_at=when,official_holdings=holdings)
+            evaluation_at=when,official_holdings=holdings,
+            alternative_source_dir=self.alternative_source_dir)
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         if self.flow=='HOLDINGS_ANALYSIS':

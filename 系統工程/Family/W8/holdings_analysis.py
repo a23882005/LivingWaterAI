@@ -317,9 +317,13 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE'}:
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE'}:
                 issuer=row['issuer_facts']
-                current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'])
+                qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
+                semi='V82_SEMICONDUCTOR_CORE' in cls.get('analysis_capabilities',[])
+                allowed_metrics=(cls['valuation_waterfall'] if semi else
+                    ['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD'] if qqq else None)
+                current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'],allowed_metrics=allowed_metrics)
                 current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'],
                     purpose='CURRENT_HOLDINGS_ANALYSIS')+current_metrics \
                     if request.get('macro_snapshot') else current_metrics
@@ -328,6 +332,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
                 row['native_product_identity']['engine_route']='V82_QQQ_CORE' if qqq else 'V82_GLOBAL_ETF_CORE'
                 waterfall={'valuation_waterfall':['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD']} if qqq else {}
+                if 'V82_SEMICONDUCTOR_CORE' in cls.get('analysis_capabilities',[]):
+                    row['native_product_identity']['engine_route']='V82_SEMICONDUCTOR_CORE'
+                    waterfall={'valuation_waterfall':deepcopy(cls['valuation_waterfall'])}
                 row['core_observation']=producer.core_observation(observed,
                     valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,**waterfall)
                 row['call_trace'].append('V82.evaluate_core_rule_state')

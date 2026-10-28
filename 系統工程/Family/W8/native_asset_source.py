@@ -94,6 +94,12 @@ def classification(symbol, source, product_source=None):
                     'facts':{'fund_name':name,'industry_focus':focus},
                     'basis':'INDEPENDENT_ISSUER_INDUSTRY_ETF__NOT_BROAD_ETF_IDENTITY'})
             result['analysis_capabilities']=['V82_TECHNICAL_OBSERVATIONS']
+            if (symbol in ('SOXX','SMH') and '## 32.8 Semiconductor｜半導體' in text
+                and 'Forward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield' in text):
+                result['analysis_capabilities'].append('V82_SEMICONDUCTOR_CORE')
+                result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD']
+                result['valuation_rule_source']='V82.md §32.8 Semiconductor'
+                if result['primary_framework'] is None:result['primary_framework']='V82.md §32.8 Semiconductor'
             return result
         if symbol=='QQQ':
             if (product.get('symbol')!='QQQ' or product.get('source_url')!='https://www.invesco.com/qqq-etf/en/about.html'

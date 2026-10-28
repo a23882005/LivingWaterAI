@@ -8,13 +8,14 @@ from copy import deepcopy
 GLOBAL_ETF_WATERFALL=('FORWARD_PE','TRAILING_PE','CAPE','PB','FCF_YIELD')
 
 
-def issuer_inputs(facts, dated_metrics=()):
+def issuer_inputs(facts, dated_metrics=(), *, allowed_metrics=None):
     metrics=[];fundamentals=[]
+    allowed=set(GLOBAL_ETF_WATERFALL if allowed_metrics is None else allowed_metrics)
     if facts:
         for name,record in facts['metrics'].items():
             common={'source_reference':facts['source_url'],'source_sha256':facts['source_sha256'],
                 'as_of':facts['as_of'],'observed_date_text':facts['as_of']}
-            if name in GLOBAL_ETF_WATERFALL:
+            if name in allowed:
                 metrics.append({**common,'metric_name':name,'current':record['value'],
                     'unit':record.get('unit'),'historical_median':None,
                     'data_quality':'OK','freshness':'UNKNOWN','pit_status':'UNVERIFIABLE',

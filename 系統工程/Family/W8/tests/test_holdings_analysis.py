@@ -206,6 +206,22 @@ class HoldingAnalysisTest(unittest.TestCase):
             self.assertEqual(identity['asset_type'],'INDUSTRY_ETF')
             self.assertEqual(identity['asset_grade'],'C')
             self.assertNotIn('V82_GLOBAL_ETF_CORE',identity['analysis_capabilities'])
+        p.write_text(p.read_text()+'\n## 32.8 Semiconductor｜半導體\nForward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        self.position['source_instrument']['ticker']='SOXX'
+        row=self.report()['analysis_result']['positions'][0]
+        self.assertEqual(row['native_product_identity']['engine_route'],'V82_SEMICONDUCTOR_CORE')
+        self.assertEqual(row['core_observation']['actual_inputs']['valuation_waterfall'],
+            ['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD'])
+        self.assertEqual(row['core_observation']['result']['valuation']['level'],'UNKNOWN')
+        self.assertTrue(row['core_observation']['actual_inputs']['right_signals'])
+        from core_analysis_inputs import issuer_inputs
+        facts={'metrics':{'EV_EBITDA':{'value':'12','unit':'multiple'}},'source_url':'SYNTHETIC',
+            'source_sha256':'a'*64,'as_of':'2026-10-27'}
+        metrics,_=issuer_inputs(facts,allowed_metrics=['EV_EBITDA'])
+        self.assertEqual(metrics[0]['current'],'12')
+        self.assertEqual(metrics[0]['metric_name'],'EV_EBITDA')
+
         wrong=HERE/'PPH_product_identity.json'
         with self.assertRaisesRegex(ValueError,'INDEPENDENT_INDUSTRY_ETF_STRUCTURE_EVIDENCE_REQUIRED'):
             M.classification('SOXX',source,{'local_path':str(wrong),

@@ -17,6 +17,30 @@ def money(value,currency):
 def percent(value):
     return '未定' if value is None else f'{Decimal(str(value))*100:g}%'
 
+def approved_target_display(symbol,targets):
+    """Merge only the two explicit SGOV roles in this approved allocation.
+
+    This is a client display total, not a physical-role allocation or a new
+    deployment target. Missing/duplicate roles and mixed money remain unknown.
+    """
+    matched=[x for x in targets if x.get('ticker')==symbol]
+    result={'status':'UNRESOLVED','weight':None,'amount':None,'currency':None,'roles':[],'display_only':True}
+    if len(matched)==1:
+        row=matched[0];w=row.get('weight',{});m=row.get('target_amount',{})
+        result.update(weight=w.get('value') if w.get('value_state')=='KNOWN' else None,
+            amount=m.get('amount') if m.get('value_state')=='KNOWN' else None,
+            currency=m.get('currency'),roles=deepcopy(matched),status='SINGLE_SOURCE_TARGET')
+    elif symbol=='SGOV' and len(matched)==2 and {x.get('instrument_id') for x in matched}=={'SGOV_BOND','SGOV_DRY'}:
+        if (all(x.get('weight',{}).get('value_state')=='KNOWN' and x.get('target_amount',{}).get('value_state')=='KNOWN' for x in matched)
+            and len({x['target_amount']['currency'] for x in matched})==1
+            and matched[0].get('source_reference_ids')==matched[1].get('source_reference_ids')):
+            result.update(status='APPROVED_ROLE_TOTAL_DISPLAY_ONLY',
+                weight=str(sum((Decimal(str(x['weight']['value'])) for x in matched),Decimal(0))),
+                amount=str(sum((Decimal(str(x['target_amount']['amount'])) for x in matched),Decimal(0))),
+                currency=matched[0]['target_amount']['currency'],roles=deepcopy(matched))
+    return result
+
+
 def build(report,request):
     positions=report['analysis_result']['positions'];mentor={r['item_id']:r for r in report['mentor']['items']}
     targets=request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('target_lines',[])
@@ -26,8 +50,8 @@ def build(report,request):
         if key in seen or key not in mentor:raise ValueError('RECOMMENDATION_REPORT_COVERAGE_MISMATCH')
         seen.add(key);c=p['current_analysis'];r=c['recommendation'];j=c['current_judgment'];t=c['technical']['native_result']
         matched=[x for x in targets if x.get('ticker')==p['symbol']]
-        weight=matched[0].get('weight',{}) if len(matched)==1 else {}
-        allocation=weight.get('value') if weight.get('value_state')=='KNOWN' else None
+        target_view=approved_target_display(p['symbol'],targets)
+        allocation=target_view['weight']
         component=r.get('confirmed_holdings_component');gap=component.get('positive_gap_amount') if component else None
         current={'Right Confirmation':'右側確認','Base Deployment':'基礎部署','Left Overweight':'左側加碼','Trend Deployment':'趨勢部署'}.get(j['mode'],j['mode']) if j['mode']!='UNKNOWN' else '模式未定'
         reasons=[]
@@ -38,12 +62,15 @@ def build(report,request):
             native=predicate.get('original_result',{})
             if native.get('assessment_status')=='VALID' and native.get('aggregate_state'):reasons.append(native['aggregate_state'])
         limitations=[GAPS.get(f,f) for f in r['missing_fields'] if f!='active_orders_and_fill_reconciliation']
+        if target_view['status']=='APPROVED_ROLE_TOTAL_DISPLAY_ONLY':
+            limitations=[f for f in limitations if f!=GAPS['approved_project_target_amount']]
+            reasons.append('核准合併目標 '+percent(target_view['weight'])+'，'+money(target_view['amount'],target_view['currency'])+'；角色持倉分帳／部署階段仍待原生結果')
         if limitations:reasons.append('；'.join(limitations))
         if not reasons:reasons.append('已保留來源觀測；尚無可用的原生策略判斷')
         new_amount=r.get('new_external_funding_buy_amount')
         rows.append({'instrument_id':key,'symbol':p['symbol'],'quantity':p['holding']['quantity'],
             'market_date':c['market'].get('observed_date'),'current_judgment':current,
-            'approved_allocation_weight':allocation,'stage_cumulative_rate':j.get('target_rate_reference'),
+            'approved_allocation_weight':allocation,'approved_target_display':target_view,'stage_cumulative_rate':j.get('target_rate_reference'),
             'cumulative_target_amount':j.get('target_amount_reference'),'target_currency':j.get('currency'),
             'holding_gap_amount':gap,'holding_gap_currency':r.get('position_currency'),
             'holding_gap_label':'依已確認持股計算，尚未扣除本人既有未成交委託',

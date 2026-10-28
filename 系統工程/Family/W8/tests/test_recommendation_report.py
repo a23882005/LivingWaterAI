@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,unittest
 HERE=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
-from recommendation_report import build
+from recommendation_report import build,approved_target_display
 
 class ReportTest(unittest.TestCase):
     def case(self):
@@ -31,5 +31,28 @@ class ReportTest(unittest.TestCase):
     def test_missing_mentor_coverage_is_not_a_completed_report(self):
         r,q=self.case();r['mentor']['items']=[]
         with self.assertRaisesRegex(ValueError,'COVERAGE_MISMATCH'):build(r,q)
+
+    def role_targets(self):
+        return [{'ticker':'SGOV','instrument_id':role,'weight':{'value_state':'KNOWN','value':weight},
+            'target_amount':{'value_state':'KNOWN','amount':amount,'currency':'USD'},'source_reference_ids':['SYNTHETIC_APPROVED_SOURCE']}
+            for role,weight,amount in [('SGOV_BOND','0.03','300'),('SGOV_DRY','0.10','1000')]]
+    def test_sgov_role_total_preserves_sources_without_duplicating_holding(self):
+        targets=self.role_targets();before=deepcopy(targets);v=approved_target_display('SGOV',targets)
+        self.assertEqual(v['weight'],'0.13');self.assertEqual(v['amount'],'1300');self.assertEqual(targets,before)
+        r,q=self.case();r['analysis_result']['positions'][0]['symbol']='SGOV'
+        q['confirmed_target']['payload']['draft']['target_lines']=targets
+        out=build(r,q)
+        self.assertEqual(len(out['rows']),1);self.assertEqual(out['rows'][0]['quantity'],'5')
+        self.assertEqual(out['rows'][0]['approved_allocation_weight'],'0.13')
+        self.assertIsNone(out['rows'][0]['proposed_existing_asset_redeployment_amount'])
+    def test_duplicate_role_is_not_summed(self):
+        targets=self.role_targets();targets[1]['instrument_id']='SGOV_BOND'
+        self.assertIsNone(approved_target_display('SGOV',targets)['weight'])
+    def test_mixed_currency_roles_are_not_summed(self):
+        targets=self.role_targets();targets[1]['target_amount']['currency']='TWD'
+        self.assertIsNone(approved_target_display('SGOV',targets)['amount'])
+    def test_unrelated_source_roles_are_not_summed(self):
+        targets=self.role_targets();targets[1]['source_reference_ids']=['OTHER_APPROVAL']
+        self.assertIsNone(approved_target_display('SGOV',targets)['amount'])
 
 if __name__=='__main__':unittest.main()

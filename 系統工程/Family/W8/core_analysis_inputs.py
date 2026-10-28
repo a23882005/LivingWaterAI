@@ -35,9 +35,9 @@ def issuer_inputs(facts, dated_metrics=()):
     return metrics,fundamentals
 
 
-def valuation_path_audit(metrics):
+def valuation_path_audit(metrics,waterfall=GLOBAL_ETF_WATERFALL):
     by={r['metric_name']:r for r in metrics};audit=[]
-    for name in GLOBAL_ETF_WATERFALL:
+    for name in waterfall:
         metric=by.get(name);missing=[]
         if metric is None:missing=['current','source_reference','as_of','unit','methodology']
         else:

@@ -53,7 +53,7 @@ def classification(symbol, source, product_source=None):
         raise ValueError('FORMAL_ELEVEN_CLASSES_NOT_IN_SOURCE')
     index=EXAMPLES.get(symbol)
     name=FORMAL_CLASSES[index] if index is not None else 'UNKNOWN'
-    framework='第四十九章｜VT／VWRA型' if index==0 else None
+    framework='第四十九章｜VT／VWRA型' if index==0 else '第四十六章｜QQQ型' if symbol=='QQQ' else None
     if framework and '# '+framework not in text:
         raise ValueError('FORMAL_FRAMEWORK_NOT_IN_SOURCE')
     result={'primary_class':name,'primary_framework':framework,
@@ -66,6 +66,17 @@ def classification(symbol, source, product_source=None):
             raise ValueError('PRODUCT_STRUCTURE_SOURCE_CHANGED')
         product=json.loads(raw)
         facts=product.get('excerpts',[])
+        if symbol=='QQQ':
+            if (product.get('symbol')!='QQQ' or product.get('source_url')!='https://www.invesco.com/qqq-etf/en/about.html'
+                or 'Nasdaq-100 Index' not in facts or '100 largest non-financial companies listed on the Nasdaq' not in facts
+                or '中度集中／成長或大型權值集中，但仍屬Broad核心曝險 → `B`' not in text):
+                raise ValueError('QQQ_INDEPENDENT_STRUCTURE_EVIDENCE_REQUIRED')
+            result.update(asset_type='BROAD_ETF',asset_grade='B',grade_evidence={
+                'rule':'V82.md Canonical Asset Grade §2.1.1',
+                'source_url':product['source_url'],'source_sha256':product_source['sha256'],
+                'facts':deepcopy(facts),'basis':'NASDAQ100_CONCENTRATED_GROWTH_BROAD_CORE__NOT_GLOBAL_ETF'})
+            result['analysis_capabilities']=['V82_QQQ_CORE']
+            return result
         contracts={
             'VT':('https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf',
                 ('FTSE Global All Cap Index','Passively managed','developed and emerging',
@@ -193,6 +204,13 @@ class AssetSourceProducer:
         self.alternative_source_dir=alternative_source_dir
         self.issuer_facts_source=issuer_facts_source
         self.product_sources=deepcopy(product_sources or {})
+        # Public issuer identity; no member holdings or financial input in this
+        # source. VT evidence is never copied to the QQQ route.
+        qqq=HERE/'QQQ_product_identity.json'
+        if qqq.is_file() and any(p.get('ticker')=='QQQ' for p in
+                self.req.get('client_snapshot',{}).get('payload',{}).get('tables',{}).get('portfolio_instrument',[])):
+            self.product_sources.setdefault('QQQ',{'local_path':str(qqq),
+                'sha256':hashlib.sha256(qqq.read_bytes()).hexdigest()})
         self.issuer_facts_sources=deepcopy(issuer_facts_sources or {})
         self.approved_rule_profile=None
         from approved_v04_technical import load_profile
@@ -543,7 +561,7 @@ class AssetSourceProducer:
             cash_sources[domain]=trial
         return contexts,cash_sources
 
-    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None):
+    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None):
         from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
         path=self.root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
         if str(path) not in sys.path:sys.path.insert(0,str(path))
@@ -557,7 +575,7 @@ class AssetSourceProducer:
                 requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
                 freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
                 source_reference=observed['source_path']) for g in gaps if g['field_path'].startswith('safety.')]
-        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(GLOBAL_ETF_WATERFALL),
+        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(valuation_waterfall or GLOBAL_ETF_WATERFALL),
             'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
             **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
             'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
@@ -569,7 +587,7 @@ class AssetSourceProducer:
         return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
                 default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
             'actual_inputs':serialize(arguments),'input_gaps':gaps,
-            'valuation_path_audit':valuation_path_audit(valuation_metrics or []),
+            'valuation_path_audit':valuation_path_audit(valuation_metrics or [],arguments['valuation_waterfall']),
             'structural_confirmation_applicability':'INAPPLICABLE_COMPANY_THESIS' if broad_etf else 'REQUIRED',
             'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
             'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',

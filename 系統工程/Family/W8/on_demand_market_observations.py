@@ -280,10 +280,10 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         key, symbol = instrument['instrument_key'], instrument.get('ticker')
         is_etf=(True if (verified_asset_types or {}).get(symbol)=='BROAD_ETF' else
             instrument.get('instrument_type')=='ETF' if instrument.get('instrument_type') in ('ETF','STOCK') else None)
-        # First production route is restricted to independently proven broad
-        # stock ETFs. V75 bonds and unverified/derivative products retain their
-        # existing components; approval does not manufacture product identity.
-        routed_profile=(approved_rule_profile if (verified_asset_types or {}).get(symbol)=='BROAD_ETF' else None)
+        # The approved price/volume algorithms do not require a global-ETF
+        # product grade. Unknown product identity remains unknown: in
+        # particular, the ETF-only nonvoting EPS slot still needs is_etf=True.
+        routed_profile=approved_rule_profile
         if (instrument.get('identity_state') not in ('KNOWN', 'SOURCE_SYMBOL_ONLY') or not isinstance(symbol, str)
                 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,31}', symbol)):
             missing.append({'instrument_key': key, 'code': 'KNOWN_EXACT_SYMBOL_REQUIRED'})

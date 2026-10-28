@@ -70,6 +70,17 @@ class RecommendationOutputTest(unittest.TestCase):
         out=self.compute()
         self.assertIsNone(out['position_currency']);self.assertIsNone(out['confirmed_position_amount'])
         self.assertIn('verified_quote_currency',out['missing_fields'])
+    def test_explicit_holding_price_unit_supplies_missing_registry_currency(self):
+        self.row['native_product_identity']['registry_identity']['quote_currency']=None
+        self.row['native_product_identity']['holding_price_currency_source']={
+            'quote_currency':'USD','registry_conflict':False}
+        out=self.compute()
+        self.assertEqual(out['confirmed_position_amount'],'500')
+        self.assertNotIn('verified_quote_currency',out['missing_fields'])
+        self.row['native_product_identity']['registry_identity']['quote_currency']='EUR'
+        out=self.compute()
+        self.assertIsNone(out['confirmed_position_amount'])
+        self.assertIn('verified_quote_currency',out['missing_fields'])
     def test_over_target_is_not_automatically_a_sell_recommendation(self):
         self.row['holding']['quantity']='12'
         out=self.compute()

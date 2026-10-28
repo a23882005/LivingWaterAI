@@ -121,6 +121,21 @@ class NativeSourceTest(unittest.TestCase):
         self.assertEqual(len(trials['TW_SUB_BROKERAGE']['assumptions']),4)
         self.assertTrue(all(row['bucket_new_investment_amount'] is None for row in contexts))
 
+    def test_qqq_has_independent_identity_grade_and_capability(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rule=Path(tmp)/'synthetic-rules.md'
+            rule.write_text('\n'.join(M.FORMAL_CLASSES)+'\n# 第四十六章｜QQQ型\n'+
+                '中度集中／成長或大型權值集中，但仍屬Broad核心曝險 → `B`')
+            source={'local_path':str(rule),'sha256':hashlib.sha256(rule.read_bytes()).hexdigest(),
+                'source_reference':'SYNTHETIC_RULE_CATALOG'}
+            product=HERE/'QQQ_product_identity.json'
+            proof={'local_path':str(product),'sha256':hashlib.sha256(product.read_bytes()).hexdigest()}
+            result=M.classification('QQQ',source,proof)
+            self.assertEqual(result['asset_grade'],'B');self.assertEqual(result['asset_type'],'BROAD_ETF')
+            self.assertEqual(result['analysis_capabilities'],['V82_QQQ_CORE'])
+            with self.assertRaisesRegex(ValueError,'STRUCTURE_EVIDENCE_REQUIRED'):
+                M.classification('SOXX',source,proof)
+
     def test_native_money_error_has_exact_path_and_cash_cannot_make_an_investment_pool(self):
         error=ValueError('C8C9.W4.MONEY: c7.contexts[0].bucket_new_investment_amount must be JSON number or decimal string')
         self.assertEqual(M.native_error_path(error),'/c7_funding_context/contexts/0/bucket_new_investment_amount')

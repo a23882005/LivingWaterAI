@@ -19,6 +19,18 @@ from loop2_cash_scenario import build_cash_overlay
 
 
 class HoldingAnalysisTest(unittest.TestCase):
+    def test_price_currency_requires_same_holding_and_explicit_per_share_unit(self):
+        position={'source_instrument':{'ticker':'SYNTHETIC'},'source_position':{'source_row':{'id':'own'}}}
+        fact={'value_state':'KNOWN','currency_code':'USD','unit':'USD_PER_SHARE'}
+        holding={'symbol':'SYNTHETIC','source_row':{'id':'own'},
+            'source_fields':{'last_price_displayed':[fact]}}
+        holdings={'analysis_security_positions':[holding]}
+        self.assertEqual(H.holding_price_currency(position,holdings)['quote_currency'],'USD')
+        holding['source_row']={'id':'other'}
+        self.assertIsNone(H.holding_price_currency(position,holdings))
+        holding['source_row']={'id':'own'};fact['unit']='USD'
+        self.assertIsNone(H.holding_price_currency(position,holdings))
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         p=Path(self.tmp.name)/'synthetic-project.md'

@@ -189,7 +189,10 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     market=row.get('market') or {};target=approved_target if approved_target is not None else (row.get('formal_conclusion') or {}).get('approved_project_target') or {}
     identity=row.get('native_product_identity') or {};registry=identity.get('registry_identity') or {}
     mapping=market.get('analysis_identity_mapping') or {};issuer=row.get('issuer_facts') or {}
-    currency=registry.get('quote_currency') or mapping.get('quote_currency') or issuer.get('currency')
+    price_source=identity.get('holding_price_currency_source') or {}
+    candidates={v for v in (registry.get('quote_currency'),mapping.get('quote_currency'),
+        issuer.get('currency'),price_source.get('quote_currency')) if v is not None}
+    currency=next(iter(candidates)) if len(candidates)==1 and not price_source.get('registry_conflict') else None
     missing=[];trace=[]
     if currency is None:missing.append('verified_quote_currency')
     price=market.get('observed_close');qty=row.get('holding',{}).get('quantity')

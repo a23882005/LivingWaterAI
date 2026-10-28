@@ -76,6 +76,16 @@ class ObservationsTest(unittest.TestCase):
         self.assertEqual(result['v75_original_predicates'],{})
         self.assertEqual(result['v75_scope'],'NOT_A_V75_SUPPORTED_BOND')
 
+    def test_approved_price_algorithms_are_not_limited_to_global_etf_identity(self):
+        profile={'approval_status':'APPROVED_FOR_IMPLEMENTATION','profile_id':'SYNTHETIC'}
+        before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:
+            M.build_member_market_observations(self.snapshot,[],self.macro,repo_root=self.root,
+                evaluation_at='2026-10-02T00:00:00Z',approved_rule_profile=profile)
+        self.assertEqual(engine.call_args.kwargs['approved_rule_profile'],profile)
+        self.assertIsNone(engine.call_args.kwargs['is_etf'])
+        self.assertEqual(self.snapshot,before)
+
     def configure_vwra_alias(self):
         folder=self.root/'系統工程/Family/W8';folder.mkdir(parents=True)
         row={'provider_symbol':'VWRA.L','reference_exchange':'XLON','reference_timezone':'Europe/London',

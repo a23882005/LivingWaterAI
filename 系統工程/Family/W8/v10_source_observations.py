@@ -38,17 +38,20 @@ def field(raw,key,unit,at):
 def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_INPUT'):
     if purpose not in ('STRICT_NATIVE_INPUT','CURRENT_HOLDINGS_ANALYSIS'):
         raise ValueError('VALUATION_PURPOSE_INVALID')
-    if symbol!='VT':return []
-    raw,at=checked_payload(snapshot,evaluated_at);found=field(raw,'m03_vt','倍 Forward',at)
+    rules={'VT':('m03_vt',(14,18,20,23),'VT/VWRA'),
+        'QQQ':('m03_qqq',(18,24,28,33),'QQQ/Nasdaq-100')}
+    if symbol not in rules:return []
+    source_key,bands,family=rules[symbol]
+    raw,at=checked_payload(snapshot,evaluated_at);found=field(raw,source_key,'倍 Forward',at)
     if found is None:return []
     value,row=found;evidence=row.get('sourceEvidence',{})
     if (evidence.get('label')!='Forward PE' or Decimal(str(evidence.get('value')))!=value
             or evidence.get('source_url')!=row['source'] or value<=0):
         raise ValueError('V10_FORWARD_PE_DEFINITION_OR_SOURCE_MISMATCH')
-    # This operational range is authorized only for the independently verified
-    # VT/VWRA-type route. A trailing multiple never enters this mapper.
-    level=('CHEAP' if value<14 else 'NORMAL' if value<18 else 'PRICEY' if value<20
-        else 'EXPENSIVE' if value<23 else 'EXTREME_CANDIDATE')
+    # Each independently verified product route has its own authorized range.
+    # A trailing multiple never enters this mapper.
+    level=next((name for limit,name in zip(bands,('CHEAP','NORMAL','PRICEY','EXPENSIVE'))
+        if value<limit),'EXTREME_CANDIDATE')
     freshness,pit,missing=valuation_validity(row,at)
     source_validity={'freshness':freshness,'pit_status':pit,'missing_contracts':list(missing)}
     current_accepted=purpose=='CURRENT_HOLDINGS_ANALYSIS'
@@ -71,7 +74,7 @@ def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_I
     return [{'metric_name':'FORWARD_PE','current':str(value),'unit':'multiple',
         'valuation_level':level,'classification_scope':'AUTHORIZED_RANGE_OBSERVATION__VALIDITY_REQUIRED',
         'source_reference':row['source'],'source_sha256':snapshot['source_sha256'],
-        'source_field':'V70.indicators.m03_vt','source_row':deepcopy(row),
+        'source_field':'V70.indicators.'+source_key,'source_row':deepcopy(row),
         'as_of':row['dataDate'],'observed_date_text':row['dataDate'],'data_quality':'OK',
         'freshness':freshness,'pit_status':pit,'frequency':row.get('frequency'),
         'available_at':row.get('available_at'),'published_at':row.get('published_at'),
@@ -86,7 +89,7 @@ def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_I
         'execution_input_eligible':False if current_accepted else None,
         'missing_contracts':missing,
         'scope':'VERIFIED_PUBLISHED_V70_CURRENT_ANALYSIS_ONLY' if current_accepted else 'EXISTING_VERIFIED_V70_FORWARD_VALUE__NO_INVENTED_FRESHNESS',
-        'range_rule':'V82 §32.3 VT/VWRA forward-only 14/18/20/23'}]
+        'range_rule':'V82 §32.3 '+family+' forward-only '+ '/'.join(map(str,bands))}]
 
 
 def valuation_validity(row,at):

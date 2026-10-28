@@ -33,6 +33,35 @@ def issue(path,reason,impact,*,category=3,source=None,code='ANALYSIS_SOURCE_GAP'
         'blocks_deployment':True,'trade_authorization':'NONE'}
 
 
+def holding_price_currency(position, holdings):
+    """Read price units from this exact accepted holding, not account cash.
+
+    A USD account or a USD total market value does not establish price units.
+    The screenshot's explicit per-share price does. No registry/DB is changed.
+    """
+    symbol=position['source_instrument'].get('ticker')
+    source=position['source_position'].get('source_row')
+    matches=[r for r in holdings.get('analysis_security_positions',[])
+        if r.get('symbol')==symbol and r.get('source_row')==source]
+    if len(matches)!=1:return None
+    row=matches[0];facts=[]
+    for key in ('last_price_displayed','average_price_displayed'):
+        for fact in row.get('source_fields',{}).get(key,[]):
+            currency=fact.get('currency_code')
+            if (fact.get('value_state')=='KNOWN' and isinstance(currency,str)
+                and re.fullmatch('[A-Z]{3}',currency)
+                and fact.get('unit')==currency+'_PER_SHARE'):
+                facts.append(deepcopy(fact))
+    currencies={f['currency_code'] for f in facts}
+    if len(currencies)!=1:return None
+    currency=next(iter(currencies))
+    registry=position['source_instrument'].get('quote_currency')
+    return {'quote_currency':currency,'source_fields':facts,
+        'registry_conflict':registry not in (None,currency),
+        'scope':'ACCEPTED_HOLDING_PRICE_UNIT__NOT_EXCHANGE_OR_PRODUCT_GRADE',
+        'registry_written':False}
+
+
 def scenario_class(root, asset_class):
     path=Path(root)/'系統工程/Family/W6/runtime/W6_17類六情境攻防評等_v1.0.json'
     raw=path.read_bytes()
@@ -205,6 +234,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'source_kind':source.get('source_kind'),'source_reference':deepcopy(source.get('source_row'))},
             'scenario_class':scenario_class(producer.root,cls),
             'native_product_identity':{'registry_identity':deepcopy(instrument),
+                'holding_price_currency_source':holding_price_currency(position,holdings),
                 'asset_type':cls['asset_type'],'asset_grade':cls['asset_grade'],
                 'product_evidence':cls.get('grade_evidence'),
                 'engine_route':'V75_PREDICATES' if observed and observed['v75_original_predicates'] else 'V82_TECHNICAL_OBSERVATIONS',
@@ -283,7 +313,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if 'V82_GLOBAL_ETF_CORE' in cls.get('analysis_capabilities',[]):
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE'}:
                 issuer=row['issuer_facts']
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'])
                 current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'],
@@ -291,9 +321,11 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     if request.get('macro_snapshot') else current_metrics
                 row['valuation_observations']=current_metrics
                 row['fundamental_fields']=fundamental_fields
-                row['native_product_identity']['engine_route']='V82_GLOBAL_ETF_CORE'
+                qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
+                row['native_product_identity']['engine_route']='V82_QQQ_CORE' if qqq else 'V82_GLOBAL_ETF_CORE'
+                waterfall={'valuation_waterfall':['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD']} if qqq else {}
                 row['core_observation']=producer.core_observation(observed,
-                    valuation_metrics=current_metrics,fundamental_fields=fundamental_fields)
+                    valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,**waterfall)
                 row['call_trace'].append('V82.evaluate_core_rule_state')
                 for candidate in row['core_observation']['valuation_path_audit']:
                     for field in candidate['missing_fields']:

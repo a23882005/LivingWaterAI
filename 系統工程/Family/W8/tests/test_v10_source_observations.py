@@ -8,6 +8,16 @@ from family_input import digest
 from v10_source_observations import forward_observations,macro_observations,credit_logic
 
 class FormalSourceTest(unittest.TestCase):
+    def test_qqq_uses_own_published_value_and_forward_ranges(self):
+        s=self.snapshot();row=dict(s['payload']['indicators']['m03_vt'])
+        row.update(value='25',sourceEvidence={'label':'Forward PE','value':'25','source_url':'SYNTHETIC_PROVIDER'})
+        s['payload']['indicators']['m03_qqq']=row;s['digest']=digest(s['payload'])
+        metric=forward_observations(s,'QQQ','2026-10-28T01:00:00Z',purpose='CURRENT_HOLDINGS_ANALYSIS')[0]
+        self.assertEqual(metric['current'],'25');self.assertEqual(metric['valuation_level'],'PRICEY')
+        self.assertEqual(metric['source_field'],'V70.indicators.m03_qqq')
+        self.assertIn('18/24/28/33',metric['range_rule'])
+        self.assertEqual(forward_observations(s,'SOXX','2026-10-28T01:00:00Z'),[])
+
     def snapshot(self):
         raw={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-10-27T01:00:00Z',
             'verification':{'ready':True},'indicators':{}}

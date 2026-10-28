@@ -1,0 +1,16 @@
+retrieved_at=2026-10-28T10:05:21+08:00
+source_1=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+source_1_excerpt=FOMC target federal funds rate or range; 2026; Date September 17; Increase 25bp; Decrease 0bp; Level 3.75-4.00 percent.
+source_2=https://fred.stlouisfed.org/series/DFEDTARL
+source_2_excerpt=2026-10-27: 3.75 percent; Updated Oct 27, 2026 7:01 AM CDT; daily effective lower limit.
+source_3=https://fred.stlouisfed.org/series/DFEDTARU
+source_3_excerpt=2026-10-27: 4.00 percent; Updated Oct 27, 2026 7:01 AM CDT; daily effective upper limit.
+source_4=https://alfred.stlouisfed.org/series?seid=DFEDTARU
+source_4_excerpt=2026-10-27: 4.00 percent; Updated Oct 27, 2026 7:01 AM CDT; vintage/release history corroborates upper limit.
+policy_schema=fed-target-evidence-v1
+result=CURRENT_CONFIRMED
+effective_date=2026-09-17
+lower_bound=3.75
+upper_bound=4.00
+midpoint=3.875
+publication_date=2026-09-17

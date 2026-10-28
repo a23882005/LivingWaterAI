@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-28T01:30:22.570Z",
+  "updated_at": "2026-10-29T04:50:21+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1586,5 +1586,24 @@
       "trade_action": "NO_TRADE",
       "full04_acceptance": "NOT_PASSED"
     }
+  },
+  "mou_same_id_writeback_20261029": {
+    "status": "PASS",
+    "scope": "Owner-authorized replacement of existing official MOU DB with reviewed approved-target version; full menu04/Gate acceptance unchanged",
+    "official_file_id_preserved": true,
+    "official_file_name": "mou.db",
+    "official_bytes": 667648,
+    "official_sha256": "2f1909ae3b6044fc7271cc107510f4c993da6af6993fd7f09c33b942c21d961c",
+    "pre_update_backup": "VERIFIED_EXACT_BYTES_IN_PRIVATE_BACKUP",
+    "schema": "UNCHANGED",
+    "existing_rows": "PRESERVED_EXCEPT_TWO_ACCOUNT_DISPLAY_LABELS",
+    "approved_target_rows": 17,
+    "approved_target_weight_units": 1000000,
+    "target_status": "CONFIRMED_COMPLETE",
+    "remote_readback": "EXACT_BYTES_AND_SHA256_MATCH",
+    "integrity_check": "ok",
+    "foreign_key_violations": 0,
+    "private_receipt_drive_id": "1LtCd-U0wixCKIT0J-9i05CMDDETWWTaS",
+    "drive_governance": "ENGINEERING_FILES_MASTER_WBS_UPDATED"
   }
 }

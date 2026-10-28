@@ -132,6 +132,8 @@ def build_formal_conclusion(root,row,request):
         modes['conflict']={'code':'INCOMPATIBLE_UP_RIGHT_LEFT_AND_DOWN','reconciliation_required':True,
             'native_selected_mode':modes['selected_mode']}
         modes['selected_mode']='UNKNOWN';modes['formal_stage']='UNKNOWN';modes['canonical_target_rate']=None
+    modes['technical_only_predicates']={'right_confirmation':truth(right_technical),
+        'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
     modes['four_modes']['Base']['entry_reasons']=['APPROVED_LONG_TERM_ALLOCATION','FUNDAMENTALS','LEGAL_VALUATION','CREDIT_SAFETY','HARD_GATE','NOT_RUNAWAY_DOWN']
     orders=order_source(request);missing=[]

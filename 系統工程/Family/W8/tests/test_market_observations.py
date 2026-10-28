@@ -175,6 +175,21 @@ class ObservationsTest(unittest.TestCase):
         self.rows[-1]['High']=1;self.write()
         out=self.build();self.assertEqual(out['missing'][0]['code'],'CACHE_OHLCV_INVALID')
 
+    def test_stock_close_only_fallback_is_explicit_and_never_used_for_v75(self):
+        self.rows[-1]['High']=1;self.write()
+        def build():
+            return M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',allow_independent_close_analysis=True)
+        self.assertEqual(build()['missing'][0]['code'],'CACHE_OHLCV_INVALID')
+        stock=self.folder/'SYNTHETICSTOCK.csv';stock.write_bytes(self.path.read_bytes())
+        self.snapshot['tables']['portfolio_instrument'][0]['ticker']='SYNTHETICSTOCK'
+        self.manifest['items']['SYNTHETICSTOCK']=self.manifest['items']['SGOV'];self.write_manifest()
+        with patch.object(M,'evaluate_close_history',return_value={'numeric':{'ma20':120,'atr14':None}}) as call:
+            out=build()
+        self.assertEqual(len(out['assets']),1);self.assertEqual(call.call_count,1)
+        self.assertIsNone(out['assets'][0]['numeric']['atr14'])
+        self.assertTrue(out['assets'][0]['history_quality']['scope'].startswith('CLOSE_ONLY'))
+
     def test_manifest_mismatch_rejected(self):
         self.manifest['items']['SGOV']['rows']+=1;self.write_manifest()
         self.assertEqual(self.build()['missing'][0]['code'],'CACHE_MANIFEST_MISMATCH')

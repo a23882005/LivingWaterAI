@@ -231,6 +231,7 @@ class AssetSourceProducer:
             evaluation_at=when,official_holdings=holdings,
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
             approved_rule_profile=self.approved_rule_profile,
+            allow_independent_close_analysis=self.flow=='HOLDINGS_ANALYSIS',
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
         # A branches before constructing or loading any deployment adapter.

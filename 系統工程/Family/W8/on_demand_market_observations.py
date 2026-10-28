@@ -235,7 +235,7 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
                                      official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
-                                     approved_rule_profile=None,verified_asset_types=None):
+                                     approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -327,6 +327,17 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             dates = [r['Date'] for r in source_rows]
             if dates != sorted(set(dates)):
                 raise ValueError('CACHE_DATE_ORDER')
+            independent_close_allowed=False
+            if allow_independent_close_analysis:
+                from bond_engine import V75_PATH
+                policy_runtime=Path(__file__).resolve().parents[3]/V75_PATH
+                if str(policy_runtime) not in sys.path:sys.path.insert(0,str(policy_runtime))
+                import v75_runtime
+                if Path(v75_runtime.__file__).resolve().parent!=policy_runtime/'v75_runtime':
+                    raise ValueError('OBSERVATION_V75_POLICY_SOURCE_MISMATCH')
+                from v75_runtime.work3 import US_LISTED_ASSETS,TW_LISTED_ASSETS
+                independent_close_allowed=(symbol not in US_LISTED_ASSETS|TW_LISTED_ASSETS and
+                    (verified_asset_types or {}).get(symbol)!='BOND_ETF')
             rows = [];invalid_rows=[];last_invalid=-1;close_only=False;excluded_sessions=[]
             for source_index,row in enumerate(source_rows):
                 day = date.fromisoformat(row['Date'])
@@ -350,7 +361,7 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                     last_invalid=source_index
                     suffix_policy=identity_mapping and identity_mapping.get('history_policy')=='CONTIGUOUS_VALID_SUFFIX_FOR_ANALYSIS_ONLY'
                     if not suffix_policy:
-                        if alternate_entry and alternate_entry.get('allow_close_only_analysis'):
+                        if independent_close_allowed or (alternate_entry and alternate_entry.get('allow_close_only_analysis')):
                             close_only=True
                         else:raise ValueError('CACHE_OHLCV_INVALID')
                 rows.append({'Date': row['Date'], **vals,'_source_decimal':{

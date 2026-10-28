@@ -74,6 +74,41 @@ def enrich_document_target_view(target,proof):
                 raise ValueError('APPROVED_TARGET_AMOUNT_SOURCE_CONFLICT')
             continue
         if money['value_state']=='KNOWN':line['target_amount']=money;changed=True
+    # The active allocation may explicitly name existing holdings at 0% in
+    # the paragraph following its table. Absence from a table alone is never
+    # zero. Read only this table's following paragraph, not older allocations.
+    source_lines=text.splitlines()
+    signature={r['original_document_row'] for r in draft['target_lines']
+        if r.get('original_document_row','').startswith('|')}
+    table_ends=[];block=[]
+    for i,s in enumerate(source_lines+['']):
+        if s.startswith('|'):block.append(s);continue
+        if signature and signature.issubset(set(block)):table_ends.append(i-1)
+        block=[]
+    currencies={r.get('target_amount',{}).get('currency') for r in draft['target_lines']
+        if r.get('target_amount',{}).get('value_state')=='KNOWN'}
+    if len(table_ends)==1 and len(currencies)==1 and all(r.get('target_amount',{}).get('value_state')=='KNOWN' for r in draft['target_lines']):
+        currency=next(iter(currencies))
+        for source_line in source_lines[table_ends[0]+1:table_ends[0]+13]:
+            if source_line.startswith('#'):break
+            match=re.match(r'^[-*]\s*([A-Z0-9]+(?:[／/、][A-Z0-9]+)+)目前[^\n]*長期目標\s*0\s*%',source_line)
+            if not match:continue
+            for symbol in re.split('[／/、]',match.group(1)):
+                existing=[r for r in draft['target_lines'] if r.get('ticker')==symbol]
+                if existing:
+                    if any(r['weight'].get('value_state')!='KNOWN' or Decimal(str(r['weight']['value']))!=0 for r in existing):
+                        raise ValueError('APPROVED_ZERO_TARGET_SOURCE_CONFLICT')
+                    continue
+                draft['target_lines'].append({'instrument_id':symbol,'ticker':symbol,
+                    'asset_type':'EXISTING_ASSET__NATIVE_TYPE_UNVERIFIED',
+                    'weight':{'value':0,'value_state':'KNOWN'},
+                    'target_amount':{'value_state':'KNOWN','amount':'0','currency':currency,
+                        'source_row':source_line,'source_column':'EXPLICIT_APPROVED_ZERO_PERCENT_TARGET',
+                        'scope':'EXPLICIT_ZERO_TARGET__NOT_ABSENT_ROW_DEFAULT'},
+                    'source_reference_ids':[proof['source_reference']],
+                    'original_document_row':source_line,
+                    'policy':'NO_NEW_BUY__NOT_AN_AUTOMATIC_SELL_INSTRUCTION'})
+                changed=True
     amounts=[r['target_amount'] for r in draft['target_lines']]
     currencies={a.get('currency') for a in amounts}
     if all(a.get('value_state')=='KNOWN' for a in amounts) and len(currencies)==1:

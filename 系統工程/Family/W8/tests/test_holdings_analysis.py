@@ -390,4 +390,33 @@ class NativeFundingAdviceTest(unittest.TestCase):
         self.assertNotIn('native_plan',item)
 
 
+class ApprovedZeroTargetMappingTest(unittest.TestCase):
+    def pack(self,paragraph):
+        from approved_target_input import build_approved_target_view
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup)
+        path=Path(tmp.name)/'synthetic-approved.md';line='| VT | 100% | NT$1,000 | core |'
+        path.write_text('| 標的 | 目標比例 | 目標台幣 | 角色 |\n|---|---|---|---|\n'+line+'\n'+paragraph)
+        return build_approved_target_view(client_id='fam_'+'a'*32,source_path=path,
+            source_reference='SYNTHETIC_APPROVED',source_available_at='2026-10-01T00:00:00Z',
+            target_version=1,allocation_version='SYNTHETIC',rows=[{'source_line':line,'weight':'1'}],
+            mappings=[{'instrument_id':'VT','ticker':'VT','asset_type':'ETF'}])
+
+    def test_explicit_zero_percent_is_mapped_without_absence_or_sell_inference(self):
+        from approved_target_input import enrich_document_target_view
+        pack=self.pack('- DRAM／SMH／ZTS／IBKR目前仍屬既有小部位，長期目標0%；0%不等於立刻賣。\n')
+        before=deepcopy(pack);view,proof=enrich_document_target_view(pack['target'],pack['trusted_approved_target_source'])
+        rows=view['payload']['draft']['target_lines'];self.assertEqual(len(rows),5)
+        self.assertEqual({r['ticker'] for r in rows[1:]},{'DRAM','SMH','ZTS','IBKR'})
+        self.assertTrue(all(r['weight']['value']==0 and r['target_amount']['amount']=='0' for r in rows[1:]))
+        self.assertTrue(all(r['policy']=='NO_NEW_BUY__NOT_AN_AUTOMATIC_SELL_INSTRUCTION' for r in rows[1:]))
+        self.assertEqual(pack,before)
+        self.assertEqual(enrich_document_target_view(view,proof),(view,proof))
+
+    def test_other_section_zero_statement_does_not_change_active_allocation(self):
+        from approved_target_input import enrich_document_target_view
+        pack=self.pack('\n## Historical\n- DRAM／SMH目前既有部位，長期目標0%。\n')
+        view,_=enrich_document_target_view(pack['target'],pack['trusted_approved_target_source'])
+        self.assertEqual([r['ticker'] for r in view['payload']['draft']['target_lines']],['VT'])
+
+
 if __name__=='__main__':unittest.main()

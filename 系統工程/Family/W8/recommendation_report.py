@@ -58,6 +58,7 @@ def build(report,request):
         component=r.get('confirmed_holdings_component');gap=component.get('positive_gap_amount') if component else None
         current={'Right Confirmation':'右側確認','Base Deployment':'基礎部署','Left Overweight':'左側加碼','Trend Deployment':'趨勢部署'}.get(j['mode'],j['mode']) if j['mode']!='UNKNOWN' else '模式未定'
         reasons=[]
+        if r.get('approved_no_new_buy'):reasons.append('正式長期目標0%：不新增；不是立即賣出指示')
         if c['valuation']['native_result']:reasons.append('估值 '+c['valuation']['native_result'].get('level','UNKNOWN'))
         if t:reasons.append('技術 Right '+t.get('right_confirmation','UNKNOWN')+'；Up/Down '+t.get('runaway_up','UNKNOWN')+'/'+t.get('runaway_down','UNKNOWN'))
         bond=c.get('native_component_observations',{})

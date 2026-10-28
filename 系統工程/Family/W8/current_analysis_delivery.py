@@ -200,6 +200,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     confirmed=Decimal(str(price))*Decimal(str(qty)) if known_position else None
     if confirmed is None:missing.append('confirmed_position_quantity_and_valuation_price')
     amount=target.get('amount') if target.get('value_state')=='KNOWN' else None
+    approved_no_new_buy=amount is not None and Decimal(str(amount))==0
     if amount is None:missing.append('approved_project_target_amount')
     rate=judgment.get('target_rate_reference')
     if rate is None:missing.append('native_mode_and_stage_target_rate')
@@ -231,6 +232,8 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
             'position_currency':currency,
             'expression':'target_amount - confirmed_amount * FX(position_currency,target_currency) - net_active_order_exposure_in_target_currency'}
     return {'scope':'RECOMMENDATION_ONLY__NO_BROKER_SUBMISSION',
+        'approved_no_new_buy':approved_no_new_buy,
+        'approved_no_new_buy_source':deepcopy(target) if approved_no_new_buy else None,
         'status':'CALCULATED' if reconciled else 'PARTIAL',
         'target_rate':rate,'cumulative_target_amount':judgment.get('target_amount_reference'),
         'currency':target.get('currency'),'position_currency':currency,

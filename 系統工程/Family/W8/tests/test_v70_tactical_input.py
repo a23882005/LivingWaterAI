@@ -38,4 +38,13 @@ class V70ComponentTest(unittest.TestCase):
         self.assertIsNone(calculate(ROOT,self.request,None))
         with self.assertRaises(PermissionError):calculate(ROOT,self.request,{**self.policy,'client_id':'OTHER'})
 
+    def test_current_reference_is_preserved_and_does_not_replace_target_base(self):
+        policy={**self.policy,'current_stock_percent':40,'current_bond_percent':60,'life_stage_code':'L6'}
+        out=calculate(ROOT,self.request,policy)
+        self.assertEqual(out['allocation']['S0'],80);self.assertEqual(out['allocation']['B0'],20)
+        self.assertEqual(out['current_stock_bond_reference']['stock_percent'],40)
+        self.assertEqual(out['allocation']['lifeStageCode'],'L6')
+        self.assertIsNone(calculate(ROOT,self.request,self.policy)['current_stock_bond_reference'])
+        self.assertEqual(calculate(ROOT,self.request,self.policy)['allocation']['lifeStageCode'],'UNKNOWN')
+
 if __name__=='__main__':unittest.main()

@@ -107,7 +107,11 @@ def build(report,request):
     if (report.get('new_investment_scenario') or {}).get('total_new_investment_amount')=='0':
         intro.insert(1,'本輪不新增外部資金，新增投入為0；既有現金與持倉保留。')
     tactical=next((p['current_analysis'].get('v70_tactical_budget') for p in positions if p['current_analysis'].get('v70_tactical_budget')),None)
-    if tactical:intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
+    if tactical:
+        current=tactical.get('current_stock_bond_reference')
+        if current:intro.append('本人提供目前股／債參考：'+str(current['stock_percent'])+'%／'+str(current['bond_percent'])+'%；保留為本人提供值，未覆寫正式持倉。')
+        intro.append('V70目標股／債風險比例：'+str(tactical['allocation']['S0'])+'%／'+str(tactical['allocation']['B0'])+'%。')
+        intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
     markdown='\n\n'.join(intro)+'\n\n| '+' | '.join(headings)+' |\n| '+' | '.join(['---']*len(headings))+' |\n'
     markdown+='\n'.join('| '+' | '.join(str(v).replace('|','／').replace('\n',' ') for v in row)+' |' for row in cells)
     markdown+='\n\n'+ '\n\n'.join('### '+r['symbol']+'｜'+str(r['market_date'] or '行情日期未定')+'\n\n'+r['mentor_explanation'] for r in rows)

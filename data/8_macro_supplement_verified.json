@@ -508,8 +508,8 @@
   "notes": [
     "2026-10-28本輪依正式契約逐項重查四站；Forward/FY1嚴格排除TTM。",
     "m06由builder依m06_rate、m06_inf、m06_rstar、m06_output_gap衍生，不在此檔手填。",
-    "Fed現行政策原始證據：data/audit/fed_target_evidence_20261028T011810+0800.txt；SHA256=c27cd2c1f1279321fa42e5f0aa7c882abbe0b975f006239d81e7259d35032d5e。",
+    "Fed現行政策原始證據：data/audit/fed_target_evidence_20261028T100521+0800.txt；SHA256=145798a37ef1cc7d96c2fc7836b3a985d05ed9cd13602ec3a8e1260b556ce550。",
     "r-star與output gap保留真實季度觀測日及vintage；工具不能解析官方XLSX或CBO表格時未刷新觀測日。",
-    "本輪執行早於2026-10-28 09:00核心爬蟲；配對核心仍為2026-10-27T09:42:00.741076+08:00，未冒充今日新批次。"
+    "本輪配對核心為2026-10-28T09:53:44.386723+08:00，09:00核心18項及s03重複傳輸欄已讀回，19筆status均為OK。"
   ]
 }

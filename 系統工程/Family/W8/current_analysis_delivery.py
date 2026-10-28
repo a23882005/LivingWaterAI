@@ -12,7 +12,7 @@ LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive
     'dif_up':'DIF上彎','rsi_improving_or_near_50':'RSI改善／接近50'}
 
 
-def deliver(row,request,*,repo_root):
+def deliver(row,request,*,repo_root,cash_trial=None):
     market=row.get('market') or {};core=(row.get('core_observation') or {}).get('result',{})
     conclusion=row.get('formal_conclusion') or {};approved=market.get('approved_technical') or {}
     metrics=deepcopy(row.get('valuation_observations',[]));valuation=deepcopy(core.get('valuation',{}))
@@ -21,6 +21,7 @@ def deliver(row,request,*,repo_root):
     right_true=[s['name'] for s in groups.get('right_signals',[]) if s['truth']=='TRUE']
     current=next((m for m in metrics if m.get('metric_name')==valuation.get('primary_metric')),None)
     judgment=current_judgment(row,repo_root)
+    recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -49,7 +50,7 @@ def deliver(row,request,*,repo_root):
         'analysis_report_delivered':has_data,'native_readiness':row['status'],
         'symbol':row['symbol'],'owner':deepcopy(row['owner']),'holding':deepcopy(row['holding']),
         'classification':deepcopy(row['scenario_class']),'native_product_identity':deepcopy(row['native_product_identity']),
-        'current_judgment':judgment,
+        'current_judgment':judgment,'recommendation':recommendation,
         'valuation':valuation_view,'market':{k:deepcopy(market.get(k)) for k in
             ('observed_date','observed_close','provider','provider_verified_at','source_path','source_sha256','history_quality')},
         'native_component_observations':deepcopy(market.get('v75_original_predicates',{})),
@@ -74,7 +75,7 @@ def deliver(row,request,*,repo_root):
             'formal_mode_determined':conclusion.get('selected_mode','UNKNOWN')!='UNKNOWN',
             'deployment_amount_calculable':conclusion.get('deployment_gap',{}).get('status')=='COMPUTED',
             'full_04_passed':False,'work9_completed':False},
-        'source_refs':deepcopy(row['source_refs']),'call_trace':deepcopy(row['call_trace']),
+        'source_refs':deepcopy(row['source_refs']),'call_trace':deepcopy(row['call_trace'])+recommendation['call_trace'],
         'trade_authorization':'NONE','trade_action':'NO_TRADE'}
     text=[f"{row['symbol']}｜{row['scenario_class']['name']}；正式來源持股 {row['holding']['quantity']}。",
         f"持倉原始日期：{row['holding']['observed_at'] or '原件未載明'}；行情日期：{market.get('observed_date','無可用來源')}。"]
@@ -108,6 +109,14 @@ def deliver(row,request,*,repo_root):
         concise.append(f"當下判斷 {judgment['mode']}；階段參考 {judgment['stage_reference']}（累積比例 {judgment['target_rate_reference']}）。")
         if judgment['target_amount_reference'] is not None:concise.append(f"目標參考 {judgment['currency']} {judgment['target_amount_reference']}；這是配置參考，不是本次訂單金額。")
     elif conclusion:concise.append(f"目前可用資料尚無法選定模式；核准目標 {target.get('currency')} {target.get('amount')}。")
+    if recommendation['confirmed_position_amount'] is not None:
+        concise.append(f"現有持倉估值 {recommendation['position_currency']} {recommendation['confirmed_position_amount']}。")
+    if recommendation['status']=='CALCULATED':
+        concise.append(f"建議補足缺口 {recommendation['currency']} {recommendation['buy_gap_amount']}（目標比例 {recommendation['target_rate']}）；並非下單。")
+    elif recommendation['cash_only_trial_buy_ceiling'] is not None:
+        concise.append(f"缺漏可用現金按0試算：本輪現金可支應買入上限 {recommendation['position_currency']} 0；不代表目標已達成或不需加碼。")
+    if recommendation['missing_fields']:
+        concise.append('補倉建議金額尚缺：'+'、'.join(recommendation['missing_fields'])+'；比例及現有持倉估值照常提供。')
     result['readable_analysis']='\n'.join(concise)
     result['delivery_digest']=digest(result)
     return result
@@ -147,3 +156,67 @@ def current_judgment(row,repo_root):
         'formal_deployment_decision':False,'execution_authorized':False,
         'reason_codes':list(stage.reason_codes),
         'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
+
+
+def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None):
+    """Present native gap math as advice, independently of order submission.
+
+    Unknown orders stay unknown. A confirmed-position gap is computed with no
+    orders only as an explicitly named component, never the reconciled gap.
+    No unknown money or exchange rate is replaced by zero.
+    """
+    from formal_mode_analysis import native
+    market=row.get('market') or {};target=(row.get('formal_conclusion') or {}).get('approved_project_target') or {}
+    identity=row.get('native_product_identity') or {};registry=identity.get('registry_identity') or {}
+    mapping=market.get('analysis_identity_mapping') or {};issuer=row.get('issuer_facts') or {}
+    currency=registry.get('quote_currency') or mapping.get('quote_currency') or issuer.get('currency')
+    missing=[];trace=[]
+    if currency is None:missing.append('verified_quote_currency')
+    price=market.get('observed_close');qty=row.get('holding',{}).get('quantity')
+    known_position=currency is not None and price is not None and qty is not None and row.get('holding',{}).get('quantity_state')=='KNOWN'
+    confirmed=Decimal(str(price))*Decimal(str(qty)) if known_position else None
+    if confirmed is None:missing.append('confirmed_position_quantity_and_valuation_price')
+    amount=target.get('amount') if target.get('value_state')=='KNOWN' else None
+    if amount is None:missing.append('approved_project_target_amount')
+    rate=judgment.get('target_rate_reference')
+    if rate is None:missing.append('native_mode_and_stage_target_rate')
+    same_currency=amount is not None and target.get('currency')==currency
+    if amount is not None and not same_currency:missing.append('target_to_position_currency_FX')
+    # The formal reconciled result is authoritative when actually computed.
+    formal_gap=(row.get('formal_conclusion') or {}).get('deployment_gap',{})
+    reconciled=formal_gap.get('value') if formal_gap.get('status')=='COMPUTED' else None
+    if reconciled is None:missing.append('active_orders_and_fill_reconciliation')
+    component=None
+    if same_currency and known_position and rate is not None:
+        dep,_,_=native(repo_root)
+        gap=dep.calculate_position_gap(project_target_position_amount=amount,target_rate=rate,
+            confirmed_position_qty=qty,canonical_valuation_price=price,active_orders=())
+        component={'scope':'CONFIRMED_HOLDINGS_ONLY__ORDERS_NOT_INCLUDED',
+            'signed_gap_amount':str(gap.final_deployment_gap_amount),
+            'positive_gap_amount':str(gap.positive_deployment_gap),
+            'actual_completion_rate':str(gap.actual_completion_rate) if gap.actual_completion_rate is not None else None,
+            'is_reconciled_deployment_gap':False}
+        trace.append('V82.calculate_position_gap:confirmed_holdings_component_only')
+    trial=cash_trial or {};available=(trial.get('decimal_values') or {}).get('available')
+    matching_cash=trial.get('owner')==row['owner'] and trial.get('currency')==currency
+    cash_ceiling='0' if matching_cash and available is not None and Decimal(str(available))==0 else None
+    formula=None
+    if amount is not None and rate is not None and confirmed is not None and not same_currency:
+        formula={'target_amount':str(Decimal(str(amount))*Decimal(str(rate))),
+            'target_currency':target.get('currency'),'confirmed_amount':str(confirmed),
+            'position_currency':currency,
+            'expression':'target_amount - confirmed_amount * FX(position_currency,target_currency) - net_active_order_exposure_in_target_currency'}
+    return {'scope':'RECOMMENDATION_ONLY__NO_BROKER_SUBMISSION',
+        'status':'CALCULATED' if reconciled else 'PARTIAL',
+        'target_rate':rate,'cumulative_target_amount':judgment.get('target_amount_reference'),
+        'currency':target.get('currency'),'position_currency':currency,
+        'confirmed_position_amount':str(confirmed) if confirmed is not None else None,
+        'price_date':market.get('observed_date'),
+        'valuation_scope':'SOURCE_MATCHED_ANALYSIS_REFERENCE__NOT_RECONCILED_HELD_VENUE_VALUATION',
+        'buy_gap_amount':reconciled.get('positive_deployment_gap') if reconciled else None,
+        'confirmed_holdings_component':component,'unresolved_gap_formula':formula,
+        'cash_only_trial_buy_ceiling':cash_ceiling,
+        'cash_assumptions':deepcopy(trial.get('assumptions',[])),
+        'cash_ceiling_is_not_total_deployment_recommendation':True,
+        'missing_fields':missing,'call_trace':trace,
+        'excess_over_target_is_not_sell_instruction':True,'broker_submission_allowed':False}

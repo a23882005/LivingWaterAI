@@ -89,6 +89,20 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
                 row['c7_client_action']=facts['c7_drift']['client_facing_action']
                 row['client_action_resolution']=facts['client_action_resolution']
                 row['summary']='原生風險、部署金額、家人政策與 C7 客戶動作分欄保留；跨引擎客戶動作待接口確認。'
+        # Advice is the purpose of menu 04. NO_TRADE prohibits submission;
+        # it does not suppress a native recommended amount or proportion.
+        amount=deepcopy(item['deployment_amount']);ratio=deepcopy(item['deployment_ratio'])
+        row['recommendation']={'action':item['canonical_action'],
+            'client_preference_action':deepcopy(item['client_preference_action']),
+            'amount':amount,'ratio':ratio,'source':'ORIGINAL_WORK9_CANONICAL_ITEM',
+            'broker_submission_allowed':False}
+        value=amount.get('value')
+        amount_text=(str(value['amount'])+' '+value['currency'] if amount.get('status')=='KNOWN'
+            else '金額未定' if amount.get('status')=='UNKNOWN' else '金額不適用')
+        ratio_value=ratio.get('value')
+        ratio_text=(str(ratio_value['value'])+'%' if ratio.get('status')=='KNOWN' else
+            '比例未定' if ratio.get('status')=='UNKNOWN' else '比例不適用')
+        row['recommendation_explanation']=f"{item['asset_id']}：原引擎建議 {item['canonical_action']}；{amount_text}，目標比例 {ratio_text}。"
         rows.append(row)
     return {'contract_name':'Family.W5.mentor.v1','language':'zh-Hant',
         'status':'EXPLAINED_WITH_PENDING_CODES' if unknown else 'EXPLAINED',
@@ -99,4 +113,4 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
         'canonical_deployment_result_sha256':original['canonical_deployment_result_sha256'],
         'source_result_digest':native._digest(original),'source_bindings':deepcopy(original['source_bindings']),
         'items':rows,'unknown_reason_codes':unknown,'reason_catalog_sha256':CATALOG_SHA256,
-        'production':'HOLD','trade_action':'NO_TRADE','execution_advice_allowed':False}
+        'production':'HOLD','trade_action':'NO_TRADE','execution_advice_allowed':True,'recommendations_allowed':True,'broker_execution_allowed':False}

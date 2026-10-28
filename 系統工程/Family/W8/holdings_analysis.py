@@ -2,7 +2,8 @@
 
 Only existing native numeric/predicate/core routines make investment facts.
 This module binds sources, preserves gaps, and explains their actual outputs.
-It never publishes native canonical_result, Work9 Mentor, amounts or orders.
+Native canonical_result and Work9 Mentor are published only by the original
+complete pipeline; this view may present source-backed recommendation components.
 """
 from copy import deepcopy
 from pathlib import Path
@@ -341,7 +342,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
-        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root)
+        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial)
+        row['call_trace']+=row['current_analysis']['recommendation']['call_trace']
         row['analysis_explanation']=row['current_analysis']['readable_analysis'];rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)

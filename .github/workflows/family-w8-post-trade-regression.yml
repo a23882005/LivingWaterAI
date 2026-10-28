@@ -127,6 +127,8 @@ jobs:
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_formal_mode_analysis.py' -v
       - name: Run holding analysis independent of new-money deployment
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_holdings_analysis.py' -v
+      - name: Validate advice amounts and original Work9 Mentor presentation
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_recommendation_output.py' -v
       - name: Validate completed-bar alternative history receipts
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_import_observed_history.py' -v
       - name: Run existing approved target input and original Family boundary

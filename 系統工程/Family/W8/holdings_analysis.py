@@ -2,8 +2,8 @@
 
 Only existing native numeric/predicate/core routines make investment facts.
 This module binds sources, preserves gaps, and explains their actual outputs.
-Native canonical_result and Work9 Mentor are published only by the original
-complete pipeline; this view may present source-backed recommendation components.
+The full deployment canonical_result belongs to the complete pipeline. Menu04
+uses a separately scoped Work9 return and Mentor for actual native components.
 """
 from copy import deepcopy
 from pathlib import Path
@@ -186,7 +186,7 @@ def explain(row):
     return text
 
 
-def build_analysis_report(producer,request,context,prepared,holdings,observations,trial):
+def build_analysis_report(producer,request,context,prepared,holdings,observations,trial,investment=None):
     from native_asset_source import classification
     by_symbol={row['symbol']:row for row in observations['assets']}
     missing={row.get('symbol'):row for row in observations['missing']}
@@ -342,7 +342,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
-        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial)
+        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial,investment=investment)
         row['call_trace']+=row['current_analysis']['recommendation']['call_trace']
         row['analysis_explanation']=row['current_analysis']['readable_analysis'];rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
@@ -372,12 +372,30 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             'positions_returned':len(rows),'native_readiness':status,
             'scope':'CURRENT_ANALYSIS_REPORTS__SEPARATE_FROM_MODE_AMOUNT_AND_FULL04_ACCEPTANCE'},
         'other_account_coverage':other_coverage,
+        'new_investment_scenario':deepcopy(investment),
+        'account_presence_source':deepcopy(getattr(producer,'account_presence_policy',None)),
         'deployment_status':{'status':'NOT_RUN','reason':'HOLDINGS_ANALYSIS_FLOW__NO_NEW_MONEY_REQUIRED',
             'full_native_canonical_complete':False},'cash_trial':trial,
         'issues':[dict(p,instrument_id=r['instrument_id']) for r in rows for p in r['issues']]+
             [dict(p,scope='CASH_DIAGNOSTIC__DOES_NOT_BLOCK_HOLDING_ANALYSIS') for p in trial['issues']],
         'source_refs':[s for r in rows for s in r['source_refs']], 'call_trace':trace,
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
+    from runtime_loader import load_c_module
+    from mentor_bridge import explain_holdings_recommendations
+    work9=load_c_module(producer.root,9)
+    work9_request={'contract_name':'LivingWaterAI.C8C9.Work9.HoldingsRecommendationInput','contract_version':'1.0',
+        'client_id':request['client_id'],'run_id':request['run_id'],'owner':deepcopy(request['owner']),
+        'source_db_sha256':holdings['source_db_sha256'],'request_digest':digest(request),
+        'positions':[{'instrument_id':r['instrument_id'],'native_component_delivery':deepcopy(r['current_analysis'])} for r in rows]}
+    work9_result=work9.build_holdings_recommendation_return(work9_request)
+    mentor_context={k:deepcopy(work9_result[k]) for k in ('client_id','run_id','owner','source_db_sha256')}
+    mentor_context.update(analysis_permission='ANALYZE_ONLY',trade_authorization='NONE',expected_result_digest=digest(work9_result))
+    report['work9_request']=work9_request;report['work9_result']=work9_result
+    report['backend_outputs']={'work9_recommendation_return':'COMPLETED','mentor':'SOURCE_BOUND_SCOPED_EXPLANATION',
+        'full_deployment_work9':'NOT_RUN'}
+    report['mentor']=explain_holdings_recommendations(producer.root,work9_request,work9_result,trusted_context=mentor_context)
+    report['call_trace'] += [{'function':'C8C9.Work9.build_holdings_recommendation_return'},
+        {'function':'W5.explain_holdings_recommendations'}]
     report['manifest']=[{'instrument_id':r['instrument_id'],'field_path':key,
         'source_db_sha256':holdings['source_db_sha256'],'output_digest':digest(r.get(key)),
         'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation','formal_conclusion','current_analysis')]
@@ -412,9 +430,23 @@ class HoldingsAnalysisRunner:
             or report.get('snapshot_digest')!=digest(request['client_snapshot']['payload'])
             or report.get('report_digest')!=digest({k:v for k,v in report.items() if k!='report_digest'})
             or report.get('deployment_status',{}).get('status')!='NOT_RUN'
-            or report.get('mentor') is not None or report.get('canonical_result') is not None
+            or not isinstance(report.get('mentor'),dict) or report.get('canonical_result') is not None
             or report.get('trade_authorization')!='NONE' or report.get('trade_action')!='NO_TRADE'):
             raise PermissionError('HOLDINGS_ANALYSIS_BINDING_MISMATCH')
+        from runtime_loader import load_c_module
+        from mentor_bridge import explain_holdings_recommendations
+        root=Path(__file__).resolve().parents[3];work9=load_c_module(root,9)
+        wreq=report.get('work9_request',{})
+        expected_positions=[{'instrument_id':r['instrument_id'],'native_component_delivery':r['current_analysis']} for r in report['analysis_result']['positions']]
+        if (wreq.get('positions')!=expected_positions or wreq.get('client_id')!=request['client_id']
+            or wreq.get('owner')!=request['owner'] or wreq.get('run_id')!=request['run_id']
+            or wreq.get('request_digest')!=digest(request) or wreq.get('source_db_sha256')!=report['source_db_sha256']):
+            raise PermissionError('HOLDINGS_WORK9_INPUT_BINDING_MISMATCH')
+        rebuilt=work9.build_holdings_recommendation_return(wreq)
+        ctx={k:deepcopy(rebuilt[k]) for k in ('client_id','run_id','owner','source_db_sha256')}
+        ctx.update(analysis_permission='ANALYZE_ONLY',trade_authorization='NONE',expected_result_digest=digest(rebuilt))
+        if rebuilt!=report.get('work9_result') or report['mentor']!=explain_holdings_recommendations(root,wreq,rebuilt,trusted_context=ctx):
+            raise PermissionError('HOLDINGS_MENTOR_SOURCE_BINDING_MISMATCH')
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

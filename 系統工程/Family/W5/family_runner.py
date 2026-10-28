@@ -101,7 +101,7 @@ class FamilyRunner:
                 prepare_input(frozen,trusted_context=ctx)
                 report=deepcopy(self.native_source_report)
                 require(report.get('schema_version')=='Family.W8.NativeSourceProduction.v1'
-                    and report.get('status')=='BLOCKED_BY_ORIGINAL_ADAPTER'
+                    and report.get('status') in ('BLOCKED_BY_ORIGINAL_ADAPTER','SOURCE_STAGE_INCOMPLETE')
                     and report.get('complete_native_bundle') is False
                     and report.get('mentor') is None,
                     'INVALID_NATIVE_SOURCE_FAILURE','source_production')

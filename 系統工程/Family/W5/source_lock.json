@@ -4,11 +4,18 @@
   "files": [
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "1406fec46b401670e6ecf4d0c259b8430505b3de",
-      "sha256": "aeaf8d5e8a33919ef43ebda7d25355325ed0d2c26d3c32f5047cad1b61abc370",
-      "size": 12477,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py"
+      "sha256": "d364aed54f0e5316eda7d1b9ac54591b7b3051b662d441c7a96d5ed40087ffb1",
+      "git_blob_sha": "d934061dece6746237b86c0367d854d2b430fa6c",
+      "size": 13007,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_AND_MENU04_RECOMMENDATION_OUTPUT",
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "1406fec46b401670e6ecf4d0c259b8430505b3de",
+        "sha256": "aeaf8d5e8a33919ef43ebda7d25355325ed0d2c26d3c32f5047cad1b61abc370",
+        "size": 12477,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py"
+      }
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py",
@@ -212,11 +219,18 @@
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "0506c26c540adce824f7d5eac599bcb7d76db143",
-      "sha256": "a06f4e5c0aed446bd3a8b8d85b61b2b4cd8ad25cb57d094fd73c1180cedc403b",
-      "size": 31530,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py"
+      "sha256": "22dde2a3f261c3a27c3843dbe7fd6241920130aa934ce31946f5e7be8f85d641",
+      "git_blob_sha": "8cbd355284e8223e89794e4469f258566c3caa5a",
+      "size": 32319,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_AND_MENU04_RECOMMENDATION_OUTPUT",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "0506c26c540adce824f7d5eac599bcb7d76db143",
+        "sha256": "a06f4e5c0aed446bd3a8b8d85b61b2b4cd8ad25cb57d094fd73c1180cedc403b",
+        "size": 31530,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py"
+      }
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py",
@@ -252,11 +266,18 @@
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "c1b87e985e90085d1ce0372ec13be838d35dc763",
-      "sha256": "33ab5e187f626f497cda449683a230809d29edd4f7c681ee2079a1800cda58bd",
-      "size": 35768,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py"
+      "sha256": "33f83a2ea2d3a0cc9ceeb0e03ed51ca69f2e5185641564b5f7a5eb319aea563a",
+      "git_blob_sha": "70f7430d2994b4e7f68c77e840d82523f1dcd810",
+      "size": 39752,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_AND_MENU04_RECOMMENDATION_OUTPUT",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "c1b87e985e90085d1ce0372ec13be838d35dc763",
+        "sha256": "33ab5e187f626f497cda449683a230809d29edd4f7c681ee2079a1800cda58bd",
+        "size": 35768,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py"
+      }
     },
     {
       "path": "系統工程/總經V70/P70-5.py",
@@ -329,6 +350,11 @@
       "sha256": "3d89dae1e9f3ca4ec19e361e40e6fb554414c4770d6963aa9fa92afdbfd19bc8",
       "size": 48827,
       "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work5_V75_Adapter_Input.schema_RECHECK1_2026-09-27_0207.json"
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py",
+      "sha256": "923266625af939c7740be49e71df818bec0cb7e432b005912e5cc340b8516d9a",
+      "family_revision": "OWNER_CONFIRMED_ABSENT_DOMAIN_CONTRACT_V1.1__NO_ACCOUNT_INVENTED"
     }
   ]
 }

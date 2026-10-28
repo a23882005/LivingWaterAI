@@ -192,7 +192,7 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertFalse(delivery['acceptance']['full_04_passed'])
         self.assertIsNone(delivery['execution_amount']['amount'])
         self.assertIsNotNone(delivery['technical']['numeric']['ma20'])
-        self.assertIsNone(report['canonical_result']);self.assertIsNone(report['mentor'])
+        self.assertIsNone(report['canonical_result']);self.assertFalse(report['mentor']['full_native_deployment_mentor'])
     def test_published_v70_forward_reaches_core_and_left_price_without_publication_metadata(self):
         self.enable_product('VT')
         raw={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-10-01T00:00:00Z',
@@ -218,6 +218,29 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
         self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
         self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
+    def test_scoped_mentor_preserves_unknown_buy_amount_and_zero_external_contribution(self):
+        from new_investment_scenario import build_plan
+        policy={'schema_version':'Family.W8.NewInvestmentTrialPolicy.v1','client_id':self.client,
+            'new_external_money':'0','source_reference':'SYNTHETIC_OWNER_ZERO_EXTERNAL'}
+        plan=build_plan(self.snapshot,self.owner,policy)
+        report=H.build_analysis_report(self.producer,self.request,self.context,self.prepared,
+            self.holdings,self.observations(),self.trial,investment=plan)
+        item=report['mentor']['items'][0]
+        self.assertEqual(item['recommendation']['new_external_funding_buy_amount'],'0')
+        self.assertIsNone(item['recommendation']['recommended_buy_amount']['amount'])
+        self.assertEqual(item['recommendation']['recommended_buy_amount']['status'],'UNKNOWN')
+        self.assertIn('既有現金及資產調整另計',item['explanation'])
+        self.assertFalse(report['mentor']['broker_execution_allowed'])
+        with patch.object(H,'prepare_input',return_value=self.prepared):
+            self.assertEqual(H.HoldingsAnalysisRunner(context=self.context,report=report).analyze(self.request)['mentor'],report['mentor'])
+
+    def test_scoped_mentor_cannot_change_amount_or_other_owner_after_redigest(self):
+        for field,value in [('new_external_funding_buy_amount','999'),('asset_id','OTHER_ASSET')]:
+            report=self.report();report['mentor']['items'][0]['recommendation'][field]=value
+            report['report_digest']=digest({k:v for k,v in report.items() if k!='report_digest'})
+            with patch.object(H,'prepare_input',return_value=self.prepared),self.assertRaises(PermissionError):
+                H.HoldingsAnalysisRunner(context=self.context,report=report).analyze(self.request)
+
     def test_missing_history_retains_position_and_precise_blocker(self):
         report=self.report({'assets':[],'missing':[{'symbol':'VT','code':'EXACT_SYMBOL_CACHE_UNAVAILABLE'}]})
         self.assertEqual(report['analysis_result']['coverage']['returned'],1)
@@ -232,9 +255,11 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertTrue(report['analysis_result']['positions'][0]['market']['numeric'])
         self.assertTrue(any(p['code']=='CASH_ASSUMPTION_CONFLICT' for p in report['issues']))
 
-    def test_analysis_never_publishes_deployment_canonical_or_mentor(self):
+    def test_analysis_publishes_scoped_work9_mentor_without_full_deployment_canonical(self):
         report=self.report()
-        self.assertIsNone(report['mentor']);self.assertIsNone(report['canonical_result'])
+        self.assertFalse(report['mentor']['full_native_deployment_mentor']);self.assertIsNone(report['canonical_result'])
+        self.assertTrue(any('Work9.build_holdings_recommendation_return' in str(c) for c in report['call_trace']))
+        self.assertEqual(len(report['mentor']['items']),1)
         self.assertEqual(report['trade_action'],'NO_TRADE')
         self.assertNotIn('Work4',str(report['call_trace']))
 

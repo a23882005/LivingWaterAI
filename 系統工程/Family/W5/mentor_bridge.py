@@ -114,3 +114,46 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
         'source_result_digest':native._digest(original),'source_bindings':deepcopy(original['source_bindings']),
         'items':rows,'unknown_reason_codes':unknown,'reason_catalog_sha256':CATALOG_SHA256,
         'production':'HOLD','trade_action':'NO_TRADE','execution_advice_allowed':True,'recommendations_allowed':True,'broker_execution_allowed':False}
+
+
+def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trusted_context,llm_suggested_changes=()):
+    """Explain the actual scoped Work9 return, retaining unresolved amounts."""
+    if llm_suggested_changes:raise MentorError('MODEL_FINANCIAL_MUTATION_REJECTED')
+    ctx=deepcopy(trusted_context);source=deepcopy(work9_result)
+    if ctx.get('analysis_permission')!='ANALYZE_ONLY' or ctx.get('trade_authorization')!='NONE':
+        raise MentorError('ANALYSIS_PERMISSION_REQUIRED')
+    for key in ('client_id','run_id','owner','source_db_sha256'):
+        if ctx.get(key)!=source.get(key):raise MentorError('CONTEXT_MISMATCH:'+key)
+    native=load_c_module(repo_path,9)
+    if ctx.get('expected_result_digest')!=native._digest(source):raise MentorError('RESULT_DIGEST_MISMATCH')
+    rebuilt=native.build_holdings_recommendation_return(deepcopy(work9_request))
+    if native._digest(rebuilt)!=native._digest(source):raise MentorError('NATIVE_SOURCE_RESULT_MISMATCH')
+    rows=[]
+    for item in source['items']:
+        facts=item['native_component_delivery'];market=facts.get('market',{})
+        valuation=facts.get('valuation',{}).get('native_result',{});tech=facts.get('technical',{}).get('native_result',{})
+        target=item['cumulative_target_amount'];ratio=item['target_ratio']
+        text=[f"{item['asset_id']}：來源持股 {facts['holding']['quantity']}；行情日期 {market.get('observed_date') or '未取得'}。"]
+        if valuation:text.append(f"原生估值 {valuation.get('level','UNKNOWN')}。")
+        if tech:text.append(f"原生技術：Right {tech.get('right_confirmation','UNKNOWN')}；Runaway Up／Down {tech.get('runaway_up','UNKNOWN')}／{tech.get('runaway_down','UNKNOWN')}。")
+        if ratio['status']=='KNOWN':
+            text.append(f"當下模式 {item['mode']}，{item['stage']}，累積目標比例 {Decimal(str(ratio['value']))*100}%。")
+            if target['amount'] is not None:text.append(f"目標金額 {target['currency']} {target['amount']}。")
+            else:text.append('本人核准的該標的目標金額尚未綁定。')
+        else:text.append('原生資料尚無法選定模式及目標比例；保留已計算的個別訊號。')
+        amount=item['recommended_buy_amount']
+        if amount['status']=='KNOWN':text.append(f"原生補倉缺口 {amount['currency']} {amount['amount']}。")
+        elif item['remaining_amount_dependencies']:
+            text.append('現有資產補倉建議金額未定，尚缺：'+'、'.join(item['remaining_amount_dependencies'])+'。')
+        if item['new_external_funding_buy_amount']=='0':
+            text.append('本輪不新增外部資金，新增資金買入建議為0；既有現金及資產調整另計，並未歸零。')
+        rows.append({'item_id':item['item_id'],'asset_id':item['asset_id'],
+            'recommendation':deepcopy({k:v for k,v in item.items() if k!='native_component_delivery'}),
+            'explanation':'\n'.join(text),'source_result_digest':source['result_digest']})
+    return {'contract_name':'Family.W5.HoldingsRecommendationMentor.v1','status':'EXPLAINED_WITH_LIMITATIONS'
+        if source['status']=='NORMALIZED_WITH_LIMITATIONS' else 'EXPLAINED',
+        'scope':source['scope'],'client_id':source['client_id'],'run_id':source['run_id'],
+        'owner':deepcopy(source['owner']),'source_db_sha256':source['source_db_sha256'],
+        'source_result_digest':native._digest(source),'mentor_return':deepcopy(source['mentor_return']),
+        'items':rows,'execution_advice_allowed':True,'broker_execution_allowed':False,
+        'full_native_deployment_mentor':False,'trade_action':'NO_TRADE'}

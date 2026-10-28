@@ -679,3 +679,57 @@ __all__ = [
     "MENTOR_RETURN_CONTRACT_NAME", "MENTOR_RETURN_CONTRACT_VERSION",
     "UnifiedDeploymentError", "build_unified_deployment",
 ]
+
+
+def build_holdings_recommendation_return(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Normalize menu-04 component results without requiring full deployment B.
+
+    No investment calculation or strategy is implemented here. Actual native
+    component facts and already-calculated amounts are copied verbatim. This
+    return has its own scope and never masquerades as the full canonical result.
+    """
+    req=_mapping(request,'holdings_recommendation_request')
+    if req.get('contract_name')!='LivingWaterAI.C8C9.Work9.HoldingsRecommendationInput' or req.get('contract_version')!='1.0':
+        _fail('C8C9.W9.HOLDINGS_CONTRACT','invalid scoped recommendation input')
+    client=_nonempty(req.get('client_id'),'client_id');run=_nonempty(req.get('run_id'),'run_id')
+    owner=_mapping(req.get('owner'),'owner')
+    if owner.get('client_id')!=client:_fail('C8C9.W9.HOLDINGS_OWNER','client/owner mismatch')
+    source_sha=_nonempty(req.get('source_db_sha256'),'source_db_sha256')
+    source_rows=req.get('positions')
+    if not isinstance(source_rows,list):_fail('C8C9.W9.HOLDINGS_SHAPE','positions must be an array')
+    items=[];seen=set()
+    for index,source in enumerate(source_rows):
+        row=_mapping(source,f'positions[{index}]');key=_nonempty(row.get('instrument_id'),'instrument_id')
+        facts=_mapping(row.get('native_component_delivery'),'native_component_delivery')
+        if key in seen or facts.get('owner')!=owner:_fail('C8C9.W9.HOLDINGS_BINDING','duplicate instrument or cross-owner facts')
+        seen.add(key)
+        if facts.get('delivery_digest')!=_digest({k:v for k,v in facts.items() if k!='delivery_digest'}):
+            _fail('C8C9.W9.HOLDINGS_DIGEST','component delivery changed')
+        judgment=_mapping(facts.get('current_judgment'),'current_judgment')
+        amounts=_mapping(facts.get('recommendation'),'recommendation')
+        amount=amounts.get('buy_gap_amount');rate=amounts.get('target_rate')
+        if amount is not None:_number_text(amount,'recommended_buy_amount')
+        item={'item_id':key,'asset_id':facts.get('symbol'),'mode':deepcopy(judgment.get('mode')),
+            'stage':deepcopy(judgment.get('stage_reference')),
+            'target_ratio':{'status':'KNOWN' if rate is not None else 'UNKNOWN','value':rate,'unit':'FRACTION'},
+            'cumulative_target_amount':{'amount':deepcopy(amounts.get('cumulative_target_amount')),'currency':amounts.get('currency')},
+            'recommended_buy_amount':{'status':'KNOWN' if amount is not None else 'UNKNOWN','amount':amount,'currency':amounts.get('currency')},
+            'recommended_sell_amount':{'status':'UNKNOWN','amount':None,'reason':'NO_NATIVE_SELL_AMOUNT_PRODUCED'},
+            'new_external_funding_buy_amount':deepcopy(amounts.get('new_external_funding_buy_amount')),
+            'new_external_funding_scope':amounts.get('new_external_funding_scope'),
+            'remaining_amount_dependencies':deepcopy(amounts.get('missing_fields',[])),
+            'native_component_delivery':deepcopy(facts),'broker_submission_allowed':False}
+        items.append(item)
+    result={'contract_name':'LivingWaterAI.C8C9.Work9.HoldingsRecommendationReturn','contract_version':'1.0',
+        'scope':'CURRENT_HOLDINGS_RECOMMENDATIONS__NOT_FULL_CAPITAL_DEPLOYMENT',
+        'status':'NORMALIZED_WITH_LIMITATIONS' if any(i['remaining_amount_dependencies'] for i in items) else 'NORMALIZED',
+        'client_id':client,'run_id':run,'owner':deepcopy(owner),'source_db_sha256':source_sha,
+        'request_digest':req.get('request_digest'),'source_request_digest':_digest(req),'items':items,
+        'mentor_return':{'scope':'EXPLAIN_NATIVE_COMPONENT_FACTS_AND_AMOUNT_LIMITATIONS',
+            'item_ids':[i['item_id'] for i in items],'financial_mutation_allowed':False},
+        'full_canonical_deployment_complete':False,'trade_action':'NO_TRADE'}
+    result['result_digest']=_digest(result)
+    return result
+
+
+__all__.append('build_holdings_recommendation_return')

@@ -36,6 +36,7 @@ EXAMPLES={'VT':0,'VWRA':0,'VOO':1,'SPY':1,'QQQ':2,'VGT':2,'0050':3,
 
 
 def native_error_path(error):
+    if getattr(error,'issues',None):return error.issues[0].path
     schema=re.search(r'schema rejection at ([^:]+):',str(error))
     if schema:return schema.group(1)
     money=re.search(r'c7\.contexts\[(\d+)\]\.([a-z_]+)',str(error))
@@ -173,11 +174,16 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
+        self.new_investment_policy=deepcopy(new_investment_policy)
+        self.account_presence_policy=deepcopy(account_presence_policy)
+        if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
+                or account_presence_policy.get('client_id')!=self.req['client_id']):
+            raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
         self.product_source=deepcopy(product_source)
         if flow not in ('HOLDINGS_ANALYSIS','DEPLOYMENT'):
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
@@ -187,9 +193,8 @@ class AssetSourceProducer:
         self.product_sources=deepcopy(product_sources or {})
         self.issuer_facts_sources=deepcopy(issuer_facts_sources or {})
         self.approved_rule_profile=None
-        if flow=='HOLDINGS_ANALYSIS':
-            from approved_v04_technical import load_profile
-            self.approved_rule_profile=load_profile(HERE/'owner_approved_v10.json')
+        from approved_v04_technical import load_profile
+        self.approved_rule_profile=load_profile(HERE/'owner_approved_v10.json')
         # Retain the existing single-source configuration without copying one
         # product's evidence into any other product's route.
         if product_source is not None:self.product_sources.setdefault('VT',deepcopy(product_source))
@@ -234,11 +239,14 @@ class AssetSourceProducer:
             allow_independent_close_analysis=self.flow=='HOLDINGS_ANALYSIS',
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
+        from new_investment_scenario import build_plan,apply_plan,wire_number
+        investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
+        from holdings_analysis import build_analysis_report
+        analysis=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial,investment=investment)
         if self.flow=='HOLDINGS_ANALYSIS':
-            from holdings_analysis import build_analysis_report
-            report=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial)
+            report=analysis
             return {'request':req,'trusted_context':ctx,'analysis_report':report,
                 'source_metadata':{'client_id':req['client_id'],'run_id':run,
                     'source_db_sha256':snapshot['source_sha256']}}
@@ -250,11 +258,13 @@ class AssetSourceProducer:
             'full_household_sources':holdings,'cash_trial':trial,'market_observations':observations,
             'call_trace':['W8.menu04.source_producer','W5.prepare_input','W5.project_official_holdings'],
             'native_inputs':{},'native_outputs':{},'mentor':None,'complete_native_bundle':False,
-            'full_native_mentor_reached':False,'trade_authorization':'NONE'}
+            'full_native_mentor_reached':False,'trade_authorization':'NONE','new_investment_scenario':investment}
         report['analysis_mode']='CASH_ZERO_SIMULATION'
-        if observed:
-            report['native_outputs']['v82_core_observation']=self.core_observation(observed)
-            report['call_trace'].append('V82.evaluate_core_rule_state:observations_only')
+        report['holdings_analysis']=analysis
+        analyzed=next((r for r in analysis['analysis_result']['positions'] if r['symbol']==self.symbol),None)
+        if analyzed and analyzed.get('core_observation'):
+            report['native_outputs']['v82_core_observation']=deepcopy(analyzed['core_observation'])
+            report['call_trace'].extend(analyzed['call_trace'])
         owner={'funding_domain':'US_BROKER','broker':req['owner']['broker'],'account':req['owner']['account']}
         ref='DB:'+snapshot['source_sha256'];target=req['confirmed_target']['payload'];draft=target['draft']
         v70_id='V70-SOURCE-INPUT-'+macro['digest'][:24]
@@ -266,13 +276,13 @@ class AssetSourceProducer:
         # Available cash is zero in this run when it was absent. No positive
         # budget is inferred from a total balance or an unverified settlement.
         available=Decimal(trial['decimal_values']['available'])
-        budget='0' if available==0 else None
+        budget='0' if available==0 or investment['total_new_investment_amount']=='0' else None
         legs={leg:{'amount':budget,'currency':req['owner']['currency'],'cash_basis':'AVAILABLE',
                    'owner':deepcopy(owner)} for leg in ('equity','bond')}
         final={'allocation_id':draft['allocation_id'],'authorization_reference':draft['allocation_id'],
             'confirmation_proof':{k:target['confirmation_evidence'][k] for k in ('confirmed_at','confirmed_by')},
             'payload':{'instrument_targets':{r['instrument_id']:{'project_target_position':
-                r['target_amount']['amount'] if r['target_amount']['value_state']=='KNOWN' else None}
+                r['target_amount']['amount'] if r['target_amount']['value_state']=='KNOWN' and r['target_amount']['currency']==req['owner']['currency'] else None}
                 for r in draft['target_lines']}}}
         if self.symbol not in final['payload']['instrument_targets']:
             # Target absence is not changed into a guessed monetary zero.
@@ -305,6 +315,7 @@ class AssetSourceProducer:
                 'payload':{'client_id':req['client_id'],'portfolio_id':req['owner']['account'],
                            'full_client_snapshot':deepcopy(snapshot)},'data_as_of':req['client_snapshot']['as_of'],
                 'source_reference_ids':[ref]},'v70_runtime_context':v70,'shared_decision_context':shared}
+        report['approved_target_original_currency']=deepcopy(draft['target_lines'])
         report['native_inputs']['work3']=deepcopy(native_request)
         function='C8C9.Work3.build_context_handoff'
         contexts=[]
@@ -314,10 +325,11 @@ class AssetSourceProducer:
             report['native_outputs']['work3']=handoff
             contexts,cash_sources=self.funding_contexts(snapshot,owner,trial,run,ref)
             report['cash_by_domain']=cash_sources
-            c7={'contract_name':'LivingWaterAI.C.Work7.FundingContext','contract_version':'C-W7-FUND-v1.0.0',
+            contexts=apply_plan(contexts,investment)
+            c7={'contract_name':'LivingWaterAI.C.Work7.FundingContext','contract_version':('C-W7-FUND-v1.1.0-ABSENT' if any(c.get('account_presence')=='OWNER_CONFIRMED_ABSENT' for c in contexts) else 'C-W7-FUND-v1.0.0'),
                 'run_id':run,'base_currency':req['owner']['currency'],'bank_cash_scope':'OUT_OF_SCOPE',
-                # A cash balance is not an authorized new-investment pool.
-                'total_new_investment_amount':None,
+                # Contribution scenario is separate from preserved cash balances.
+                'total_new_investment_amount':wire_number(investment['total_new_investment_amount']),
                 'contexts':contexts,'source_reference_ids':[ref]}
             stock={'contract_name':w4.INPUT_CONTRACT_NAME,'contract_version':w4.INPUT_CONTRACT_VERSION,
                 'baseline_id':w4.BASELINE_ID,'run_id':run,'work3_handoff':handoff,'c7_funding_context':c7,
@@ -329,9 +341,13 @@ class AssetSourceProducer:
             report['native_inputs']['stock_request']=stock
             function='C8C9.Work4.build_v82_runtime_input';report['call_trace'].append(function)
             report['native_outputs']['work4']=w4.build_v82_runtime_input(stock)
+            from livingwater_v82_runtime.validation import validate_and_bind_funding
+            function='V82.validate_and_bind_funding';report['call_trace'].append(function)
+            bound=validate_and_bind_funding(report['native_outputs']['work4']['v82_runtime_input'])
+            report['native_outputs']['funding_binding']=str(bound)
         except ValueError as error:
             report['status']='BLOCKED_BY_ORIGINAL_ADAPTER'
-            report['first_failure']={'function':function,'code':getattr(error,'code',type(error).__name__),
+            report['first_failure']={'function':function,'code':(error.issues[0].code if getattr(error,'issues',None) else getattr(error,'code',type(error).__name__)),
                 'raw_error':str(error),'detail':getattr(error,'detail',str(error)),
                 'field_path':native_error_path(error)}
         else:
@@ -360,9 +376,11 @@ class AssetSourceProducer:
                 'original_broker_links':deepcopy(snapshot['tables'].get('account_broker_link',[])),
                 'original_funding_domains':deepcopy(snapshot['tables'].get('funding_domain',[])),
                 'unused_domain_representation_in_original_schema':None,
-                'invented_accounts':False,'native_contract_modified':False}
+                'funding_contract_version':c7['contract_version'],
+                'owner_confirmed_absent_domains':[r['domain'] for r in contexts if r.get('account_presence')=='OWNER_CONFIRMED_ABSENT'],
+                'invented_accounts':False,'base_contract_schema_modified':False}
         missing_identity=[f'/c7_funding_context/contexts/{i}/{field}'
-            for i,row in enumerate(contexts) for field in ('broker','account') if row.get(field) is None]
+            for i,row in enumerate(contexts) for field in ('broker','account') if row.get(field) is None and row.get('account_presence')!='OWNER_CONFIRMED_ABSENT']
         report['issues']=[{'code':'CONTRACT_SCOPE_UNSUPPORTED','stage':'NATIVE_INPUT_READY',
             'field_path':path,'source_id':ref,'producer':'W8.AssetSourceProducer.funding_contexts',
             'missing_reason':'Required native domain identity is absent; original schema has no unused-domain representation',
@@ -374,7 +392,9 @@ class AssetSourceProducer:
             'remediation':'Map the existing approved funding evaluation and assignment; retain unknown if absent',
             'retryable':False,'evidence_ref':'native_inputs.stock_request.c7_funding_context'}
             for path in ['/c7_funding_context/total_new_investment_amount']+
-            [f'/c7_funding_context/contexts/{i}/bucket_new_investment_amount' for i in range(len(contexts))]]
+            [f'/c7_funding_context/contexts/{i}/bucket_new_investment_amount' for i in range(len(contexts))]
+            if (path.endswith('total_new_investment_amount') and investment['total_new_investment_amount'] is None)
+            or any(path==f'/c7_funding_context/contexts/{i}/bucket_new_investment_amount' and row.get('bucket_new_investment_amount') is None for i,row in enumerate(contexts))]
         report['mode']='CASH_ZERO_SIMULATION'
         report['source_data_provenance']='SOURCE_BACKED'
         report['effective_input_provenance']='CASH_ZERO_SIMULATION'
@@ -458,7 +478,27 @@ class AssetSourceProducer:
         """
         contexts=[];cash_sources={}
         accounts=snapshot['tables']['portfolio_account']
+        presence=getattr(self,'account_presence_policy',None)
+        if presence is not None and (presence.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
+                or presence.get('client_id')!=snapshot['client_id']):
+            raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
         for domain in ('TW_LOCAL_BROKER','TW_SUB_BROKERAGE','US_BROKER'):
+            source=(presence or {}).get('absent_domains',{}).get(domain)
+            if source:
+                if domain==selected_owner['funding_domain']:raise PermissionError('SELECTED_ACCOUNT_CANNOT_BE_ABSENT')
+                family_owner={'client_id':snapshot['client_id'],'account':None,'broker':None,'currency':selected_trial['currency']}
+                values={k:'0' for k in ('total','available','unsettled','reserved')}
+                scenario=build_cash_overlay(values,snapshot=snapshot,owner=family_owner,authorization=self.policy,run_id=run)
+                cash_sources[domain]={'owner':family_owner,'currency':selected_trial['currency'],'decimal_values':values,
+                    'cash_state':{k:0 for k in values},'formal_sources':{k:{'account_presence':'OWNER_CONFIRMED_ABSENT','source_reference':source} for k in values},
+                    'assumptions':[],'scenario':scenario,'issues':[],'label':'Owner已確認無此類帳戶'}
+                contexts.append({'domain':domain,'broker':None,'account':None,
+                    'account_presence':'OWNER_CONFIRMED_ABSENT','account_presence_source':source,
+                    'bucket_new_investment_amount':0,'brokerage_cash_state':{k:0 for k in values},
+                    'executable_budget':{leg:{'amount':0,'cash_basis':'AVAILABLE','source_domain':domain,
+                        'source_broker':None,'source_account':None} for leg in ('equity','bond')},
+                    'source_reference_ids':[ref,source]})
+                continue
             if domain==selected_owner['funding_domain']:
                 owner=selected_owner;trial=selected_trial
             else:

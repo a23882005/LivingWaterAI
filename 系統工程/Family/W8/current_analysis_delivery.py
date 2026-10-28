@@ -12,7 +12,7 @@ LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive
     'dif_up':'DIF上彎','rsi_improving_or_near_50':'RSI改善／接近50'}
 
 
-def deliver(row,request,*,repo_root,cash_trial=None):
+def deliver(row,request,*,repo_root,cash_trial=None,investment=None):
     market=row.get('market') or {};core=(row.get('core_observation') or {}).get('result',{})
     conclusion=row.get('formal_conclusion') or {};approved=market.get('approved_technical') or {}
     metrics=deepcopy(row.get('valuation_observations',[]));valuation=deepcopy(core.get('valuation',{}))
@@ -21,7 +21,7 @@ def deliver(row,request,*,repo_root,cash_trial=None):
     right_true=[s['name'] for s in groups.get('right_signals',[]) if s['truth']=='TRUE']
     current=next((m for m in metrics if m.get('metric_name')==valuation.get('primary_metric')),None)
     judgment=current_judgment(row,repo_root)
-    recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial)
+    recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -101,6 +101,8 @@ def deliver(row,request,*,repo_root,cash_trial=None):
         '本人目標缺漏、未設曝險限制、掛單／成交不足不刪除本分析；不推定空掛單或新增上限。']
     result['analysis_details']='\n'.join(text)
     concise=[text[0]]
+    if investment and investment.get('assumed_zero'):
+        concise.append('本輪不新增外部資金，新增投入為0；既有現金與持倉保留。')
     if market.get('numeric'):
         n=market['numeric'];concise.append(f"{market['observed_date']}收盤 {market['observed_close']:.2f}；MA20 {n.get('ma20')}，RSI14 {n.get('rsi14')}，ATR14 {n.get('atr14')}。")
     if current:concise.append(f"{current['metric_name']} {current['current']}（{current.get('as_of')}），估值 {valuation['level']}。")
@@ -158,7 +160,7 @@ def current_judgment(row,repo_root):
         'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
 
 
-def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None):
+def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None):
     """Present native gap math as advice, independently of order submission.
 
     Unknown orders stay unknown. A confirmed-position gap is computed with no
@@ -198,7 +200,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None):
             'is_reconciled_deployment_gap':False}
         trace.append('V82.calculate_position_gap:confirmed_holdings_component_only')
     trial=cash_trial or {};available=(trial.get('decimal_values') or {}).get('available')
-    matching_cash=trial.get('owner')==row['owner'] and trial.get('currency')==currency
+    matching_cash=currency is not None and trial.get('owner')==row['owner'] and trial.get('currency')==currency
     cash_ceiling='0' if matching_cash and available is not None and Decimal(str(available))==0 else None
     formula=None
     if amount is not None and rate is not None and confirmed is not None and not same_currency:
@@ -217,6 +219,10 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None):
         'confirmed_holdings_component':component,'unresolved_gap_formula':formula,
         'cash_only_trial_buy_ceiling':cash_ceiling,
         'cash_assumptions':deepcopy(trial.get('assumptions',[])),
+        'reported_cash_balance':(trial.get('decimal_values') or {}).get('total') if matching_cash else None,
+        'new_external_funding_amount':investment.get('total_new_investment_amount') if investment else None,
+        'new_external_funding_buy_amount':'0' if investment and investment.get('total_new_investment_amount')=='0' else None,
+        'new_external_funding_scope':'EXCLUDES_EXISTING_CASH_AND_SGOV_REDEPLOYMENT',
         'cash_ceiling_is_not_total_deployment_recommendation':True,
         'missing_fields':missing,'call_trace':trace,
         'excess_over_target_is_not_sell_instruction':True,'broker_submission_allowed':False}

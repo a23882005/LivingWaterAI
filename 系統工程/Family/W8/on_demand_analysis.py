@@ -194,7 +194,7 @@ class OnDemandAnalysisProvider:
             from family_input import digest
             from family_runner import FamilyRunner
             if (source_report.get('schema_version')!='Family.W8.NativeSourceProduction.v1'
-                or source_report.get('status')!='BLOCKED_BY_ORIGINAL_ADAPTER'
+                or source_report.get('status') not in ('BLOCKED_BY_ORIGINAL_ADAPTER','SOURCE_STAGE_INCOMPLETE')
                 or source_report.get('client_id')!=client
                 or source_report.get('source_db_sha256')!=sha
                 or source_report.get('run_id')!=request.get('run_id')

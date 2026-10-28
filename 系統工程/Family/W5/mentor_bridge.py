@@ -145,6 +145,10 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         if tactical:text.append(f"原V70重算股票戰術總額度 {tactical['allocation']['sTot']}%，{tactical['currency']} {tactical['amounts']['stock']}；這是總額度，並非本檔補倉金額。")
         component=facts.get('recommendation',{}).get('confirmed_holdings_component')
         if component:text.append(f"按已確認持股計算的缺口 {facts['recommendation']['position_currency']} {component['positive_gap_amount']}（尚未扣除有效掛單）。")
+        native_funding=facts.get('native_funding_advice',{})
+        if native_funding.get('status')=='CASH_TRIAL_ADVICE_COMPUTED':
+            plan=native_funding['native_plan']
+            text.append(f"原Work3／Work4及V82金額規劃已執行：本輪缺漏可用現金按0試算，現金買入建議 {source['owner']['currency']} {plan['execution_amount']}；這不代表既有現金餘額或持股缺口為0，既有資產調整及扣掛單淨額另列。")
         amount=item['recommended_buy_amount']
         if amount['status']=='KNOWN':text.append(f"原生補倉缺口 {amount['currency']} {amount['amount']}。")
         elif item['remaining_amount_dependencies']:

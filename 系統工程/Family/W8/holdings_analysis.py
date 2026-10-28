@@ -412,6 +412,21 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             [dict(p,scope='CASH_DIAGNOSTIC__DOES_NOT_BLOCK_HOLDING_ANALYSIS') for p in trial['issues']],
         'source_refs':[s for r in rows for s in r['source_refs']], 'call_trace':trace,
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
+    if (getattr(producer,'native_funding_advice_enabled',False) and investment
+        and investment.get('total_new_investment_amount') is not None
+        and request.get('macro_snapshot') and trial.get('cash_state')):
+        from native_funding_advice import build as build_native_funding_advice,delivery as funding_delivery
+        funding=build_native_funding_advice(producer,request,report,trial=trial,
+            investment=investment,tactical=tactical)
+        report['native_funding_advice']=funding
+        report['deployment_status']['native_funding_components']={
+            'computed':sum(i['status']=='CASH_TRIAL_ADVICE_COMPUTED' for i in funding['items'].values()),
+            'rejected':sum(i['status']=='NATIVE_CONTRACT_REJECTED' for i in funding['items'].values()),
+            'input_unavailable':sum(i['status']=='INPUT_UNAVAILABLE' for i in funding['items'].values())}
+        report['call_trace']+=funding['call_trace']
+        for row in rows:
+            row['current_analysis']['native_funding_advice']=funding_delivery(funding['items'][row['instrument_id']])
+            row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
     from runtime_loader import load_c_module
     from mentor_bridge import explain_holdings_recommendations
     work9=load_c_module(producer.root,9)
@@ -443,7 +458,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     from recommendation_report import build as build_recommendation_report
     report['recommendation_report']=build_recommendation_report(report,request)
     report['engineering_completion']={'menu04_recommendation_output':'IMPLEMENTED',
-        'full_native_deployment_source_producer':'INCOMPLETE_DIAGNOSTIC_BRANCH_OUTSIDE_MENU04_REPORT',
+        'full_native_deployment_source_producer':'INCOMPLETE_REMAINING_MENU04_WORK',
         'order_adjusted_net_amount':report['recommendation_report']['net_after_orders_status'],
         'full_native_canonical_complete':False}
     report['manifest_digest']=digest(report['manifest']);report['report_digest']=digest(report)
@@ -488,6 +503,8 @@ class HoldingsAnalysisRunner:
         from recommendation_report import build as build_recommendation_report
         if report.get('recommendation_report')!=build_recommendation_report(report,request):
             raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
+        from native_funding_advice import validate as validate_native_funding_advice
+        validate_native_funding_advice(root,report,request)
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

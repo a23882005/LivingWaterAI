@@ -328,4 +328,66 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(output['result']['deployment_status']['status'],'NOT_RUN')
 
 
+import native_funding_advice as F
+
+
+class NativeFundingAdviceTest(unittest.TestCase):
+    def case(self):
+        stock=json.loads((HERE.parent/'W5/tests/fixtures/work4_adapter_request.json').read_text())
+        w=stock['work3_handoff'];client=w['client_state_context']['payload']['client_id']
+        owner={**w['owner'],'client_id':client,'currency':w['currency']}
+        contexts=deepcopy(stock['c7_funding_context']['contexts'])
+        for c in contexts:
+            c['bucket_new_investment_amount']=0
+            c['brokerage_cash_state']={k:0 for k in ('total','available','unsettled','reserved')}
+            for leg in c['executable_budget'].values():leg['amount']=0
+        selected=next(c for c in contexts if c['domain']==owner['funding_domain'])
+        selected['brokerage_cash_state']['total']=500
+        snapshot={'client_id':client,'source_sha256':'a'*64,'tables':{}}
+        at='2026-10-27T23:59:00+00:00'
+        request={'run_id':w['run_id'],'client_id':client,'owner':owner,'evaluation_at':at,
+            'client_snapshot':{'payload':snapshot,'as_of':at},'expected_versions':{'target':'SYNTHETIC'},
+            'macro_snapshot':{'digest':'b'*64,'asOf':at,'payload':{'scope':'SYNTHETIC'}},
+            'confirmed_target':{'payload':{'confirmation_evidence':deepcopy(w['final_target']['confirmation_proof']),
+                'draft':{'allocation_id':w['final_target']['allocation_id'],
+                    'target_lines':[{'instrument_id':'QQQ','ticker':'QQQ',
+                        'target_amount':{'value_state':'KNOWN','amount':'1000','currency':'USD'}}]}}}}
+        row={'instrument_id':'SYNTHETIC_QQQ','symbol':'QQQ','holding':{'quantity':'5'},
+            'market':{'observed_close':'100'},'native_product_identity':{'asset_type':'BROAD_ETF','asset_grade':'B'},
+            'core_observation':{'result':{'permission':{'hard_gate':'NOT_TRIGGERED','new_buy_order_permission':True,'reason_codes':[]}}},
+            'current_analysis':{'current_judgment':{'target_rate_reference':'0.95'},
+                'recommendation':{'confirmed_holdings_component':{'positive_gap_amount':'450'}}}}
+        producer=SimpleNamespace(root=ROOT,fx_observation=None,funding_contexts=lambda *args:(deepcopy(contexts),{}))
+        trial={'decimal_values':{'available':'0'},'cash_state':deepcopy(selected['brokerage_cash_state'])}
+        investment={'total_new_investment_amount':'0','account_contributions':{}}
+        tactical={'native_currency_amounts':{'stock':'1000','bond':'0','dry_powder':'0'}}
+        return producer,request,{'analysis_result':{'positions':[row]}},trial,investment,tactical
+
+    def test_original_work4_and_native_zero_budget_plan_keep_positive_gap(self):
+        p,r,report,trial,investment,tactical=self.case()
+        before=deepcopy((r,report,trial))
+        out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
+        item=out['items']['SYNTHETIC_QQQ']
+        self.assertEqual(item['status'],'CASH_TRIAL_ADVICE_COMPUTED',item['issues'])
+        self.assertEqual(item['native_plan']['execution_amount'],'0')
+        self.assertEqual(item['native_plan']['residual_gap_amount'],'450.00')
+        self.assertIn('MAXIMUM_ALLOWED_BUY_AMOUNT_ZERO',item['native_plan']['reason_codes'])
+        self.assertFalse(item['active_orders_assumed_empty'])
+        self.assertEqual((r,report,trial),before)
+        report['native_funding_advice']=out
+        report['analysis_result']['positions'][0]['current_analysis']['native_funding_advice']=F.delivery(item)
+        F.validate(ROOT,report,r)
+        item['native_plan']['execution_amount']='900'
+        report['analysis_result']['positions'][0]['current_analysis']['native_funding_advice']=F.delivery(item)
+        with self.assertRaisesRegex(PermissionError,'PLAN_MISMATCH'):F.validate(ROOT,report,r)
+
+    def test_positive_cash_without_budget_assignment_is_not_zeroed(self):
+        p,r,report,trial,investment,tactical=self.case();trial['decimal_values']['available']='50'
+        out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
+        item=out['items']['SYNTHETIC_QQQ']
+        self.assertEqual(item['status'],'INPUT_UNAVAILABLE')
+        self.assertIn('funding.equity_executable_budget_assignment',[x['field_path'] for x in item['issues']])
+        self.assertNotIn('native_plan',item)
+
+
 if __name__=='__main__':unittest.main()

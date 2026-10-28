@@ -276,6 +276,12 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         alternate_raw=(alternate_base/'manifest.json').read_bytes();alternate=json.loads(alternate_raw)
         if alternate.get('schema_version')!='Family.W8.AlternativeMarketHistory.v1':
             raise ValueError('ALTERNATIVE_MARKET_MANIFEST_SCHEMA')
+    bond_ids=set()
+    if approved_rule_profile is not None:
+        runtime=Path(__file__).resolve().parents[3]/'系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
+        if str(runtime) not in sys.path:sys.path.insert(0,str(runtime))
+        from v75_runtime.work3 import US_LISTED_ASSETS,TW_LISTED_ASSETS
+        bond_ids=set(US_LISTED_ASSETS)|set(TW_LISTED_ASSETS)
     for instrument in instruments:
         key, symbol = instrument['instrument_key'], instrument.get('ticker')
         is_etf=(True if (verified_asset_types or {}).get(symbol)=='BROAD_ETF' else
@@ -283,7 +289,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         # The approved price/volume algorithms do not require a global-ETF
         # product grade. Unknown product identity remains unknown: in
         # particular, the ETF-only nonvoting EPS slot still needs is_etf=True.
-        routed_profile=approved_rule_profile
+        routed_profile=(None if symbol in bond_ids or
+            (verified_asset_types or {}).get(symbol)=='BOND_ETF' else approved_rule_profile)
         if (instrument.get('identity_state') not in ('KNOWN', 'SOURCE_SYMBOL_ONLY') or not isinstance(symbol, str)
                 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,31}', symbol)):
             missing.append({'instrument_key': key, 'code': 'KNOWN_EXACT_SYMBOL_REQUIRED'})

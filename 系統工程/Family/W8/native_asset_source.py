@@ -201,6 +201,7 @@ class AssetSourceProducer:
         if flow not in ('HOLDINGS_ANALYSIS','DEPLOYMENT'):
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
         self.flow=flow;self.analyze_all=analyze_all
+        self.native_funding_advice_enabled=True
         self.alternative_source_dir=alternative_source_dir
         self.issuer_facts_source=issuer_facts_source
         self.product_sources=deepcopy(product_sources or {})

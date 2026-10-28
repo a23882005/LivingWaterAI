@@ -71,6 +71,7 @@ def build(report,request):
         if limitations:reasons.append('；'.join(limitations))
         if not reasons:reasons.append('已保留來源觀測；尚無可用的原生策略判斷')
         new_amount=r.get('new_external_funding_buy_amount')
+        native_funding=c.get('native_funding_advice',{})
         rows.append({'instrument_id':key,'symbol':p['symbol'],'quantity':p['holding']['quantity'],
             'market_date':c['market'].get('observed_date'),'current_judgment':current,
             'approved_allocation_weight':allocation,'approved_target_display':target_view,'stage_cumulative_rate':j.get('target_rate_reference'),
@@ -78,24 +79,28 @@ def build(report,request):
             'holding_gap_amount':gap,'holding_gap_currency':r.get('position_currency'),
             'holding_gap_label':'依已確認持股計算，尚未扣除本人既有未成交委託',
             'proposed_new_external_buy_amount':new_amount,'new_external_currency':p['owner']['currency'],
+            'native_cash_trial_buy_amount':native_funding.get('native_plan',{}).get('execution_amount'),
+            'native_cash_trial_status':native_funding.get('status','NOT_RUN'),
             'proposed_existing_asset_redeployment_amount':r.get('buy_gap_amount'),
             'sell_recommendation':deepcopy(mentor[key]['recommendation']['recommended_sell_amount']),
             'net_after_orders_status':'PENDING_ORDER_CONFIRMATION' if 'active_orders_and_fill_reconciliation' in r['missing_fields'] else 'SEE_NATIVE_RESULT',
             'reason':'；'.join(reasons),'remaining_analysis_fields':limitations,
             'mentor_explanation':mentor[key]['explanation']})
     if len(seen)!=len(mentor):raise ValueError('RECOMMENDATION_REPORT_MENTOR_COVERAGE_MISMATCH')
-    headings=['標的／持股','目前判斷','核准配置比／階段累積比','已確認持股缺口¹','本次既有資產建議投入額','本輪新增外部資金買入²','賣出建議金額','簡短理由']
+    headings=['標的／持股','目前判斷','核准配置比／階段累積比','已確認持股缺口¹','本次既有資產建議投入額','原生可用現金試算買入³','本輪新增外部資金買入²','賣出建議金額','簡短理由']
     cells=[]
     for r in rows:
         cells.append([f"{r['symbol']}／{r['quantity']}",r['current_judgment'],
             percent(r['approved_allocation_weight'])+'／'+percent(r['stage_cumulative_rate']),
             money(r['holding_gap_amount'],r['holding_gap_currency']),
             money(r['proposed_existing_asset_redeployment_amount'],r['holding_gap_currency']),
+            money(r['native_cash_trial_buy_amount'],r['new_external_currency']),
             money(r['proposed_new_external_buy_amount'],r['new_external_currency']),
             money(r['sell_recommendation'].get('amount'),r['sell_recommendation'].get('currency',r['holding_gap_currency'])),r['reason']])
     intro=['第04項持股建議報告已完成；逐檔無法判定的部分已明列。',
         '¹ 依已確認持股計算，尚未扣除本人既有未成交委託。持股缺口不等於本次立即應買金額。',
         '² 新增外部資金與既有現金／資產重新部署分開列示；0只表示該欄的試算金額，不代表全部不買。',
+        '³ 原Work3／Work4綁定後執行V82金額規劃；缺漏可用現金按0試算，不能當作既有資產調整金額或扣除掛單後淨額。',
         '未產生原生賣出金額者標為未定；不將目標超配直接當作賣出指示。',
         '掛單扣除後淨額待確認；其他判斷、缺口與Mentor已交付。']
     if (report.get('new_investment_scenario') or {}).get('total_new_investment_amount')=='0':

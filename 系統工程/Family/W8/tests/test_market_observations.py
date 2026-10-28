@@ -78,6 +78,9 @@ class ObservationsTest(unittest.TestCase):
 
     def test_approved_price_algorithms_are_not_limited_to_global_etf_identity(self):
         profile={'approval_status':'APPROVED_FOR_IMPLEMENTATION','profile_id':'SYNTHETIC'}
+        self.snapshot['tables']['portfolio_instrument'][0]['ticker']='TESTSTOCK'
+        self.manifest['items']['TESTSTOCK']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'TESTSTOCK.csv';self.write()
         before=deepcopy(self.snapshot)
         with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:
             M.build_member_market_observations(self.snapshot,[],self.macro,repo_root=self.root,

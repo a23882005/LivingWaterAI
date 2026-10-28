@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-29T04:50:21+08:00",
+  "updated_at": "2026-10-29T06:50:58+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Total PM personally completes the existing PR59 native input assembly and full original FamilyRunner → Mentor for Joseph and MOU. Existing holdings are official by explicit Owner decision. The concrete remaining engineering issue is absent native_bundle and associated source contexts; do not return to Owner for the same holdings confirmation.",
+  "next_owner": "New conversation Family中PM／全專案總PM，親自執行剩餘工程並負責Gate與治理",
+  "next_action": "Read 20261029 three handoff ZIPs then fresh PR59/live governance; apply approved V82 v1.0 and current MOU 17-target fixed-ID DB, coordinate existing worker and complete/independently accept Joseph/MOU menu04, then remaining W8 processes and Gate D/E. Earlier active_04_focus snapshots are historical where superseded.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1605,5 +1605,55 @@
     "foreign_key_violations": 0,
     "private_receipt_drive_id": "1LtCd-U0wixCKIT0J-9i05CMDDETWWTaS",
     "drive_governance": "ENGINEERING_FILES_MASTER_WBS_UPDATED"
+  },
+  "handoff_20261029": {
+    "role": "Family中PM＝全專案總PM＝剩餘工程直接執行者",
+    "status": "HANDOFF_PACKAGES_VERIFIED__ENGINEERING_IN_PROGRESS",
+    "read_order": [
+      "ZIP1",
+      "ZIP2",
+      "ZIP3"
+    ],
+    "packages": [
+      {
+        "name": "Family_W8_20261029_065058_ZIP1_中PM總PM職責與最高架構.zip",
+        "bytes": 86192,
+        "sha256": "3d24b4b3bf340f742c2ed9e6bd074372428b4ac546584ce02f562189e1d07f93",
+        "payload_files": 6
+      },
+      {
+        "name": "Family_W8_20261029_065058_ZIP2_已完成工程與正式來源證據.zip",
+        "bytes": 751711,
+        "sha256": "c8d4af64b5cb189e4b7716c3abf6793488f323f87ca4752b8ebc46cd72316641",
+        "payload_files": 15
+      },
+      {
+        "name": "Family_W8_20261029_065058_ZIP3_剩餘工序與四戶Gate驗收.zip",
+        "bytes": 7115,
+        "sha256": "9a84b67927a76c24ecf503f6e1c67a652602a19088c48097d43da5935e3abcf3",
+        "payload_files": 6
+      }
+    ],
+    "remote_validation": "3/3_EXACT_BYTES_SHA256_CRC__27_PAYLOAD_SIZE_SHA256_PASS",
+    "uat_rows": 56,
+    "latest_pr59_head": "e11cbf7834806a8291b114cd5cb9ae3913c96ecc",
+    "pr59_status": "OPEN_DRAFT_UNMERGED",
+    "latest_pr_head_ci_observation": "No PR-triggered workflow runs returned; newer-head customer E2E not independently accepted",
+    "latest_status_overrides_older_focus_snapshot": true,
+    "latest_engineering": "Partial original Core/product-specific routes/Loop2 cash advice exist; complete per-asset Loop2 targets, remaining source mappings and full native FamilyRunner/Work9/Mentor customer acceptance remain pending",
+    "approved_v82_v1": "APPROVED_FOR_IMPLEMENTATION_ON_20261028; explicit revisions override old candidate labels",
+    "mou_database": "Original fixed-ID DB updated and verified 20261029, 17 confirmed targets; see mou_same_id_writeback_20261029",
+    "execution_mode": "ChatGPT on demand; GitHub code; Drive independent DB/report; no Hostinger/Render persistent host",
+    "next_owner": "New conversation Family Total PM, hands-on, full governance and Gate responsibility",
+    "next_sequence": [
+      "Coordinate/accept existing PR59 work and finish Joseph/MOU menu04",
+      "Remaining DB same-ID persistence per live evidence",
+      "Menu11 transaction/holdings/cash/zero position sync",
+      "Menu13/12 W6 reports produce/save/readback/lookup",
+      "Four households x14 real E2E",
+      "Gate D / four Projects rollout / trial fixes / Gate E / closeout"
+    ],
+    "private_links": "Drive engineering/file management/Master WBS",
+    "index": "系統工程/Family/W8/20261029_中PM總PM三ZIP正式交接索引.md"
   }
 }

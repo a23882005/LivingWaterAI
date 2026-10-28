@@ -6,6 +6,7 @@ copied from the bound source producers and original V82 components.
 from copy import deepcopy
 from family_input import digest
 from decimal import Decimal
+import re
 from approved_v04_technical import both,truth
 
 LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive':'MACD空方柱縮短／翻正',
@@ -21,7 +22,9 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None):
     right_true=[s['name'] for s in groups.get('right_signals',[]) if s['truth']=='TRUE']
     current=next((m for m in metrics if m.get('metric_name')==valuation.get('primary_metric')),None)
     judgment=current_judgment(row,repo_root)
-    recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment)
+    from formal_mode_analysis import target_for_symbol
+    recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment,
+        approved_target=target_for_symbol(request,row['symbol']))
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -160,7 +163,19 @@ def current_judgment(row,repo_root):
         'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
 
 
-def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None):
+def source_target_in_currency(target,currency):
+    """Use an explicitly approved money column, never an inferred FX rate."""
+    if target.get('value_state')!='KNOWN':return None
+    if target.get('currency')==currency:return {'amount':target['amount'],'currency':currency,'source_column':target.get('source_column')}
+    if currency!='USD':return None
+    matches=re.findall(r'US\$\s*([0-9][0-9,]*(?:\.[0-9]+)?)',target.get('source_row',''))
+    if len(matches)!=1:return None
+    return {'amount':matches[0].replace(',',''),'currency':'USD',
+        'source_column':'EXPLICIT_APPROVED_USD_COLUMN','source_row':target['source_row'],
+        'fx_inferred':False}
+
+
+def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None,approved_target=None):
     """Present native gap math as advice, independently of order submission.
 
     Unknown orders stay unknown. A confirmed-position gap is computed with no
@@ -168,7 +183,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     No unknown money or exchange rate is replaced by zero.
     """
     from formal_mode_analysis import native
-    market=row.get('market') or {};target=(row.get('formal_conclusion') or {}).get('approved_project_target') or {}
+    market=row.get('market') or {};target=approved_target if approved_target is not None else (row.get('formal_conclusion') or {}).get('approved_project_target') or {}
     identity=row.get('native_product_identity') or {};registry=identity.get('registry_identity') or {}
     mapping=market.get('analysis_identity_mapping') or {};issuer=row.get('issuer_facts') or {}
     currency=registry.get('quote_currency') or mapping.get('quote_currency') or issuer.get('currency')
@@ -182,7 +197,8 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     if amount is None:missing.append('approved_project_target_amount')
     rate=judgment.get('target_rate_reference')
     if rate is None:missing.append('native_mode_and_stage_target_rate')
-    same_currency=amount is not None and target.get('currency')==currency
+    calculation_target=source_target_in_currency(target,currency)
+    same_currency=calculation_target is not None
     if amount is not None and not same_currency:missing.append('target_to_position_currency_FX')
     # The formal reconciled result is authoritative when actually computed.
     formal_gap=(row.get('formal_conclusion') or {}).get('deployment_gap',{})
@@ -191,7 +207,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     component=None
     if same_currency and known_position and rate is not None:
         dep,_,_=native(repo_root)
-        gap=dep.calculate_position_gap(project_target_position_amount=amount,target_rate=rate,
+        gap=dep.calculate_position_gap(project_target_position_amount=calculation_target['amount'],target_rate=rate,
             confirmed_position_qty=qty,canonical_valuation_price=price,active_orders=())
         component={'scope':'CONFIRMED_HOLDINGS_ONLY__ORDERS_NOT_INCLUDED',
             'signed_gap_amount':str(gap.final_deployment_gap_amount),
@@ -217,6 +233,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
         'valuation_scope':'SOURCE_MATCHED_ANALYSIS_REFERENCE__NOT_RECONCILED_HELD_VENUE_VALUATION',
         'buy_gap_amount':reconciled.get('positive_deployment_gap') if reconciled else None,
         'confirmed_holdings_component':component,'unresolved_gap_formula':formula,
+        'calculation_target':calculation_target,
         'cash_only_trial_buy_ceiling':cash_ceiling,
         'cash_assumptions':deepcopy(trial.get('assumptions',[])),
         'reported_cash_balance':(trial.get('decimal_values') or {}).get('total') if matching_cash else None,

@@ -279,10 +279,11 @@ class AssetSourceProducer:
         budget='0' if available==0 or investment['total_new_investment_amount']=='0' else None
         legs={leg:{'amount':budget,'currency':req['owner']['currency'],'cash_basis':'AVAILABLE',
                    'owner':deepcopy(owner)} for leg in ('equity','bond')}
+        from current_analysis_delivery import source_target_in_currency
         final={'allocation_id':draft['allocation_id'],'authorization_reference':draft['allocation_id'],
             'confirmation_proof':{k:target['confirmation_evidence'][k] for k in ('confirmed_at','confirmed_by')},
             'payload':{'instrument_targets':{r['instrument_id']:{'project_target_position':
-                r['target_amount']['amount'] if r['target_amount']['value_state']=='KNOWN' and r['target_amount']['currency']==req['owner']['currency'] else None}
+                (source_target_in_currency(r['target_amount'],req['owner']['currency']) or {}).get('amount')}
                 for r in draft['target_lines']}}}
         if self.symbol not in final['payload']['instrument_targets']:
             # Target absence is not changed into a guessed monetary zero.

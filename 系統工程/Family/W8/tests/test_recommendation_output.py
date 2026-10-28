@@ -29,6 +29,16 @@ class RecommendationOutputTest(unittest.TestCase):
         self.assertIsNone(out['buy_gap_amount'])
         self.assertIn('active_orders_and_fill_reconciliation',out['missing_fields'])
         self.assertIn('V82.calculate_position_gap:confirmed_holdings_component_only',out['call_trace'])
+    def test_explicit_approved_usd_column_removes_fx_dependency_without_inventing_rate(self):
+        target=self.row['formal_conclusion']['approved_project_target']
+        target.update(currency='TWD',amount='31500',source_row='| SYNTHETIC | 10% | NT$31,500 | US$1,000.00 |')
+        out=self.compute()
+        self.assertEqual(target['amount'],'31500');self.assertEqual(target['currency'],'TWD')
+        self.assertEqual(out['calculation_target']['amount'],'1000.00')
+        self.assertFalse(out['calculation_target']['fx_inferred'])
+        self.assertNotIn('target_to_position_currency_FX',out['missing_fields'])
+        self.assertEqual(out['confirmed_holdings_component']['positive_gap_amount'],'450.0000')
+
     def test_cross_currency_is_not_subtracted_without_fx(self):
         self.row['formal_conclusion']['approved_project_target']['currency']='TWD'
         out=self.compute()

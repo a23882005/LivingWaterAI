@@ -63,5 +63,9 @@ def extend_schema(schema):
                 'properties':{k:deepcopy(leg) for k in ('equity','bond')}}
             absent['required']=list(dict.fromkeys(absent.get('required',[])+['account_presence','account_presence_source','source_reference_ids']))
             return {'oneOf':[original,absent]}
-        return {k:walk(v) for k,v in node.items()}
+        result={k:walk(v) for k,v in node.items()}
+        if {'boundary_contract','contexts','total_new_investment_amount','base_currency'}.issubset(props):
+            result['properties']['contract_version']={'const':VERSION}
+            result['required']=list(dict.fromkeys(result.get('required',[])+['contract_version']))
+        return result
     return walk(deepcopy(schema))

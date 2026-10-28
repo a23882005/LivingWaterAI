@@ -422,6 +422,14 @@ def _v70_framework_issues(canonical_input: Mapping[str, Any]) -> Tuple[List[Dict
 
 
 
+def _absence_contract():
+    import importlib.util
+    path=Path(__file__).resolve().parents[4]/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py'
+    spec=importlib.util.spec_from_file_location('c7_confirmed_absence_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def _known_context_text(value: Any) -> bool:
     if not isinstance(value, str) or not value.strip():
         return False
@@ -446,6 +454,7 @@ def _validate_funding_context(funding_context: Mapping[str, Any], funding_schema
     funding_errors: List[str] = []
     account_errors: List[str] = []
     cross_errors: List[str] = []
+    if _absence_contract().is_extended(raw):funding_schema=_absence_contract().extend_schema(funding_schema)
     schema_errors = _schema_issues(raw, funding_schema, "funding_context", "C_W7_FUNDING_CONTEXT_SCHEMA_INVALID")
     issues += schema_errors
     if schema_errors:
@@ -483,6 +492,12 @@ def _validate_funding_context(funding_context: Mapping[str, Any], funding_schema
             funding_errors.append(f"context[{idx}] is not an object")
             continue
         domain = c.get("domain")
+        try:absent=_absence_contract().validate_absent(c,raw.get("contract_version"))
+        except ValueError as error:
+            funding_errors.append(str(error))
+            issues.append(_issue("C_W7_ACCOUNT_ABSENCE_INVALID","BLOCKING",f"funding_context.contexts.{idx}",str(error),blocking=True))
+            continue
+        if absent:continue
         broker = c.get("broker")
         account = c.get("account")
         if domain not in FUNDING_DOMAINS or not _known_context_text(broker) or not _known_context_text(account):
@@ -564,6 +579,7 @@ def _validate_funding_context(funding_context: Mapping[str, Any], funding_schema
         "source_reference_ids": _uniq(raw.get("source_reference_ids", [])) if all_ok else [],
         "reason": None if all_ok else "Funding Context / account isolation / executable budget validation failed.",
     }
+    if _absence_contract().is_extended(raw):snapshot["contract_version"]=raw["contract_version"]
     return snapshot, issues, funding_errors, account_errors, cross_errors
 
 def _final_target_engine_lineage_issues(work6_result: Mapping[str, Any]) -> List[Dict[str, Any]]:
@@ -806,6 +822,7 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
     w6_schema = _load_json(work6_output_schema_path)
     w7_schema = _load_json(work7_output_schema_path)
     funding_schema = _load_json(funding_context_schema_path)
+    if _absence_contract().is_extended(funding_context):w7_schema=_absence_contract().extend_schema(w7_schema)
 
     ci = deepcopy(dict(canonical_input))
     w6 = deepcopy(dict(work6_result))

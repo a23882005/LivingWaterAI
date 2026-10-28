@@ -447,4 +447,70 @@ class AcceptedHoldingQuantityTimeTest(unittest.TestCase):
                 quantity_time(req,position,ctx)
 
 
+class AbsentAccountDownstreamTest(unittest.TestCase):
+    def absent(self,source):
+        out=deepcopy(source);out['contract_version']='C-W7-FUND-v1.1.0-ABSENT'
+        row=next(c for c in out['contexts'] if c['domain']=='TW_SUB_BROKERAGE')
+        removed=row['bucket_new_investment_amount'];out['total_new_investment_amount']-=removed
+        row.update(broker=None,account=None,bucket_new_investment_amount=0,
+            account_presence='OWNER_CONFIRMED_ABSENT',account_presence_source='SYNTHETIC_OWNER_ABSENCE',
+            source_reference_ids=['SYNTHETIC_OWNER_ABSENCE'])
+        row['brokerage_cash_state']={k:0 for k in ('total','available','unsettled','reserved')}
+        for leg in row['executable_budget'].values():leg.update(amount=0,source_broker=None,source_account=None)
+        return out
+
+    def test_original_work5_work6_accept_same_versioned_absent_domain(self):
+        from runtime_loader import load_c_module
+        req=json.loads((HERE.parent/'W5/tests/fixtures/work5_adapter_request.json').read_text())
+        c7=self.absent(req['c7_funding_context']);w3=req['work3_handoff']
+        owner=tuple(w3['owner'][k] for k in ('funding_domain','broker','account'))
+        w5=load_c_module(ROOT,5);w6=load_c_module(ROOT,6)
+        selected=w5._validate_c7_against_work3(c7,w3,owner,req['run_id'])
+        result=w6._c7_validate(c7,req['run_id'],owner,w3['currency'])
+        self.assertEqual(selected['account'],owner[2]);self.assertEqual(result[0],selected)
+        bad=deepcopy(c7);next(c for c in bad['contexts'] if c['domain']=='TW_SUB_BROKERAGE')['broker']='FAKE'
+        with self.assertRaises(ValueError):w5._validate_c7_against_work3(bad,w3,owner,req['run_id'])
+        with self.assertRaises(ValueError):w6._c7_validate(bad,req['run_id'],owner,w3['currency'])
+
+    def test_actual_c7_engine_preserves_absent_domain_and_present_account_budget(self):
+        from c7_engine import run_c7_engine
+        b=HERE.parent/'W5/tests/fixtures/c7';read=lambda n:json.loads((b/n).read_text())
+        funding=self.absent(read('W13_LOOP2_C7_FUNDING_CONTEXT_US_HAPPY.json'))
+        source={'canonical_input':read('W13_C_WORK7_CANONICAL_INPUT_QA_RUN3.json'),
+            'work6_result':read('W13_C_WORK6_SOURCE_QA_RUN3.json'),
+            'funding_context':funding,'evaluated_at':read('W13_C_WORK7_ASSET_FRAMEWORK_RESULT_QA_RUN3.json')['created_at']}
+        before=deepcopy(source);result=run_c7_engine(ROOT,source)['result']
+        self.assertEqual(result['status'],'READY_FOR_PM_GATE',result.get('issues'))
+        contexts=result['funding_context_snapshot']['contexts']
+        absent=next(c for c in contexts if c['domain']=='TW_SUB_BROKERAGE')
+        self.assertIsNone(absent['broker']);self.assertIsNone(absent['account'])
+        self.assertEqual(next(c for c in contexts if c['domain']=='US_BROKER'),
+            next(c for c in funding['contexts'] if c['domain']=='US_BROKER'))
+        self.assertEqual(source,before)
+
+    def test_original_full_pipeline_and_mentor_accept_absent_unused_account(self):
+        import importlib.util
+        if importlib.util.find_spec('pytest') is None:
+            self.skipTest('Full native fixture helpers require pinned pytest; this check runs in CI')
+        sys.path.insert(0,str(HERE.parent/'W5/tests'))
+        from test_target_units import bound_case
+        from c7_engine import run_c7_engine
+        from native_pipeline import run_native_pipeline
+        from mentor_bridge import explain_native
+        bundle,source=bound_case();source['funding_context']=self.absent(source['funding_context'])
+        bundle['asset_framework']=run_c7_engine(ROOT,source)['result']
+        for branch in ('stock_request','bond_request'):
+            bundle[branch]['c7_funding_context']=deepcopy(source['funding_context'])
+        before=deepcopy((bundle,source))
+        result=run_native_pipeline(ROOT,bundle,c7_source=source)
+        self.assertEqual(result['status'],'NATIVE_PIPELINE_COMPLETE')
+        unified=result['unified_result']
+        mentor=explain_native(ROOT,result['work9_request'],unified,trusted_context={
+            'client_id':result['client_id'],'run_id':result['run_id'],'owner':unified['owner'],
+            'currency':unified['currency'],'analysis_permission':'ANALYZE_ONLY','trade_authorization':'NONE',
+            'runtime_mode':'REAL_DETERMINISTIC','data_provenance':'SYNTHETIC','expected_result_digest':digest(unified)})
+        self.assertTrue(mentor['recommendations_allowed']);self.assertFalse(mentor['broker_execution_allowed'])
+        self.assertEqual((bundle,source),before)
+
+
 if __name__=='__main__':unittest.main()

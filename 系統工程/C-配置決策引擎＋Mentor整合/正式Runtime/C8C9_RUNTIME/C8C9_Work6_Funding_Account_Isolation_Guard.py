@@ -108,8 +108,18 @@ def _load_schema(path: Path) -> dict[str, Any]:
         _fail("C8C9.W6.SCHEMA_LOAD", f"cannot load schema {path.name}: {exc}")
 
 
+def _absence_contract():
+    import importlib.util
+    path=Path(__file__).resolve().parents[4]/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py'
+    spec=importlib.util.spec_from_file_location('c7_confirmed_absence_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def _validate_schema(value: Any, path: Path, code: str) -> None:
-    validator = Draft202012Validator(_load_schema(path))
+    schema=_load_schema(path);absence=_absence_contract()
+    if absence.is_extended(value):schema=absence.extend_schema(schema)
+    validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(value), key=lambda e: list(e.absolute_path))
     if errors:
         e = errors[0]
@@ -159,7 +169,7 @@ def _work3_validate(w3: Mapping[str, Any], run_id: str) -> tuple[tuple[str, str,
 
 def _c7_validate(c7: Mapping[str, Any], run_id: str, owner: tuple[str, str, str], currency: str) -> tuple[Mapping[str, Any], Decimal, Decimal]:
     _validate_schema(c7, _C7_SCHEMA, "C8C9.W6.C7_SCHEMA")
-    if c7.get("contract_name") != C7_CONTRACT_NAME or c7.get("contract_version") != C7_CONTRACT_VERSION:
+    if c7.get("contract_name") != C7_CONTRACT_NAME or c7.get("contract_version") not in (C7_CONTRACT_VERSION,_absence_contract().VERSION):
         _fail("C8C9.W6.C7_CONTRACT", "C7 Funding Context contract/version mismatch")
     if c7.get("run_id") != run_id:
         _fail("C8C9.W6.RUN_ID_MISMATCH", "C7 Funding Context run_id differs")
@@ -180,6 +190,11 @@ def _c7_validate(c7: Mapping[str, Any], run_id: str, owner: tuple[str, str, str]
         ident = (ctx.get("domain"), ctx.get("broker"), ctx.get("account"))
         if ident[0] not in FORMAL_DOMAINS:
             _fail("C8C9.W6.DOMAIN_SET", f"context[{idx}] domain invalid")
+        try:absent=_absence_contract().validate_absent(ctx,c7.get("contract_version"))
+        except ValueError as error:_fail("C8C9.W6.ACCOUNT_ABSENCE",str(error))
+        if absent:
+            domains.append(ident[0])
+            continue
         broker = _nonempty(ident[1], f"c7.contexts[{idx}].broker")
         account = _nonempty(ident[2], f"c7.contexts[{idx}].account")
         ident = (ident[0], broker, account)

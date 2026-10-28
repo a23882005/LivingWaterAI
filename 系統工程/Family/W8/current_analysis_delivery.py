@@ -43,7 +43,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     # Structural readiness does not delete dated issuer values/composition.
     structure['available_issuer_facts']={k:deepcopy(facts[k]) for k in
         ('as_of','source_url','stock_count','benchmark','top_ten_weight_pct','regions_pct','metrics') if k in facts}
-    target=deepcopy(conclusion.get('approved_project_target'))
+    target=deepcopy(target_for_symbol(request,row['symbol']))
     policy_status=('NOT_SET_IN_BOUND_APPROVED_SOURCE' if not
         request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('etf_constraints',{}).get(row['symbol'])
         else 'SEE_SOURCE_LEAF_RESULTS')

@@ -291,9 +291,18 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
-    "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+    "sha256": "7b2cf98dcc3fa5982e826c899e025304a86f7788ae59b1f97217e5ac90d48b60",
     "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
-    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c",
+    "upstream": {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
+      "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+      "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
+      "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    },
+    "git_blob_sha": "aebacc30df7ca47906cd52f543ff65e6a260a854",
+    "size": 57930,
+    "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/__init__.py",

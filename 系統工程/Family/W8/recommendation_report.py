@@ -4,7 +4,7 @@ from decimal import Decimal
 from html import escape
 from family_input import digest
 
-GAPS={'approved_project_target_amount':'本人核准目標金額未綁定',
+GAPS={'approved_project_target_amount':'Loop2逐檔長期目標尚未產製／綁定',
     'native_mode_and_stage_target_rate':'原生模式／部署階段未定',
     'verified_quote_currency':'報價幣別未核實',
     'confirmed_position_quantity_and_valuation_price':'持股估值必要欄位不足',
@@ -75,20 +75,24 @@ def build(report,request):
         native_funding=c.get('native_funding_advice',{})
         rows.append({'instrument_id':key,'symbol':p['symbol'],'quantity':p['holding']['quantity'],
             'market_date':c['market'].get('observed_date'),'current_judgment':current,
-            'approved_allocation_weight':allocation,'approved_target_display':target_view,'stage_cumulative_rate':j.get('target_rate_reference'),
+            'approved_allocation_weight':allocation,'approved_target_display':target_view,
+            'long_term_allocation_target':deepcopy(c.get('long_term_allocation_target')),
+            'current_round_deployment_target':deepcopy(c.get('current_round_deployment_target')),
+            'stage_cumulative_rate':j.get('target_rate_reference'),
             'cumulative_target_amount':j.get('target_amount_reference'),'target_currency':j.get('currency'),
             'holding_gap_amount':gap,'holding_gap_currency':r.get('position_currency'),
-            'holding_gap_label':'依已確認持股計算，尚未扣除本人既有未成交委託',
+            'holding_gap_label':('本人已確認無掛單；依已確認持股與當輪階段參考計算' if r.get('order_source',{}).get('status')=='VERIFIED' else '依已確認持股計算，尚未扣除本人既有未成交委託'),
+            'order_confirmation_status':r.get('order_source',{}).get('status','UNKNOWN'),
             'proposed_new_external_buy_amount':new_amount,'new_external_currency':p['owner']['currency'],
             'native_cash_trial_buy_amount':native_funding.get('native_plan',{}).get('execution_amount'),
             'native_cash_trial_status':native_funding.get('status','NOT_RUN'),
             'proposed_existing_asset_redeployment_amount':r.get('buy_gap_amount'),
             'sell_recommendation':deepcopy(mentor[key]['recommendation']['recommended_sell_amount']),
-            'net_after_orders_status':'PENDING_ORDER_CONFIRMATION' if 'active_orders_and_fill_reconciliation' in r['missing_fields'] else 'SEE_NATIVE_RESULT',
+            'net_after_orders_status':('OWNER_CONFIRMED_NO_OPEN_ORDERS' if r.get('order_source',{}).get('status')=='VERIFIED' else 'PENDING_ORDER_CONFIRMATION' if 'active_orders_and_fill_reconciliation' in r['missing_fields'] else 'SEE_NATIVE_RESULT'),
             'reason':'；'.join(reasons),'remaining_analysis_fields':limitations,
             'mentor_explanation':mentor[key]['explanation']})
     if len(seen)!=len(mentor):raise ValueError('RECOMMENDATION_REPORT_MENTOR_COVERAGE_MISMATCH')
-    headings=['標的／持股','目前判斷','核准配置比／階段累積比','已確認持股缺口¹','本次既有資產建議投入額','原生可用現金試算買入³','本輪新增外部資金買入²','賣出建議金額','簡短理由']
+    headings=['標的／持股','目前判斷','長期配置比／當輪累積目標比','已確認持股缺口¹','本次既有資產建議投入額','原生可用現金試算買入³','本輪新增外部資金買入²','賣出建議金額','簡短理由']
     cells=[]
     for r in rows:
         cells.append([f"{r['symbol']}／{r['quantity']}",r['current_judgment'],
@@ -98,12 +102,17 @@ def build(report,request):
             money(r['native_cash_trial_buy_amount'],r['new_external_currency']),
             money(r['proposed_new_external_buy_amount'],r['new_external_currency']),
             money(r['sell_recommendation'].get('amount'),r['sell_recommendation'].get('currency',r['holding_gap_currency'])),r['reason']])
+    all_orders_confirmed=bool(rows) and all(r['order_confirmation_status']=='VERIFIED' for r in rows)
     intro=['第04項持股建議報告已完成；逐檔無法判定的部分已明列。',
         '¹ 依已確認持股計算，尚未扣除本人既有未成交委託。持股缺口不等於本次立即應買金額。',
         '² 新增外部資金與既有現金／資產重新部署分開列示；0只表示該欄的試算金額，不代表全部不買。',
         '³ 原Work3／Work4綁定後執行V82金額規劃；缺漏可用現金按0試算，不能當作既有資產調整金額或扣除掛單後淨額。',
+        '長期配置比是全組合占比；當輪累積目標比是該檔長期目標的部署進度，兩者分開，不要求本人填逐檔比例。',
         '未產生原生賣出金額者標為未定；不將目標超配直接當作賣出指示。',
         '掛單扣除後淨額待確認；其他判斷、缺口與Mentor已交付。']
+    if all_orders_confirmed:
+        intro[1]='¹ 本人已確認無未成交掛單；持股缺口依當輪階段參考計算，不等於本次立即應買金額。'
+        intro[-1]='本人已確認無掛單；其餘配置、模式及資金限制各自列示。'
     if (report.get('new_investment_scenario') or {}).get('total_new_investment_amount')=='0':
         intro.insert(1,'本輪不新增外部資金，新增投入為0；既有現金與持倉保留。')
     tactical=next((p['current_analysis'].get('v70_tactical_budget') for p in positions if p['current_analysis'].get('v70_tactical_budget')),None)
@@ -122,7 +131,7 @@ def build(report,request):
     out={'schema_version':'Family.W8.RecommendationReport.v1','status':'REPORT_COMPLETE_WITH_LIMITATIONS',
         'report_delivery_status':'COMPLETE','scope':'SELECTED_IB_HOLDINGS_RECOMMENDATIONS',
         'client_id':request['client_id'],'run_id':request['run_id'],'positions_returned':len(rows),
-        'net_after_orders_status':'PENDING_OWNER_ORDER_CONFIRMATION',
+        'net_after_orders_status':'OWNER_CONFIRMED_NO_OPEN_ORDERS' if all_orders_confirmed else 'PENDING_OWNER_ORDER_CONFIRMATION',
         'analysis_status':report['status'],'full_native_deployment_complete':False,
         'rows':rows,'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
     out['digest']=digest(out)

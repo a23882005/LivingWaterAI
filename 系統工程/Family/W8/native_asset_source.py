@@ -185,7 +185,7 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -194,6 +194,7 @@ class AssetSourceProducer:
         self.account_presence_policy=deepcopy(account_presence_policy)
         self.v70_strategic_policy=deepcopy(v70_strategic_policy)
         self.fx_observation=deepcopy(fx_observation)
+        self.order_confirmation=deepcopy(order_confirmation)
         if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')

@@ -139,12 +139,14 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         if ratio['status']=='KNOWN':
             text.append(f"當下模式 {item['mode']}，{item['stage']}，累積目標比例 {Decimal(str(ratio['value']))*100}%。")
             if target['amount'] is not None:text.append(f"目標金額 {target['currency']} {target['amount']}。")
-            else:text.append('本人核准的該標的目標金額尚未綁定。')
+            else:text.append('Loop2逐檔長期目標尚未產製／綁定；這是程式接線待辦，不要求本人填比例。')
         else:text.append('原生資料尚無法選定模式及目標比例；保留已計算的個別訊號。')
         tactical=facts.get('v70_tactical_budget')
         if tactical:text.append(f"原V70重算股票戰術總額度 {tactical['allocation']['sTot']}%，{tactical['currency']} {tactical['amounts']['stock']}；這是總額度，並非本檔補倉金額。")
         component=facts.get('recommendation',{}).get('confirmed_holdings_component')
-        if component:text.append(f"按已確認持股計算的缺口 {facts['recommendation']['position_currency']} {component['positive_gap_amount']}（尚未扣除有效掛單）。")
+        if component:
+            order_note='本人已確認無掛單；當輪階段參考' if facts['recommendation'].get('order_source',{}).get('status')=='VERIFIED' else '尚未扣除有效掛單'
+            text.append(f"按已確認持股計算的缺口 {facts['recommendation']['position_currency']} {component['positive_gap_amount']}（{order_note}）。")
         if facts.get('recommendation',{}).get('approved_no_new_buy'):
             text.append('本人正式長期目標明訂0%，因此不新增；這是既有核准配置政策，不等於必須立即賣出，賣出金額仍需原生依據。')
         native_funding=facts.get('native_funding_advice',{})

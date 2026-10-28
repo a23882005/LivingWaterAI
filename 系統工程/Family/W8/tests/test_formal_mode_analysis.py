@@ -41,6 +41,19 @@ class ModeAnalysisTest(unittest.TestCase):
             'field_key':'order_tab_count','value_text':'2'}]}}}}
         self.assertIsNone(order_source(req)['active_orders'])
         self.assertTrue(target_for_symbol(req,'VT')['absence_is_not_zero'])
+    def test_no_orders_confirmation_is_scoped_and_does_not_replace_old_screenshots(self):
+        request={'client_id':'SYNTHETIC','owner':{'client_id':'SYNTHETIC','account':'A'},
+            'run_id':'RUN','client_snapshot':{'payload':{'source_sha256':'a'*64,'tables':{
+            'portfolio_snapshot_item':[{'entity_key':'IB_SCREEN','field_key':'order_tab_count','value_text':'5'}]}}}}
+        proof={'schema_version':'Family.W8.OwnerNoOpenOrders.v1','client_id':'SYNTHETIC',
+            'owner':deepcopy(request['owner']),'no_open_orders':True,'source_reference':'SYNTHETIC_OWNER_STATEMENT'}
+        before=deepcopy(request)
+        self.assertEqual(order_source(request,proof)['active_orders'],[])
+        self.assertEqual(request,before)
+        self.assertIsNone(order_source(request)['active_orders'])
+        proof['owner']['account']='B'
+        with self.assertRaisesRegex(PermissionError,'SCOPE_MISMATCH'):order_source(request,proof)
+
     def test_numeric_truth_is_not_a_boolean_assertion(self):
         self.assertIsNone(tri(0));self.assertIsNone(tri(1))
 

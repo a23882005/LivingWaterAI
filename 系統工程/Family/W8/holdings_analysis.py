@@ -222,6 +222,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     positions=prepared.payload['positions']
     if not producer.analyze_all:
         positions=[r for r in positions if r['source_instrument'].get('ticker')==producer.symbol]
+    from formal_mode_analysis import order_source
+    order_confirmation=deepcopy(getattr(producer,'order_confirmation',None))
+    orders=order_source(request,order_confirmation)
     rows=[];trace=['W8.menu04.holdings_analysis','W5.prepare_input','W5.project_official_holdings']
     dated_valuation=vt_valuation_observations(context) if any(r['source_instrument'].get('ticker')=='VT' for r in positions) else []
     for position in positions:
@@ -229,6 +232,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         cls=classification(symbol,producer.class_source,producer.product_sources.get(symbol))
         observed=deepcopy(by_symbol.get(symbol));problems=[]
         row={'instrument_id':position['instrument_key'],'symbol':symbol,'owner':deepcopy(request['owner']),
+            'owner_order_confirmation':deepcopy(order_confirmation),
             'holding':{'quantity':position['quantity'],'quantity_state':position['quantity_state'],
                 'observed_at':source.get('as_of_utc'),'received_at':source.get('received_at_utc'),
                 'source_kind':source.get('source_kind'),'source_reference':deepcopy(source.get('source_row'))},
@@ -406,6 +410,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'other_account_coverage':other_coverage,
         'new_investment_scenario':deepcopy(investment),
         'account_presence_source':deepcopy(getattr(producer,'account_presence_policy',None)),
+        'order_source':deepcopy(orders),
         'deployment_status':{'status':'NOT_RUN','reason':'HOLDINGS_ANALYSIS_FLOW__NO_NEW_MONEY_REQUIRED',
             'full_native_canonical_complete':False},'cash_trial':trial,
         'issues':[dict(p,instrument_id=r['instrument_id']) for r in rows for p in r['issues']]+

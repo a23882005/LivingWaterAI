@@ -148,7 +148,7 @@ def build(producer,request,report,*,trial,investment,tactical):
             out['amount_scope']='ZERO_AVAILABLE_CASH_TRIAL__NOT_EXISTING_ASSET_REDEPLOYMENT_OR_ORDER_ADJUSTED_NET'
             out['active_orders_assumed_empty']=False
             out['position_gap_scope']='CONFIRMED_HOLDINGS_COMPONENT_ONLY'
-            out['order_adjusted_net_status']='PENDING_OWNER_ORDER_CONFIRMATION'
+            out['order_adjusted_net_status']=('OWNER_CONFIRMED_NO_OPEN_ORDERS' if advice['recommendation'].get('order_source',{}).get('status')=='VERIFIED' else 'PENDING_OWNER_ORDER_CONFIRMATION')
         except ValueError as error:
             from native_asset_source import native_error_path
             out['status']='NATIVE_CONTRACT_REJECTED'
@@ -193,6 +193,10 @@ def validate(root,report,request):
             raise PermissionError('NATIVE_FUNDING_ADVICE_ZERO_TRIAL_BINDING_MISMATCH')
         # The native zero-budget result cannot be re-signed into a positive
         # recommendation, an executable order or an order-adjusted net gap.
+        from formal_mode_analysis import order_source
+        orders=order_source(request,row.get('owner_order_confirmation'))
+        expected_orders='OWNER_CONFIRMED_NO_OPEN_ORDERS' if orders['status']=='VERIFIED' else 'PENDING_OWNER_ORDER_CONFIRMATION'
+        if item.get('order_adjusted_net_status')!=expected_orders:raise PermissionError('NATIVE_FUNDING_ADVICE_ORDER_SOURCE_MISMATCH')
         plan=item['native_plan']
         if (plan!=plain(zero_cash_plan(row,stock,bound,request['owner']))
             or plan['execution_amount']!='0' or plan['execution_quantity']!='0'

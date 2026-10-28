@@ -196,6 +196,24 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(known['kd_golden_cross'],'UNKNOWN')
         self.assertFalse(formal['reduction_candidates_used'])
 
+    def test_owner_no_orders_propagates_to_report_and_mentor_without_guessing_judgment(self):
+        self.producer.order_confirmation={'schema_version':'Family.W8.OwnerNoOpenOrders.v1',
+            'client_id':self.client,'owner':deepcopy(self.owner),'no_open_orders':True,
+            'source_reference':'SYNTHETIC_OWNER_NO_ORDERS'}
+        report=self.report();row=report['analysis_result']['positions'][0]
+        self.assertEqual(report['order_source']['active_orders'],[])
+        self.assertEqual(row['current_analysis']['long_term_allocation_target']['status'],'LOOP2_TARGET_PRODUCER_PENDING')
+        self.assertFalse(row['current_analysis']['long_term_allocation_target']['owner_input_required'])
+        self.assertTrue(row['current_analysis']['current_round_deployment_target']['not_portfolio_allocation_weight'])
+        self.assertNotIn('active_orders_and_fill_reconciliation',row['current_analysis']['recommendation']['missing_fields'])
+        self.assertEqual(report['recommendation_report']['net_after_orders_status'],'OWNER_CONFIRMED_NO_OPEN_ORDERS')
+        self.assertNotIn('掛單扣除後淨額待確認',report['recommendation_report']['markdown'])
+        self.assertIsNone(report['canonical_result'])
+        # A verified empty order source is not a mode/target/funding assertion.
+        self.assertIsNone(row['current_analysis']['recommendation']['buy_gap_amount'])
+        self.producer.order_confirmation['client_id']='OTHER_MEMBER'
+        with self.assertRaisesRegex(PermissionError,'SCOPE_MISMATCH'):self.report()
+
     def test_report_delivery_is_independent_of_missing_orders_and_target(self):
         self.enable_product('VT');report=self.report();row=report['analysis_result']['positions'][0]
         delivery=row['current_analysis']
@@ -229,6 +247,18 @@ class HoldingAnalysisTest(unittest.TestCase):
         out=current_judgment(row,ROOT)
         self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
         self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
+        self.request['confirmed_target']={'payload':{'draft':{'target_lines':[{'ticker':'VT',
+            'weight':{'value_state':'KNOWN','value':'0.2'},
+            'target_amount':{'value_state':'KNOWN','amount':'1000','currency':'USD'}}]}}}
+        row['formal_conclusion']['approved_project_target']={'value_state':'KNOWN','amount':'1000','currency':'USD'}
+        before=deepcopy(self.request)
+        from current_analysis_delivery import deliver
+        view=deliver(row,self.request,repo_root=ROOT)
+        self.assertEqual(view['long_term_allocation_target']['weight']['value'],'0.2')
+        self.assertEqual(view['current_round_deployment_target']['cumulative_rate'],'0.95')
+        self.assertEqual(view['current_round_deployment_target']['amount'],'950.00')
+        self.assertEqual(self.request,before)
+
         self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
     def test_readable_report_cannot_diverge_from_native_results_after_redigest(self):
         for field in ('rows','html'):

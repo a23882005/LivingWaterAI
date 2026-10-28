@@ -24,7 +24,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     judgment=current_judgment(row,repo_root)
     from formal_mode_analysis import target_for_symbol
     recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment,
-        approved_target=target_for_symbol(request,row['symbol']),fx_observation=fx_observation)
+        approved_target=target_for_symbol(request,row['symbol']),fx_observation=fx_observation,request=request)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -48,6 +48,23 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('etf_constraints',{}).get(row['symbol'])
         else 'SEE_SOURCE_LEAF_RESULTS')
     has_data=bool(market.get('numeric') or metrics or facts)
+    target_lines=request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('target_lines',[])
+    matching=[line for line in target_lines if line.get('ticker')==row['symbol']]
+    allocation_weight=deepcopy(matching[0].get('weight')) if len(matching)==1 else None
+    # The long-term allocation and native stage rate have different denominators.
+    # Never turn the latter into a newly approved portfolio weight.
+    long_term={'scope':'LONG_TERM_PORTFOLIO_ALLOCATION',
+        'weight':allocation_weight,'target_amount':deepcopy(target),
+        'status':'SOURCE_BOUND' if target.get('value_state')=='KNOWN' else 'LOOP2_TARGET_PRODUCER_PENDING',
+        'owner_input_required':False,'does_not_infer_zero_from_absence':True}
+    round_target={'scope':'CURRENT_ROUND_NATIVE_STAGE_REFERENCE',
+        'mode':judgment['mode'],'stage':judgment['stage_reference'],
+        'cumulative_rate':judgment['target_rate_reference'],
+        'amount':judgment['target_amount_reference'],'currency':judgment['currency'],
+        'status':'CALCULATED_REFERENCE' if judgment['target_amount_reference'] is not None else
+            'RATE_ONLY' if judgment['target_rate_reference'] is not None else 'DEPENDENT_NATIVE_INPUTS_UNRESOLVED',
+        'call_trace':deepcopy(judgment['call_trace']),'formal_deployment_decision':False,
+        'not_portfolio_allocation_weight':True}
     result={'schema_version':'Family.W8.CurrentHoldingDelivery.v1',
         'delivery_status':'ANALYSIS_DELIVERED_WITH_LIMITATIONS' if has_data else 'LIMITATION_REPORT_ONLY',
         'analysis_report_delivered':has_data,'native_readiness':row['status'],
@@ -64,7 +81,8 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         'formal_stage':conclusion.get('formal_stage','UNKNOWN'),
         'stage_reasons':conclusion.get('stage_required_unknown_fields',[])+
             (['normal_deployment_mode'] if conclusion.get('selected_mode','UNKNOWN')=='UNKNOWN' else []),
-        'approved_target':target,'owner_exposure_policy_status':policy_status,
+        'approved_target':target,'long_term_allocation_target':long_term,
+        'current_round_deployment_target':round_target,'owner_exposure_policy_status':policy_status,
         'cumulative_target':{'status':'UNKNOWN' if conclusion.get('canonical_target_rate') is None else 'SEE_FORMAL_STAGE',
             'rate':conclusion.get('canonical_target_rate'),'amount':None},
         'nine_stage_reference':deepcopy(conclusion.get('nine_stage_reference',[])),
@@ -101,7 +119,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
             f"正式模式 {result['formal_mode']}／階段 {result['formal_stage']}。估值與技術結果已可用；基本面、信用及必要安全結論不足只限制所依賴的模式成立。",
             f"原安全層買進權限 {result['buy_permission'].get('value')}，原因 {','.join(result['buy_permission'].get('reason_codes',[]))}。"]
     text += ['核准目標及九階參考另列；正式累積目標、部署缺口與可執行金額分開，不以參考表當訂單。',
-        '本人目標缺漏、未設曝險限制、掛單／成交不足不刪除本分析；不推定空掛單或新增上限。']
+        ('本人已確認無掛單；未完成的配置與資金條件另列。' if recommendation['order_source']['status']=='VERIFIED' else '目標產製、曝險與掛單缺項不刪除本分析；不推定空掛單或新增上限。')]
     result['analysis_details']='\n'.join(text)
     concise=[text[0]]
     if investment and investment.get('assumed_zero'):
@@ -178,7 +196,7 @@ def source_target_in_currency(target,currency,fx_observation=None):
         'fx_inferred':False}
 
 
-def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None,approved_target=None,fx_observation=None):
+def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None,approved_target=None,fx_observation=None,request=None):
     """Present native gap math as advice, independently of order submission.
 
     Unknown orders stay unknown. A confirmed-position gap is computed with no
@@ -210,7 +228,11 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     # The formal reconciled result is authoritative when actually computed.
     formal_gap=(row.get('formal_conclusion') or {}).get('deployment_gap',{})
     reconciled=formal_gap.get('value') if formal_gap.get('status')=='COMPUTED' else None
-    if reconciled is None:missing.append('active_orders_and_fill_reconciliation')
+    from formal_mode_analysis import order_source
+    if row.get('owner_order_confirmation') and request is None:raise PermissionError('OWNER_ORDER_REQUEST_REQUIRED')
+    orders=order_source(request,row.get('owner_order_confirmation')) if request is not None else {'status':'UNKNOWN','active_orders':None}
+    if reconciled is None and orders['status']!='VERIFIED':missing.append('active_orders_and_fill_reconciliation')
+    order_adjusted_reference=None
     component=None
     if same_currency and known_position and rate is not None:
         dep,_,_=native(repo_root)
@@ -222,6 +244,12 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
             'actual_completion_rate':str(gap.actual_completion_rate) if gap.actual_completion_rate is not None else None,
             'is_reconciled_deployment_gap':False}
         trace.append('V82.calculate_position_gap:confirmed_holdings_component_only')
+        if orders['status']=='VERIFIED':
+            order_adjusted_reference={**deepcopy(component),
+                'scope':'OWNER_CONFIRMED_NO_OPEN_ORDERS__CURRENT_STAGE_REFERENCE',
+                'is_reconciled_deployment_gap':False,
+                'source_reference':orders['source']['source_reference']}
+            trace.append('V82.calculate_position_gap:owner_confirmed_no_open_orders')
     trial=cash_trial or {};available=(trial.get('decimal_values') or {}).get('available')
     matching_cash=currency is not None and trial.get('owner')==row['owner'] and trial.get('currency')==currency
     cash_ceiling='0' if matching_cash and available is not None and Decimal(str(available))==0 else None
@@ -242,6 +270,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
         'valuation_scope':'SOURCE_MATCHED_ANALYSIS_REFERENCE__NOT_RECONCILED_HELD_VENUE_VALUATION',
         'buy_gap_amount':reconciled.get('positive_deployment_gap') if reconciled else None,
         'confirmed_holdings_component':component,'unresolved_gap_formula':formula,
+        'order_source':orders,'order_adjusted_reference_gap':order_adjusted_reference,
         'calculation_target':calculation_target,
         'cash_only_trial_buy_ceiling':cash_ceiling,
         'cash_assumptions':deepcopy(trial.get('assumptions',[])),

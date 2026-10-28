@@ -73,7 +73,19 @@ def target_for_symbol(request,symbol):
     return deepcopy(found[0]['target_amount'])
 
 
-def order_source(request):
+def order_source(request,confirmation=None):
+    if confirmation is not None:
+        if (confirmation.get('schema_version')!='Family.W8.OwnerNoOpenOrders.v1'
+            or confirmation.get('client_id')!=request.get('client_id')
+            or confirmation.get('owner')!=request.get('owner')
+            or confirmation.get('no_open_orders') is not True
+            or not confirmation.get('source_reference')):
+            raise PermissionError('OWNER_NO_OPEN_ORDERS_SCOPE_MISMATCH')
+        return {'status':'VERIFIED','active_orders':[],
+            'basis':'OWNER_EXPLICIT_NO_OPEN_ORDERS','source':deepcopy(confirmation),
+            'run_id':request['run_id'],'source_db_sha256':request['client_snapshot']['payload']['source_sha256'],
+            'historical_order_or_fill_completeness_asserted':False}
+
     tables=request['client_snapshot']['payload']['tables'];badge=[]
     for row in tables.get('portfolio_snapshot_item',[]):
         if row.get('entity_key')=='IB_SCREEN' and row.get('field_key')=='order_tab_count':
@@ -137,7 +149,7 @@ def build_formal_conclusion(root,row,request):
         'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
     modes['four_modes']['Base']['entry_reasons']=['APPROVED_LONG_TERM_ALLOCATION','FUNDAMENTALS','LEGAL_VALUATION','CREDIT_SAFETY','HARD_GATE','NOT_RUNAWAY_DOWN']
-    orders=order_source(request);missing=[]
+    orders=order_source(request,row.get('owner_order_confirmation'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
     if target['value_state']=='KNOWN' and target.get('currency')!=request['owner']['currency']:missing.append('verified_same_run_target_FX')
@@ -216,8 +228,9 @@ def gap_matrix(row,target,coverage,orders):
         'targets_orders_exposure':[
             item('approved target amount','MAPPED_FROM_EXISTING_SOURCE' if target['value_state']=='KNOWN' else 'NO_UNIQUE_APPROVED_TARGET',
                 target,['target','gap'],'Explicit original amount is used; no current NAV substitution or absent-row zero'),
-            item('active order details/reconciliation','SOURCE_DETAILS_MISSING',orders,
-                ['projected position','gap','execution safety'], 'Read original order asset/side/remaining quantity/state/fills; tab count is not a complete ledger'),
+            item('active order details/reconciliation','MAPPED_FROM_OWNER_CONFIRMATION' if orders['status']=='VERIFIED' else 'SOURCE_DETAILS_MISSING',orders,
+                [] if orders['status']=='VERIFIED' else ['projected position','gap','execution safety'],
+                'No open orders confirmed for this owner/account; historical fills are not asserted' if orders['status']=='VERIFIED' else 'Read original order asset/side/remaining quantity/state/fills; tab count is not a complete ledger'),
             item('lookthrough weights/limits','PRODUCER_AND_REQUIRED_SOURCES_NOT_CONNECTED','Issuer partial holdings and accepted account positions',
                 ['fund viability','exposure limits','safety'], 'Map complete dated issuer composition and existing authorized limits, preserving uncovered weights')]
     }

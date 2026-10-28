@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-27T22:33:08.832Z",
+  "updated_at": "2026-10-28T00:27:42.007Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1070,7 +1070,7 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "IN_PROGRESS__FORMAL_V10_ANALYSIS_PARTIAL__DEPLOYMENT_NOT_RUN",
+    "status": "IN_PROGRESS__FORMAL_MODE_INPUTS_UNRESOLVED",
     "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
@@ -1109,8 +1109,8 @@
     "evidence": {
       "drive_id": "10K0QLJId3M4SCxocVEP54aSMtHUlZZCV",
       "name": "Family_04_Joseph_MOU_input_binding.json",
-      "bytes": 22460701,
-      "sha256": "24ef20d592b3fa104431adf25fe20e4ba7d16ae8a9490f0cb196d4b8029aed50",
+      "bytes": 22432091,
+      "sha256": "c4a19eed316ca1b504012e8bf99c8361ac82df6270b96637746fc42c567b3270",
       "fresh_remote_readback": "EXACT_SIZE_AND_SHA256_MATCH",
       "latest_section": "latest_holdings_analysis",
       "actual_runs_section": "latest_holdings_analysis.actual_formal_entry_runs"
@@ -1129,7 +1129,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "24b00f875d7efbad361a57f075803826d76b3c6b",
+    "work_head": "c04b73d0744c2d04368c425e709c149e9a301d16",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1159,7 +1159,7 @@
       "recorded_at": "2026-10-27T06:49:35+08:00",
       "effect": "Use existing official holdings; prior completeness-confirmation stop superseded"
     },
-    "integrated_main": "16318bb078f5d5328b7994fdd54001b4c0c94ced",
+    "integrated_main": "75fa92cdb3c80fd95ce9225658e91347824656db",
     "latest_patch_validation": {
       "code_commit": "108b14add12f596e635c467d4c8573d0a9c08fc6",
       "local_affected_tests": 27,
@@ -1486,6 +1486,52 @@
       "mentor": null,
       "trade_action": "NO_TRADE",
       "full04_complete": false
+    },
+    "latest_formal_modes": {
+      "code_commit": "c04b73d0744c2d04368c425e709c149e9a301d16",
+      "prior_mode_wiring_commit": "f2012efceed4988e459b8ebb1d99fd32d46fa83b",
+      "preserved_main_market_refresh": "75fa92cdb3c80fd95ce9225658e91347824656db",
+      "implemented": [
+        "Explicit original approved target money mapping without current-NAV substitution",
+        "Independent Base/Left/Right/Trend source context through original V82 selectors",
+        "Nine-stage reference is distinguished from unresolved formal Stage",
+        "No unknown active-order ledger defaulting to an empty list",
+        "Verified byte capture is not substituted for formal PIT availability",
+        "Same-day unverified bars do not erase independent historical analysis",
+        "Explicit non-V75 Close-only analysis on invalid stock OHLC; dependent ATR/KD unavailable"
+      ],
+      "actual_formal_entry": "BOTH_MEMBERS_EXECUTED__ALL_SELECTED_POSITIONS_RETURNED_PARTIAL__NONE_COMPLETE",
+      "first_asset": "NATIVE_CORE_AND_MODE_SELECTOR_EXECUTED__REQUIRED_FACTS_UNRESOLVED",
+      "gaps": [
+        "Field-specific valuation validity and PIT metadata",
+        "ETF structure/look-through and event-coverage source production",
+        "Canonical market session/price-basis and reporting FX",
+        "Approved asset target, active orders and fill reconciliation"
+      ],
+      "required_program_work": [
+        "Qualified Price Map and qP/qV producers",
+        "Current ETF structural and exposure producers",
+        "Complete required-domain event and safety integration"
+      ],
+      "verification": {
+        "related_unittest_passed": 133,
+        "original_dependency_hashes_passed": 115,
+        "remote_changed_file_blob_readbacks": "14/14_MATCH",
+        "compile": "PASS",
+        "new_code_pr_ci": "NO_ASSOCIATED_RUNS_RETURNED",
+        "previous_commit_ci_not_reused": true
+      },
+      "deployment": "NOT_RUN",
+      "work9_mentor": "NOT_RUN",
+      "full04_acceptance": "NOT_PASSED",
+      "official_db_writes": 0,
+      "trade_action": "NO_TRADE",
+      "backups": {
+        "evidence": "1ZtoAWoP8Su0ksooLMYv-LpkN79qYrVGd",
+        "engineering": "1rfuEiaRDqx7OwZEyvM-ttT2sd57fCJjxcErSORLN7rk",
+        "files": "1JhiMBj1n4bRlix5hXIzyGpdIBvTXq5oVEq9waG9Nwgc",
+        "wbs": "1Tv9KGZo5XS0n3xoLSn8IGthP9DVdmiSgMubKWhEVsjI"
+      }
     }
   }
 }

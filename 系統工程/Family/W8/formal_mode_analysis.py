@@ -132,6 +132,7 @@ def build_formal_conclusion(root,row,request):
         modes['conflict']={'code':'INCOMPATIBLE_UP_RIGHT_LEFT_AND_DOWN','reconciliation_required':True,
             'native_selected_mode':modes['selected_mode']}
         modes['selected_mode']='UNKNOWN';modes['formal_stage']='UNKNOWN';modes['canonical_target_rate']=None
+    modes['call_trace']+=viability['call_trace']
     modes['technical_only_predicates']={'right_confirmation':truth(right_technical),
         'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
@@ -184,30 +185,9 @@ def build_formal_conclusion(root,row,request):
 
 
 def etf_viability_audit(row,request):
-    """Audit the exact approved ETF_VIABLE_01 leaves against existing sources.
-
-    Listing identity, a positive ROE and an empty company Thesis Set do not
-    establish these current structural facts. No new mandatory leaves are added.
-    """
-    facts=row.get('issuer_facts') or {}
-    evidence=row['native_product_identity'].get('product_evidence')
-    leaves={
-        'fund_legally_operating':('Official current fund/regulator status',facts.get('fund_status')),
-        'current_mandate_within_client_approved_mandate':('Current prospectus/index version and approved allowed-set subset',facts.get('mandate')),
-        'nav_reporting_and_creation_redemption_function_valid':('Dated NAV/redemption operational notice or approved structure N/A',facts.get('nav_redemption_status')),
-        'termination_or_disqualification_absent':('Effective official event assertion with completed coverage',facts.get('termination_event')),
-        'lookthrough_disposition_allows_long_term_holding':('Complete PIT components/denominator and original authorized exposure limits',facts.get('lookthrough'))}
-    return {'rule_ref':'V82 v1.0 CMR6.3 ETF_VIABLE_01','result':'UNKNOWN',
-        'leaves':{key:{'truth':'UNKNOWN','required_source':required,'existing_source_value':value,
-            'reason':'NO_VERIFIED_CURRENT_LEAF_ASSERTION_IN_BOUND_SOURCES',
-            'gap_kind':'SOURCE_FACT_MISSING' if value is None else 'SOURCE_MAPPING_AND_VALIDATION_REQUIRED'}
-            for key,(required,value) in leaves.items()},
-        'checked_sources':{'product_evidence':deepcopy(evidence),
-            'issuer_url':facts.get('source_url'),'issuer_date':facts.get('as_of'),
-            'available_fields':sorted(facts),'target_allocation_version':request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('original_allocation_version')},
-        'existing_metrics_are_not_viability_assertions':True,
-        'required_producer':'CMR6.3 current ETF structure and exposure leaf production',
-        'producer_complete':False}
+    from etf_structure_source import evaluate_etf_structure
+    return evaluate_etf_structure(row.get('issuer_facts'),request,row['symbol'],
+        row['native_product_identity'].get('product_evidence'))
 
 
 def gap_matrix(row,target,coverage,orders):

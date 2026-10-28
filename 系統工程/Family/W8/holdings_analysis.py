@@ -333,12 +333,12 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['source_refs'] += [{'source_kind':'DATED_VALUATION','sha256':v['source_sha256'],
                 'source_reference':v['source_reference'],'observed_at':v['observed_date_text']}
                 for v in row['valuation_observations']]
-        row['requirements']=audit_requirements(row,producer.class_source)
-        if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
         row['position_valuation_allowed']=False
         if row.get('core_observation'):
             row['formal_conclusion']=build_formal_conclusion(producer.root,row,request)
             row['call_trace']+=row['formal_conclusion']['call_trace']
+        row['requirements']=audit_requirements(row,producer.class_source)
+        if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
         row['analysis_explanation']=explain(row);rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)

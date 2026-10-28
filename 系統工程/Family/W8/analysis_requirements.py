@@ -42,6 +42,11 @@ def audit(row,source):
         'td9_low_state':obs.get('td9',{}).get('low_count'),
         'macd_state':formal.get('macd'),'ma_state':formal.get('ma_price_relationships'),
         'rsi_state':formal.get('rsi'),'atr_value':obs.get('numeric',{}).get('atr14')}
+    conclusion=row.get('formal_conclusion') or {}
+    if conclusion.get('etf_viability_audit'):
+        known['fundamental_state']={'scope':'ETF_VIABLE_01',
+            'long_term_viable':conclusion['etf_viability_audit']['result']}
+        known['left_buy_point_state']=conclusion['market_predicates']['left']
     for n in (1,2,3):
         lows=obs.get('swings',{}).get('lows',[])
         if len(lows)>=n:known['previous_swing_low_'+str(n)]=lows[-n]['value']
@@ -89,6 +94,10 @@ def audit(row,source):
             }.get(field,('DEPENDENCY_UNRESOLVED','Dependent original source or mapping is unresolved'))
             entry.update(gap_kind=cause[0],reason=cause[1],
                 program_location='W8.holdings_analysis.build_analysis_report / W8.analysis_requirements.audit')
+            if conclusion.get('etf_viability_audit') and field=='fundamental_state':
+                entry.update(gap_kind='SOURCE_FACTS_MISSING',
+                    reason='ETF_VIABLE_01 leaf algorithms executed; exact current-source gaps are retained per leaf',
+                    source_observation=conclusion['etf_viability_audit'])
             if approved and field in ('weekly_timeframe_state','monthly_timeframe_state'):
                 timeframe=field.split('_')[0]
                 entry.update(gap_kind='SOURCE_SESSION_COVERAGE_UNVERIFIED',

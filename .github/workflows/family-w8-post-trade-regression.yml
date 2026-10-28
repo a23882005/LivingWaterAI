@@ -121,6 +121,8 @@ jobs:
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_v04*.py' -v
       - name: Validate v1.0 V70 source observations
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_v10_source_observations.py' -v
+      - name: Validate ETF structural source production
+        run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_etf_structure_source.py' -v
       - name: Validate original mode selection and source target amounts
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_formal_mode_analysis.py' -v
       - name: Run holding analysis independent of new-money deployment

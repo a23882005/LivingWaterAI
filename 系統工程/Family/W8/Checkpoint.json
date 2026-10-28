@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-28T00:27:42.007Z",
+  "updated_at": "2026-10-28T01:30:22.570Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1070,7 +1070,7 @@
     "gov_docs": "Drive Family construction management, file management and lifecycle Master WBS updated separately after ZIP verification."
   },
   "active_04_focus": {
-    "status": "IN_PROGRESS__FORMAL_MODE_INPUTS_UNRESOLVED",
+    "status": "IN_PROGRESS__MOU_VT_REQUIRED_SOURCE_FACTS_UNRESOLVED",
     "owner_instruction": "Existing Joseph and MOU holdings are official. Total PM completes menu 04 personally in the same branch, using original engines and Mentor; no temporary portfolio or repeated completeness confirmation.",
     "members": [
       "Joseph",
@@ -1129,7 +1129,7 @@
     "next_executor": "Same Family Total PM, hands-on; no delegation",
     "draft_pr": 59,
     "branch": "family/w8-complete-04-joseph-mou",
-    "work_head": "c04b73d0744c2d04368c425e709c149e9a301d16",
+    "work_head": "5694f4a4c6afcc26780dea9a4fa73915fdf91712",
     "code_merged": false,
     "implemented": [
       "Approved original document targets transformed into read-only source views, preserving original rows and unknown original signing event/NAV",
@@ -1532,6 +1532,59 @@
         "files": "1JhiMBj1n4bRlix5hXIzyGpdIBvTXq5oVEq9waG9Nwgc",
         "wbs": "1Tv9KGZo5XS0n3xoLSn8IGthP9DVdmiSgMubKWhEVsjI"
       }
+    },
+    "latest_mou_vt_structure": {
+      "code_commit": "5694f4a4c6afcc26780dea9a4fa73915fdf91712",
+      "scope": "MOU_VT_ONLY__FULL_OWNER_CONTEXT_RETAINED",
+      "environment": "RUNNING_CONNECTED__ORIGINAL_FAILURE_CAUSE_NOT_RECORDED",
+      "implemented": [
+        "ETF_VIABLE_01 five independent leaves replace fixed UNKNOWN diagnostics",
+        "Mandate subset comparison and exact exposure interval comparison against existing owner limits",
+        "Current official source validity, explicit event coverage and owner/symbol binding",
+        "ETF and Left results mapped into Family required-result audit"
+      ],
+      "actual_status": "ANALYSIS_PARTIAL",
+      "actual_required_unknowns_resolved": 0,
+      "formal_mode": "UNKNOWN",
+      "formal_stage": "UNKNOWN",
+      "source_gaps": [
+        "Field-specific valuation availability and source validity",
+        "Current issuer structural and event assertions",
+        "Original normalized mandate and lookthrough policy limits"
+      ],
+      "source_data_not_fabricated": true,
+      "validation": {
+        "local_affected_unittest_passed": 39,
+        "original_dependency_hashes_passed": 115,
+        "changed_remote_blobs_verified": "6/6",
+        "ci_code_commit": "5694f4a4c6afcc26780dea9a4fa73915fdf91712",
+        "ci_all_five": "SUCCESS",
+        "ci_runs": [
+          40614470990,
+          40614470999,
+          40614471094,
+          40614470975,
+          40614470974
+        ],
+        "new_etf_step_verified_in_job": true
+      },
+      "evidence": {
+        "drive_id": "1g6E_ejXWotrTzBAnLalj5eSQLIvETD8A",
+        "bytes": 944381,
+        "sha256": "10aee81c136444c14cb39b0e9c17fdf0afa4c00b55aac73ee9f9e8abe6ced532",
+        "readback": "EXACT_SIZE_SHA256_MATCH",
+        "prior_full_household_evidence_preserved": true
+      },
+      "governance_backups": {
+        "engineering": "1LOToh4BVpVeAZjEmYTfCeh96qPIO2NGLtA27SpZWw-o",
+        "files": "1sHtFyk8hCz0VZfKidqbaWSnEjaQ9nSDW7AjzgWsSHKk",
+        "wbs": "1OTgG9DgdX3eezR3rvZ1HYSZX8HKRIG_UyUyXtElA2gQ"
+      },
+      "deployment": "NOT_RUN",
+      "work9": "NOT_RUN",
+      "official_db_writes": 0,
+      "trade_action": "NO_TRADE",
+      "full04_acceptance": "NOT_PASSED"
     }
   }
 }

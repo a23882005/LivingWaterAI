@@ -54,6 +54,13 @@ def build(report,request):
         seen.add(key);c=p['current_analysis'];r=c['recommendation'];j=c['current_judgment'];t=c['technical']['native_result']
         matched=[x for x in targets if x.get('ticker')==p['symbol']]
         target_view=approved_target_display(p['symbol'],targets)
+        derived=c.get('long_term_allocation_target',{})
+        if target_view.get('weight') is None and derived.get('status')=='ORIGINAL_C6_BASELINE_DERIVED':
+            projected_money=derived['target_amount']
+            target_view={'status':'ORIGINAL_C6_BASELINE_DERIVED','weight':derived['weight']['value'],
+                'amount':projected_money['amount'],'currency':projected_money['currency'],
+                'basis':'EXISTING_COMPLETE_APPROVAL__NOT_NEW_OPTIMIZED_ALLOCATION'}
+
         allocation=target_view['weight']
         component=r.get('confirmed_holdings_component');gap=component.get('positive_gap_amount') if component else None
         current={'Right Confirmation':'右側確認','Base Deployment':'基礎部署','Left Overweight':'左側加碼','Trend Deployment':'趨勢部署'}.get(j['mode'],j['mode']) if j['mode']!='UNKNOWN' else '模式未定'

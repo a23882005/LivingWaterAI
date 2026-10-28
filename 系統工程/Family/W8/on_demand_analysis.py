@@ -91,13 +91,15 @@ class OnDemandAnalysisProvider:
 
     def __init__(self, trusted_source_producer, *,
                  repo_root=PROJECT_ROOT, runner_factory=None,
-                 official_holdings_decision=None, official_file_id=None):
+                 official_holdings_decision=None, official_file_id=None,
+                 official_holdings_previous_snapshot=None):
         if not callable(trusted_source_producer):
             raise ValueError("TRUSTED_W2_W3_PRODUCER_REQUIRED")
         self.producer = trusted_source_producer
         self.repo_root = Path(repo_root)
         self.runner_factory = runner_factory
         self.official_holdings_decision = deepcopy(official_holdings_decision)
+        self.official_holdings_previous_snapshot = deepcopy(official_holdings_previous_snapshot)
         self.official_file_id = official_file_id
         if official_holdings_decision is not None and not official_file_id:
             raise ValueError('OFFICIAL_HOLDINGS_FILE_ID_REQUIRED')
@@ -157,7 +159,8 @@ class OnDemandAnalysisProvider:
                 snapshot, official_file_id=self.official_file_id,
                 account_key=request['owner']['account'],
                 owner_decision=self.official_holdings_decision,
-                evaluation_at=request['evaluation_at'])
+                evaluation_at=request['evaluation_at'],
+                previous_snapshot=self.official_holdings_previous_snapshot)
         if 'analysis_report' in pack:
             if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
             here=str(Path(__file__).resolve().parent)

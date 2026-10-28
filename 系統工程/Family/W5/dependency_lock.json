@@ -285,9 +285,11 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/adjustment_loop.py",
-    "sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "sha256": "421693a245290e65c85f5bdd83864720f711af69a0908f9570f0a0df974e2005",
     "sha": "4b7bfc90f3a16578c65e11a8d3389d139c4fe209",
-    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c",
+    "upstream_sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "family_revision": "EXTRACT_EXISTING_COMPLETE_TARGET_WEIGHT_LOOKUP__UNCHANGED_DRIFT_MATH"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",

@@ -60,6 +60,18 @@ def build(producer,request,report,*,trial,investment,tactical):
     converted={r['instrument_id']:{'project_target_position':
         (source_target_in_currency(r['target_amount'],owner['currency'],producer.fx_observation) or {}).get('amount')}
         for r in draft['target_lines']}
+    for symbol,item in report.get('loop2_target_projection',{}).get('targets',{}).items():
+        money=item['target_amount']
+        converted[symbol]={'project_target_position':
+            (source_target_in_currency(money,owner['currency'],producer.fx_observation) or {}).get('amount')}
+    # The W1 instrument key is opaque (and may differ from the ticker). Only
+    # a unique target for this symbol can populate the original adapter path.
+    from formal_mode_analysis import target_for_symbol
+    for row in report['analysis_result']['positions']:
+        symbol=row['symbol']
+        money=target_for_symbol(request,symbol,projection=report.get('loop2_target_projection'))
+        converted[symbol]={'project_target_position':
+            (source_target_in_currency(money,owner['currency'],producer.fx_observation) or {}).get('amount')}
     v70id='V70-SOURCE-INPUT-'+macro['digest'][:24]
     amounts=(tactical or {}).get('native_currency_amounts') or {}
     v70={'run_id':run,'source_namespace':'V70.RUNTIME_CONTEXT','upstream_v70_snapshot_id':v70id,

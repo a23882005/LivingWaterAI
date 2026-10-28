@@ -268,7 +268,7 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -278,6 +278,8 @@ class AssetSourceProducer:
         self.v70_strategic_policy=deepcopy(v70_strategic_policy)
         self.fx_observation=deepcopy(fx_observation)
         self.order_confirmation=deepcopy(order_confirmation)
+        self.loop2_target_projection_policy=deepcopy(loop2_target_projection_policy)
+        self.official_target_base_source=deepcopy(official_target_base_source)
         if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
@@ -319,7 +321,14 @@ class AssetSourceProducer:
         req['evaluation_at']=datetime.now(timezone.utc).isoformat()
         if macro.get('capture_receipt'):ctx['macro_capture_digest']=digest(macro['capture_receipt'])
         req['expected_versions']['market']=ctx['expected_versions']['market']=macro['digest']
-        if req.get('confirmed_target',{}).get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
+        if snapshot['tables'].get('final_target_version'):
+            from official_target_input import build as build_official_target
+            view,proof=build_official_target(snapshot,evaluation_at=req['evaluation_at'],
+                base_source=self.official_target_base_source)
+            req['confirmed_target']=view;ctx['official_target_source']=proof
+            ctx['target_hash']=view['target_hash']
+            req['expected_versions']['target']=ctx['expected_versions']['target']=str(view['target_version'])
+        elif req.get('confirmed_target',{}).get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
             from approved_target_input import enrich_document_target_view
             view,proof=enrich_document_target_view(req['confirmed_target'],ctx['approved_document_target_source'])
             req['confirmed_target']=view;ctx['approved_document_target_source']=proof;ctx['target_hash']=view['target_hash']
@@ -616,7 +625,8 @@ class AssetSourceProducer:
                 candidates=[]
                 if domain=='TW_LOCAL_BROKER':
                     candidates=[r for r in accounts if r['account_key']!=selected_owner['account']
-                        and ('Taiwan broker' in r.get('account_label','') or 'Cathay Securities' in r.get('account_label',''))]
+                        and any(label in r.get('account_label','') for label in
+                            ('Taiwan broker','Cathay Securities','台股持倉帳戶'))]
                 if len(candidates)>1:raise ValueError('FUNDING_DOMAIN_ACCOUNT_AMBIGUOUS')
                 account=candidates[0]['account_key'] if candidates else None
                 links=[r for r in snapshot['tables'].get('account_broker_link',[]) if r.get('account_key')==account]

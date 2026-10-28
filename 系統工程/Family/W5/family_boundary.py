@@ -5,6 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
+import importlib.util
 from family_input import digest
 from funding_guard import amount, owner_key
 
@@ -37,13 +38,21 @@ def one(rows,field):
 def nonempty(value):return isinstance(value,str) and bool(value.strip())
 
 
-def validate_target(target,client_id,evaluation_at,*,approved_document_source=None):
+def validate_target(target,client_id,evaluation_at,*,approved_document_source=None,
+                    official_target_source=None,snapshot=None):
     """Validate an existing W2 record or independently bound approved-document view.
 
     The document view records source availability, not a fictional signing event.
     Its independent trusted proof is required; the legacy W2 path is unchanged.
     """
     require(isinstance(target,dict),'TARGET_REQUIRED','confirmed_target','W2','DATA_UNAVAILABLE')
+    if target.get('source_kind')=='OFFICIAL_W1_CONFIRMED_ALLOCATION':
+        path=Path(__file__).resolve().parent.parent/'W8/official_target_input.py'
+        spec=importlib.util.spec_from_file_location('family_w1_target_reader',path)
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        require(isinstance(snapshot,dict) and snapshot.get('client_id')==client_id,
+                'OFFICIAL_TARGET_CLIENT_MISMATCH','confirmed_target')
+        return module.validate(target,official_target_source,snapshot,evaluation_at.isoformat())
     if target.get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
         source=approved_document_source or {}
         require(source.get('schema_version')=='Family.W5.ApprovedDocumentTargetSource.v1'
@@ -190,7 +199,8 @@ def prepare_input(request,*,trusted_context):
         for row in rows:
             if 'client_id' in row:require(row['client_id']==req['client_id'],'CROSS_CLIENT_ROW',table,'W1')
     target=validate_target(req.get('confirmed_target'),req['client_id'],at,
-        approved_document_source=ctx.get('approved_document_target_source'))
+        approved_document_source=ctx.get('approved_document_target_source'),
+        official_target_source=ctx.get('official_target_source'),snapshot=payload)
     require(str(target['target_version'])==versions['target'] and target['target_hash']==ctx.get('target_hash'),'TARGET_VERSION_CONFLICT','confirmed_target','W2')
     owner=bind_owner(payload,req.get('owner',{}),at,
         approved_account_scope=ctx.get('approved_document_account_scope'))

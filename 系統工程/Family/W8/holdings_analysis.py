@@ -225,6 +225,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     from formal_mode_analysis import order_source
     order_confirmation=deepcopy(getattr(producer,'order_confirmation',None))
     orders=order_source(request,order_confirmation)
+    from loop2_target_projection import produce as project_loop2_targets
+    target_projection=project_loop2_targets(producer.root,request,context,
+        getattr(producer,'loop2_target_projection_policy',None),
+        [p['source_instrument'].get('ticker') for p in positions if p['source_instrument'].get('ticker')])
     rows=[];trace=['W8.menu04.holdings_analysis','W5.prepare_input','W5.project_official_holdings']
     dated_valuation=vt_valuation_observations(context) if any(r['source_instrument'].get('ticker')=='VT' for r in positions) else []
     for position in positions:
@@ -384,14 +388,15 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 for v in row['valuation_observations']]
         row['position_valuation_allowed']=False
         if row.get('core_observation') and cls['asset_type']!='INDIVIDUAL_STOCK':
-            row['formal_conclusion']=build_formal_conclusion(producer.root,row,request)
+            row['formal_conclusion']=build_formal_conclusion(producer.root,row,request,target_projection=target_projection)
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
-        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial,investment=investment,tactical=tactical,fx_observation=fx_observation)
+        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial,investment=investment,tactical=tactical,fx_observation=fx_observation,target_projection=target_projection)
         row['call_trace']+=row['current_analysis']['recommendation']['call_trace']
         row['analysis_explanation']=row['current_analysis']['readable_analysis'];rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
+    trace.extend({'function':name} for name in target_projection['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)
         else 'ANALYSIS_PARTIAL' if any(r['status']!='ANALYSIS_COMPLETE' for r in rows) else 'ANALYSIS_COMPLETE')
     # Other brokers remain distinct rows. An IB account proof cannot authorize
@@ -420,7 +425,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'other_account_coverage':other_coverage,
         'new_investment_scenario':deepcopy(investment),
         'account_presence_source':deepcopy(getattr(producer,'account_presence_policy',None)),
-        'order_source':deepcopy(orders),
+        'order_source':deepcopy(orders),'loop2_target_projection':deepcopy(target_projection),
         'deployment_status':{'status':'NOT_RUN','reason':'HOLDINGS_ANALYSIS_FLOW__NO_NEW_MONEY_REQUIRED',
             'full_native_canonical_complete':False},'cash_trial':trial,
         'issues':[dict(p,instrument_id=r['instrument_id']) for r in rows for p in r['issues']]+
@@ -520,6 +525,8 @@ class HoldingsAnalysisRunner:
         from recommendation_report import build as build_recommendation_report
         if report.get('recommendation_report')!=build_recommendation_report(report,request):
             raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
+        from loop2_target_projection import validate as validate_loop2_targets
+        validate_loop2_targets(root,request,self.context,report)
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}

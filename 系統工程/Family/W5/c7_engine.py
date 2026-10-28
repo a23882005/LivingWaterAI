@@ -12,7 +12,7 @@ C_ROOT = Path('系統工程/C-配置決策引擎＋Mentor整合/正式Runtime')
 _LOCK = RLock()
 
 
-def run_c7_engine(repo_path, source):
+def load_original_configuration_module(repo_path, module_name):
     root = Path(repo_path).resolve()
     verify(root)
     base = root / C_ROOT
@@ -26,9 +26,16 @@ def run_c7_engine(repo_path, source):
                     raise ValueError('C7_MODULE_ORIGIN_CONFLICT:' + name)
         sys.path.insert(0, str(base))
         try:
-            module = importlib.import_module('work7.asset_framework')
+            module = importlib.import_module(module_name)
         finally:
             sys.path.remove(str(base))
+    return module
+
+
+def run_c7_engine(repo_path, source):
+    root = Path(repo_path).resolve()
+    base = root / C_ROOT
+    module = load_original_configuration_module(root, 'work7.asset_framework')
     schemas = base / 'contracts_c7'
     data = deepcopy(source)
     result = module.run_asset_framework_integration(

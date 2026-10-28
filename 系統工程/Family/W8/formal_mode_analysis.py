@@ -63,9 +63,11 @@ def resolve_mode_context(root,*,up,right,left_price_conditions,fundamentals_viab
         'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
 
 
-def target_for_symbol(request,symbol):
+def target_for_symbol(request,symbol,*,projection=None):
     lines=request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('target_lines',[])
     found=[r for r in lines if r.get('ticker')==symbol]
+    if not found and projection and symbol in projection.get('targets',{}):
+        return deepcopy(projection['targets'][symbol]['target_amount'])
     if len(found)!=1:
         return {'value_state':'UNKNOWN','amount':None,'currency':None,
             'reason':'NO_UNIQUE_TARGET_FOR_THIS_SYMBOL_IN_CURRENT_APPROVED_ALLOCATION',
@@ -110,7 +112,7 @@ def event_coverage(request):
         'reason':'NEWS_ROWS_ARE_NOT_A_VERIFIED_NEGATIVE_EVENT_SEARCH_OR_COMPLETE_ACTIVE_EVENT_REGISTRY'}
 
 
-def build_formal_conclusion(root,row,request):
+def build_formal_conclusion(root,row,request,*,target_projection=None):
     dep,P,M=native(root);core=row['core_observation']['result'];market=row['market'];approved=market.get('approved_technical',{})
     technical=core['technical'];up=tri(technical['runaway_up']);right_technical=tri(technical['right_confirmation']);down=tri(technical['runaway_down'])
     valuation=core['valuation'];legal=True if valuation['formal_output_eligible'] else None
@@ -130,7 +132,7 @@ def build_formal_conclusion(root,row,request):
     uncontrollable_event_gap_clear=None
     left_safety=both(gate_clear,neg(down),credit_base,uncontrollable_event_gap_clear)
     right=both(right_technical,tri(approved.get('off_low')),fundamental,credit_right,neg(down),legal)
-    target=target_for_symbol(request,row['symbol'])
+    target=target_for_symbol(request,row['symbol'],projection=target_projection)
     price_conditions={'valuation_reasonable_or_cheap':value_zone,'price_map_zone':None,
         'near_confirmed_low':None,'near_important_ma_or_support':None,'meaningful_drawdown':None}
     stage_facts={'asset_identity':row['native_product_identity']['asset_type'] is not None,

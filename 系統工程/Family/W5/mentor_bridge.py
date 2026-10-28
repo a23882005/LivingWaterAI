@@ -148,7 +148,7 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
             order_note='本人已確認無掛單；當輪階段參考' if facts['recommendation'].get('order_source',{}).get('status')=='VERIFIED' else '尚未扣除有效掛單'
             text.append(f"按已確認持股計算的缺口 {facts['recommendation']['position_currency']} {component['positive_gap_amount']}（{order_note}）。")
         if facts.get('recommendation',{}).get('approved_no_new_buy'):
-            text.append('本人正式長期目標明訂0%，因此不新增；這是既有核准配置政策，不等於必須立即賣出，賣出金額仍需原生依據。')
+            text.append('原C依既有完整核准配置算出長期目標0%，因此此配置基準不新增；不是重新最佳化的提案，也不代表必須立即賣出。' if facts['recommendation'].get('approved_no_new_buy_source',{}).get('basis')=='ORIGINAL_C6_COMPLETE_APPROVED_TARGET_LOOKUP' else '本人正式長期目標明訂0%，因此不新增；這是既有核准配置政策，不等於必須立即賣出，賣出金額仍需原生依據。')
         native_funding=facts.get('native_funding_advice',{})
         if native_funding.get('status')=='CASH_TRIAL_ADVICE_COMPUTED':
             plan=native_funding['native_plan']

@@ -526,6 +526,27 @@ class NativeFundingAdviceTest(unittest.TestCase):
         self.assertIn('funding.equity_executable_budget_assignment',[x['field_path'] for x in item['issues']])
         self.assertNotIn('native_plan',item)
 
+    def test_official_opaque_instrument_key_maps_to_unique_native_ticker(self):
+        p,r,report,trial,investment,tactical=self.case()
+        r['confirmed_target']['payload']['draft']['target_lines'][0]['instrument_id']='OPAQUE_W1_KEY'
+        out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
+        item=out['items']['SYNTHETIC_QQQ']
+        self.assertEqual(item['status'],'CASH_TRIAL_ADVICE_COMPUTED',item['issues'])
+        targets=item['stock_request']['work3_handoff']['final_target']['payload']['instrument_targets']
+        self.assertEqual(targets['QQQ']['project_target_position'],'1000')
+        self.assertEqual(targets['OPAQUE_W1_KEY'],targets['QQQ'])
+
+    def test_two_roles_for_one_ticker_are_not_merged_into_native_target(self):
+        p,r,report,trial,investment,tactical=self.case()
+        lines=r['confirmed_target']['payload']['draft']['target_lines']
+        duplicate=deepcopy(lines[0]);duplicate['instrument_id']='SECOND_ROLE'
+        lines.append(duplicate)
+        out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
+        item=out['items']['SYNTHETIC_QQQ']
+        self.assertEqual(item['status'],'INPUT_UNAVAILABLE')
+        self.assertTrue(any(i['field_path']=='approved_project_target_amount' for i in item['issues']))
+        self.assertNotIn('native_plan',item)
+
 
 class ApprovedZeroTargetMappingTest(unittest.TestCase):
     def pack(self,paragraph):
@@ -651,3 +672,54 @@ class AbsentAccountDownstreamTest(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+from loop2_target_projection import produce as project_loop2_targets,validate as validate_loop2_projection
+from approved_target_input import build_approved_target_view,enrich_document_target_view
+
+class CompleteTargetProjectionTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        path=Path(self.tmp.name)/'approved.md'
+        path.write_text('| 標的 | 目標比例 | 目標金額（US$） |\n|---|---|---|\n| AAA | 60% | 600 |\n| BBB | 40% | 400 |\n')
+        client='fam_'+'a'*32
+        pack=build_approved_target_view(client_id=client,source_path=path,
+            source_reference='SYNTHETIC_APPROVED_FULL_ALLOCATION',source_available_at='2026-10-27T00:00:00Z',
+            target_version=1,allocation_version='SYNTHETIC',rows=[{'source_line':'| AAA | 60% | 600 |','weight':'0.6'},
+                {'source_line':'| BBB | 40% | 400 |','weight':'0.4'}],
+            mappings=[{'instrument_id':'AAA_ROLE','ticker':'AAA','asset_type':'股票ETF'},
+                {'instrument_id':'BBB_ROLE','ticker':'BBB','asset_type':'股票ETF'}])
+        target,proof=enrich_document_target_view(pack['target'],pack['trusted_approved_target_source'])
+        self.request={'client_id':client,'run_id':'SYNTHETIC_RUN','owner':{'client_id':client,'account':'SYNTHETIC'},
+            'client_snapshot':{'payload':{'source_sha256':'a'*64}},'confirmed_target':target}
+        self.context={'approved_document_target_source':proof}
+        self.policy={'schema_version':'Family.W8.CompleteTargetProjectionPolicy.v1','client_id':client,
+            'scope':'EXISTING_CONFIRMED_FULL_ALLOCATION_ONLY','source_reference':'SYNTHETIC_OWNER_EXISTING_TARGETS'}
+    def project(self):return project_loop2_targets(ROOT,self.request,self.context,self.policy,['AAA','NEW'])
+    def test_native_complete_target_lookup_preserves_approval_and_derives_only_missing_zero(self):
+        before=deepcopy((self.request,self.context));out=self.project()
+        self.assertEqual(out['status'],'SOURCE_BASELINE_PROJECTED')
+        self.assertNotIn('AAA',out['targets']);self.assertEqual(out['targets']['NEW']['weight']['value'],'0.0')
+        self.assertEqual(out['targets']['NEW']['target_amount']['amount'],'0.0')
+        self.assertEqual((self.request,self.context),before)
+        validate_loop2_projection(ROOT,self.request,self.context,{'loop2_target_projection':out})
+        out['targets']['NEW']['target_amount']['amount']='500';out['output_digest']=digest(out['targets'])
+        with self.assertRaisesRegex(PermissionError,'REPLAY_MISMATCH'):
+            validate_loop2_projection(ROOT,self.request,self.context,{'loop2_target_projection':out})
+    def test_incomplete_unknown_or_other_client_is_not_a_zero_target(self):
+        self.request['confirmed_target']['payload']['draft']['target_lines'].pop()
+        self.context['approved_document_target_source']['target_view_digest']=digest(self.request['confirmed_target'])
+        out=self.project();self.assertEqual(out['status'],'INCOMPLETE_SOURCE');self.assertEqual(out['targets'],{})
+        self.policy['client_id']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'POLICY_SCOPE_MISMATCH'):self.project()
+    def test_grouped_symbol_is_not_closed_world_absence(self):
+        self.request['confirmed_target']['payload']['draft']['target_lines'][0]['original_document_row']='| AAA + NEW | 60% | 600 |'
+        self.context['approved_document_target_source']['target_view_digest']=digest(self.request['confirmed_target'])
+        out=self.project();self.assertNotIn('NEW',out['targets'])
+        self.assertEqual(out['issues'][0]['code'],'GROUPED_TARGET_MAPPING_REQUIRED')
+    def test_unknown_budget_currency_remains_unknown_money(self):
+        self.request['confirmed_target']['payload']['draft']['denominator']={'value_state':'UNKNOWN','amount':None,'currency':None}
+        self.context['approved_document_target_source']['target_view_digest']=digest(self.request['confirmed_target'])
+        out=self.project();money=out['targets']['NEW']['target_amount']
+        self.assertEqual(out['targets']['NEW']['weight']['value'],'0.0')
+        self.assertEqual(money['value_state'],'UNKNOWN');self.assertIsNone(money['amount']);self.assertIsNone(money['currency'])

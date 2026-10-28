@@ -13,7 +13,7 @@ LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive
     'dif_up':'DIF上彎','rsi_improving_or_near_50':'RSI改善／接近50'}
 
 
-def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=None,fx_observation=None):
+def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=None,fx_observation=None,target_projection=None):
     market=row.get('market') or {};core=(row.get('core_observation') or {}).get('result',{})
     conclusion=row.get('formal_conclusion') or {};approved=market.get('approved_technical') or {}
     metrics=deepcopy(row.get('valuation_observations',[]));valuation=deepcopy(core.get('valuation',{}))
@@ -22,9 +22,9 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     right_true=[s['name'] for s in groups.get('right_signals',[]) if s['truth']=='TRUE']
     current=next((m for m in metrics if m.get('metric_name')==valuation.get('primary_metric')),None)
     from formal_mode_analysis import target_for_symbol
-    judgment=current_judgment(row,repo_root,approved_target=target_for_symbol(request,row['symbol']))
+    judgment=current_judgment(row,repo_root,approved_target=target_for_symbol(request,row['symbol'],projection=target_projection))
     recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment,
-        approved_target=target_for_symbol(request,row['symbol']),fx_observation=fx_observation,request=request)
+        approved_target=target_for_symbol(request,row['symbol'],projection=target_projection),fx_observation=fx_observation,request=request)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -43,7 +43,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     # Structural readiness does not delete dated issuer values/composition.
     structure['available_issuer_facts']={k:deepcopy(facts[k]) for k in
         ('as_of','source_url','stock_count','benchmark','top_ten_weight_pct','regions_pct','metrics') if k in facts}
-    target=deepcopy(target_for_symbol(request,row['symbol']))
+    target=deepcopy(target_for_symbol(request,row['symbol'],projection=target_projection))
     policy_status=('NOT_SET_IN_BOUND_APPROVED_SOURCE' if not
         request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('etf_constraints',{}).get(row['symbol'])
         else 'SEE_SOURCE_LEAF_RESULTS')
@@ -51,11 +51,13 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     target_lines=request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('target_lines',[])
     matching=[line for line in target_lines if line.get('ticker')==row['symbol']]
     allocation_weight=deepcopy(matching[0].get('weight')) if len(matching)==1 else None
+    if allocation_weight is None and target_projection:
+        allocation_weight=deepcopy(target_projection.get('targets',{}).get(row['symbol'],{}).get('weight'))
     # The long-term allocation and native stage rate have different denominators.
     # Never turn the latter into a newly approved portfolio weight.
     long_term={'scope':'LONG_TERM_PORTFOLIO_ALLOCATION',
         'weight':allocation_weight,'target_amount':deepcopy(target),
-        'status':'SOURCE_BOUND' if target.get('value_state')=='KNOWN' else 'LOOP2_TARGET_PRODUCER_PENDING',
+        'status':('ORIGINAL_C6_BASELINE_DERIVED' if target.get('basis')=='ORIGINAL_C6_COMPLETE_APPROVED_TARGET_LOOKUP' else 'SOURCE_BOUND') if target.get('value_state')=='KNOWN' else 'LOOP2_TARGET_PRODUCER_PENDING',
         'owner_input_required':False,'does_not_infer_zero_from_absence':True}
     round_target={'scope':'CURRENT_ROUND_NATIVE_STAGE_REFERENCE',
         'mode':judgment['mode'],'stage':judgment['stage_reference'],

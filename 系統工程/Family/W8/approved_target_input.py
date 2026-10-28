@@ -214,7 +214,7 @@ def bind_document_account_scope(snapshot, target_pack, *, account_key, broker,
 
 
 def bind_official_holdings(snapshot, *, official_file_id, account_key,
-                          owner_decision, evaluation_at):
+                          owner_decision, evaluation_at,previous_snapshot=None):
     """Apply an operator-recorded Owner decision to the existing official DB.
 
     The decision is trusted executor context, not a menu payload. It accepts
@@ -224,6 +224,10 @@ def bind_official_holdings(snapshot, *, official_file_id, account_key,
     """
     client=snapshot.get('client_id')
     decision=deepcopy(owner_decision)
+    if previous_snapshot is not None:
+        return rebind_unchanged_official_holdings(snapshot,previous_snapshot,
+            official_file_id=official_file_id,account_key=account_key,
+            owner_decision=decision,evaluation_at=evaluation_at)
     if (snapshot.get('schema_version')!='Family.W5.W1Snapshot.v1'
         or snapshot.get('data_provenance')!='SOURCE_BACKED'
         or snapshot.get('payload_digest')!=_digest(snapshot.get('tables'))
@@ -254,3 +258,85 @@ def bind_official_holdings(snapshot, *, official_file_id, account_key,
         'owner_decision':decision,'owner_decision_digest':_digest(decision),
         'holdings_status':'OFFICIAL','cash_settlement_asserted':False,
         'database_written':False,'trade_authorization':'NONE'}
+
+
+def rebind_unchanged_official_holdings(snapshot,previous_snapshot,*,official_file_id,
+                                     account_key,owner_decision,evaluation_at):
+    """Keep the original acceptance only when its actual holdings still match.
+
+    Later target/registry updates do not constitute a new owner decision.
+    Preserve the original decision bytes and time, and record both versions.
+    A changed sealed intake, quantity, identity, or account requires its own
+    source review; updating only the old decision's DB hash is never allowed.
+    """
+    from decimal import Decimal
+    previous=bind_official_holdings(previous_snapshot,official_file_id=official_file_id,
+        account_key=account_key,owner_decision=owner_decision,evaluation_at=evaluation_at)
+    if (snapshot.get('client_id')!=previous_snapshot['client_id']
+        or snapshot.get('schema_version')!=previous_snapshot['schema_version']
+        or snapshot.get('data_provenance')!='SOURCE_BACKED'
+        or snapshot.get('payload_digest')!=_digest(snapshot.get('tables'))
+        or not re.fullmatch(r'[0-9a-f]{64}',str(snapshot.get('source_sha256','')))):
+        raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_SNAPSHOT_MISMATCH')
+    for table in ('portfolio_snapshot_run','portfolio_snapshot_item','portfolio_snapshot_lineage'):
+        if snapshot['tables'].get(table)!=previous_snapshot['tables'].get(table):
+            raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_CHANGED')
+    from official_holdings_source import project_official_holdings
+    old=project_official_holdings(previous_snapshot,evaluation_at=evaluation_at)
+    current=project_official_holdings(snapshot,evaluation_at=evaluation_at)
+    if old['source_layer_conflicts'] or current['source_layer_conflicts']:
+        raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_CONFLICT')
+    old_accounts=[r for r in previous_snapshot['tables']['portfolio_account'] if r['account_key']==account_key]
+    accounts=[r for r in snapshot['tables']['portfolio_account'] if r['account_key']==account_key]
+    if len(old_accounts)!=1 or len(accounts)!=1 or any(
+            accounts[0].get(k)!=old_accounts[0].get(k) for k in ('client_id','account_key','account_currency')):
+        raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_ACCOUNT_CHANGED')
+    # Original sealed quantities are accepted facts. New formal ledger rows
+    # may make them explicit, but cannot silently add/change a holding.
+    expected={}
+    for row in old['analysis_security_positions']:
+        if row['source_kind']=='SEALED_W6' and row.get('broker_label')!='IB':continue
+        if row['source_kind']=='OWNER_SCREENSHOT_SOURCE':
+            markers=[r for r in previous_snapshot['tables']['portfolio_snapshot_item']
+                if r.get('run_id')==row['source_run_id']
+                and r.get('domain_code')=='OWNER_SCREENSHOT_SOURCE'
+                and r.get('field_key')=='broker_account_number'
+                and r.get('entity_key')=='IB_SCREEN']
+            if len(markers)!=1:raise PermissionError('OFFICIAL_HOLDINGS_ORIGINAL_BROKER_SOURCE_REQUIRED')
+        symbol=row['symbol']
+        if symbol in expected or row['quantity'] is None:
+            raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_AMBIGUOUS')
+        expected[symbol]=Decimal(row['quantity'])
+    ledger={}
+    for row in current['ledger_positions']:
+        if row['account_key']!=account_key:continue
+        symbol=row['symbol'];at=datetime.fromisoformat(row['observed_at'].replace('Z','+00:00'))
+        prior_at=(datetime.fromisoformat(ledger[symbol]['observed_at'].replace('Z','+00:00'))
+            if symbol in ledger else None)
+        if prior_at is None or at>prior_at:ledger[symbol]=row
+        elif at==prior_at and row!=ledger[symbol]:
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_POSITION_AMBIGUOUS')
+    # Legacy ledger symbols already represented in the accepted sealed layer
+    # can retain older quantities. A later OWNER_VERIFIED row must agree.
+    for symbol,row in ledger.items():
+        if symbol not in expected:
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_ADDED_POSITION')
+        if row['source_row'].get('position_source_kind')=='OWNER_VERIFIED' and (
+                row['quantity'] is None or Decimal(row['quantity'])!=expected[symbol]):
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_QUANTITY_CHANGED')
+    prior_registry={r['ticker']:r for r in previous_snapshot['tables']['portfolio_instrument']}
+    for symbol,old_row in prior_registry.items():
+        new=[r for r in snapshot['tables']['portfolio_instrument'] if r.get('ticker')==symbol]
+        if len(new)!=1 or any(old_row.get(k) is not None and new[0].get(k)!=old_row[k]
+                for k in ('instrument_key','instrument_type','ticker','quote_currency','exchange_code','isin')):
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_IDENTITY_CHANGED')
+    result=deepcopy(previous)
+    result.update(snapshot_digest=snapshot['payload_digest'],source_db_sha256=snapshot['source_sha256'])
+    result['snapshot_rebinding']={'schema_version':'Family.W8.UnchangedHoldingsRebinding.v1',
+        'previous_source_db_sha256':previous_snapshot['source_sha256'],
+        'previous_snapshot_digest':_digest(previous_snapshot),
+        'current_snapshot_digest':_digest(snapshot),
+        'accepted_source_digest':_digest({k:previous_snapshot['tables'].get(k) for k in
+            ('portfolio_snapshot_run','portfolio_snapshot_item','portfolio_snapshot_lineage')}),
+        'original_decision_unchanged':True,'new_owner_approval_asserted':False}
+    return result

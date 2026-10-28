@@ -60,7 +60,8 @@ def classification(symbol, source, product_source=None):
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
-    if product_source is None and symbol in ('SOXX','SMH','PPH'):
+    if (product_source is None and symbol in ('SOXX','SMH','PPH')
+        and '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' in text):
         identity_path=HERE/(symbol+'_product_identity.json')
         if identity_path.is_file():
             product_source={'local_path':str(identity_path),
@@ -83,7 +84,7 @@ def classification(symbol, source, product_source=None):
                 or product.get('is_stock_etf') is not True or product.get('is_single_industry') is not True
                 or product.get('evidence_kind')!='OFFICIAL_ISSUER_PRODUCT_PAGE'
                 or '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' not in text):
-                raise ValueError('INDEPENDENT_INDUSTRY_ETF_IDENTITY_REQUIRED')
+                raise ValueError('INDEPENDENT_INDUSTRY_ETF_STRUCTURE_EVIDENCE_REQUIRED')
             framework=('SOXX（iShares Semiconductor ETF）專屬半導體框架' if symbol=='SOXX'
                 else '第四十七章｜PPH型' if symbol=='PPH' else None)
             if framework is not None and framework not in text:raise ValueError('FORMAL_INDUSTRY_FRAMEWORK_REQUIRED')

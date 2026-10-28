@@ -207,7 +207,7 @@ class HoldingAnalysisTest(unittest.TestCase):
             self.assertEqual(identity['asset_grade'],'C')
             self.assertNotIn('V82_GLOBAL_ETF_CORE',identity['analysis_capabilities'])
         wrong=HERE/'PPH_product_identity.json'
-        with self.assertRaisesRegex(ValueError,'INDEPENDENT_INDUSTRY_ETF_IDENTITY_REQUIRED'):
+        with self.assertRaisesRegex(ValueError,'INDEPENDENT_INDUSTRY_ETF_STRUCTURE_EVIDENCE_REQUIRED'):
             M.classification('SOXX',source,{'local_path':str(wrong),
                 'sha256':hashlib.sha256(wrong.read_bytes()).hexdigest()})
 

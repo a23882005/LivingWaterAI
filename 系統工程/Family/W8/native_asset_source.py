@@ -100,6 +100,10 @@ def classification(symbol, source, product_source=None):
                 result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD']
                 result['valuation_rule_source']='V82.md §32.8 Semiconductor'
                 if result['primary_framework'] is None:result['primary_framework']='V82.md §32.8 Semiconductor'
+            if (symbol=='PPH' and '製藥／醫療ETF：Forward P/E → EV/EBITDA → FCF Yield' in text):
+                result['analysis_capabilities'].append('V82_HEALTHCARE_CORE')
+                result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','FCF_YIELD']
+                result['valuation_rule_source']='V82.md §32.6 Healthcare ETF'
             return result
         if symbol=='QQQ':
             if (product.get('symbol')!='QQQ' or product.get('source_url')!='https://www.invesco.com/qqq-etf/en/about.html'

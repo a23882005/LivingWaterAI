@@ -222,6 +222,13 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(metrics[0]['current'],'12')
         self.assertEqual(metrics[0]['metric_name'],'EV_EBITDA')
 
+        p.write_text(p.read_text()+'\n製藥／醫療ETF：Forward P/E → EV/EBITDA → FCF Yield\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        self.position['source_instrument']['ticker']='PPH'
+        healthcare=self.report()['analysis_result']['positions'][0]
+        self.assertEqual(healthcare['native_product_identity']['engine_route'],'V82_HEALTHCARE_CORE')
+        self.assertEqual(healthcare['core_observation']['actual_inputs']['valuation_waterfall'],
+            ['FORWARD_PE','EV_EBITDA','FCF_YIELD'])
         wrong=HERE/'PPH_product_identity.json'
         with self.assertRaisesRegex(ValueError,'INDEPENDENT_INDUSTRY_ETF_STRUCTURE_EVIDENCE_REQUIRED'):
             M.classification('SOXX',source,{'local_path':str(wrong),

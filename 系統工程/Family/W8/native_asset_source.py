@@ -60,12 +60,40 @@ def classification(symbol, source, product_source=None):
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
+    if product_source is None and symbol in ('SOXX','SMH','PPH'):
+        identity_path=HERE/(symbol+'_product_identity.json')
+        if identity_path.is_file():
+            product_source={'local_path':str(identity_path),
+                'sha256':sha256(identity_path.read_bytes()).hexdigest()}
     if product_source is not None:
         raw=Path(product_source['local_path']).read_bytes()
         if sha256(raw).hexdigest()!=product_source['sha256']:
             raise ValueError('PRODUCT_STRUCTURE_SOURCE_CHANGED')
         product=json.loads(raw)
         facts=product.get('excerpts',[])
+        industry_contracts={
+            'SOXX':('iShares Semiconductor ETF','https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf','semiconductor industry'),
+            'SMH':('VanEck Semiconductor ETF','https://www.vaneck.com/us/en/investments/semiconductor-etf-smh/overview/','semiconductor industry'),
+            'PPH':('VanEck Pharmaceutical ETF','https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph/overview/','pharmaceutical industry')}
+        if symbol in industry_contracts:
+            name,url,focus=industry_contracts[symbol]
+            if (product.get('schema_version')!='Family.W8.PublicIssuerIdentity.v1'
+                or product.get('symbol')!=symbol or product.get('fund_name')!=name
+                or product.get('source_url')!=url or product.get('industry_focus')!=focus
+                or product.get('is_stock_etf') is not True or product.get('is_single_industry') is not True
+                or product.get('evidence_kind')!='OFFICIAL_ISSUER_PRODUCT_PAGE'
+                or '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' not in text):
+                raise ValueError('INDEPENDENT_INDUSTRY_ETF_IDENTITY_REQUIRED')
+            framework=('SOXX（iShares Semiconductor ETF）專屬半導體框架' if symbol=='SOXX'
+                else '第四十七章｜PPH型' if symbol=='PPH' else None)
+            if framework is not None and framework not in text:raise ValueError('FORMAL_INDUSTRY_FRAMEWORK_REQUIRED')
+            result.update(asset_type='INDUSTRY_ETF',asset_grade='C',primary_framework=framework,
+                grade_evidence={'rule':'V82.md Canonical Asset Grade §2.1',
+                    'source_url':url,'source_sha256':product_source['sha256'],
+                    'facts':{'fund_name':name,'industry_focus':focus},
+                    'basis':'INDEPENDENT_ISSUER_INDUSTRY_ETF__NOT_BROAD_ETF_IDENTITY'})
+            result['analysis_capabilities']=['V82_TECHNICAL_OBSERVATIONS']
+            return result
         if symbol=='QQQ':
             if (product.get('symbol')!='QQQ' or product.get('source_url')!='https://www.invesco.com/qqq-etf/en/about.html'
                 or 'Nasdaq-100 Index' not in facts or '100 largest non-financial companies listed on the Nasdaq' not in facts

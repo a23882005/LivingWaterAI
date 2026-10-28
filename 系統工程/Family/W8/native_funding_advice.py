@@ -110,13 +110,14 @@ def build(producer,request,report,*,trial,investment,tactical):
             'full_native_canonical_complete':False,'trade_action':'NO_TRADE','issues':[]}
         results[row['instrument_id']]=out
         missing=[]
-        if not row.get('core_observation'):missing.append('native_product_identity.asset_type_and_core')
+        if not row.get('core_observation'):missing.append('native_product_identity.core_route' if identity.get('asset_type') is not None else 'native_product_identity.asset_type_and_core')
         if symbol not in converted or converted[symbol]['project_target_position'] is None:missing.append('approved_project_target_amount')
         if identity.get('asset_type') is None:missing.append('native_product_identity.asset_type')
         if identity.get('asset_grade')=='UNKNOWN':missing.append('native_product_identity.asset_grade')
         if budget is None:missing.append('funding.equity_executable_budget_assignment')
         if missing:
-            out['issues']=[{'field_path':f,'code':'REQUIRED_SOURCE_UNAVAILABLE'} for f in missing];continue
+            out['issues']=[{'field_path':f,'code':('NATIVE_CORE_PRODUCER_NOT_CONNECTED' if f=='native_product_identity.core_route' else 'LOOP2_TARGET_PRODUCER_REQUIRED' if f=='approved_project_target_amount' else 'REQUIRED_SOURCE_UNAVAILABLE'),
+                **({'owner_input_required':False} if f in ('native_product_identity.core_route','approved_project_target_amount') else {})} for f in missing];continue
         function='C8C9.Work3.build_context_handoff'
         try:
             out['call_trace'].append(function);out['work3_input']=deepcopy(work3_input)

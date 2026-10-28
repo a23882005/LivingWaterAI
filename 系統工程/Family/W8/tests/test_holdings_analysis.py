@@ -196,6 +196,21 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(known['kd_golden_cross'],'UNKNOWN')
         self.assertFalse(formal['reduction_candidates_used'])
 
+    def test_industry_etfs_use_independent_issuer_identity_and_keep_their_own_route(self):
+        source=self.producer.class_source;p=Path(source['local_path'])
+        p.write_text(p.read_text()+'\n`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`\n'+
+            'SOXX（iShares Semiconductor ETF）專屬半導體框架\n第四十七章｜PPH型\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        for symbol in ('SOXX','SMH','PPH'):
+            identity=M.classification(symbol,source)
+            self.assertEqual(identity['asset_type'],'INDUSTRY_ETF')
+            self.assertEqual(identity['asset_grade'],'C')
+            self.assertNotIn('V82_GLOBAL_ETF_CORE',identity['analysis_capabilities'])
+        wrong=HERE/'PPH_product_identity.json'
+        with self.assertRaisesRegex(ValueError,'INDEPENDENT_INDUSTRY_ETF_IDENTITY_REQUIRED'):
+            M.classification('SOXX',source,{'local_path':str(wrong),
+                'sha256':hashlib.sha256(wrong.read_bytes()).hexdigest()})
+
     def test_owner_no_orders_propagates_to_report_and_mentor_without_guessing_judgment(self):
         self.producer.order_confirmation={'schema_version':'Family.W8.OwnerNoOpenOrders.v1',
             'client_id':self.client,'owner':deepcopy(self.owner),'no_open_orders':True,

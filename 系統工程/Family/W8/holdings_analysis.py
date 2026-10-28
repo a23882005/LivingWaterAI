@@ -353,8 +353,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     row['source_refs'].append({'source_kind':'ISSUER_FACTS','sha256':issuer['source_sha256'],
                         'source_reference':issuer['source_url'],'observed_at':issuer['as_of']})
             elif not observed['v75_original_predicates']:
-                problems.append(issue('native_product_identity.asset_type',
-                    'Registry product identity does not establish approved native subtype/grade; technical components are asset-independent',
+                problems.append(issue('native_product_identity.core_route' if cls['asset_type'] is not None else 'native_product_identity.asset_type',
+                    'Product-specific Core producer is not connected' if cls['asset_type'] is not None else 'Registry product identity does not establish approved native subtype/grade; technical components are asset-independent',
                     'Full product-specific Core judgement is not invoked; original technical aggregation is retained',category=1))
             if cls['primary_class']=='UNKNOWN':
                 problems.append(issue('scenario_class','No approved Sxx membership for this instrument in the explicit mapping',

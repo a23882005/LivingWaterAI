@@ -13,7 +13,7 @@ LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive
     'dif_up':'DIF上彎','rsi_improving_or_near_50':'RSI改善／接近50'}
 
 
-def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=None):
+def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=None,fx_observation=None):
     market=row.get('market') or {};core=(row.get('core_observation') or {}).get('result',{})
     conclusion=row.get('formal_conclusion') or {};approved=market.get('approved_technical') or {}
     metrics=deepcopy(row.get('valuation_observations',[]));valuation=deepcopy(core.get('valuation',{}))
@@ -24,7 +24,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     judgment=current_judgment(row,repo_root)
     from formal_mode_analysis import target_for_symbol
     recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment,
-        approved_target=target_for_symbol(request,row['symbol']))
+        approved_target=target_for_symbol(request,row['symbol']),fx_observation=fx_observation)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
     dependencies={
         'Base':['fundamentals_long_term_viable','credit/safety','higher_priority_mode_resolution'],
@@ -163,19 +163,22 @@ def current_judgment(row,repo_root):
         'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
 
 
-def source_target_in_currency(target,currency):
+def source_target_in_currency(target,currency,fx_observation=None):
     """Use an explicitly approved money column, never an inferred FX rate."""
     if target.get('value_state')!='KNOWN':return None
     if target.get('currency')==currency:return {'amount':target['amount'],'currency':currency,'source_column':target.get('source_column')}
     if currency!='USD':return None
     matches=re.findall(r'US\$\s*([0-9][0-9,]*(?:\.[0-9]+)?)',target.get('source_row',''))
-    if len(matches)!=1:return None
+    if len(matches)!=1:
+        from fx_conversion import convert
+        value=convert(target['amount'],target.get('currency'),currency,fx_observation)
+        return {'amount':str(value),'currency':currency,'source_column':'DATED_PUBLIC_FX_CONVERSION','fx_observation':deepcopy(fx_observation)} if value is not None else None
     return {'amount':matches[0].replace(',',''),'currency':'USD',
         'source_column':'EXPLICIT_APPROVED_USD_COLUMN','source_row':target['source_row'],
         'fx_inferred':False}
 
 
-def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None,approved_target=None):
+def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=None,approved_target=None,fx_observation=None):
     """Present native gap math as advice, independently of order submission.
 
     Unknown orders stay unknown. A confirmed-position gap is computed with no
@@ -197,7 +200,7 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     if amount is None:missing.append('approved_project_target_amount')
     rate=judgment.get('target_rate_reference')
     if rate is None:missing.append('native_mode_and_stage_target_rate')
-    calculation_target=source_target_in_currency(target,currency)
+    calculation_target=source_target_in_currency(target,currency,fx_observation)
     same_currency=calculation_target is not None
     if amount is not None and not same_currency:missing.append('target_to_position_currency_FX')
     # The formal reconciled result is authoritative when actually computed.

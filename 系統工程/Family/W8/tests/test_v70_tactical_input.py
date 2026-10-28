@@ -27,6 +27,13 @@ class V70ComponentTest(unittest.TestCase):
         self.assertEqual(b['allocation']['S0'],60)
         self.assertNotEqual(a['allocation']['sTot'],b['allocation']['sTot'])
         self.assertEqual(a['allocation']['cTot'],b['allocation']['cTot'])
+    def test_public_fx_binds_native_currency_without_changing_source_base(self):
+        fx={'base_currency':'USD','quote_currency':'TWD','quote_per_base':'32','as_of':'2026-10-27','source_url':'https://example.test/fx'}
+        out=calculate(ROOT,self.request,self.policy,fx)
+        self.assertIsNone(out['native_currency_issue'])
+        for k,value in out['native_currency_amounts'].items():self.assertEqual(Decimal(value)*32,Decimal(out['amounts'][k]))
+        self.assertEqual(out['allocation_base']['currency'],'TWD')
+
     def test_cross_owner_rejected_and_absent_policy_not_inferred(self):
         self.assertIsNone(calculate(ROOT,self.request,None))
         with self.assertRaises(PermissionError):calculate(ROOT,self.request,{**self.policy,'client_id':'OTHER'})

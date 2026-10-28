@@ -5,7 +5,7 @@ from pathlib import Path
 import hashlib,json,subprocess
 
 
-def calculate(root,request,policy):
+def calculate(root,request,policy,fx_observation=None):
     if not policy:return None
     if policy.get('client_id')!=request['client_id'] or not policy.get('source_reference'):
         raise PermissionError('V70_STRATEGIC_POLICY_OWNER_REQUIRED')
@@ -21,9 +21,12 @@ def calculate(root,request,policy):
     if base.get('value_state')!='KNOWN':raise ValueError('V70_APPROVED_ALLOCATION_BASE_REQUIRED')
     amounts={k:str(Decimal(base['amount'])*Decimal(str(result['allocation'][field]))/100)
         for k,field in [('stock','sTot'),('bond','bTot'),('dry_powder','cTot')]}
+    from fx_conversion import convert
+    converted={k:convert(v,base['currency'],request['owner']['currency'],fx_observation) for k,v in amounts.items()}
+    native_amounts={k:str(v) for k,v in converted.items()} if all(v is not None for v in converted.values()) else None
     result.update(approved_strategic_source=deepcopy(policy),allocation_base=deepcopy(base),
         amount_basis='APPROVED_ALLOCATION_BASE__NOT_CURRENT_MARKET_NAV',currency=base['currency'],amounts=amounts,
         native_execution_currency=request['owner']['currency'],
-        native_currency_amounts=amounts if base['currency']==request['owner']['currency'] else None,
-        native_currency_issue=None if base['currency']==request['owner']['currency'] else 'V70_TACTICAL_BUDGET_FX_REQUIRED')
+        native_currency_amounts=native_amounts,fx_observation=deepcopy(fx_observation),
+        native_currency_issue=None if native_amounts is not None else 'V70_TACTICAL_BUDGET_FX_REQUIRED')
     return result

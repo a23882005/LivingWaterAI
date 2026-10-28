@@ -186,7 +186,7 @@ def explain(row):
     return text
 
 
-def build_analysis_report(producer,request,context,prepared,holdings,observations,trial,investment=None,tactical=None):
+def build_analysis_report(producer,request,context,prepared,holdings,observations,trial,investment=None,tactical=None,fx_observation=None):
     from native_asset_source import classification
     by_symbol={row['symbol']:row for row in observations['assets']}
     missing={row.get('symbol'):row for row in observations['missing']}
@@ -342,7 +342,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
-        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial,investment=investment,tactical=tactical)
+        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root,cash_trial=trial,investment=investment,tactical=tactical,fx_observation=fx_observation)
         row['call_trace']+=row['current_analysis']['recommendation']['call_trace']
         row['analysis_explanation']=row['current_analysis']['readable_analysis'];rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])

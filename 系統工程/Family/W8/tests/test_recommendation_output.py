@@ -39,6 +39,17 @@ class RecommendationOutputTest(unittest.TestCase):
         self.assertNotIn('target_to_position_currency_FX',out['missing_fields'])
         self.assertEqual(out['confirmed_holdings_component']['positive_gap_amount'],'450.0000')
 
+    def test_public_fx_enables_original_confirmed_holdings_gap_without_clearing_orders(self):
+        from current_analysis_delivery import recommendation_amounts
+        target=self.row['formal_conclusion']['approved_project_target']
+        target.update(currency='TWD',amount='32000')
+        fx={'base_currency':'USD','quote_currency':'TWD','quote_per_base':'32','as_of':'2026-10-27','source_url':'https://example.test/fx'}
+        out=recommendation_amounts(self.row,self.judgment,ROOT,fx_observation=fx)
+        self.assertEqual(out['confirmed_holdings_component']['positive_gap_amount'],'450.00')
+        self.assertNotIn('target_to_position_currency_FX',out['missing_fields'])
+        self.assertIn('active_orders_and_fill_reconciliation',out['missing_fields'])
+        self.assertIsNone(out['buy_gap_amount'])
+
     def test_cross_currency_is_not_subtracted_without_fx(self):
         self.row['formal_conclusion']['approved_project_target']['currency']='TWD'
         out=self.compute()

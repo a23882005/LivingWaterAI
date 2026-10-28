@@ -103,9 +103,9 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     if market.get('numeric'):
         n=market['numeric'];text += [f"來源收盤 {market['observed_close']}；MA20 {n.get('ma20')}，RSI14 {n.get('rsi14')}，ATR14 {n.get('atr14')}。"]
     if current:
-        text += [f"估值：{current['metric_name']} {current['current']}，資料日 {current.get('as_of')}，原V82判斷 {valuation['level']}。"]
+        text += [f"估值：{current['metric_name']} {current['current']}，來源日期 {current.get('as_of')}，原V82判斷 {valuation['level']}。"]
         if current.get('current_source_accepted'):
-            text += ['採用總經端已核對發布的近期輸入作當下分析；原始發布時間與有效期未補造，此結果不作歷史已知證據。']
+            text += [('採用已核對的當前來源觀測作分析；觀測日不冒充原始財報／發布日期，此結果不作歷史已知證據。' if current.get('as_of_basis') else '採用總經端已核對發布的近期輸入作當下分析；原始發布時間與有效期未補造，此結果不作歷史已知證據。')]
     elif metrics:text += ['估值數值已列出；尚無能合法分級的主指標，未把Trailing PE當Forward PE或套用相同門檻。']
     if tech:
         text += [f"原技術判斷：Right確認 {tech.get('right_confirmation','UNKNOWN')}，Runaway Up {tech.get('runaway_up','UNKNOWN')}，Runaway Down {tech.get('runaway_down','UNKNOWN')}。"]

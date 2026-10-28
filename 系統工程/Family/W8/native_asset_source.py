@@ -56,16 +56,19 @@ def classification(symbol, source, product_source=None):
     framework='第四十九章｜VT／VWRA型' if index==0 else '第四十六章｜QQQ型' if symbol=='QQQ' else None
     if framework and '# '+framework not in text:
         raise ValueError('FORMAL_FRAMEWORK_NOT_IN_SOURCE')
-    result={'primary_class':name,'primary_framework':framework,
+    result={'symbol':symbol,'primary_class':name,'primary_framework':framework,
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
-    if (product_source is None and symbol in ('SOXX','SMH','PPH')
+    if (product_source is None and symbol in ('SOXX','SMH','PPH','NATO')
         and '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' in text):
         identity_path=HERE/(symbol+'_product_identity.json')
         if identity_path.is_file():
             product_source={'local_path':str(identity_path),
                 'sha256':sha256(identity_path.read_bytes()).hexdigest()}
+    if (product_source is None and symbol=='VALU' and '廣泛分散核心市場結構 → `A`' in text):
+        identity_path=HERE/'VALU_product_identity.json'
+        if identity_path.is_file():product_source={'local_path':str(identity_path),'sha256':sha256(identity_path.read_bytes()).hexdigest()}
     if product_source is not None:
         raw=Path(product_source['local_path']).read_bytes()
         if sha256(raw).hexdigest()!=product_source['sha256']:
@@ -75,24 +78,27 @@ def classification(symbol, source, product_source=None):
         industry_contracts={
             'SOXX':('iShares Semiconductor ETF','https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf','semiconductor industry'),
             'SMH':('VanEck Semiconductor ETF','https://www.vaneck.com/us/en/investments/semiconductor-etf-smh/overview/','semiconductor industry'),
-            'PPH':('VanEck Pharmaceutical ETF','https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph/overview/','pharmaceutical industry')}
+            'PPH':('VanEck Pharmaceutical ETF','https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph/overview/','pharmaceutical industry'),
+            'NATO':('Future of Defence UCITS ETF','https://hanetf.com/fund/nato-future-of-defence-etf/','defence and cyber defence theme')}
         if symbol in industry_contracts:
             name,url,focus=industry_contracts[symbol]
             if (product.get('schema_version')!='Family.W8.PublicIssuerIdentity.v1'
                 or product.get('symbol')!=symbol or product.get('fund_name')!=name
                 or product.get('source_url')!=url or product.get('industry_focus')!=focus
-                or product.get('is_stock_etf') is not True or product.get('is_single_industry') is not True
+                or (symbol=='NATO' and product.get('isin')!='IE000OJ5TQP4')
+                or product.get('is_stock_etf') is not True
+                or (product.get('is_thematic') is not True if symbol=='NATO' else product.get('is_single_industry') is not True)
                 or product.get('evidence_kind')!='OFFICIAL_ISSUER_PRODUCT_PAGE'
                 or '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' not in text):
                 raise ValueError('INDEPENDENT_INDUSTRY_ETF_STRUCTURE_EVIDENCE_REQUIRED')
             framework=('SOXX（iShares Semiconductor ETF）專屬半導體框架' if symbol=='SOXX'
-                else '第四十七章｜PPH型' if symbol=='PPH' else None)
+                else '第四十七章｜PPH型' if symbol=='PPH' else '第五十二章｜國防／航太／軍工型' if symbol=='NATO' else None)
             if framework is not None and framework not in text:raise ValueError('FORMAL_INDUSTRY_FRAMEWORK_REQUIRED')
-            result.update(asset_type='INDUSTRY_ETF',asset_grade='C',primary_framework=framework,
+            result.update(asset_type='THEME_ETF' if symbol=='NATO' else 'INDUSTRY_ETF',asset_grade='C',primary_framework=framework,
                 grade_evidence={'rule':'V82.md Canonical Asset Grade §2.1',
                     'source_url':url,'source_sha256':product_source['sha256'],
                     'facts':{'fund_name':name,'industry_focus':focus},
-                    'basis':'INDEPENDENT_ISSUER_INDUSTRY_ETF__NOT_BROAD_ETF_IDENTITY'})
+                    'basis':'INDEPENDENT_ISSUER_SPECIALIZED_EQUITY_ETF__NOT_BROAD_ETF_IDENTITY'})
             result['analysis_capabilities']=['V82_TECHNICAL_OBSERVATIONS']
             if (symbol in ('SOXX','SMH') and '## 32.8 Semiconductor｜半導體' in text
                 and 'Forward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield' in text):
@@ -104,6 +110,11 @@ def classification(symbol, source, product_source=None):
                 result['analysis_capabilities'].append('V82_HEALTHCARE_CORE')
                 result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','FCF_YIELD']
                 result['valuation_rule_source']='V82.md §32.6 Healthcare ETF'
+            if (symbol=='NATO' and '## 32.9 Defense｜國防軍工' in text
+                and 'Forward P/E → EV/EBITDA → FCF Yield → EV/Sales' in text):
+                result['analysis_capabilities'].append('V82_DEFENCE_CORE')
+                result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','FCF_YIELD','EV_SALES']
+                result['valuation_rule_source']='V82.md §32.9 Defence'
             return result
         if symbol=='QQQ':
             if (product.get('symbol')!='QQQ' or product.get('source_url')!='https://www.invesco.com/qqq-etf/en/about.html'
@@ -117,6 +128,9 @@ def classification(symbol, source, product_source=None):
             result['analysis_capabilities']=['V82_QQQ_CORE']
             return result
         contracts={
+            'VALU':('https://www.vanguard.co.uk/professional/product/etf/equity/E161/ftse-global-all-cap-ucits-etf-usd-acc.html',
+                ('FTSE Global All Cap Index','passive management','physical acquisition',
+                 'large-, mid-, and small-cap stocks','developed and emerging markets')),
             'VT':('https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf',
                 ('FTSE Global All Cap Index','Passively managed','developed and emerging',
                  'large-, mid-, and small-capitalization')),
@@ -127,6 +141,13 @@ def classification(symbol, source, product_source=None):
         if (not contract or product.get('symbol')!=symbol or product.get('source_url')!=contract[0]
                 or not all(x in facts for x in contract[1])):
             raise ValueError(symbol+'_OFFICIAL_STRUCTURE_EVIDENCE_REQUIRED')
+        if symbol=='VALU':
+            if (product.get('isin')!='IE000VAHT5T0' or product.get('listing')!={
+                'exchange':'XLON','currency':'USD','ticker':'VALU','reuters':'VAVALU.L'}
+                or '# 第四十九章｜VT／VWRA型' not in text):
+                raise ValueError('VALU_INDEPENDENT_LONDON_ETF_EVIDENCE_REQUIRED')
+            result.update(primary_class=FORMAL_CLASSES[0],primary_framework='第四十九章｜VT／VWRA型',
+                sot_section='V82.md §32.2 / chapter 49; independent VALU issuer/listing')
         if symbol=='VWRA' and (product.get('isin')!='IE00BK5BQT80' or
                 product.get('listing')!={'exchange':'XLON','currency':'USD','reuters':'VWRA.L'}):
             raise ValueError('VWRA_INDEPENDENT_LISTING_EVIDENCE_REQUIRED')

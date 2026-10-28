@@ -35,6 +35,44 @@ def field(raw,key,unit,at):
     return value,row
 
 
+def forward_level(value,bands):
+    return next((name for limit,name in zip(bands,('CHEAP','NORMAL','PRICEY','EXPENSIVE'))
+        if value<limit),'EXTREME_CANDIDATE')
+
+
+def current_forward_observations(facts,asset_class,rule_source):
+    """Use an explicitly labelled current observation with its own product class.
+
+    The owner authorizes recent current-analysis sources. This is not a PIT,
+    original financial publication-date, execution or macro-producer assertion.
+    """
+    if not facts or not facts.get('current_forward_observation'):return []
+    proof=facts['current_forward_observation'];record=facts.get('metrics',{}).get('FORWARD_PE',{})
+    if (proof.get('label')!='Forward PE' or proof.get('metric_name')!='FORWARD_PE'
+        or proof.get('purpose')!='OWNER_AUTHORIZED_RECENT_CURRENT_ANALYSIS_ONLY'
+        or facts.get('symbol')!=asset_class.get('symbol')
+        or record.get('unit')!='multiple' or asset_class.get('primary_class')!='全球股票ETF'
+        or asset_class.get('asset_type')!='BROAD_ETF'):return []
+    from formal_analysis_signals import verify_rules
+    text=verify_rules(rule_source)
+    row=next((line for line in text.splitlines() if line.startswith('| VT／VWRA型 |')),None)
+    if row is None or not all(token in row for token in ('<14','>=14 且 <18','>=18 且 <20','>=20 且 <23','>=23')):
+        return []
+    if isinstance(record.get('value'),bool):raise ValueError('CURRENT_FORWARD_PE_INVALID')
+    value=Decimal(str(record.get('value')))
+    if not value.is_finite() or value<=0:raise ValueError('CURRENT_FORWARD_PE_INVALID')
+    return [{'metric_name':'FORWARD_PE','current':str(value),'unit':'multiple',
+        'valuation_level':forward_level(value,(14,18,20,23)),
+        'source_reference':facts['source_url'],'source_sha256':facts['source_sha256'],
+        'as_of':facts['as_of'],'as_of_basis':facts.get('as_of_basis'),
+        'observed_date_text':facts['as_of'],'source_original_data_date':facts.get('source_original_data_date'),
+        'data_quality':'OK','freshness':'NOT_APPLICABLE','pit_status':'NOT_APPLICABLE',
+        'current_source_accepted':True,'historical_publication_time_verified':False,
+        'execution_input_eligible':False,'purpose':'CURRENT_HOLDINGS_ANALYSIS',
+        'range_rule':'V82 §32.3 verified global stock ETF class; own Forward PE source',
+        'scope':'DIRECT_CURRENT_PROVIDER_OBSERVATION__NOT_V70_OR_HISTORICAL_PIT'}]
+
+
 def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_INPUT'):
     if purpose not in ('STRICT_NATIVE_INPUT','CURRENT_HOLDINGS_ANALYSIS'):
         raise ValueError('VALUATION_PURPOSE_INVALID')
@@ -50,8 +88,7 @@ def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_I
         raise ValueError('V10_FORWARD_PE_DEFINITION_OR_SOURCE_MISMATCH')
     # Each independently verified product route has its own authorized range.
     # A trailing multiple never enters this mapper.
-    level=next((name for limit,name in zip(bands,('CHEAP','NORMAL','PRICEY','EXPENSIVE'))
-        if value<limit),'EXTREME_CANDIDATE')
+    level=forward_level(value,bands)
     freshness,pit,missing=valuation_validity(row,at)
     source_validity={'freshness':freshness,'pit_status':pit,'missing_contracts':list(missing)}
     current_accepted=purpose=='CURRENT_HOLDINGS_ANALYSIS'

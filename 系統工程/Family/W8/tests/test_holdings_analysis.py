@@ -234,6 +234,44 @@ class HoldingAnalysisTest(unittest.TestCase):
             M.classification('SOXX',source,{'local_path':str(wrong),
                 'sha256':hashlib.sha256(wrong.read_bytes()).hexdigest()})
 
+    def test_london_global_etf_uses_own_identity_and_forward_value(self):
+        source=self.producer.class_source;p=Path(source['local_path'])
+        p.write_text(p.read_text()+'\n廣泛分散核心市場結構 → `A`\n'+
+            '| VT／VWRA型 | `<14` | `>=14 且 <18` | `>=18 且 <20` | `>=20 且 <23` | `>=23` |\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        identity=M.classification('VALU',source)
+        self.assertEqual(identity['asset_type'],'BROAD_ETF');self.assertEqual(identity['asset_grade'],'A')
+        self.assertIn('/E161/',identity['grade_evidence']['source_url'])
+        from v10_source_observations import current_forward_observations
+        facts={'symbol':'VALU','source_url':'SYNTHETIC_PROVIDER','source_sha256':'a'*64,'as_of':'2026-10-28',
+            'source_original_data_date':None,'as_of_basis':'CURRENT_PROVIDER_OBSERVATION__NOT_ORIGINAL_FINANCIAL_DATE',
+            'metrics':{'FORWARD_PE':{'value':'16','unit':'multiple'}},
+            'current_forward_observation':{'label':'Forward PE','metric_name':'FORWARD_PE',
+                'purpose':'OWNER_AUTHORIZED_RECENT_CURRENT_ANALYSIS_ONLY'}}
+        observed=current_forward_observations(facts,identity,source)
+        self.assertEqual(observed[0]['valuation_level'],'NORMAL')
+        self.assertIsNone(observed[0]['source_original_data_date'])
+        self.assertFalse(observed[0]['historical_publication_time_verified'])
+        facts['current_forward_observation']['label']='Trailing PE'
+        self.assertEqual(current_forward_observations(facts,identity,source),[])
+        facts['current_forward_observation']['label']='Forward PE';facts['symbol']='VT'
+        self.assertEqual(current_forward_observations(facts,identity,source),[])
+        wrong=HERE/'QQQ_product_identity.json'
+        with self.assertRaisesRegex(ValueError,'STRUCTURE_EVIDENCE_REQUIRED'):
+            M.classification('VALU',source,{'local_path':str(wrong),
+                'sha256':hashlib.sha256(wrong.read_bytes()).hexdigest()})
+
+    def test_defence_theme_identity_has_its_own_formal_waterfall(self):
+        source=self.producer.class_source;p=Path(source['local_path'])
+        p.write_text(p.read_text()+'\n`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`\n'+
+            '第五十二章｜國防／航太／軍工型\n## 32.9 Defense｜國防軍工\n'+
+            'Forward P/E → EV/EBITDA → FCF Yield → EV/Sales\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        identity=M.classification('NATO',source)
+        self.assertEqual(identity['asset_type'],'THEME_ETF');self.assertEqual(identity['asset_grade'],'C')
+        self.assertIn('V82_DEFENCE_CORE',identity['analysis_capabilities'])
+        self.assertEqual(identity['valuation_waterfall'],['FORWARD_PE','EV_EBITDA','FCF_YIELD','EV_SALES'])
+
     def test_company_core_runs_without_inventing_grade_thesis_or_etf_waterfall(self):
         source=self.producer.class_source;p=Path(source['local_path'])
         p.write_text(p.read_text()+'\n單一上市公司之普通股／股票權益\n'+

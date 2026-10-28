@@ -19,7 +19,7 @@ from analysis_requirements import audit as audit_requirements
 from core_analysis_inputs import issuer_inputs
 from formal_mode_analysis import build_formal_conclusion
 from current_analysis_delivery import deliver as deliver_current_analysis
-from v10_source_observations import forward_observations,macro_observations
+from v10_source_observations import forward_observations,current_forward_observations,macro_observations
 
 STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
 CATALOG_BLOB='4cd333be719252034b6b9d6e8a787c838db816c4'
@@ -200,7 +200,7 @@ def explain(row):
         text+=('個股Thesis／結構確認缺少來源，保留原生不可判定。' if row['native_product_identity']['asset_type']=='INDIVIDUAL_STOCK' else '個股Thesis計分不適用本ETF；Core空Thesis輸出的NONE不代表ETF結構安全已通過。')
     if row.get('issuer_facts'):
         facts=row['issuer_facts'];metrics=facts['metrics']
-        text+=(f"官方 {facts['as_of']}：trailing P/E={metrics.get('TRAILING_PE',{}).get('value','UNKNOWN')}，P/B={metrics.get('PB',{}).get('value','UNKNOWN')}，"
+        text+=(f"來源觀測 {facts['as_of']}：trailing P/E={metrics.get('TRAILING_PE',{}).get('value','UNKNOWN')}，P/B={metrics.get('PB',{}).get('value','UNKNOWN')}，"
             f"ROE={metrics.get('ROE',{}).get('value','UNKNOWN')}%，盈餘成長率={metrics.get('EARNINGS_GROWTH',{}).get('value','UNKNOWN')}%；"
             '未將這些值轉成Forward預估或基本面改善判斷。')
     if row.get('requirements'):
@@ -317,16 +317,18 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE'}:
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE'}:
                 issuer=row['issuer_facts']
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
-                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE')),None)
+                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE')),None)
                 allowed_metrics=(cls['valuation_waterfall'] if special else
                     ['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD'] if qqq else None)
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'],allowed_metrics=allowed_metrics)
-                current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'],
-                    purpose='CURRENT_HOLDINGS_ANALYSIS')+current_metrics \
-                    if request.get('macro_snapshot') else current_metrics
+                forward=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'],
+                    purpose='CURRENT_HOLDINGS_ANALYSIS') if request.get('macro_snapshot') else []
+                if not forward:forward=current_forward_observations(issuer,cls,producer.class_source)
+                forwarded={metric['metric_name'] for metric in forward}
+                current_metrics=forward+[metric for metric in current_metrics if metric['metric_name'] not in forwarded]
                 row['valuation_observations']=current_metrics
                 row['fundamental_fields']=fundamental_fields
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])

@@ -1,0 +1,34 @@
+from copy import deepcopy
+from pathlib import Path
+from decimal import Decimal
+import hashlib,sys,unittest
+ROOT=Path(__file__).resolve().parents[4]
+sys.path[:0]=[str(ROOT/'系統工程/Family/W8')]
+from v70_tactical_input import calculate
+
+class V70ComponentTest(unittest.TestCase):
+    def setUp(self):
+        self.request={'client_id':'SYNTHETIC','owner':{'currency':'USD'},'confirmed_target':{'payload':{'draft':{
+            'denominator':{'value_state':'KNOWN','amount':'1000000','currency':'TWD'}}}}}
+        self.policy={'client_id':'SYNTHETIC','stock_percent':80,'bond_percent':20,'source_reference':'SYNTHETIC_APPROVED_BASE'}
+    def test_original_recomputation_conserves_amounts_and_retains_unknown_bond_source(self):
+        before=deepcopy((self.request,self.policy));out=calculate(ROOT,self.request,self.policy)
+        self.assertEqual(out['allocation']['S0'],80);self.assertEqual(out['allocation']['B0'],20)
+        self.assertEqual(sum(Decimal(v) for v in out['amounts'].values()),Decimal('1000000'))
+        self.assertEqual(out['bond_score_source'],'UNKNOWN');self.assertIsNone(out['snapshot']['bScore'])
+        self.assertTrue(out['bond_score_does_not_affect_this_allocation'])
+        self.assertIsNone(out['native_currency_amounts']);self.assertEqual(out['native_currency_issue'],'V70_TACTICAL_BUDGET_FX_REQUIRED')
+        self.assertEqual(out['source_html_sha256'],hashlib.sha256((ROOT/'系統工程/總經V70/V70-3-27.html').read_bytes()).hexdigest())
+        self.assertEqual((self.request,self.policy),before)
+    def test_new_base_is_sent_to_original_function_instead_of_scaling_old_result(self):
+        a=calculate(ROOT,self.request,self.policy)
+        other={**self.policy,'stock_percent':60,'bond_percent':40}
+        b=calculate(ROOT,self.request,other)
+        self.assertEqual(b['allocation']['S0'],60)
+        self.assertNotEqual(a['allocation']['sTot'],b['allocation']['sTot'])
+        self.assertEqual(a['allocation']['cTot'],b['allocation']['cTot'])
+    def test_cross_owner_rejected_and_absent_policy_not_inferred(self):
+        self.assertIsNone(calculate(ROOT,self.request,None))
+        with self.assertRaises(PermissionError):calculate(ROOT,self.request,{**self.policy,'client_id':'OTHER'})
+
+if __name__=='__main__':unittest.main()

@@ -174,13 +174,14 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
         self.new_investment_policy=deepcopy(new_investment_policy)
         self.account_presence_policy=deepcopy(account_presence_policy)
+        self.v70_strategic_policy=deepcopy(v70_strategic_policy)
         if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
@@ -241,10 +242,12 @@ class AssetSourceProducer:
                 for symbol,proof in self.product_sources.items()})
         from new_investment_scenario import build_plan,apply_plan,wire_number
         investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
+        from v70_tactical_input import calculate
+        tactical=calculate(self.root,req,getattr(self,'v70_strategic_policy',None))
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         from holdings_analysis import build_analysis_report
-        analysis=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial,investment=investment)
+        analysis=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial,investment=investment,tactical=tactical)
         if self.flow=='HOLDINGS_ANALYSIS':
             report=analysis
             return {'request':req,'trusted_context':ctx,'analysis_report':report,
@@ -270,9 +273,11 @@ class AssetSourceProducer:
         v70_id='V70-SOURCE-INPUT-'+macro['digest'][:24]
         v70={'run_id':run,'source_namespace':'V70.RUNTIME_CONTEXT','upstream_v70_snapshot_id':v70_id,
             'snapshot_as_of':macro['asOf'],'data_as_of':{'macro':macro['asOf']},'source_reference_ids':[ref],
-            'payload':{'run_id':run,'stock_tactical_amount':None,'bond_tactical_amount':None,
-                'v70_original_dry_powder_amount':None,'value_state':'UNKNOWN','data_quality':'UNKNOWN',
-                'issue_codes':['V70_MONETARY_SOURCE_NOT_PRODUCED']}}
+            'payload':{'run_id':run,'stock_tactical_amount':(tactical or {}).get('native_currency_amounts',{}).get('stock') if (tactical or {}).get('native_currency_amounts') else None,'bond_tactical_amount':(tactical or {}).get('native_currency_amounts',{}).get('bond') if (tactical or {}).get('native_currency_amounts') else None,
+                'v70_original_dry_powder_amount':(tactical or {}).get('native_currency_amounts',{}).get('dry_powder') if (tactical or {}).get('native_currency_amounts') else None,
+                'value_state':'KNOWN' if (tactical or {}).get('native_currency_amounts') else 'UNKNOWN','data_quality':'FALLBACK_USED' if tactical else 'UNKNOWN',
+                'original_currency_tactical_result':tactical,
+                'issue_codes':([tactical['native_currency_issue']] if tactical and tactical['native_currency_issue'] else [] if tactical else ['V70_MONETARY_SOURCE_NOT_PRODUCED'])}}
         # Available cash is zero in this run when it was absent. No positive
         # budget is inferred from a total balance or an unverified settlement.
         available=Decimal(trial['decimal_values']['available'])

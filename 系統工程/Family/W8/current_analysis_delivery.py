@@ -13,7 +13,7 @@ LABELS={'kd_golden_cross':'KD黃金交叉','macd_bear_hist_shrinking_or_positive
     'dif_up':'DIF上彎','rsi_improving_or_near_50':'RSI改善／接近50'}
 
 
-def deliver(row,request,*,repo_root,cash_trial=None,investment=None):
+def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=None):
     market=row.get('market') or {};core=(row.get('core_observation') or {}).get('result',{})
     conclusion=row.get('formal_conclusion') or {};approved=market.get('approved_technical') or {}
     metrics=deepcopy(row.get('valuation_observations',[]));valuation=deepcopy(core.get('valuation',{}))
@@ -53,7 +53,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None):
         'analysis_report_delivered':has_data,'native_readiness':row['status'],
         'symbol':row['symbol'],'owner':deepcopy(row['owner']),'holding':deepcopy(row['holding']),
         'classification':deepcopy(row['scenario_class']),'native_product_identity':deepcopy(row['native_product_identity']),
-        'current_judgment':judgment,'recommendation':recommendation,
+        'current_judgment':judgment,'recommendation':recommendation,'v70_tactical_budget':deepcopy(tactical),
         'valuation':valuation_view,'market':{k:deepcopy(market.get(k)) for k in
             ('observed_date','observed_close','provider','provider_verified_at','source_path','source_sha256','history_quality')},
         'native_component_observations':deepcopy(market.get('v75_original_predicates',{})),

@@ -403,10 +403,10 @@ class ApprovedZeroTargetMappingTest(unittest.TestCase):
 
     def test_explicit_zero_percent_is_mapped_without_absence_or_sell_inference(self):
         from approved_target_input import enrich_document_target_view
-        pack=self.pack('- DRAM／SMH／ZTS／IBKR目前仍屬既有小部位，長期目標0%；0%不等於立刻賣。\n')
+        pack=self.pack('- ALPHA／BETA／GAMMA／DELTA目前仍屬既有小部位，長期目標0%；0%不等於立刻賣。\n')
         before=deepcopy(pack);view,proof=enrich_document_target_view(pack['target'],pack['trusted_approved_target_source'])
         rows=view['payload']['draft']['target_lines'];self.assertEqual(len(rows),5)
-        self.assertEqual({r['ticker'] for r in rows[1:]},{'DRAM','SMH','ZTS','IBKR'})
+        self.assertEqual({r['ticker'] for r in rows[1:]},{'ALPHA','BETA','GAMMA','DELTA'})
         self.assertTrue(all(r['weight']['value']==0 and r['target_amount']['amount']=='0' for r in rows[1:]))
         self.assertTrue(all(r['policy']=='NO_NEW_BUY__NOT_AN_AUTOMATIC_SELL_INSTRUCTION' for r in rows[1:]))
         self.assertEqual(pack,before)
@@ -414,9 +414,37 @@ class ApprovedZeroTargetMappingTest(unittest.TestCase):
 
     def test_other_section_zero_statement_does_not_change_active_allocation(self):
         from approved_target_input import enrich_document_target_view
-        pack=self.pack('\n## Historical\n- DRAM／SMH目前既有部位，長期目標0%。\n')
+        pack=self.pack('\n## Historical\n- ALPHA／BETA目前既有部位，長期目標0%。\n')
         view,_=enrich_document_target_view(pack['target'],pack['trusted_approved_target_source'])
         self.assertEqual([r['ticker'] for r in view['payload']['draft']['target_lines']],['VT'])
+
+
+class AcceptedHoldingQuantityTimeTest(unittest.TestCase):
+    def case(self):
+        req={'client_id':'SYNTHETIC','owner':{'account':'SYNTHETIC_IB'},
+            'evaluation_at':'2026-10-28T01:00:00Z',
+            'client_snapshot':{'payload':{'source_sha256':'a'*64,'payload_digest':'b'*64}}}
+        position={'source_kind':'OWNER_SCREENSHOT_SOURCE','as_of_utc':None}
+        proof={'schema_version':'Family.W8.OfficialHoldingsAcceptance.v1','state':'COMPLETE',
+            'client_id':'SYNTHETIC','account_key':'SYNTHETIC_IB','source_db_sha256':'a'*64,
+            'snapshot_digest':'b'*64,'as_of':'2026-10-26T01:00:00Z',
+            'owner_decision':{'action':'ACCEPT_EXISTING_OFFICIAL_HOLDINGS'}}
+        return req,position,{'holdings_completeness':proof}
+
+    def test_owner_boundary_does_not_invent_observation_date(self):
+        from position_source_bridge import quantity_time
+        req,position,ctx=self.case();before=deepcopy(position)
+        at,basis=quantity_time(req,position,ctx)
+        self.assertEqual(at,ctx['holdings_completeness']['as_of'])
+        self.assertIn('NOT_ORIGINAL_OBSERVATION',basis);self.assertEqual(position,before)
+
+    def test_other_account_or_snapshot_acceptance_cannot_date_a_position(self):
+        from position_source_bridge import quantity_time
+        from family_boundary import BoundaryError
+        for field in ('account_key','source_db_sha256'):
+            req,position,ctx=self.case();ctx['holdings_completeness'][field]='OTHER'
+            with self.assertRaisesRegex(BoundaryError,'POSITION_OBSERVATION_TIME_REQUIRED'):
+                quantity_time(req,position,ctx)
 
 
 if __name__=='__main__':unittest.main()

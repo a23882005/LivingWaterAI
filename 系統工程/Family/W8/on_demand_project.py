@@ -125,6 +125,8 @@ def build_project_menu(*, family_login, project_name, login_account,
             raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
         native=_load(ROOT/'native_asset_source.py','family_w8_native_source')
         config=dict(native_source_config)
+        if config.get('flow','HOLDINGS_ANALYSIS')!='HOLDINGS_ANALYSIS':
+            raise ValueError('MENU04_INCOMPLETE_DEPLOYMENT_DIAGNOSTIC_NOT_A_PRODUCTION_ENTRY')
         if config.get('db_path') is not None and Path(config['db_path']).resolve()!=Path(downloaded_db_path).resolve():
             raise PermissionError('NATIVE_PRODUCER_DB_OVERRIDE_REJECTED')
         config['db_path']=downloaded_db_path

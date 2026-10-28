@@ -410,6 +410,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     report['common_gap_groups']=grouped
     from recommendation_report import build as build_recommendation_report
     report['recommendation_report']=build_recommendation_report(report,request)
+    report['engineering_completion']={'menu04_recommendation_output':'IMPLEMENTED',
+        'full_native_deployment_source_producer':'INCOMPLETE_DIAGNOSTIC_BRANCH_OUTSIDE_MENU04_REPORT',
+        'order_adjusted_net_amount':report['recommendation_report']['net_after_orders_status'],
+        'full_native_canonical_complete':False}
     report['manifest_digest']=digest(report['manifest']);report['report_digest']=digest(report)
     return report
 
@@ -449,6 +453,9 @@ class HoldingsAnalysisRunner:
         ctx.update(analysis_permission='ANALYZE_ONLY',trade_authorization='NONE',expected_result_digest=digest(rebuilt))
         if rebuilt!=report.get('work9_result') or report['mentor']!=explain_holdings_recommendations(root,wreq,rebuilt,trusted_context=ctx):
             raise PermissionError('HOLDINGS_MENTOR_SOURCE_BINDING_MISMATCH')
+        from recommendation_report import build as build_recommendation_report
+        if report.get('recommendation_report')!=build_recommendation_report(report,request):
+            raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

@@ -42,7 +42,10 @@ def approved_target_display(symbol,targets):
 
 
 def build(report,request):
-    positions=report['analysis_result']['positions'];mentor={r['item_id']:r for r in report['mentor']['items']}
+    positions=report['analysis_result']['positions']
+    requested=report['analysis_result'].get('coverage',{}).get('requested')
+    if requested is not None and requested!=len(positions):raise ValueError('RECOMMENDATION_REPORT_POSITION_COVERAGE_MISMATCH')
+    mentor={r['item_id']:r for r in report['mentor']['items']}
     targets=request.get('confirmed_target',{}).get('payload',{}).get('draft',{}).get('target_lines',[])
     rows=[];seen=set()
     for p in positions:

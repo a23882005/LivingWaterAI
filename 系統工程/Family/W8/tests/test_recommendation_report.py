@@ -32,6 +32,10 @@ class ReportTest(unittest.TestCase):
         r,q=self.case();r['mentor']['items']=[]
         with self.assertRaisesRegex(ValueError,'COVERAGE_MISMATCH'):build(r,q)
 
+    def test_unreturned_requested_position_cannot_be_reported_complete(self):
+        r,q=self.case();r['analysis_result']['coverage']={'requested':2}
+        with self.assertRaisesRegex(ValueError,'POSITION_COVERAGE_MISMATCH'):build(r,q)
+
     def role_targets(self):
         return [{'ticker':'SGOV','instrument_id':role,'weight':{'value_state':'KNOWN','value':weight},
             'target_amount':{'value_state':'KNOWN','amount':amount,'currency':'USD'},'source_reference_ids':['SYNTHETIC_APPROVED_SOURCE']}

@@ -218,6 +218,16 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
         self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
         self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
+    def test_readable_report_cannot_diverge_from_native_results_after_redigest(self):
+        for field in ('rows','html'):
+            report=self.report();view=report['recommendation_report']
+            if field=='rows':view['rows'][0]['holding_gap_amount']='999999'
+            else:view['html']='<p>BUY 999999</p>'
+            view['digest']=digest({k:v for k,v in view.items() if k!='digest'})
+            report['report_digest']=digest({k:v for k,v in report.items() if k!='report_digest'})
+            with patch.object(H,'prepare_input',return_value=self.prepared),self.assertRaisesRegex(PermissionError,'READABLE_REPORT_SOURCE_RESULT_MISMATCH'):
+                H.HoldingsAnalysisRunner(context=self.context,report=report).analyze(self.request)
+
     def test_readable_report_is_complete_independently_of_pending_order_net(self):
         r=self.report();view=r['recommendation_report']
         self.assertEqual(view['report_delivery_status'],'COMPLETE')

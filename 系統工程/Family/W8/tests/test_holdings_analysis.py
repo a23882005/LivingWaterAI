@@ -234,6 +234,25 @@ class HoldingAnalysisTest(unittest.TestCase):
             M.classification('SOXX',source,{'local_path':str(wrong),
                 'sha256':hashlib.sha256(wrong.read_bytes()).hexdigest()})
 
+    def test_company_core_runs_without_inventing_grade_thesis_or_etf_waterfall(self):
+        source=self.producer.class_source;p=Path(source['local_path'])
+        p.write_text(p.read_text()+'\n單一上市公司之普通股／股票權益\n'+
+            '## 32.8 Semiconductor｜半導體\nForward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield\n')
+        source['sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+        for symbol in ('NVDA','IBKR'):
+            self.position['source_instrument']['ticker']=symbol
+            row=self.report()['analysis_result']['positions'][0]
+            self.assertEqual(row['native_product_identity']['asset_type'],'INDIVIDUAL_STOCK')
+            self.assertEqual(row['native_product_identity']['asset_grade'],'UNKNOWN')
+            self.assertEqual(row['core_observation']['function'],'V82.evaluate_core_rule_state')
+            self.assertEqual(row['core_observation']['structural_confirmation_applicability'],'REQUIRED')
+            self.assertEqual(row['core_observation']['result']['structural_risk']['state'],'UNKNOWN')
+            self.assertIsNone(row.get('formal_conclusion'))
+            self.assertEqual(row['native_product_identity']['company_listing_source']['symbol'],symbol)
+            if symbol=='IBKR':
+                self.assertEqual(row['core_observation']['actual_inputs']['valuation_waterfall'],[])
+            else:self.assertEqual(row['core_observation']['actual_inputs']['valuation_waterfall'][1],'EV_EBITDA')
+
     def test_owner_no_orders_propagates_to_report_and_mentor_without_guessing_judgment(self):
         self.producer.order_confirmation={'schema_version':'Family.W8.OwnerNoOpenOrders.v1',
             'client_id':self.client,'owner':deepcopy(self.owner),'no_open_orders':True,
@@ -430,6 +449,18 @@ class NativeFundingAdviceTest(unittest.TestCase):
         investment={'total_new_investment_amount':'0','account_contributions':{}}
         tactical={'native_currency_amounts':{'stock':'1000','bond':'0','dry_powder':'0'}}
         return producer,request,{'analysis_result':{'positions':[row]}},trial,investment,tactical
+
+    def test_bond_component_route_never_enters_stock_funding_adapter(self):
+        p,r,report,trial,investment,tactical=self.case()
+        row=report['analysis_result']['positions'][0]
+        row['symbol']='SGOV';row['core_observation']=None
+        row['native_product_identity']={'engine_route':'V75_PREDICATES','asset_type':None,'asset_grade':'UNKNOWN'}
+        out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
+        item=out['items'][row['instrument_id']]
+        self.assertEqual(item['status'],'BOND_ROUTE_PENDING')
+        self.assertEqual(item['issues'][0]['field_path'],'bond_request')
+        self.assertEqual(item['call_trace'],[])
+        self.assertNotIn('stock_request',item);self.assertNotIn('native_plan',item)
 
     def test_original_work4_and_native_zero_budget_plan_keep_positive_gap(self):
         p,r,report,trial,investment,tactical=self.case()

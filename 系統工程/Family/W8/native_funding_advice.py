@@ -109,6 +109,11 @@ def build(producer,request,report,*,trial,investment,tactical):
             'source_db_sha256':snapshot['source_sha256'],'call_trace':[],
             'full_native_canonical_complete':False,'trade_action':'NO_TRADE','issues':[]}
         results[row['instrument_id']]=out
+        if identity.get('engine_route')=='V75_PREDICATES':
+            out['status']='BOND_ROUTE_PENDING'
+            out['issues']=[{'field_path':'bond_request','code':'V75_FUNDING_SOURCE_PRODUCER_REQUIRED',
+                'owner_input_required':False}]
+            continue
         missing=[]
         if not row.get('core_observation'):missing.append('native_product_identity.core_route' if identity.get('asset_type') is not None else 'native_product_identity.asset_type_and_core')
         if symbol not in converted or converted[symbol]['project_target_position'] is None:missing.append('approved_project_target_amount')

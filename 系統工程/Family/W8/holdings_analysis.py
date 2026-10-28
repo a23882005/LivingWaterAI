@@ -197,7 +197,7 @@ def explain(row):
             text+=f"{label}：成立 {len(values['TRUE'])}、不成立 {len(values['FALSE'])}、不可判定 {len(values['UNKNOWN'])}。"
             if group=='up_price' and len(values['FALSE'])==len(signals):
                 text+='三項原生價格結構均不成立，所以Core判定Runaway Up不成立；並非將缺項當False。'
-        text+='個股Thesis計分不適用本ETF；Core空Thesis輸出的NONE不代表ETF結構安全已通過。'
+        text+=('個股Thesis／結構確認缺少來源，保留原生不可判定。' if row['native_product_identity']['asset_type']=='INDIVIDUAL_STOCK' else '個股Thesis計分不適用本ETF；Core空Thesis輸出的NONE不代表ETF結構安全已通過。')
     if row.get('issuer_facts'):
         facts=row['issuer_facts'];metrics=facts['metrics']
         text+=(f"官方 {facts['as_of']}：trailing P/E={metrics.get('TRAILING_PE',{}).get('value','UNKNOWN')}，P/B={metrics.get('PB',{}).get('value','UNKNOWN')}，"
@@ -240,7 +240,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             'native_product_identity':{'registry_identity':deepcopy(instrument),
                 'holding_price_currency_source':holding_price_currency(position,holdings),
                 'asset_type':cls['asset_type'],'asset_grade':cls['asset_grade'],
-                'product_evidence':cls.get('grade_evidence'),
+                'product_evidence':cls.get('grade_evidence'),'company_listing_source':deepcopy(cls.get('company_identity')),
                 'engine_route':'V75_PREDICATES' if observed and observed['v75_original_predicates'] else 'V82_TECHNICAL_OBSERVATIONS',
                 'scope':'ANALYSIS_ONLY__NOT_DEPLOYMENT_IDENTITY_ATTESTATION'},
             'market':observed,'valuation_observations':deepcopy(dated_valuation) if symbol=='VT' else [],
@@ -317,10 +317,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE'}:
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE'}:
                 issuer=row['issuer_facts']
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
-                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE')),None)
+                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE')),None)
                 allowed_metrics=(cls['valuation_waterfall'] if special else
                     ['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD'] if qqq else None)
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'],allowed_metrics=allowed_metrics)
@@ -336,7 +336,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     row['native_product_identity']['engine_route']=special
                     waterfall={'valuation_waterfall':deepcopy(cls['valuation_waterfall'])}
                 row['core_observation']=producer.core_observation(observed,
-                    valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,**waterfall)
+                    valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,
+                    broad_etf=cls['asset_type']!='INDIVIDUAL_STOCK',**waterfall)
                 row['call_trace'].append('V82.evaluate_core_rule_state')
                 for candidate in row['core_observation']['valuation_path_audit']:
                     for field in candidate['missing_fields']:
@@ -380,7 +381,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'source_reference':v['source_reference'],'observed_at':v['observed_date_text']}
                 for v in row['valuation_observations']]
         row['position_valuation_allowed']=False
-        if row.get('core_observation'):
+        if row.get('core_observation') and cls['asset_type']!='INDIVIDUAL_STOCK':
             row['formal_conclusion']=build_formal_conclusion(producer.root,row,request)
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
@@ -434,7 +435,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         report['deployment_status']['native_funding_components']={
             'computed':sum(i['status']=='CASH_TRIAL_ADVICE_COMPUTED' for i in funding['items'].values()),
             'rejected':sum(i['status']=='NATIVE_CONTRACT_REJECTED' for i in funding['items'].values()),
-            'input_unavailable':sum(i['status']=='INPUT_UNAVAILABLE' for i in funding['items'].values())}
+            'input_unavailable':sum(i['status']=='INPUT_UNAVAILABLE' for i in funding['items'].values()),
+            'bond_route_pending':sum(i['status']=='BOND_ROUTE_PENDING' for i in funding['items'].values()),
+            'funding_bound_pending_stage':sum(i['status']=='FUNDING_BOUND' for i in funding['items'].values())}
         report['call_trace']+=funding['call_trace']
         for row in rows:
             row['current_analysis']['native_funding_advice']=funding_delivery(funding['items'][row['instrument_id']])

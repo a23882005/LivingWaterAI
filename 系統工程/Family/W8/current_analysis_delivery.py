@@ -21,8 +21,8 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     groups=market.get('observed_named_signals',{})
     right_true=[s['name'] for s in groups.get('right_signals',[]) if s['truth']=='TRUE']
     current=next((m for m in metrics if m.get('metric_name')==valuation.get('primary_metric')),None)
-    judgment=current_judgment(row,repo_root)
     from formal_mode_analysis import target_for_symbol
+    judgment=current_judgment(row,repo_root,approved_target=target_for_symbol(request,row['symbol']))
     recommendation=recommendation_amounts(row,judgment,repo_root,cash_trial=cash_trial,investment=investment,
         approved_target=target_for_symbol(request,row['symbol']),fx_observation=fx_observation,request=request)
     modes=deepcopy(conclusion.get('four_modes',{}));predicate=conclusion.get('market_predicates',{})
@@ -145,7 +145,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
     return result
 
 
-def current_judgment(row,repo_root):
+def current_judgment(row,repo_root,*,approved_target=None):
     """Owner-scoped current judgment; source safety is outside this A request.
 
     The original selector/stage functions are reused. This output never grants
@@ -170,7 +170,7 @@ def current_judgment(row,repo_root):
     mode=dep.select_deployment_mode(runaway_up=P(tech.get('runaway_up','UNKNOWN')),
         right_add=P(truth(right)),left_buy_point=P(truth(left)))
     stage=dep.resolve_deployment_stage(mode=mode)
-    target=c.get('approved_project_target') or {}
+    target=approved_target if approved_target is not None else c.get('approved_project_target') or {}
     amount=(str(Decimal(target['amount'])*stage.target_rate) if target.get('value_state')=='KNOWN' and stage.target_rate is not None else None)
     return {'scope':'CURRENT_HOLDINGS_JUDGMENT__OWNER_REQUESTED_EXISTING_PUBLISHED_INPUTS',
         'mode':mode.value,'stage_reference':stage.stage,

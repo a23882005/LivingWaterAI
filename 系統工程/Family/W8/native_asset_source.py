@@ -137,6 +137,29 @@ def classification(symbol, source, product_source=None):
             'source_url':product['source_url'],'source_sha256':product_source['sha256'],
             'facts':deepcopy(facts),'basis':'GLOBAL_PASSIVE_DIVERSIFIED_STRUCTURE__NOT_TICKER_DEFAULT'})
         result['analysis_capabilities']=['V82_GLOBAL_ETF_CORE']
+    if product_source is None and '單一上市公司之普通股／股票權益' in text:
+        catalog_path=HERE/'company_identity_catalog.json'
+        if catalog_path.is_file():
+            raw=catalog_path.read_bytes();catalog=json.loads(raw)
+            proof=catalog.get('items',{}).get(symbol)
+            if proof is not None:
+                if (catalog.get('schema_version')!='Family.W8.CompanyIdentityCatalog.v1'
+                    or proof.get('schema_version')!='Family.W8.CompanyListingIdentity.v1'
+                    or proof.get('symbol')!=symbol or proof.get('listing_status')!='LISTED'
+                    or not proof.get('source_reference')
+                    or not any(row.get('ticker')==symbol and row.get('security_type')=='Common Stock'
+                        for row in proof.get('listings',[]))):
+                    raise ValueError('COMPANY_COMMON_STOCK_IDENTITY_REQUIRED')
+                result.update(asset_type='INDIVIDUAL_STOCK',asset_grade='UNKNOWN',
+                    grade_evidence={'basis':'PRODUCT_IDENTITY_DOES_NOT_ESTABLISH_ASSET_GRADE',
+                        'source_reference':proof['source_reference'],'source_sha256':sha256(raw).hexdigest()},
+                    company_identity=deepcopy(proof),analysis_capabilities=['V82_INDIVIDUAL_COMPONENT_CORE'],
+                    valuation_waterfall=[])
+                if (symbol in ('NVDA','AVGO') and '## 32.8 Semiconductor｜半導體' in text
+                    and 'Forward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield' in text):
+                    result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD']
+                    result['valuation_rule_source']='V82.md §32.8 Semiconductor'
+                    result['primary_framework']='V82.md §32.8 Semiconductor'
     return result
 
 
@@ -612,11 +635,15 @@ class AssetSourceProducer:
         groups={k:[PredicateTruth(value) for value in predicate_votes(values)]
                 for k,values in observed['observed_named_signals'].items()}
         gaps=unresolved_core_contracts(observed,broad_etf)
+        if valuation_waterfall==[]:
+            gaps.append({'field_path':'valuation.product_specific_waterfall','kind':'DEFINITION_OR_PRODUCER_UNRESOLVED',
+                'reason':'Company valuation_class producer is not connected; no global ETF valuation fallback is used',
+                'sot_section':'V82.md §32.6A Individual Stock routing'})
         safety=[EvidenceFact(name=g['field_path'],value='UNKNOWN',
                 requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
                 freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
                 source_reference=observed['source_path']) for g in gaps if g['field_path'].startswith('safety.')]
-        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(valuation_waterfall or GLOBAL_ETF_WATERFALL),
+        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(GLOBAL_ETF_WATERFALL if valuation_waterfall is None else valuation_waterfall),
             'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
             **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
             'theses':[] if broad_etf else [{'state':'UNKNOWN'}],

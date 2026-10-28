@@ -218,6 +218,16 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
         self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
         self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
+    def test_readable_report_is_complete_independently_of_pending_order_net(self):
+        r=self.report();view=r['recommendation_report']
+        self.assertEqual(view['report_delivery_status'],'COMPLETE')
+        self.assertEqual(view['positions_returned'],1)
+        self.assertEqual(view['net_after_orders_status'],'PENDING_OWNER_ORDER_CONFIRMATION')
+        self.assertIsNone(view['rows'][0]['holding_gap_amount'])
+        self.assertIsNone(view['rows'][0]['proposed_existing_asset_redeployment_amount'])
+        self.assertIn('持股缺口不等於本次立即應買金額',view['markdown'])
+        self.assertIn('<table>',view['html']);self.assertFalse(view['full_native_deployment_complete'])
+
     def test_scoped_mentor_preserves_unknown_buy_amount_and_zero_external_contribution(self):
         from new_investment_scenario import build_plan
         policy={'schema_version':'Family.W8.NewInvestmentTrialPolicy.v1','client_id':self.client,

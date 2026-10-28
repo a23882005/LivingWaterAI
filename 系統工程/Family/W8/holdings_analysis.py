@@ -408,6 +408,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         if instrument_id not in item['positions']:item['positions'].append(instrument_id)
         if field not in item['field_paths']:item['field_paths'].append(field)
     report['common_gap_groups']=grouped
+    from recommendation_report import build as build_recommendation_report
+    report['recommendation_report']=build_recommendation_report(report,request)
     report['manifest_digest']=digest(report['manifest']);report['report_digest']=digest(report)
     return report
 

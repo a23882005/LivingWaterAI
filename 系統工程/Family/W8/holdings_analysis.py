@@ -17,6 +17,7 @@ from family_boundary import prepare_input
 from analysis_requirements import audit as audit_requirements
 from core_analysis_inputs import issuer_inputs
 from formal_mode_analysis import build_formal_conclusion
+from current_analysis_delivery import deliver as deliver_current_analysis
 from v10_source_observations import forward_observations,macro_observations
 
 STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
@@ -284,7 +285,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             if 'V82_GLOBAL_ETF_CORE' in cls.get('analysis_capabilities',[]):
                 issuer=row['issuer_facts']
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'])
-                current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'])+current_metrics \
+                current_metrics=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'],
+                    purpose='CURRENT_HOLDINGS_ANALYSIS')+current_metrics \
                     if request.get('macro_snapshot') else current_metrics
                 row['valuation_observations']=current_metrics
                 row['fundamental_fields']=fundamental_fields
@@ -339,7 +341,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
-        row['analysis_explanation']=explain(row);rows.append(row)
+        row['current_analysis']=deliver_current_analysis(row,request,repo_root=producer.root)
+        row['analysis_explanation']=row['current_analysis']['readable_analysis'];rows.append(row)
         trace.extend({'instrument_id':row['instrument_id'],'function':name} for name in row['call_trace'])
     status=('ANALYSIS_BLOCKED' if not rows or all(r['status']=='ANALYSIS_BLOCKED' for r in rows)
         else 'ANALYSIS_PARTIAL' if any(r['status']!='ANALYSIS_COMPLETE' for r in rows) else 'ANALYSIS_COMPLETE')
@@ -363,6 +366,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             'positions':rows,'coverage':{'requested':len(positions),'returned':len(rows),
                 'partial':sum(r['status']=='ANALYSIS_PARTIAL' for r in rows),
                 'blocked':sum(r['status']=='ANALYSIS_BLOCKED' for r in rows)}},
+        'analysis_delivery':{'reports_delivered':sum(r['current_analysis']['analysis_report_delivered'] for r in rows),
+            'positions_returned':len(rows),'native_readiness':status,
+            'scope':'CURRENT_ANALYSIS_REPORTS__SEPARATE_FROM_MODE_AMOUNT_AND_FULL04_ACCEPTANCE'},
         'other_account_coverage':other_coverage,
         'deployment_status':{'status':'NOT_RUN','reason':'HOLDINGS_ANALYSIS_FLOW__NO_NEW_MONEY_REQUIRED',
             'full_native_canonical_complete':False},'cash_trial':trial,
@@ -372,7 +378,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
     report['manifest']=[{'instrument_id':r['instrument_id'],'field_path':key,
         'source_db_sha256':holdings['source_db_sha256'],'output_digest':digest(r.get(key)),
-        'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation','formal_conclusion')]
+        'builder':r['call_trace']} for r in rows for key in ('holding','scenario_class','native_product_identity','market','valuation_observations','core_observation','formal_conclusion','current_analysis')]
     grouped={}
     for problem in report['issues']:
         field=problem['field_path'];group=(field if field.startswith(('valuation.','fundamentals.')) else

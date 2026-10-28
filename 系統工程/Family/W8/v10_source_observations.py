@@ -35,7 +35,9 @@ def field(raw,key,unit,at):
     return value,row
 
 
-def forward_observations(snapshot,symbol,evaluated_at):
+def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_INPUT'):
+    if purpose not in ('STRICT_NATIVE_INPUT','CURRENT_HOLDINGS_ANALYSIS'):
+        raise ValueError('VALUATION_PURPOSE_INVALID')
     if symbol!='VT':return []
     raw,at=checked_payload(snapshot,evaluated_at);found=field(raw,'m03_vt','倍 Forward',at)
     if found is None:return []
@@ -48,6 +50,13 @@ def forward_observations(snapshot,symbol,evaluated_at):
     level=('CHEAP' if value<14 else 'NORMAL' if value<18 else 'PRICEY' if value<20
         else 'EXPENSIVE' if value<23 else 'EXTREME_CANDIDATE')
     freshness,pit,missing=valuation_validity(row,at)
+    source_validity={'freshness':freshness,'pit_status':pit,'missing_contracts':list(missing)}
+    current_accepted=purpose=='CURRENT_HOLDINGS_ANALYSIS'
+    if current_accepted:
+        # Owner directs that the verified published V70 producer qualifies its
+        # input for current A analysis. Historical publication metadata is not
+        # required in this scope; no timestamp or expiry is manufactured.
+        freshness='NOT_APPLICABLE';pit='NOT_APPLICABLE';missing=[]
     capture=snapshot.get('capture_receipt',{})
     capture_verified=False
     if row.get('available_at') is None and capture.get('schema_version')=='Family.W5.SourceCaptureBound.v1':
@@ -68,10 +77,15 @@ def forward_observations(snapshot,symbol,evaluated_at):
         'available_at':row.get('available_at'),'published_at':row.get('published_at'),
         'availability_bound':deepcopy(capture) if capture_verified else None,
         'known_by_capture_verified':capture_verified,
-        'pit_scope':'SOURCE_AVAILABILITY_CONTRACT__CAPTURE_IS_NOT_A_PIT_SUBSTITUTE',
+        'pit_scope':'CURRENT_V70_PRODUCER_ACCEPTANCE__NO_HISTORICAL_PUBLICATION_CLAIM' if current_accepted else 'SOURCE_AVAILABILITY_CONTRACT__CAPTURE_IS_NOT_A_PIT_SUBSTITUTE',
         'valid_until':row.get('valid_until'),'method':row.get('method'),
+        'purpose':purpose,'strict_contract_validity':source_validity,
+        'current_source_accepted':current_accepted,
+        'source_acceptance_basis':'OWNER_20261028_V70_PUBLISHED_INPUT_QUALIFIES_FOR_CURRENT_ANALYSIS' if current_accepted else None,
+        'historical_publication_time_verified':False if current_accepted else pit=='VERIFIED',
+        'execution_input_eligible':False if current_accepted else None,
         'missing_contracts':missing,
-        'scope':'EXISTING_VERIFIED_V70_FORWARD_VALUE__NO_INVENTED_FRESHNESS',
+        'scope':'VERIFIED_PUBLISHED_V70_CURRENT_ANALYSIS_ONLY' if current_accepted else 'EXISTING_VERIFIED_V70_FORWARD_VALUE__NO_INVENTED_FRESHNESS',
         'range_rule':'V82 §32.3 VT/VWRA forward-only 14/18/20/23'}]
 
 

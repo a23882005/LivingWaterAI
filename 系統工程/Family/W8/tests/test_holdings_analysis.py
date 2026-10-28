@@ -184,6 +184,40 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(known['kd_golden_cross'],'UNKNOWN')
         self.assertFalse(formal['reduction_candidates_used'])
 
+    def test_report_delivery_is_independent_of_missing_orders_and_target(self):
+        self.enable_product('VT');report=self.report();row=report['analysis_result']['positions'][0]
+        delivery=row['current_analysis']
+        self.assertTrue(delivery['analysis_report_delivered'])
+        self.assertEqual(report['analysis_delivery']['reports_delivered'],1)
+        self.assertFalse(delivery['acceptance']['full_04_passed'])
+        self.assertIsNone(delivery['execution_amount']['amount'])
+        self.assertIsNotNone(delivery['technical']['numeric']['ma20'])
+        self.assertIsNone(report['canonical_result']);self.assertIsNone(report['mentor'])
+    def test_published_v70_forward_reaches_core_and_left_price_without_publication_metadata(self):
+        self.enable_product('VT')
+        raw={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-10-01T00:00:00Z',
+            'verification':{'ready':True},'indicators':{'m03_vt':{'value':'15.9','unit':'倍 Forward',
+                'status':'OK','dataDate':'2026-09-30','source':'SYNTHETIC_PROVIDER',
+                'sourceEvidence':{'label':'Forward PE','value':'15.9','source_url':'SYNTHETIC_PROVIDER'}}}}
+        self.request['macro_snapshot']={'payload':raw,'digest':digest(raw),'source_sha256':'a'*64}
+        row=self.report()['analysis_result']['positions'][0]
+        self.assertEqual(row['core_observation']['result']['valuation']['level'],'NORMAL')
+        self.assertEqual(row['formal_conclusion']['left_inputs']['price_condition_at_least_one'],'TRUE')
+        self.assertEqual(row['current_analysis']['valuation']['native_result']['level'],'NORMAL')
+        self.assertIsNone(row['valuation_observations'][0]['available_at'])
+        self.assertEqual(row['formal_conclusion']['formal_stage'],'UNKNOWN')
+        self.assertTrue(row['current_analysis']['analysis_report_delivered'])
+        self.assertFalse(row['current_analysis']['current_judgment']['execution_authorized'])
+    def test_owner_scoped_judgment_reuses_original_selector_without_execution_permission(self):
+        self.enable_product('VT');row=self.report()['analysis_result']['positions'][0]
+        row['core_observation']['result']['valuation']['formal_output_eligible']=True
+        row['core_observation']['result']['technical']={'right_confirmation':'TRUE','runaway_up':'FALSE','runaway_down':'FALSE'}
+        row['market']['approved_technical']={'off_low':'TRUE'}
+        from current_analysis_delivery import current_judgment
+        out=current_judgment(row,ROOT)
+        self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
+        self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
+        self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
     def test_missing_history_retains_position_and_precise_blocker(self):
         report=self.report({'assets':[],'missing':[{'symbol':'VT','code':'EXACT_SYMBOL_CACHE_UNAVAILABLE'}]})
         self.assertEqual(report['analysis_result']['coverage']['returned'],1)

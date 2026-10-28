@@ -22,6 +22,27 @@ class FormalSourceTest(unittest.TestCase):
         self.assertEqual(row['freshness'],'UNKNOWN');self.assertEqual(row['pit_status'],'UNVERIFIABLE')
         self.assertEqual(row['as_of'],'2026-10-23')
         self.assertEqual(forward_observations(self.snapshot(),'VWRA','2026-10-27T21:00:00Z'),[])
+    def test_published_v70_is_accepted_for_current_analysis_without_fake_publication_time(self):
+        from copy import deepcopy
+        s=self.snapshot();before=deepcopy(s)
+        metrics=forward_observations(s,'VT','2026-10-28T01:00:00Z',purpose='CURRENT_HOLDINGS_ANALYSIS')
+        self.assertTrue(metrics[0]['current_source_accepted']);self.assertFalse(metrics[0]['historical_publication_time_verified'])
+        self.assertFalse(metrics[0]['execution_input_eligible'])
+        self.assertIsNone(metrics[0]['available_at']);self.assertIsNone(metrics[0]['valid_until'])
+        self.assertEqual(metrics[0]['strict_contract_validity']['pit_status'],'UNVERIFIABLE')
+        root=HERE.parents[2];sys.path.insert(0,str(root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'))
+        from livingwater_v82_runtime.core_rules import resolve_valuation
+        result=resolve_valuation(metrics,['FORWARD_PE','TRAILING_PE','CAPE','PB','FCF_YIELD'])
+        self.assertEqual(result.level.value,'NORMAL');self.assertTrue(result.formal_output_eligible)
+        self.assertEqual(s,before)
+        strict=forward_observations(s,'VT','2026-10-28T01:00:00Z')[0]
+        self.assertEqual(strict['freshness'],'UNKNOWN');self.assertEqual(strict['pit_status'],'UNVERIFIABLE')
+    def test_current_acceptance_still_requires_published_verified_v70_and_exact_field(self):
+        s=self.snapshot();s['payload']['verification']['ready']=False;s['digest']=digest(s['payload'])
+        self.assertEqual(forward_observations(s,'VT','2026-10-28T01:00:00Z',purpose='CURRENT_HOLDINGS_ANALYSIS'),[])
+        s=self.snapshot();s['payload']['indicators']['m03_vt']['sourceEvidence']['label']='Trailing PE';s['digest']=digest(s['payload'])
+        with self.assertRaisesRegex(ValueError,'DEFINITION_OR_SOURCE'):
+            forward_observations(s,'VT','2026-10-28T01:00:00Z',purpose='CURRENT_HOLDINGS_ANALYSIS')
     def test_checked_capture_is_a_known_by_bound_not_formal_pit(self):
         s=self.snapshot();s['capture_receipt']={'schema_version':'Family.W5.SourceCaptureBound.v1',
             'captured_at':'2026-10-27T20:00:00Z','source_sha256':s['source_sha256'],

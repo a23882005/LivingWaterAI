@@ -76,6 +76,12 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
     try:assemble_native_input(request,context,sources)
     except NativeSourceAssemblyError as error:missing=list(error.missing)
     else:raise PermissionError('PARTIAL_COMPONENT_SOURCES_MUST_NOT_DISPATCH')
+    from deployment_readiness import c7_bucket_preflight,completion_gaps
+    try:preflight=c7_bucket_preflight(producer.root,request,analysis,context)
+    except (ValueError,KeyError,TypeError) as error:
+        preflight={'status':'SOURCE_INPUTS_INCOMPLETE','full_c7_source_produced':False,
+            'code':getattr(error,'code',type(error).__name__),'message':str(error),'call_trace':[],
+            'approval_unchanged':True,'trade_action':'NO_TRADE'}
     row=next(r for r in analysis['analysis_result']['positions'] if r['symbol']==producer.symbol)
     item=analysis['native_funding_advice']['items'][row['instrument_id']];bond=analysis['native_bond_source']
     owner=deepcopy(item['stock_request']['work3_handoff']['owner'])
@@ -100,12 +106,13 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'native_outputs':outputs,'native_sources':sources,
         'context_source_bindings':deepcopy(sources['context_bindings']),
         'component_results':deepcopy(sources.get('component_results',{})),
+        'c7_bucket_preflight':deepcopy(preflight),'completion_gaps':completion_gaps(analysis,missing),
         'source_validation_issues':deepcopy(sources['source_validation_issues']),'first_failure':failure,
         'analysis_source_call_trace':deepcopy(analysis['call_trace']),
         'call_trace_scope':'COMPONENT_SOURCE_REPLAY_AND_ASSEMBLY_ONLY',
         'call_trace':['W8.reuse_verified_analysis_components','W8.HoldingsAnalysisRunner.analyze:source_replay',
             'C8C9.Work3.build_context_handoff:component_replay','C8C9.Work4.build_v82_runtime_input:component_replay',
-            'C8C9.Work5.build_v75_runtime_input:component_replay',*sources['context_call_trace'],
+            'C8C9.Work5.build_v75_runtime_input:component_replay',*sources['context_call_trace'],*preflight['call_trace'],
             'W8.assemble_native_input:report_all_missing_sources'],
         'mode':'CASH_ZERO_SIMULATION','analysis_mode':'CASH_ZERO_SIMULATION',
         'source_data_provenance':'SOURCE_BACKED','effective_input_provenance':'CASH_ZERO_SIMULATION',
@@ -114,6 +121,7 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'issues':[{'code':'NATIVE_SOURCE_INPUTS_REQUIRED','stage':'NATIVE_INPUT_READY',
             'field_path':field,'source_id':'VERIFIED-ANALYSIS:'+analysis['report_digest'],
             'producer':'W8.assemble_native_input','missing_reason':'Required source section has not been produced',
+            'blocker_category':'ENGINEERING_NOT_CONNECTED','owner_input_required':False,
             'remediation':'Bind the identified original source; retain existing approved allocation',
             'retryable':False,'evidence_ref':'native_sources'} for field in missing],
         'stage_status':{'SOURCE_LOADING':'COMPLETED','SOURCE_READY':'COMPLETED','MAPPING_READY':'PARTIAL',

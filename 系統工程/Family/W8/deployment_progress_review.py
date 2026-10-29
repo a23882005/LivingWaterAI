@@ -50,6 +50,10 @@ def build(root, request, analysis, work6, c7, source_sections):
             'review_period_start', 'review_period_end', 'forms_screened', 'filings_retrieved',
             'locally_retained_matched_primary_documents', 'all_forms_reviewed',
             'unnamed_trust_effects_fully_covered', 'new_trade_gate_created')}
+    if pool.get('plugin_data_cross_checks'):
+        from v75_plugin_data_inputs import summary
+        for symbol in ('SGOV','SPSB'):
+            evidence.setdefault(symbol,{})['plugin_market_cross_check']=summary(pool['plugin_data_cross_checks'],symbol)
     path = Path('系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py')
     out = {'schema_version': 'Family.W8.DeploymentProgressReview.v1', **deepcopy(identity),
         'evaluation_at': request['evaluation_at'], 'analysis_report_digest': analysis['report_digest'],

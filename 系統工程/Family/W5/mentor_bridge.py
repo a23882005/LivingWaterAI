@@ -60,6 +60,31 @@ def ready_data_evidence_notes(evidence,symbol,additional_delta=None):
     return []
 
 
+def plugin_evidence_notes(evidence,symbol):
+    if not evidence or symbol not in evidence['ibkr_weekly']:return []
+    weekly=evidence['ibkr_weekly'][symbol];daily=evidence['massive_daily'][symbol]
+    alpha=evidence['alpha_dividends'][symbol]
+    notes=[symbol+'外掛交叉核對：IB '+str(weekly['raw_bar_count'])+'根週線、'+
+        str(weekly['dividend_count'])+'筆配息事件；Massive '+str(daily['raw_bar_count'])+
+        '根日線；Alpha Vantage '+str(alpha['row_count'])+'筆歷史配息。價格與配息分別核對，保留發行商主來源。']
+    historical=[r for r in weekly['multiple_bars_per_iso_week'] if not r['latest_week']]
+    notes.append('IB最新週尚未完成；'+('另有'+str(len(historical))+'個歷史週含多根標記，先保留查核；' if historical else '')+
+        '完整且唯一的週資料共'+str(weekly['usable_unique_completed_weeks'])+'週。')
+    if weekly['invalid_ohlcv_bars']:
+        notes.append('另有'+str(len(weekly['invalid_ohlcv_bars']))+'根IB週線的OHLC不一致，保留原值並排除於完整週核對。')
+    differences=evidence['issuer_dividend_comparisons'][symbol]['alpha']['differences']
+    for row in differences:
+        if row['field']=='amount':
+            notes.append(symbol+' '+row['ex_date']+' Alpha配息與發行商差額為每股US$'+row['difference']+
+                '；維持發行商原值US$'+row['issuer']+'。')
+    if any(r['field']=='payment_date' for r in differences):
+        notes.append(symbol+'第三方付款日缺漏／差異已另列，未改寫發行商付款日。')
+    ambiguous=evidence['issuer_dividend_comparisons'][symbol]['ibkr']['ambiguous_provider_events']
+    if ambiguous:
+        notes.append(symbol+'另有'+str(len(ambiguous))+'個歷史除息日含多筆IB現金事件，金額分列，待來源定義核對。')
+    return notes
+
+
 def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggested_changes=(),bond_context=None):
     if llm_suggested_changes:raise MentorError('MODEL_FINANCIAL_MUTATION_REJECTED')
     req=deepcopy(work9_request);original=deepcopy(unified);context=deepcopy(trusted_context)
@@ -215,6 +240,7 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                     text.append(distribution_source_text(symbol,distribution))
             text.extend(ready_data_evidence_notes(bond_source.get('ready_data_evidence'),symbol,
                 bond_source.get('additional_delta_evidence')))
+            text.extend(plugin_evidence_notes(bond_source.get('plugin_data_cross_checks'),symbol))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
             liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
             if liquidity:

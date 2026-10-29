@@ -196,6 +196,8 @@ def build(report,request):
             if distribution:intro.append(distribution_source_text(symbol,distribution))
         from mentor_bridge import ready_data_evidence_notes
         intro.extend(ready_data_evidence_notes(pool.get('ready_data_handoff'),symbol,pool.get('additional_delta_handoff')))
+        from mentor_bridge import plugin_evidence_notes
+        intro.extend(plugin_evidence_notes(pool.get('plugin_data_cross_checks'),symbol))
     if supplement:
         intro.append('V75波動率補充來源：MOVE '+supplement['observed_date']+' 為 '+
             f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+

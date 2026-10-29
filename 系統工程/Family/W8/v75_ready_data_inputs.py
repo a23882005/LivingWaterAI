@@ -66,7 +66,8 @@ def sgov_distributions(files, observed_date):
         if total != sum((number(raw[k]) for k in header[4:]), Decimal(0)):
             raise PermissionError('READY_DATA_SGOV_COMPONENT_SUM')
         day = iso(row['Ex-Date'], '%b %d, %Y')
-        normalized.append({'ex_date': day, 'total': str(total), 'income': amount(raw['Income']),
+        normalized.append({'ex_date': day, 'pay_date': iso(raw['Payable Date'], '%b %d, %Y'),
+            'total': str(total), 'income': amount(raw['Income']),
             'roc': amount(raw['Return of Capital']), 'final_tax_characterization': False,
             'characterization': 'PROVISIONAL_ISSUER_DISPLAY' if day[:4] == '2026' else 'ISSUER_PRIOR_YEAR_DISPLAY'})
     window = distribution_window(normalized, observed_date)

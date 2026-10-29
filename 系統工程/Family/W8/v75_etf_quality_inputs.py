@@ -241,3 +241,5 @@ def bind_native(request,source,pool,run):
         source['ready_data_evidence']=deepcopy(pool['ready_data_handoff'])
     if pool.get('additional_delta_handoff'):
         source['additional_delta_evidence']=deepcopy(pool['additional_delta_handoff'])
+    if pool.get('plugin_data_cross_checks'):
+        source['plugin_data_cross_checks']=deepcopy(pool['plugin_data_cross_checks'])

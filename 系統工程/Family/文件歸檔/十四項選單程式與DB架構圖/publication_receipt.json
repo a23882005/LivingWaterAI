@@ -1,13 +1,12 @@
 {
-  "revision": "v1.1",
+  "revision": "v1.2",
   "date": "2026/10/29",
   "code_baseline": "60fd1d5f062ad7b3b20a713d44198e927fc0c212",
   "sources_verified_on": "2026/10/29; prior readback reused",
   "pages": 6,
-  "private_link_annotations_removed": 9,
-  "public_sha256": "0a2fe35d1e65c07701f352e7a733afc2880333726684c080a55985bbc847b705",
-  "public_bytes": 518838,
-  "drive_sha256": "a16ff54152d8bb9d040cfdcd6e65173c356648098c62179c2a7c7434c0b5298f",
-  "drive_bytes": 520635,
-  "qa": "6 pages; 14 items; page bounds; 10 private edition links; text and pixels match after font subsetting"
+  "public_sha256": "ab96aa1101f330734aa8c52690d0edf0c79678988bac5904f44b35bd51964b29",
+  "public_bytes": 520757,
+  "drive_sha256": "7d3e3be3738078a3b38911de240a587eecceba5c40feda9fac3bc6beabe0e213",
+  "drive_bytes": 522554,
+  "qa": "6/6 pages and 14/14 menu items; full color; 10 private edition links; text and pixels match after font subsetting; no text out of page"
 }

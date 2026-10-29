@@ -230,6 +230,8 @@ def validate(root,report,request):
     """Replay actual native contracts before accepting a cash-trial amount."""
     source=report.get('native_funding_advice')
     if source is None:return
+    from formal_mode_analysis import native
+    native(root)  # Replays also start in a fresh process without a prior core call.
     for key,expected in (('client_id',request['client_id']),('run_id',request['run_id']),
             ('source_db_sha256',request['client_snapshot']['payload']['source_sha256'])):
         if source.get(key)!=expected:raise PermissionError('NATIVE_FUNDING_ADVICE_BINDING_MISMATCH')

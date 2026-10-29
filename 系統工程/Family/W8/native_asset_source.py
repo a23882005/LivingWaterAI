@@ -409,7 +409,9 @@ class AssetSourceProducer:
             evaluation_at=when,official_holdings=holdings,
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
             approved_rule_profile=self.approved_rule_profile,
-            allow_independent_close_analysis=self.flow=='HOLDINGS_ANALYSIS',
+            # Both entry modes retain the independent analysis first. Only
+            # qualified evidence may enter the later deployment assembler.
+            allow_independent_close_analysis=True,
             approved_target=req.get('confirmed_target'),
             bond_advisory_candidates=advisory_candidates,
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
@@ -433,6 +435,13 @@ class AssetSourceProducer:
         if self.flow=='HOLDINGS_ANALYSIS':
             report=analysis
             return {'request':req,'trusted_context':ctx,'analysis_report':report,
+                'source_metadata':{'client_id':req['client_id'],'run_id':run,
+                    'source_db_sha256':snapshot['source_sha256']}}
+        from deployment_component_sources import build as reuse_deployment_components
+        stitched=reuse_deployment_components(self,req,ctx,analysis,prepared,holdings,trial,
+            observations,investment,asset_class,held)
+        if stitched is not None:
+            return {'request':req,'trusted_context':ctx,'source_production':stitched,
                 'source_metadata':{'client_id':req['client_id'],'run_id':run,
                     'source_db_sha256':snapshot['source_sha256']}}
         observed=next((r for r in observations['assets'] if r['symbol']==self.symbol),None)
@@ -652,9 +661,11 @@ class AssetSourceProducer:
             add(issue['field_path'],None,'W5 snapshot / original C7 schema',
                 'NO_VALUE_INVENTED',None,'UNAVAILABLE')
         for section,state in report['source_inventory'].items():
-            if section in ('bond_request','stock_evidence','producer_contract','stock_source_fields',
+            if section in ('stock_request','bond_request','stock_evidence','producer_contract','stock_source_fields',
                            'bond_evidence','asset_framework','physical_sgov'):
-                add('native_sources.native_bundle.'+section,None,'W8.AssetSourceProducer',state,None,'UNAVAILABLE')
+                value=report.get('native_sources',{}).get('native_bundle',{}).get(section)
+                add('native_sources.native_bundle.'+section,None,'W8.AssetSourceProducer',state,value,
+                    'SOURCE_BACKED' if value is not None else 'UNAVAILABLE')
         return records
 
     def funding_contexts(self, snapshot, selected_owner, selected_trial, run, ref):

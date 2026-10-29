@@ -113,6 +113,8 @@ def validate(request,context,report,root):
         raise PermissionError('V75_SUPPLEMENT_REPLAY_MISMATCH')
     if supplement is None:return
     from on_demand_market_observations import _macro_metrics
+    from bond_advisory import candidates
+    candidates(root)  # Load and verify the frozen source before a cold replay.
     from v75_runtime.predicates import EVALUATORS
     metrics,_=_macro_metrics(request['macro_snapshot'],request['evaluation_at'])
     old_metrics=metrics.get('PRED-005',{})

@@ -24,8 +24,19 @@ def bind_stock_source(request, prepared, binding):
     facts=request['native_bundle']['stock_evidence']
     require(mapping.get('account_key')==account and mapping.get('native_owner')==binding['native_owner'],
             'STOCK_SOURCE_OWNER_MISMATCH','native_binding.stock_instrument')
+    reference=mapping.get('market_reference')
+    exchange_matches=facts['exchange']==instrument.get('exchange_code')
+    if reference is not None:
+        require(reference.get('scope')=='ANALYSIS_MARKET_REFERENCE__NOT_HELD_OR_EXECUTION_VENUE'
+            and reference.get('asset_id')==facts['asset_id']
+            and reference.get('exchange')==facts['exchange']
+            and reference.get('currency')==facts['currency']
+            and reference.get('source_digest')==facts.get('market_identity_digest')
+            and bool(reference.get('source_reference')),
+            'STOCK_MARKET_REFERENCE_MISMATCH','stock.market_reference')
+        exchange_matches=True
     require(mapping.get('asset_id')==native['asset']['asset_id']==facts['asset_id']==instrument.get('ticker')
-            and facts['exchange']==instrument.get('exchange_code')
+            and exchange_matches
             and facts['currency']==instrument.get('quote_currency')==request['owner']['currency'],
             'STOCK_INSTRUMENT_MISMATCH','stock.asset_identity')
     if positions:
@@ -61,7 +72,8 @@ def bind_stock_source(request, prepared, binding):
             'instrument_key':instrument['instrument_key'],'snapshot_digest':digest(snapshot),
             'source_position':source,'confirmed_quantity':str(quantity),'policy':policy,
             'additional_new_buy_cap':None if policy['new_buy_candidate'] else '0',
-            'scope':'STOCK_IDENTITY_QUANTITY_NEW_BUY_ONLY'}
+            'market_reference':deepcopy(reference),'held_exchange':instrument.get('exchange_code'),
+            'scope':'STOCK_IDENTITY_QUANTITY_NEW_BUY_ONLY; market reference grants no execution venue'}
 
 
 def apply_stock_policy(bundle, source):

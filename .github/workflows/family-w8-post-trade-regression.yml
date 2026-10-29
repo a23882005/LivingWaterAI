@@ -156,6 +156,7 @@ jobs:
           python -m pytest -q
           '系統工程/Family/W5/tests/test_broker_snapshot_source.py'
           '系統工程/Family/W5/tests/test_tactical_budget.py'
+          '系統工程/Family/W5/tests/test_analysis_source_mappings.py'
           '系統工程/Family/W8/tests/test_sgov_role_source.py'
           '系統工程/Family/W8/tests/test_native_bond_source.py'
           '系統工程/Family/W8/tests/test_v75_macro_inputs.py'
@@ -171,5 +172,6 @@ jobs:
           '系統工程/Family/W8/tests/test_account_funding_check.py'
           '系統工程/Family/W8/tests/test_deployment_component_sources.py'
           '系統工程/Family/W8/tests/test_deployment_context_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_evidence_sources.py'
           '系統工程/Family/W8/tests/test_qualified_equity_inputs.py'
 

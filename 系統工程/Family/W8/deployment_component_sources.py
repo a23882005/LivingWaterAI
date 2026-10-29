@@ -70,6 +70,8 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
     HoldingsAnalysisRunner(context=context,report=analysis).analyze(request)
     from deployment_context_sources import extend
     sources=extend(producer.root,request,analysis,prepared,sources)
+    from deployment_evidence_sources import extend as produce_evidence
+    sources=produce_evidence(producer.root,request,analysis,prepared,sources,trusted_context=context)
     from on_demand_analysis import assemble_native_input,NativeSourceAssemblyError
     try:assemble_native_input(request,context,sources)
     except NativeSourceAssemblyError as error:missing=list(error.missing)
@@ -97,6 +99,7 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'native_inputs':{'work3':deepcopy(item['work3_input']),**deepcopy(sources['native_bundle'])},
         'native_outputs':outputs,'native_sources':sources,
         'context_source_bindings':deepcopy(sources['context_bindings']),
+        'component_results':deepcopy(sources.get('component_results',{})),
         'source_validation_issues':deepcopy(sources['source_validation_issues']),'first_failure':failure,
         'analysis_source_call_trace':deepcopy(analysis['call_trace']),
         'call_trace_scope':'COMPONENT_SOURCE_REPLAY_AND_ASSEMBLY_ONLY',
@@ -115,7 +118,7 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
             'retryable':False,'evidence_ref':'native_sources'} for field in missing],
         'stage_status':{'SOURCE_LOADING':'COMPLETED','SOURCE_READY':'COMPLETED','MAPPING_READY':'PARTIAL',
             'NATIVE_INPUT_READY':'BLOCKED','NATIVE_COMPLETE':'NOT_REACHED','MENTOR_READY':'NOT_REACHED'},
-        'source_inventory':{key:('REUSED_VERIFIED_SHARED_COMPONENT' if key in sources['native_bundle'] else
+        'source_inventory':{key:('SOURCE_PRODUCED; SEE_INDEPENDENT_BINDING_RESULT' if key in sources['native_bundle'] else
             'REQUIRED_ORIGINAL_SOURCE_NOT_PRODUCED') for key in ('stock_request','bond_request','stock_evidence',
                 'producer_contract','stock_source_fields','bond_evidence','asset_framework','physical_sgov')},
         'context_source_inventory':{key:('QUALIFIED_HISTORY_AND_OWNER_RULES_BOUND__FULL_NATIVE_INPUT_PENDING'
@@ -135,7 +138,7 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
             'original_core_state':outputs.get('v82_core_observation',{}).get('result'),
             'cash_assumption':trial['label'],'native_deployment_completed':False,
             'native_work9_mentor_completed':False,'first_blocker':failure},
-        'analysis_summary':'已重用並重播同輪持倉分析及原生股債組件；完整原生部署仍缺：'+','.join(missing)}
+            'analysis_summary':'已接入同輪持倉、原生股債證據及逐項來源驗證；完整原生部署仍缺：'+','.join(missing)}
     report['manifest']=producer.source_manifest(report,request,held,'DB:'+analysis['source_db_sha256'])
     report['manifest_digest']=digest(report['manifest']);report['report_digest']=digest(report)
     return report

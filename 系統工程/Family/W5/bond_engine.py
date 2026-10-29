@@ -90,6 +90,7 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
             raise BondEvidenceError('POLICY_SOURCE_COVERAGE')
         if set(evidence) != expected:
             raise BondEvidenceError('ASSET_EVIDENCE_COVERAGE')
+        evaluated={};incomplete=[]
         for item in state.per_asset_inputs:
             facts = evidence[item.asset_id]
             for key, value in [('asset_id', item.asset_id), ('run_id', run.run_id),
@@ -108,9 +109,15 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
                           for pid, fn in EVALUATORS.items()]
             trace.append('V75.predicates.PRED-001..010:' + item.asset_id)
             result['predicate_results'][item.asset_id] = [p.model_dump(mode='json') for p in predicates]
+            evaluated[item.asset_id]=predicates
             if any(p.assessment_status.value != 'VALID' for p in predicates):
-                return {**result, 'status': 'INSUFFICIENT_DATA', 'canonical': None,
-                        'issues': ['PREDICATES_NOT_VALID:' + item.asset_id]}
+                incomplete.append('PREDICATES_NOT_VALID:'+item.asset_id)
+        if incomplete:
+            return {**result,'status':'INSUFFICIENT_DATA','canonical':None,'issues':incomplete}
+        # Diagnose every asset before considering any terminal action. A valid
+        # first asset cannot hide a later asset's unavailable predicates.
+        for item in state.per_asset_inputs:
+            facts=evidence[item.asset_id];predicates=evaluated[item.asset_id]
             raw_quantity = facts['existing_policy']['current_position_quantity']
             if isinstance(raw_quantity, (bool, float)):
                 raise BondEvidenceError('EXACT_QUANTITY_REQUIRED')

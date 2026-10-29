@@ -64,6 +64,14 @@ def test_missing_metric_is_not_fabricated_pause():
     assert not any('assemble_final_snapshot' in x for x in result['call_trace'])
 
 
+def test_all_assets_are_diagnosed_before_any_terminal_decision():
+    facts=evidence();facts['SGOV']['metrics']['PRED-007']={};facts['SPSB']['metrics']['PRED-008']={}
+    result=run_bond_engine(ROOT,request(5),facts)
+    assert set(result['predicate_results'])=={'SGOV','SPSB'}
+    assert result['issues']==['PREDICATES_NOT_VALID:SGOV','PREDICATES_NOT_VALID:SPSB']
+    assert result['native_step10_traces']=={} and result['canonical'] is None
+
+
 @pytest.mark.parametrize('field,value,reason', [
     ('broker_account_id','OTHER','EVIDENCE_IDENTITY'),
     ('asset_id','OTHER','EVIDENCE_IDENTITY'),

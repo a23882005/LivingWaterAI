@@ -56,9 +56,12 @@ def bind_position_values(request,prepared,context):
         price=source['prices'][asset]
         require(price.get('unit')=='CURRENCY_PER_SHARE','VALUATION_PRICE_UNIT_REQUIRED','prices.'+asset+'.unit')
         positions=[p for p in prepared.payload['positions'] if p['instrument_key']==row['instrument_key']]
-        instrument=(one(positions,'valuation.positions')['source_instrument'] if positions else
-            one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
-                 if r['instrument_key']==row['instrument_key']],'valuation.instrument'))
+        if row.get('approved_target_only'):
+            instrument=row['source_instrument']  # Already authenticated by bind_bond_sources.
+        else:
+            instrument=(one(positions,'valuation.positions')['source_instrument'] if positions else
+                one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
+                     if r['instrument_key']==row['instrument_key']],'valuation.instrument'))
         require(price.get('currency')==instrument['quote_currency'],'VALUATION_QUOTE_CURRENCY_MISMATCH','prices.'+asset)
         position=row['source_position']
         quantity_at,quantity_basis=quantity_time(request,position,context)
@@ -75,12 +78,21 @@ def bind_position_values(request,prepared,context):
         require(valued['state']=='KNOWN','POSITION_VALUATION_UNAVAILABLE','valuation.'+asset,status='DATA_UNAVAILABLE')
         result[asset]=valued
     quote=source['prices'][stock['asset_id']];facts=bundle['stock_evidence']
-    require(amount(quote['value'])==amount(facts['valuation_price']) and quote['as_of']==facts['as_of'],
+    observation_at=quote.get('price_observation_as_of',quote['as_of'])
+    if observation_at!=quote['as_of']:
+        require(quote.get('valuation_basis')=='CURRENT_QUANTITY_AT_KNOWN_REFERENCE_PRICE'
+            and timestamp(observation_at,'price.observation')<=timestamp(quote['as_of'],'price.valuation')
+            and bool(quote.get('price_source_digest')),
+            'STOCK_VALUATION_REFERENCE_CLOCK_REQUIRED','stock_evidence.valuation_price')
+    require(amount(quote['value'])==amount(facts['valuation_price']) and observation_at==facts['as_of'],
             'STOCK_VALUATION_SOURCE_MISMATCH','stock_evidence.valuation_price')
     holdings=bundle['bond_request']['v75_source_context']['existing_bond_holdings']
     for asset in bonds:
         if asset=='SGOV':continue  # Existing bond bucket is logical money, not all physical SGOV.
-        holding=one([r for r in holdings if r['asset_id']==asset],'bond.valuation')
+        found=[r for r in holdings if r['asset_id']==asset]
+        if not found and amount(bonds[asset]['confirmed_quantity'])==0 and amount(result[asset]['value'])==0:
+            continue  # Complete W1 source proves an approved target is not held.
+        holding=one(found,'bond.valuation')
         require(native_number(holding['amount']['amount'],'bond.amount')==amount(result[asset]['value']),
                 'BOND_VALUATION_MISMATCH','existing_bond_holdings.'+asset)
     require('SGOV' in bonds,'SGOV_PHYSICAL_SOURCE_REQUIRED','bond_instruments',status='DATA_UNAVAILABLE')

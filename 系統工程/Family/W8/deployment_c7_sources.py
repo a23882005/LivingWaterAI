@@ -32,10 +32,10 @@ def metric(value, unit, at, refs, *, quality='OK', freshness='UNKNOWN'):
         'issue_codes': [], 'source_reference_ids': list(refs), 'source_native_status': None}
 
 
-def money(value, currency, at, refs):
+def money(value, currency, at, refs, *, quality='OK'):
     return {'value_state': 'KNOWN' if value is not None else 'UNKNOWN',
         'amount': float(value) if value is not None else None, 'currency': currency, 'as_of': at,
-        'data_quality': 'OK' if value is not None else 'UNKNOWN', 'freshness': 'UNKNOWN',
+        'data_quality': quality if value is not None else 'UNKNOWN', 'freshness': 'UNKNOWN',
         'issue_codes': [], 'source_reference_ids': list(refs)}
 
 
@@ -70,6 +70,7 @@ def extend(root, request, analysis, prepared, context, sources):
     comparison_ready = portfolio is not None and portfolio['denominator']['state'] == 'KNOWN'
     if comparison_ready:
         base = Decimal(portfolio['denominator']['value'])
+    comparison_quality = 'FALLBACK_USED' if comparison_ready else 'OK'
     target_ref = 'SRC_APPROVED_LONG_TERM'; current_ref = 'SRC_CURRENT_SCOPE'; v70_ref = 'SRC_V70'
     tactical = next(r['current_analysis']['v70_tactical_budget'] for r in analysis['analysis_result']['positions']
                     if r['current_analysis'].get('v70_tactical_budget'))
@@ -87,7 +88,8 @@ def extend(root, request, analysis, prepared, context, sources):
         v70[field] = metric(Decimal(str(allocation[key])) / 100, 'portfolio_weight',
                              raw['snapshot_as_of'], [v70_ref], freshness=freshness)
     for field in ('stock_tactical_amount', 'bond_tactical_amount', 'v70_original_dry_powder_amount'):
-        v70[field] = money(raw['payload'][field], currency, raw['snapshot_as_of'], [v70_ref])
+        v70[field] = money(raw['payload'][field], currency, raw['snapshot_as_of'], [v70_ref],
+                           quality=raw['payload']['data_quality'])
     mappings = {r['instrument_id']: r for r in preflight['mapping']}
     native_products = {r['symbol']: r['native_product_identity'] for r in analysis['analysis_result']['positions']}
     currency_by_symbol = {}
@@ -108,10 +110,10 @@ def extend(root, request, analysis, prepared, context, sources):
             'display_name': row.get('display_name'), 'asset_type': kind, 'market': None,
             'base_currency': currency_by_symbol.get(row['ticker']), 'value_state': 'KNOWN',
             'weight': metric(weight, 'portfolio_weight', at, [target_ref]),
-            'portfolio_amount': money(base * weight, currency, at, [target_ref]),
+            'portfolio_amount': money(base * weight, currency, at, [target_ref], quality=comparison_quality),
             'source_reference_ids': [target_ref]})
     proposal = {'allocation_id': 'APPROVED-BASE-PROJECTION:' + digest(target),
-        'stage': 'PROPOSED', 'as_of': at, 'denominator': money(base, currency, at, [target_ref]),
+        'stage': 'PROPOSED', 'as_of': at, 'denominator': money(base, currency, at, [target_ref], quality=comparison_quality),
         'positions': lines, 'declared_total_weight': metric(sum(Decimal(str(r['weight']['value']))
             for r in lines), 'portfolio_weight', at, [target_ref]),
         'confirmation_status': 'PENDING', 'confirmed_at': None, 'confirmed_by': None,
@@ -143,13 +145,13 @@ def extend(root, request, analysis, prepared, context, sources):
                     'base_currency': currency_by_symbol.get(symbol) if symbol else currency,
                     'value_state': 'KNOWN',
                     'weight': metric(role_value / base, 'portfolio_weight', at, [current_ref], quality='FALLBACK_USED'),
-                    'portfolio_amount': money(role_value, currency, at, [current_ref]),
+                    'portfolio_amount': money(role_value, currency, at, [current_ref], quality=comparison_quality),
                     'source_reference_ids': [current_ref]})
         if len({r['instrument_id'] for r in current_lines}) != len(current_lines):
             raise PermissionError('C7_CURRENT_CROSS_ACCOUNT_INSTRUMENT_COLLISION')
         current_slot = {'value_state': 'KNOWN', 'reason': portfolio['scope'], 'snapshot': {
             'allocation_id': 'CURRENT-COMPARISON:' + portfolio['output_digest'], 'stage': 'CURRENT', 'as_of': at,
-            'denominator': money(base, currency, at, [current_ref]), 'positions': current_lines,
+            'denominator': money(base, currency, at, [current_ref], quality=comparison_quality), 'positions': current_lines,
             'declared_total_weight': metric(1, 'portfolio_weight', at, [current_ref], quality='FALLBACK_USED'),
             'confirmation_status': 'NOT_APPLICABLE', 'confirmed_at': None, 'confirmed_by': None,
             'source_reference_ids': [current_ref]}}
@@ -158,7 +160,7 @@ def extend(root, request, analysis, prepared, context, sources):
     canonical = {'contract_name': 'LivingWaterAI.C.CanonicalInput', 'contract_version': 'C-W1-v1.0.1',
         'identity': {k: request[k] for k in ('client_id', 'run_id', 'request_id')},
         'decision_phase': 'PROPOSAL_REVIEW', 'capital_context': {
-            'total_investment_amount': money(base, currency, at, [target_ref]), 'base_currency': currency,
+            'total_investment_amount': money(base, currency, at, [target_ref], quality=comparison_quality), 'base_currency': currency,
             'fx_metadata': {'value_state': 'UNKNOWN', 'as_of': None, 'rates': [], 'source_reference_ids': []}},
         'allocations': {'current_allocation': current_slot,
             'proposed_allocation': {'value_state': 'KNOWN', 'snapshot': proposal, 'reason':

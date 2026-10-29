@@ -50,7 +50,15 @@ def save_manifest(source,manifest):
 
 
 def macro():
-    path=ROOT/'系統工程/總經V70/V70_macro_latest.json';raw=path.read_bytes();value=json.loads(raw)
+    # Contract tests at 02:00 must not read a live publication that can be
+    # refreshed later in the day. These labelled synthetic rows are separate
+    # from real source replay; production's future-publication guard remains.
+    value={'schema':'V70.3/family-macro-feed-v3','asOf':'2026-10-29T01:00:00Z',
+        'verification':{'ready':True},'indicators':{
+            key:{'value':number,'unit':unit,'status':'OK','dataDate':'2026-10-28',
+                'source':'https://example.test/synthetic/'+key,'lastVerifiedAt':'2026-10-29T01:00:00Z'}
+            for key,number,unit in [('m02',3.38,'%'),('m12',102.19,'')]}}
+    raw=json.dumps(value,sort_keys=True).encode()
     return {'payload':value,'digest':digest(value),'source_sha256':sha256(raw).hexdigest()}
 
 

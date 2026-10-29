@@ -14,6 +14,15 @@ WORK6_SHA256='5d8eed1638a76f63b9bff9ed822f5f53e09a0b481cb236c7ae4ba3b1c60f8b3c'
 WORK1_SHA256='ac23e11197f167be00c5e4c303462373eeced67f353ba26d26bfb4c739b50a71'
 
 
+def treasury_reference(effective_duration_years):
+    from v75_remaining_inputs import number
+    duration=number(effective_duration_years)
+    if duration<0:raise ValueError('V75_FORMAL_DURATION_DOMAIN')
+    for maximum,tenor in ((1,'1 Yr'),(3,'2 Yr'),(7,'5 Yr'),(12,'10 Yr'),(18,'20 Yr')):
+        if duration<=maximum:return tenor
+    return '30 Yr'
+
+
 def read(source,evaluation_at):
     if source is None:return None
     if (source.get('schema_version')!='Family.W8.FormalV75ParameterSource.v1'

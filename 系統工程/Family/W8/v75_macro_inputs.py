@@ -178,6 +178,13 @@ def read(source,evaluation_at):
     if parameters is not None:
         out['formal_parameters']=parameters
         out['available_at']=max(out['available_at'],parameters['available_at'],key=_time)
+    from v75_issuer_facts import read as read_issuers
+    issuers=read_issuers(manifest.get('etf_issuer_sources'),evaluation_at)
+    if issuers and parameters is None:raise PermissionError('V75_ISSUER_FORMAL_PARAMETER_BINDING_REQUIRED')
+    for symbol,issuer in issuers.items():
+        out['source_proofs']['ISSUER_'+symbol]={k:issuer[k] for k in
+            ('source_reference','source_sha256','receipt_sha256','available_at')}
+        out['available_at']=max(out['available_at'],issuer['available_at'],key=_time)
     series={key:fred(value,key,_time(proofs[key]['available_at'])) for key,value in data.items()
         if key not in ('SEP','TREASURY','FUTURES','NYFED_REPO','YAHOO_SGOV','YAHOO_SPSB')}
     effr=series['EFFR'];last=max(day for day,value in effr.items() if value is not None)
@@ -215,6 +222,11 @@ def read(source,evaluation_at):
     # PRED-003's duration <=1y branch uses 1Y, including SGOV. 3M may
     # describe its holdings but is never the canonical branch reference.
     for asset,tenor in [('SGOV','1 Yr'),('SPSB','2 Yr')]:
+        profile=issuers.get(asset,{}).get('facts',{}).get('effective_duration')
+        if profile and profile.get('value') is not None:
+            from formal_v75_parameters import treasury_reference
+            if profile['unit']!='YEARS':raise ValueError('V75_MACRO_DURATION_UNIT')
+            tenor=treasury_reference(profile['value'])
         if not rows or tenor not in rows[0]:
             out.setdefault('asset_unprovided_inputs',{}).setdefault(asset,{})['PRED-003']=[
                 'official Treasury '+tenor+' reference history']
@@ -234,11 +246,25 @@ def read(source,evaluation_at):
             'comparison_5bd':days[5].isoformat(),'comparison_10bd':days[10].isoformat(),
             'scope':'TREASURY_RATE_PATH_REFERENCE__NOT_ETF_YIELD_ATTRACTIVENESS_HISTORY',
             'basis':'V75_PREDICATE_PARAMS_v1.0.3 / PRED-003 duration reference maturity',
-            'auxiliary_3m_is_branch_reference':False}
+            'effective_duration_source':deepcopy(profile),'auxiliary_3m_is_branch_reference':False}
+        if parameters and profile and profile.get('value') is not None:
+            from v75_etf_quality_inputs import daily_freshness
+            checks=[daily_freshness(d,evaluation_at) for d in (days[0].isoformat(),profile['observed_date'])]
+            out.setdefault('qualified_predicate_inputs',{}).setdefault(asset,{})['PRED-003']={
+                'input_freshness_verified':all(r['state']=='FRESH' for r in checks),
+                'checks':checks,'basis':'FORMAL_DURATION_REFERENCE_AND_ORIGINAL_DAILY_FRESHNESS'}
+    if parameters:
+        from v75_etf_quality_inputs import daily_freshness
+        checks=[daily_freshness(v['observed_date'],evaluation_at) for v in credit_basis.values()]
+        out.setdefault('qualified_shared_predicate_inputs',{})['PRED-004']={
+            'input_freshness_verified':all(r['state']=='FRESH' for r in checks),
+            'checks':checks,'basis':'ALL_HY_IG_A_BBB_LEVELS_AND_5_20_BUSINESS_DAY_DELTAS'}
     from v75_remaining_inputs import extend
     out=extend(out,data,proofs)
     from v75_market_contract import qualify
-    return qualify(out,data,proofs,manifest,evaluation_at)
+    out=qualify(out,data,proofs,manifest,evaluation_at)
+    from v75_etf_quality_inputs import extend as extend_quality
+    return extend_quality(out,data,issuers,evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):
@@ -250,8 +276,13 @@ def slot(pool,pid,asset,previous,evaluation_at):
     contract=pool.get('qualified_bond_markets',{}).get(asset,{})
     fresh=(contract.get('eligible') is True and
         pid=='PRED-007' and pool['calculations']['PRED-007']['observed_date']==contract['observed_date'])
-    missing=deepcopy(pool['unprovided_inputs'].get(pid,[]))+deepcopy(
-        pool.get('asset_unprovided_inputs',{}).get(asset,{}).get(pid,[]))
+    qualified=pool.get('qualified_predicate_inputs',{}).get(asset,{}).get(pid,
+        pool.get('qualified_shared_predicate_inputs',{}).get(pid,{}))
+    if qualified:fresh=qualified.get('input_freshness_verified') is True
+    if pid=='PRED-010' and asset in pool.get('etf_quality_assessments',{}):
+        fresh=pool['etf_quality_assessments'][asset]['input_freshness_verified']
+    missing=deepcopy(pool.get('asset_unprovided_inputs',{}).get(asset,{}).get(pid,
+        pool['unprovided_inputs'].get(pid,[])))
     return {'metrics':deepcopy(metrics),'original_result':result.model_dump(mode='json'),
         'input_coverage':'PARTIAL_RAW_METRICS' if missing else 'COMPLETE_RAW_METRICS',
         'unprovided_inputs':missing,

@@ -225,6 +225,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
             'accepted':checked.accepted,'issues':[vars(i) for i in checked.issues]}
         gaps.extend({'code':i.code,'field_path':i.path,'message':i.message} for i in checked.issues)
         if checked.model is not None:
+            from v75_etf_quality_inputs import bind_native as bind_native_etf_quality
+            bind_native_etf_quality(request,result,report.get('v75_macro_inputs') or {},checked.model)
             result['call_trace'].append('V75.build_work3_state:STRUCTURAL_DIAGNOSTIC_ONLY')
             state=build_work3_state(checked.model)
             result['structural_state']=state.model_dump(mode='json')

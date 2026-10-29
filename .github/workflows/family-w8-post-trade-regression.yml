@@ -161,6 +161,8 @@ jobs:
           '系統工程/Family/W8/tests/test_v75_macro_inputs.py'
           '系統工程/Family/W8/tests/test_v75_remaining_inputs.py'
           '系統工程/Family/W8/tests/test_v75_market_contract.py'
+          '系統工程/Family/W8/tests/test_formal_v75_parameters.py'
+          '系統工程/Family/W8/tests/test_v75_etf_quality_inputs.py'
           '系統工程/Family/W8/tests/test_native_source_freshness.py'
           '系統工程/Family/W8/tests/test_account_funding_check.py'
           '系統工程/Family/W8/tests/test_deployment_component_sources.py'

@@ -10,6 +10,13 @@ sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
 import formal_v75_parameters as M
 
 
+@pytest.mark.parametrize('duration,tenor',[
+    ('0.11','1 Yr'),('1','1 Yr'),('1.01','2 Yr'),('3','2 Yr'),('7','5 Yr'),
+    ('12','10 Yr'),('18','20 Yr'),('18.01','30 Yr')])
+def test_frozen_duration_bands_select_the_treasury_reference(duration,tenor):
+    assert M.treasury_reference(duration)==tenor
+
+
 def test_exact_bytes_and_availability_are_required_even_with_correct_version(tmp_path):
     path=tmp_path/'synthetic-contract.md';path.write_bytes(b'SYNTHETIC fixture, never production parameters')
     source={'schema_version':'Family.W8.FormalV75ParameterSource.v1','parameter_version':M.VERSION,

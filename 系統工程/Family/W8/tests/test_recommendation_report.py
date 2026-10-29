@@ -32,6 +32,20 @@ class ReportTest(unittest.TestCase):
         r,q=self.case();r['mentor']['items']=[]
         with self.assertRaisesRegex(ValueError,'COVERAGE_MISMATCH'):build(r,q)
 
+    def test_income_observation_is_preserved_beside_canonical_yield_and_quality_gaps(self):
+        r,q=self.case();r['v75_macro_inputs']={
+            'income_observations':{'SGOV':{'calculation':{'observed_date':'2026-10-28',
+                'latest_yield_pct':'3.64','history_years':'4'}}},
+            'canonical_yield_observations':{'SGOV':{'basis':'OFFICIAL_PORTFOLIO_YTM',
+                'current':{'observed_date':'2026-10-27','value':'4.03'}}},
+            'etf_quality_assessments':{'SGOV':{'metrics':{'structure_state':'UNKNOWN',
+                'liquidity_state_etf':'UNKNOWN','distribution_quality_state':'UNKNOWN'}}}}
+        text=build(r,q)['markdown']
+        self.assertIn('過去12月現金配息殖利率 3.64%',text)
+        self.assertIn('官方組合到期殖利率 4.03%',text)
+        self.assertIn('結構 資料未齊',text)
+        self.assertIn('第008項仍需同口徑週資料歷史',text)
+
     def test_unreturned_requested_position_cannot_be_reported_complete(self):
         r,q=self.case();r['analysis_result']['coverage']={'requested':2}
         with self.assertRaisesRegex(ValueError,'POSITION_COVERAGE_MISMATCH'):build(r,q)

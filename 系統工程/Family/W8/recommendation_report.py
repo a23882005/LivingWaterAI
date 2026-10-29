@@ -164,13 +164,28 @@ def build(report,request):
         intro.append('V70目標股／債風險比例：'+str(tactical['allocation']['S0'])+'%／'+str(tactical['allocation']['B0'])+'%。')
         intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
     supplement=report.get('bond_market_supplement')
-    calculations=(report.get('v75_macro_inputs') or {}).get('calculations',{})
+    pool=report.get('v75_macro_inputs') or {}
     for symbol in ('SGOV','SPSB'):
-        history=calculations.get(symbol+'.PRED-008')
+        history=pool.get('income_observations',{}).get(symbol,{}).get('calculation')
         if history:
             intro.append(symbol+' '+history['observed_date']+' 的過去12月現金配息殖利率 '+
                 f"{Decimal(history['latest_yield_pct']):.2f}"+'%，在本ETF同口徑近 '+
                 f"{Decimal(history['history_years']):.2f}"+' 年的參考序列中已完成比較。採現金配息／未含配息還原的收盤價；與SEC殖利率、到期殖利率分列，不代表配息品質已通過。')
+        current=pool.get('canonical_yield_observations',{}).get(symbol,{})
+        point=current.get('current') or {}
+        if point.get('value') is not None:
+            name='官方組合到期殖利率' if current['basis']=='OFFICIAL_PORTFOLIO_YTM' else '官方30-Day SEC Yield'
+            intro.append(symbol+' '+point['observed_date']+' '+name+' '+point['value']+
+                '%；第008項仍需同口徑週資料歷史，不以現金配息收益率推算百分位。')
+        quality=(report.get('native_bond_source',{}).get('etf_quality_assessments',{}).get(symbol)
+            or pool.get('etf_quality_assessments',{}).get(symbol))
+        if quality:
+            states=quality['metrics'];labels={'UNKNOWN':'資料未齊','REVIEW_REQUIRED':'需複查',
+                'STRUCTURE_OK':'通過','STRUCTURE_ABNORMAL':'異常','LIQUIDITY_OK':'通過','LIQUIDITY_ABNORMAL':'異常',
+                'DISTRIBUTION_OK':'通過','DISTRIBUTION_ABNORMAL':'異常','NOT_APPLICABLE':'不適用'}
+            intro.append(symbol+' ETF品質：結構 '+labels[states['structure_state']]+'、流動性 '+
+                labels[states['liquidity_state_etf']]+'、配息品質 '+labels[states['distribution_quality_state']]+
+                '。依已核對的V75 v1.0.3原參數判斷；官網30天價差未代替20交易日資料，未定案的配息分類未當成零ROC。')
     if supplement:
         intro.append('V75波動率補充來源：MOVE '+supplement['observed_date']+' 為 '+
             f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+

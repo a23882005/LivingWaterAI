@@ -145,6 +145,25 @@ class ProjectionTest(unittest.TestCase):
         self.assertEqual(bound['policy']['holding_policy'],'UNKNOWN')
         self.assertFalse(bound['policy']['new_buy_candidate'])
 
+    def test_missing_quote_currency_uses_an_explicit_same_row_per_share_fact_without_db_write(self):
+        item=self.run_source(kind='SCREENSHOT');item['entity_key']='VT'
+        self.tables['portfolio_instrument'][0]['quote_currency']=None
+        self.tables['portfolio_snapshot_item'] += [
+            {**item,'item_no':2,'field_key':'broker_account_number','entity_key':'IB_SCREEN','value_text':'SYNTHETIC'},
+            {**item,'item_no':3,'field_key':'last_price_displayed','value_text':'100',
+                'currency_code':'USD','unit':'USD_PER_SHARE'}]
+        before=deepcopy(self.tables);positions=self.bound_positions();instrument=positions[0]['source_instrument']
+        self.assertEqual(instrument['quote_currency'],'USD')
+        self.assertFalse(instrument['quote_currency_source']['registry_written'])
+        self.assertEqual(self.tables,before)
+        self.assertIsNone(self.tables['portfolio_instrument'][0]['quote_currency'])
+
+    def test_market_value_currency_or_unknown_unit_cannot_become_quote_currency(self):
+        for key,unit in [('market_value','USD'),('last_price_displayed','USD')]:
+            row={'source_row':{'id':'SYNTHETIC'},'source_fields':{key:[{
+                'value_state':'KNOWN','currency_code':'USD','unit':unit}]}}
+            with self.subTest(key=key):self.assertIsNone(M.holding_quote_currency(row))
+
     def test_source_broker_category_cannot_pull_in_taiwan_positions(self):
         item=self.run_source();rows=json.loads(item['value_text'])
         rows.append({'symbol':'0050','quantity':'1000','broker_label':'截圖台灣券商','currency':'TWD'})

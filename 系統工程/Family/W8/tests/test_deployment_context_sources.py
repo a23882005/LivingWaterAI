@@ -99,3 +99,39 @@ def test_position_binding_preserves_prepared_identity_and_exact_quantity(kind):
     position[kind]='999' if kind=='quantity' else 'OTHER'
     with pytest.raises(PermissionError,match='DEPLOYMENT_STOCK_POSITION_MAPPING_MISMATCH'):
         extend(ROOT,request,report,prepared,sources)
+
+
+def technical_case(folder):
+    from test_qualified_equity_inputs import fixture
+    from qualified_equity_inputs import read
+    request,report,prepared,sources=inputs();row=report['analysis_result']['positions'][0]
+    request['evaluation_at']='2026-10-29T04:00:00Z'
+    _,descriptor=fixture(folder,symbol='QQQ');pool=read(descriptor,request['evaluation_at'],ROOT)
+    equity=pool['items']['QQQ'];report['qualified_equity_inputs']=pool
+    row['market'].update(qualified_equity_market_digest=equity['digest'],observed_date=equity['observed_date'],
+        observed_close=float(equity['rows'][-1]['Close']),source_sha256=equity['technical_source_template']['sha256'])
+    return request,report,prepared,sources
+
+
+def test_qualified_history_template_is_owner_bound_without_claiming_full_family_validation(tmp_path):
+    request,report,prepared,sources=technical_case(tmp_path)
+    result=extend(ROOT,request,report,prepared,sources)
+    technical=result['trusted_context']['technical_source']
+    assert technical['client_id']==request['client_id'] and technical['family_owner']==request['owner']
+    assert result['context_bindings']['technical_source']['full_family_technical_binding_passed'] is False
+    assert result['context_bindings']['technical_source']['original_technical_binding_passed'] is True
+    with pytest.raises(NativeSourceAssemblyError) as caught:assemble_native_input(request,{},result)
+    assert len(caught.value.missing)==8 and 'trusted_context.technical_source' not in caught.value.missing
+
+
+@pytest.mark.parametrize('kind',['price','digest','stale'])
+def test_mixed_or_stale_market_source_cannot_supply_the_technical_template(kind,tmp_path):
+    request,report,prepared,sources=technical_case(tmp_path)
+    market=report['analysis_result']['positions'][0]['market']
+    if kind=='price':market['observed_close']=999
+    elif kind=='digest':market['qualified_equity_market_digest']='0'*64
+    else:report['qualified_equity_inputs']['items']['QQQ']['status']='STALE'
+    if kind=='stale':assert 'technical_source' not in extend(ROOT,request,report,prepared,sources)['trusted_context']
+    else:
+        with pytest.raises(PermissionError,match='DEPLOYMENT_TECHNICAL_MARKET_SOURCE_MISMATCH'):
+            extend(ROOT,request,report,prepared,sources)

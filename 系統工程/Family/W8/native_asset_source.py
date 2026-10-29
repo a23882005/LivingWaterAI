@@ -298,9 +298,10 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.broker_snapshot_source=deepcopy(broker_snapshot_source)
+        self.qualified_equity_source_manifest=deepcopy(qualified_equity_source_manifest)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
@@ -387,6 +388,11 @@ class AssetSourceProducer:
         if self.broker_snapshot_source is not None:
             ctx['broker_snapshot_source']=deepcopy(self.broker_snapshot_source)
             req['broker_snapshot_source_digest']=digest(self.broker_snapshot_source)
+        if self.qualified_equity_source_manifest is not None:
+            ctx['qualified_equity_source_manifest']=deepcopy(self.qualified_equity_source_manifest)
+            req['qualified_equity_source_digest']=digest(self.qualified_equity_source_manifest)
+        else:
+            ctx.pop('qualified_equity_source_manifest',None);req.pop('qualified_equity_source_digest',None)
         prepared=prepare_input(req,trusted_context=ctx)
         broker_view=prepared.payload.get('broker_snapshot_source')
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
@@ -422,6 +428,10 @@ class AssetSourceProducer:
         macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
         observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
         observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
+        from qualified_equity_inputs import read as read_equities,apply as apply_equities
+        equities=read_equities(self.qualified_equity_source_manifest,when,self.root)
+        observations=apply_equities(observations,equities,req,self.root,self.class_source,self.approved_rule_profile,
+            prepared.payload['positions'])
         from new_investment_scenario import build_plan,apply_plan,wire_number
         investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
         from v70_tactical_input import calculate

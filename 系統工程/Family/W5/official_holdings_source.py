@@ -37,6 +37,23 @@ def _quantity(value):
     return str(value)  # Preserve source precision, including trailing zeroes.
 
 
+def holding_quote_currency(row):
+    """Use an explicit per-share price unit, never a market-value currency."""
+    facts=[]
+    for key in ('last_price_displayed','average_price_displayed'):
+        for fact in row.get('source_fields',{}).get(key,[]):
+            currency=fact.get('currency_code')
+            if (fact.get('value_state')=='KNOWN' and isinstance(currency,str)
+                and len(currency)==3 and currency.isascii() and currency.isalpha() and currency.isupper()
+                and fact.get('unit')==currency+'_PER_SHARE'):
+                facts.append(deepcopy(fact))
+    currencies={f['currency_code'] for f in facts}
+    if len(currencies)!=1:return None
+    return {'currency':next(iter(currencies)),'source_fields':facts,
+        'source_row_digest':_digest(row['source_row']),
+        'scope':'ACCEPTED_PER_SHARE_PRICE_UNIT__NO_FX_OR_VENUE_ASSERTION','registry_written':False}
+
+
 def project_official_holdings(snapshot, *, evaluation_at=None):
     """Resolve source quantities; never sum representations of the same holding.
 
@@ -229,6 +246,13 @@ def build_official_position_view(snapshot, account, evaluation_at, acceptance, a
                 'identity_state': 'SOURCE_SYMBOL_ONLY', 'source_reference': row['source_row'].get('source_reference')}
         elif row.get('currency') and instrument.get('quote_currency') not in (None, row['currency']):
             raise ValueError('OFFICIAL_POSITION_CURRENCY_MISMATCH')
+        quote_source=holding_quote_currency(row)
+        if quote_source is not None:
+            if instrument.get('quote_currency') not in (None,quote_source['currency']):
+                raise ValueError('OFFICIAL_POSITION_QUOTE_CURRENCY_CONFLICT')
+            if instrument.get('quote_currency') is None:
+                instrument['quote_currency']=quote_source['currency']
+                instrument['quote_currency_source']=quote_source
         source = {'client_id': snapshot['client_id'], 'account_key': account,
             'instrument_key': instrument['instrument_key'], 'quantity_decimal': row['quantity'],
             'as_of_utc': row['observed_at'], 'received_at_utc': row['received_at'],

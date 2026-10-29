@@ -5,6 +5,8 @@ their own required source sections. Cash-trial bindings attest no external
 funding event or new available balance.
 """
 from copy import deepcopy
+from hashlib import sha256
+from pathlib import Path
 from family_input import digest
 from family_boundary import BoundaryError
 from runtime_loader import load_c_module
@@ -93,4 +95,39 @@ def extend(root,request,analysis,prepared,sources):
     bindings['stock_instrument']={'status':'PREPARED_POSITION_IDENTITY_ONLY',
         'position_digest':digest(position),'exchange_or_canonical_price_qualification_asserted':False}
     trace.append('W8.map_prepared_stock_instrument')
+    equity=(analysis.get('qualified_equity_inputs') or {}).get('items',{}).get(symbol)
+    if equity is not None:
+        row=next(r for r in analysis['analysis_result']['positions'] if r['instrument_id']==position['instrument_key'])
+        market=row.get('market') or {}
+        if (market.get('qualified_equity_market_digest')!=equity['digest']
+            or market.get('observed_date')!=equity['observed_date']
+            or market.get('observed_close')!=float(equity['rows'][-1]['Close'])
+            or market.get('source_sha256')!=equity['technical_source_template']['sha256']):
+            raise PermissionError('DEPLOYMENT_TECHNICAL_MARKET_SOURCE_MISMATCH')
+        if equity['status']=='FRESH':
+            technical=deepcopy(equity['technical_source_template'])
+            technical.update(client_id=request['client_id'],family_owner=deepcopy(request['owner']))
+            approval=Path(root)/'系統工程/Family/W8/owner_approved_v10.json'
+            technical['owner_approved_rule_source']={'local_path':str(approval),'sha256':sha256(approval.read_bytes()).hexdigest()}
+            technical['verified_asset_type']=row['native_product_identity']['asset_type']
+            # Only the identity fields consumed by this original source
+            # validator enter the probe. No stock_evidence section is emitted.
+            technical_probe=deepcopy(probe)
+            technical_probe['native_bundle']['stock_evidence']={k:technical['metadata'][k] for k in ('exchange','currency')}
+            technical_probe['technical_source_digest']=digest(technical)
+            from family_technical_bridge import bind_technical_source
+            trace.append('W5.bind_technical_source:qualified_history_and_owner_rules')
+            try:
+                bound=bind_technical_source(root,technical_probe,{'technical_source':technical,
+                    'native_binding':{'data_provenance':'SOURCE_BACKED'}})
+            except BoundaryError as error:
+                issues.append({'source_section':'trusted_context.technical_source',**deepcopy(error.issue)})
+            else:
+                contexts['technical_source']=technical
+                bindings['technical_source']={'status':'ORIGINAL_TECHNICAL_SOURCE_BOUND__FULL_FAMILY_VALIDATION_PENDING',
+                    'source_digest':digest(technical),'binding_digest':digest(bound),
+                    'history_digest':technical['metadata']['history_digest'],
+                    'owner_approved_spec_sha256':bound['owner_approved_technical']['spec_sha256'],
+                    'source_market_digest':equity['digest'],'original_technical_binding_passed':True,
+                    'full_family_technical_binding_passed':False}
     return out

@@ -4,9 +4,11 @@ Snapshot timing is an evaluation boundary, not historical point-in-time proof.
 Unapproved predicates remain UNKNOWN. SYNTHETIC inputs remain labelled.
 """
 from copy import deepcopy
+from hashlib import sha256
+from pathlib import Path
 from family_input import digest
 from family_boundary import require,BoundaryError,timestamp
-from technical_source_bridge import build_partial_technical,read_history,NAMES
+from technical_source_bridge import build_partial_technical,read_history,NAMES,predicate_votes,_aggregate
 
 
 def bind_technical_source(repo_path,request,context):
@@ -43,6 +45,21 @@ def bind_technical_source(repo_path,request,context):
         require(meta.get(key)==facts[key],'TECHNICAL_INSTRUMENT_MISMATCH','technical_source.'+key)
     require(meta.get('data_provenance')==context['native_binding']['data_provenance'],
             'TECHNICAL_PROVENANCE_MISMATCH','technical_source.data_provenance')
+    approval=source.get('owner_approved_rule_source')
+    if approval is not None:
+        path=Path(repo_path).resolve()/'系統工程/Family/W8/owner_approved_v10.json'
+        require(Path(approval.get('local_path','')).resolve()==path
+            and sha256(path.read_bytes()).hexdigest()==approval.get('sha256'),
+            'TECHNICAL_APPROVAL_SOURCE_MISMATCH','technical_source.owner_approved_rule_source')
+        asset=request['native_bundle']['stock_request']['asset_context']['asset']
+        require(meta['data_provenance']=='SOURCE_BACKED' and source.get('verified_asset_type')==asset.get('asset_type')=='BROAD_ETF',
+            'TECHNICAL_APPROVED_PRODUCT_SOURCE_REQUIRED','technical_source.verified_asset_type')
+        from approved_v04_technical import load_profile,produce
+        approved=produce(rows,profile=load_profile(path),is_etf=True)
+        summary.update(signals=deepcopy(approved['signals']),ma20_ok=approved['ma20_ok'],
+            native_technical_aggregation=_aggregate(repo_path,approved['signals'],approved['ma20_ok']),
+            owner_approved_technical=deepcopy(approved))
+        summary['call_trace']+=['W8.load_profile:verified_owner_v1.0','W8.produce:owner_approved_32_slots']
     # Approved engineering fixture: explicit predicate inputs, never a new rule.
     fixture=source.get('synthetic_complete_predicates')
     if fixture is not None:
@@ -65,7 +82,7 @@ def apply_technical_source(bundle,technical):
     data=deepcopy(bundle)
     if technical is None:return data
     facts=data['stock_evidence']
-    for group in NAMES:facts['core'][group]=[x['truth'] for x in technical['signals'][group]]
+    for group in NAMES:facts['core'][group]=predicate_votes(technical['signals'][group])
     facts['core']['ma20_ok']=technical['ma20_ok']
     if 'synthetic_complete_predicates' in technical:
         facts['core'].update(deepcopy(technical['synthetic_complete_predicates']))
@@ -73,6 +90,10 @@ def apply_technical_source(bundle,technical):
     facts['source_reference']=facts['source_reference']+' | TECHNICAL:'+technical['source_reference']
     facts['technical_source_digest']=technical['history_digest']
     data['producer_contract'].update(producer='W5_FULL_HISTORY_BRIDGE',version='1',parameters={'history_digest':technical['history_digest'],'scope':technical.get('synthetic_fixture_scope','PARTIAL_ORIGINAL_RULES')})
+    if 'owner_approved_technical' in technical:
+        approved=technical['owner_approved_technical']
+        data['producer_contract']['parameters'].update(scope='QUALIFIED_SOURCE_WITH_OWNER_APPROVED_V1_0',
+            owner_approved_spec_sha256=approved['spec_sha256'],approval_receipt_sha256=approved['approval_receipt_sha256'])
     facts.update(deepcopy(data['producer_contract']))
     facts['swings']=[{'asset_id':facts['asset_id'],**p} for k in ('lows','highs') for p in technical['swings'][k]]
     facts['technical_available_at']=technical.get('snapshot_available_at')

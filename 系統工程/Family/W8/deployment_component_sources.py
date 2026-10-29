@@ -118,7 +118,9 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'source_inventory':{key:('REUSED_VERIFIED_SHARED_COMPONENT' if key in sources['native_bundle'] else
             'REQUIRED_ORIGINAL_SOURCE_NOT_PRODUCED') for key in ('stock_request','bond_request','stock_evidence',
                 'producer_contract','stock_source_fields','bond_evidence','asset_framework','physical_sgov')},
-        'context_source_inventory':{key:('REUSED_VERIFIED_SHARED_CONTEXT' if key in sources['trusted_context']
+        'context_source_inventory':{key:('QUALIFIED_HISTORY_AND_OWNER_RULES_BOUND__FULL_NATIVE_INPUT_PENDING'
+            if key=='technical_source' and key in sources['trusted_context'] else
+            'REUSED_VERIFIED_SHARED_CONTEXT' if key in sources['trusted_context']
             else 'REQUIRED_ORIGINAL_SOURCE_NOT_PRODUCED') for key in
                 ('funding_source','valuation_source','v70_source','c7_source','technical_source')},
         'coverage':[{'instrument_id':r['instrument_id'],'symbol':r['symbol'],'status':'BLOCKED',

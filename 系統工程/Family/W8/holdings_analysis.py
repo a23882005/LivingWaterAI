@@ -451,6 +451,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         report['bond_market_supplement']=deepcopy(observations['bond_market_supplement'])
     if observations.get('v75_macro_inputs') is not None:
         report['v75_macro_inputs']=deepcopy(observations['v75_macro_inputs'])
+    if observations.get('qualified_equity_inputs') is not None:
+        report['qualified_equity_inputs']=deepcopy(observations['qualified_equity_inputs'])
     from bond_policy_audit import build as audit_bond_policy
     policy_audit=audit_bond_policy(request,context)
     if policy_audit is not None:report['bond_policy_audit']=policy_audit
@@ -601,6 +603,8 @@ class HoldingsAnalysisRunner:
         validate_v75_macro_inputs(request,self.context,report,root)
         from v75_market_contract import validate as validate_v75_market_contract
         validate_v75_market_contract(request,self.context,report,root)
+        from qualified_equity_inputs import validate as validate_qualified_equities
+        validate_qualified_equities(request,self.context,report,root,prepared_positions=prepared.payload['positions'])
         from bond_policy_audit import validate as validate_bond_policy
         validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)

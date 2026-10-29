@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 HERE=Path(__file__).resolve().parents[1]
 ROOT=HERE.parents[2]
-sys.path.insert(0,str(ROOT/'系統工程/Family/W5'))
+sys.path[:0]=[str(HERE),str(ROOT/'系統工程/Family/W5')]
 from family_input import digest
 spec=importlib.util.spec_from_file_location('market_observations_test',HERE/'on_demand_market_observations.py')
 M=importlib.util.module_from_spec(spec);spec.loader.exec_module(M)

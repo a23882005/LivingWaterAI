@@ -19,12 +19,13 @@ from v75_handoff_inputs import amount, csv_rows, distribution_window, iso, xml
 from v75_remaining_inputs import number, time
 
 
-def manifest_files(source, evaluation_at):
-    if (source.get('schema_version') != 'Family.W8.V75ReadyDataSource.v1'
+def manifest_files(source, evaluation_at, *, schema='Family.W8.V75ReadyDataSource.v1',
+                   manifest_name='PACKAGE_MANIFEST.json', size_field='size'):
+    if (source.get('schema_version') != schema
             or time(source['ingested_at']) > time(evaluation_at)):
         raise PermissionError('READY_DATA_SCHEMA_OR_AVAILABILITY')
     root = Path(source['root']).resolve()
-    raw = (root / 'PACKAGE_MANIFEST.json').read_bytes()
+    raw = (root / manifest_name).read_bytes()
     if sha256(raw).hexdigest() != source['manifest_sha256']:
         raise PermissionError('READY_DATA_MANIFEST_HASH')
     files = {}
@@ -35,7 +36,7 @@ def manifest_files(source, evaluation_at):
                 or str(path) in files):
             raise PermissionError('READY_DATA_MANIFEST_PATH')
         content = local.read_bytes()
-        if len(content) != item['size'] or sha256(content).hexdigest() != item['sha256']:
+        if len(content) != item[size_field] or sha256(content).hexdigest() != item['sha256']:
             raise PermissionError('READY_DATA_SOURCE_HASH:' + str(path))
         files[str(path)] = content
     return files
@@ -186,17 +187,19 @@ class SparseYieldHTML(HTMLParser):
             if self.depth == self.cell['depth']: self.cell['direct'] += value
 
 
-def sparse_yields(files, evaluation_at):
-    manifest = json.loads(files['spsb_sparse_history/replay_manifest.json'])
-    supplied = json.loads(files['spsb_sparse_history/sparse_archived_issuer_yields.json'], parse_float=Decimal)
+def sparse_yields(files, evaluation_at, *, prefix='spsb_sparse_history'):
+    manifest = json.loads(files[prefix + '/replay_manifest.json'])
+    supplied = json.loads(files[prefix + '/sparse_archived_issuer_yields.json'], parse_float=Decimal)
     actual = []
     for source in manifest:
-        key = 'spsb_sparse_history/' + source['path']; raw = files[key]
+        key = prefix + '/' + source['path']; raw = files[key]
         if source['status'] != 200 or len(raw) != source['bytes'] or sha256(raw).hexdigest() != source['sha256']:
             raise PermissionError('READY_DATA_SPARSE_RAW_HASH')
         captured = datetime.strptime(source['capture_timestamp'], '%Y%m%d%H%M%S').replace(tzinfo=timezone.utc)
         if captured > time(evaluation_at):
             raise PermissionError('READY_DATA_SPARSE_FUTURE_CAPTURE')
+        if source.get('retrieval_utc') and time(source['retrieval_utc']) > time(evaluation_at):
+            raise PermissionError('READY_DATA_SPARSE_FUTURE_RETRIEVAL')
         if (not source['original_url'].startswith('https://www.ssga.com/us/en/')
                 or not source['original_url'].split('?')[0].endswith('-spsb')
                 or source['replay_url'] != 'https://web.archive.org/web/' + source['capture_timestamp'] + 'id_/' + source['original_url']):
@@ -217,7 +220,7 @@ def sparse_yields(files, evaluation_at):
             raise PermissionError('READY_DATA_SPARSE_RECEIPT_MISMATCH')
         key = (row['metric'], row['as_of'], str(number(row['value_percent'])))
         item = unique.setdefault(key, {'metric': key[0], 'as_of': key[1], 'value_percent': key[2], 'sources': []})
-        item['sources'].append({**deepcopy(source), 'raw_file': 'spsb_sparse_history/' + source['path']})
+        item['sources'].append({**deepcopy(source), 'raw_file': prefix + '/' + source['path']})
     verified = sorted(unique.values(), key=lambda r: (r['metric'], r['as_of']))
     return {'ticker': 'SPSB', 'observations': verified, 'raw_source_rows': len(supplied),
         'distinct_observations': len(verified), 'counts_by_metric': dict(Counter(r['metric'] for r in verified)),

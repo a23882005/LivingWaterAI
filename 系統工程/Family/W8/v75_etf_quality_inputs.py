@@ -239,3 +239,5 @@ def bind_native(request,source,pool,run):
     source['etf_quality_assessments']=assessments
     if pool.get('ready_data_handoff'):
         source['ready_data_evidence']=deepcopy(pool['ready_data_handoff'])
+    if pool.get('additional_delta_handoff'):
+        source['additional_delta_evidence']=deepcopy(pool['additional_delta_handoff'])

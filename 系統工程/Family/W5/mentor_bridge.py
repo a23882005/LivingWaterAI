@@ -19,6 +19,14 @@ class MentorError(ValueError):
 
 def distribution_source_text(symbol,distribution):
     text='已核對'+symbol+' '+str(distribution['periods'])+'次配息'
+    partial=distribution.get('partial_components')
+    if partial:
+        return (text+'；其中'+str(partial['component_verified_payment_count'])+'次已對上正式稅表，合計每股 '+
+            distribution['currency']+' '+partial['component_verified_distribution_per_share']+
+            '、已知子集ROC '+partial['known_ROC_per_share']+'；其餘'+
+            str(partial['total_payment_count']-partial['component_verified_payment_count'])+'次、每股 '+
+            distribution['currency']+' '+partial['unknown_component_distribution_per_share']+
+            '的成分仍未知，整體近12次ROC維持未知。')
     if distribution.get('complete_source_breakdown'):
         total=distribution.get('as_reported_total_distribution')
         income=distribution.get('as_reported_income_sum')
@@ -31,7 +39,7 @@ def distribution_source_text(symbol,distribution):
     return text+'金額；既有年度稅務分解與缺漏分列，未把缺少的ROC補0。'
 
 
-def ready_data_evidence_notes(evidence,symbol):
+def ready_data_evidence_notes(evidence,symbol,additional_delta=None):
     if not evidence:return []
     if symbol=='SGOV':
         coverage=evidence['bounded_event_coverage']
@@ -45,7 +53,7 @@ def ready_data_evidence_notes(evidence,symbol):
             notes.append('另保留2026/01/16交易場所變更公告，公告預定於2026/02/23前後改掛NYSE。')
         return notes
     if symbol=='SPSB':
-        history=evidence['sparse_yield_evidence'];counts=history['counts_by_metric']
+        history=(additional_delta or evidence)['sparse_yield_evidence'];counts=history['counts_by_metric']
         return ['SPSB另有'+str(counts.get('portfolio_ytm',0))+'筆組合YTM及'+str(counts.get('sec_yield_30day',0))+
             '筆30-Day SEC Yield存檔來源核對；各自保留資料日期，未冒充五年完整週序列，未補值或計算百分位。',
             'SPSB配息金額與QII預扣稅分類分列；QII不是ROC，未以100%減QII推算ROC。']
@@ -205,7 +213,8 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                 distribution=quality.get('calculations',{}).get('distribution_source')
                 if distribution:
                     text.append(distribution_source_text(symbol,distribution))
-            text.extend(ready_data_evidence_notes(bond_source.get('ready_data_evidence'),symbol))
+            text.extend(ready_data_evidence_notes(bond_source.get('ready_data_evidence'),symbol,
+                bond_source.get('additional_delta_evidence')))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
             liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
             if liquidity:

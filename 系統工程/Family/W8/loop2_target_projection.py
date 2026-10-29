@@ -5,8 +5,30 @@ It never changes the W2 approval, source document, DB or trade authorization.
 """
 from copy import deepcopy
 from decimal import Decimal
+from hashlib import sha256
+from pathlib import Path
 import re
 from family_input import digest
+
+
+def document_groupings(proof):
+    """Keep display aggregation separate from a grouped target instruction."""
+    raw=Path(proof['local_source_path']).read_bytes()
+    if sha256(raw).hexdigest()!=proof['source_sha256']:
+        raise PermissionError('LOOP2_TARGET_DOCUMENT_CHANGED')
+    headers=[];groups=[]
+    for number,line in enumerate(raw.decode('utf-8-sig').splitlines(),1):
+        heading=re.match(r'^(#{1,6})\s+(.+)$',line)
+        if heading:
+            level=len(heading[1])
+            headers=[h for h in headers if h[0]<level]+[(level,heading[2])]
+        for match in re.finditer(r'([A-Z][A-Z0-9.-]*)\s*[＋+]\s*([A-Z][A-Z0-9.-]*)\s*共同解讀',line):
+            display=any('漂移' in text and '規則' in text for _,text in headers)
+            groups.append({'symbols':list(match.groups()),'line_number':number,'text':line,
+                'section_path':[text for _,text in headers],
+                'scope':'GROUPED_CURRENT_EXPOSURE_DISPLAY' if display else 'GROUPED_TARGET_SEMANTICS_UNRESOLVED',
+                'source_sha256':proof['source_sha256'],'source_reference':proof['source_reference']})
+    return groups
 
 
 def produce(root,request,context,policy,symbols):
@@ -49,6 +71,10 @@ def produce(root,request,context,policy,symbols):
     issues=c6._validate_snapshot_weights(weight_view,'confirmed_target.target_lines')
     if not lines or issues:
         out['status']='INCOMPLETE_SOURCE';out['issues']=issues or [{'field_path':'confirmed_target.target_lines'}];return out
+    groupings=document_groupings(proof)
+    out['document_groupings']=groupings
+    out['target_scope']='EXISTING_COMPLETE_APPROVED_BASELINE__NOT_NEW_STRATEGIC_PROPOSAL'
+    out['approved_target_unchanged']=True
     denom=draft.get('denominator') or {}
     out['source_target_digest']=digest(target);out['native_weight_input']=weight_view
     for symbol in symbols:
@@ -56,7 +82,8 @@ def produce(root,request,context,policy,symbols):
         if same:continue # Existing explicit targets and multiple-role boundaries retain their own mapper.
         # A symbol mentioned in a grouped source row is unresolved, not absent.
         pattern=r'(?<![A-Z0-9])'+re.escape(symbol)+r'(?![A-Z0-9])'
-        if any(re.search(pattern,r.get('original_document_row','')) for r in lines):
+        if (any(re.search(pattern,r.get('original_document_row','')) for r in lines)
+            or any(symbol in g['symbols'] and g['scope']!='GROUPED_CURRENT_EXPOSURE_DISPLAY' for g in groupings)):
             out['issues'].append({'field_path':'target.'+symbol,'code':'GROUPED_TARGET_MAPPING_REQUIRED'});continue
         # Use a guaranteed-absent ID only after proving absence by ticker in
         # this same complete approval. Do not mistake an opaque source ID for
@@ -74,6 +101,9 @@ def produce(root,request,context,policy,symbols):
                 'source_target_digest':out['source_target_digest'],
                 'source_reference':policy['source_reference']},
             'original_instrument_id':iid,'basis':'ORIGINAL_C6_COMPLETE_APPROVED_TARGET_LOOKUP',
+            'target_scope':out['target_scope'],
+            'current_exposure_display_groups':[deepcopy(g) for g in groupings if symbol in g['symbols']],
+            'new_strategic_allocation_created':False,
             'not_an_immediate_sell_instruction':True}
         out['call_trace'].append('C.Work6.final_target_weight:'+symbol)
     out['status']='SOURCE_BASELINE_PROJECTED';out['output_digest']=digest(out['targets'])

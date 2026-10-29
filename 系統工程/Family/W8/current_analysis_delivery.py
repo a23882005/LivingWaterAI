@@ -59,6 +59,11 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         'weight':allocation_weight,'target_amount':deepcopy(target),
         'status':('ORIGINAL_C6_BASELINE_DERIVED' if target.get('basis')=='ORIGINAL_C6_COMPLETE_APPROVED_TARGET_LOOKUP' else 'SOURCE_BOUND') if target.get('value_state')=='KNOWN' else 'LOOP2_TARGET_PRODUCER_PENDING',
         'owner_input_required':False,'does_not_infer_zero_from_absence':True}
+    if long_term['status']=='ORIGINAL_C6_BASELINE_DERIVED':
+        source=target_projection['targets'][row['symbol']]
+        long_term.update(target_scope=source.get('target_scope'),
+            current_exposure_display_groups=deepcopy(source.get('current_exposure_display_groups',[])),
+            new_strategic_allocation_created=False)
     round_target={'scope':'CURRENT_ROUND_NATIVE_STAGE_REFERENCE',
         'mode':judgment['mode'],'stage':judgment['stage_reference'],
         'cumulative_rate':judgment['target_rate_reference'],

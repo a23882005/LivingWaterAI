@@ -723,3 +723,25 @@ class CompleteTargetProjectionTest(unittest.TestCase):
         out=self.project();money=out['targets']['NEW']['target_amount']
         self.assertEqual(out['targets']['NEW']['weight']['value'],'0.0')
         self.assertEqual(money['value_state'],'UNKNOWN');self.assertIsNone(money['amount']);self.assertIsNone(money['currency'])
+    def add_grouping(self,heading):
+        from hashlib import sha256
+        proof=self.context['approved_document_target_source'];path=Path(proof['local_source_path'])
+        path.write_text(path.read_text()+'\n## '+heading+'\n- 全球核心桶可由AAA＋NEW共同解讀。\n')
+        proof['source_sha256']=sha256(path.read_bytes()).hexdigest()
+    def test_drift_display_grouping_does_not_duplicate_or_split_approved_target(self):
+        self.add_grouping('客戶專屬漂移圖規則')
+        before=deepcopy(self.request['confirmed_target']);out=self.project()
+        self.assertEqual(out['targets']['NEW']['target_amount']['amount'],'0.0')
+        group=out['targets']['NEW']['current_exposure_display_groups'][0]
+        self.assertEqual(group['scope'],'GROUPED_CURRENT_EXPOSURE_DISPLAY')
+        self.assertFalse(out['targets']['NEW']['new_strategic_allocation_created'])
+        self.assertEqual(before,self.request['confirmed_target'])
+        self.assertNotIn('AAA',out['targets'])
+    def test_grouped_target_instruction_outside_drift_display_remains_unresolved(self):
+        self.add_grouping('正式配置目標規則')
+        out=self.project();self.assertNotIn('NEW',out['targets'])
+        self.assertEqual(out['issues'][0]['code'],'GROUPED_TARGET_MAPPING_REQUIRED')
+    def test_drift_source_bytes_are_rechecked_before_zero_lookup(self):
+        proof=self.context['approved_document_target_source'];path=Path(proof['local_source_path'])
+        path.write_text(path.read_text()+'changed')
+        with self.assertRaisesRegex(PermissionError,'DOCUMENT_CHANGED'):self.project()

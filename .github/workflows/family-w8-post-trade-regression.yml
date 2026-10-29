@@ -4,12 +4,14 @@ on:
     branches: [main]
     paths:
       - '系統工程/Family/W8/**'
-      - '系統工程/Family/W5/family_boundary.py'
+      - '系統工程/Family/W5/**'
       - '系統工程/Family/W7/family_menu.py'
       - '.github/workflows/family-w8-post-trade-regression.yml'
   push:
     branches: [main]
     paths:
+      - '系統工程/Family/W5/**'
+      - '系統工程/Family/W8/**'
       - '系統工程/Family/W8/post_trade_state.py'
       - '系統工程/Family/W8/official_mutations.py'
       - '系統工程/Family/W8/official_family_entry.py'
@@ -144,4 +146,21 @@ jobs:
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_target_input.py' -v
           python -m pytest '系統工程/Family/W5/tests/test_family_boundary.py' '系統工程/Family/W5/tests/test_family_runner.py' '系統工程/Family/W5/tests/test_c7_engine.py' -q
           python -m pytest '系統工程/Family/W5/tests/test_family_technical.py' '系統工程/Family/W5/tests/test_technical_source_bridge.py' -q
+      - name: Prepare qualified bond calendar
+        run: python -m pip install exchange_calendars==4.13.2
+      - name: Validate source-bound broker, SGOV and V75 contracts
+        env:
+          PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests:系統工程/Family/W8:系統工程/Family/W8/tests
+          W5_W2_ROOT: 系統工程/Family/W5/vendor/w2
+        run: >-
+          python -m pytest -q
+          '系統工程/Family/W5/tests/test_broker_snapshot_source.py'
+          '系統工程/Family/W5/tests/test_tactical_budget.py'
+          '系統工程/Family/W8/tests/test_sgov_role_source.py'
+          '系統工程/Family/W8/tests/test_native_bond_source.py'
+          '系統工程/Family/W8/tests/test_v75_macro_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_remaining_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_market_contract.py'
+          '系統工程/Family/W8/tests/test_native_source_freshness.py'
+          '系統工程/Family/W8/tests/test_account_funding_check.py'
 

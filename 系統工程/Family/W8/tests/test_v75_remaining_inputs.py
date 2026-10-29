@@ -22,7 +22,8 @@ def history(symbol='SGOV',start='2021-10-01'):
             dividends[str(stamp)]={'date':stamp,'amount':'0.25'};months.add(month)
     return {'chart':{'error':None,'result':[{'meta':{'symbol':symbol,'currency':'USD','instrumentType':'ETF',
         'dataGranularity':'1d','exchangeTimezoneName':'America/New_York','exchangeName':'PCX'},
-        'timestamp':stamps,'indicators':{'quote':[{'close':closes}],'adjclose':[{'adjclose':['1']*len(stamps)}]},
+        'timestamp':stamps,'indicators':{'quote':[{'close':closes,'open':closes,
+            'high':closes,'low':closes,'volume':[1000]*len(stamps)}],'adjclose':[{'adjclose':['1']*len(stamps)}]},
         'events':{'dividends':dividends}}]}}
 
 

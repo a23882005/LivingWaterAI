@@ -30,7 +30,25 @@ def tactical_cap(handoff, leg):
         raise TacticalBudgetError('TACTICAL_AMOUNT_INVALID')
     settlement = handoff['funding_context']['settlement']
     if settlement['source_status'] != 'SETTLED' or settlement['cash_basis'] != 'AVAILABLE':
-        raise TacticalBudgetError('SETTLED_AVAILABLE_REQUIRED')
+        # A non-executing zero-budget trial can still reach native diagnostics.
+        # It never upgrades UNKNOWN settlement, releases cash, or preserves a
+        # positive tactical allowance as executable money.
+        leg_budget=handoff['funding_context'].get('executable_budget',{}).get(leg,{})
+        available=settlement.get('cash_state',{}).get('available')
+        budget=leg_budget.get('amount')
+        try:
+            zero=(settlement['source_status'] in {'UNKNOWN','TRIAL_MISSING_CASH_ZERO'}
+                and settlement['cash_basis']=='AVAILABLE'
+                and available is not None and not isinstance(available,bool)
+                and budget is not None and not isinstance(budget,bool)
+                and Decimal(str(available))==0 and Decimal(str(budget))==0)
+        except (InvalidOperation,TypeError):zero=False
+        if not zero:raise TacticalBudgetError('SETTLED_AVAILABLE_REQUIRED')
+        return {'amount':Decimal('0'),'source_amount':amount,'currency':handoff['currency'],
+            'source_snapshot_id':context['upstream_v70_snapshot_id'],
+            'reason_codes':['ZERO_EXECUTABLE_BUDGET__SETTLEMENT_NOT_ASSERTED']+
+                [code for code in issues if code in {'EXCEEDS_CAP','HARD_GATE','HARD_GATE_TRIGGERED'}],
+            'source_field':field,'scope':'NON_EXECUTING_ZERO_BUDGET_DIAGNOSTIC_ONLY'}
     # These explicit risk states carry a zero new-buy ceiling. Preserve the
     # original payload in the caller rather than changing its declared amount.
     blocked = [code for code in issues if code in {'EXCEEDS_CAP','HARD_GATE','HARD_GATE_TRIGGERED'}]

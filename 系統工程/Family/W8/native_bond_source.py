@@ -39,8 +39,14 @@ def _target(request,symbol,fx):
 
 
 def delivery(result):
-    return {k:deepcopy(v) for k,v in result.items()
-        if k not in ('shared_inputs','adapter_request','adapter_result','source_fx','strategic_policy')}
+    out={k:deepcopy(v) for k,v in result.items()
+        if k not in ('shared_inputs','adapter_request','adapter_result','source_fx','strategic_policy','native_runtime_attempt')}
+    attempt=result.get('native_runtime_attempt')
+    if attempt is not None:
+        out['native_runtime_attempt']={k:deepcopy(attempt[k]) for k in
+            ('status','issues','call_trace','unqualified_predicates_not_substituted','required_inputs') if k in attempt}
+        out['native_runtime_attempt']['canonical_returned']=attempt.get('canonical') is not None
+    return out
 
 
 def target_market_observations(request,observations,rows,*,root):
@@ -241,6 +247,12 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         result['status']='NATIVE_CONTRACT_REJECTED'
         gaps.append({'code':getattr(exc,'code',type(exc).__name__),
             'field_path':'v75_source_context','message':str(exc)})
+    if result.get('adapter_request') and result.get('native_validation'):
+        from v75_native_attempt import build as run_native_v75_attempt
+        attempt=run_native_v75_attempt(root,request,result)
+        result['native_runtime_attempt']=attempt
+        result['call_trace']+=attempt['call_trace']
+        result['canonical_result']=deepcopy(attempt.get('canonical'))
     from bond_advisory import build as build_advisory
     advisory=build_advisory(root,request,result)
     if advisory is not None:

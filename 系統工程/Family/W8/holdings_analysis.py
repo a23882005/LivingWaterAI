@@ -599,6 +599,8 @@ class HoldingsAnalysisRunner:
         validate_bond_supplement(request,self.context,report,root)
         from v75_macro_inputs import validate as validate_v75_macro_inputs
         validate_v75_macro_inputs(request,self.context,report,root)
+        from v75_market_contract import validate as validate_v75_market_contract
+        validate_v75_market_contract(request,self.context,report,root)
         from bond_policy_audit import validate as validate_bond_policy
         validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)
@@ -618,7 +620,10 @@ class HoldingsAnalysisRunner:
                 market=row['market']
                 evaluation=datetime.fromisoformat(request['evaluation_at'].replace('Z','+00:00'))
                 verified=datetime.fromisoformat(market['provider_verified_at'].replace('Z','+00:00'))
+                qualified=market.get('qualified_bond_market') or {}
+                completed=(qualified.get('eligible') is True and qualified.get('observed_date')==market['observed_date']
+                    and datetime.fromisoformat(qualified['session_close_at'].replace('Z','+00:00'))<=verified)
                 if (market['symbol']!=row['symbol'] or verified>evaluation or
-                        market['observed_date']>=evaluation.astimezone(timezone.utc).date().isoformat()):
+                        market['observed_date']>=evaluation.astimezone(timezone.utc).date().isoformat() and not completed):
                     raise PermissionError('HOLDINGS_ANALYSIS_MARKET_BINDING_OR_TIME_MISMATCH')
         return report

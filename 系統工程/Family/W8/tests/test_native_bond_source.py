@@ -69,6 +69,19 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertEqual(compatibility['native_us_template'],{'SGOV':'70','SPSB':'30'})
         self.assertEqual(req['confirmed_target'],before)
 
+    def test_original_runtime_failure_is_preserved_after_fresh_snapshot_gate(self):
+        p,req,report,shared,strategy=self.case()
+        report['native_source_freshness']={'market':{'state':'FRESH'},'v70':{'state':'FRESH'}}
+        out=self.build(p,req,report,shared,strategy)
+        self.assertTrue(out['native_validation']['accepted'])
+        attempt=out['native_runtime_attempt']
+        self.assertIn('V75.assemble_final_snapshot',attempt['call_trace'])
+        self.assertIn('V75.evaluate_runtime_ready',attempt['call_trace'])
+        self.assertFalse(attempt['runtime_ready']['output']['formal_output_eligible'])
+        self.assertEqual(attempt['runtime_ready']['output']['per_asset_decisions'],[])
+        self.assertEqual(out['canonical_result'],attempt['canonical'])
+        self.assertFalse(out['full_native_canonical_complete'])
+
     def test_target_ambiguity_does_not_drop_one_role_or_insert_zero(self):
         p,req,report,shared,strategy=self.case()
         req['confirmed_target']['payload']['draft']['target_lines'][0]['instrument_id']='UNIDENTIFIED_ROLE'

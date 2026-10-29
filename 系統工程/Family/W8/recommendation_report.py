@@ -176,6 +176,15 @@ def build(report,request):
             f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+
             ' 的五營業日變化 '+f"{Decimal(supplement['metrics']['move_pct_change_5bd']):.2f}"+
             '%。此分項已用原生公式重算；其他部署條件及正式新鮮度證據仍各自核對。')
+    native_bond=report.get('native_bond_source') or {}
+    attempt=native_bond.get('native_runtime_attempt')
+    if attempt:
+        if attempt.get('runtime_ready') and not attempt['runtime_ready']['output']['formal_output_eligible']:
+            intro.append('原生V75已產生最終快照；目前未通過正式部署資格，核准配置與模板差異保留在下方比較。')
+        elif attempt.get('runtime_ready'):
+            intro.append('原生V75已產生債券組件快照；全戶共同部署仍需完成股票、資金與保全核對。')
+        elif attempt.get('status')=='INSUFFICIENT_DATA':
+            intro.append('原生V75仍待完整且有效的必要資料，尚未核定本輪債券買進金額；缺項保留，未改成0元或完整通過。')
     markdown='\n\n'.join(intro)+'\n\n| '+' | '.join(headings)+' |\n| '+' | '.join(['---']*len(headings))+' |\n'
     markdown+='\n'.join('| '+' | '.join(str(v).replace('|','／').replace('\n',' ') for v in row)+' |' for row in cells)
     comparison=report.get('native_bond_source',{}).get('advisory_comparison')
@@ -209,6 +218,7 @@ def build(report,request):
         'analysis_status':report['status'],'full_native_deployment_complete':False,
         'rows':rows,'bond_advisory_comparison':deepcopy(comparison),
         'account_funding_check':deepcopy(account),
+        'native_bond_run_status':attempt.get('status') if attempt else None,
         'sgov_role_accounting':deepcopy(sgov),
         'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
     out['digest']=digest(out)

@@ -416,10 +416,10 @@ class AssetSourceProducer:
                 for symbol,proof in self.product_sources.items()})
         from v75_market_supplement import read as read_bond_supplement,apply as apply_bond_supplement
         supplement=read_bond_supplement(self.bond_market_supplement_source,when)
-        observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
         from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
         macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
-        observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root)
+        observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
+        observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
         from new_investment_scenario import build_plan,apply_plan,wire_number
         investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
         from v70_tactical_input import calculate

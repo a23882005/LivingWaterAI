@@ -223,7 +223,9 @@ def read(source,evaluation_at):
             'scope':'TREASURY_RATE_PATH_REFERENCE__NOT_ETF_YIELD_ATTRACTIVENESS_HISTORY',
             'basis':'V75 §43 0–3 month Treasury instrument' if asset=='SGOV' else 'V75 §44 2Y/3Y Treasury monitoring'}
     from v75_remaining_inputs import extend
-    return extend(out,data,proofs)
+    out=extend(out,data,proofs)
+    from v75_market_contract import qualify
+    return qualify(out,data,proofs,manifest,evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):
@@ -232,19 +234,24 @@ def slot(pool,pid,asset,previous,evaluation_at):
     from v75_runtime.predicates import EVALUATORS
     result=EVALUATORS[pid](metrics,_time(evaluation_at),
         [proof['source_reference'] for proof in pool['source_proofs'].values()])
+    contract=pool.get('qualified_bond_markets',{}).get(asset,{})
+    fresh=(contract.get('eligible') is True and (pid=='PRED-008' or
+        pid=='PRED-007' and pool['calculations']['PRED-007']['observed_date']==contract['observed_date']))
     return {'metrics':deepcopy(metrics),'original_result':result.model_dump(mode='json'),
         'input_coverage':'PARTIAL_RAW_METRICS' if pool['unprovided_inputs'].get(pid) else 'COMPLETE_RAW_METRICS',
         'unprovided_inputs':deepcopy(pool['unprovided_inputs'].get(pid,[])),
         'source_pool_digest':digest(pool),'source_available_at':pool['available_at'],
-        'input_freshness_verified':False,'deployment_input_eligible':False,
+        'input_freshness_verified':fresh,'deployment_input_eligible':fresh and result.assessment_status.value=='VALID',
         'original_default_freshness_is_not_attestation':True,
         'original_result_as_of_basis':'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE',
         'previous_observation':deepcopy(previous)}
 
 
-def apply(observations,pool,*,evaluation_at,repo_root):
+def apply(observations,pool,*,evaluation_at,repo_root,macro=None):
     if pool is None:return observations
     from bond_advisory import candidates
+    from v75_market_contract import apply as apply_qualified_market
+    observations=apply_qualified_market(observations,pool,repo_root=repo_root,evaluation_at=evaluation_at,macro=macro)
     supported=set(candidates(repo_root));out=deepcopy(observations);out['v75_macro_inputs']=deepcopy(pool)
     for row in out['assets']:
         if row['symbol'] not in supported:continue

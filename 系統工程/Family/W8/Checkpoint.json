@@ -1676,5 +1676,15 @@
     "next": "總PM先唯讀核對PR59最新差異與實跑證據，維持單一施工線；依既定WBS接續Joseph/MOU04與原FamilyRunner/Work9/Mentor驗收",
     "engineering_status": "W8 IN_PROGRESS；本次交接完整性驗證維持既有Gate狀態",
     "runtime": "GitHub code / Drive DB and reports / ChatGPT on demand"
+  },
+  "architecture_video_archive_20261029": {
+    "status": "OWNER_APPROVED_ARCHIVED",
+    "path": "系統工程/Family/文件歸檔/十四項選單程式與DB架構圖/活水AI-系統架構圖-說明小影片.mp4",
+    "sha256": "78fc5e5d4c4e305ec71e2ad45c76825216ce0f8736b18500edc707e62f397d76",
+    "bytes": 6835303,
+    "duration_seconds": 76.875,
+    "drive_location": "系統工程",
+    "maintenance_owner": "Family中PM",
+    "scope": "Documentation archive; existing engineering acceptance unchanged"
   }
 }

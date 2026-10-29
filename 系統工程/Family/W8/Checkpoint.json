@@ -1686,5 +1686,16 @@
     "drive_location": "系統工程",
     "maintenance_owner": "Family中PM",
     "scope": "Documentation archive; existing engineering acceptance unchanged"
+  },
+  "user_manual_video_archive_20261029": {
+    "status": "OWNER_APPROVED_ARCHIVED",
+    "path": "系統工程/Family/文件歸檔/家人使用手冊說明影片/活水AI-家人使用手冊-說明小影片.mp4",
+    "sha256": "15c917f98a7be1ab7a379a04e58504f9f4165f62e86cc124692eb095773d0278",
+    "bytes": 5584613,
+    "duration_seconds": 182,
+    "drive_location": "系統工程",
+    "maintenance_owner": "Family中PM",
+    "approved_edition": "粉紅封面3秒翻頁版",
+    "scope": "Documentation archive; engineering acceptance unchanged"
   }
 }

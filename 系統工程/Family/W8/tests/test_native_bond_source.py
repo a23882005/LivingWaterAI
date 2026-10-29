@@ -12,7 +12,7 @@ import native_bond_source as B
 
 
 class NativeBondSourceTest(unittest.TestCase):
-    def case(self):
+    def case(self,supplement=None):
         p,req,report,trial,investment,tactical=holding_tests.NativeFundingAdviceTest().case()
         req['owner']['funding_domain']='INVESTMENT'  # Family purpose is not the native broker domain.
         req['client_snapshot']['payload']['tables']={'sgov_role_proposal':[],'sgov_role_confirmation':[]}
@@ -27,6 +27,7 @@ class NativeBondSourceTest(unittest.TestCase):
             {'value_state':'KNOWN','amount':'700','currency':'USD'}},
             {'instrument_id':'SGOV_DRY','ticker':'SGOV','target_amount':
             {'value_state':'KNOWN','amount':'300','currency':'USD'}}]
+        if supplement is not None:report['bond_market_supplement']=deepcopy(supplement)
         shared=build_shared_inputs(p,req,report,trial=trial,investment=investment,tactical=tactical)
         strategy={'client_id':req['client_id'],'bond_percent':20,'life_stage_code':'L7',
             'source_reference':'SYNTHETIC_EXISTING_STRATEGIC_SOURCE'}
@@ -75,6 +76,20 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertNotIn('adapter_request',out)
         self.assertTrue(any(i['field_path']=='target_bond_holdings.SGOV' for i in out['issues']))
         self.assertEqual(out['targets'],{})
+
+    def test_supplement_time_and_source_survive_actual_work3_work5_boundary(self):
+        supplement={'available_at':'2026-10-27T22:01:00Z','source_sha256':'e'*64}
+        p,req,report,shared,strategy=self.case(supplement)
+        before=deepcopy(shared)
+        out=self.build(p,req,report,shared,strategy)
+        self.assertEqual(out['status'],'ORIGINAL_V75_SOURCE_CHECKED_WITH_GAPS',out['issues'])
+        self.assertIn('native_validation',out)
+        self.assertIn('structural_state',out)
+        native=out['adapter_result']['v75_runtime_input']
+        self.assertEqual(native['market_snapshot']['data_timestamp'],supplement['available_at'])
+        self.assertEqual(shared,before)
+        shared['work3_input']['shared_decision_context']['payload']['bond_market_supplement']['source_sha256']='f'*64
+        with self.assertRaisesRegex(PermissionError,'SUPPLEMENT_BINDING'):self.build(p,req,report,shared,strategy)
 
     def test_advisory_native_map_preserves_approval_cash_and_dry_role(self):
         p,req,report,shared,strategy=self.case()

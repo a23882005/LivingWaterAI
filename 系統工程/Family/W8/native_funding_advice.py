@@ -122,6 +122,11 @@ def build_shared_inputs(producer,request,report,*,trial,investment,tactical):
     shared['data_as_of']['bond_market_source_verification']={k:v['provider_verified_at']
         for k,v in bond_markets.items() if v.get('provider_verified_at')}
     shared['source_reference_ids'].append('BOND-MARKET:'+digest(bond_markets))
+    if report.get('bond_market_supplement') is not None:
+        supplement=report['bond_market_supplement']
+        shared['payload']['bond_market_supplement']=deepcopy(supplement)
+        shared['data_as_of']['bond_market_supplement_available_at']=supplement['available_at']
+        shared['source_reference_ids'].append('BOND-MARKET-SUPPLEMENT:'+digest(supplement))
     return {'work3_input':work3_input,'c7_funding_context':c7,'budget':budget}
 
 

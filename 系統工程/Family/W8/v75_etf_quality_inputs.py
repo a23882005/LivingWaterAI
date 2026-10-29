@@ -245,3 +245,5 @@ def bind_native(request,source,pool,run):
         source['plugin_data_cross_checks']=deepcopy(pool['plugin_data_cross_checks'])
     if pool.get('ib_qa_handoff'):
         source['ib_qa_evidence']=deepcopy(pool['ib_qa_handoff'])
+    if pool.get('official_reply_status'):
+        source['official_reply_status']=deepcopy(pool['official_reply_status'])

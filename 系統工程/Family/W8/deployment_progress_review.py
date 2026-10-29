@@ -59,6 +59,10 @@ def build(root, request, analysis, work6, c7, source_sections):
         from v75_ib_qa_inputs import summary as qa_summary
         for symbol in ('SGOV','SPSB'):
             evidence.setdefault(symbol,{})['ib_qa_cross_check']=qa_summary(ib_qa,symbol)
+    from deployment_blockers import build as build_blockers
+    blockers=build_blockers(analysis,work6,c7,root)
+    from continuation_mentor import build as build_mentor
+    mentor_review=build_mentor(request,analysis,work6,c7,blockers)
     path = Path('系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py')
     out = {'schema_version': 'Family.W8.DeploymentProgressReview.v1', **deepcopy(identity),
         'evaluation_at': request['evaluation_at'], 'analysis_report_digest': analysis['report_digest'],
@@ -73,6 +77,7 @@ def build(root, request, analysis, work6, c7, source_sections):
             'approved_target_digest': digest(request['confirmed_target']), 'approval_changed': False,
             'new_tactical_approval_created': False},
         'account_funding_check': deepcopy(funding), 'data_evidence': evidence,
+        'dependency_review':blockers,'mentor_review':mentor_review,
         'remaining_predicate_inputs': deepcopy(pool.get('asset_unprovided_inputs', {})),
         'engineering_dependencies': [
             {'stage': 'UNIFIED_WORK9', 'state': 'WAITING_FOR_VALID_NATIVE_CANONICAL_DECISIONS_AND_FUNDING'},

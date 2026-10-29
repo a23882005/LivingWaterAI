@@ -83,6 +83,10 @@ def build(request,context):
             for i,line in enumerate(rule_lines,1) if line.startswith('|')
             and any(symbol in line for symbol in ('SGOV','SPSB'))
             and any(weight in line for weight in ('70%','30%'))]
+        out['generic_bond_rule_basis']['deployment_and_role_clauses']=[{'line_number':i,'text':line}
+            for i,line in enumerate(rule_lines,1) if any(token in line for token in (
+                '本輪可部署比例可降至0','BOND_LONG_TERM_TARGET` 就必須同時保留',
+                '不能因股票下跌就整筆視為子彈挪走','禁止重複計算、互相挪用'))]
     return out
 
 

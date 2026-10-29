@@ -79,15 +79,21 @@ def build(root, request, report):
                     'code': getattr(error, 'code', type(error).__name__), 'reason': str(error)}
                 out['issues'].append({'instrument_id': iid, 'code': 'NATIVE_WORK6_REJECTED',
                                       'field_path': 'adapter_checks.' + iid})
-        if item['status'] == 'CASH_TRIAL_ADVICE_COMPUTED':
+        adapter_passed=out['adapter_checks'].get(iid,{}).get('status')=='PASSED'
+        if item['status'] == 'CASH_TRIAL_ADVICE_COMPUTED' and adapter_passed:
             amount = item['native_plan'].get('execution_amount')
             if amount is not None:
                 out['claims'].append({'claim_id': 'V82:' + iid, 'owner': deepcopy(request['owner']),
                     'run_id': request['run_id'], 'asset_class': 'EQUITY', 'amount': amount,
+                    'asset_id': row['symbol'], 'source_engine': 'V82',
                     'source_reference': 'native_funding_advice.items.' + iid + '.native_plan'})
                 continue
         out['unresolved_decisions'].append({'instrument_id': iid, 'symbol': row['symbol'],
             'native_status': item['status'], 'amount': None,
+            'funding_adapter_status':out['adapter_checks'].get(iid,{}).get('status'),
+            'component_issues':deepcopy(item.get('issues',[])),
+            'mode_reason_codes':deepcopy(row.get('current_analysis',{}).get('current_judgment',{}).get('reason_codes',[])),
+            'formal_stage_unknown_fields':deepcopy(row.get('formal_conclusion',{}).get('stage_required_unknown_fields',[])),
             'field_path': ('native_bond_source.canonical_result' if item['status'] == 'BOND_DELEGATED_TO_V75'
                            else 'native_funding_advice.items.' + iid + '.native_plan'),
             'missing_amount_replaced_by_zero': False})
@@ -111,6 +117,22 @@ def build(root, request, report):
     else:
         out['issues'].append({'code': 'WORK4_WORK5_ACCOUNT_FUNDING_SOURCE_REQUIRED',
                               'field_path': 'native_stock_and_bond_adapters'})
+    # Repeated adapter observations attest one shared pool, not N balances.
+    out['shared_cash_ledger'] = {'schema_version':'Family.W8.SharedCashLedger.v1',
+        'owner':deepcopy(request['owner']),'run_id':request['run_id'],
+        'cash_basis':'AVAILABLE','shared_cash_source_count':1 if cash is not None else 0,
+        'adapter_observation_count':sum(r['status']=='PASSED' for r in out['adapter_checks'].values()),
+        'shared_cash_fingerprint':digest(cash) if cash is not None else None,
+        'available_once':cash['available'] if cash is not None else None,
+        'equity_budget_once':cash['equity_executable_budget'] if cash is not None else None,
+        'bond_budget_once':cash['bond_executable_budget'] if cash is not None else None,
+        'known_claims':deepcopy(out['claims']),
+        'known_claims_budget_check':deepcopy(out['known_claims_budget_check']),
+        'unresolved_decisions':deepcopy(out['unresolved_decisions']),
+        'physical_sgov_is_cash':False,'sgov_roles_added_to_physical_value':False,
+        'new_external_money_added_again':False,'unknown_amounts_counted_as_zero':False,
+        'scope':'ONE_SHARED_ACCOUNT_POOL__ENUMERATED_KNOWN_NATIVE_AMOUNTS_ONLY',
+        'joint_execution_authorized':False,'trade_action':'NO_TRADE'}
     out['output_digest'] = digest(out)
     return out
 

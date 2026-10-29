@@ -108,6 +108,8 @@ class FamilyRunner:
             'expected_versions':deepcopy(request['expected_versions']),'evaluation_at':request['evaluation_at'],
             'runtime_mode':'REAL_DETERMINISTIC','data_provenance':ctx['native_binding']['data_provenance'],
             'technical_intake':prepared.payload['technical_intake'],'native_result':native,'mentor':mentor,'call_trace':native['call_trace'],
+            'formal_deployment_ready':native.get('formal_deployment_ready',False),
+            'read_only_native_wait_review':native.get('read_only_native_wait_review',False),
             'storage_scope':'ISOLATED_TEST_STAGING','production':'HOLD','trade_action':'NO_TRADE'}
 
     def analyze(self,request,*,timeout_seconds=30):
@@ -159,5 +161,9 @@ class FamilyRunner:
             'request_id':request.get('request_id'),'run_id':request.get('run_id'),
             'issue_codes':[detail],'canonical_result':None,'mentor':None,
             'storage_scope':'ISOLATED_TEST_STAGING','production':'HOLD','trade_action':'NO_TRADE'}
-        if review is not None:result['configuration_review']=review
+        if review is not None:
+            result['configuration_review']=review
+            if review.get('mentor_review') is not None:
+                result['mentor_review']=deepcopy(review['mentor_review'])
+                result['formal_deployment_ready']=False
         return result

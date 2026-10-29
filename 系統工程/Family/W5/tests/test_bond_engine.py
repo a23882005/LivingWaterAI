@@ -62,6 +62,13 @@ def test_missing_metric_is_not_fabricated_pause():
     assert result['status'] == 'INSUFFICIENT_DATA'
     assert result['canonical'] is None
     assert not any('assemble_final_snapshot' in x for x in result['call_trace'])
+    partial=result['independent_asset_evaluations']
+    assert [d['asset_id'] for d in partial['per_asset_decisions']]==['SGOV']
+    assert partial['incomplete_assets']==['SPSB']
+    assert partial['shared_budget_scaled'] is False and partial['undeployed_amount'] is None
+    assert partial['missing_predicates_rewritten_as_wait'] is False
+    assert 'V75.evaluate_step10:SGOV' in result['call_trace']
+    assert 'V75.evaluate_step10:SPSB' not in result['call_trace']
 
 
 def test_all_assets_are_diagnosed_before_any_terminal_decision():

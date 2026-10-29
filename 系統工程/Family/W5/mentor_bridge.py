@@ -60,6 +60,12 @@ def ready_data_evidence_notes(evidence,symbol,additional_delta=None,ib_qa=None):
     return []
 
 
+def official_reply_notes(status):
+    if not status:return []
+    return ['State Street已回覆無法提供本次要求的資料，本次詢問已結案，不再等待資料交付；沒有附件或付費方案。',
+        'IB正式工單由本人送出，尚待答覆；目前未提供工單編號或客服答案，較早外掛回饋另列。']
+
+
 def plugin_evidence_notes(evidence,symbol,ib_qa=None):
     if not evidence or symbol not in evidence['ibkr_weekly']:return []
     weekly=evidence['ibkr_weekly'][symbol];daily=evidence['massive_daily'][symbol]
@@ -259,6 +265,7 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                 bond_source.get('additional_delta_evidence'),bond_source.get('ib_qa_evidence')))
             text.extend(plugin_evidence_notes(bond_source.get('plugin_data_cross_checks'),symbol,
                 bond_source.get('ib_qa_evidence')))
+            text.extend(official_reply_notes(bond_source.get('official_reply_status')))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
             liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
             if liquidity:

@@ -46,6 +46,12 @@ class AccountFundingCheckTest(unittest.TestCase):
         self.assertFalse(out['unresolved_decisions'][0]['missing_amount_replaced_by_zero'])
         self.assertFalse(out['full_native_canonical_complete'])
         self.assertNotEqual(out['conservation_status'], 'CONSERVATION_CHECK_PASSED')
+        ledger=out['shared_cash_ledger']
+        self.assertEqual(ledger['shared_cash_source_count'],1)
+        self.assertEqual(ledger['available_once'],'0')
+        self.assertIsNone(ledger['unresolved_decisions'][0]['amount'])
+        self.assertFalse(ledger['unknown_amounts_counted_as_zero'])
+        self.assertEqual(ledger['known_claims'][0]['asset_id'],'QQQ')
 
     def test_orders_and_physical_sgov_do_not_become_available_cash(self):
         p, req, report = self.case()
@@ -55,6 +61,8 @@ class AccountFundingCheckTest(unittest.TestCase):
         self.assertEqual(out['order_source']['status'], 'UNKNOWN')
         self.assertEqual(out['known_claims_budget_check']['result']['available_remaining'], '0')
         self.assertFalse(out['joint_execution_authorized'])
+        self.assertFalse(out['shared_cash_ledger']['physical_sgov_is_cash'])
+        self.assertFalse(out['shared_cash_ledger']['new_external_money_added_again'])
 
     def test_overspending_claim_is_rejected_instead_of_scaled_or_zeroed(self):
         p, req, report = self.case()
@@ -109,6 +117,19 @@ class AccountFundingCheckTest(unittest.TestCase):
         report['account_funding_check']['known_claims_budget_check']['result']['equity_used'] = '2'
         with self.assertRaisesRegex(PermissionError, 'CHECK_REPLAY'):
             A.validate(p.root, req, report)
+
+    def test_rejected_work6_adapter_cannot_contribute_even_a_zero_claim(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        p,req,report=self.case();original=A.load_c_module
+        def reject(_):raise ValueError('SYNTHETIC_ORIGINAL_WORK6_REJECTION')
+        def load(root,work):
+            return SimpleNamespace(INPUT_CONTRACT_NAME='SYNTHETIC',INPUT_CONTRACT_VERSION='SYNTHETIC',
+                BASELINE_ID='SYNTHETIC',validate_funding_account_isolation=reject) if work==6 else original(root,work)
+        with patch.object(A,'load_c_module',side_effect=load):out=A.build(p.root,req,report)
+        self.assertEqual(out['claims'],[])
+        self.assertEqual(out['adapter_checks']['SYNTHETIC_QQQ']['status'],'REJECTED')
+        self.assertEqual(out['shared_cash_ledger']['shared_cash_source_count'],0)
 
 
 if __name__ == '__main__':

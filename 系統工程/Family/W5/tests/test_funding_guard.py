@@ -30,3 +30,17 @@ def test_run_isolation():
     with pytest.raises(FundingError,match='RUN'):run([c])
 def test_unknown_available():
     with pytest.raises(FundingError,match='DATA_UNAVAILABLE'):run([],available=None)
+
+def test_different_labels_cannot_duplicate_one_underlying_native_decision():
+    first={**claim('first','EQUITY','10'),'source_engine':'V82','asset_id':'SYNTHETIC'}
+    renamed={**first,'claim_id':'renamed'}
+    with pytest.raises(FundingError,match='DUPLICATE_NATIVE_DECISION'):run([first,renamed])
+
+def test_independent_native_assets_use_one_shared_balance():
+    rows=[{**claim('a','EQUITY','10'),'source_engine':'V82','asset_id':'ONE'},
+          {**claim('b','BOND','20'),'source_engine':'V75','asset_id':'TWO'}]
+    assert run(rows)['available_remaining']=='70'
+
+def test_partially_supplied_native_decision_identity_is_not_accepted():
+    with pytest.raises(FundingError,match='NATIVE_DECISION_IDENTITY_REQUIRED'):
+        run([{**claim('a','EQUITY','10'),'source_engine':'V82'}])

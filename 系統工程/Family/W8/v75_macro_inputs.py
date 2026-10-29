@@ -312,6 +312,8 @@ def read(source,evaluation_at):
     out=extend_plugin_data(out,manifest.get('plugin_data_source'),data,evaluation_at)
     from v75_ib_qa_inputs import extend as extend_ib_qa
     out=extend_ib_qa(out,manifest.get('ib_qa_additional_source'),data,evaluation_at)
+    from v75_official_reply_inputs import extend as extend_official_reply
+    out=extend_official_reply(out,manifest.get('official_reply_source'),evaluation_at)
     from v75_pred007_inputs import extend as extend_pred007
     return extend_pred007(out,manifest.get('pred007_amendment_source'),evaluation_at)
 

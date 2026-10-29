@@ -114,6 +114,22 @@ def bind_c7_source(repo_path, request, context):
                 and progress.get('digest') == digest({k:v for k,v in progress.items() if k != 'digest'}),
                 'C7_CONTINUATION_REVIEW_BINDING_MISMATCH', 'c7_source.continuation_review')
             error.issue['configuration_review']['deployment_progress'] = deepcopy(progress)
+            mentor=progress.get('mentor_review')
+            if mentor is not None:
+                require(mentor.get('schema_version')=='Family.W5.ContinuationMentor.v1'
+                    and all(mentor.get(k)==request.get(k) for k in ('client_id','run_id','owner','evaluation_at'))
+                    and mentor.get('source_db_sha256')==request['client_snapshot']['payload']['source_sha256']
+                    and mentor.get('digest')==digest({k:v for k,v in mentor.items() if k!='digest'})
+                    and mentor.get('source_bindings',{}).get('work6_result_digest')==digest(work6)
+                    and mentor.get('source_bindings',{}).get('c7_result_digest')==digest(result)
+                    and mentor.get('source_bindings',{}).get('analysis_report_digest')==progress.get('analysis_report_digest')
+                    and mentor.get('full_native_mentor_reached') is False
+                    and mentor.get('full_native_pipeline_complete') is False
+                    and mentor.get('formal_deployment_ready') is False and mentor.get('canonical_result') is None
+                    and mentor.get('broker_execution_allowed') is False and mentor.get('financial_mutation_allowed') is False
+                    and mentor.get('trade_action')=='NO_TRADE',
+                    'C7_CONTINUATION_MENTOR_BINDING_MISMATCH','c7_source.continuation_review.mentor_review')
+                error.issue['configuration_review']['mentor_review']=deepcopy(mentor)
         raise error
     require(digest(result) == digest(request['native_bundle']['asset_framework']),
             'C7_COMPUTED_FRAMEWORK_MISMATCH', 'native_bundle.asset_framework')

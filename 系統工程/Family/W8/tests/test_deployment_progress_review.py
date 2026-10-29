@@ -79,3 +79,33 @@ def test_native_c7_error_retains_progress_and_rejects_swapped_scope(monkeypatch)
     req['c7_source_digest'] = digest(source)
     with pytest.raises(BoundaryError, match='CONTINUATION_REVIEW_BINDING'):
         bind_c7_source(ROOT, req, ctx)
+
+
+@pytest.mark.parametrize('changed',['owner','work6_result_digest','formal_deployment_ready'])
+def test_c7_rejects_resigned_mentor_with_another_owner_source_or_ready_state(monkeypatch,changed):
+    from continuation_mentor import build as mentor
+    from deployment_blockers import build as blockers
+    from test_continuation_review import case as mentor_case
+    source=blocked_source(monkeypatch);req,ctx=source_case()
+    req['client_snapshot']={'payload':{'source_sha256':'0'*64}}
+    for key in ('schema_version','producer','version','source_reference','family_owner'):
+        source[key]=deepcopy(ctx['c7_source'][key])
+    from c7_engine import run_c7_engine
+    actual=run_c7_engine(ROOT,source)['result']
+    # Reuse original scoped Work9 fixture with this source's exact identity.
+    m=mentor_case();synthetic=mentor(*m,blockers(m[1],m[2],m[3]))
+    for key in ('client_id','run_id','owner','evaluation_at'):synthetic[key]=deepcopy(req[key])
+    synthetic['source_bindings'].update(work6_result_digest=digest(source['work6_result']),
+        c7_result_digest=digest(actual),analysis_report_digest='a'*64)
+    if changed=='owner':synthetic['owner']['account']='OTHER'
+    elif changed=='work6_result_digest':synthetic['source_bindings'][changed]='f'*64
+    else:synthetic[changed]=True
+    synthetic['digest']=digest({k:v for k,v in synthetic.items() if k!='digest'})
+    progress={'schema_version':'Family.W8.DeploymentProgressReview.v1',
+        **{k:deepcopy(req[k]) for k in ('client_id','run_id','owner','evaluation_at')},
+        'source_db_sha256':'0'*64,'analysis_report_digest':'a'*64,'mentor_review':synthetic,
+        'full_native_pipeline_complete':False,'full_native_mentor_reached':False,'trade_action':'NO_TRADE'}
+    progress['digest']=digest(progress);source['continuation_review']=progress
+    ctx['c7_source']=source;req['c7_source_digest']=digest(source)
+    with pytest.raises(BoundaryError,match='CONTINUATION_MENTOR_BINDING'):
+        bind_c7_source(ROOT,req,ctx)

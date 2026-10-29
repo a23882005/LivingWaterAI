@@ -13,6 +13,29 @@ from current_allocation_source import build as current_allocation
 from deployment_readiness import c7_bucket_preflight
 
 
+def reference_currencies(request, analysis):
+    """Bind reference-asset quote units, including approved but unheld assets."""
+    candidates = {}; proofs = {}
+    def add(symbol, currency, field):
+        if isinstance(currency,str) and len(currency)==3 and currency.isalpha() and currency.isupper():
+            candidates.setdefault(symbol,set()).add(currency)
+            proofs.setdefault(symbol,[]).append({'currency':currency,'field_path':field})
+    for i,row in enumerate(request['client_snapshot']['payload']['tables']['portfolio_instrument']):
+        add(row.get('ticker'),row.get('quote_currency'),f'client_snapshot.payload.tables.portfolio_instrument[{i}].quote_currency')
+    for symbol,row in (analysis.get('qualified_equity_inputs') or {}).get('items',{}).items():
+        if row.get('symbol')==symbol:
+            add(symbol,row.get('technical_source_template',{}).get('metadata',{}).get('currency'),
+                'qualified_equity_inputs.items.'+symbol+'.technical_source_template.metadata.currency')
+    for symbol,row in (analysis.get('v75_macro_inputs') or {}).get('qualified_bond_markets',{}).items():
+        if row.get('symbol')==symbol:
+            add(symbol,row.get('currency'),'v75_macro_inputs.qualified_bond_markets.'+symbol+'.currency')
+    currencies = {symbol:next(iter(values)) if len(values)==1 else None for symbol,values in candidates.items()}
+    return currencies, {symbol:{'value':currencies[symbol],
+        'status':'SOURCE_BOUND' if currencies[symbol] else 'CONFLICT',
+        'source_fields':rows,'account_currency_used_as_fallback':False,'registry_written':False}
+        for symbol,rows in proofs.items()}
+
+
 def current_sgov_roles(roles, physical_value, reference_value):
     bond = Decimal(roles['sgov_bond_bucket_amount']['amount'])
     dry = Decimal(roles['sgov_dry_powder_bucket_amount']['amount'])
@@ -92,10 +115,8 @@ def extend(root, request, analysis, prepared, context, sources):
                            quality=raw['payload']['data_quality'])
     mappings = {r['instrument_id']: r for r in preflight['mapping']}
     native_products = {r['symbol']: r['native_product_identity'] for r in analysis['analysis_result']['positions']}
-    currency_by_symbol = {}
-    for instrument in request['client_snapshot']['payload']['tables']['portfolio_instrument']:
-        if instrument.get('quote_currency'):
-            currency_by_symbol[instrument.get('ticker')] = instrument['quote_currency']
+    currency_by_symbol, currency_bindings = reference_currencies(request, analysis)
+    out['component_results']['configuration_reference_currencies'] = currency_bindings
     lines = []
     for row in target['payload']['draft']['target_lines']:
         weight = Decimal(str(row['weight']['value'])); mapping = mappings[row['instrument_id']]

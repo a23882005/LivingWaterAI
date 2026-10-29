@@ -125,12 +125,12 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
             evaluated[item.asset_id]=predicates
             if any(p.assessment_status.value != 'VALID' for p in predicates):
                 incomplete.append('PREDICATES_NOT_VALID:'+item.asset_id)
-        if incomplete:
-            return {**result,'status':'INSUFFICIENT_DATA','canonical':None,'issues':incomplete}
         # Diagnose every asset before considering any terminal action. A valid
         # first asset cannot hide a later asset's unavailable predicates.
         for item in state.per_asset_inputs:
             facts=evidence[item.asset_id];predicates=evaluated[item.asset_id]
+            if any(p.assessment_status.value != 'VALID' for p in predicates):
+                continue  # Original Step10 forbids an incomplete predicate set.
             raw_quantity = facts['existing_policy']['current_position_quantity']
             if isinstance(raw_quantity, (bool, float)):
                 raise BondEvidenceError('EXACT_QUANTITY_REQUIRED')
@@ -160,6 +160,17 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
                 trace.append('V75.proportional_scale_decisions:W1_NEW_BUY_ZERO:'+item.asset_id)
             decisions.append(decision)
             trace.extend(['V75.evaluate_step10:' + item.asset_id, 'V75.build_decision:' + item.asset_id])
+        if incomplete:
+            # Preserve independent original evaluations, but do not scale or
+            # publish money until all decisions needed by the account exist.
+            return {**result,'status':'INSUFFICIENT_DATA','canonical':None,'issues':incomplete,
+                'independent_asset_evaluations':{
+                    'scope':'ORIGINAL_STEP10_BEFORE_SHARED_BUDGET_SCALING__NOT_DEPLOYMENT_AUTHORIZATION',
+                    'per_asset_decisions':[d.model_dump(mode='json') for d in decisions],
+                    'shared_budget_scaled':False,'undeployed_amount':None,
+                    'incomplete_assets':[item.asset_id for item in state.per_asset_inputs
+                        if any(p.assessment_status.value != 'VALID' for p in evaluated[item.asset_id])],
+                    'missing_predicates_rewritten_as_wait':False}}
         decisions = proportional_scale_decisions(decisions, Money(
             amount=min(run.bond_executable_budget.amount,cap['amount']),currency=run.currency))
         trace.append('V75.proportional_scale_decisions')

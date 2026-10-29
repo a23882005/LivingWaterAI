@@ -1707,5 +1707,28 @@
     "git_blob": "a215b0364f5eccb442007278ca628c44edb553e4",
     "owner": "Family中PM",
     "scope": "原文保存、跨端歸檔與治理；正式規則及工程驗收沿用既有紀錄"
+  },
+  "v82_three_layers_diagram_archive_20261030": {
+    "owner": "Family中PM",
+    "owner_decision": "滿不錯的，照樣存起來",
+    "type": "TEACHING_DIAGRAM",
+    "source": "系統工程/Family/文件歸檔/V82三層量化規則白話逐字稿/V82_三層量化規則_白話逐字稿.docx",
+    "files": [
+      {
+        "path": "系統工程/Family/文件歸檔/V82三層量化規則白話逐字稿/V82_三層分工與部署流程圖.pdf",
+        "drive_file_id": "1UrpP3lVyI3qfnNgM9a4-csWSImDQfP-S",
+        "sha256": "17372ce918d9f2159dbe60380f25233c80bf79cf891ab485430b12ac1d74ac5d",
+        "git_blob": "5dbceee010616a7e68b7f2bb6e42602abf92c9ec",
+        "size_bytes": 401064
+      },
+      {
+        "path": "系統工程/Family/文件歸檔/V82三層量化規則白話逐字稿/V82_三層分工與部署流程圖.png",
+        "drive_file_id": "1yH4ga8vf7PDWyhvk9Wfvw8ut1ysjFe_B",
+        "sha256": "430828016c02b49f115f6cf1a74af909d451cec263ddc333791c18b6c9a445b7",
+        "git_blob": "a597900cc492d582279a5ef97b38fa0743169942",
+        "size_bytes": 484453
+      }
+    ],
+    "scope": "Word教學圖解歸檔；沿用正式規則與工程驗收狀態"
   }
 }

@@ -164,6 +164,13 @@ def build(report,request):
         intro.append('V70目標股／債風險比例：'+str(tactical['allocation']['S0'])+'%／'+str(tactical['allocation']['B0'])+'%。')
         intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
     supplement=report.get('bond_market_supplement')
+    calculations=(report.get('v75_macro_inputs') or {}).get('calculations',{})
+    for symbol in ('SGOV','SPSB'):
+        history=calculations.get(symbol+'.PRED-008')
+        if history:
+            intro.append(symbol+' '+history['observed_date']+' 的過去12月現金配息殖利率 '+
+                f"{Decimal(history['latest_yield_pct']):.2f}"+'%，在本ETF同口徑近 '+
+                f"{Decimal(history['history_years']):.2f}"+' 年的參考序列中已完成比較。採現金配息／未含配息還原的收盤價；與SEC殖利率、到期殖利率分列，不代表配息品質已通過。')
     if supplement:
         intro.append('V75波動率補充來源：MOVE '+supplement['observed_date']+' 為 '+
             f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+

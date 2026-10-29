@@ -11,6 +11,7 @@ from hashlib import sha256
 from html.parser import HTMLParser
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from urllib.parse import urlparse,parse_qs
 import csv,io,json
 
 from family_input import digest
@@ -157,15 +158,23 @@ def read(source,evaluation_at):
         expected=('https://www.federalreserve.gov/monetarypolicy/fomcprojtabl' if key=='SEP' else
             'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/' if key=='TREASURY' else
             'https://query1.finance.yahoo.com/v8/finance/chart/ZQ' if key=='FUTURES' else
+            'https://markets.newyorkfed.org/api/rp/repo/all/results/' if key=='NYFED_REPO' else
+            'https://query1.finance.yahoo.com/v8/finance/chart/'+key[6:]+'?' if key in ('YAHOO_SGOV','YAHOO_SPSB') else
             'https://fred.stlouisfed.org/graph/fredgraph.csv?id='+key)
         if not url.startswith(expected):raise PermissionError('V75_MACRO_PROVIDER_IDENTITY:'+key)
+        if key in ('YAHOO_SGOV','YAHOO_SPSB'):
+            query=parse_qs(urlparse(url).query)
+            if (query.get('interval')!=['1d'] or query.get('range') not in (['5y'],['10y'],['max'])
+                or not {'div','splits'}<=set(','.join(query.get('events',[])).split(','))):
+                raise PermissionError('V75_MACRO_YIELD_EVENT_QUERY_REQUIRED:'+key)
         data[key]=content;proofs[key]={'source_reference':url,'source_sha256':item['sha256'],
             'receipt_sha256':item['receipt_sha256'],'available_at':receipt['available_at']}
     out={'schema_version':'Family.W8.V75MacroInputs.v1','manifest_sha256':source['sha256'],
         'available_at':max((v['available_at'] for v in proofs.values()),key=_time),
         'source_proofs':proofs,'shared_metrics':{},'asset_metrics':{},'calculations':{},
         'unprovided_inputs':{},'canonical_freshness_attested':False}
-    series={key:fred(value,key,_time(proofs[key]['available_at'])) for key,value in data.items() if key not in ('SEP','TREASURY','FUTURES')}
+    series={key:fred(value,key,_time(proofs[key]['available_at'])) for key,value in data.items()
+        if key not in ('SEP','TREASURY','FUTURES','NYFED_REPO','YAHOO_SGOV','YAHOO_SPSB')}
     effr=series['EFFR'];last=max(day for day,value in effr.items() if value is not None)
     start=last.replace(year=last.year-10)
     sample=[value for day,value in effr.items() if start<=day<=last and value is not None]
@@ -213,7 +222,8 @@ def read(source,evaluation_at):
             'comparison_5bd':days[5].isoformat(),'comparison_10bd':days[10].isoformat(),
             'scope':'TREASURY_RATE_PATH_REFERENCE__NOT_ETF_YIELD_ATTRACTIVENESS_HISTORY',
             'basis':'V75 §43 0–3 month Treasury instrument' if asset=='SGOV' else 'V75 §44 2Y/3Y Treasury monitoring'}
-    return out
+    from v75_remaining_inputs import extend
+    return extend(out,data,proofs)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):
@@ -241,7 +251,7 @@ def apply(observations,pool,*,evaluation_at,repo_root):
         predicates=row.setdefault('v75_original_predicates',{})
         for pid in set(pool['shared_metrics'])|set(pool['asset_metrics'].get(row['symbol'],{})):
             predicates[pid]=slot(pool,pid,row['symbol'],predicates.get(pid),evaluation_at)
-        row['call_trace'].append('V75.PRED-001/002/003/004/006:VERIFIED_SOURCE_NORMALIZATION')
+        row['call_trace'].append('V75.PRED-001/002/003/004/006/007/008/010:SOURCE_NORMALIZATION')
     return out
 
 

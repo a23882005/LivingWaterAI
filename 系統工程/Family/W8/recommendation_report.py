@@ -3,6 +3,7 @@ from copy import deepcopy
 from decimal import Decimal
 from html import escape
 from family_input import digest
+from formal_mode_analysis import order_result_status
 
 GAPS={'approved_project_target_amount':'Loop2逐檔長期目標尚未產製／綁定',
     'native_mode_and_stage_target_rate':'原生模式／部署階段未定',
@@ -93,12 +94,13 @@ def build(report,request):
             'holding_gap_amount':gap,'holding_gap_currency':r.get('position_currency'),
             'holding_gap_label':('本人已確認無掛單；依已確認持股與當輪階段參考計算' if r.get('order_source',{}).get('status')=='VERIFIED' else '依已確認持股計算，尚未扣除本人既有未成交委託'),
             'order_confirmation_status':r.get('order_source',{}).get('status','UNKNOWN'),
+            'order_adjusted_reference_gap':deepcopy(r.get('order_adjusted_reference_gap')),
             'proposed_new_external_buy_amount':new_amount,'new_external_currency':p['owner']['currency'],
             'native_cash_trial_buy_amount':native_funding.get('native_plan',{}).get('execution_amount'),
             'native_cash_trial_status':native_funding.get('status','NOT_RUN'),
             'proposed_existing_asset_redeployment_amount':r.get('buy_gap_amount'),
             'sell_recommendation':deepcopy(mentor[key]['recommendation']['recommended_sell_amount']),
-            'net_after_orders_status':('OWNER_CONFIRMED_NO_OPEN_ORDERS' if r.get('order_source',{}).get('status')=='VERIFIED' else 'PENDING_ORDER_CONFIRMATION' if 'active_orders_and_fill_reconciliation' in r['missing_fields'] else 'SEE_NATIVE_RESULT'),
+            'net_after_orders_status':order_result_status(r.get('order_source',{'status':'UNKNOWN'})),
             'reason':'；'.join(reasons),'remaining_analysis_fields':limitations,
             'mentor_explanation':mentor[key]['explanation']})
     if len(seen)!=len(mentor):raise ValueError('RECOMMENDATION_REPORT_MENTOR_COVERAGE_MISMATCH')
@@ -123,6 +125,14 @@ def build(report,request):
     if all_orders_confirmed:
         intro[1]='¹ 本人已確認無未成交掛單；持股缺口依當輪階段參考計算，不等於本次立即應買金額。'
         intro[-1]='本人已確認無掛單；其餘配置、模式及資金限制各自列示。'
+    broker=report.get('broker_readonly_source')
+    if broker is not None:
+        source=broker['order_source']
+        intro.insert(1,'本戶持倉與現金採券商唯讀快照 '+broker['captured_at']+'；原資料庫與核准配置保留。')
+        if source.get('complete_for_open_order_exposure'):
+            intro[-1]='券商現行掛單共'+str(len(source['active_orders']))+'筆，依剩餘股數計入可計算的原生參考缺口；換單狀態保留核對註記。'
+        intro.append('券商現金總額 '+money(broker['cash']['total'],request['owner']['currency'])+
+            '；未提供獨立可用現金欄位，沿用缺值0試算。融資購買力與帳戶available funds未轉作現金。')
     if (report.get('new_investment_scenario') or {}).get('total_new_investment_amount')=='0':
         intro.insert(1,'本輪不新增外部資金，新增投入為0；既有現金與持倉保留。')
     account=report.get('account_funding_check')
@@ -181,7 +191,7 @@ def build(report,request):
     out={'schema_version':'Family.W8.RecommendationReport.v1','status':'REPORT_COMPLETE_WITH_LIMITATIONS',
         'report_delivery_status':'COMPLETE','scope':'SELECTED_IB_HOLDINGS_RECOMMENDATIONS',
         'client_id':request['client_id'],'run_id':request['run_id'],'positions_returned':len(rows),
-        'net_after_orders_status':'OWNER_CONFIRMED_NO_OPEN_ORDERS' if all_orders_confirmed else 'PENDING_OWNER_ORDER_CONFIRMATION',
+        'net_after_orders_status':order_result_status(broker['order_source']) if broker else 'OWNER_CONFIRMED_NO_OPEN_ORDERS' if all_orders_confirmed else 'PENDING_OWNER_ORDER_CONFIRMATION',
         'analysis_status':report['status'],'full_native_deployment_complete':False,
         'rows':rows,'bond_advisory_comparison':deepcopy(comparison),
         'account_funding_check':deepcopy(account),

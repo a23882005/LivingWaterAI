@@ -202,7 +202,7 @@ def classification(symbol, source, product_source=None):
     return result
 
 
-def cash_trial(snapshot, owner, policy, *, db_path=None, run_id='UNBOUND_DIAGNOSTIC'):
+def cash_trial(snapshot, owner, policy, *, db_path=None, run_id='UNBOUND_DIAGNOSTIC',broker_view=None):
     """Apply the explicit cash-only assumption, without changing any source row."""
     if (policy.get('schema_version')!='Family.W8.CashTrialPolicy.v1' or
         policy.get('missing_cash_value')!='0' or not policy.get('source_reference')):
@@ -263,6 +263,16 @@ def cash_trial(snapshot, owner, policy, *, db_path=None, run_id='UNBOUND_DIAGNOS
                     if values[field] is not None and Decimal(values[field])!=Decimal(candidate):
                         raise ValueError('CASH_SOURCE_CONFLICT:cash_state.'+field)
                     values[field]=candidate;facts[field]=deepcopy(latest)
+    historical_facts=None
+    if broker_view is not None:
+        if broker_view['owner']!=owner or broker_view['source_db_sha256']!=snapshot['source_sha256']:
+            raise PermissionError('BROKER_CASH_OWNER_MISMATCH')
+        historical_facts=deepcopy(facts)
+        values={k:None for k in ('total','available','unsettled','reserved')}
+        values['total']=broker_view['cash']['total']
+        facts={'total':{'source_kind':'BROKER_READONLY_SNAPSHOT',
+            'source_descriptor_digest':broker_view['source_descriptor_digest'],
+            'captured_at':broker_view['captured_at'],'broker_cash':deepcopy(broker_view['cash'])}}
     scenario=build_cash_overlay(values,snapshot=snapshot,owner=owner,
         authorization=policy,run_id=run_id)
     validated=validate_cash_overlay(values,scenario,snapshot=snapshot,owner=owner,
@@ -270,11 +280,13 @@ def cash_trial(snapshot, owner, policy, *, db_path=None, run_id='UNBOUND_DIAGNOS
     # Conflicting or malformed cash remains in the isolated diagnostic context;
     # it cannot become effective native cash or be masked with another zero.
     values=validated['effective_cash']
-    return {'owner':deepcopy(owner),'currency':owner['currency'],
+    out={'owner':deepcopy(owner),'currency':owner['currency'],
         'cash_state':{k:float(Decimal(v)) for k,v in values.items()} if values else None,
         'decimal_values':values,'formal_sources':facts,'assumptions':scenario['assumptions'],
         'scenario':scenario,'issues':validated['issues'],
         'label':'缺漏現金按 0 試算','official_cash_records_changed':False}
+    if historical_facts is not None:out['superseded_db_cash_sources']=historical_facts
+    return out
 
 
 class AssetSourceProducer:
@@ -286,8 +298,9 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
+        self.broker_snapshot_source=deepcopy(broker_snapshot_source)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
@@ -368,18 +381,25 @@ class AssetSourceProducer:
             native_targets=produce_native_targets(req,self.fx_observation)
             ctx['native_target_source']=native_targets
             req['native_target_source_digest']=digest(native_targets)
+        if self.broker_snapshot_source is not None:
+            ctx['broker_snapshot_source']=deepcopy(self.broker_snapshot_source)
+            req['broker_snapshot_source_digest']=digest(self.broker_snapshot_source)
         prepared=prepare_input(req,trusted_context=ctx)
+        broker_view=prepared.payload.get('broker_snapshot_source')
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')
         held=found[0];asset_class=classification(self.symbol,self.class_source,self.product_sources.get(self.symbol))
         if self.flow=='DEPLOYMENT' and asset_class['primary_class']!=FORMAL_CLASSES[0]:
             raise ValueError('CLASS_SPECIFIC_NATIVE_PRODUCER_REQUIRED')
-        trial=cash_trial(snapshot,req['owner'],self.policy,db_path=self.db_path,run_id=run)
+        trial=cash_trial(snapshot,req['owner'],self.policy,db_path=self.db_path,run_id=run,broker_view=broker_view)
         if self.flow=='DEPLOYMENT' and trial['issues']:
             raise ValueError(trial['issues'][0]['code']+':'+trial['issues'][0]['field_path'])
         spec=importlib.util.spec_from_file_location('asset_source_market',HERE/'on_demand_market_observations.py')
         market=importlib.util.module_from_spec(spec);spec.loader.exec_module(market)
         holdings=project_official_holdings(snapshot,evaluation_at=when)
+        if broker_view is not None:
+            from broker_snapshot_source import project_holdings as broker_holdings
+            holdings=broker_holdings(holdings,prepared.payload['positions'],broker_view)
         from bond_advisory import policy as bond_advisory_policy,candidates as bond_candidates
         advisory_candidates=bond_candidates(self.root) if bond_advisory_policy(req,ctx) else None
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,

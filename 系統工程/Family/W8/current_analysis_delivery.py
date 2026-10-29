@@ -244,8 +244,9 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
     reconciled=formal_gap.get('value') if formal_gap.get('status')=='COMPUTED' else None
     from formal_mode_analysis import order_source
     if row.get('owner_order_confirmation') and request is None:raise PermissionError('OWNER_ORDER_REQUEST_REQUIRED')
-    orders=order_source(request,row.get('owner_order_confirmation')) if request is not None else {'status':'UNKNOWN','active_orders':None}
-    if reconciled is None and orders['status']!='VERIFIED':missing.append('active_orders_and_fill_reconciliation')
+    orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source')) if request is not None else {'status':'UNKNOWN','active_orders':None}
+    if reconciled is None and orders['status']!='VERIFIED' and not orders.get('complete_for_open_order_exposure'):
+        missing.append('active_orders_and_fill_reconciliation')
     order_adjusted_reference=None
     component=None
     if same_currency and known_position and rate is not None:
@@ -264,6 +265,18 @@ def recommendation_amounts(row,judgment,repo_root,*,cash_trial=None,investment=N
                 'is_reconciled_deployment_gap':False,
                 'source_reference':orders['source']['source_reference']}
             trace.append('V82.calculate_position_gap:owner_confirmed_no_open_orders')
+        elif orders.get('complete_for_open_order_exposure'):
+            from formal_mode_analysis import native_orders
+            adjusted=dep.calculate_position_gap(project_target_position_amount=calculation_target['amount'],
+                target_rate=rate,confirmed_position_qty=qty,canonical_valuation_price=price,
+                active_orders=native_orders(repo_root,orders,row['symbol']))
+            order_adjusted_reference={'scope':orders['exposure_scope'],
+                'signed_gap_amount':str(adjusted.final_deployment_gap_amount),
+                'positive_gap_amount':str(adjusted.positive_deployment_gap),
+                'active_buy_amount':str(adjusted.active_buy_exposure_amount),
+                'active_sell_amount':str(adjusted.active_sell_exposure_amount),
+                'is_reconciled_deployment_gap':False,'source_reference':orders['source_reference']}
+            trace.append('V82.calculate_position_gap:broker_working_order_exposure')
     trial=cash_trial or {};available=(trial.get('decimal_values') or {}).get('available')
     matching_cash=currency is not None and trial.get('owner')==row['owner'] and trial.get('currency')==currency
     cash_ceiling='0' if matching_cash and available is not None and Decimal(str(available))==0 else None

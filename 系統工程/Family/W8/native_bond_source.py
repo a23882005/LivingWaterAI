@@ -82,6 +82,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         raise PermissionError('BOND_SOURCE_SUPPLEMENT_BINDING_MISMATCH')
     if inp['shared_decision_context']['payload'].get('v75_macro_inputs')!=report.get('v75_macro_inputs'):
         raise PermissionError('BOND_SOURCE_MACRO_INPUT_BINDING_MISMATCH')
+    if inp['shared_decision_context']['payload'].get('broker_readonly_source')!=report.get('broker_readonly_source'):
+        raise PermissionError('BOND_SOURCE_BROKER_INPUT_BINDING_MISMATCH')
     result={'schema_version':'Family.W8.NativeBondSource.v1','client_id':request['client_id'],
         'run_id':run,'owner':deepcopy(owner),'source_db_sha256':snapshot['source_sha256'],
         'status':'SOURCE_INCOMPLETE','requested_instruments':[r['instrument_id'] for r in rows],
@@ -151,6 +153,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         times.append(report['bond_market_supplement']['available_at'])
     if report.get('v75_macro_inputs'):
         times.append(report['v75_macro_inputs']['available_at'])
+    if report.get('broker_readonly_source'):
+        times.append(report['broker_readonly_source']['captured_at'])
     if any(not t for t in times):
         gaps.append({'code':'V75_SOURCE_CAPTURE_TIME_REQUIRED','field_path':'market_snapshot.data_timestamp'})
         return result

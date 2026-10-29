@@ -75,7 +75,14 @@ def target_for_symbol(request,symbol,*,projection=None):
     return deepcopy(found[0]['target_amount'])
 
 
-def order_source(request,confirmation=None):
+def order_source(request,confirmation=None,*,broker_orders=None):
+    if broker_orders is not None:
+        if (broker_orders.get('schema_version')!='Family.W5.BrokerOrderExposure.v1'
+            or broker_orders.get('client_id')!=request['client_id']
+            or broker_orders.get('owner')!=request['owner'] or broker_orders.get('run_id')!=request['run_id']
+            or broker_orders.get('source_descriptor_digest')!=request.get('broker_snapshot_source_digest')):
+            raise PermissionError('BROKER_ORDER_SOURCE_BINDING_MISMATCH')
+        return deepcopy(broker_orders)
     if confirmation is not None:
         if (confirmation.get('schema_version')!='Family.W8.OwnerNoOpenOrders.v1'
             or confirmation.get('client_id')!=request.get('client_id')
@@ -99,6 +106,23 @@ def order_source(request,confirmation=None):
         'required_fields':['asset_id','side','state','order_qty','confirmed_filled_qty','as_of','available_at'],
         'checked_sources':['official SQLite portfolio_snapshot_item','official SQLite table schema','approved Project source'],
         'holdings_acceptance_is_not_order_completeness':True}
+
+
+def native_orders(root,orders,symbol):
+    if not orders.get('complete_for_open_order_exposure'):return ()
+    dep,_,_=native(root)
+    from livingwater_v82_runtime.enums import OrderLifecycleState
+    return tuple(dep.ActiveOrderExposure(order_intent_id=o['order_intent_id'],side=o['side'],
+        state=OrderLifecycleState(o['state']),order_qty=Decimal(o['order_qty']),
+        confirmed_filled_qty=Decimal(o['confirmed_filled_qty']))
+        for o in orders['active_orders'] if o['asset_id']==symbol)
+
+
+def order_result_status(orders):
+    if orders.get('complete_for_open_order_exposure'):
+        return ('BROKER_WORKING_EXPOSURE_ACCOUNTED' if orders.get('lifecycle_fully_resolved')
+            else 'BROKER_WORKING_EXPOSURE_ACCOUNTED__REPLACEMENT_LIFECYCLE_PENDING')
+    return 'OWNER_CONFIRMED_NO_OPEN_ORDERS' if orders.get('status')=='VERIFIED' else 'PENDING_OWNER_ORDER_CONFIRMATION'
 
 
 def event_coverage(request):
@@ -151,18 +175,19 @@ def build_formal_conclusion(root,row,request,*,target_projection=None):
         'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
     modes['four_modes']['Base']['entry_reasons']=['APPROVED_LONG_TERM_ALLOCATION','FUNDAMENTALS','LEGAL_VALUATION','CREDIT_SAFETY','HARD_GATE','NOT_RUNAWAY_DOWN']
-    orders=order_source(request,row.get('owner_order_confirmation'));missing=[]
+    orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
     if target['value_state']=='KNOWN' and target.get('currency')!=request['owner']['currency']:missing.append('verified_same_run_target_FX')
     if not row.get('position_valuation_allowed',False):missing.append('canonical_valuation_price_identity_and_validity')
-    if orders['status']!='VERIFIED':missing.append('active_orders_and_fill_reconciliation')
+    if orders['status']!='VERIFIED' and not orders.get('complete_for_open_order_exposure'):
+        missing.append('active_orders_and_fill_reconciliation')
     gap={'status':'NOT_RUN_REQUIRED_INPUTS_UNRESOLVED','value':None,'missing_fields':missing,
         'function':'V82.calculate_position_gap','active_orders_defaulted_to_empty':False}
     if not missing:
         result=dep.calculate_position_gap(project_target_position_amount=target['amount'],
             target_rate=modes['canonical_target_rate'],confirmed_position_qty=row['holding']['quantity'],
-            canonical_valuation_price=market['observed_close'],active_orders=orders['active_orders'])
+            canonical_valuation_price=market['observed_close'],active_orders=native_orders(root,orders,row['symbol']))
         gap={'status':'COMPUTED','value':{k:str(v) if isinstance(v,Decimal) else v for k,v in asdict(result).items()},
             'function':'V82.calculate_position_gap','missing_fields':[]}
         modes['call_trace'].append('V82.calculate_position_gap')
@@ -230,8 +255,11 @@ def gap_matrix(row,target,coverage,orders):
         'targets_orders_exposure':[
             item('approved target amount','MAPPED_FROM_EXISTING_SOURCE' if target['value_state']=='KNOWN' else 'NO_UNIQUE_APPROVED_TARGET',
                 target,['target','gap'],'Explicit original amount is used; no current NAV substitution or absent-row zero'),
-            item('active order details/reconciliation','MAPPED_FROM_OWNER_CONFIRMATION' if orders['status']=='VERIFIED' else 'SOURCE_DETAILS_MISSING',orders,
-                [] if orders['status']=='VERIFIED' else ['projected position','gap','execution safety'],
+            item('active order details/reconciliation',
+                'MAPPED_FROM_BROKER_WORKING_EXPOSURE' if orders.get('complete_for_open_order_exposure') else
+                'MAPPED_FROM_OWNER_CONFIRMATION' if orders['status']=='VERIFIED' else 'SOURCE_DETAILS_MISSING',orders,
+                [] if orders['status']=='VERIFIED' or orders.get('complete_for_open_order_exposure') else ['projected position','gap','execution safety'],
+                'Working-order remaining quantities are included; provider replacement lifecycle caveats remain explicit' if orders.get('complete_for_open_order_exposure') else
                 'No open orders confirmed for this owner/account; historical fills are not asserted' if orders['status']=='VERIFIED' else 'Read original order asset/side/remaining quantity/state/fills; tab count is not a complete ledger'),
             item('lookthrough weights/limits','PRODUCER_AND_REQUIRED_SOURCES_NOT_CONNECTED','Issuer partial holdings and accepted account positions',
                 ['fund viability','exposure limits','safety'], 'Map complete dated issuer composition and existing authorized limits, preserving uncovered weights')]

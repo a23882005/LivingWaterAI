@@ -224,7 +224,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         positions=[r for r in positions if r['source_instrument'].get('ticker')==producer.symbol]
     from formal_mode_analysis import order_source
     order_confirmation=deepcopy(getattr(producer,'order_confirmation',None))
-    orders=order_source(request,order_confirmation)
+    broker_view=prepared.payload.get('broker_snapshot_source')
+    orders=order_source(request,order_confirmation,
+        broker_orders=broker_view.get('order_source') if broker_view else None)
     from loop2_target_projection import produce as project_loop2_targets
     target_projection=project_loop2_targets(producer.root,request,context,
         getattr(producer,'loop2_target_projection_policy',None),
@@ -258,6 +260,12 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 {'source_kind':'FORMAL_CLASSIFICATION','sha256':producer.class_source['sha256'],
                     'source_reference':producer.class_source['source_reference'],'scenario_blob':CATALOG_BLOB}],
             'call_trace':[]}
+        if broker_view is not None:
+            row['broker_order_source']=deepcopy(orders)
+            row['source_refs'][0]['source_reference']=deepcopy(position['original_db_position']['source_position']['source_row'])
+            row['source_refs'].append({'source_kind':'BROKER_READONLY_SNAPSHOT',
+                'source_descriptor_digest':broker_view['source_descriptor_digest'],
+                'source_reference':deepcopy(source['source_row']),'observed_at':broker_view['captured_at']})
         if source.get('as_of_utc') is None:
             problems.append(issue('holding.observed_at','Original sealed holding has no observation timestamp',
                 'Quantity is retained as accepted; current-as-of completeness is not asserted',source='DB:'+holdings['source_db_sha256']))
@@ -405,7 +413,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     # a different broker binding; preserve those holdings and exact gaps.
     other_sources=[r for r in holdings['analysis_security_positions'] if
         not ((r.get('source_kind')=='SEALED_W6' and r.get('broker_label')=='IB')
-             or r.get('source_kind')=='OWNER_SCREENSHOT_SOURCE')]
+             or r.get('source_kind')=='OWNER_SCREENSHOT_SOURCE'
+             or (r.get('source_kind')=='BROKER_READONLY_SNAPSHOT'
+                 and r['source_row'].get('account_key')==request['owner']['account']))]
     other_sources.extend(holdings['ledger_only_positions'])
     other_coverage=[{'status':'ANALYSIS_BLOCKED','symbol':r.get('symbol'),
         'holding_source':deepcopy(r),'issues':[issue('owner.account_scope',
@@ -434,6 +444,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             [dict(p,scope='CASH_DIAGNOSTIC__DOES_NOT_BLOCK_HOLDING_ANALYSIS') for p in trial['issues']],
         'source_refs':[s for r in rows for s in r['source_refs']], 'call_trace':trace,
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
+    if broker_view is not None:report['broker_readonly_source']=deepcopy(broker_view)
     if context.get('native_target_source') is not None:
         report['native_target_source']=deepcopy(context['native_target_source'])
     if observations.get('bond_market_supplement') is not None:
@@ -529,6 +540,16 @@ class HoldingsAnalysisRunner:
     def analyze(self,request):
         prepared=prepare_input(request,trusted_context=self.context)
         report=deepcopy(self.report)
+        if report.get('broker_readonly_source')!=prepared.payload.get('broker_snapshot_source'):
+            raise PermissionError('BROKER_REPORT_SOURCE_REPLAY_MISMATCH')
+        broker=prepared.payload.get('broker_snapshot_source')
+        if broker is not None:
+            from formal_mode_analysis import order_source
+            expected_orders=order_source(request,broker_orders=broker['order_source'])
+            if (report.get('order_source')!=expected_orders
+                or any(r.get('broker_order_source')!=expected_orders for r in report['analysis_result']['positions'])
+                or Decimal(report['cash_trial']['decimal_values']['total'])!=Decimal(broker['cash']['total'])):
+                raise PermissionError('BROKER_REPORT_ORDER_OR_CASH_REPLAY_MISMATCH')
         if (report.get('schema_version')!='Family.W8.HoldingsAnalysisReport.v1'
             or report.get('status') not in STATES or report.get('request_digest')!=digest(request)
             or report.get('client_id')!=request['client_id'] or report.get('run_id')!=request['run_id']

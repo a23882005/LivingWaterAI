@@ -4,7 +4,7 @@ from pathlib import Path
 import sys,unittest,tempfile,hashlib
 HERE=Path(__file__).resolve().parents[1];ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
-from formal_mode_analysis import resolve_mode_context,target_for_symbol,order_source,tri
+from formal_mode_analysis import resolve_mode_context,target_for_symbol,order_source,order_result_status,native_orders,native,tri
 from approved_target_input import build_approved_target_view,enrich_document_target_view,_digest
 
 class ModeAnalysisTest(unittest.TestCase):
@@ -56,6 +56,27 @@ class ModeAnalysisTest(unittest.TestCase):
 
     def test_numeric_truth_is_not_a_boolean_assertion(self):
         self.assertIsNone(tri(0));self.assertIsNone(tri(1))
+
+    def test_broker_replacement_remaining_quantity_reaches_original_gap_calculator(self):
+        request={'client_id':'SYNTHETIC','owner':{'account':'A'},'run_id':'R',
+            'broker_snapshot_source_digest':'a'*64}
+        source={'schema_version':'Family.W5.BrokerOrderExposure.v1',
+            'client_id':'SYNTHETIC','owner':{'account':'A'},'run_id':'R',
+            'source_descriptor_digest':'a'*64,'status':'BROKER_WORKING_EXPOSURE_VERIFIED',
+            'complete_for_open_order_exposure':True,'lifecycle_fully_resolved':False,
+            'active_orders':[{'asset_id':'VT','order_intent_id':'SYNTHETIC:1','side':'BUY',
+                'state':'REPLACE_PENDING','order_qty':'2','confirmed_filled_qty':'1'}]}
+        orders=order_source(request,broker_orders=source)
+        dep,_,_=native(ROOT)
+        gap=dep.calculate_position_gap(project_target_position_amount='1000',target_rate='1',
+            confirmed_position_qty='10',canonical_valuation_price='90',active_orders=native_orders(ROOT,orders,'VT'))
+        self.assertEqual(str(gap.active_buy_exposure_amount),'90')
+        self.assertEqual(str(gap.final_deployment_gap_amount),'10')
+        self.assertIn('REPLACEMENT_LIFECYCLE_PENDING',order_result_status(orders))
+        self.assertEqual(native_orders(ROOT,orders,'OTHER'),())
+        source['owner']['account']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'BINDING_MISMATCH'):
+            order_source(request,broker_orders=source)
 
 class ExplicitTargetTest(unittest.TestCase):
     def pack(self,path,line):

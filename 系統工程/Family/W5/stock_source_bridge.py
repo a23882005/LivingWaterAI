@@ -31,7 +31,15 @@ def bind_stock_source(request, prepared, binding):
     if positions:
         position=one(positions,'stock.positions')
         require(position['quantity_state']=='KNOWN','STOCK_QUANTITY_UNKNOWN','stock.position','W1','DATA_UNAVAILABLE')
-        if position['source_position'].get('source_kind') in ('SEALED_W6','OWNER_SCREENSHOT_SOURCE'):
+        quantity=amount(position['quantity'])
+        if position['source_position'].get('source_kind')=='BROKER_READONLY_SNAPSHOT':
+            view=prepared.payload.get('broker_snapshot_source')
+            require(view is not None and view['owner']==request['owner']
+                and view['source_descriptor_digest']==request.get('broker_snapshot_source_digest')
+                and any(r['contract_id']==instrument.get('broker_contract_id')
+                    and amount(r['quantity'])==quantity for r in view['positions']),
+                'STOCK_BROKER_SOURCE_MISMATCH','stock.position.source_row')
+        elif position['source_position'].get('source_kind') in ('SEALED_W6','OWNER_SCREENSHOT_SOURCE'):
             require(position['source_position']['source_row'] in tables['portfolio_snapshot_item'],
                     'STOCK_SEALED_SOURCE_MISMATCH','stock.position.source_row')
         else:
@@ -39,7 +47,6 @@ def bind_stock_source(request, prepared, binding):
             one([r for r in tables['portfolio_position'] if r['account_key']==account
                  and r['instrument_key']==instrument['instrument_key']
                  and timestamp(r['as_of_utc'],'stock.position.as_of')==when],'stock.latest_position')
-        quantity=amount(position['quantity'])
         source=deepcopy(position['source_position'])
     else:
         # prepare_input has already required trusted account completeness evidence.

@@ -206,6 +206,16 @@ def prepare_input(request,*,trusted_context):
         approved_account_scope=ctx.get('approved_document_account_scope'))
     positions=position_view(payload,req['owner']['account'],at,ctx.get('holdings_completeness'),
         approved_account_scope=ctx.get('approved_document_account_scope'))
+    broker_source=None
+    if ctx.get('broker_snapshot_source') is not None:
+        require(req.get('broker_snapshot_source_digest')==digest(ctx['broker_snapshot_source']),
+                'BROKER_SOURCE_BINDING_MISMATCH','broker_snapshot_source_digest')
+        from broker_snapshot_source import read as read_broker,project_positions as broker_positions
+        broker_source=read_broker(req,ctx['broker_snapshot_source'])
+        positions=broker_positions(positions,broker_source)
+    else:
+        require(req.get('broker_snapshot_source_digest') is None,
+                'TRUSTED_BROKER_SOURCE_REQUIRED','broker_snapshot_source_digest')
     macro=req.get('macro_snapshot',{})
     if macro.get('capture_receipt') is not None:
         require(digest(macro['capture_receipt'])==ctx.get('macro_capture_digest'),
@@ -226,4 +236,6 @@ def prepare_input(request,*,trusted_context):
         'allocation_id':allocation_id,'target_record_id':target['payload']['target_id'],'confirmation_run_id':target['confirmation_run_id'],'analysis_run_id':req['run_id'],
         'original_payload_digest':digest(target['payload'])}
     binding['binding_digest']=digest(binding)
-    return PreparedInput(digest(req),{'request':req,'target_binding':binding,'owner_binding':owner,'positions':positions,'engine_calls':0,'trade_action':'NO_TRADE'})
+    result={'request':req,'target_binding':binding,'owner_binding':owner,'positions':positions,'engine_calls':0,'trade_action':'NO_TRADE'}
+    if broker_source is not None:result['broker_snapshot_source']=broker_source
+    return PreparedInput(digest(req),result)

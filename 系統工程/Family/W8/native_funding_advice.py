@@ -6,6 +6,7 @@ gap remains explicitly separate from the unknown order-adjusted net gap.
 from copy import deepcopy
 from dataclasses import asdict
 from decimal import Decimal
+from pathlib import Path
 from family_input import digest
 from runtime_loader import load_c_module
 from current_analysis_delivery import source_target_in_currency
@@ -26,9 +27,12 @@ def zero_cash_plan(row,stock,bound,owner):
     from livingwater_v82_runtime.enums import HardGateState
     symbol=row['symbol'];permission=row['core_observation']['result']['permission']
     target=stock['work3_handoff']['final_target']['payload']['instrument_targets'][symbol]['project_target_position']
+    from formal_mode_analysis import native_orders
     gap=calculate_position_gap(project_target_position_amount=target,
         target_rate=row['current_analysis']['current_judgment']['target_rate_reference'],
-        confirmed_position_qty=row['holding']['quantity'],canonical_valuation_price=row['market']['observed_close'],active_orders=())
+        confirmed_position_qty=row['holding']['quantity'],canonical_valuation_price=row['market']['observed_close'],
+        active_orders=native_orders(Path(__file__).resolve().parents[3],
+            row['current_analysis']['recommendation'].get('order_source',{}),symbol))
     return build_buy_execution_plan(gap=gap,
         permission=PermissionResult(HardGateState(permission['hard_gate']),permission['new_buy_order_permission'],tuple(permission['reason_codes'])),
         bound_equity_budget=bound,order_working_price=None,minimum_lot=None,
@@ -132,6 +136,11 @@ def build_shared_inputs(producer,request,report,*,trial,investment,tactical):
         shared['payload']['v75_macro_inputs']=deepcopy(source)
         shared['data_as_of']['v75_macro_inputs_available_at']=source['available_at']
         shared['source_reference_ids'].append('V75-MACRO-INPUTS:'+digest(source))
+    if report.get('broker_readonly_source') is not None:
+        source=report['broker_readonly_source']
+        shared['payload']['broker_readonly_source']=deepcopy(source)
+        shared['data_as_of']['broker_snapshot_available_at']=source['captured_at']
+        shared['source_reference_ids'].append('BROKER-READONLY:'+source['source_descriptor_digest'])
     return {'work3_input':work3_input,'c7_funding_context':c7,'budget':budget}
 
 
@@ -194,8 +203,10 @@ def build(producer,request,report,*,trial,investment,tactical,shared_inputs=None
             out['native_plan']=plain(plan);out['status']='CASH_TRIAL_ADVICE_COMPUTED'
             out['amount_scope']='ZERO_AVAILABLE_CASH_TRIAL__NOT_EXISTING_ASSET_REDEPLOYMENT_OR_ORDER_ADJUSTED_NET'
             out['active_orders_assumed_empty']=False
-            out['position_gap_scope']='CONFIRMED_HOLDINGS_COMPONENT_ONLY'
-            out['order_adjusted_net_status']=('OWNER_CONFIRMED_NO_OPEN_ORDERS' if advice['recommendation'].get('order_source',{}).get('status')=='VERIFIED' else 'PENDING_OWNER_ORDER_CONFIRMATION')
+            order_data=advice['recommendation'].get('order_source',{})
+            out['position_gap_scope']=('BROKER_WORKING_EXPOSURE_REFERENCE' if order_data.get('complete_for_open_order_exposure') else 'CONFIRMED_HOLDINGS_COMPONENT_ONLY')
+            from formal_mode_analysis import order_result_status
+            out['order_adjusted_net_status']=order_result_status(order_data)
         except ValueError as error:
             from native_asset_source import native_error_path
             out['status']='NATIVE_CONTRACT_REJECTED'
@@ -241,8 +252,9 @@ def validate(root,report,request):
         # The native zero-budget result cannot be re-signed into a positive
         # recommendation, an executable order or an order-adjusted net gap.
         from formal_mode_analysis import order_source
-        orders=order_source(request,row.get('owner_order_confirmation'))
-        expected_orders='OWNER_CONFIRMED_NO_OPEN_ORDERS' if orders['status']=='VERIFIED' else 'PENDING_OWNER_ORDER_CONFIRMATION'
+        orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source'))
+        from formal_mode_analysis import order_result_status
+        expected_orders=order_result_status(orders)
         if item.get('order_adjusted_net_status')!=expected_orders:raise PermissionError('NATIVE_FUNDING_ADVICE_ORDER_SOURCE_MISMATCH')
         plan=item['native_plan']
         if (plan!=plain(zero_cash_plan(row,stock,bound,request['owner']))

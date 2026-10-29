@@ -1,4 +1,10 @@
-# V82 Greenfield Runtime Candidate — W12 E07 RECHECK4
+# V82 Runtime — approved v1.0 additions and archived W12 baseline
+
+2026/10/30: adopted component `V82_APPROVED_IMPLEMENTATION_1.0` adds own-history qP/qV, full Entry/stage selection, M/speed/Trend timing and persistent daily planning cycles. Family W5/W8 use the same native contract; canonical 49/13 fields remain unchanged. See [the current implementation guide](../../../Family/W8/V82_IMPLEMENTATION_GUIDE.md) for authority, input contracts, tests and limits.
+
+`deployment.py` uses `V82_EXECUTION_DECIMAL_1.0.1` to keep high-precision caps below legal lot boundaries; existing MIN and investment thresholds remain unchanged. Component versions are separate from frozen package metadata 0.9.0. The W12 evidence below describes its archived baseline, not acceptance of these additions or Joseph/MOU readiness. Current additions await Family middle-PM independent acceptance: Production HOLD, NO_TRADE.
+
+## Archived W12 E07 RECHECK4 baseline
 
 Current engineering status of this package:
 

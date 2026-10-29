@@ -27,11 +27,24 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "708edf57461a78563828abd1932d904ea0cfe3dd",
-      "sha256": "81e2b13ab208152c47a36338b265c819d79a63810a8378202e50783354d647dd",
-      "size": 12456,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py"
+      "sha256": "82eb080acd23b5dd2def5ef9e6a1882600c0b7f24c71f52dd6d042427fab19ec",
+      "git_blob_sha": "6341e06250d0180d5a9f46d0f8e9334f1ed57ca6",
+      "size": 13588,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      },
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "708edf57461a78563828abd1932d904ea0cfe3dd",
+        "sha256": "81e2b13ab208152c47a36338b265c819d79a63810a8378202e50783354d647dd",
+        "size": 12456,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py"
+      },
+      "prior_upstream": null
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/canonical_output.py",
@@ -401,9 +414,9 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_profiles.py",
-      "sha256": "105ceb6a526a9e9b262401b0602e7d2ad6d99044adfba7d97566bb240b5bf442",
-      "git_blob_sha": "f398f5e4a9eb82b6196c1146192695614d6483d2",
-      "size": 12180,
+      "sha256": "b8e5759f03475d022b6642e7efea6dd14744de8c3d9fe7c82b78ff4ffeb876a5",
+      "git_blob_sha": "7a3e33f85cb064b178ab5c3d79302b26cd1e4f21",
+      "size": 14288,
       "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
@@ -413,14 +426,58 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py",
-      "sha256": "02774a6161565b63c3f39c3351df395c3da31b69b6f43d835b8a24500ec0316d",
-      "git_blob_sha": "af079043e172044d06cf10ad99cea3bb34a4a198",
-      "size": 15536,
-      "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
+      "sha256": "b443a06905f7620132ad48f74e9d88743eb6361b2f0039a9379c5492222fe889",
+      "git_blob_sha": "852ce6974bf56773730d3f6f77885c3a27d7d6a5",
+      "size": 16572,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
-        "scope": "New approved native producer; prior frozen functions unchanged; not production cutover approval"
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      },
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py",
+        "sha256": "02774a6161565b63c3f39c3351df395c3da31b69b6f43d835b8a24500ec0316d",
+        "git_blob_sha": "af079043e172044d06cf10ad99cea3bb34a4a198",
+        "size": 15536,
+        "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7"
+      },
+      "prior_upstream": null
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py",
+      "sha256": "943fbb566014317a63041992e36de5bfd6cff3dfb4509899d8e5c733a882dd85",
+      "git_blob_sha": "ef5f021b20be617e2e2c4012d3a69ce5cada82f5",
+      "size": 8066,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+      "sha256": "0c22bc7ff5232fdfd10587d8c3b9ddef05c8400f736698d413d344bd0b1dfe26",
+      "git_blob_sha": "e8573bcc12e69d8d04338dbba7aede674d2a34fb",
+      "size": 17525,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/slice_allocation.py",
+      "sha256": "a2b7d7a3f00882407b714d885ce203a85833c3c53ded5a89b533575821d23b11",
+      "git_blob_sha": "3932103116ebcb906a74ec1f4be4ad24c4fb73c0",
+      "size": 6390,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
       }
     }
   ]

@@ -94,6 +94,12 @@ def apply_technical_source(bundle,technical):
         approved=technical['owner_approved_technical']
         data['producer_contract']['parameters'].update(scope='QUALIFIED_SOURCE_WITH_OWNER_APPROVED_V1_0',
             owner_approved_spec_sha256=approved['spec_sha256'],approval_receipt_sha256=approved['approval_receipt_sha256'])
+        if facts.get('approved_v10_context') is not None:
+            context=facts['approved_v10_context']
+            context.update(off_low=approved['off_low'],
+                maturity_signals=deepcopy(approved['left_maturity_signals']),
+                trend_timing_inputs=deepcopy(approved['trend_timing_inputs']))
+            data['producer_contract']['parameters']['approved_v10_context_digest']=digest(context)
     facts.update(deepcopy(data['producer_contract']))
     facts['swings']=[{'asset_id':facts['asset_id'],**p} for k in ('lows','highs') for p in technical['swings'][k]]
     facts['technical_available_at']=technical.get('snapshot_available_at')

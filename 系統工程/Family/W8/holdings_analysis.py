@@ -268,6 +268,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             'native_product_identity':{'registry_identity':deepcopy(instrument),
                 'holding_price_currency_source':holding_price_currency(position,holdings),
                 'asset_type':cls['asset_type'],'asset_grade':cls['asset_grade'],
+                'primary_class':cls['primary_class'],
                 'product_evidence':cls.get('grade_evidence'),'company_listing_source':deepcopy(cls.get('company_identity')),
                 'engine_route':'V75_PREDICATES' if observed and observed['v75_original_predicates'] else 'V82_TECHNICAL_OBSERVATIONS',
                 'scope':'ANALYSIS_ONLY__NOT_DEPLOYMENT_IDENTITY_ATTESTATION'},
@@ -419,8 +420,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 'source_reference':v['source_reference'],'observed_at':v['observed_date_text']}
                 for v in row['valuation_observations']]
         row['position_valuation_allowed']=False
-        if row.get('core_observation') and cls['asset_type']!='INDIVIDUAL_STOCK':
-            row['formal_conclusion']=build_formal_conclusion(producer.root,row,request,target_projection=target_projection)
+        if row.get('core_observation'):
+            row['formal_conclusion']=build_formal_conclusion(producer.root,row,request,target_projection=target_projection,
+                approved_source_descriptor=(context.get('v82_approved_sources') or {}).get(symbol))
             row['call_trace']+=row['formal_conclusion']['call_trace']
         row['requirements']=audit_requirements(row,producer.class_source)
         if observed and row['requirements']['complete']:row['status']='ANALYSIS_COMPLETE'
@@ -645,4 +647,7 @@ class HoldingsAnalysisRunner:
             if row.get('market'):
                 validate_market_time(row['market'],row['symbol'],request['evaluation_at'],
                     report.get('qualified_equity_inputs'))
+            from v82_approved_context import validate as validate_approved_context
+            validate_approved_context(root,row,request,self.context,
+                target_projection=report.get('loop2_target_projection'))
         return report

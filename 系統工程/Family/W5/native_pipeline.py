@@ -148,6 +148,12 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         'formal_deployment_ready':bond['runtime_ready']['runtime_ready'] is True,
         'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
+        **({'stock_local_plan':{'execution_amount':str(stock['execution'].execution_amount)
+            if stock['execution'].execution_amount is not None else None,
+            'approved_v10_analysis':deepcopy(stock['approved_v10_analysis']),
+            'daily_slice':deepcopy(stock['daily_slice']),
+            'shared_slice_allocation':deepcopy(stock['shared_slice_allocation'])}}
+            if stock.get('approved_v10_analysis') else {}),
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
         'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,
         'production':'HOLD','trade_action':'NO_TRADE'}

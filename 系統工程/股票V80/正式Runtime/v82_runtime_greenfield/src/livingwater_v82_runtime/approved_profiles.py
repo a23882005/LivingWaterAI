@@ -141,35 +141,66 @@ def right_entry(*, off_low, right_confirmation, fundamentals_viable, credit_allo
         'event_dependencies':deepcopy(event_dependencies)}
 
 
-def apply_restrictions(states, restrictions, *, snapshot_id):
+def constraint_expression(expression,facts):
+    """Small typed rule interface; no eval(), opaque policy flag or LLM text."""
+    if not isinstance(expression,dict):return P.UNKNOWN,False
+    op=expression.get('operator')
+    if op in ('AND','OR'):
+        children=expression.get('operands')
+        if not isinstance(children,list) or not children:return P.UNKNOWN,False
+        values=[constraint_expression(c,facts) for c in children]
+        if not all(valid for _,valid in values):return P.UNKNOWN,False
+        states=[v for v,_ in values]
+        if op=='AND':return tri_and(*states),True
+        return (P.TRUE if P.TRUE in states else P.UNKNOWN if P.UNKNOWN in states else P.FALSE),True
+    if op=='NOT':
+        value,valid=constraint_expression(expression.get('operand'),facts)
+        return negate(value),valid
+    field=expression.get('field')
+    if not isinstance(field,str) or op not in ('TRUTH','LT','LE','GT','GE','EQ'):return P.UNKNOWN,False
+    value=facts.get(field)
+    if op=='TRUTH':
+        try:return truth(value),True
+        except ValueError:return P.UNKNOWN,False
+    if op=='EQ' and isinstance(value,str) and isinstance(expression.get('value'),str) and number(value) is None:
+        return (P.UNKNOWN if value=='UNKNOWN' else truth(value==expression['value'])),True
+    return compare(value,op,expression.get('value')),True
+
+
+def apply_restrictions(states, restrictions, *, snapshot_id, facts=None):
     out={int(k):truth(v) for k,v in states.items()};audit=[]
     seen=set()
     for row in restrictions:
         rid=row.get('restriction_id');effect=row.get('effect') or {};expression=row.get('expression')
-        valid=(bool(rid) and rid not in seen and bool(row.get('source')) and bool(row.get('authority'))
-            and row.get('snapshot_id')==snapshot_id and isinstance(expression,str) and bool(expression.strip())
+        source_valid=(bool(rid) and rid not in seen and bool(row.get('source')) and bool(row.get('authority'))
+            and row.get('snapshot_id')==snapshot_id)
+        valid=(source_valid and isinstance(expression,dict)
             and effect.get('kind') in ('MAX_STAGE','REQUIRE_STAGE_PREDICATE'))
         if rid:seen.add(rid)
         applies=truth(row.get('applies_when')) if valid else P.UNKNOWN
-        limit=effect.get('stage');requirement=truth(row.get('expression_truth')) if valid else P.UNKNOWN
+        limit=effect.get('stage');requirement,supported=constraint_expression(expression,facts or {})
+        valid=valid and supported
         if not isinstance(limit,int) or isinstance(limit,bool) or not 1<=limit<=9:valid=False
         for stage in out:
+            if source_valid and truth(row.get('applies_when')) is P.FALSE:continue
             if not valid:
                 out[stage]=tri_and(out[stage],P.UNKNOWN);continue
             if applies is P.FALSE:continue
             affected=stage>limit if effect['kind']=='MAX_STAGE' else stage>=limit
             if affected:
-                condition=P.FALSE if effect['kind']=='MAX_STAGE' else requirement
+                if effect['kind']=='MAX_STAGE':condition=negate(tri_and(applies,requirement))
+                else:condition=requirement
                 if applies is P.UNKNOWN and condition is not P.TRUE:condition=P.UNKNOWN
                 out[stage]=tri_and(out[stage],condition)
         audit.append({'restriction_id':rid,'source':row.get('source'),'authority':row.get('authority'),
-            'expression':expression,'effect':deepcopy(effect),'valid':valid,
-            'reason':None if valid else 'NAMED_STAGE_CONSTRAINT_UNRESOLVED'})
+            'expression':expression,'expression_result':requirement.value,'effect':deepcopy(effect),'valid':valid,
+            'reason':None if valid else 'INAPPLICABLE_CONSTRAINT_RETAINED' if source_valid and truth(row.get('applies_when')) is P.FALSE
+                else 'NAMED_STAGE_CONSTRAINT_UNRESOLVED'})
     return out,audit
 
 
 def resolve_approved_stage(*, mode, left_result, q_value, range_result, required_facts,
-                           restrictions, snapshot_id):
+                           restrictions, snapshot_id, constraint_facts=None):
     mode=NormalDeploymentMode(mode)
     required={'asset_identity','primary_framework','fundamentals_viable','valuation_legal'}
     unknown=sorted(required-set(required_facts))+sorted(k for k,v in required_facts.items() if truth(v) is P.UNKNOWN)
@@ -182,7 +213,12 @@ def resolve_approved_stage(*, mode, left_result, q_value, range_result, required
     elif mode is NormalDeploymentMode.BASE_DEPLOYMENT:states={1:P.TRUE}
     elif mode is NormalDeploymentMode.RIGHT_CONFIRMATION:states={8:P.TRUE}
     else:states={}
-    states,audit=apply_restrictions(states,restrictions,snapshot_id=snapshot_id)
+    facts={}
+    for key,row in (constraint_facts or {}).items():
+        facts[key]=(row.get('value') if isinstance(row,dict) and row.get('snapshot_id')==snapshot_id
+            and row.get('value_state')=='KNOWN' and row.get('source_reference') and row.get('rule_version') else None)
+    facts.update(qV=q_value,A_normal=range_result.get('normal'),**required_facts)
+    states,audit=apply_restrictions(states,restrictions,snapshot_id=snapshot_id,facts=facts)
     selection=_select(states,nested=mode is NormalDeploymentMode.LEFT_OVERWEIGHT)
     stage=selection['stage'] if not unknown and not rejected else None
     reasons=[*('STAGE_REQUIRED_UNKNOWN:'+k for k in unknown),*('STAGE_REQUIRED_FALSE:'+k for k in rejected)]

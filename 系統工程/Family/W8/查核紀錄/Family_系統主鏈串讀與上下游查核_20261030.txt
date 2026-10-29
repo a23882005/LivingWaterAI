@@ -1,0 +1,148 @@
+活水AI Family｜中PM系統主鏈串讀與上下游契約查核
+查核日期：2026/10/30（台灣時間）
+查核者：Family中PM／總PM
+main基準：38ff92c90131d47f2c4d2d04dfb4713feca7de31
+施工PR：a23882005/LivingWaterAI #59，Draft／未合併
+本輪鎖定PR head：f6ddf599fa0bda5303895046b5175addf03e8de2
+
+【結論與證據範圍】
+本輪沿 Mentor → V70 → 配置承接 → V82／V75 → 資金保全／SGOV／保護持倉 → Work9／Mentor → W6／HTML／Drive 重新串讀。已建立494份程式、契約、設定與可讀文件的版本核對快照，各檔Git blob與PR tree一致；494是來源核對數，不是494份均已逐行人工審閱或全數驗收。深入閱讀以本報告列出的主鏈、正式契約、相關轉接與持久化程式為範圍。
+Fresh Read Drive：Mentor v3.21.0、V82 v1.21.0、債券V75 v2.7.0；V82核准v1.0實作規格沿既有正式契約。讀取PR Checkpoint與V82_COMPLETION_CONTRACT，區分main正式版本與尚未合併施工。
+四戶正式DB從Drive原ID重新下載，以唯讀方式逐表讀取並檢查結構、列數、完整性、外鍵；本輪沒有修改私人DB、投資母規則或runtime程式。直接DB報告來源probe沒有套用完整W8成交後投影，不等於當前持倉覆蓋率或完整第04項實跑。
+本輪驗證為靜態呼叫鏈查核、正式DB唯讀來源轉接、隔離合成報告元件probe；未重跑兩戶完整投資／報告端到端，也未重跑整套CI。PR記錄的44項V82新函式測試是施工者證據，本輪不冒稱獨立重跑。
+
+【先把三種編號分清楚】
+Menu 03：本人手動啟動目標配置檢視／調整，屬Loop 1入口。
+Menu 04：本人手動啟動當下投入速度分析，屬Loop 2入口。
+Family W5：股票／債券引擎整合；Family W6：報告；Family W7：選單；Family W8：按需執行與整線驗收。
+C原Work6：Mentor配置調整；C原Work7：V70配置框架承接。
+C8C9 Work6：帳戶資金隔離；Work7：SGOV角色；Work8：保護持倉；Work9：統一部署回傳。它們不是Family W6～W9的相同工項。
+Menu 03／04進入後，其他資料讀取或部分共用功能由程式依實際接線呼叫；不可把相關Menu編號畫成會員必須逐個手動操作。也不可把「讀取同類資料」誤寫成真的呼叫另一個Menu handler。
+
+【實際執行架構】
+GitHub保存程式與版控；ChatGPT在家人提出需求時按需執行；Google Drive保存各戶正式SQLite DB及報告。2026/10/26 Owner架構裁決優先於歷史Hostinger／OAuth常駐後端方案。不存在必須常駐24小時才可運作的前提。
+Mentor.md是正式規則與協作契約，不能把它當成已存在的一支mentor_agent.py。Python主鏈的確定性解釋實作主要見W5/mentor_bridge.py；外部ChatGPT負責依規則協調與說明。
+
+【逐站：上游實際輸出什麼，下游拿什麼】
+以下程式路徑以「系統工程/」為共同根目錄。
+
+入口與本人資料
+程式：Family/W7/family_menu.py，Family/W8/on_demand_project.py、official_family_entry.py、on_demand_analysis.py。
+呼叫：FamilyMenu.select() → route(number) → 已綁定handler；04為deployment_pace。
+上游：已登入本人、固定DB ID、重新取得的DB bytes與SHA。
+下游：OfficialFamilyEntry.current_snapshot() → W5/family_input.read_snapshot()，取得Family.W5.W1Snapshot.v1，含client_id、identity、29張投資來源表、source_sha256、payload_digest。
+檢查：身分、帳戶、DB SHA、snapshot實際內容一致；有成交後封存資料時，再由post_trade_state投影現行持倉並保留原歷史。
+狀態：選單入口存在；OnDemandAnalysisProvider會依來源包分成持倉分析、來源不足診斷、完整FamilyRunner三條路。不能只看到select(04)回傳就宣稱整線完成。
+
+Mentor與Loop 1
+規則：MENTOR主程式/Mentor.md 開頭正式整合契約。
+上游：本人需求、核准戰略股債基準、Current、Proposed、偏好／保護持倉、來源證據。
+下游：C-配置決策引擎＋Mentor整合/正式Runtime/work6/adjustment_loop.py：run_mentor_adjustment_loop()；呼叫work5/core_engine.py的run_configuration_engine()，由benchmark_reader、績效風險與穿透曝險模組提供配置評估。
+輸出：loop_status、route、current_proposal、final_target、preference_locks、drift_snapshot、radar_snapshot、mentor_result_contract及來源追溯。
+規則邊界：改變資產大類、期限、提領需求、人生階段／風險能力，或保護持倉超出凍結bucket，回RETURN_TO_V70。Loop 2不得反向改長期目標。
+核准確認與DB入庫是不同步驟；有引擎Final Target不等於已寫回Drive。
+
+V70：總經與整體戰術額度
+程式：總經V70/V70-3-27.html；Family/W8/v70_component_runtime.cjs、v70_tactical_input.py；另有on_demand_current_sources.py／v70_original_runtime.cjs路線，不能混為同一正式發布狀態。
+上游：已核准S0/B0、同輪總經feed、八群風險、CAP等。S0/B0目前仍由既有訪談／核准來源注入，不能宣稱V70已從完整個人風險資料自行推導。
+實算：V70原JS的calcTotal／stress／calcAlloc；輸出S0、B0、T、sTot、bTot、cTot及原因。
+金額轉接：v70_tactical_input.calculate()按核准allocation base乘比例，必要時用具來源FX轉到執行幣別。此base明標不是即時NAV。
+重要：component runtime明標ORIGINAL_NUMERIC_COMPONENTS_NOT_FORMAL_PUBLISH；會在本輪結果對不同bScore相同時才容許缺bScore的數值元件輸出，並不假裝已取得bScore或正式publish Gate通過。
+下游：W5/v70_source_bridge.py將來源context以明確同輪binding承接；保留原snapshot、時間、來源digest；W5/tactical_budget.py讀stock_tactical_amount／bond_tactical_amount。
+V70額度不是現金餘額，也不是每檔都能各用一次的獨立總額。
+
+配置承接：C原Work7與C8C9 Work3
+程式：Family/W8/deployment_c7_sources.py → W5/configuration_source.py、c7_engine.py → 原work6/adjustment_loop.py、work7/asset_framework.py。
+上游：Current、本人核准目標／確認證據、V70框架、benchmark及Funding Context。
+C7輸出：status、integrated_asset_framework、work6_final_target_reference、funding_context_snapshot、drift_snapshot、radar_snapshot、snapshot_lineage、hard_checks。
+C7未READY_FOR_PM_GATE時，FamilyRunner保留拒絕與configuration_review，不擅自捏造目標或走完Work9。
+C8C9_Work3_Context_Handoff_Adapter.build_context_handoff()承接正式W2 envelope、Final Target、Client State、Funding、V70與shared decision context，無損複製並對V82／V75綁相同run／owner／context digest。
+實際輸出路徑包含final_target、funding_context.settlement、executable_budget.equity／bond、remaining_target_gap、v70_runtime_context、shared_decision_context、engine_bindings。
+不是只傳「股債比例」；帳戶、幣別、授權、來源時點與確認證據同樣是必要輸入。
+
+V82：股票逐檔部署
+主鏈：Family/W5/family_runner.py → native_pipeline.py → stock_engine.run_stock_engine()。
+承接：C8C9_Work4_V82_Integration_Adapter.build_v82_runtime_input()產出v82_runtime_input與integration_binding。
+輸入：asset/listing身分、project_target_position、confirmed_position_snapshot、V70 snapshot、C7 Funding Context、shared市場context、技術／估值／安全證據、活動訂單與價格。
+現行呼叫：validate_and_bind_funding → evaluate_core_rule_state → select_deployment_mode → resolve_deployment_stage → calculate_position_gap → build_buy_execution_plan。
+輸出：core_state、deployment、position_gap、execution，再由assemble_stock_output產生正式49欄canonical及13欄呈現投影。
+已確認缺口：此版stock_engine仍以technical.right_confirmation直接作right_add，且resolve_deployment_stage仍吃外部left_stage／trend_stage；還沒改成呼叫新approved_profiles完整Right／正式選階。M／日切片／cycle帳本沒有在這條主鏈完整消費。
+新進度：PR新增approved_profiles.py與own_history.py，含完整Right事件依賴、qP/qV、Left／Trend正式選階、range適用性、具名限制與UNKNOWN處理；Checkpoint明標第一段44測試、family_menu04_integrated=false。不能再說完全沒有實作，也不能說已完整接通。
+
+V75：債券逐檔部署
+主鏈：native_pipeline → bond_engine.run_bond_engine() → C8C9_Work5_V75_Integration_Adapter。
+輸入：同輪V70債券額度、正式Final Target／gap、帳戶資金、PRED-001～010來源、信用類別、存續期、現有部位政策。
+實算：validate_v75_run_input → build_work3_state → 各predicate evaluator → evaluate_step10 → build_decision → proportional_scale_decisions → assemble_final_snapshot → evaluate_runtime_ready。
+輸出：per_asset_decisions、deploy_amount、existing_position_action、gate／evaluation／formal_output_eligible、runtime_ready與V75未部署SGOV contribution。
+必要predicate未VALID時，保留獨立可算項目，但不偽造共同金額／WAIT。合法原生HARD_WAIT有受限唯讀呈現路徑，不能升格為可部署。
+PRED007已有具名USD正式修訂來源接線；本輪不修改該投資規則。
+
+資金、SGOV與保護持倉
+主鏈：native_pipeline → funding_bridge.reconcile_funding → C8C9 Work6資金隔離＋funding_guard.check_aggregate → Work7 SGOV＋sgov_bridge → Work8保護持倉＋permission_bridge。
+輸入：真正V82／V75金額claim、同一client/domain/broker/account/currency及AVAILABLE資金。
+輸出：cash_eligibility、equity_used、bond_used、available_remaining、SGOV角色對帳及保護後動作。
+限制：不跨戶、跨券商、跨帳戶或幣別借錢；未結算／保留款不能當可執行現金；同來源多次觀測不能變多筆資金；未知金額不能補0冒充完整總額。
+SGOV_BOND與SGOV_DRY為不同logical role，同一實體價值不能重複計算。V70的dry powder、V75未部署contribution及真實已結算現金不是同一概念；V82沒有可以捏造V82_UNDEPLOYED_TO_SGOV的canonical欄位。
+account_funding_check.py有列舉已知金額與shared_cash_ledger，但明標未決決策、joint_execution_authorized=false；這是診斷，不是同日daily cycle額度帳本已完成。
+
+Work9與回Mentor
+程式：C8C9_Work9_Unified_Deployment_Mentor_Return.build_unified_deployment() → Family/W5/mentor_bridge.explain_native()。
+上游：原Work4／5／6／7／8結果，逐一驗schema、baseline、run、owner、幣別、digest與共享來源。
+輸出：canonical_deployment_result.items、undeployed_disposition、funding_context、來源bindings與mentor_return。
+Mentor重播比對Work9結果，按固定reason catalog翻譯／解釋，拒絕LLM改寫金融動作。不同「持倉分析／續作Mentor」診斷回傳不等於這個完整統一Mentor已到達。
+
+DB讀寫與保存
+讀：on_demand_project固定本人DB → inspect校驗SQLite／身分／SHA → family_input snapshot；歷史、假設與已確認實際持倉分層。
+寫：on_demand_mutations.OnDemandMutationStager → official_mutations既有writer → 新working DB交易／外鍵檢查 → SQLite backup API封存candidate。
+目標寫final_target_version＋final_target_allocation，先DRAFT再確認；weight_units總和1000000。
+新增資金寫funding_source為PLANNED_CONTRIBUTION，不冒充已到帳現金；個人資料寫personal_profile_attribute；交易事件／修正／成交後現況保留portfolio_event及snapshot來源鏈。
+正式化：遠端原件備份 → 重新讀取原件／備份核對 → 原Drive ID寫回 → 重新下載比SHA、完整性、外鍵及指定欄位 → PERSISTED_REMOTE_VERIFIED。
+OnDemandWriteback是分階段工具契約，不會自己上傳；source recheck不是跨執行者的原子分散鎖，同資源仍須由呼叫方序列化。
+V82/persistence.py的InMemory／JSONL repository是參考持久化適配器；不能把它當成Family正式SQLite日額度帳本已落地。FamilyRunner的StagingAnalysisStore同樣是記憶體staging復原，不是正式Drive資料已保存。
+
+報告資料如何形成
+Menu 13 → build_report_source(本人snapshot) → OnDemandW6Renderer → trusted_current_input_producer提供market與engine → build_w6_current_data → 核准W6 v16 renderer。
+build_report_source只整理本人持倉／cash／DB目標與來源分層，不把舊價／假設轉成即時NAV或可執行現金。
+build_w6_current_data核對同client／DB SHA／run、來源行情、target_key、最新完整確認目標、持倉估值覆蓋及cash scope／FX，輸出actual、target、drift、approved_radar、verified_sections等。
+渲染還要求四雷達及八組具來源內容章節，不能用舊Joseph report_data填補其他人。approved_report_radar及approved_w6_section_content在本輪掃描的Family程式中只有消費點，未找到主線自動producer；可能由可信外部注入，須以真正注入與同輪證據驗收，不能因參數存在就算完成。
+舊W6/report_receiver.py另有更嚴格canonical receipt及digest檢查，但不能拿另一條路的檢查存在，推論on_demand_w6已呼叫同樣檢查。
+
+HTML／PDF如何做
+Family/W8/w6_member_render.py核對核准v16 ZIP SHA，從ZIP取report.mjs的CSS、mother.html及封面／頁首素材；母版是樣式／互動來源，不提供舊客戶數字。
+_build_blocks用當輪actual／target／drift、來源內容與四雷達建立14章內容，文字經html.escape。
+_source_html產出內文HTML與JSON blocks；Playwright／Chromium載入後執行PAGINATION_SCRIPT動態分頁，檢查圖片、overflow、章節與頁數；同一頁面產PDF並逐頁截PNG。
+_reader以mother.html綁本人名、動態頁數／目錄／圖片，內嵌PNG data URI後產index.html，ZIP含index.html、PNG與PDF。
+輸出四檔：report.pdf、index.html、report.html、report.zip。
+問題：目前report.html在瀏覽器分頁前寫入，最後回讀的是原始檔，沒有保存page.content()。原始HTML的main#pages為空，只有application/json腳本，沒有分頁執行腳本。因此它不能當成已完成分頁的獨立內文HTML；PDF與index.html是另一條已渲染DOM／PNG路徑，不能一併說它們已壞。
+
+報告上傳與完成
+prepare_report_delivery只產本地檔與STAGED_NOT_PERSISTED計畫；會員選單回REPORT_UPLOAD_REQUIRED。
+當次執行者須將所有產物上傳本人正式報告資料夾，逐份重新下載核對大小／SHA，再準備manifest；manifest最後上傳並重新讀回，verify_published_manifest才回PERSISTED_REMOTE_VERIFIED。
+Menu 12只查本人正式報告folder的完成交付，不把本地PDF存在視為已存Drive。每次台灣時間命名保留歷史報告。
+
+【本輪新增查核項目】
+W6-DRIFT：正式Mentor及C7要求沿用C的drift_snapshot；w6_current_data.py卻重新以行情總額×DB權重產target／drift，未消費C snapshot及其protected／action語意。C原Drift定義為Target－Current，W6圖表定義Current－Target；各自有標示，但下游不可把反號數值當同一canonical欄位。修復需保留canonical值，展示反號另具名且可追溯；不修改既有金融規則。
+W6-INPUT：w6_current_data只核對部分engine外框，未在此路徑要求真正canonical payload、其digest及formal_deployment_ready等完整資格。合成外框能產CALCULATION_READY，但缺章節時renderer仍拒絕；這是輸入接線／資格檢查缺口，不是已證明假報告成功發布。
+W6-TARGET：fresh Joseph DB無final_target_version／allocation列；W5可承接外部核准目標，W6此路徑只讀DB目標，不能直接銜接。應依正式既有外部核准契約做無損轉接，或循既有核准流程正式入庫；不得重造確認事件消除缺口。
+W6-CONTENT：雷達與章節來源producer／正式映射須補證據，不能把trusted callback視為整線完成。
+W6-HTML：獨立report.html未保存完成分頁DOM，需與PDF／翻頁index同輪一致。
+V82-INTEGRATION：新增qP／qV、profile、完整Right函式尚未被Family主鏈呼叫；M／乘數／日切片／daily cycle仍續作。保留Codex第一段成果，不重做。
+SYSTEM-STATUS：有handler／schema／函式不等於兩戶同輪整線PASS；股票多標的共同額度、V75必要資料、C7回流、Work9與正式W6仍依Checkpoint／真實證據驗收。
+
+【本輪實讀DB結果】
+Joseph：46張表；mou：52張；Arthur：46張；Lilian：46張。四顆integrity_check均ok、foreign_key_check均0。
+Joseph無DB內正式target版本／allocation；mou有完整確認目標但沒有cash_balance_snapshot；Arthur／Lilian有DB目標，但現金來源仍有NEEDS_REVIEW。這些是來源狀態，不可改成0或已結算。
+直接DB→W5 snapshot→formal_report_source唯讀probe：四戶來源轉接均可建立，但reporting_flags的即時估值／可部署現金／完整v16資料均未認證。該函式本來就只做來源整理，flags=false不是DB損毀。
+Arthur／Lilian只做本輪要求之資料結構與來源讀取，不展開其投資部署施工。
+
+【施工與驗收順序】
+沿原Codex PR59完成V82新原生函式接線、M／cycle／共享額度；另以本報告W6項目補報告契約與HTML，不另起衝突投資引擎。
+用同一組來源與同一輪追通：訊號→模式→Stage→Gap→日額度→資金限制→最終金額→統一Work9→Mentor→canonical報告轉接→HTML／PDF→本人Drive→重新讀回。
+逐站驗client／owner／account／幣別／listing／run或semantic cycle key／版本／來源digest／as_of、UNKNOWN依賴、單位與比例分母，不只驗欄位名稱相同。
+驗收要含成熟／未成熟／未知、Gate禁新買仍保留合法分析、同日換run、成交／取消待確認／commitment、資金不足與多標的不重複額度，以及報告與canonical數字／符號／保護動作一致。
+中PM負責獨立比對與驗收，工程status依正式證據更新；本輪查核不把W8、Gate D／E或正式上線改成PASS。
+
+【可重現證據】
+本輪工作紀錄：tmp/system_reread/，包含PR tree／494檔blob核對快照、DB schema收據及來源轉接收據、probe_report_chain.py與結果。
+報告元件probe結果：沒有canonical payload的合成OK外框可建立W6CurrentData；章節缺失時_build_blocks明確拒絕W6_VERIFIED_CHAPTER_CONTENT_MISSING；原始report.html空main且沒有執行分頁JS。這些是元件證據，不是正式家人E2E／瀏覽器QA或上傳驗收。
+私人DB原件、身分與敏感數值留私人作業區，不隨公開GitHub查核紀錄提交。

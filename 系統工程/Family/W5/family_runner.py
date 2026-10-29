@@ -62,6 +62,8 @@ class FamilyRunner:
             proof=w3['final_target']['confirmation_proof']
             require(all(proof.get(k)==evidence.get(k) for k in ('confirmed_at','confirmed_by')),
                     'NATIVE_CONFIRMATION_PROOF_MISMATCH',branch)
+        from v82_slice_bridge import bind as bind_v82_slice
+        prepared.payload['approved_v10_context']=bind_v82_slice(self.repo_path,request,ctx)
         # Protection and target/drift consumers require a ready C7 framework.
         # Report the original C7 refusal before accessing absent target rows.
         prepared.payload['c7_computation']=bind_c7_source(self.repo_path,request,ctx)
@@ -102,7 +104,7 @@ class FamilyRunner:
         if amendment is not None:
             from v75_pred007_source import describe
             mentor['liquidity_amendment']={'assessment':deepcopy(amendment),'explanation':describe(amendment)}
-        return {'schema_version':'Family.W5.result.v1','status':'OK','client_id':request['client_id'],
+        result={'schema_version':'Family.W5.result.v1','status':'OK','client_id':request['client_id'],
             'request_id':request['request_id'],'run_id':request['run_id'],'owner':deepcopy(request['owner']),
             'input_digest':input_digest(request),'target_binding':deepcopy(prepared.payload['target_binding']),
             'expected_versions':deepcopy(request['expected_versions']),'evaluation_at':request['evaluation_at'],
@@ -111,6 +113,12 @@ class FamilyRunner:
             'formal_deployment_ready':native.get('formal_deployment_ready',False),
             'read_only_native_wait_review':native.get('read_only_native_wait_review',False),
             'storage_scope':'ISOLATED_TEST_STAGING','production':'HOLD','trade_action':'NO_TRADE'}
+        from v82_slice_bridge import finalize as finalize_v82_slice
+        try:receipt=finalize_v82_slice(request,result)
+        except (PermissionError,ValueError) as error:
+            raise BoundaryError(str(error),'approved_v10_context.cycle_snapshot',status='DATA_UNAVAILABLE') from error
+        if receipt is not None:result['daily_slice_ledger_receipt']=receipt
+        return result
 
     def analyze(self,request,*,timeout_seconds=30):
         frozen=deepcopy(request)
@@ -143,7 +151,14 @@ class FamilyRunner:
                     'source_data_provenance':'SOURCE_BACKED',
                     'mode':report.get('mode'),'runtime_mode':'REAL_DETERMINISTIC'}
             response=self.store.analyze(frozen,validate=self._validate,compute=self._compute,timeout_seconds=timeout_seconds)
-            return {**response['result'],'replay_status':response['status']}
+            result={**response['result'],'replay_status':response['status']}
+            from v82_slice_bridge import finalize as finalize_v82_slice
+            try:receipt=(finalize_v82_slice(frozen,result) if response['status']!='COMPUTED' else None)
+            except (PermissionError,ValueError) as error:
+                return self._error(frozen,'DATA_UNAVAILABLE',{'code':str(error),
+                    'producer':'V82_DAILY_CYCLE_LEDGER','field_path':'approved_v10_context.cycle_snapshot'})
+            if receipt is not None:result['daily_slice_ledger_receipt']=receipt
+            return result
         except BoundaryError as error:
             return self._error(frozen,error.status,error.issue)
         except RecoveryError as error:

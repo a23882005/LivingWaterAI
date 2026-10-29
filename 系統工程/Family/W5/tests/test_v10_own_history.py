@@ -26,10 +26,10 @@ def valuation_case(metric='FORWARD_PE'):
             'as_of':iso(observed),'available_at':iso(observed+timedelta(days=1)),
             'freshness':'FRESH','pit_status':'VERIFIED','economic_meaningful':True,'value':str(i+1)})
         d=end
-    current={**history[-1],'as_of':'2025-02-15T00:00:00Z','available_at':'2025-02-16T00:00:00Z',
-        'retrieved_at':'2025-02-16T01:00:00Z','value':'60.5'}
+    current={**history[-1],'as_of':'2025-01-15T00:00:00Z','available_at':'2025-01-16T00:00:00Z',
+        'retrieved_at':'2025-01-16T01:00:00Z','value':'60.5'}
     return dict(identity=identity,current=current,history=history,cadence='DAILY',calendar=calendar,
-        comparable_from='2015-01-01T00:00:00Z',decision_at='2025-02-17T00:00:00Z')
+        comparable_from='2015-01-01T00:00:00Z',decision_at='2025-01-17T00:00:00Z')
 
 
 def test_midrank_ties_current_exclusion_and_yield_direction():
@@ -108,7 +108,10 @@ def price_case(count=3300):
 
 def complete_price(count=3300):
     a=price_case(count);s=a['calendar']['sessions'];a['actions'].update(coverage_verified=True,
-        coverage_start=s[0]['session_id'],coverage_end=s[-1]['session_id'],events=[])
+        coverage_start=s[0]['session_id'],coverage_end=s[-1]['session_id'],events=[],
+        source_reference='SYNTHETIC_COMPLETE_EVENT_REGISTRY',source_hash='SYNTHETIC_HASH',
+        pit_status='VERIFIED',available_at=a['decision_at'])
+    a['calendar'].update(coverage_cutoff=a['decision_at'],last_completed_session=s[-1]['session_id'])
     return a
 
 

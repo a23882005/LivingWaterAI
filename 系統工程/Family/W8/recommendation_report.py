@@ -71,7 +71,7 @@ def build(report,request):
                 if derived.get('status')=='ORIGINAL_C6_BASELINE_DERIVED'
                 else '正式長期目標0%：不新增；不是立即賣出指示'))
         if c['valuation']['native_result']:reasons.append('估值 '+c['valuation']['native_result'].get('level','UNKNOWN'))
-        if t:reasons.append('技術 Right '+t.get('right_confirmation','UNKNOWN')+'；Up/Down '+t.get('runaway_up','UNKNOWN')+'/'+t.get('runaway_down','UNKNOWN'))
+        if t:reasons.append('技術 R_ok '+t.get('right_confirmation','UNKNOWN')+'；Up/Down '+t.get('runaway_up','UNKNOWN')+'/'+t.get('runaway_down','UNKNOWN'))
         bond=c.get('native_component_observations',{})
         for predicate in bond.values():
             native=predicate.get('original_result',{})

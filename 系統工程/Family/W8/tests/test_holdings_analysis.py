@@ -285,7 +285,9 @@ class HoldingAnalysisTest(unittest.TestCase):
             self.assertEqual(row['core_observation']['function'],'V82.evaluate_core_rule_state')
             self.assertEqual(row['core_observation']['structural_confirmation_applicability'],'REQUIRED')
             self.assertEqual(row['core_observation']['result']['structural_risk']['state'],'UNKNOWN')
-            self.assertIsNone(row.get('formal_conclusion'))
+            self.assertIsNone(row['formal_conclusion']['etf_viability_audit'])
+            self.assertEqual(row['formal_conclusion']['individual_thesis_audit']['scope'],'INDIVIDUAL_STOCK__NOT_ETF_VIABILITY')
+            self.assertIsNone(row['formal_conclusion']['canonical_target_rate'])
             self.assertEqual(row['native_product_identity']['company_listing_source']['symbol'],symbol)
             if symbol=='IBKR':
                 self.assertEqual(row['core_observation']['actual_inputs']['valuation_waterfall'],[])
@@ -333,14 +335,14 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(row['formal_conclusion']['formal_stage'],'UNKNOWN')
         self.assertTrue(row['current_analysis']['analysis_report_delivered'])
         self.assertFalse(row['current_analysis']['current_judgment']['execution_authorized'])
-    def test_owner_scoped_judgment_reuses_original_selector_without_execution_permission(self):
+    def test_technical_r_alone_does_not_replace_same_run_full_entry_and_stage(self):
         self.enable_product('VT');row=self.report()['analysis_result']['positions'][0]
         row['core_observation']['result']['valuation']['formal_output_eligible']=True
         row['core_observation']['result']['technical']={'right_confirmation':'TRUE','runaway_up':'FALSE','runaway_down':'FALSE'}
         row['market']['approved_technical']={'off_low':'TRUE'}
         from current_analysis_delivery import current_judgment
         out=current_judgment(row,ROOT)
-        self.assertEqual(out['mode'],'Right Confirmation');self.assertEqual(out['stage_reference'],'STAGE_8')
+        self.assertEqual(out['mode'],'UNKNOWN');self.assertEqual(out['stage_reference'],'UNKNOWN')
         self.assertFalse(out['execution_authorized']);self.assertFalse(out['formal_deployment_decision'])
         self.request['confirmed_target']={'payload':{'draft':{'target_lines':[{'ticker':'VT',
             'weight':{'value_state':'KNOWN','value':'0.2'},
@@ -350,8 +352,8 @@ class HoldingAnalysisTest(unittest.TestCase):
         from current_analysis_delivery import deliver
         view=deliver(row,self.request,repo_root=ROOT)
         self.assertEqual(view['long_term_allocation_target']['weight']['value'],'0.2')
-        self.assertEqual(view['current_round_deployment_target']['cumulative_rate'],'0.95')
-        self.assertEqual(view['current_round_deployment_target']['amount'],'950.00')
+        self.assertIsNone(view['current_round_deployment_target']['cumulative_rate'])
+        self.assertIsNone(view['current_round_deployment_target']['amount'])
         self.assertEqual(self.request,before)
 
         self.assertFalse(row['core_observation']['result']['permission']['new_buy_order_permission'])
@@ -364,6 +366,25 @@ class HoldingAnalysisTest(unittest.TestCase):
             report['report_digest']=digest({k:v for k,v in report.items() if k!='report_digest'})
             with patch.object(H,'prepare_input',return_value=self.prepared),self.assertRaisesRegex(PermissionError,'READABLE_REPORT_SOURCE_RESULT_MISMATCH'):
                 H.HoldingsAnalysisRunner(context=self.context,report=report).analyze(self.request)
+
+    def test_approved_decision_replays_supplementary_bytes_and_native_analysis(self):
+        self.enable_product('VT')
+        from v82_approved_context import validate
+        path=Path(self.tmp.name)/'SYNTHETIC_APPROVED_SOURCE.json'
+        path.write_text(json.dumps({'schema_version':'Family.W8.V82ApprovedSource.v1',
+            'client_id':self.client,'owner':self.owner,'asset_id':'VT',
+            'source_db_sha256':self.snapshot['source_sha256'],
+            'source_reference':'SYNTHETIC_PIT_SOURCE','available_at':self.request['evaluation_at']}))
+        self.context['v82_approved_sources']={'VT':{'local_path':str(path),
+            'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}}
+        report=self.report();row=report['analysis_result']['positions'][0]
+        validate(ROOT,row,self.request,self.context,target_projection=report['loop2_target_projection'])
+        row['formal_conclusion']['approved_v10_analysis']['formal_stage']='STAGE_9'
+        with self.assertRaisesRegex(PermissionError,'NATIVE_REPLAY_MISMATCH'):
+            validate(ROOT,row,self.request,self.context,target_projection=report['loop2_target_projection'])
+        path.write_text('{}')
+        with self.assertRaisesRegex(PermissionError,'SOURCE_HASH_MISMATCH'):
+            validate(ROOT,row,self.request,self.context,target_projection=report['loop2_target_projection'])
 
     def test_readable_report_is_complete_independently_of_pending_order_net(self):
         r=self.report();view=r['recommendation_report']

@@ -100,12 +100,14 @@ def test_base_right_reference_cannot_publish_when_stage_necessary_facts_are_unkn
 def test_named_constraints_are_applied_and_unresolved_constraints_remain_named():
     restriction={'restriction_id':'SYNTHETIC_APPROVED_CAP','authority':'SYNTHETIC_OWNER',
         'source':'SYNTHETIC_CONTRACT','snapshot_id':SNAP,'applies_when':'TRUE',
-        'expression':'approved_limit=8','expression_truth':'TRUE','effect':{'kind':'MAX_STAGE','stage':8}}
+        'expression':{'field':'qV','operator':'LT','value':'60'},'effect':{'kind':'MAX_STAGE','stage':8}}
     assert resolve(restrictions=[restriction])[0].stage=='STAGE_8'
     restriction['effect']={'kind':'OPAQUE_POLICY','stage':8}
     d,a=resolve(restrictions=[restriction]);assert d.target_rate is None
     assert a['stage_restrictions'][0]['reason']=='NAMED_STAGE_CONSTRAINT_UNRESOLVED'
     assert a['stage_restrictions'][0]['restriction_id']=='SYNTHETIC_APPROVED_CAP'
+    restriction.update(expression='OPAQUE_POLICY_TRUE',expression_truth='TRUE',effect={'kind':'MAX_STAGE','stage':8})
+    assert resolve(restrictions=[restriction])[0].target_rate is None
 
 
 def test_gate_is_absent_from_right_analysis_and_up_down_conflict_preempts_normal_mode():

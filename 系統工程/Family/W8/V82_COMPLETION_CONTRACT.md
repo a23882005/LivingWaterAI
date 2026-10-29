@@ -1,5 +1,7 @@
 V82補齊工程，2026/10/30，Family中PM驗收線
 
+本文件下方保留第一段施工快照。後續已完成同源Entry/Stage、M/日切片、持久cycle及Family04接線，現行契約與規則→函式→測試對照見 [V82_IMPLEMENTATION_GUIDE.md](V82_IMPLEMENTATION_GUIDE.md)；實跑及驗收狀態以最新Checkpoint為準。第一段「尚未接線」不再代表現況，兩戶必要來源及C7未通過仍不得宣稱全功能驗收。
+
 本批沿 PR59，基準27d41bd，保留main查核報告38ff92c。授權為Owner本輪交辦及正式三層量化規格v1.0；規格DOCX SHA-256：816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f。交接ZIP SHA-256：93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301。Fresh Read V82 v1.21.0 SHA-256：392e54808c33cce99e3567f0e8942650ad50b382d9fc87acbbe20f012b568372。
 
 原生Owner位於股票V80/正式Runtime/v82_runtime_greenfield；新增已核准的v1.0方法，保留既有selector、九階比例、gap及資金MIN。49／13欄不擴充，profile、來源、限制與帳本進sidecar。舊來源鎖保留，新增原生模組逐份登錄核准範圍與hash；不是以改hash跳過驗證。

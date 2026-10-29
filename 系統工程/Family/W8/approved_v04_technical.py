@@ -52,7 +52,15 @@ def val(value):
 def produce(rows,*,profile,is_etf=None,close_only=False):
     with localcontext() as ctx:
         ctx.prec=50;ctx.rounding=ROUND_HALF_EVEN
-        return _produce(rows,profile=profile,is_etf=is_etf,close_only=close_only)
+        result=_produce(rows,profile=profile,is_etf=is_etf,close_only=close_only)
+        if len(rows)>1:
+            # Recompute the prior snapshot from its own prefix, so a Swing
+            # confirmed today cannot leak into yesterday's Up evidence.
+            previous=_produce(rows[:-1],profile=profile,is_etf=is_etf,close_only=close_only)
+            result['trend_timing_inputs']['previous_technical']={
+                k:[r['truth'] for r in previous['signals'][k]] for k in ('up_price','up_confirm')}
+            result['trend_timing_inputs']['previous_technical']['ma20_ok']=previous['ma20_ok']
+        return result
 
 
 def _produce(rows,*,profile,is_etf,close_only):
@@ -292,6 +300,15 @@ def _produce(rows,*,profile,is_etf,close_only):
         'ma20_ok':truth(ma20_ok),'off_low':truth(off_low),
         'numeric_decimal':{key:str(value) if value is not None else None for key,value in numeric.items()},
         'technical_reduction_signals':reduction,'left_maturity_signals':maturity,
+        'trend_timing_inputs':{'bars':[{key:str(series_[i]) if series_[i] is not None else None
+            for key,series_ in (('Open',o),('High',h),('Low',l),('Close',c))}
+            for i in range(max(0,count-5),count)],
+            'ma5':str(at(ma[5])) if at(ma[5]) is not None else None,
+            'ma10':str(at(ma[10])) if at(ma[10]) is not None else None,
+            'ma20':str(at(ma[20])) if at(ma[20]) is not None else None,
+            'previous_atr14':str(at(atr,t-1)) if at(atr,t-1) is not None else None,
+            'previous_close':str(at(c,t-1)) if at(c,t-1) is not None else None,
+            'breakout_retest_success':next(x['truth'] for x in vectors['right_signals'] if x['name']=='breakout_retest_success')},
         'low_td9_score_times4':str(scores[td[1]]*4) if td else None,
         'technical_reduction_scope':'CONDITIONS_ONLY__CLASSIFICATION_AND_SELL_PERMISSION_REMAIN_WITH_ORIGINAL_OWNER',
         'episode_trace':episode_trace,'timeframes':timeframes(rows,c),

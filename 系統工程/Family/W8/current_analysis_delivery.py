@@ -39,7 +39,7 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         'historical_pit_verified':bool(current and current.get('historical_publication_time_verified')),
         'publication_time_missing_does_not_erase_value':True}
     facts=row.get('issuer_facts') or {}
-    structure=deepcopy(conclusion.get('etf_viability_audit',{}))
+    structure=deepcopy(conclusion.get('etf_viability_audit') or conclusion.get('individual_thesis_audit') or {})
     # Structural readiness does not delete dated issuer values/composition.
     structure['available_issuer_facts']={k:deepcopy(facts[k]) for k in
         ('as_of','source_url','stock_count','benchmark','top_ten_weight_pct','regions_pct','metrics') if k in facts}
@@ -147,6 +147,20 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         concise.append(f"缺漏可用現金按0試算：本輪現金可支應買入上限 {recommendation['position_currency']} 0；不代表目標已達成或不需加碼。")
     if recommendation['missing_fields']:
         concise.append('補倉建議金額尚缺：'+'、'.join(recommendation['missing_fields'])+'；比例及現有持倉估值照常提供。')
+    approved_decision=conclusion.get('approved_v10_analysis')
+    if approved_decision:
+        result['approved_rule_summary']={k:deepcopy(approved_decision[k]) for k in (
+            'profile_version','right_entry','range_result','maturity','speed','trend_timing','stage_audit','funding_layers')}
+        result['approved_rule_summary']['history_features']={k:{name:deepcopy(approved_decision[k].get(name))
+            for name in ('value','status','reason_codes')} for k in ('qP','qV')}
+        velocity=approved_decision['speed'];state=approved_decision['maturity']['state']
+        rate=velocity['mode_rate'];label={'MATURE':'成熟','IMMATURE':'未成熟','UNKNOWN':'資料未齊'}[state]
+        concise.append('正常買入切片：成熟度'+label+'；日切片率'+(str(Decimal(rate)*100)+'%' if rate is not None else '未定')+
+            '。這是補足缺口的速度，仍須核對日內已用額度、資金及交易條件。')
+        layers=approved_decision.get('funding_layers')
+        if layers and layers.get('planning_pool') is not None:
+            concise.append('已授權規劃資金池 '+request['owner']['currency']+' '+layers['planning_pool']+
+                '；已結算現金 '+str(layers.get('settled_execution_cash') or '未定')+'。可動用SGOV尚須轉現、結算及原交易授權，不重複計為現金。')
     result['readable_analysis']='\n'.join(concise)
     result['delivery_digest']=digest(result)
     return result
@@ -164,28 +178,19 @@ def current_judgment(row,repo_root,*,approved_target=None):
             'mode':'UNKNOWN','stage_reference':'UNKNOWN','target_rate_reference':None,
             'target_amount_reference':None,'currency':None,'formal_deployment_decision':False,
             'execution_authorized':False,'reason_codes':['ORIGINAL_PRODUCT_ROUTE_RETAINED'],'call_trace':[]}
-    dep,P,_=native(repo_root)
-    core=(row.get('core_observation') or {}).get('result',{})
-    tech=core.get('technical') or (row.get('market') or {}).get('v82_original_aggregation',{})
-    approved=(row.get('market') or {}).get('approved_technical',{})
-    down=tri(tech.get('runaway_down'));not_down=None if down is None else not down
-    legal=True if core.get('valuation',{}).get('formal_output_eligible') else None
-    right=both(tri(tech.get('right_confirmation')),tri(approved.get('off_low')),legal,not_down)
     c=row.get('formal_conclusion') or {}
-    price=tri(c.get('left_inputs',{}).get('price_condition_at_least_one'))
-    left=both(price,legal,not_down)
-    mode=dep.select_deployment_mode(runaway_up=P(tech.get('runaway_up','UNKNOWN')),
-        right_add=P(truth(right)),left_buy_point=P(truth(left)))
-    stage=dep.resolve_deployment_stage(mode=mode)
+    decision=c.get('approved_v10_analysis') or {}
+    rate=decision.get('canonical_target_rate')
     target=approved_target if approved_target is not None else c.get('approved_project_target') or {}
-    amount=(str(Decimal(target['amount'])*stage.target_rate) if target.get('value_state')=='KNOWN' and stage.target_rate is not None else None)
+    amount=(str(Decimal(target['amount'])*Decimal(rate)) if target.get('value_state')=='KNOWN' and rate is not None else None)
     return {'scope':'CURRENT_HOLDINGS_JUDGMENT__OWNER_REQUESTED_EXISTING_PUBLISHED_INPUTS',
-        'mode':mode.value,'stage_reference':stage.stage,
-        'target_rate_reference':str(stage.target_rate) if stage.target_rate is not None else None,
+        'mode':decision.get('selected_mode','UNKNOWN'),'stage_reference':decision.get('formal_stage','UNKNOWN'),
+        'target_rate_reference':rate,
         'target_amount_reference':amount,'currency':target.get('currency'),
         'formal_deployment_decision':False,'execution_authorized':False,
-        'reason_codes':list(stage.reason_codes),
-        'call_trace':['V82.select_deployment_mode','V82.resolve_deployment_stage']}
+        'reason_codes':deepcopy(decision.get('reason_codes',['APPROVED_FULL_ENTRY_AND_STAGE_SOURCE_REQUIRED'])),
+        'approved_analysis_digest':digest(decision) if decision else None,
+        'call_trace':deepcopy(decision.get('call_trace',[]))}
 
 
 def source_target_in_currency(target,currency,fx_observation=None):

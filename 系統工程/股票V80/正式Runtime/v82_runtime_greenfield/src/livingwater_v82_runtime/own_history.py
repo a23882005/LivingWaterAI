@@ -71,6 +71,13 @@ def _periods(calendar, cadence, current_at):
         seen.add(row['period_id']);last=end
         if end<current_at:result.append({**row,'start_time':start,'end_time':end})
     if not result:raise ValueError('COMPLETED_REFERENCE_PERIODS_REQUIRED')
+    local=current_at.astimezone(_calendar(calendar))
+    current_start=date(local.year,local.month if cadence=='MONTHLY' else ((local.month-1)//3)*3+1,1)
+    prior_end=current_start.fromordinal(current_start.toordinal()-1)
+    expected_month=prior_end.month if cadence=='MONTHLY' else ((prior_end.month-1)//3)*3+1
+    latest=result[-1]['start_time'].astimezone(_calendar(calendar))
+    if (latest.year,latest.month)!=(prior_end.year,expected_month):
+        raise ValueError('CALENDAR_LATEST_COMPLETED_PERIOD_MISSING')
     # Do not allow an omitted entire period to improve coverage statistics.
     keys=[(p['start_time'].year,p['start_time'].month) for p in result]
     width=3 if cadence=='QUARTERLY' else 1
@@ -147,7 +154,12 @@ def _wealth_series(identity, bars, actions, calendar, decision_at):
     if identity.get('price_basis')!='RAW_UNADJUSTED':raise ValueError('RAW_UNADJUSTED_PRICE_REQUIRED')
     sessions=calendar.get('sessions')
     if not isinstance(sessions,list) or not sessions:raise ValueError('CALENDAR_UNRESOLVED')
-    if actions.get('coverage_verified') is not True:raise ValueError('EVENT_COVERAGE_UNKNOWN')
+    if not calendar.get('coverage_cutoff') or time(calendar['coverage_cutoff'])<cutoff:
+        raise ValueError('CALENDAR_NOT_COVERED_AT_CUTOFF')
+    if (actions.get('coverage_verified') is not True or not actions.get('source_reference')
+        or not actions.get('source_hash') or actions.get('pit_status')!='VERIFIED'
+        or not actions.get('available_at') or time(actions['available_at'])>cutoff):
+        raise ValueError('EVENT_COVERAGE_UNKNOWN')
     if any(actions.get(k)!=identity[k] for k in ('asset_id','listing','share_class','currency')):
         raise ValueError('CORPORATE_ACTION_IDENTITY_CONFLICT')
     coverage_start,coverage_end=date.fromisoformat(actions['coverage_start']),date.fromisoformat(actions['coverage_end'])
@@ -197,6 +209,8 @@ def _wealth_series(identity, bars, actions, calendar, decision_at):
         current={'session_id':sid,'close':c,'wealth':w,'log_return':ret,'segment':segment,
             'knowledge_at':knowledge.isoformat(),'source_hash':row['source_hash']}
         rows.append(current);prior=current
+    if not rows or calendar.get('last_completed_session')!=rows[-1]['session_id']:
+        raise ValueError('CALENDAR_LATEST_COMPLETED_SESSION_MISMATCH')
     return rows
 
 

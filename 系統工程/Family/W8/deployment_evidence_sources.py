@@ -27,6 +27,66 @@ def _issue(out,section,error):
             'field_path':section,'message':str(error)}))})
 
 
+def approved_stock_inputs(root,request,stock,facts,contract,decision,orders):
+    """Qualify supplied execution facts and read/propose the native cycle.
+
+    This producer never persists a plan. Family finalization commits the first
+    lawful cycle+intent atomically after the original common funding/Work9 gates.
+    """
+    from family_boundary import timestamp
+    from runtime_loader import load_c_module
+    from tactical_budget import tactical_cap
+    from livingwater_v82_runtime.approved_profiles import number
+    from livingwater_v82_runtime.approved_decision import slice_cap
+    from livingwater_v82_runtime.deployment import calculate_position_gap,ActiveOrderExposure
+    from livingwater_v82_runtime.enums import OrderLifecycleState
+    from v82_slice_bridge import ensure_cycle
+    source=facts['approved_v10_context'];execution=source.get('execution_constraints') or {}
+    source['cash_source_digest']=digest(stock['c7_funding_context'])
+    if execution:
+        if (execution.get('status')!='QUALIFIED' or execution.get('owner')!=request['owner']
+            or execution.get('asset_id')!=facts['asset_id'] or execution.get('currency')!=facts['currency']
+            or execution.get('exchange')!=facts['exchange'] or not execution.get('source_hash')
+            or not execution.get('source_reference') or not execution.get('adapter_version')
+            or not timestamp(execution['as_of'],'as_of')<=timestamp(execution['available_at'],'available_at')<=timestamp(request['evaluation_at'],'evaluation_at')):
+            raise PermissionError('V82_EXECUTION_REFERENCE_SOURCE_MISMATCH')
+        price=number(execution.get('normalized_order_price'),'0');tick=number(execution.get('tick_size'),'0')
+        lot=number(execution.get('minimum_lot'),'0');working=number(execution.get('order_working_price'),'0')
+        if None in (price,tick,lot,working) or min(price,tick,lot,working)<=0 or price%tick!=0:
+            raise PermissionError('V82_EXECUTION_PRICE_TICK_OR_LOT_INVALID')
+        facts.update(normalized_order_price=str(price),order_working_price=str(working),minimum_lot=str(lot))
+        facts['source_gaps']=[k for k in facts['source_gaps'] if k not in ('qualified_order_price','minimum_lot')]
+    if source.get('additional_caps_scope_verified') is True:
+        values=source.get('additional_position_caps')
+        if not isinstance(values,list) or any(number(v,'0') is None for v in values):raise PermissionError('V82_EXPLICIT_CAP_SOURCE_INVALID')
+        facts['required_known_caps']=deepcopy(values)
+    if decision.get('canonical_target_rate') is not None and source.get('planning_ledger_source'):
+        from formal_mode_analysis import native_orders
+        adapter=load_c_module(root,4);wire=adapter.build_v82_runtime_input(stock)['v82_runtime_input']
+        gap=calculate_position_gap(project_target_position_amount=wire['client_target']['project_target_position'],
+            target_rate=decision['canonical_target_rate'],confirmed_position_qty=stock['asset_context']['confirmed_position_snapshot']['quantity'],
+            canonical_valuation_price=facts['valuation_price'],active_orders=native_orders(root,orders,facts['asset_id']))
+        source=ensure_cycle(source,decision,gap=gap.positive_deployment_gap,
+            permission=bool(facts['core'] and decision.get('conflicts')==[] and
+                decision['stage_audit']['required_unknown_fields']==[] and
+                # The original permission is provided separately below.
+                facts.get('approved_permission') is True),
+            exposure_reconciled=orders.get('status')=='VERIFIED' or orders.get('complete_for_open_order_exposure') is True,
+            execution_inputs_qualified=True)
+        facts['approved_v10_context']=source
+        sliced=slice_cap(decision,source,permission=facts.get('approved_permission'),positive_gap=gap.positive_deployment_gap,
+            known_zero_capacity=tactical_cap(stock['work3_handoff'],'equity')['amount']==0)
+        if source.get('shared_allocation_request') is not None:
+            for row in source['shared_allocation_request']['slices']:
+                if row['asset_id']==facts['asset_id']:row['slice']=sliced['cap']
+        cycle=(source.get('cycle_snapshot') or {}).get('cycle')
+        if cycle is not None:
+            facts['order_intent_id']='LOCAL_V82_RECOMMENDATION:'+digest({'cycle_id':cycle['slice_cycle_id'],
+                'revision':cycle['revision'],'source_snapshot':source['identity']['snapshot_id']})
+    contract['parameters']['approved_v10_context_digest']=digest(source)
+    facts['parameters']=deepcopy(contract['parameters'])
+
+
 def stock_sources(root,request,analysis,out):
     from formal_mode_analysis import native,native_orders
     from native_funding_advice import plain
@@ -69,6 +129,13 @@ def stock_sources(root,request,analysis,out):
         'required_known_caps':[] if zero_cap else [None],'order_intent_id':None,
         'source_gaps':['formal_stage_reference','risk_reduction_predicate','technical_reduction_predicate',
             'qualified_order_price','minimum_lot']+([] if zero_cap else ['additional_position_caps'])}
+    conclusion=row.get('formal_conclusion') or {}
+    if conclusion.get('approved_v10_context') is not None:
+        facts['approved_v10_context']=deepcopy(conclusion['approved_v10_context'])
+        facts['approved_v10_context']['native_owner']=deepcopy(out['native_binding']['native_owner'])
+        facts['approved_permission']=core['result']['permission']['new_buy_order_permission']
+        approved_stock_inputs(root,request,stock,facts,contract,conclusion['approved_v10_analysis'],orders)
+        facts['source_gaps'].remove('formal_stage_reference')
     fields={k:'UNKNOWN' for k in CANONICAL_FIELD_NAMES if k not in CALCULATED}
     fields.update(asset_behavior_classification=row['scenario_class']['formal_v82_class'],
         primary_framework=row.get('primary_framework') or 'UNKNOWN')

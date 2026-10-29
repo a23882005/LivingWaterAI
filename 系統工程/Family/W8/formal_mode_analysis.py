@@ -136,14 +136,16 @@ def event_coverage(request):
         'reason':'NEWS_ROWS_ARE_NOT_A_VERIFIED_NEGATIVE_EVENT_SEARCH_OR_COMPLETE_ACTIVE_EVENT_REGISTRY'}
 
 
-def build_formal_conclusion(root,row,request,*,target_projection=None):
+def build_formal_conclusion(root,row,request,*,target_projection=None,approved_source_descriptor=None):
     dep,P,M=native(root);core=row['core_observation']['result'];market=row['market'];approved=market.get('approved_technical',{})
     technical=core['technical'];up=tri(technical['runaway_up']);right_technical=tri(technical['right_confirmation']);down=tri(technical['runaway_down'])
     valuation=core['valuation'];legal=True if valuation['formal_output_eligible'] else None
     value_level=valuation['level'];value_zone=(value_level in ('CHEAP','NORMAL')) if legal else None
     # Required ETF structural facts are distinct from the company-thesis score
     # and the sign of aggregate earnings growth. The source facts are absent.
-    viability=etf_viability_audit(row,request)
+    viability=(etf_viability_audit(row,request) if row['native_product_identity'].get('asset_type')!='INDIVIDUAL_STOCK' else
+        {'leaves':{'preregistered_thesis_contract':{'truth':'UNKNOWN'}},
+            'call_trace':['V82.CMR6.individual_thesis_input_required'],'scope':'INDIVIDUAL_STOCK__NOT_ETF_VIABILITY'})
     fundamental_facts={k:tri(v['truth']) for k,v in viability['leaves'].items()}
     fundamental=both(*fundamental_facts.values())
     credit=(row.get('macro_observations') or {}).get('credit',{}).get('risk_level','UNKNOWN')
@@ -155,15 +157,27 @@ def build_formal_conclusion(root,row,request,*,target_projection=None):
     coverage=event_coverage(request)
     uncontrollable_event_gap_clear=None
     left_safety=both(gate_clear,neg(down),credit_base,uncontrollable_event_gap_clear)
-    right=both(right_technical,tri(approved.get('off_low')),fundamental,credit_right,neg(down),legal)
     target=target_for_symbol(request,row['symbol'],projection=target_projection)
     price_conditions={'valuation_reasonable_or_cheap':value_zone,'price_map_zone':None,
         'near_confirmed_low':None,'near_important_ma_or_support':None,'meaningful_drawdown':None}
-    stage_facts={'asset_identity':row['native_product_identity']['asset_type'] is not None,
-        'primary_framework':True if row.get('primary_framework') else None,
-        'fundamentals_viable':fundamental,'valuation_legal':legal}
-    modes=resolve_mode_context(root,up=up,right=right,left_price_conditions=price_conditions,
-        fundamentals_viable=fundamental,left_safety=left_safety,stage_facts=stage_facts)
+    from v82_approved_context import build as build_approved_context
+    approved_context,decision=build_approved_context(root,row,request,fundamental=fundamental,
+        price_conditions=price_conditions,left_safety=left_safety,source_descriptor=approved_source_descriptor)
+    right=tri(decision['market_predicates']['right'])
+    fundamental=tri(approved_context['fundamentals_viable'])
+    modes={k:deepcopy(decision[k]) for k in ('market_predicates','left_inputs','selected_mode','formal_stage','canonical_target_rate','call_trace')}
+    modes.update(approved_v10_context=approved_context,approved_v10_analysis=decision,
+        native_stage_result={'mode':decision['selected_mode'],'stage':decision['formal_stage'],
+            'target_rate':decision['canonical_target_rate'],'reason_codes':decision['reason_codes']},
+        stage_required_unknown_fields=decision['stage_audit']['required_unknown_fields'],
+        stage_disallowed_fields=decision['stage_audit']['required_false_fields'],
+        four_modes={'Base':{'selection_predicate':truth(both(neg(up),neg(right),neg(tri(modes['market_predicates']['left'])))),
+                'technical_confirmation_required':False,'reference_stage':'STAGE_1'},
+            'Left':{'market_predicate':modes['market_predicates']['left'],
+                'reference_stages':['STAGE_'+str(i) for i in range(2,8)],'oversold_required_for_entry':False},
+            'Right':{'market_predicate':decision['right_entry']['truth'],'reference_stage':'STAGE_8',
+                'complete_entry':deepcopy(decision['right_entry'])},
+            'Trend':{'market_predicate':truth(up),'reference_stage_maximum':'STAGE_9'}})
     base_entry=both((Decimal(target['amount'])>0) if target['value_state']=='KNOWN' else None,
         fundamental,legal,credit_base,gate_clear,neg(down))
     if down is True and (up is True or right is True or tri(modes['market_predicates']['left']) is True):
@@ -212,7 +226,8 @@ def build_formal_conclusion(root,row,request,*,target_projection=None):
         'classification':deepcopy(row['native_product_identity']),'scenario_class':deepcopy(row['scenario_class']),
         'valuation_validity':{'native_result':deepcopy(valuation),'source_metrics':deepcopy(row['valuation_observations'])},
         'fundamentals_viability_facts':{k:truth(v) for k,v in fundamental_facts.items()},
-        'etf_viability_audit':viability,
+        'etf_viability_audit':viability if row['native_product_identity'].get('asset_type')!='INDIVIDUAL_STOCK' else None,
+        'individual_thesis_audit':viability if row['native_product_identity'].get('asset_type')=='INDIVIDUAL_STOCK' else None,
         'left_safety_inputs':{'hard_gate_clear':truth(gate_clear),'not_runaway_down':truth(neg(down)),
             'credit_allows_normal_addition':truth(credit_base),
             'uncontrollable_event_gap_negations_absent':truth(uncontrollable_event_gap_clear)},
@@ -236,8 +251,9 @@ def gap_matrix(row,target,coverage,orders):
         'valuation_and_pit':[
             item('valuation.FORWARD_PE.frequency/valid_until','SOURCE_METADATA_MISSING',deepcopy(row['valuation_observations']),
                 ['legal valuation','Left price branch','Stage'], 'Bind provider-specific release/validity contract; do not invent a global age limit'),
-            item('qV/qP required history','PRODUCER_AND_REQUIRED_SOURCE_NOT_CONNECTED',{'history_path':row['market']['source_path'],'sha256':row['market']['source_sha256'],'rule':'V82 v1.0 PV2/PV3'},
-                ['Left Stage3-7','Trend Stage8/9'], 'Produce own-metric PIT history and corporate-action/calendar-qualified wealth; only consume if the selected mode needs it')],
+            item('qV/qP required history','NATIVE_PRODUCERS_CONNECTED__SOURCE_QUALIFICATION_REQUIRED',
+                deepcopy((row.get('formal_conclusion') or {}).get('approved_v10_analysis',{})),
+                ['Left Stage3-7','Trend Stage8/9'], 'Native PV2/PV3 consume own-metric PIT history and corporate-action/calendar-qualified wealth; retain exact source reasons')],
         'fundamentals_and_events':[
             item('ETF viable structural facts','SOURCE_FACTS_MISSING','Issuer structure and dated fundamentals; no complete current structural assertions',
                 ['Base entry','Left','Right','Stage','buy permission'], 'Bind active fund/mandate/NAV/redemption/termination and authorized exposure facts'),

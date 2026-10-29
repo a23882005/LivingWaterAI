@@ -197,7 +197,12 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         'strategic_bond_weight_b0':{'value':str(strategic_policy['bond_percent']),'unit':'PERCENT'},
         'existing_bond_holdings':existing,'target_bond_holdings':targets,
         'authorized_universe':[t['asset_id'] for t in targets if Decimal(t['target_amount']['amount'])>0],
-        'market_snapshot':{'data_timestamp':market_at,'data_source':'VERIFIED_CACHE_CAPTURE__NOT_EXCHANGE_CLOSE_ATTESTATION',
+        'market_snapshot':{'data_timestamp':market_at,'data_source':(
+            'QUALIFIED_PROVIDER_RTH_CLOSE_AND_CONTRACT_IDENTITY__SHARED_SOURCE_AVAILABILITY_CLOCK'
+            if freshness.get('market',{}).get('state')=='FRESH' and all(
+                source.get('qualified_bond_market',{}).get('eligible') is True
+                for source in market_payload.values() if source['symbol'] in target_symbols)
+            else 'VERIFIED_CACHE_CAPTURE__NOT_EXCHANGE_CLOSE_ATTESTATION'),
             'freshness_state':freshness.get('market',{}).get('state','UNKNOWN'),'payload':deepcopy(market_payload),'source_lineage':deepcopy(refs)},
         'v70_snapshot':{'data_timestamp':v70['snapshot_as_of'],'data_source':'V70.RUNTIME_CONTEXT',
             'freshness_state':freshness.get('v70',{}).get('state','UNKNOWN'),'payload':deepcopy(v70['payload']),'source_lineage':deepcopy(v70['source_reference_ids'])},

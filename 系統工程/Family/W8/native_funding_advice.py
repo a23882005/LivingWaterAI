@@ -122,6 +122,13 @@ def build_shared_inputs(producer,request,report,*,trial,investment,tactical):
         if r['native_product_identity'].get('engine_route')=='V75_PREDICATES' and r.get('market')}
     bond_markets.update(deepcopy(report.get('bond_target_market_observations',{})))
     shared=work3_input['shared_decision_context']
+    roles=report.get('sgov_role_source')
+    if roles is not None:
+        shared['payload']['sgov_role_source']=deepcopy(roles)
+        shared['source_reference_ids'].append('SGOV-ROLE-SOURCE:'+roles['digest'])
+        if roles['status']=='SOURCE_DERIVED_ACCOUNTING':
+            envelope['sgov_boundary'].update(deepcopy(roles['roles']))
+            shared['data_as_of']['sgov_role_valuation_as_of']=roles['physical']['valuation_as_of']
     shared['payload']['bond_market_observations']=bond_markets
     shared['data_as_of']['bond_market_source_verification']={k:v['provider_verified_at']
         for k,v in bond_markets.items() if v.get('provider_verified_at')}

@@ -37,6 +37,7 @@ def build(root, request, report):
            'new_external_money': funding['new_external_money'],
            'physical_bond_positions': deepcopy(bond.get('physical_holdings', {})),
            'sgov_role_sources': deepcopy(bond.get('sgov_role_source_rows', {})),
+           'sgov_role_accounting': deepcopy(report.get('sgov_role_source')),
            'sgov_role_policy': deepcopy(report.get('bond_policy_audit')),
            'physical_sgov_included_in_available_cash': False,
            'target_or_historical_sgov_amounts_used_as_current_cash': False,

@@ -454,6 +454,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     from bond_policy_audit import build as audit_bond_policy
     policy_audit=audit_bond_policy(request,context)
     if policy_audit is not None:report['bond_policy_audit']=policy_audit
+    from sgov_role_source import produce as produce_sgov_roles
+    sgov_roles=produce_sgov_roles(request,context,report)
+    if sgov_roles is not None:report['sgov_role_source']=sgov_roles
     if (getattr(producer,'native_funding_advice_enabled',False) and investment
         and investment.get('total_new_investment_amount') is not None
         and request.get('macro_snapshot') and trial.get('cash_state')):
@@ -580,6 +583,8 @@ class HoldingsAnalysisRunner:
             raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
         from loop2_target_projection import validate as validate_loop2_targets
         validate_loop2_targets(root,request,self.context,report)
+        from sgov_role_source import validate as validate_sgov_roles
+        validate_sgov_roles(request,self.context,report)
         if request.get('native_target_source_digest') is not None:
             from native_target_source import bind as bind_native_targets
             if bind_native_targets(request,self.context)!=report.get('native_target_source'):

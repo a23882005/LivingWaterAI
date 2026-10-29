@@ -84,6 +84,13 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         raise PermissionError('BOND_SOURCE_MACRO_INPUT_BINDING_MISMATCH')
     if inp['shared_decision_context']['payload'].get('broker_readonly_source')!=report.get('broker_readonly_source'):
         raise PermissionError('BOND_SOURCE_BROKER_INPUT_BINDING_MISMATCH')
+    roles=report.get('sgov_role_source')
+    if inp['shared_decision_context']['payload'].get('sgov_role_source')!=roles:
+        raise PermissionError('BOND_SOURCE_SGOV_ROLE_BINDING_MISMATCH')
+    if roles and roles['status']=='SOURCE_DERIVED_ACCOUNTING':
+        for name,money in roles['roles'].items():
+            if inp['work2_envelope']['sgov_boundary'][name]!=money:
+                raise PermissionError('BOND_SOURCE_SGOV_ROLE_AMOUNT_MISMATCH')
     result={'schema_version':'Family.W8.NativeBondSource.v1','client_id':request['client_id'],
         'run_id':run,'owner':deepcopy(owner),'source_db_sha256':snapshot['source_sha256'],
         'status':'SOURCE_INCOMPLETE','requested_instruments':[r['instrument_id'] for r in rows],
@@ -94,6 +101,7 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         'targets':{},'physical_holdings':{},'predicate_observations':{},
         'sgov_role_source_rows':{k:deepcopy(snapshot['tables'].get(k,[]))
             for k in ('sgov_role_proposal','sgov_role_confirmation')},
+        'sgov_role_source':deepcopy(roles),
         'canonical_result':None,'full_native_canonical_complete':False,'trade_action':'NO_TRADE'}
     gaps=result['issues']
     existing=[];targets=[]
@@ -101,7 +109,14 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         symbol=row['symbol'];market=row.get('market') or {};qty=row['holding'].get('quantity')
         recommendation=row['current_analysis']['recommendation']
         price=market.get('observed_close')
-        if (qty is None or price is None or recommendation.get('position_currency')!=owner['currency']):
+        role_physical=(roles or {}).get('physical') if symbol=='SGOV' else None
+        if role_physical is not None:
+            money=deepcopy(role_physical['valuation'])
+            if money['currency']!=owner['currency'] or Decimal(role_physical['quantity'])!=Decimal(str(qty)):
+                raise PermissionError('BOND_SOURCE_SGOV_PHYSICAL_MISMATCH')
+            existing.append({'asset_id':symbol,'amount':money,'broker_account_id':owner['account']})
+            result['physical_holdings'][symbol]=deepcopy(role_physical)
+        elif (qty is None or price is None or recommendation.get('position_currency')!=owner['currency']):
             gaps.append({'code':'BOND_PHYSICAL_VALUE_SOURCE_REQUIRED',
                 'field_path':'existing_bond_holdings.'+symbol})
         else:
@@ -155,6 +170,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         times.append(report['v75_macro_inputs']['available_at'])
     if report.get('broker_readonly_source'):
         times.append(report['broker_readonly_source']['captured_at'])
+    if roles and roles.get('physical'):
+        times.append(roles['physical']['valuation_as_of'])
     if any(not t for t in times):
         gaps.append({'code':'V75_SOURCE_CAPTURE_TIME_REQUIRED','field_path':'market_snapshot.data_timestamp'})
         return result

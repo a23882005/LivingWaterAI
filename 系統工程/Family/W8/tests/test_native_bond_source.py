@@ -78,6 +78,29 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertTrue(any(i['field_path']=='target_bond_holdings.SGOV' for i in out['issues']))
         self.assertEqual(out['targets'],{})
 
+    def test_source_roles_and_physical_value_survive_original_v75_adapter(self):
+        p,req,report,shared,strategy=self.case()
+        row=report['analysis_result']['positions'][0]
+        amount=str(int(row['holding']['quantity'])*int(row['market']['observed_close']))
+        roles={'status':'SOURCE_DERIVED_ACCOUNTING','roles':{
+            'sgov_bond_bucket_amount':{'amount':'0','currency':'USD'},
+            'sgov_dry_powder_bucket_amount':{'amount':amount,'currency':'USD'}},
+            'physical':{'quantity':row['holding']['quantity'],
+                'valuation':{'amount':amount,'currency':'USD'},'valuation_as_of':req['evaluation_at']}}
+        report['sgov_role_source']=roles
+        shared['work3_input']['shared_decision_context']['payload']['sgov_role_source']=deepcopy(roles)
+        shared['work3_input']['work2_envelope']['sgov_boundary'].update(deepcopy(roles['roles']))
+        out=self.build(p,req,report,shared,strategy)
+        native=out['adapter_result']['v75_runtime_input']
+        self.assertEqual(native['existing_bond_holdings'][0]['amount']['amount'],amount)
+        self.assertEqual(native['sgov_bond_bucket_amount'],{'status':'KNOWN','value':roles['roles']['sgov_bond_bucket_amount']})
+        self.assertEqual(native['sgov_dry_powder_bucket_amount'],{'status':'KNOWN','value':roles['roles']['sgov_dry_powder_bucket_amount']})
+        self.assertFalse(any(i['code']=='SGOV_BOND_ROLE_UNKNOWN_WITH_EXISTING_HOLDING' for i in out['issues']))
+        self.assertEqual(req['confirmed_target']['payload']['draft']['target_lines'][0]['target_amount']['amount'],'700')
+        shared['work3_input']['work2_envelope']['sgov_boundary']['sgov_dry_powder_bucket_amount']['amount']='1'
+        with self.assertRaisesRegex(PermissionError,'ROLE_AMOUNT_MISMATCH'):
+            self.build(p,req,report,shared,strategy)
+
     def test_supplement_time_and_source_survive_actual_work3_work5_boundary(self):
         supplement={'available_at':'2026-10-27T22:01:00Z','source_sha256':'e'*64}
         p,req,report,shared,strategy=self.case(supplement)

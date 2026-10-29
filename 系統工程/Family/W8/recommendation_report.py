@@ -149,7 +149,14 @@ def build(report,request):
                 str(account['coverage']['unresolved_native_decisions'])+'檔金額未定，未以0補入；全戶共同部署保全尚未通過。')
         elif budget and budget['status']=='REJECTED':
             intro.append('已產生的原生金額超出帳戶資金或不符合資金契約，停止合併建議。')
-        intro.append('現有SGOV持倉、核准目標與歷史角色金額均未轉成可買股票的現金；角色來源與目前分帳缺口保留。')
+        intro.append('現有SGOV持倉、核准目標與歷史角色金額均未轉成可買股票的現金。')
+    sgov=report.get('sgov_role_source')
+    if sgov and sgov['status']=='SOURCE_DERIVED_ACCOUNTING':
+        roles=sgov['roles']
+        intro.append('SGOV來源分帳：實體 '+sgov['physical']['quantity']+' 股；債券用途 '+
+            money(roles['sgov_bond_bucket_amount']['amount'],request['owner']['currency'])+'，股票買點彈藥用途 '+
+            money(roles['sgov_dry_powder_bucket_amount']['amount'],request['owner']['currency'])+
+            '。依既有用途／核准配置作帳務分類，並非新增本人角色確認；不增加可用現金或發出賣出建議。')
     tactical=next((p['current_analysis'].get('v70_tactical_budget') for p in positions if p['current_analysis'].get('v70_tactical_budget')),None)
     if tactical:
         current=tactical.get('current_stock_bond_reference')
@@ -195,6 +202,7 @@ def build(report,request):
         'analysis_status':report['status'],'full_native_deployment_complete':False,
         'rows':rows,'bond_advisory_comparison':deepcopy(comparison),
         'account_funding_check':deepcopy(account),
+        'sgov_role_accounting':deepcopy(sgov),
         'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
     out['digest']=digest(out)
     return out

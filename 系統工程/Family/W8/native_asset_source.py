@@ -345,6 +345,9 @@ class AssetSourceProducer:
         if snapshot!=self.req['client_snapshot']['payload']:
             raise PermissionError('PRODUCER_APPROVAL_SNAPSHOT_CHANGED')
         req=deepcopy(self.req);ctx=deepcopy(self.ctx)
+        ctx['sgov_role_strategic_policy']=deepcopy(self.v70_strategic_policy)
+        ctx['sgov_role_classification_source']=deepcopy(self.class_source)
+        ctx['sgov_role_product_sources']=deepcopy(self.product_sources)
         if self.bond_market_supplement_source is not None:
             ctx['bond_market_supplement_source']=deepcopy(self.bond_market_supplement_source)
         if self.v75_macro_source_manifest is not None:

@@ -304,6 +304,8 @@ def read(source,evaluation_at):
     out=extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
     from v75_handoff_inputs import extend as extend_handoff
     out=extend_handoff(out,manifest.get('source_handoff'),data,evaluation_at)
+    from v75_ready_data_inputs import extend as extend_ready_data
+    out=extend_ready_data(out,manifest.get('ready_data_source'),data,evaluation_at)
     from v75_pred007_inputs import extend as extend_pred007
     return extend_pred007(out,manifest.get('pred007_amendment_source'),evaluation_at)
 

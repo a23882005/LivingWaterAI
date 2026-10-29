@@ -17,6 +17,41 @@ class MentorError(ValueError):
     pass
 
 
+def distribution_source_text(symbol,distribution):
+    text='已核對'+symbol+' '+str(distribution['periods'])+'次配息'
+    if distribution.get('complete_source_breakdown'):
+        total=distribution.get('as_reported_total_distribution')
+        income=distribution.get('as_reported_income_sum')
+        if total is not None:text+='；每股總額 '+distribution.get('currency','USD')+' '+total
+        if income is not None:text+='、收益 '+distribution.get('currency','USD')+' '+income
+        text+='；發行商列示ROC '+str(distribution['as_reported_roc_pct'])+'%。'
+        if distribution.get('provisional_issuer_components'):
+            text+='2026稅務性質仍屬暫定，並非年度最終稅表。'
+        return text
+    return text+'金額；既有年度稅務分解與缺漏分列，未把缺少的ROC補0。'
+
+
+def ready_data_evidence_notes(evidence,symbol):
+    if not evidence:return []
+    if symbol=='SGOV':
+        coverage=evidence['bounded_event_coverage']
+        notes=[];types={event['type'] for event in coverage['events']}
+        if 'adopted_underlying_index_cash_flow_reinvestment_change' in types:
+            notes.append('SGOV指數現金處理已於2025/10/31再平衡後改採 ICE US 1-Month Treasury Bill Index 收益累積；重大性及內部核准狀態另列未裁定，未自動新增買進禁令。')
+        notes.append('SGOV事件查核範圍：'+coverage['review_period_start']+'至'+coverage['review_period_end']+
+            '，'+str(coverage['filings_retrieved'])+'份 exact-form 497主文件查核索引；'+
+            str(coverage['locally_retained_matched_primary_documents'])+'份相關公告原文已核對。未涵蓋所有SEC表單與未具名Trust影響。')
+        if 'primary_listing_venue_change' in types:
+            notes.append('另保留2026/01/16交易場所變更公告，公告預定於2026/02/23前後改掛NYSE。')
+        return notes
+    if symbol=='SPSB':
+        history=evidence['sparse_yield_evidence'];counts=history['counts_by_metric']
+        return ['SPSB另有'+str(counts.get('portfolio_ytm',0))+'筆組合YTM及'+str(counts.get('sec_yield_30day',0))+
+            '筆30-Day SEC Yield存檔來源核對；各自保留資料日期，未冒充五年完整週序列，未補值或計算百分位。',
+            'SPSB配息金額與QII預扣稅分類分列；QII不是ROC，未以100%減QII推算ROC。']
+    return []
+
+
 def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggested_changes=(),bond_context=None):
     if llm_suggested_changes:raise MentorError('MODEL_FINANCIAL_MUTATION_REJECTED')
     req=deepcopy(work9_request);original=deepcopy(unified);context=deepcopy(trusted_context)
@@ -169,9 +204,8 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                 if missing:text.append('品質來源待補：'+'、'.join(missing)+'。')
                 distribution=quality.get('calculations',{}).get('distribution_source')
                 if distribution:
-                    text.append('已核對發行商'+str(distribution['periods'])+'期配息明細；'+
-                        ('2026成分仍屬暫定，保留品質未定。' if distribution['provisional_issuer_components'] else
-                         '2025稅務分解與2026缺漏分列，未把缺少的ROC補0。'))
+                    text.append(distribution_source_text(symbol,distribution))
+            text.extend(ready_data_evidence_notes(bond_source.get('ready_data_evidence'),symbol))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
             liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
             if liquidity:

@@ -190,7 +190,12 @@ def build(report,request):
                 'DISTRIBUTION_OK':'通過','DISTRIBUTION_ABNORMAL':'異常','NOT_APPLICABLE':'不適用'}
             intro.append(symbol+' ETF品質：結構 '+labels[states['structure_state']]+'、流動性 '+
                 labels[states['liquidity_state_etf']]+'、配息品質 '+labels[states['distribution_quality_state']]+
-                '。依已核對的V75 v1.0.3原參數判斷；官網30天價差未代替20交易日資料，未定案的配息分類未當成零ROC。')
+                '。依已核對的V75 v1.0.3原參數判斷；官網30天價差未代替20交易日資料。')
+            from mentor_bridge import distribution_source_text
+            distribution=quality.get('calculations',{}).get('distribution_source')
+            if distribution:intro.append(distribution_source_text(symbol,distribution))
+        from mentor_bridge import ready_data_evidence_notes
+        intro.extend(ready_data_evidence_notes(pool.get('ready_data_handoff'),symbol))
     if supplement:
         intro.append('V75波動率補充來源：MOVE '+supplement['observed_date']+' 為 '+
             f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+

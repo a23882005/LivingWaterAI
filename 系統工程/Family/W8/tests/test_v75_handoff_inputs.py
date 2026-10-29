@@ -59,16 +59,20 @@ def test_csv_extraction_must_match_bound_annual_treasury_xml():
     with pytest.raises(PermissionError,match='EXTRACT_XML_MISMATCH'):H.treasury(files)
 
 
-def test_provisional_zeros_and_missing_roc_never_become_final_quality_clearance():
+def test_complete_issuer_breakdown_is_usable_while_tax_finality_stays_provisional():
     rows=[{'ex_date':f'2026-{m:02d}-01','total':'1','roc':'0',
         'characterization':'PROVISIONAL_ISSUER_DISPLAY','final_tax_characterization':False} for m in range(1,11)]
     rows+=[{'ex_date':'2025-'+m+'-01','total':'1','roc':'0',
         'characterization':'OFFICIAL_2025_TAX_BREAKDOWN','final_tax_characterization':True} for m in ('11','12')]
     out=H.distribution_window(rows,'2026-10-28')
-    assert out['as_reported_roc_pct']=='0' and not out['complete_source_breakdown']
-    assert out['native_distribution_quality_state']=='UNKNOWN'
+    assert out['as_reported_roc_pct']=='0' and out['complete_source_breakdown']
+    assert out['provisional_issuer_components'] and not out['complete_final_breakdown']
+    assert out['native_distribution_quality_state'] is None
+    from v75_etf_quality_inputs import components
+    assert components({'trailing_12m_roc_pct':out['as_reported_roc_pct']},'US')[0]['distribution_quality_state']=='DISTRIBUTION_OK'
     rows[0]['roc']=None;out=H.distribution_window(rows,'2026-10-28')
     assert out['as_reported_roc_pct'] is None and out['missing_roc_dates']==['2026-01-01']
+    assert not out['complete_source_breakdown'] and out['native_distribution_quality_state']=='UNKNOWN'
     rows.pop()
     with pytest.raises(ValueError,match='WINDOW_COVERAGE'):H.distribution_window(rows,'2026-10-28')
 

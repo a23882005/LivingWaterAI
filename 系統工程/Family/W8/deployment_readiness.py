@@ -87,7 +87,7 @@ def completion_gaps(analysis,missing):
             data.append({'field':symbol+'.PRED-010.'+field,
                 'reason':('20 trading-day NBBO history not acquired; 30 calendar-day issuer median is a separate observation'
                     if field=='median_20d_bid_ask_spread_pct' else
-                    'Issuer breakdown incomplete/provisional; missing ROC is not zero'
+                    'Complete issuer breakdown not supplied; missing ROC is not zero; tax finality is separate'
                     if 'roc' in field else 'Required source coverage/observation not established')})
     engineering=[{'field':field,'owner_input_required':False,
         'reason':'Full same-run Work6 engine lineage, Current Allocation/Drift/protection and C7 framework have not been produced; existing approval is retained'}

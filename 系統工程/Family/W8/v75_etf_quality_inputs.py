@@ -141,11 +141,15 @@ def assess(issuer,contract,raw,parameters,evaluation_at,*,authorized_universe,
         proof['distribution_source']=deepcopy(distribution)
         if distribution.get('complete_source_breakdown'):
             flat['trailing_12m_roc_pct']=distribution['as_reported_roc_pct']
+    if facts.get('bounded_event_coverage'):
+        proof['bounded_event_coverage']=deepcopy(facts['bounded_event_coverage'])
     # The captured issuer reports 30 CALENDAR days, not the required 20
-    # trading days. Distribution zero columns are likewise not sufficient
-    # when the issuer explicitly says current-year classification is pending.
+    # trading days. A reconciled issuer distribution breakdown can be used
+    # under PRED-010.C while its annual tax characterization stays provisional.
     states,missing=components(flat,issuer['market'])
     fresh=all(p['state']=='FRESH' for p in (pd_proof['freshness'],aum_fresh))
+    available=max([issuer['available_at']]+[p['source_available_at'] for p in
+        (distribution,facts.get('bounded_event_coverage')) if p and p.get('source_available_at')],key=time)
     return {'schema_version':'Family.W8.V75ETFQualityInputs.v1','symbol':issuer['symbol'],
         'parameter_version':parameters['parameter_version'],'parameter_sha256':parameters['parameter_sha256'],
         'metrics':states,'normalized_facts':flat,'calculations':proof,'unprovided_inputs':missing,
@@ -153,7 +157,7 @@ def assess(issuer,contract,raw,parameters,evaluation_at,*,authorized_universe,
         'raw_evidence_complete':not missing,'unknown_is_quality_pause':True,
         'intended_order_amount':str(number(intended_order_amount)) if intended_order_amount is not None else None,
         'order_source':deepcopy(order_source),'issuer_source_reference':issuer['source_reference'],
-        'issuer_source_sha256':issuer['source_sha256'],'source_available_at':issuer['available_at'],
+        'issuer_source_sha256':issuer['source_sha256'],'source_available_at':available,
         'known_auxiliary_observations':{'bid_ask_spread_30_calendar_days':deepcopy(facts.get('bid_ask_spread_30_calendar_days')),
             'distribution_characterization':deepcopy(facts.get('distribution_characterization')),
             'distribution_source_observation':deepcopy(distribution)},
@@ -233,3 +237,5 @@ def bind_native(request,source,pool,run):
             'original_default_freshness_is_not_attestation':True,
             'original_result_as_of_basis':'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE'}
     source['etf_quality_assessments']=assessments
+    if pool.get('ready_data_handoff'):
+        source['ready_data_evidence']=deepcopy(pool['ready_data_handoff'])

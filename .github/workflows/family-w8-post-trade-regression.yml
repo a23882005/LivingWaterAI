@@ -201,6 +201,7 @@ jobs:
           '系統工程/Family/W8/tests/test_v75_sofr_horizon_inputs.py'
           '系統工程/Family/W8/tests/test_v75_technical_inputs.py'
           '系統工程/Family/W8/tests/test_v75_handoff_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_ready_data_inputs.py'
           '系統工程/Family/W8/tests/test_native_source_freshness.py'
           '系統工程/Family/W8/tests/test_account_funding_check.py'
           '系統工程/Family/W8/tests/test_deployment_component_sources.py'

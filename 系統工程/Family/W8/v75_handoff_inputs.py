@@ -204,9 +204,10 @@ def distribution_window(rows,observed_date):
         'as_reported_dividend_sum':str(sum((number(r['dividend']) for r in selected),Decimal(0))) if 'dividend' in selected[0] else None,
         'as_reported_roc_pct':format(reported/total*100,'f') if visible_complete and total>0 else None,
         'provisional_issuer_components':provisional,'complete_final_breakdown':complete,
-        'complete_source_breakdown':visible_complete and not provisional,
+        'complete_source_breakdown':visible_complete,
+        'distribution_rule_basis':'V75_PREDICATE_PARAMS_v1.0.3 / PRED-010.C: issuer distribution source; final annual tax status is separate',
         'missing_roc_dates':[r['ex_date'] for r in selected if r['roc'] is None],
-        'native_distribution_quality_state':'UNKNOWN' if not complete else None,
+        'native_distribution_quality_state':'UNKNOWN' if not visible_complete else None,
         'missing_components_not_filled_zero':True}
 
 

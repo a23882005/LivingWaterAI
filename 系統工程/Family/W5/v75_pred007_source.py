@@ -133,10 +133,12 @@ def unavailable(kind,reason=None):
 def rate_inputs(kind,source,evaluation_at):
     a,b=('SOFR','IORB') if kind=='R' else ('DCPF3M','DTB3')
     series={};receipts={};errors=[]
+    if not isinstance(source.get('series',{}),dict):raise InvalidInput('RATE_SOURCE_STRUCTURE')
     for key in (a,b):
         item=source.get('series',{}).get(key)
         if item is None:continue
         try:
+            if not isinstance(item,dict):raise InvalidInput('RATE_SOURCE_STRUCTURE:'+key)
             if item.get('unit')!='PERCENT' or (kind=='C' and item.get('basis')!='DISCOUNT_360'):
                 raise InvalidInput('RATE_UNIT_OR_DISCOUNT_BASIS:'+key)
             raw,receipt=read_official(item,key,evaluation_at);series[key]=points(raw,key);receipts[key]=receipt
@@ -178,6 +180,7 @@ def candidate(kind,source,rules,evaluation_at,calendar_info,loaded=None):
 
 
 def legacy_candidate(kind,item,evaluation_at):
+    if not isinstance(item,dict):raise InvalidInput('LEGACY_CANDIDATE_STRUCTURE:'+kind)
     result={**unavailable(kind),'source_ids':deepcopy(item.get('source_ids',[])),
         'observation_date':item.get('observation_date'),'retrieved_at':item.get('retrieved_at')}
     if 'units' in item and item['units']!=result['units']:raise InvalidInput('LEGACY_CANDIDATE_UNIT:'+kind)
@@ -209,7 +212,9 @@ def legacy_candidate(kind,item,evaluation_at):
 
 def assess(source,evaluation_at,legacy_candidates):
     signals={k:unavailable(k) for k in FIELDS};quality=[];rules=None;cal=None
+    if not isinstance(legacy_candidates,dict):quality.append('INVALID_INPUT');legacy_candidates={}
     try:
+        if not isinstance(source,dict):raise InvalidInput('AMENDMENT_SOURCE_STRUCTURE')
         if source.get('schema_version')!='Family.W5.Pred007AmendmentSource.v1':raise ReviewRequired('AMENDMENT_SOURCE_SCHEMA')
         rules=load_rules(source['ruleset'],evaluation_at)
         raw,receipt=read_official(source['calendar'],'FED_K8',evaluation_at)
@@ -268,6 +273,9 @@ def bind(request,context):
     if source is None:
         require(not amended and not request.get('v75_pred007_source_digest'),
             'PRED007_AMENDMENT_SOURCE_REQUIRED','trusted_context.v75_pred007_source')
+        require(not (request.get('owner',{}).get('currency')=='USD'
+            and time(request['evaluation_at'])>=time(EFFECTIVE_AT)),
+            'PRED007_AMENDMENT_SOURCE_REQUIRED','trusted_context.v75_pred007_source',status='DATA_UNAVAILABLE')
         return None
     require(request['expected_versions'].get('v75_pred007')==EFFECTIVE_VERSION,
         'PRED007_AMENDMENT_VERSION_MISMATCH','expected_versions.v75_pred007')

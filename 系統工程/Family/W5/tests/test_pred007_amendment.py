@@ -286,3 +286,13 @@ def test_incomplete_family_keeps_observable_amendment_diagnostics(tmp_path):
     assessment=out['issue_codes'][0]['pred007_amendment']
     assert assessment['assessment_status']=='INVALID_INPUT' and assessment['aggregate_state'] is None
     assert assessment['signals']['C']['available'] and assessment['signals']['S']['available']
+
+
+def test_current_usd_legacy_configuration_cannot_dispatch_after_effective_time(monkeypatch):
+    from test_family_end_to_end import full_family_case
+    from test_stock_source_bridge import refresh
+    from family_runner import FamilyRunner
+    req,ctx=full_family_case();req['evaluation_at']=AT;refresh(req,ctx);calls=[]
+    monkeypatch.setattr('family_runner.run_native_pipeline',lambda *args:calls.append(1))
+    result=FamilyRunner(ROOT,context_provider=lambda:ctx).analyze(req)
+    assert result['issue_codes'][0]['code']=='PRED007_AMENDMENT_SOURCE_REQUIRED' and calls==[]

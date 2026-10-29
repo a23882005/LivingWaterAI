@@ -142,6 +142,7 @@ class NativeSourceTest(unittest.TestCase):
 
     def failure_case(self):
         req={'client_id':self.client,'run_id':'SYNTHETIC_RUN','request_id':'SYNTHETIC_REQ',
+            'evaluation_at':'2026-10-28T00:00:00Z',  # Historical base-rule rejection fixture.
             'owner':self.owner,'client_snapshot':{'payload':self.snapshot()}}
         report={'schema_version':'Family.W8.NativeSourceProduction.v1','status':'BLOCKED_BY_ORIGINAL_ADAPTER',
             'complete_native_bundle':False,'mentor':None,'client_id':self.client,'owner':self.owner,

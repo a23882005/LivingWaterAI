@@ -53,3 +53,12 @@ def test_retired_spread_terms_never_reappear_as_waiting_for_owner_decision(tmp_p
 def test_new_source_is_opt_in_for_historical_replays():
     pool=source_pool();before=deepcopy(pool)
     assert extend(pool,None,AT)==before
+
+
+def test_current_usd_missing_source_is_not_fallback_to_retired_fields():
+    pool=source_pool();row=slot(pool,'PRED-007','SGOV',None,AT)
+    assert row['original_result']['assessment_status']=='REVIEW_REQUIRED'
+    assert row['unprovided_inputs']==['pred007_amendment_source'] and row['metrics']=={}
+    assert row['rule_identity']['source_binding_status']=='MISSING_AMENDMENT_SOURCE'
+    historical=slot(pool,'PRED-007','SGOV',None,'2026-10-29T08:00:00Z')
+    assert 'rule_identity' not in historical

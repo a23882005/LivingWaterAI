@@ -113,7 +113,12 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
                     value,assessment=amended_pred007(metrics,run.analysis_timestamp.isoformat(),run.currency)
                     result.setdefault('predicate_amendments',{})[item.asset_id]=assessment
                     trace.append('V75.PRED-007:V75-PRED007-20261029-01@1.0:explicit_version_mapping')
-                else:value=fn(metrics,observed,[facts['source_reference']])
+                else:
+                    if pid=='PRED-007' and run.currency=='USD':
+                        from v75_pred007_source import EFFECTIVE_AT,time
+                        if run.analysis_timestamp>=time(EFFECTIVE_AT):
+                            raise BondEvidenceError('PRED007_AMENDMENT_SOURCE_REQUIRED')
+                    value=fn(metrics,observed,[facts['source_reference']])
                 predicates.append(value)
             trace.append('V75.predicates.PRED-001..010:' + item.asset_id)
             result['predicate_results'][item.asset_id] = [p.model_dump(mode='json') for p in predicates]

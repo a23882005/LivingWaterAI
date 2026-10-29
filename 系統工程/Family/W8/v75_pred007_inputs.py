@@ -2,7 +2,7 @@
 from copy import deepcopy
 from datetime import datetime
 from family_input import digest
-from v75_pred007_source import assess,evaluate,identity
+from v75_pred007_source import evaluate,identity,time,EFFECTIVE_AT
 
 
 def extend(pool,source,evaluation_at):
@@ -42,10 +42,23 @@ def extend(pool,source,evaluation_at):
 
 def slot(pool,asset,evaluation_at,previous):
     amendment=pool.get('usd_pred007_amendment')
-    if amendment is None:return None
     currency=(pool.get('qualified_bond_markets',{}).get(asset,{}) or
         pool.get('issuer_observations',{}).get(asset,{})).get('currency')
     if currency!='USD':return None
+    if amendment is None:
+        if time(evaluation_at)<time(EFFECTIVE_AT):return None
+        from v75_runtime.models import PredicateResult
+        result=PredicateResult(predicate_id='PRED-007',predicate_version=identity()['base_predicate_version'],
+            aggregate_state=None,sub_states=[],assessment_status='REVIEW_REQUIRED',as_of=time(evaluation_at),
+            source_lineage=['AMENDMENT_SOURCE_REQUIRED:'+identity()['effective_predicate_version']],
+            input_freshness_state='UNKNOWN',reason_codes=['PRED007_AMENDMENT_SOURCE_REQUIRED'],
+            required_input_missing=['pred007_amendment_source'])
+        return {'metrics':{},'original_result':result.model_dump(mode='json'),
+            'rule_identity':{**identity(),'source_binding_status':'MISSING_AMENDMENT_SOURCE'},
+            'input_coverage':'AMENDMENT_NOT_LOADED','unprovided_inputs':['pred007_amendment_source'],
+            'source_pool_digest':digest(pool),'source_available_at':pool['available_at'],
+            'input_freshness_verified':False,'deployment_input_eligible':False,
+            'previous_observation':deepcopy(previous)}
     model,assessment=evaluate(amendment['metrics'],evaluation_at)
     return {'metrics':deepcopy(amendment['metrics']),'original_result':model.model_dump(mode='json'),
         'rule_identity':deepcopy(amendment['rule_identity']),'amendment_assessment':assessment,

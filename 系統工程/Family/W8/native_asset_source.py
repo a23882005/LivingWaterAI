@@ -427,7 +427,7 @@ class AssetSourceProducer:
         from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
         macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
         amendment=(macro_inputs or {}).get('usd_pred007_amendment')
-        if amendment:
+        if amendment and req['owner']['currency']=='USD':
             req['expected_versions']['v75_pred007']=ctx['expected_versions']['v75_pred007']=amendment['rule_identity']['effective_predicate_version']
             ctx['v75_pred007_source']=deepcopy(amendment['metrics']['amendment_source'])
             ctx['v75_pred007_legacy_candidates']=deepcopy(amendment['metrics']['legacy_candidates'])

@@ -37,14 +37,16 @@
       ],
       "excerpts": [
         {
-          "text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+          "text": "and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives",
           "section": "Business / Risk Factors",
-          "search_anchor": "three segments: Productivity and Business Processes"
+          "search_anchor": "three segments: Productivity and Business Processes",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
           "text": "We face intense competition across all markets for our products and services, which could adversely affect our results of operations.",
           "section": "Business / Risk Factors",
-          "search_anchor": "We face intense competition across all markets"
+          "search_anchor": "We face intense competition across all markets",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -188,19 +190,22 @@
       ],
       "excerpts": [
         {
-          "text": "Medtronic plc, headquartered in Galway, Ireland, is the leading global healthcare technology company. Medtronic was founded in 1949 and today serves healthcare systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us “to contribute to human welfare by the application of biomedical engineering in the research, design, manufacture, and sale of products to alleviate pain, restore health, and extend life.”",
+          "text": "leading global healthcare technology company. Medtronic was founded in 1949 and today serves healthcare systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us",
           "section": "Business / Risk Factors",
-          "search_anchor": "was founded in 1949"
+          "search_anchor": "was founded in 1949",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "Medtronic plc, headquartered in Galway, Ireland, is the leading global healthcare technology company. Medtronic was founded in 1949 and today serves healthcare systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us “to contribute to human welfare by the application of biomedical engineering in the research, design, manufacture, and sale of products to alleviate pain, restore health, and extend life.”",
+          "text": "systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us “to contribute to human welfare by the application of biomedical engineering in the research,",
           "section": "Business / Risk Factors",
-          "search_anchor": "more than 150 countries"
+          "search_anchor": "more than 150 countries",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "•liabilities, claims, litigation, investigations, or other adverse developments relating to acquired businesses or the business practices of acquired companies, including investigations by governmental entities, potential Foreign Corrupt Practices Act (FCPA) or product liability claims, intellectual property disputes, earnout or other contingent payment disputes, or other unanticipated liabilities,",
+          "text": "Foreign Corrupt Practices Act (FCPA) or product liability claims, intellectual property disputes, earnout or other contingent payment disputes, or other unanticipated liabilities,",
           "section": "Business / Risk Factors",
-          "search_anchor": "product liability"
+          "search_anchor": "product liability",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -344,19 +349,22 @@
       ],
       "excerpts": [
         {
-          "text": "Zoetis Inc. is a global leader in the animal health industry, focused on the discovery, development, manufacture and commercialization of medicines, vaccines, diagnostic products and services, biodevices, genetic tests and precision animal health. We have a diversified business, commercializing products across eight core species: dogs, cats and horses (collectively, companion animals) and cattle, swine, poultry, fish and sheep (collectively, livestock); and within seven major product categories: parasiticides, vaccines, dermatology, anti-infectives, pain and sedation, other pharmaceutical and animal health diagnostics. With a legacy of nearly 75 years, we continue to pioneer ways to predict, prevent, detect, and treat animal illness, supporting those raising and caring for animals worldwide - from veterinarians and pet owners to livestock producers.",
+          "text": "precision animal health. We have a diversified business, commercializing products across eight core species: dogs, cats and horses (collectively, companion animals) and cattle, swine, poultry, fish and sheep (collectively, livestock); and within seven major product categories: parasiticides, vaccines, dermatology, anti-infectives,",
           "section": "Business / Risk Factors",
-          "search_anchor": "diversified business"
+          "search_anchor": "diversified business",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "Zoetis Inc. is a global leader in the animal health industry, focused on the discovery, development, manufacture and commercialization of medicines, vaccines, diagnostic products and services, biodevices, genetic tests and precision animal health. We have a diversified business, commercializing products across eight core species: dogs, cats and horses (collectively, companion animals) and cattle, swine, poultry, fish and sheep (collectively, livestock); and within seven major product categories: parasiticides, vaccines, dermatology, anti-infectives, pain and sedation, other pharmaceutical and animal health diagnostics. With a legacy of nearly 75 years, we continue to pioneer ways to predict, prevent, detect, and treat animal illness, supporting those raising and caring for animals worldwide - from veterinarians and pet owners to livestock producers.",
+          "text": "health diagnostics. With a legacy of nearly 75 years, we continue to pioneer ways to predict, prevent, detect, and treat animal illness, supporting those raising and caring for animals worldwide - from veterinarians and pet owners to livestock producers.",
           "section": "Business / Risk Factors",
-          "search_anchor": "nearly 75 years"
+          "search_anchor": "nearly 75 years",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "Although our business is the largest based on revenue in the animal health industry (which includes medicines, vaccines and diagnostics), we face competition in the regions in which we compete. Principal drivers of competition vary depending on the particular region, species, product category and individual product, and include new product development, quality, price, service and promotion to veterinary professionals, pet owners and livestock producers.",
+          "text": "(which includes medicines, vaccines and diagnostics), we face competition in the regions in which we compete. Principal drivers of competition vary depending on the particular region, species, product category and individual product, and include new product development, quality, price, service",
           "section": "Business / Risk Factors",
-          "search_anchor": "we face competition"
+          "search_anchor": "we face competition",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -500,19 +508,22 @@
       ],
       "excerpts": [
         {
-          "text": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier models that serve our businesses, which is reported in Alphabet-level activities. Alphabet's structure is about helping each of our businesses prosper through strong leaders and independence.",
+          "text": "We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier",
           "section": "Business / Risk Factors",
-          "search_anchor": "Google Services and Google Cloud"
+          "search_anchor": "Google Services and Google Cloud",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "We have built world-class advertising technologies for advertisers, agencies, and publishers to power their digital marketing businesses. Our advertising solutions help millions of companies grow their businesses through our wide range of products across devices and formats, and we aim to ensure positive user experiences by serving the right ads at the right time and by building deep partnerships with brands and agencies. AI has been foundational to our advertising business for more than a decade. Products like Demand Gen, Performance Max, and Product Studio use the full power of our AI to help advertisers find untapped and incremental conversion opportunities.",
+          "text": "power their digital marketing businesses. Our advertising solutions help millions of companies grow their businesses through our wide range of products across devices and formats, and we aim to ensure positive user experiences by serving the right ads at the",
           "section": "Business / Risk Factors",
-          "search_anchor": "advertising solutions help millions"
+          "search_anchor": "advertising solutions help millions",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "For example, the DOJ and a number of state Attorneys General filed a lawsuit concerning our Search and Search advertising practices and our compliance with US antitrust laws. In August 2024, the US District Court for the District of Columbia ruled against Google, and in December 2025, entered a final judgment requiring remedies, which, among other things, imposes restrictions on how we distribute our services and requires us to share certain search data with and offer syndication services to certain competitors. In January 2026, we appealed the final judgment and moved to pause implementation of certain remedies. In February 2026, the DOJ and state Attorneys General also appealed.",
+          "text": "against Google, and in December 2025, entered a final judgment requiring remedies, which, among other things, imposes restrictions on how we distribute our services and requires us to share certain search data with and offer syndication services to certain competitors.",
           "section": "Business / Risk Factors",
-          "search_anchor": "entered a final judgment requiring remedies"
+          "search_anchor": "entered a final judgment requiring remedies",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -656,19 +667,22 @@
       ],
       "excerpts": [
         {
-          "text": "Adobe’s mission is to empower everyone to create. We build innovative platforms and tools that unleash creativity, productivity and personalized customer experiences. For over four decades, our innovations have transformed how people everywhere engage across all types of media. Adobe’s solutions are the foundation of digital experiences, starting with the first creative spark, to the creation and development of all content and media, to the personalized delivery across every channel.",
+          "text": "productivity and personalized customer experiences. For over four decades, our innovations have transformed how people everywhere engage across all types of media. Adobe’s solutions are the foundation of digital experiences, starting with the first creative spark, to the creation and",
           "section": "Business / Risk Factors",
-          "search_anchor": "over four decades"
+          "search_anchor": "over four decades",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "In fiscal 2025, our business consisted of three reportable segments: Digital Media, Digital Experience and Publishing and Advertising. Spanning both our Digital Media and Digital Experience segments, we drove business success through customer-focused innovation and go-to-market strategies.",
+          "text": "fiscal 2025, our business consisted of three reportable segments: Digital Media, Digital Experience and Publishing and Advertising. Spanning both our Digital Media and Digital Experience segments, we drove business success through customer-focused innovation and go-to-market strategies.",
           "section": "Business / Risk Factors",
-          "search_anchor": "three reportable segments: Digital Media"
+          "search_anchor": "three reportable segments: Digital Media",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "We participate in a highly competitive and rapidly evolving environment where our competitors include companies of various sizes and both public and private companies, including large, global companies and smaller companies with more specialized focuses, new entrants, and AI or cloud-native companies. We compete with software companies, AI companies, hardware manufacturers, operating system developers, and social media companies across our business. The markets for our solutions are characterized by rapid technological innovation, new industry standards, evolving distribution and sales models, limited barriers to entry, short product lifecycles, customer price sensitivity, global economic conditions and the frequent entry of new solutions or competitors.",
+          "text": "We participate in a highly competitive and rapidly evolving environment where our competitors include companies of various sizes and both public and private companies, including large, global companies and smaller companies with more specialized focuses, new entrants, and AI or",
           "section": "Business / Risk Factors",
-          "search_anchor": "highly competitive and rapidly evolving"
+          "search_anchor": "highly competitive and rapidly evolving",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -812,19 +826,22 @@
       ],
       "excerpts": [
         {
-          "text": "Over the past three years, we have been subject to a series of shifting and expanding export control restrictions, impacting our ability to serve customers outside the United States.",
+          "text": "been subject to a series of shifting and expanding export control restrictions, impacting our ability to serve customers outside the United States.",
           "section": "Business / Risk Factors",
-          "search_anchor": "shifting and expanding export control restrictions"
+          "search_anchor": "shifting and expanding export control restrictions",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "We have experienced periods where we receive a significant amount of our revenue from a limited number of customers, and this trend may continue. For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of these partners, we are selling multiple products and systems in our portfolio through their channels. Our operating results depend on sales to our partner network, as well as the ability of these partners to sell products that incorporate our technologies. We have a small number of partners that are involved in system integration with our key customers. As our system design becomes increasingly complex, system integrators may be unable to meet specifications of our key customers. Changes in our partners' or customers' business models or their ownership can reduce the number of partners available to us and harm our ability to sell our advanced data center syst",
+          "text": "For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of",
           "section": "Business / Risk Factors",
-          "search_anchor": "one direct customer represented 22%"
+          "search_anchor": "one direct customer represented 22%",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "nt of our revenue from a limited number of customers, and this trend may continue. For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of these partners, we are selling multiple products and systems in our portfolio through their channels. Our operating results depend on sales to our partner network, as well as the ability of these partners to sell products that incorporate our technologies. We have a small number of partners that are involved in system integration with our key customers. As our system design becomes increasingly complex, system integrators may be unable to meet specifications of our key customers. Changes in our partners' or customers' business models or their ownership can reduce the number of partners available to us and harm our ability to sell our advanced data center systems to customers. In the future, these partners may decide to purchase",
+          "text": "of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of these partners, we are selling multiple products and systems in our",
           "section": "Business / Risk Factors",
-          "search_anchor": "another direct customer represented 14%"
+          "search_anchor": "another direct customer represented 14%",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -968,14 +985,16 @@
       ],
       "excerpts": [
         {
-          "text": "We sell our products and solutions through our direct sales force and a select network of distributors and channel partners globally. Distributors and OEMs, or their contract manufacturers (“CMs”), typically account for the substantial majority of our semiconductor sales. A relatively small number of customers account for a significant portion of our net revenue. Sales to distributors accounted for 48% of our net revenue for each of the fiscal years 2025 and 2024. We believe aggregate sales to our top five end customers, through all channels, accounted for approximately 40% of our net revenue for each of the fiscal years 2025 and 2024. We expect to continue to experience significant customer concentration in future periods. The loss of, or significant decrease in demand from, any of our top five end customers could have a material adverse effect on our business, results of operations and financial condition.",
+          "text": "We believe aggregate sales to our top five end customers, through all channels, accounted for approximately 40% of our net revenue for each of the fiscal years 2025 and 2024. We expect to continue to experience significant customer concentration in",
           "section": "Business / Risk Factors",
-          "search_anchor": "top five end customers"
+          "search_anchor": "top five end customers",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
           "text": "•We operate in a highly cyclical semiconductor industry that is undergoing profound change due to AI.",
           "section": "Business / Risk Factors",
-          "search_anchor": "highly cyclical semiconductor industry"
+          "search_anchor": "highly cyclical semiconductor industry",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {
@@ -1119,19 +1138,22 @@
       ],
       "excerpts": [
         {
-          "text": "Since the launching of our electronic brokerage business in 1993, we have grown to approximately 4.4 million institutional and individual brokerage customers. We provide our customers with what we believe to be one of the most effective and efficient automated brokerage platforms in the industry.",
+          "text": "1993, we have grown to approximately 4.4 million institutional and individual brokerage customers. We provide our customers with what we believe to be one of the most effective and efficient automated brokerage platforms in the industry.",
           "section": "Business / Risk Factors",
-          "search_anchor": "4.4 million institutional and individual"
+          "search_anchor": "4.4 million institutional and individual",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "We are exposed to the risk of loss if a customer, counterparty or issuer fails to perform its obligations under contractual terms. Our counterparty risk is primarily from margin loans extended to customers, securities purchased under agreements to resell (“repos”), securities borrowing and lending arrangements, cash and/or collateral deposited with clearing houses, exchanges, banks, securities firms and other financial counterparties, all of which may result in credit exposure in the event the counterparty defaults on their obligations to us due to bankruptcy, lack of liquidity, operational failure or other reasons.",
+          "text": "Our counterparty risk is primarily from margin loans extended to customers, securities purchased under agreements to resell (“repos”), securities borrowing and lending arrangements, cash and/or collateral deposited with clearing houses, exchanges, banks, securities firms and other financial counterparties, all of",
           "section": "Business / Risk Factors",
-          "search_anchor": "margin loans extended to customers"
+          "search_anchor": "margin loans extended to customers",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         },
         {
-          "text": "Our customer margin credit exposure is to a great extent mitigated by our policy of automatically evaluating each account throughout the trading day and closing out positions automatically for accounts that are found to be under-margined. While this methodology is effective in most situations, it may not be effective in situations in which no liquid market exists for the relevant securities or commodities or in which, for any reason, automatic liquidation for certain accounts has been disabled. If no liquid market exists or automatic liquidation has been disabled, we are subject to risks inherent in extending credit, especially during periods of rapidly declining markets. Any loss or expense incurred due to defaults by our customers in failing to repay margin loans or to maintain adequate collateral for these loans would cause harm to our business, financial condition and results of operations.",
+          "text": "loss or expense incurred due to defaults by our customers in failing to repay margin loans or to maintain adequate collateral for these loans would cause harm to our business, financial condition and results of operations.",
           "section": "Business / Risk Factors",
-          "search_anchor": "defaults by our customers in failing to repay margin loans"
+          "search_anchor": "defaults by our customers in failing to repay margin loans",
+          "scope": "EXACT_SOURCE_FRAGMENT__FULL_FILING_REFERENCED_BY_SHA256"
         }
       ],
       "financial_evidence": {

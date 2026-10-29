@@ -666,6 +666,10 @@ class AssetSourceProducer:
                 value=report.get('native_sources',{}).get('native_bundle',{}).get(section)
                 add('native_sources.native_bundle.'+section,None,'W8.AssetSourceProducer',state,value,
                     'SOURCE_BACKED' if value is not None else 'UNAVAILABLE')
+        for section,state in report.get('context_source_inventory',{}).items():
+            value=report.get('native_sources',{}).get('trusted_context',{}).get(section)
+            add('native_sources.trusted_context.'+section,None,'W8.deployment_context_sources',state,value,
+                'SOURCE_BACKED' if value is not None else 'UNAVAILABLE')
         return records
 
     def funding_contexts(self, snapshot, selected_owner, selected_trial, run, ref):

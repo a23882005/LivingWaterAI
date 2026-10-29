@@ -68,6 +68,8 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
     # Switching entry modes never bypasses its owner/cash/target/market guards.
     from holdings_analysis import HoldingsAnalysisRunner
     HoldingsAnalysisRunner(context=context,report=analysis).analyze(request)
+    from deployment_context_sources import extend
+    sources=extend(producer.root,request,analysis,prepared,sources)
     from on_demand_analysis import assemble_native_input,NativeSourceAssemblyError
     try:assemble_native_input(request,context,sources)
     except NativeSourceAssemblyError as error:missing=list(error.missing)
@@ -77,7 +79,6 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
     owner=deepcopy(item['stock_request']['work3_handoff']['owner'])
     _,cash_sources=producer.funding_contexts(request['client_snapshot']['payload'],owner,trial,
         request['run_id'],'DB:'+analysis['source_db_sha256'])
-    trace=[t.get('function',str(t)) if isinstance(t,dict) else t for t in analysis['call_trace']]
     outputs={'work3':deepcopy(item['stock_request']['work3_handoff']),
         'work4':deepcopy(item['work4_result']),'work5':deepcopy(bond['adapter_result']),
         'v75_runtime_attempt':deepcopy(bond.get('native_runtime_attempt'))}
@@ -94,8 +95,14 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'cash_by_domain':cash_sources,'market_observations':deepcopy(observations),
         'holdings_analysis':deepcopy(analysis),'new_investment_scenario':deepcopy(investment),
         'native_inputs':{'work3':deepcopy(item['work3_input']),**deepcopy(sources['native_bundle'])},
-        'native_outputs':outputs,'native_sources':sources,'first_failure':failure,
-        'call_trace':['W8.reuse_verified_analysis_components','W8.HoldingsAnalysisRunner.analyze',*trace,
+        'native_outputs':outputs,'native_sources':sources,
+        'context_source_bindings':deepcopy(sources['context_bindings']),
+        'source_validation_issues':deepcopy(sources['source_validation_issues']),'first_failure':failure,
+        'analysis_source_call_trace':deepcopy(analysis['call_trace']),
+        'call_trace_scope':'COMPONENT_SOURCE_REPLAY_AND_ASSEMBLY_ONLY',
+        'call_trace':['W8.reuse_verified_analysis_components','W8.HoldingsAnalysisRunner.analyze:source_replay',
+            'C8C9.Work3.build_context_handoff:component_replay','C8C9.Work4.build_v82_runtime_input:component_replay',
+            'C8C9.Work5.build_v75_runtime_input:component_replay',*sources['context_call_trace'],
             'W8.assemble_native_input:report_all_missing_sources'],
         'mode':'CASH_ZERO_SIMULATION','analysis_mode':'CASH_ZERO_SIMULATION',
         'source_data_provenance':'SOURCE_BACKED','effective_input_provenance':'CASH_ZERO_SIMULATION',
@@ -111,6 +118,9 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
         'source_inventory':{key:('REUSED_VERIFIED_SHARED_COMPONENT' if key in sources['native_bundle'] else
             'REQUIRED_ORIGINAL_SOURCE_NOT_PRODUCED') for key in ('stock_request','bond_request','stock_evidence',
                 'producer_contract','stock_source_fields','bond_evidence','asset_framework','physical_sgov')},
+        'context_source_inventory':{key:('REUSED_VERIFIED_SHARED_CONTEXT' if key in sources['trusted_context']
+            else 'REQUIRED_ORIGINAL_SOURCE_NOT_PRODUCED') for key in
+                ('funding_source','valuation_source','v70_source','c7_source','technical_source')},
         'coverage':[{'instrument_id':r['instrument_id'],'symbol':r['symbol'],'status':'BLOCKED',
             'native_complete':False,'mentor_ready':False,'holding_analysis_status':r['status'],
             'reason':'FULL_NATIVE_SOURCE_ASSEMBLY_INCOMPLETE'} for r in analysis['analysis_result']['positions']],

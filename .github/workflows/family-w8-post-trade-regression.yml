@@ -164,4 +164,5 @@ jobs:
           '系統工程/Family/W8/tests/test_native_source_freshness.py'
           '系統工程/Family/W8/tests/test_account_funding_check.py'
           '系統工程/Family/W8/tests/test_deployment_component_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_context_sources.py'
 

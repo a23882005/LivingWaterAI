@@ -1,8 +1,8 @@
 const fs=require('fs'),vm=require('vm'),Module=require('module'),crypto=require('crypto');
 const ac=new Module('native-acorn');ac._compile(process.binding('natives')['internal/deps/acorn/acorn/dist/acorn'],'native-acorn');const parse=ac.exports.parse;
-const input=JSON.parse(fs.readFileSync(0,'utf8'));const root=input.repo_root,html=fs.readFileSync(root+'/系統工程/總經V70/V70-3-27.html','utf8'),feed=JSON.parse(fs.readFileSync(root+'/系統工程/總經V70/V70_macro_latest.json'));
+const input=JSON.parse(fs.readFileSync(0,'utf8'));const root=input.repo_root,feedPath=input.feed_path||root+'/系統工程/總經V70/V70_macro_latest.json',html=fs.readFileSync(root+'/系統工程/總經V70/V70-3-27.html','utf8'),feed=JSON.parse(fs.readFileSync(feedPath));
 const sources=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].filter(m=>!m[1].includes('src=')&&!m[1].includes('application/json')).map(m=>m[2]);
-const hash=s=>crypto.createHash('sha256').update(s).digest('hex');if(hash(html)!==input.html_sha256||hash(fs.readFileSync(root+'/系統工程/總經V70/V70_macro_latest.json'))!==input.feed_sha256)throw Error('V70_SOURCE_CHANGED');
+const hash=s=>crypto.createHash('sha256').update(s).digest('hex');if(hash(html)!==input.html_sha256||hash(fs.readFileSync(feedPath))!==input.feed_sha256)throw Error('V70_SOURCE_CHANGED');
 if(!feed.verification?.ready)throw Error('V70_SOURCE_NOT_READY');
 const keep=new Set(['macroConfig','C_VALUATION_IDS','C_VALUATION_ALPHA','lifeStageLabels']);const selected=[];
 for(const s of sources){let ast;try{ast=parse(s,{ecmaVersion:'latest'})}catch{continue}for(const n of ast.body){if(n.type==='FunctionDeclaration')selected.push(s.slice(n.start,n.end));if(n.type==='VariableDeclaration'&&n.declarations.some(d=>keep.has(d.id.name)))selected.push(s.slice(n.start,n.end));if(n.type==='ExpressionStatement'&&n.expression.type==='AssignmentExpression'&&s.slice(n.expression.left.start,n.expression.left.end)==='window.v703StressModel')selected.push(s.slice(n.start,n.end));}}

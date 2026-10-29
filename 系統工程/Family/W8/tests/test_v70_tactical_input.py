@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from decimal import Decimal
-import hashlib,sys,unittest
+import hashlib,json,sys,tempfile,unittest
 ROOT=Path(__file__).resolve().parents[4]
 sys.path[:0]=[str(ROOT/'系統工程/Family/W8')]
 from v70_tactical_input import calculate
@@ -37,6 +37,20 @@ class V70ComponentTest(unittest.TestCase):
     def test_cross_owner_rejected_and_absent_policy_not_inferred(self):
         self.assertIsNone(calculate(ROOT,self.request,None))
         with self.assertRaises(PermissionError):calculate(ROOT,self.request,{**self.policy,'client_id':'OTHER'})
+
+    def test_selected_verified_feed_is_consumed_by_original_v70_components(self):
+        with tempfile.TemporaryDirectory() as folder:
+            raw=json.loads((ROOT/'系統工程/總經V70/V70_macro_latest.json').read_text())
+            path=Path(folder)/'synthetic-capture-of-public-feed.json';path.write_text(json.dumps(raw,sort_keys=True))
+            source={'schema_version':'Family.W5.VerifiedMacroFeedSource.v1','local_path':str(path),
+                'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+            request=deepcopy(self.request);request['macro_snapshot']={'source_sha256':source['sha256']}
+            out=calculate(ROOT,request,self.policy,feed_source=source)
+            self.assertEqual(out['source_feed_sha256'],source['sha256'])
+            self.assertEqual(out['feed_as_of'],raw['asOf'])
+            self.assertEqual(out['allocation']['S0'],80)
+            request['macro_snapshot']['source_sha256']='f'*64
+            with self.assertRaisesRegex(PermissionError,'MACRO_SOURCE_BINDING'):calculate(ROOT,request,self.policy,feed_source=source)
 
     def test_current_reference_is_preserved_and_does_not_replace_target_base(self):
         policy={**self.policy,'current_stock_percent':40,'current_bond_percent':60,'life_stage_code':'L6'}

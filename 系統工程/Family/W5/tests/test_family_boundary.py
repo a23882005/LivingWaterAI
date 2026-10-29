@@ -40,6 +40,20 @@ def refresh_snapshot(req,ctx):
     p=req['client_snapshot']['payload'];p['payload_digest']=digest(p['tables']);req['client_snapshot']['digest']=digest(p);ctx['snapshot_digest']=digest(p);ctx['holdings_completeness']['snapshot_digest']=p['payload_digest']
 
 
+def test_selected_macro_source_requires_its_independent_context_binding():
+    req,ctx=fixture()
+    selected={'schema_version':'Family.W5.VerifiedMacroFeedSource.v1',
+        'local_path':'SYNTHETIC_SOURCE_NOT_READ_BY_THIS_CAPTURE_BOUNDARY','sha256':'a'*64}
+    ctx['verified_macro_feed_source']=selected
+    req['macro_snapshot']['source_sha256']=selected['sha256']
+    req['macro_snapshot']['capture_receipt']={'source_selection_digest':digest(selected)}
+    ctx['macro_capture_digest']=digest(req['macro_snapshot']['capture_receipt'])
+    assert prepare_input(req,trusted_context=ctx).payload['engine_calls']==0
+    ctx['verified_macro_feed_source']={**selected,'sha256':'b'*64}
+    with pytest.raises(BoundaryError,match='MACRO_SOURCE_SELECTION_MISMATCH'):
+        prepare_input(req,trusted_context=ctx)
+
+
 @pytest.mark.parametrize('client',['SYNTHETIC_A','SYNTHETIC_B','SYNTHETIC_C','SYNTHETIC_D'])
 def test_client_and_historical_target_binding(client):
     req,ctx=fixture(client);before=deepcopy(req)

@@ -210,6 +210,12 @@ def prepare_input(request,*,trusted_context):
     if macro.get('capture_receipt') is not None:
         require(digest(macro['capture_receipt'])==ctx.get('macro_capture_digest'),
             'MACRO_CAPTURE_BINDING_MISMATCH','macro_snapshot.capture_receipt','W3')
+    selected=ctx.get('verified_macro_feed_source')
+    if selected is not None:
+        require(selected.get('schema_version')=='Family.W5.VerifiedMacroFeedSource.v1'
+                and macro.get('source_sha256')==selected.get('sha256')
+                and macro.get('capture_receipt',{}).get('source_selection_digest')==digest(selected),
+                'MACRO_SOURCE_SELECTION_MISMATCH','macro_snapshot.source_selection','W3')
     require(macro.get('digest')==digest(macro.get('payload'))==versions['market'],'MACRO_DIGEST_MISMATCH','macro_snapshot','W3')
     require(macro.get('asOf')==macro.get('payload',{}).get('asOf'),'MACRO_ASOF_MISMATCH','macro_snapshot.asOf','W3')
     require(timestamp(macro.get('asOf'),'macro_snapshot.asOf')<=at,'FUTURE_MACRO','macro_snapshot.asOf','W3')

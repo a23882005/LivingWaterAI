@@ -278,7 +278,7 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -292,6 +292,7 @@ class AssetSourceProducer:
         self.official_target_base_source=deepcopy(official_target_base_source)
         self.bond_market_supplement_source=deepcopy(bond_market_supplement_source)
         self.v75_macro_source_manifest=deepcopy(v75_macro_source_manifest)
+        self.verified_macro_feed_source=deepcopy(verified_macro_feed_source)
         if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
@@ -327,12 +328,15 @@ class AssetSourceProducer:
             ctx['bond_market_supplement_source']=deepcopy(self.bond_market_supplement_source)
         if self.v75_macro_source_manifest is not None:
             ctx['v75_macro_source_manifest']=deepcopy(self.v75_macro_source_manifest)
+        if self.verified_macro_feed_source is not None:
+            ctx['verified_macro_feed_source']=deepcopy(self.verified_macro_feed_source)
         when=datetime.now(timezone.utc).isoformat();run='family-04-'+uuid.uuid4().hex
         req.update(run_id=run,request_id=run+'-request',evaluation_at=when)
         req['client_snapshot']['as_of']=when
         # Refresh the actual W3 feed independently; no old result is re-labelled.
         from market_bridge import read_macro_snapshot
-        macro=read_macro_snapshot(self.root,source_commit=self.source_commit,capture_bound=True)
+        read_options={'source':self.verified_macro_feed_source} if self.verified_macro_feed_source is not None else {}
+        macro=read_macro_snapshot(self.root,source_commit=self.source_commit,capture_bound=True,**read_options)
         req['macro_snapshot']=macro
         req['evaluation_at']=datetime.now(timezone.utc).isoformat()
         when=req['evaluation_at']  # One post-capture evaluation clock for all native observations.
@@ -389,7 +393,8 @@ class AssetSourceProducer:
         investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
         from v70_tactical_input import calculate
         if self.fx_observation and self.fx_observation['as_of']>when[:10]:raise ValueError('FUTURE_FX_SOURCE')
-        tactical=calculate(self.root,req,getattr(self,'v70_strategic_policy',None),self.fx_observation)
+        budget_options={'feed_source':self.verified_macro_feed_source} if self.verified_macro_feed_source is not None else {}
+        tactical=calculate(self.root,req,getattr(self,'v70_strategic_policy',None),self.fx_observation,**budget_options)
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         from holdings_analysis import build_analysis_report

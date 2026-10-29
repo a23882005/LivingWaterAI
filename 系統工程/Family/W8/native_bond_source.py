@@ -82,6 +82,7 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         'status':'SOURCE_INCOMPLETE','requested_instruments':[r['instrument_id'] for r in rows],
         'shared_inputs':shared,'source_fx':deepcopy(fx_observation),
         'strategic_policy':deepcopy(strategic_policy),'call_trace':[], 'issues':[],
+        'policy_audit':deepcopy(report.get('bond_policy_audit')),
         'targets':{},'physical_holdings':{},'predicate_observations':{},
         'sgov_role_source_rows':{k:deepcopy(snapshot['tables'].get(k,[]))
             for k in ('sgov_role_proposal','sgov_role_confirmation')},
@@ -185,6 +186,21 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
             result['structural_state']=state.model_dump(mode='json')
             gaps.extend({'code':i.code,'field_path':i.field,'message':i.message}
                 for i in state.issues)
+            ratio_issues=[i.code for i in state.issues if i.code in (
+                'US_GENERIC_CORE_TARGET_RATIO_MISMATCH','TW_GENERIC_CORE_TARGET_RATIO_MISMATCH')]
+            from v75_runtime.work3 import US_GENERIC_CORE_WEIGHTS,TW_GENERIC_CORE_WEIGHTS
+            result['target_compatibility']={
+                'status':'APPROVED_TARGET_RULE_INCOMPATIBILITY' if ratio_issues else 'NATIVE_GENERIC_TEMPLATE_MATCH',
+                'native_issue_codes':ratio_issues,
+                'source_target_digest':digest(request['confirmed_target']),
+                'source_kind':request['confirmed_target'].get('source_kind'),
+                'runtime_work3_sha256':sha256((runtime/'work3.py').read_bytes()).hexdigest(),
+                'native_us_template':{k:str(v) for k,v in US_GENERIC_CORE_WEIGHTS.items()},
+                'native_tw_template':{k:str(v) for k,v in TW_GENERIC_CORE_WEIGHTS.items()},
+                'approved_target_amounts':deepcopy(targets),'mapping_complete':True,
+                'approved_target_modified':False,'native_rule_overridden':False,
+                'exception_route':'NOT_SUPPORTED_BY_FROZEN_RUNTIME',
+                'resolution':'REQUIRES_DOCUMENTED_POLICY_RESOLUTION' if ratio_issues else 'NO_TEMPLATE_CHANGE_REQUIRED'}
         result['status']='ORIGINAL_V75_SOURCE_CHECKED_WITH_GAPS'
     except ValueError as exc:
         result['status']='NATIVE_CONTRACT_REJECTED'

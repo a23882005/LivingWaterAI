@@ -53,6 +53,20 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertEqual(out['trade_action'],'NO_TRADE')
         self.assertEqual((req,report,shared),before)
 
+    def test_single_sgov_approval_is_rule_conflict_not_a_missing_spsb_mapping(self):
+        p,req,report,shared,strategy=self.case()
+        req['confirmed_target']['source_kind']='OFFICIAL_W1_CONFIRMED_ALLOCATION'
+        before=deepcopy(req['confirmed_target'])
+        out=self.build(p,req,report,shared,strategy)
+        compatibility=out['target_compatibility']
+        self.assertEqual(compatibility['status'],'APPROVED_TARGET_RULE_INCOMPATIBILITY')
+        self.assertTrue(compatibility['mapping_complete'])
+        self.assertEqual(set(out['targets']),{'SGOV'})
+        self.assertFalse(compatibility['native_rule_overridden'])
+        self.assertFalse(compatibility['approved_target_modified'])
+        self.assertEqual(compatibility['native_us_template'],{'SGOV':'70','SPSB':'30'})
+        self.assertEqual(req['confirmed_target'],before)
+
     def test_target_ambiguity_does_not_drop_one_role_or_insert_zero(self):
         p,req,report,shared,strategy=self.case()
         req['confirmed_target']['payload']['draft']['target_lines'][0]['instrument_id']='UNIDENTIFIED_ROLE'
@@ -73,6 +87,7 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertEqual({r['asset_id'] for r in native['existing_bond_holdings']},{'SGOV'})
         self.assertEqual(set(native['authorized_universe']),{'SGOV','SPSB'})
         self.assertFalse(any(i['code']=='US_GENERIC_CORE_TARGET_RATIO_MISMATCH' for i in out['issues']))
+        self.assertEqual(out['target_compatibility']['status'],'NATIVE_GENERIC_TEMPLATE_MATCH')
         self.assertTrue(any(i['field_path']=='bond_evidence.SPSB.market' for i in out['issues']))
 
     def test_replay_rejects_resigned_native_result_and_delivery(self):

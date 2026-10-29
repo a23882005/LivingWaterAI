@@ -434,6 +434,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
     if context.get('native_target_source') is not None:
         report['native_target_source']=deepcopy(context['native_target_source'])
+    from bond_policy_audit import build as audit_bond_policy
+    policy_audit=audit_bond_policy(request,context)
+    if policy_audit is not None:report['bond_policy_audit']=policy_audit
     if (getattr(producer,'native_funding_advice_enabled',False) and investment
         and investment.get('total_new_investment_amount') is not None
         and request.get('macro_snapshot') and trial.get('cash_state')):
@@ -552,6 +555,8 @@ class HoldingsAnalysisRunner:
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
         from native_bond_source import validate as validate_native_bond_source
+        from bond_policy_audit import validate as validate_bond_policy
+        validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()

@@ -153,6 +153,14 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         bond_source=facts.get('native_bond_source')
         if bond_source:
             text.append('原Work5／V75來源檢查：'+bond_source['status']+'；SGOV實體持股與債券桶／子彈桶分開，尚未產生完整債券部署建議。')
+            audit=bond_source.get('policy_audit') or {}
+            if audit.get('owner_role_policy')=='EXPLICIT_IBKR_STOCK_OPPORTUNITY_RESERVE':
+                text.append('既有本人紀錄明訂IBKR SGOV為股票買點彈藥；歷史金額與長期目標均未套用為本輪角色餘額，可用現金仍須另核。')
+            elif audit.get('owner_role_policy')=='SEPARATE_DEFENSIVE_AND_OPPORTUNITY_ROLES':
+                text.append('既有正式紀錄要求SGOV防守核心與機動子彈分帳；尚未以歷史比例拆分本輪持倉，防守部位不作股票買進資金。')
+            compatibility=bond_source.get('target_compatibility',{})
+            if compatibility.get('status')=='APPROVED_TARGET_RULE_INCOMPATIBILITY':
+                text.append('核准債券目標已完整映射，但與V75固定核心比例不相容；保留核准配置，未新增SPSB目標或改寫規則。個案限制須有明確理由與核准，現行原生Runtime尚無例外輸入口。')
             fields=list(dict.fromkeys(i['field_path'] for i in bond_source['issues']))
             if fields:text.append('V75仍缺：'+'、'.join(fields)+'。')
         if native_funding.get('status')=='CASH_TRIAL_ADVICE_COMPUTED':

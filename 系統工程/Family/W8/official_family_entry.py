@@ -8,6 +8,7 @@ Google Drive remains the sole official customer-record store.
 import hashlib
 import json
 import importlib.util
+from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -225,7 +226,21 @@ class OfficialFamilyEntry:
             result={"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
                     "client_id": self.client_id, "source_sha256": current["source_sha256"],
                     "issue_codes": decision.get("issue_codes", []),
+                    "canonical_result": None, "mentor": None, "trade_action": "NO_TRADE",
                     "trade_authorization": "NONE"}
+            review = decision.get('configuration_review')
+            if review is not None:
+                if (review.get('schema_version') != 'Family.W5.ConfigurationReview.v1'
+                    or review.get('client_id') != self.client_id
+                    or review.get('run_id') != request.get('run_id')
+                    or review.get('evaluation_at') != request.get('evaluation_at')
+                    or review.get('owner') != request.get('owner')
+                    or review.get('source_db_sha256') != current['source_sha256']
+                    or review.get('full_native_pipeline_complete') is not False
+                    or review.get('full_native_mentor_reached') is not False
+                    or review.get('trade_action') != 'NO_TRADE'):
+                    raise PermissionError('OFFICIAL_CONFIGURATION_REVIEW_BINDING_MISMATCH')
+                result['configuration_review'] = deepcopy(review)
             if source_failure_bound:
                 result.update(source_production=decision.get('source_production'),
                     call_trace=decision.get('call_trace',[]),mentor=decision.get('mentor'))

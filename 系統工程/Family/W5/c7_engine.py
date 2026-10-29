@@ -87,6 +87,9 @@ def bind_c7_source(repo_path, request, context):
         engine = work6.get('final_target_engine_result') or {}
         error.issue['configuration_review'] = {
             'schema_version': 'Family.W5.ConfigurationReview.v1',
+            'client_id': request['client_id'], 'run_id': request['run_id'],
+            'owner': deepcopy(request['owner']),
+            'source_db_sha256': request.get('client_snapshot', {}).get('payload', {}).get('source_sha256'),
             'scope': 'ORIGINAL_C_WORK6_AND_C7_REVIEW__NOT_UNIFIED_WORK9_MENTOR',
             'evaluation_at': source['evaluated_at'], 'c7_status': result['status'],
             'work6_status': work6['loop_status'], 'work6_snapshot_id': work6['work6_snapshot_id'],

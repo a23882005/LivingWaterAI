@@ -18,12 +18,13 @@ def save(path,value):
     path.write_text(json.dumps(value));return {'local_path':str(path),'sha256':sha256(path.read_bytes()).hexdigest()}
 
 
-def fixture(folder,symbol='VT'):
+def fixture(folder,symbol='VT',post_close=False):
     import exchange_calendars as xc
     cal=xc.get_calendar('XNYS',start='2026-10-01',end='2026-11-05')
-    sessions=cal.sessions_in_range('2026-10-01','2026-10-28');days=[str(s.date()) for s in sessions]
+    sessions=cal.sessions_in_range('2026-10-01','2026-10-29' if post_close else '2026-10-28');days=[str(s.date()) for s in sessions]
     quote={k:[] for k in ('open','high','low','close','volume')};rows=[];receipts=[]
     available='2026-10-29T03:00:00Z';written='2026-10-29T03:00:01Z'
+    if post_close:available='2026-10-29T21:00:00Z';written='2026-10-29T21:00:01Z'
     for i,session in enumerate(sessions):
         values={'open':100+i,'high':102+i,'low':99+i,'close':101+i,'volume':1000+i}
         for k,v in values.items():quote[k].append(v)
@@ -61,11 +62,50 @@ def fixture(folder,symbol='VT'):
         'evaluation_mode':'SNAPSHOT_AFTER_ACQUISITION','artifact_written_at':written,
         'fetch_completed_at':available,'data_provenance':'SOURCE_BACKED'}
     qualified={'schema_version':'Family.W8.EquitySourceQualification.v1','symbol':symbol,
-        'source_evaluation_at':'2026-10-29T03:01:00Z','contract':contract,'rows':len(rows),'excluded_bars':[],
+        'source_evaluation_at':'2026-10-29T21:01:00Z' if post_close else '2026-10-29T03:01:00Z','contract':contract,'rows':len(rows),'excluded_bars':[],
         'source_artifacts':{'yahoo':yahoo,'ibkr_identity':identity,'ibkr_history':ibkr},
         'technical_source_template':{'csv_path':str(csv_path),'sha256':sha256(csv_path.read_bytes()).hexdigest(),
             'metadata':metadata}}
     return qualified,publish(folder,qualified)
+
+
+def postclose_market(folder):
+    _,descriptor=fixture(folder,post_close=True)
+    pool=M.read(descriptor,'2026-10-29T21:02:00Z',ROOT);source=pool['items']['VT']
+    return pool,{'symbol':'VT','observed_date':source['observed_date'],
+        'provider_verified_at':source['source_available_at'],'formal_identity_verified':True,
+        'qualified_equity_market_digest':source['digest'],
+        'source_sha256':source['technical_source_template']['sha256']}
+
+
+def test_holdings_accept_same_utc_day_only_after_qualified_equity_close_and_capture(tmp_path):
+    from holdings_analysis import validate_market_time
+    pool,market=postclose_market(tmp_path)
+    assert pool['items']['VT']['status']=='FRESH' and market['observed_date']=='2026-10-29'
+    validate_market_time(market,'VT','2026-10-29T21:02:00Z',pool)
+    with pytest.raises(PermissionError,match='MARKET_BINDING_OR_TIME'):
+        validate_market_time(market,'VT','2026-10-29T19:59:00Z',pool)
+
+
+@pytest.mark.parametrize('changed',['digest','source_hash','identity','stale','preclose_capture','future_observed'])
+def test_holdings_same_day_equity_proof_cannot_be_inferred_or_relabelled(tmp_path,changed):
+    from holdings_analysis import validate_market_time
+    pool,market=postclose_market(tmp_path);source=pool['items']['VT']
+    if changed=='digest':market['qualified_equity_market_digest']='0'*64
+    elif changed=='source_hash':market['source_sha256']='0'*64
+    elif changed=='identity':market['formal_identity_verified']=False
+    elif changed=='stale':source['status']='STALE'
+    elif changed=='preclose_capture':source['raw_history_available_at']='2026-10-29T19:59:59Z'
+    else:market['observed_date']='2026-10-30'
+    with pytest.raises(PermissionError,match='MARKET_BINDING_OR_TIME'):
+        validate_market_time(market,'VT','2026-10-29T21:02:00Z',pool)
+
+
+def test_holdings_unqualified_same_day_market_remains_rejected(tmp_path):
+    from holdings_analysis import validate_market_time
+    _,market=postclose_market(tmp_path)
+    with pytest.raises(PermissionError,match='MARKET_BINDING_OR_TIME'):
+        validate_market_time(market,'VT','2026-10-29T21:02:00Z')
 
 
 def publish(folder,qualified):

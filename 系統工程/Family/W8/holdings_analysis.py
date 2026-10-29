@@ -25,6 +25,28 @@ STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
 CATALOG_BLOB='4cd333be719252034b6b9d6e8a787c838db816c4'
 
 
+def validate_market_time(market,symbol,evaluation_at,qualified_equities=None):
+    """Use completed-session proofs only after the original source replay."""
+    evaluation=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
+    verified=datetime.fromisoformat(market['provider_verified_at'].replace('Z','+00:00'))
+    bond=market.get('qualified_bond_market') or {}
+    completed=(bond.get('eligible') is True and bond.get('observed_date')==market['observed_date']
+        and datetime.fromisoformat(bond['session_close_at'].replace('Z','+00:00'))<=verified)
+    equity=(qualified_equities or {}).get('items',{}).get(symbol)
+    if equity is not None:
+        def at(key):return datetime.fromisoformat(equity[key].replace('Z','+00:00'))
+        completed=completed or (equity['status']=='FRESH' and equity['symbol']==symbol
+            and market.get('qualified_equity_market_digest')==equity['digest']
+            and market.get('source_sha256')==equity['technical_source_template']['sha256']
+            and market.get('formal_identity_verified') is True
+            and market['observed_date']==equity['observed_date']
+            and at('session_close_at')<=at('raw_history_available_at')<=at('source_available_at')==verified)
+    today=evaluation.astimezone(timezone.utc).date().isoformat()
+    if (market['symbol']!=symbol or verified>evaluation or market['observed_date']>today
+            or market['observed_date']==today and not completed):
+        raise PermissionError('HOLDINGS_ANALYSIS_MARKET_BINDING_OR_TIME_MISMATCH')
+
+
 def issue(path,reason,impact,*,category=3,source=None,code='ANALYSIS_SOURCE_GAP'):
     return {'code':code,'field_path':path,'unknown_category':category,
         'reason':reason,'impact':impact,'source_id':source,
@@ -621,13 +643,6 @@ class HoldingsAnalysisRunner:
                 raise PermissionError('HOLDINGS_ANALYSIS_POSITION_BINDING_MISMATCH')
             seen.add(row['instrument_id'])
             if row.get('market'):
-                market=row['market']
-                evaluation=datetime.fromisoformat(request['evaluation_at'].replace('Z','+00:00'))
-                verified=datetime.fromisoformat(market['provider_verified_at'].replace('Z','+00:00'))
-                qualified=market.get('qualified_bond_market') or {}
-                completed=(qualified.get('eligible') is True and qualified.get('observed_date')==market['observed_date']
-                    and datetime.fromisoformat(qualified['session_close_at'].replace('Z','+00:00'))<=verified)
-                if (market['symbol']!=row['symbol'] or verified>evaluation or
-                        market['observed_date']>=evaluation.astimezone(timezone.utc).date().isoformat() and not completed):
-                    raise PermissionError('HOLDINGS_ANALYSIS_MARKET_BINDING_OR_TIME_MISMATCH')
+                validate_market_time(row['market'],row['symbol'],request['evaluation_at'],
+                    report.get('qualified_equity_inputs'))
         return report

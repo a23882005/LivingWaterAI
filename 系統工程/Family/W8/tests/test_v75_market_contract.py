@@ -61,7 +61,9 @@ def test_full_source_replay_qualifies_only_completed_bond_prices(tmp_path):
     assert row['qualified_bond_market']['contract_id']==123 and row['qualified_bond_market']['eligible']
     assert row['formal_identity_verified'] and not row['formal_deployment_eligible']
     assert row['v75_original_predicates']['PRED-009']['deployment_input_eligible']
-    assert row['v75_original_predicates']['PRED-008']['input_freshness_verified']
+    assert not row['v75_original_predicates']['PRED-008']['input_freshness_verified']
+    assert row['v75_original_predicates']['PRED-008']['original_result']['assessment_status']=='INSUFFICIENT_DATA'
+    assert pool['income_observations']['SGOV']['calculation']['latest_ttm_cash_per_share']
     assert row['v75_original_predicates']['PRED-007']['input_freshness_verified']
     assert not row['v75_original_predicates']['PRED-007']['deployment_input_eligible']
     request={'evaluation_at':at,'macro_snapshot':macro()};context={'v75_macro_source_manifest':source}

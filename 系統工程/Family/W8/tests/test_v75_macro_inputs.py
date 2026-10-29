@@ -50,8 +50,8 @@ class MacroInputsTest(unittest.TestCase):
         html='<table>'+''.join('<tr>'+''.join('<td>'+x+'</td>' for x in row)+'</tr>' for row in rows)+'</table>'
         save('SEP',html.encode(),'https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm')
         save('FUTURES',json.dumps(self.future()).encode(),'https://query1.finance.yahoo.com/v8/finance/chart/ZQJ27.CBT?interval=1d')
-        stream=io.StringIO();writer=csv.writer(stream);writer.writerow(['Date','3 Mo','2 Yr'])
-        writer.writerows((d.strftime('%m/%d/%Y'),'4','3.5') for d in reversed(days) if d>=date(2026,8,1))
+        stream=io.StringIO();writer=csv.writer(stream);writer.writerow(['Date','3 Mo','1 Yr','2 Yr'])
+        writer.writerows((d.strftime('%m/%d/%Y'),'4','3.8','3.5') for d in reversed(days) if d>=date(2026,8,1))
         save('TREASURY',stream.getvalue().encode(),'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all')
         manifest=root/'manifest.json';manifest.write_text(json.dumps({'schema_version':'Family.W8.V75MacroSourceManifest.v1','sources':sources}))
         return {'local_path':str(manifest),'sha256':sha256(manifest.read_bytes()).hexdigest()},sources
@@ -85,6 +85,7 @@ class MacroInputsTest(unittest.TestCase):
             self.assertEqual(pool['shared_metrics']['PRED-004']['hy_oas_bps'],'318.00')
             self.assertNotIn('core_ppi_ann3_pct',pool['shared_metrics']['PRED-006'])
             self.assertNotIn('PRED-008',pool['asset_metrics']['SPSB'])
+            self.assertEqual(pool['calculations']['SGOV.PRED-003']['tenor'],'1 Yr')
             observations={'assets':[{'symbol':'SPSB','call_trace':[],'v75_original_predicates':{}}]}
             before=deepcopy(observations);out=M.apply(observations,pool,evaluation_at=at,repo_root=ROOT)
             self.assertEqual(observations,before)
@@ -102,6 +103,24 @@ class MacroInputsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             source,files=self.fixture(folder);Path(files['EFFR']['local_path']).write_text('changed')
             with self.assertRaisesRegex(PermissionError,'SOURCE_CHANGED'):M.read(source,'2026-10-29T02:00:00Z')
+
+    def test_missing_one_year_reference_keeps_other_assets_and_never_uses_three_months(self):
+        with tempfile.TemporaryDirectory() as folder:
+            source,files=self.fixture(folder);item=files['TREASURY'];path=Path(item['local_path'])
+            rows=list(csv.DictReader(io.StringIO(path.read_text())))
+            stream=io.StringIO();writer=csv.DictWriter(stream,fieldnames=['Date','3 Mo','2 Yr'])
+            writer.writeheader();writer.writerows({k:r[k] for k in writer.fieldnames} for r in rows)
+            path.write_text(stream.getvalue());item['sha256']=sha256(path.read_bytes()).hexdigest()
+            receipt=Path(item['receipt_path']);value=json.loads(receipt.read_text());value['sha256']=item['sha256']
+            receipt.write_text(json.dumps(value));item['receipt_sha256']=sha256(receipt.read_bytes()).hexdigest()
+            manifest=Path(source['local_path']);manifest.write_text(json.dumps({
+                'schema_version':'Family.W8.V75MacroSourceManifest.v1','sources':files}))
+            source['sha256']=sha256(manifest.read_bytes()).hexdigest()
+            pool=M.read(source,'2026-10-29T02:00:00Z')
+            self.assertEqual(pool['asset_metrics']['SGOV']['PRED-003'],{})
+            self.assertEqual(pool['calculations']['SPSB.PRED-003']['tenor'],'2 Yr')
+            self.assertIn('PRED-001',pool['shared_metrics'])
+            self.assertIn('1 Yr',pool['asset_unprovided_inputs']['SGOV']['PRED-003'][0])
 
 
 if __name__=='__main__':unittest.main()

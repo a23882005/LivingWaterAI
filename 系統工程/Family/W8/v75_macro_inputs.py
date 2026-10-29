@@ -146,6 +146,8 @@ def read(source,evaluation_at):
     manifest=json.loads(raw)
     if manifest.get('schema_version')!='Family.W8.V75MacroSourceManifest.v1':
         raise ValueError('V75_MACRO_MANIFEST_SCHEMA')
+    from formal_v75_parameters import read as read_parameters
+    parameters=read_parameters(manifest.get('formal_parameter_source'),evaluation_at)
     at=_time(evaluation_at);data={};proofs={}
     for key,item in manifest['sources'].items():
         content=Path(item['local_path']).read_bytes();receipt_raw=Path(item['receipt_path']).read_bytes()
@@ -173,6 +175,9 @@ def read(source,evaluation_at):
         'available_at':max((v['available_at'] for v in proofs.values()),key=_time),
         'source_proofs':proofs,'shared_metrics':{},'asset_metrics':{},'calculations':{},
         'unprovided_inputs':{},'canonical_freshness_attested':False}
+    if parameters is not None:
+        out['formal_parameters']=parameters
+        out['available_at']=max(out['available_at'],parameters['available_at'],key=_time)
     series={key:fred(value,key,_time(proofs[key]['available_at'])) for key,value in data.items()
         if key not in ('SEP','TREASURY','FUTURES','NYFED_REPO','YAHOO_SGOV','YAHOO_SPSB')}
     effr=series['EFFR'];last=max(day for day,value in effr.items() if value is not None)
@@ -207,7 +212,14 @@ def read(source,evaluation_at):
     out['unprovided_inputs']['PRED-006']=['core_ppi_ann3_pct','core_ppi_ann6_pct',
         'breakeven_5y_delta_20bd_bps','breakeven_5y_pct','oil_price_change_20bd_pct']
     rows=list(csv.DictReader(io.StringIO(data['TREASURY'].decode('utf-8-sig'))))
-    for asset,tenor in [('SGOV','3 Mo'),('SPSB','2 Yr')]:
+    # PRED-003's duration <=1y branch uses 1Y, including SGOV. 3M may
+    # describe its holdings but is never the canonical branch reference.
+    for asset,tenor in [('SGOV','1 Yr'),('SPSB','2 Yr')]:
+        if not rows or tenor not in rows[0]:
+            out.setdefault('asset_unprovided_inputs',{}).setdefault(asset,{})['PRED-003']=[
+                'official Treasury '+tenor+' reference history']
+            out['asset_metrics'].setdefault(asset,{})['PRED-003']={}
+            continue
         points={}
         for row in rows:
             day=datetime.strptime(row['Date'],'%m/%d/%Y').date()
@@ -221,7 +233,8 @@ def read(source,evaluation_at):
         out['calculations'][asset+'.PRED-003']={'tenor':tenor,'observed_date':days[0].isoformat(),
             'comparison_5bd':days[5].isoformat(),'comparison_10bd':days[10].isoformat(),
             'scope':'TREASURY_RATE_PATH_REFERENCE__NOT_ETF_YIELD_ATTRACTIVENESS_HISTORY',
-            'basis':'V75 §43 0–3 month Treasury instrument' if asset=='SGOV' else 'V75 §44 2Y/3Y Treasury monitoring'}
+            'basis':'V75_PREDICATE_PARAMS_v1.0.3 / PRED-003 duration reference maturity',
+            'auxiliary_3m_is_branch_reference':False}
     from v75_remaining_inputs import extend
     out=extend(out,data,proofs)
     from v75_market_contract import qualify
@@ -235,11 +248,13 @@ def slot(pool,pid,asset,previous,evaluation_at):
     result=EVALUATORS[pid](metrics,_time(evaluation_at),
         [proof['source_reference'] for proof in pool['source_proofs'].values()])
     contract=pool.get('qualified_bond_markets',{}).get(asset,{})
-    fresh=(contract.get('eligible') is True and (pid=='PRED-008' or
-        pid=='PRED-007' and pool['calculations']['PRED-007']['observed_date']==contract['observed_date']))
+    fresh=(contract.get('eligible') is True and
+        pid=='PRED-007' and pool['calculations']['PRED-007']['observed_date']==contract['observed_date'])
+    missing=deepcopy(pool['unprovided_inputs'].get(pid,[]))+deepcopy(
+        pool.get('asset_unprovided_inputs',{}).get(asset,{}).get(pid,[]))
     return {'metrics':deepcopy(metrics),'original_result':result.model_dump(mode='json'),
-        'input_coverage':'PARTIAL_RAW_METRICS' if pool['unprovided_inputs'].get(pid) else 'COMPLETE_RAW_METRICS',
-        'unprovided_inputs':deepcopy(pool['unprovided_inputs'].get(pid,[])),
+        'input_coverage':'PARTIAL_RAW_METRICS' if missing else 'COMPLETE_RAW_METRICS',
+        'unprovided_inputs':missing,
         'source_pool_digest':digest(pool),'source_available_at':pool['available_at'],
         'input_freshness_verified':fresh,'deployment_input_eligible':fresh and result.assessment_status.value=='VALID',
         'original_default_freshness_is_not_attestation':True,

@@ -50,7 +50,7 @@ def qualify(pool,data,proofs,manifest,evaluation_at):
             o,h,l,c,v=[number(quote[k][i]) for k in ('open','high','low','close','volume')]
             if min(o,h,l,c)<=0 or h<max(o,l,c) or l>min(o,h,c) or v<0 or v!=v.to_integral_value():
                 raise ValueError('V75_MARKET_INVALID_OHLCV')
-        calculation=pool['calculations'][symbol+'.PRED-008']
+        calculation=pool['price_history_checks'][symbol]
         import exchange_calendars as xc
         at=time(evaluation_at);day=calculation['observed_date']
         cal=xc.get_calendar('XNYS',start=day,end=at.date()+timedelta(days=7))

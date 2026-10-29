@@ -150,8 +150,19 @@ def extend(pool,data,proofs):
         key='YAHOO_'+symbol
         if key not in data:continue
         metrics,proof=cash_yield_history(data[key],symbol,proofs[key]['available_at'])
-        pool['asset_metrics'].setdefault(symbol,{})['PRED-008']=metrics
-        pool['calculations'][symbol+'.PRED-008']=proof
+        # The original parameter table permits portfolio YTM / SEC yield,
+        # not cash distributions / Close, for PRED-008. Keep the completed
+        # price proof and useful income observation without granting a
+        # native yield-attractiveness input.
+        pool.setdefault('income_observations',{})[symbol]={
+            'cash_yield_percentile_pct':metrics['yield_percentile_pct'],
+            'history_years':metrics['history_years'],'calculation':proof,
+            'canonical_predicate_input':False}
+        pool.setdefault('price_history_checks',{})[symbol]=proof
+        pool['asset_metrics'].setdefault(symbol,{})['PRED-008']={}
+        pool.setdefault('asset_unprovided_inputs',{}).setdefault(symbol,{})['PRED-008']=[
+            'official portfolio YTM (preferred) / 30-Day SEC Yield (fallback)',
+            'same-definition trailing 5-year weekly yield observations (>=3 years only for SHORT_HISTORY)']
     # UNKNOWN is the frozen component state, not an all-clear default. The
     # original evaluator emits ETF_QUALITY_UNKNOWN, which retains PAUSE.
     if any(key.startswith('YAHOO_') for key in data):

@@ -98,7 +98,9 @@ def test_native_quality_unknown_is_explicit_and_one_liquidity_signal_stays_insuf
     pool=M.extend({'shared_metrics':{},'asset_metrics':{},'calculations':{},'unprovided_inputs':{}},data,proofs)
     at=M.time('2026-10-29T02:00:00Z')
     assert pred007(pool['shared_metrics']['PRED-007'],at,['SYNTHETIC']).assessment_status.value=='INSUFFICIENT_DATA'
-    assert pred008(pool['asset_metrics']['SGOV']['PRED-008'],at,['SYNTHETIC']).assessment_status.value=='VALID'
+    assert pred008(pool['asset_metrics']['SGOV']['PRED-008'],at,['SYNTHETIC']).assessment_status.value=='INSUFFICIENT_DATA'
+    assert pool['income_observations']['SGOV']['cash_yield_percentile_pct']=='100'
+    assert not pool['income_observations']['SGOV']['canonical_predicate_input']
     quality=pred010(pool['shared_metrics']['PRED-010'],at,['SYNTHETIC']).model_dump(mode='json')
     assert quality['assessment_status']=='VALID' and quality['sub_states']==['ETF_QUALITY_UNKNOWN']
     assert pool['unprovided_inputs']['PRED-010']

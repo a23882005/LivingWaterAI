@@ -12,6 +12,7 @@ VERSION='V75_PREDICATE_PARAMS_v1.0.3'
 PARAMETER_SHA256='9aea7bca82fa0f9b3835136a87afcdb08682b226ed4162213e083186beb5f54e'
 WORK6_SHA256='5d8eed1638a76f63b9bff9ed822f5f53e09a0b481cb236c7ae4ba3b1c60f8b3c'
 WORK1_SHA256='ac23e11197f167be00c5e4c303462373eeced67f353ba26d26bfb4c739b50a71'
+BASE_RULE_SHA256='98f5115ebc7fc16272f135d25eaa12f3790ff32dbad76f5eab72aec409715458'
 
 
 def treasury_reference(effective_duration_years):
@@ -36,7 +37,7 @@ def read(source,evaluation_at):
     if (source.get('outer_sha256')!=WORK6_SHA256 or source.get('inner_sha256')!=WORK1_SHA256
         or source.get('outer_crc_passed') is not True or source.get('inner_crc_passed') is not True):
         raise PermissionError('V75_FORMAL_PARAMETER_CHECKPOINT_PROVENANCE')
-    return {'parameter_version':VERSION,'parameter_sha256':PARAMETER_SHA256,
+    result={'parameter_version':VERSION,'parameter_sha256':PARAMETER_SHA256,
         'work6_sha256':WORK6_SHA256,'work1_sha256':WORK1_SHA256,
         'available_at':source['source_available_at'],'threshold_owner':'ORIGINAL_V75_WORK1',
         'runtime_evaluator':'UNCHANGED_V75_RUNTIME_EVALUATORS',
@@ -46,3 +47,11 @@ def read(source,evaluation_at):
         'minimum_since_inception_years':3,
         'sgov_treasury_branch_reference':'1 Yr',
         'ttm_cash_yield_is_canonical_yield':False}
+    base=source.get('base_rule_source')
+    if base is not None:
+        if (base.get('source_sha256')!=BASE_RULE_SHA256 or
+            sha256(Path(base['local_source_path']).read_bytes()).hexdigest()!=BASE_RULE_SHA256
+            or not base.get('source_reference') or time(base['source_available_at'])>time(evaluation_at)):
+            raise PermissionError('V75_FORMAL_BASE_RULE_SOURCE')
+        result['base_rule_source']={k:base[k] for k in ('source_sha256','source_reference','source_available_at')}
+    return result

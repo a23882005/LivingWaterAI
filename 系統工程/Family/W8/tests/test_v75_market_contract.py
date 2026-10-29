@@ -60,7 +60,8 @@ def test_full_source_replay_qualifies_only_completed_bond_prices(tmp_path):
     out=M.apply(raw,pool,evaluation_at=at,repo_root=ROOT,macro=macro());row=out['assets'][0]
     assert row['qualified_bond_market']['contract_id']==123 and row['qualified_bond_market']['eligible']
     assert row['formal_identity_verified'] and not row['formal_deployment_eligible']
-    assert row['v75_original_predicates']['PRED-009']['deployment_input_eligible']
+    assert not row['v75_original_predicates']['PRED-009']['deployment_input_eligible']
+    assert row['v75_original_predicates']['PRED-009']['raw_price_freshness_verified']
     assert not row['v75_original_predicates']['PRED-008']['input_freshness_verified']
     assert row['v75_original_predicates']['PRED-008']['original_result']['assessment_status']=='INSUFFICIENT_DATA'
     assert pool['income_observations']['SGOV']['calculation']['latest_ttm_cash_per_share']

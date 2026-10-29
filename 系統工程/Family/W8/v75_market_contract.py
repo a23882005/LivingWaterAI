@@ -94,8 +94,19 @@ def updates(row,pool,*,repo_root,evaluation_at,macro):
     result=evaluate_observed_history(rows,repo_root=repo_root,evaluation_at=evaluation_at,
         macro=macro,asset_id=row['symbol'],is_etf=True)
     technical=result['v75_original_predicates']['PRED-009']
-    technical.update(input_freshness_verified=contract['eligible'],
-        deployment_input_eligible=contract['eligible'] and technical['original_result']['assessment_status']=='VALID',
+    complete=False
+    if pool.get('formal_parameters'):
+        from v75_technical_inputs import produce
+        from v75_runtime.predicates import EVALUATORS
+        named=produce(rows,pool['formal_parameters']);complete=named['complete_named_inputs']
+        original=EVALUATORS['PRED-009'](named['metrics'],time(evaluation_at),
+            [contract['source_reference'],contract['source_sha256'],named['parameter_sha256']])
+        technical.update(metrics=named['metrics'],original_result=original.model_dump(mode='json'),
+            named_input_source=named,unprovided_inputs=named['unprovided_inputs'],
+            input_coverage='COMPLETE_V75_NAMED_INPUTS' if complete else 'PARTIAL_V75_NAMED_INPUTS')
+    technical.update(input_freshness_verified=contract['eligible'] and complete,
+        raw_price_freshness_verified=contract['eligible'],
+        deployment_input_eligible=contract['eligible'] and complete and technical['original_result']['assessment_status']=='VALID',
         market_contract_digest=contract['digest'])
     return {**result,'qualified_bond_market':deepcopy(contract),'observed_date':contract['observed_date'],
         'observed_close':float(Decimal(contract['close'])),'rows':len(rows),

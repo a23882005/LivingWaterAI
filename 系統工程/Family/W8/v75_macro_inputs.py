@@ -48,11 +48,15 @@ def number(value):
 
 
 def weekdays(end,count):
+    # The parameter table says US business days. A missing ordinary
+    # business-day quote remains an error; federal holidays are excluded
+    # by the declared calendar, never by skipping missing observations.
+    import pandas as pd
+    from pandas.tseries.holiday import USFederalHolidayCalendar
+    offset=pd.offsets.CustomBusinessDay(calendar=USFederalHolidayCalendar())
     days=[end]
     while len(days)<=count:
-        prior=days[-1]-timedelta(days=1)
-        while prior.weekday()>4:prior-=timedelta(days=1)
-        days.append(prior)
+        days.append((pd.Timestamp(days[-1])-offset).date())
     return days
 
 
@@ -185,18 +189,34 @@ def read(source,evaluation_at):
         out['source_proofs']['ISSUER_'+symbol]={k:issuer[k] for k in
             ('source_reference','source_sha256','receipt_sha256','available_at')}
         out['available_at']=max(out['available_at'],issuer['available_at'],key=_time)
+    from v75_official_release_inputs import read as read_releases
+    releases=read_releases(manifest.get('official_release_sources'),evaluation_at)
+    if releases and parameters is None:raise PermissionError('V75_RELEASE_FORMAL_PARAMETER_BINDING_REQUIRED')
+    if releases:
+        out['official_release_observations']=releases
+        for key,record in releases.items():
+            out['source_proofs']['RELEASE_'+key]={k:record[k] for k in
+                ('source_reference','source_sha256','receipt_sha256','available_at')}
+            out['available_at']=max(out['available_at'],record['available_at'],key=_time)
     series={key:fred(value,key,_time(proofs[key]['available_at'])) for key,value in data.items()
         if key not in ('SEP','TREASURY','FUTURES','NYFED_REPO','YAHOO_SGOV','YAHOO_SPSB')}
     effr=series['EFFR'];last=max(day for day,value in effr.items() if value is not None)
     start=last.replace(year=last.year-10)
     sample=[value for day,value in effr.items() if start<=day<=last and value is not None]
     if min(effr)>start or len(sample)<2000:raise ValueError('V75_MACRO_EFFR_TEN_YEAR_COVERAGE')
+    import pandas as pd
+    from pandas.tseries.holiday import USFederalHolidayCalendar
+    expected={d.date() for d in pd.date_range(start,last,freq=pd.offsets.CustomBusinessDay(calendar=USFederalHolidayCalendar()))}
+    covered=sum(effr.get(d) is not None for d in expected)
+    if covered*100<len(expected)*80:raise ValueError('V75_MACRO_EFFR_EIGHTY_PERCENT_COVERAGE')
     median,basis=sep(data['SEP']);pce_yoy,yoy_basis=monthly(series['PCEPILFE'],12)
     out['shared_metrics']['PRED-001']={'effr_pct':str(effr[last]),
         'effr_10y_percentile_pct':str(Decimal(sum(value<=effr[last] for value in sample))*100/len(sample)),
         'sep_long_run_median_pct':median,'core_pce_yoy_pct':pce_yoy}
     out['calculations']['PRED-001']={'effr_observed_date':last.isoformat(),
         'percentile_window_start':start.isoformat(),'sample_count':len(sample),
+        'required_us_business_observations':len(expected),'valid_required_observations':covered,
+        'coverage_minimum_percent':80,'comparison_calendar':'US_FEDERAL_BUSINESS_DAYS',
         'percentile_method':'EMPIRICAL_CDF_WEAK_RANK__COUNT_LE_CURRENT_DIV_VALID_OBSERVATIONS',
         'SEP':basis,'core_pce_yoy':yoy_basis}
     delta,basis=futures(data['FUTURES'],at,_time(proofs['FUTURES']['available_at']))
@@ -211,13 +231,26 @@ def read(source,evaluation_at):
             'comparison_5bd':days[5].isoformat(),'comparison_20bd':days[20].isoformat(),'unit_conversion':'PERCENT_TO_BPS_X100'}
     out['shared_metrics']['PRED-004']=credit;out['calculations']['PRED-004']=credit_basis
     inflation={};inflation_basis={}
-    for label,key in [('core_pce','PCEPILFE'),('core_cpi','CPILFESL')]:
+    for label,key in [('core_pce','PCEPILFE'),('core_cpi','CPILFESL'),('core_ppi','WPSFD49116')]:
+        if key not in series:continue
         for n in (3,6):
             value,basis=monthly(series[key],n);inflation[f'{label}_ann{n}_pct']=value
             inflation_basis[f'{label}_ann{n}_pct']=basis
+    if 'T5YIE' in series:
+        values=series['T5YIE'];days=window(values,20)
+        inflation['breakeven_5y_pct']=str(values[days[0]])
+        inflation['breakeven_5y_delta_20bd_bps']=str((values[days[0]]-values[days[20]])*100)
+        inflation_basis['breakeven']={'series':'T5YIE','observed_date':str(days[0]),'comparison_date':str(days[20]),
+            'formula':'(current_percent - prior_percent) *100 bps','comparison_calendar':'US_FEDERAL_BUSINESS_DAYS'}
+    if 'DCOILWTICO' in series:
+        values=series['DCOILWTICO'];days=window(values,20)
+        if min(values[d] for d in days)<=0:raise ValueError('V75_MACRO_POSITIVE_OIL_PRICE_REQUIRED')
+        inflation['oil_price_change_20bd_pct']=str((values[days[0]]/values[days[20]]-1)*100)
+        inflation_basis['oil']={'series':'DCOILWTICO','observed_date':str(days[0]),'comparison_date':str(days[20]),
+            'formula':'(current_price / prior_price -1) *100 percent','comparison_calendar':'US_FEDERAL_BUSINESS_DAYS'}
     out['shared_metrics']['PRED-006']=inflation;out['calculations']['PRED-006']=inflation_basis
-    out['unprovided_inputs']['PRED-006']=['core_ppi_ann3_pct','core_ppi_ann6_pct',
-        'breakeven_5y_delta_20bd_bps','breakeven_5y_pct','oil_price_change_20bd_pct']
+    out['unprovided_inputs']['PRED-006']=[k for k in ('core_ppi_ann3_pct','core_ppi_ann6_pct',
+        'breakeven_5y_delta_20bd_bps','breakeven_5y_pct','oil_price_change_20bd_pct') if k not in inflation]
     rows=list(csv.DictReader(io.StringIO(data['TREASURY'].decode('utf-8-sig'))))
     # PRED-003's duration <=1y branch uses 1Y, including SGOV. 3M may
     # describe its holdings but is never the canonical branch reference.
@@ -264,7 +297,11 @@ def read(source,evaluation_at):
     from v75_market_contract import qualify
     out=qualify(out,data,proofs,manifest,evaluation_at)
     from v75_etf_quality_inputs import extend as extend_quality
-    return extend_quality(out,data,issuers,evaluation_at)
+    out=extend_quality(out,data,issuers,evaluation_at)
+    from v75_official_release_inputs import qualify as qualify_releases
+    out=qualify_releases(out,evaluation_at)
+    from v75_sofr_horizon_inputs import extend as extend_sofr
+    return extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):

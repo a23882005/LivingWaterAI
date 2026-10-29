@@ -73,7 +73,7 @@ def read(source,evaluation_at):
     with localcontext() as ctx:
         ctx.prec=40
         change=(current/previous-1)*100
-    return {'schema_version':'Family.W8.V75MarketSupplement.v1','predicate_id':'PRED-005',
+    supplement={'schema_version':'Family.W8.V75MarketSupplement.v1','predicate_id':'PRED-005',
         'metrics':{'move':str(current),'move_pct_change_5bd':str(change)},
         'observed_date':last.isoformat(),'comparison_date':expected[-1].isoformat(),
         'comparison_close':str(previous),'observed_sessions':[d.isoformat() for d in reversed(expected)],
@@ -81,6 +81,15 @@ def read(source,evaluation_at):
         'receipt_sha256':source['receipt_sha256'],'available_at':receipt['available_at'],
         'provider':'YAHOO_FINANCE_DAILY_INDEX_CHART','exchange_close_attested':False,
         'scope':'DATED_PROVIDER_OBSERVATIONS__NOT_CANONICAL_FRESHNESS_ATTESTATION'}
+    from formal_v75_parameters import read as read_parameters
+    parameters=read_parameters(source.get('formal_parameter_source'),evaluation_at)
+    if parameters:
+        from v75_etf_quality_inputs import daily_freshness
+        check=daily_freshness(last.isoformat(),evaluation_at)
+        supplement.update(formal_parameters=parameters,canonical_daily_freshness=check,
+            input_freshness_verified=check['state']=='FRESH',
+            scope='FORMAL_WORK1_DAILY_FRESHNESS__VERIFIED_PROVIDER_INDEX_SERIES')
+    return supplement
 
 
 def apply(observations,supplement,*,evaluation_at,repo_root):
@@ -97,9 +106,10 @@ def apply(observations,supplement,*,evaluation_at,repo_root):
         previous=deepcopy(predicates['PRED-005'])
         result=EVALUATORS['PRED-005'](supplement['metrics'],_time(evaluation_at),
             [supplement['source_reference'],supplement['source_sha256']])
+        fresh=supplement.get('input_freshness_verified') is True
         predicates['PRED-005']={'metrics':deepcopy(supplement['metrics']),
             'original_result':result.model_dump(mode='json'),'input_coverage':'COMPLETE_RAW_METRICS',
-            'input_freshness_verified':False,'deployment_input_eligible':False,
+            'input_freshness_verified':fresh,'deployment_input_eligible':fresh and result.assessment_status.value=='VALID',
             'original_default_freshness_is_not_attestation':True,
             'original_result_as_of_basis':'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE',
             'supplement_source':deepcopy(supplement),'previous_macro_observation':previous}

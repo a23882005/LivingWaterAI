@@ -153,6 +153,26 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         bond_source=facts.get('native_bond_source')
         if bond_source:
             text.append('原Work5／V75來源檢查：'+bond_source['status']+'；SGOV實體持股與債券桶／子彈桶分開，尚未產生完整債券部署建議。')
+            symbol=facts.get('symbol',item['asset_id'])
+            quality=bond_source.get('etf_quality_assessments',{}).get(symbol)
+            if quality:
+                states=quality['metrics'];labels={'UNKNOWN':'資料未齊','REVIEW_REQUIRED':'需複查',
+                    'STRUCTURE_OK':'通過','STRUCTURE_ABNORMAL':'異常','LIQUIDITY_OK':'通過','LIQUIDITY_ABNORMAL':'異常',
+                    'DISTRIBUTION_OK':'通過','DISTRIBUTION_ABNORMAL':'異常','NOT_APPLICABLE':'不適用'}
+                text.append('V75 ETF品質：結構 '+labels[states['structure_state']]+'；流動性 '+
+                    labels[states['liquidity_state_etf']]+'；配息品質 '+labels[states['distribution_quality_state']]+'。')
+                missing_labels={'liquidation_or_termination_announced':'清算／終止公告的完整來源核對',
+                    'unapproved_material_methodology_change':'重大方法變更與核准紀錄核對',
+                    'median_20d_bid_ask_spread_pct':'20交易日買賣價差中位數',
+                    'trailing_12m_roc_pct_with_complete_issuer_breakdown':'近12月配息來源與ROC分解'}
+                missing=[missing_labels[k] for k in quality['unprovided_inputs'] if k in missing_labels]
+                if missing:text.append('品質來源待補：'+'、'.join(missing)+'。')
+            technical=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-009',{})
+            state=technical.get('original_result',{}).get('aggregate_state')
+            if technical.get('deployment_input_eligible') and state:
+                label={'TRIM_WATCH':'技術減碼觀察','RIGHT_CONFIRM':'右側確認',
+                    'LEFT_MATURE':'左側成熟','TECHNICAL_NEUTRAL':'技術中性'}[state]
+                text.append('V75原生技術分類：'+label+'；須與完整安全條件及既有部位政策共同判斷。')
             audit=bond_source.get('policy_audit') or {}
             if audit.get('owner_role_policy')=='EXPLICIT_IBKR_STOCK_OPPORTUNITY_RESERVE':
                 text.append('既有本人紀錄明訂IBKR SGOV為股票買點彈藥；歷史金額與長期目標均未套用為本輪角色餘額，可用現金仍須另核。')

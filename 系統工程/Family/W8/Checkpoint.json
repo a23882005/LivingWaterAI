@@ -1697,5 +1697,15 @@
     "maintenance_owner": "Family中PM",
     "approved_edition": "粉紅封面3秒翻頁版",
     "scope": "Documentation archive; engineering acceptance unchanged"
+  },
+  "v82_plain_script_archive_20261030": {
+    "type": "OWNER_PROVIDED_TEACHING_SCRIPT",
+    "file": "系統工程/Family/文件歸檔/V82三層量化規則白話逐字稿/V82_三層量化規則_白話逐字稿.docx",
+    "drive_file_id": "19WgHGCXAy2ksRdc_z0PTh_zmVza6VjjK",
+    "sha256": "a7b442a6a81f93bfd7f7e931acfe5d3dfaa251f507b33dde62899147edd321ec",
+    "size_bytes": 45692,
+    "git_blob": "a215b0364f5eccb442007278ca628c44edb553e4",
+    "owner": "Family中PM",
+    "scope": "原文保存、跨端歸檔與治理；正式規則及工程驗收沿用既有紀錄"
   }
 }

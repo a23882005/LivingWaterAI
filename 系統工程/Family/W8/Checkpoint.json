@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-29T06:50:58+08:00",
+  "updated_at": "2026-10-29T08:03:13+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1616,31 +1616,31 @@
     ],
     "packages": [
       {
-        "name": "Family_W8_20261029_065058_ZIP1_中PM總PM職責與最高架構.zip",
-        "bytes": 86192,
-        "sha256": "3d24b4b3bf340f742c2ed9e6bd074372428b4ac546584ce02f562189e1d07f93",
-        "payload_files": 6
+        "name": "Family_W8_20261029_080313_ZIP1_中PM總PM職責與最高架構_複核修訂版.zip",
+        "bytes": 89667,
+        "sha256": "8ad3ba8aff3c964690662e8ac59cd2231961f098d6492ca47857d80364d5aead",
+        "payload_files": 7
       },
       {
-        "name": "Family_W8_20261029_065058_ZIP2_已完成工程與正式來源證據.zip",
-        "bytes": 751711,
-        "sha256": "c8d4af64b5cb189e4b7716c3abf6793488f323f87ca4752b8ebc46cd72316641",
-        "payload_files": 15
+        "name": "Family_W8_20261029_080313_ZIP2_已完成工程與正式來源證據_複核修訂版.zip",
+        "bytes": 817663,
+        "sha256": "0f9f1d4570609c8db038249b49da229274e4e3bbc5d1d0d3e13456d4ac9fca18",
+        "payload_files": 23
       },
       {
-        "name": "Family_W8_20261029_065058_ZIP3_剩餘工序與四戶Gate驗收.zip",
-        "bytes": 7115,
-        "sha256": "9a84b67927a76c24ecf503f6e1c67a652602a19088c48097d43da5935e3abcf3",
-        "payload_files": 6
+        "name": "Family_W8_20261029_080313_ZIP3_剩餘工序與四戶Gate驗收_複核修訂版.zip",
+        "bytes": 8901,
+        "sha256": "315225d8e7eb4c576e8c75549f08e36d03415fe43c5e14df5f67e86070079667",
+        "payload_files": 7
       }
     ],
-    "remote_validation": "3/3_EXACT_BYTES_SHA256_CRC__27_PAYLOAD_SIZE_SHA256_PASS",
+    "remote_validation": "3/3_EXACT_BYTES_SHA256_CRC__37_PAYLOAD_SIZE_SHA256_PASS",
     "uat_rows": 56,
-    "latest_pr59_head": "e11cbf7834806a8291b114cd5cb9ae3913c96ecc",
+    "latest_pr59_head": "0334f9ae82f42b6a3786f7e1e2dd31cf1f52b0c3",
     "pr59_status": "OPEN_DRAFT_UNMERGED",
-    "latest_pr_head_ci_observation": "No PR-triggered workflow runs returned; newer-head customer E2E not independently accepted",
+    "latest_pr_head_ci_observation": "Latest head observed 0334f9a; old e11 CI snapshot is historical; this handoff review did not rerun engineering CI",
     "latest_status_overrides_older_focus_snapshot": true,
-    "latest_engineering": "Partial original Core/product-specific routes/Loop2 cash advice exist; complete per-asset Loop2 targets, remaining source mappings and full native FamilyRunner/Work9/Mentor customer acceptance remain pending",
+    "latest_engineering": "PR59 remains open/draft/unmerged; official W1 confirmed-target reader and approval-lineage/account/instrument binding advanced; full native deployment and customer FamilyRunner/Work9/Mentor acceptance pending",
     "approved_v82_v1": "APPROVED_FOR_IMPLEMENTATION_ON_20261028; explicit revisions override old candidate labels",
     "mou_database": "Original fixed-ID DB updated and verified 20261029, 17 confirmed targets; see mou_same_id_writeback_20261029",
     "execution_mode": "ChatGPT on demand; GitHub code; Drive independent DB/report; no Hostinger/Render persistent host",
@@ -1654,6 +1654,14 @@
       "Gate D / four Projects rollout / trial fixes / Gate E / closeout"
     ],
     "private_links": "Drive engineering/file management/Master WBS",
-    "index": "系統工程/Family/W8/20261029_中PM總PM三ZIP正式交接索引.md"
+    "index": "系統工程/Family/W8/20261029_中PM總PM三ZIP正式交接索引.md",
+    "rechecked_at": "2026-10-29T08:03:13+08:00",
+    "review_corrections": [
+      "Explicit Total PM scope, authority, hands-on execution and honest reviewer identity",
+      "Five governance records: contents, file identities, backup/writeback/readback/recovery/sync",
+      "Full repo paths with Family parent directory; eight Project file pointers and four report folders",
+      "Fresh PR head and commit snapshot; official W1 target updates and dependency changes disclosed",
+      "Gate D then PROD/four Projects rollout then TRIAL then Gate E and final closeout; 56-row menu blob checked"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-29T02:06:36.481682Z",
+  "asOf": "2026-10-29T02:08:01.901833Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -1004,10 +1004,10 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-29T10:06:36+08:00",
+  "dataUpdatedAt": "2026-10-29T10:08:01+08:00",
   "sourceSnapshot": {
     "macro18": "2fdfed3ba22fa34e5385d82790d53b7ee665badc",
-    "macro8": "33b2cd726853b2b2df6bcf0e2cbe09a31b7d53b3",
+    "macro8": "6a1dbf9673bbc814c762aa0244b387474a935497",
     "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
     "macro18GeneratedAt": "2026-10-29T09:54:20.457231+08:00",

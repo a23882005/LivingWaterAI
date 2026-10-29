@@ -72,10 +72,16 @@ def build(producer,request,context,analysis,prepared,holdings,trial,observations
     sources=extend(producer.root,request,analysis,prepared,sources)
     from deployment_evidence_sources import extend as produce_evidence
     sources=produce_evidence(producer.root,request,analysis,prepared,sources,trusted_context=context)
+    from deployment_c7_sources import extend as produce_configuration
+    sources=produce_configuration(producer.root,request,analysis,prepared,context,sources)
     from on_demand_analysis import assemble_native_input,NativeSourceAssemblyError
     try:assemble_native_input(request,context,sources)
     except NativeSourceAssemblyError as error:missing=list(error.missing)
-    else:raise PermissionError('PARTIAL_COMPONENT_SOURCES_MUST_NOT_DISPATCH')
+    else:
+        # A complete source package enters the real FamilyRunner. Its original
+        # C7 and native contracts still decide whether computation may proceed.
+        # No source failure wrapper or fabricated readiness result is returned.
+        return {'dispatch_native_sources':sources}
     from deployment_readiness import c7_bucket_preflight,completion_gaps
     try:preflight=c7_bucket_preflight(producer.root,request,analysis,context)
     except (ValueError,KeyError,TypeError) as error:

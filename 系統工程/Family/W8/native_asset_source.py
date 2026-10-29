@@ -457,6 +457,13 @@ class AssetSourceProducer:
         stitched=reuse_deployment_components(self,req,ctx,analysis,prepared,holdings,trial,
             observations,investment,asset_class,held)
         if stitched is not None:
+            if 'dispatch_native_sources' in stitched:
+                sources=stitched['dispatch_native_sources']
+                return {'request':req,'trusted_context':ctx,'native_sources':sources,
+                    'source_metadata':{'client_id':req['client_id'],'run_id':run,
+                        'source_db_sha256':snapshot['source_sha256'],
+                        'market_data_provenance':'SOURCE_BACKED','market_verification':True,
+                        'market_as_of':req['macro_snapshot']['payload']['asOf']}}
             return {'request':req,'trusted_context':ctx,'source_production':stitched,
                 'source_metadata':{'client_id':req['client_id'],'run_id':run,
                     'source_db_sha256':snapshot['source_sha256']}}

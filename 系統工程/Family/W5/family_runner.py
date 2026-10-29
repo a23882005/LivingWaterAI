@@ -62,6 +62,9 @@ class FamilyRunner:
             proof=w3['final_target']['confirmation_proof']
             require(all(proof.get(k)==evidence.get(k) for k in ('confirmed_at','confirmed_by')),
                     'NATIVE_CONFIRMATION_PROOF_MISMATCH',branch)
+        # Protection and target/drift consumers require a ready C7 framework.
+        # Report the original C7 refusal before accessing absent target rows.
+        prepared.payload['c7_computation']=bind_c7_source(self.repo_path,request,ctx)
         require(bundle['stock_evidence']['evaluated_at']==request['evaluation_at'],'NATIVE_EVALUATION_TIME_MISMATCH','stock_evidence.evaluated_at')
         prepared.payload['technical_intake']=bind_technical_source(self.repo_path,request,ctx) if ctx.get('technical_source') is not None else None
         prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
@@ -74,7 +77,7 @@ class FamilyRunner:
         prepared.payload['family_sources']['target']=bind_target_source(request,projection=native_targets)
         prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding,projection=native_targets)
         prepared.payload['family_sources']['v70']=bind_v70_source(request,ctx)
-        prepared.payload['family_sources']['c7']=bind_c7_source(self.repo_path,request,ctx)
+        prepared.payload['family_sources']['c7']=prepared.payload['c7_computation']
         if ctx.get('technical_source') is None:bind_technical_source(self.repo_path,request,ctx)
         return prepared,ctx
 

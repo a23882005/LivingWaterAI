@@ -38,6 +38,14 @@ def run_c7_engine(repo_path, source):
     module = load_original_configuration_module(root, 'work7.asset_framework')
     schemas = base / 'contracts_c7'
     data = deepcopy(source)
+    if data.get('work6_source') is not None:
+        from configuration_source import run_work6_engine
+        replay = run_work6_engine(root, data['work6_source'])
+        require(data['work6_source']['canonical_input'] == data['canonical_input']
+                and data['work6_source']['evaluated_at'] == data['evaluated_at'],
+                'C7_WORK6_SOURCE_IDENTITY_MISMATCH', 'c7_source.work6_source')
+        require(replay['result'] == data['work6_result'],
+                'C7_WORK6_REPLAY_MISMATCH', 'c7_source.work6_result')
     result = module.run_asset_framework_integration(
         data['canonical_input'], work6_result=data['work6_result'],
         funding_context=data['funding_context'], evaluated_at=data['evaluated_at'],
@@ -65,9 +73,17 @@ def bind_c7_source(repo_path, request, context):
     require(identity['client_id'] == request['client_id'] and identity['run_id'] == request['run_id'],
             'C7_SOURCE_IDENTITY_MISMATCH', 'canonical_input.identity')
     require(source['evaluated_at'] == request['evaluation_at'], 'C7_EVALUATION_MISMATCH', 'c7_source.evaluated_at')
+    if context['native_binding']['data_provenance'] == 'SOURCE_BACKED':
+        require(isinstance(source.get('work6_source'), dict), 'C7_WORK6_SOURCE_REQUIRED',
+                'c7_source.work6_source', status='DATA_UNAVAILABLE')
     computed = run_c7_engine(repo_path, source)
     result = computed['result']
-    require(result['status'] == 'READY_FOR_PM_GATE', 'C7_FRAMEWORK_NOT_READY', 'c7.status', status='DATA_UNAVAILABLE')
+    if result['status'] != 'READY_FOR_PM_GATE':
+        from family_boundary import BoundaryError
+        error = BoundaryError('C7_FRAMEWORK_NOT_READY', 'c7.status', status='DATA_UNAVAILABLE')
+        error.issue.update(native_status=result['status'], native_issues=deepcopy(result['issues']),
+                           work6_status=source['work6_result']['loop_status'])
+        raise error
     require(digest(result) == digest(request['native_bundle']['asset_framework']),
             'C7_COMPUTED_FRAMEWORK_MISMATCH', 'native_bundle.asset_framework')
     return computed

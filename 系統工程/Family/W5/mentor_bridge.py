@@ -160,7 +160,13 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                 text.append('既有正式紀錄要求SGOV防守核心與機動子彈分帳；尚未以歷史比例拆分本輪持倉，防守部位不作股票買進資金。')
             compatibility=bond_source.get('target_compatibility',{})
             if compatibility.get('status')=='APPROVED_TARGET_RULE_INCOMPATIBILITY':
-                text.append('核准債券目標已完整映射，但與V75固定核心比例不相容；保留核准配置，未新增SPSB目標或改寫規則。個案限制須有明確理由與核准，現行原生Runtime尚無例外輸入口。')
+                text.append('核准債券目標與V75通用長期配置地圖有差異；核准配置保留，V75可另提債券建議供參考，不推定本人禁止SPSB或公司債，也不要求補寫例外原因。')
+            comparison=bond_source.get('advisory_comparison')
+            if comparison:
+                for line in comparison['lines']:
+                    text.append(f"V75長期比較 {line['asset_id']}：原核准金額 {line['currency']} {line['approved_target_amount'] if line['approved_target_present'] else '未列'}；通用地圖建議 {line['proposed_long_term_amount']}，差額 {line['difference_amount']}。"+
+                        ('超短公債提供低利率敏感度防守。' if line['asset_id']=='SGOV' else '短期投資級公司債補強收息，同時承擔信用風險。'))
+                text.append('以上是長期配置比較，未改變核准目標；今天是否適合部署仍依V75來源、資格與部署條件判斷，不是立即買進或賣出指示。')
             fields=list(dict.fromkeys(i['field_path'] for i in bond_source['issues']))
             if fields:text.append('V75仍缺：'+'、'.join(fields)+'。')
         if native_funding.get('status')=='CASH_TRIAL_ADVICE_COMPUTED':

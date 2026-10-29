@@ -130,9 +130,28 @@ def build(report,request):
         intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
     markdown='\n\n'.join(intro)+'\n\n| '+' | '.join(headings)+' |\n| '+' | '.join(['---']*len(headings))+' |\n'
     markdown+='\n'.join('| '+' | '.join(str(v).replace('|','／').replace('\n',' ') for v in row)+' |' for row in cells)
+    comparison=report.get('native_bond_source',{}).get('advisory_comparison')
+    comparison_text=[]
+    if comparison:
+        comparison_text.append('債券配置比較：現行核准配置保留。下列是V75通用長期地圖的建議差異，並非今日買賣金額。')
+        for line in comparison['lines']:
+            old=money(line['approved_target_amount'],line['currency']) if line['approved_target_present'] else '原核准配置未列'
+            why=('超短公債降低利率敏感度、提供防守核心' if line['asset_id']=='SGOV' else
+                '短期投資級公司債補強收息，同時承擔信用風險')
+            comparison_text.append(line['asset_id']+'：'+old+'；V75長期比較 '+
+                money(line['proposed_long_term_amount'],line['currency'])+'（組合占比 '+
+                percent(line['proposed_portfolio_weight'])+'），差額 '+money(line['difference_amount'],line['currency'])+'；'+why+'。')
+        comparison_text.append('未推定本人禁止SPSB或公司債，也未新增例外理由；今天能否部署仍取決於原生資格、行情、角色與資金證據。')
+        for candidate in comparison.get('candidate_assessments',[]):
+            eligible=candidate['native_eligibility']['new_long_term_target_allowed']
+            status='可列入評估，今日部署仍待證據' if eligible is True else 'V75規則不建立新配置' if eligible is False else '資格未定'
+            comparison_text.append(candidate['asset_id']+'：'+status+'；行情日期 '+
+                str(candidate.get('market_date') or '未取得')+'。')
+        markdown+='\n\n'+'\n\n'.join(comparison_text)
     markdown+='\n\n'+ '\n\n'.join('### '+r['symbol']+'｜'+str(r['market_date'] or '行情日期未定')+'\n\n'+r['mentor_explanation'] for r in rows)
     body=''.join('<p>'+escape(x)+'</p>' for x in intro)+'<table><thead><tr>'+''.join('<th>'+escape(h)+'</th>' for h in headings)+'</tr></thead><tbody>'
     body+=''.join('<tr>'+''.join('<td>'+escape(str(v))+'</td>' for v in row)+'</tr>' for row in cells)+'</tbody></table>'
+    body+=''.join('<p>'+escape(x)+'</p>' for x in comparison_text)
     body+=''.join('<details><summary>'+escape(r['symbol'])+'｜Mentor與來源日期 '+escape(r['market_date'] or '未定')+'</summary><pre>'+escape(r['mentor_explanation'])+'</pre></details>' for r in rows)
     html='<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第04項持股建議</title><style>body{font:16px system-ui;margin:24px;color:#182333}table{border-collapse:collapse;width:100%}td,th{padding:12px;border:1px solid #ccd4df;text-align:left;vertical-align:top}th{background:#edf3fa}pre{white-space:pre-wrap}details{margin-top:16px}tr:nth-child(even){background:#f7f9fc}</style>'+body+'</html>'
     out={'schema_version':'Family.W8.RecommendationReport.v1','status':'REPORT_COMPLETE_WITH_LIMITATIONS',
@@ -140,6 +159,7 @@ def build(report,request):
         'client_id':request['client_id'],'run_id':request['run_id'],'positions_returned':len(rows),
         'net_after_orders_status':'OWNER_CONFIRMED_NO_OPEN_ORDERS' if all_orders_confirmed else 'PENDING_OWNER_ORDER_CONFIRMATION',
         'analysis_status':report['status'],'full_native_deployment_complete':False,
-        'rows':rows,'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
+        'rows':rows,'bond_advisory_comparison':deepcopy(comparison),
+        'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
     out['digest']=digest(out)
     return out

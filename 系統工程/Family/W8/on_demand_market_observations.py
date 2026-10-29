@@ -236,7 +236,7 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
                                      official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
                                      approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False,
-                                     approved_target=None):
+                                     approved_target=None,bond_advisory_candidates=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -279,6 +279,15 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'approved_target_reference':{'target_hash':approved_target.get('target_hash'),
                     'target_instrument_id':line['instrument_id']}})
             seen.add(symbol)
+    if bond_advisory_candidates:
+        from bond_advisory import candidates
+        if not set(bond_advisory_candidates).issubset(candidates(repo_root)):
+            raise PermissionError('OBSERVATION_BOND_ADVISORY_UNIVERSE_MISMATCH')
+        seen={r.get('ticker') for r in instruments}
+        for symbol in sorted(set(bond_advisory_candidates)-seen):
+            instruments.append({'instrument_key':'BOND_ADVISORY:'+symbol,'ticker':symbol,
+                'identity_state':'SOURCE_SYMBOL_ONLY',
+                'advisory_candidate_scope':'BOND_RECOMMENDATIONS_ONLY'})
     assets, missing = [], []
     base = Path(repo_root).resolve() / 'data/market_history/global'
     manifest_path = base / 'manifest.json'
@@ -434,6 +443,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'provider_verified_at': entry['last_verified_utc'],
                 'cache_validation': 'MANIFEST_DATE_ORDER_SHA256_CLOSE_VERIFIED__OHLC_INVALID' if close_only else 'MANIFEST_DATE_ORDER_SHA256_VERIFIED__VALID_SUFFIX_OHLCV_ONLY' if invalid_rows else 'ROW_COUNT_DATE_ORDER_OHLCV_SHA256_VERIFIED',
                 'instrument_registry_state': instrument.get('identity_state'),
+                **({'advisory_candidate_scope':instrument['advisory_candidate_scope']}
+                    if instrument.get('advisory_candidate_scope') else {}),
                 'holding_source_reference': instrument.get('holding_source_reference'),
                 'source_gaps': ['EXCHANGE_CURRENCY_PROVIDER_ATTESTATION', 'PRICE_BASIS_AND_SPLITS',
                                 'OFFICIAL_SESSION_CLOSE_AND_AVAILABILITY', 'CANONICAL_NAMED_PREDICATES'],

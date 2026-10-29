@@ -76,6 +76,39 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertTrue(any(i['field_path']=='target_bond_holdings.SGOV' for i in out['issues']))
         self.assertEqual(out['targets'],{})
 
+    def test_advisory_native_map_preserves_approval_cash_and_dry_role(self):
+        p,req,report,shared,strategy=self.case()
+        report['bond_policy_audit']={'bond_advisory_policy':{
+            'scope':'BOND_RECOMMENDATIONS_ONLY','trade_authorization':'NONE'}}
+        req['confirmed_target']['payload']['draft']['denominator']={
+            'value_state':'KNOWN','amount':'3500','currency':'USD'}
+        before=deepcopy((req,shared));out=self.build(p,req,report,shared,strategy)
+        a=out['advisory_comparison'];lines={r['asset_id']:r for r in a['lines']}
+        self.assertEqual(a['generic_bucket_total']['amount'],'700')
+        self.assertEqual(lines['SGOV']['proposed_long_term_amount'],'490')
+        self.assertEqual(lines['SPSB']['proposed_long_term_amount'],'210')
+        self.assertEqual(lines['SPSB']['proposed_portfolio_weight'],'0.06')
+        self.assertFalse(lines['SPSB']['approved_target_present'])
+        self.assertIsNone(lines['SPSB']['today_buy_amount'])
+        self.assertEqual(a['inferred_owner_prohibitions'],[])
+        self.assertIsNone(a['invented_exception_reason'])
+        self.assertFalse(a['owner_decision_required_to_continue_analysis'])
+        self.assertFalse(any(i['code']=='US_GENERIC_CORE_TARGET_RATIO_MISMATCH'
+            for i in a['native_structural_state']['issues']))
+        assessments={r['asset_id']:r for r in a['candidate_assessments']}
+        self.assertTrue(assessments['SPSB']['native_eligibility']['new_long_term_target_allowed'])
+        self.assertFalse(assessments['BNDW']['native_eligibility']['new_long_term_target_allowed'])
+        self.assertIsNone(assessments['IEF']['new_long_term_weight'])
+        self.assertEqual(out['adapter_result']['v75_runtime_input']['authorized_universe'],['SGOV'])
+        self.assertEqual((req,shared),before)
+        report['native_bond_source']=out
+        row=report['analysis_result']['positions'][0]
+        row['current_analysis']['native_bond_source']=B.delivery(out)
+        B.validate(p.root,req,report)
+        a['lines'][0]['proposed_long_term_amount']='900'
+        row['current_analysis']['native_bond_source']=B.delivery(out)
+        with self.assertRaisesRegex(PermissionError,'REPLAY_MISMATCH'):B.validate(p.root,req,report)
+
     def test_approved_unheld_spsb_target_is_not_omitted_from_native_bucket(self):
         p,req,report,shared,strategy=self.case()
         req['confirmed_target']['payload']['draft']['target_lines'].append({

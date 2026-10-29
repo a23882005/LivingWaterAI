@@ -66,5 +66,18 @@ class BondPolicyAuditTest(unittest.TestCase):
         self.assertIsNone(A.build({}, {'approved_document_target_source':{
             'source_reference':'SYNTHETIC_VALUATION_ONLY'}}))
 
+    def test_advisory_scope_is_source_bound_and_does_not_create_restrictions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            req,ctx,_=self.case(directory)
+            ctx['bond_advisory_policy']={**ctx['approved_document_target_source'],
+                'schema_version':'Family.W8.BondAdvisoryPolicy.v1',
+                'scope':'BOND_RECOMMENDATIONS_ONLY','allow_other_bond_recommendations':True,
+                'trade_authorization':'NONE'}
+            out=A.build(req,ctx)
+            self.assertTrue(out['bond_advisory_policy']['allow_other_bond_recommendations'])
+            self.assertFalse(out['target_amounts_applied_to_current_roles'])
+            ctx['bond_advisory_policy']['trade_authorization']='EXECUTE'
+            with self.assertRaisesRegex(PermissionError,'POLICY_BINDING'):A.build(req,ctx)
+
 
 if __name__=='__main__':unittest.main()

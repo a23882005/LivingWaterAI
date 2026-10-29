@@ -65,6 +65,8 @@ def build(request,context):
         'target_amounts_applied_to_current_roles':False,
         'current_target_source_kind':request['confirmed_target'].get('source_kind'),
         'rule_exception_evidence':None,'database_written':False,'trade_action':'NO_TRADE'}
+    from bond_advisory import policy as advisory_policy
+    out['bond_advisory_policy']=advisory_policy(request,context)
     rule=context.get('bond_rule_source')
     if rule is not None:
         rule_lines=_read(rule,at)
@@ -75,6 +77,12 @@ def build(request,context):
         out['rule_exception_evidence'].update(source_lines=matches,
             scope='RULE_ALLOWS_DOCUMENTED_ACCOUNT_OR_MARKET_LIMITATION__NOT_CLIENT_APPROVAL',
             client_exception_approved=False)
+        out['generic_bond_rule_basis']={k:deepcopy(rule[k]) for k in
+            ('source_reference','source_sha256','source_available_at')}
+        out['generic_bond_rule_basis']['source_lines']=[{'line_number':i,'text':line}
+            for i,line in enumerate(rule_lines,1) if line.startswith('|')
+            and any(symbol in line for symbol in ('SGOV','SPSB'))
+            and any(weight in line for weight in ('70%','30%'))]
     return out
 
 

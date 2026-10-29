@@ -51,7 +51,8 @@ def target_market_observations(request,observations,rows,*,root):
     target_symbols={r.get('ticker') for r in request['confirmed_target']['payload']['draft']['target_lines']}
     held_symbols={r['symbol'] for r in rows}
     return {r['instrument_key']:deepcopy(r) for r in observations['assets']
-        if r['symbol'] in (target_symbols & set(US_LISTED_ASSETS))-held_symbols}
+        if (r['symbol'] in (target_symbols & set(US_LISTED_ASSETS))-held_symbols
+            or r.get('advisory_candidate_scope')=='BOND_RECOMMENDATIONS_ONLY')}
 
 
 def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
@@ -117,6 +118,7 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         symbol=source['symbol']
         predicates=deepcopy(source.get('v75_original_predicates',{}))
         result['predicate_observations'][symbol]=predicates
+        if symbol not in target_symbols:continue
         for pid,entry in predicates.items():
             native=entry['original_result']
             if native.get('assessment_status')!='VALID' or not entry.get('deployment_input_eligible'):
@@ -139,7 +141,7 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
     for symbol in target_symbols:
         if symbol not in result['predicate_observations']:
             gaps.append({'code':'V75_TARGET_MARKET_SOURCE_REQUIRED','field_path':'bond_evidence.'+symbol+'.market'})
-    times=[r.get('provider_verified_at') for r in market_payload.values()]
+    times=[r.get('provider_verified_at') for r in market_payload.values() if r['symbol'] in target_symbols]
     if any(not t for t in times):
         gaps.append({'code':'V75_SOURCE_CAPTURE_TIME_REQUIRED','field_path':'market_snapshot.data_timestamp'})
         return result
@@ -200,12 +202,19 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
                 'approved_target_amounts':deepcopy(targets),'mapping_complete':True,
                 'approved_target_modified':False,'native_rule_overridden':False,
                 'exception_route':'NOT_SUPPORTED_BY_FROZEN_RUNTIME',
-                'resolution':'REQUIRES_DOCUMENTED_POLICY_RESOLUTION' if ratio_issues else 'NO_TEMPLATE_CHANGE_REQUIRED'}
+                'resolution':('COMPARE_NATIVE_PROPOSAL_WITH_UNCHANGED_APPROVAL'
+                    if result['policy_audit'] and result['policy_audit'].get('bond_advisory_policy')
+                    else 'KEEP_APPROVAL_AND_REPORT_TEMPLATE_DIFFERENCE') if ratio_issues else 'NO_TEMPLATE_CHANGE_REQUIRED'}
         result['status']='ORIGINAL_V75_SOURCE_CHECKED_WITH_GAPS'
     except ValueError as exc:
         result['status']='NATIVE_CONTRACT_REJECTED'
         gaps.append({'code':getattr(exc,'code',type(exc).__name__),
             'field_path':'v75_source_context','message':str(exc)})
+    from bond_advisory import build as build_advisory
+    advisory=build_advisory(root,request,result)
+    if advisory is not None:
+        result['advisory_comparison']=advisory
+        result['call_trace']+=advisory['call_trace']
     return result
 
 

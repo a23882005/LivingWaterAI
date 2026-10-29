@@ -130,6 +130,23 @@ class ObservationsTest(unittest.TestCase):
             M.build_member_market_observations(self.snapshot,[],self.macro,
                 repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',approved_target=target)
 
+    def test_advisory_candidate_does_not_become_holding_or_approved_target(self):
+        spsb=self.folder/'SPSB.csv';spsb.write_bytes(self.path.read_bytes())
+        self.manifest['items']['SPSB']=deepcopy(self.manifest['items']['SGOV']);self.write_manifest()
+        before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'numeric':{}}),\
+             patch('bond_advisory.candidates',return_value=['SGOV','SPSB']):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',bond_advisory_candidates=['SPSB'])
+            candidate=next(r for r in out['assets'] if r['symbol']=='SPSB')
+            self.assertEqual(candidate['instrument_key'],'BOND_ADVISORY:SPSB')
+            self.assertEqual(candidate['advisory_candidate_scope'],'BOND_RECOMMENDATIONS_ONLY')
+            self.assertFalse(candidate['formal_identity_verified'])
+            self.assertEqual(self.snapshot,before)
+            with self.assertRaisesRegex(PermissionError,'UNIVERSE_MISMATCH'):
+                M.build_member_market_observations(self.snapshot,[],self.macro,
+                    repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',bond_advisory_candidates=['QQQ'])
+
     def test_approved_target_cannot_replace_sealed_holding_listing(self):
         self.configure_vwra_alias();self.snapshot['tables']['portfolio_position']=[]
         self.snapshot['payload_digest']=digest(self.snapshot['tables'])

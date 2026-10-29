@@ -351,12 +351,15 @@ class AssetSourceProducer:
         spec=importlib.util.spec_from_file_location('asset_source_market',HERE/'on_demand_market_observations.py')
         market=importlib.util.module_from_spec(spec);spec.loader.exec_module(market)
         holdings=project_official_holdings(snapshot,evaluation_at=when)
+        from bond_advisory import policy as bond_advisory_policy,candidates as bond_candidates
+        advisory_candidates=bond_candidates(self.root) if bond_advisory_policy(req,ctx) else None
         observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings,
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
             approved_rule_profile=self.approved_rule_profile,
             allow_independent_close_analysis=self.flow=='HOLDINGS_ANALYSIS',
             approved_target=req.get('confirmed_target'),
+            bond_advisory_candidates=advisory_candidates,
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
         from new_investment_scenario import build_plan,apply_plan,wire_number

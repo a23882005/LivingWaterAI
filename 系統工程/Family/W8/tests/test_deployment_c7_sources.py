@@ -1,5 +1,6 @@
 """Original Work6/Work7 refusals and lineage survive the source boundary."""
 from copy import deepcopy
+from decimal import Decimal
 import json
 from pathlib import Path
 import sys
@@ -16,6 +17,7 @@ from family_boundary import BoundaryError
 from family_input import digest
 from test_c7_engine import original_case, source_case
 from test_family_runner import runner_case
+from deployment_c7_sources import current_sgov_roles
 
 
 def blocked_source(monkeypatch):
@@ -86,3 +88,34 @@ def test_an_unpinned_workbook_cannot_authorize_its_own_source_contract(tmp_path)
         configuration_source.benchmark_source(ROOT, {'local_path': str(path),
             'drive_file_id': '1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-', 'sha256': digest('fake')},
             '2026-10-29T10:00:00Z')
+
+
+def test_single_role_sgov_can_be_revalued_without_shifting_any_shares_between_roles():
+    roles = {'sgov_bond_bucket_amount': {'amount': '0'}, 'sgov_dry_powder_bucket_amount': {'amount': '1409.94'}}
+    result = current_sgov_roles(roles, '1409.94', Decimal('1409.80'))
+    assert result == [('SGOV_BOND', 'bond ETF', Decimal(0)), ('SGOV_DRY', 'cash', Decimal('1409.80'))]
+    assert roles['sgov_dry_powder_bucket_amount']['amount'] == '1409.94'
+
+
+def test_mixed_sgov_roles_cannot_be_split_using_weights_or_price_ratios():
+    roles = {'sgov_bond_bucket_amount': {'amount': '600'}, 'sgov_dry_powder_bucket_amount': {'amount': '400'}}
+    with pytest.raises(ValueError, match='MIXED_SGOV_ROLE_QUANTITIES_REQUIRED'):
+        current_sgov_roles(roles, '1000', Decimal('1100'))
+    with pytest.raises(PermissionError, match='SGOV_ROLE_VALUE_MISMATCH'):
+        current_sgov_roles(roles, '999', Decimal('1100'))
+
+
+def test_c7_refusal_retains_native_drift_review_without_claiming_unified_mentor(monkeypatch):
+    source = blocked_source(monkeypatch)
+    req, ctx = source_case()
+    for key in ('schema_version', 'producer', 'version', 'source_reference', 'family_owner'):
+        source[key] = deepcopy(ctx['c7_source'][key])
+    ctx['c7_source'] = source; req['c7_source_digest'] = digest(source)
+    with pytest.raises(BoundaryError, match='C7_FRAMEWORK_NOT_READY') as error:
+        bind_c7_source(ROOT, req, ctx)
+    result = family_runner.FamilyRunner._error(req, error.value.status, error.value.issue)
+    assert result['mentor'] is None and result['canonical_result'] is None
+    review = result['configuration_review']
+    assert review['full_native_mentor_reached'] is False
+    assert review['drift_snapshot'] == source['work6_result']['drift_snapshot']
+    assert review['original_work6_mentor_contract'] == source['work6_result']['mentor_result_contract']

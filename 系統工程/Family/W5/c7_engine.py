@@ -83,6 +83,23 @@ def bind_c7_source(repo_path, request, context):
         error = BoundaryError('C7_FRAMEWORK_NOT_READY', 'c7.status', status='DATA_UNAVAILABLE')
         error.issue.update(native_status=result['status'], native_issues=deepcopy(result['issues']),
                            work6_status=source['work6_result']['loop_status'])
+        work6 = source['work6_result']
+        engine = work6.get('final_target_engine_result') or {}
+        error.issue['configuration_review'] = {
+            'schema_version': 'Family.W5.ConfigurationReview.v1',
+            'scope': 'ORIGINAL_C_WORK6_AND_C7_REVIEW__NOT_UNIFIED_WORK9_MENTOR',
+            'evaluation_at': source['evaluated_at'], 'c7_status': result['status'],
+            'work6_status': work6['loop_status'], 'work6_snapshot_id': work6['work6_snapshot_id'],
+            'c7_snapshot_id': result['work7_snapshot_id'],
+            'current_allocation': deepcopy(engine.get('allocations', {}).get('current_allocation')),
+            'drift_snapshot': deepcopy(work6['drift_snapshot']),
+            'configuration_engine_eligibility': deepcopy(engine.get('formal_output_eligibility')),
+            'configuration_engine_issues': deepcopy(engine.get('issues', [])),
+            'original_work6_mentor_contract': deepcopy(work6['mentor_result_contract']),
+            'comparison_context': deepcopy(source.get('comparison_context')),
+            'original_c7_issues': deepcopy(result['issues']),
+            'full_native_pipeline_complete': False, 'full_native_mentor_reached': False,
+            'trade_action': 'NO_TRADE'}
         raise error
     require(digest(result) == digest(request['native_bundle']['asset_framework']),
             'C7_COMPUTED_FRAMEWORK_MISMATCH', 'native_bundle.asset_framework')

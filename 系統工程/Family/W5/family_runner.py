@@ -153,7 +153,11 @@ class FamilyRunner:
 
     @staticmethod
     def _error(request,status,issue):
-        return {'schema_version':'Family.W5.result.v1','status':status,
+        detail=deepcopy(issue)
+        review=detail.pop('configuration_review',None)
+        result={'schema_version':'Family.W5.result.v1','status':status,
             'request_id':request.get('request_id'),'run_id':request.get('run_id'),
-            'issue_codes':[issue],'canonical_result':None,'mentor':None,
+            'issue_codes':[detail],'canonical_result':None,'mentor':None,
             'storage_scope':'ISOLATED_TEST_STAGING','production':'HOLD','trade_action':'NO_TRADE'}
+        if review is not None:result['configuration_review']=review
+        return result

@@ -68,7 +68,9 @@ def build(request, analysis, prepared, context):
                     'source_reference': 'ACCEPTED-POSITION:' + digest(position)}
         price = {'state': 'KNOWN', 'value': str(number(market['observed_close'])),
                  'currency': currency, 'instrument_key': key, 'as_of': request['evaluation_at'],
-                 'price_observation_as_of': observed, 'price_source_digest': market['source_sha256'],
+                 'price_observation_date': market['observed_date'],
+                 'price_observation_as_of': None, 'observation_time_state': 'DATE_ONLY',
+                 'price_source_digest': market['source_sha256'],
                  'valuation_basis': out['valuation_basis'],
                  'source_reference': 'ANALYSIS-MARKET:' + market['source_sha256']}
         # FX is an independently supplied, asset-specific source, never the

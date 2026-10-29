@@ -38,7 +38,8 @@ def test_dated_exact_account_values_never_masquerade_as_global_nav_or_available_
     assert out['portfolio_nav']['state'] == 'UNKNOWN'
     assert not out['reported_cash']['executable_budget']
     assert not out['latest_market_freshness_asserted']
-    assert out['positions'][0]['price']['price_observation_as_of'] == '2026-10-28T00:00:00Z'
+    assert out['positions'][0]['price']['price_observation_date'] == '2026-10-28'
+    assert out['positions'][0]['price']['price_observation_as_of'] is None
     assert args == before
 
 

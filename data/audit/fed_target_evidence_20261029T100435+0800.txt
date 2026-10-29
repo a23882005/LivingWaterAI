@@ -1,0 +1,13 @@
+retrieved_at=2026-10-29T10:04:35+08:00
+policy_schema=fed-target-evidence-v1
+primary_url=https://www.federalreserve.gov/monetarypolicy/openmarket.htm
+primary_result=CURRENT_CONFIRMED
+primary_excerpt=Federal Reserve current policy table: target range 3.75%-4.00%, effective 2026-09-17; arithmetic midpoint 3.875%.
+primary_publication_date=2026-09-16
+fred_lower_url=https://fred.stlouisfed.org/series/DFEDTARL
+fred_lower_observation=2026-10-28,3.75
+fred_upper_url=https://fred.stlouisfed.org/series/DFEDTARU
+fred_upper_observation=2026-10-28,4.00
+alfred_upper_url=https://alfred.stlouisfed.org/series?seid=DFEDTARU
+alfred_upper_observation=2026-10-28,4.00
+verification=The primary policy range and same-day official-series bounds agree; effective federal funds rate was not used.

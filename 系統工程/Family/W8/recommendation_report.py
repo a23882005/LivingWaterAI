@@ -128,6 +128,12 @@ def build(report,request):
         if current:intro.append('本人提供目前股／債參考：'+str(current['stock_percent'])+'%／'+str(current['bond_percent'])+'%；保留為本人提供值，未覆寫正式持倉。')
         intro.append('V70目標股／債風險比例：'+str(tactical['allocation']['S0'])+'%／'+str(tactical['allocation']['B0'])+'%。')
         intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
+    supplement=report.get('bond_market_supplement')
+    if supplement:
+        intro.append('V75波動率補充來源：MOVE '+supplement['observed_date']+' 為 '+
+            f"{Decimal(supplement['metrics']['move']):.2f}"+'，相較 '+supplement['comparison_date']+
+            ' 的五營業日變化 '+f"{Decimal(supplement['metrics']['move_pct_change_5bd']):.2f}"+
+            '%。此分項已用原生公式重算；其他部署條件及正式新鮮度證據仍各自核對。')
     markdown='\n\n'.join(intro)+'\n\n| '+' | '.join(headings)+' |\n| '+' | '.join(['---']*len(headings))+' |\n'
     markdown+='\n'.join('| '+' | '.join(str(v).replace('|','／').replace('\n',' ') for v in row)+' |' for row in cells)
     comparison=report.get('native_bond_source',{}).get('advisory_comparison')

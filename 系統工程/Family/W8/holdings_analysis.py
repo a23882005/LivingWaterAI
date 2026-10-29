@@ -434,6 +434,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
     if context.get('native_target_source') is not None:
         report['native_target_source']=deepcopy(context['native_target_source'])
+    if observations.get('bond_market_supplement') is not None:
+        report['bond_market_supplement']=deepcopy(observations['bond_market_supplement'])
     from bond_policy_audit import build as audit_bond_policy
     policy_audit=audit_bond_policy(request,context)
     if policy_audit is not None:report['bond_policy_audit']=policy_audit
@@ -555,6 +557,8 @@ class HoldingsAnalysisRunner:
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
         from native_bond_source import validate as validate_native_bond_source
+        from v75_market_supplement import validate as validate_bond_supplement
+        validate_bond_supplement(request,self.context,report,root)
         from bond_policy_audit import validate as validate_bond_policy
         validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)

@@ -142,6 +142,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         if symbol not in result['predicate_observations']:
             gaps.append({'code':'V75_TARGET_MARKET_SOURCE_REQUIRED','field_path':'bond_evidence.'+symbol+'.market'})
     times=[r.get('provider_verified_at') for r in market_payload.values() if r['symbol'] in target_symbols]
+    if report.get('bond_market_supplement'):
+        times.append(report['bond_market_supplement']['available_at'])
     if any(not t for t in times):
         gaps.append({'code':'V75_SOURCE_CAPTURE_TIME_REQUIRED','field_path':'market_snapshot.data_timestamp'})
         return result

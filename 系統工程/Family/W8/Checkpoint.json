@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-30T07:22:45.014913+08:00",
+  "updated_at": "2026-10-30T07:34:02.402774+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -1732,7 +1732,7 @@
     "scope": "Word教學圖解歸檔；沿用正式規則與工程驗收狀態"
   },
   "v82_completion_20261030": {
-    "status": "PHASE2_ENGINEERING_REGRESSION_PASSED",
+    "status": "ENGINEERING_REGRESSION_AND_TWO_HOUSEHOLD_REPLAY_DELIVERED__INDEPENDENT_PM_GATE_PENDING",
     "baseline": "27d41bdba846de9b74690f78091c88bf197b34c6",
     "pm_audit_merge": "38ff92c90131d47f2c4d2d04dfb4713feca7de31",
     "phase1": {
@@ -1747,7 +1747,7 @@
     "phase1_commit": "f6ddf599fa0bda5303895046b5175addf03e8de2",
     "pm_chain_audit_merge": "7fb06304d4bf5b7669d9691ae1ca252d768b6c54",
     "phase2": {
-      "status": "IMPLEMENTED_REGRESSION_PASSED__PRIVATE_REPLAY_NEXT",
+      "status": "IMPLEMENTED_REGRESSION_AND_PRIVATE_REPLAY_COMPLETE__PM_ACCEPTANCE_PENDING",
       "component_version": "V82_APPROVED_IMPLEMENTATION_1.0",
       "decimal_version": "V82_EXECUTION_DECIMAL_1.0.1",
       "scope": [
@@ -1776,12 +1776,60 @@
         "planning_cash_plus_authorized_SGOV": "100000",
         "settled_cash": "20000"
       },
-      "actual_Joseph_MOU_replay": "PENDING_CURRENT_CODE_COMMIT",
+      "actual_Joseph_MOU_replay": {
+        "Joseph": {
+          "holdings_coverage": {
+            "requested": 10,
+            "returned": 10,
+            "partial": 10,
+            "blocked": 0
+          },
+          "approved_v82_positions": 9,
+          "work6_status": "FINAL_TARGET_CONFIRMED",
+          "c7_status": "RETURN_TO_V70",
+          "drift_rows": 21,
+          "account_funding_status": "BLOCKED_MISSING_NATIVE_DECISIONS",
+          "planning_book_cycles": 0,
+          "planning_book_intents": 0,
+          "official_db_unchanged": true
+        },
+        "MOU": {
+          "holdings_coverage": {
+            "requested": 16,
+            "returned": 16,
+            "partial": 16,
+            "blocked": 0
+          },
+          "approved_v82_positions": 15,
+          "work6_status": "FINAL_TARGET_CONFIRMED",
+          "c7_status": "RETURN_TO_V70",
+          "drift_rows": 19,
+          "account_funding_status": "BLOCKED_MISSING_NATIVE_DECISIONS",
+          "planning_book_cycles": 0,
+          "planning_book_intents": 0,
+          "official_db_unchanged": true,
+          "approved_SGOV_long_term_weight": "0.20"
+        }
+      },
       "independent_middle_pm_acceptance": "PENDING",
       "production": "HOLD",
       "trade_action": "NO_TRADE",
       "guide": "系統工程/Family/W8/V82_IMPLEMENTATION_GUIDE.md",
-      "private_db_changed": false
+      "private_db_changed": false,
+      "code_tested_commit": "48e896128a94eaa2132f9d210fbbcb94d9ec8ed1",
+      "CI_code_commit": "48e896128a94eaa2132f9d210fbbcb94d9ec8ed1",
+      "CI_workflows_passed": 6,
+      "full_04_acceptance": false,
+      "formal_Drive_cycle_sync_acceptance": false,
+      "formal_Drive_cycle_sync_gap": "Operator same-ID read/write/readback integration and cross-environment broker receipts remain unaccepted; local SQLite/CAS and Family guards tested",
+      "public_review": "系統工程/Family/W8/查核紀錄/V82_核准補齊工程與兩戶實跑回交_20261030.txt",
+      "remote_preserved_at_close": {
+        "main": "946a2a4",
+        "pm_refinement": "1a9990d",
+        "financial_program_blobs_unchanged_from": "48e8961",
+        "private_replay_source_revision": "48e8961",
+        "updated_market_cache_regression": "W8_FULL_621_PASS_AFTER_MAIN_946a2a4_MERGE"
+      }
     }
   }
 }

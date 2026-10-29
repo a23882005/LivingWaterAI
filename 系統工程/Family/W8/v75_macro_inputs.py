@@ -310,6 +310,8 @@ def read(source,evaluation_at):
     out=extend_additional_delta(out,manifest.get('additional_delta_source'),data,evaluation_at,manifest.get('source_handoff'))
     from v75_plugin_data_inputs import extend as extend_plugin_data
     out=extend_plugin_data(out,manifest.get('plugin_data_source'),data,evaluation_at)
+    from v75_ib_qa_inputs import extend as extend_ib_qa
+    out=extend_ib_qa(out,manifest.get('ib_qa_additional_source'),data,evaluation_at)
     from v75_pred007_inputs import extend as extend_pred007
     return extend_pred007(out,manifest.get('pred007_amendment_source'),evaluation_at)
 

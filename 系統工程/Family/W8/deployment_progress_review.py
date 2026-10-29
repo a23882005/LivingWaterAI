@@ -27,7 +27,8 @@ def build(root, request, analysis, work6, c7, source_sections):
     pool = analysis.get('v75_macro_inputs') or {}
     ready = pool.get('ready_data_handoff') or {}
     delta = pool.get('additional_delta_handoff') or {}
-    sparse = (delta or ready).get('sparse_yield_evidence') or {}
+    ib_qa = pool.get('ib_qa_handoff') or {}
+    sparse = (ib_qa or delta or ready).get('sparse_yield_evidence') or {}
     quality = (analysis.get('native_bond_source') or {}).get('etf_quality_assessments') or pool.get('etf_quality_assessments', {})
     evidence = {}
     for symbol, assessment in quality.items():
@@ -54,6 +55,10 @@ def build(root, request, analysis, work6, c7, source_sections):
         from v75_plugin_data_inputs import summary
         for symbol in ('SGOV','SPSB'):
             evidence.setdefault(symbol,{})['plugin_market_cross_check']=summary(pool['plugin_data_cross_checks'],symbol)
+    if ib_qa:
+        from v75_ib_qa_inputs import summary as qa_summary
+        for symbol in ('SGOV','SPSB'):
+            evidence.setdefault(symbol,{})['ib_qa_cross_check']=qa_summary(ib_qa,symbol)
     path = Path('系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py')
     out = {'schema_version': 'Family.W8.DeploymentProgressReview.v1', **deepcopy(identity),
         'evaluation_at': request['evaluation_at'], 'analysis_report_digest': analysis['report_digest'],

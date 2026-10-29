@@ -39,7 +39,7 @@ def distribution_source_text(symbol,distribution):
     return text+'金額；既有年度稅務分解與缺漏分列，未把缺少的ROC補0。'
 
 
-def ready_data_evidence_notes(evidence,symbol,additional_delta=None):
+def ready_data_evidence_notes(evidence,symbol,additional_delta=None,ib_qa=None):
     if not evidence:return []
     if symbol=='SGOV':
         coverage=evidence['bounded_event_coverage']
@@ -53,14 +53,14 @@ def ready_data_evidence_notes(evidence,symbol,additional_delta=None):
             notes.append('另保留2026/01/16交易場所變更公告，公告預定於2026/02/23前後改掛NYSE。')
         return notes
     if symbol=='SPSB':
-        history=(additional_delta or evidence)['sparse_yield_evidence'];counts=history['counts_by_metric']
+        history=(ib_qa or additional_delta or evidence)['sparse_yield_evidence'];counts=history['counts_by_metric']
         return ['SPSB另有'+str(counts.get('portfolio_ytm',0))+'筆組合YTM及'+str(counts.get('sec_yield_30day',0))+
             '筆30-Day SEC Yield存檔來源核對；各自保留資料日期，未冒充五年完整週序列，未補值或計算百分位。',
             'SPSB配息金額與QII預扣稅分類分列；QII不是ROC，未以100%減QII推算ROC。']
     return []
 
 
-def plugin_evidence_notes(evidence,symbol):
+def plugin_evidence_notes(evidence,symbol,ib_qa=None):
     if not evidence or symbol not in evidence['ibkr_weekly']:return []
     weekly=evidence['ibkr_weekly'][symbol];daily=evidence['massive_daily'][symbol]
     alpha=evidence['alpha_dividends'][symbol]
@@ -82,6 +82,23 @@ def plugin_evidence_notes(evidence,symbol):
     ambiguous=evidence['issuer_dividend_comparisons'][symbol]['ibkr']['ambiguous_provider_events']
     if ambiguous:
         notes.append(symbol+'另有'+str(len(ambiguous))+'個歷史除息日含多筆IB現金事件，金額分列，待來源定義核對。')
+    if ib_qa:
+        qa=ib_qa['ibkr_audit'][symbol];extended=ib_qa['massive_daily'][symbol]
+        notes.append(symbol+'追加查核：IB日線共'+str(qa['daily_raw_bar_count'])+'根，其中'+
+            str(len(qa['invalid_daily_bars']))+'根OHLC邊界異常，維持隔離，未修改high或close。')
+        if qa['invalid_weekly_bars_reproduced']:
+            notes.append(symbol+' '+str(len(qa['invalid_weekly_bars_reproduced']))+
+                '根異常週線在原始回應與重抓資料中重現；已確認不是CSV轉檔造成，連接器後端根因尚未確定。')
+        notes.append(symbol+' Massive追加日線共'+str(extended['raw_bar_count'])+'根，實際'+
+            extended['first_session_date']+'至'+extended['last_session_date']+'；已對上原'+
+            str(extended['previous_daily_bars_reconciled'])+'根，並非五年完整序列。拆股調整與配息再投資分開，成交量及時段口徑未擅自等同IB。')
+        if extended['missing_session_dates_within_actual_range']:
+            notes.append(symbol+' Massive實際區間仍缺'+str(len(extended['missing_session_dates_within_actual_range']))+'個交易日，未補造。')
+        if symbol=='SPSB':
+            derived=ib_qa['SPSB_derived_week']
+            notes.append('SPSB '+derived['week_start']+'週已用完整日線衍生彙總，O'+str(derived['open'])+
+                '／H'+str(derived['high'])+'／L'+str(derived['low'])+'／C'+str(derived['close'])+
+                '／V'+str(derived['volume'])+'；不是IB官方修正版，原兩筆週列保留。')
     return notes
 
 
@@ -239,8 +256,9 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                 if distribution:
                     text.append(distribution_source_text(symbol,distribution))
             text.extend(ready_data_evidence_notes(bond_source.get('ready_data_evidence'),symbol,
-                bond_source.get('additional_delta_evidence')))
-            text.extend(plugin_evidence_notes(bond_source.get('plugin_data_cross_checks'),symbol))
+                bond_source.get('additional_delta_evidence'),bond_source.get('ib_qa_evidence')))
+            text.extend(plugin_evidence_notes(bond_source.get('plugin_data_cross_checks'),symbol,
+                bond_source.get('ib_qa_evidence')))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
             liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
             if liquidity:

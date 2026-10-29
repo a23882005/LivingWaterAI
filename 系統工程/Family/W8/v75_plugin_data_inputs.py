@@ -114,11 +114,12 @@ def ibkr_history(files, symbol, evaluation_at):
         'source_raw_sha256': sha256(files[prefix + '_5y_weekly_raw.json']).hexdigest()}
 
 
-def daily_history(files, symbol, primary_raw, evaluation_at):
+def daily_bars(raw_file, csv_file, primary_raw, evaluation_at):
+    """Reconcile raw/CSV session bars without assuming their request identity."""
     import exchange_calendars as xc
-    _, raw = tool_response(files['massive/' + symbol + '_daily_raw.json'])
+    _, raw = tool_response(raw_file)
     original = list(csv.DictReader(io.StringIO(raw['result'])))
-    extracted = csv_rows(files['massive/' + symbol + '_daily.csv'])
+    extracted = csv_rows(csv_file)
     if len(original) != len(extracted) or not original:
         raise PermissionError('PLUGIN_DATA_DAILY_COVERAGE')
     zone = ZoneInfo('America/New_York'); primary = json.loads(primary_raw, parse_float=Decimal)['chart']['result'][0]
@@ -144,22 +145,32 @@ def daily_history(files, symbol, primary_raw, evaluation_at):
                 'difference': str(other-official),
                 'same_at_four_decimal_places': other.quantize(Decimal('.0001'), rounding=ROUND_HALF_EVEN) ==
                     official.quantize(Decimal('.0001'), rounding=ROUND_HALF_EVEN)})
-    qa = json.loads(files['massive/qa.json'])[symbol]
-    if (qa['count'] != len(original) or qa['first'] != str(days[0]) or qa['last'] != str(days[-1])
-            or qa['request_adjusted'] is not True or qa['source'] !=
-            'Massive /v2/aggs/ticker/' + symbol + '/range/1/day/' + str(days[0]) + '/' + str(days[-1])):
-        raise PermissionError('PLUGIN_DATA_DAILY_QA_MISMATCH')
-    return {'symbol': symbol, 'raw_bar_count': len(original), 'completed_daily_bars': rows,
-        'forming_sessions_excluded': excluded, 'overlap_count': len(comparisons), 'close_comparisons': comparisons,
+    expected = {str(d.date()) for d in cal.sessions_in_range(str(days[0]), str(days[-1]))}
+    return {'raw_bar_count': len(original), 'first_session_date': str(days[0]), 'last_session_date': str(days[-1]),
+        'missing_session_dates_within_actual_range': sorted(expected-set(map(str, days))),
+        'completed_daily_bars': rows, 'forming_sessions_excluded': excluded,
+        'overlap_count': len(comparisons), 'close_comparisons': comparisons,
         'exact_close_matches': sum(number(r['difference']) == 0 for r in comparisons),
         'four_decimal_close_matches': sum(r['same_at_four_decimal_places'] for r in comparisons),
         'max_abs_close_difference': str(max((abs(number(r['difference'])) for r in comparisons), default=Decimal(0))),
         'comparison_basis': 'DECIMAL_HALF_EVEN_4DP_DIAGNOSTIC_ONLY__NO_ACCEPTANCE_THRESHOLD',
-        'request_adjusted': True, 'total_return_attested': False,
-        'volume_basis_qualified_for_canonical_liquidity': False,
-        'instrument_identity_basis': 'DELIVERED_REQUEST_QA_CONTEXT__NO_SYMBOL_ECHO_IN_RAW_CSV',
+        'total_return_attested': False, 'volume_basis_qualified_for_canonical_liquidity': False,
         'canonical_market_source_replaced': False, 'used_as_NBBO': False,
-        'source_raw_sha256': sha256(files['massive/' + symbol + '_daily_raw.json']).hexdigest()}
+        'source_raw_sha256': sha256(raw_file).hexdigest()}
+
+
+def daily_history(files, symbol, primary_raw, evaluation_at):
+    out = daily_bars(files['massive/' + symbol + '_daily_raw.json'],
+        files['massive/' + symbol + '_daily.csv'], primary_raw, evaluation_at)
+    qa = json.loads(files['massive/qa.json'])[symbol]
+    first = out['first_session_date']; last = out['last_session_date']
+    if (qa['count'] != out['raw_bar_count'] or qa['first'] != first or qa['last'] != last
+            or qa['request_adjusted'] is not True or qa['source'] !=
+            'Massive /v2/aggs/ticker/' + symbol + '/range/1/day/' + first + '/' + last):
+        raise PermissionError('PLUGIN_DATA_DAILY_QA_MISMATCH')
+    return {**out, 'symbol': symbol, 'request_adjusted': True,
+        'instrument_identity_basis': 'DELIVERED_REQUEST_QA_CONTEXT__NO_SYMBOL_ECHO_IN_RAW_CSV',
+        'adjustment_basis': 'DELIVERED_REQUEST_CONTEXT__NOT_TOTAL_RETURN_ATTESTATION'}
 
 
 def alpha_dividends(files, symbol, evaluation_at):

@@ -321,7 +321,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE'}:
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_BROAD_EQUITY_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE'}:
                 issuer=row['issuer_facts']
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
                 special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE')),None)
@@ -337,6 +337,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 row['fundamental_fields']=fundamental_fields
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
                 row['native_product_identity']['engine_route']='V82_QQQ_CORE' if qqq else 'V82_GLOBAL_ETF_CORE'
+                if 'V82_BROAD_EQUITY_CORE' in cls.get('analysis_capabilities',[]):
+                    row['native_product_identity']['engine_route']='V82_BROAD_EQUITY_CORE'
                 waterfall={'valuation_waterfall':['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD']} if qqq else {}
                 if special:
                     row['native_product_identity']['engine_route']=special

@@ -60,6 +60,10 @@ def classification(symbol, source, product_source=None):
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
+    if product_source is None and symbol in ('CPAI','DYNF','DRAM'):
+        identity_path=HERE/(symbol+'_product_identity.json')
+        if identity_path.is_file():
+            product_source={'local_path':str(identity_path),'sha256':sha256(identity_path.read_bytes()).hexdigest()}
     if (product_source is None and symbol in ('SOXX','SMH','PPH','NATO')
         and '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' in text):
         identity_path=HERE/(symbol+'_product_identity.json')
@@ -75,6 +79,12 @@ def classification(symbol, source, product_source=None):
             raise ValueError('PRODUCT_STRUCTURE_SOURCE_CHANGED')
         product=json.loads(raw)
         facts=product.get('excerpts',[])
+        from equity_product_identity import classify as classify_equity_product
+        extra=classify_equity_product(symbol,product,text)
+        if extra is not None:
+            result.update(extra)
+            result['grade_evidence']['source_sha256']=product_source['sha256']
+            return result
         industry_contracts={
             'SOXX':('iShares Semiconductor ETF','https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf','semiconductor industry'),
             'SMH':('VanEck Semiconductor ETF','https://www.vaneck.com/us/en/investments/semiconductor-etf-smh/overview/','semiconductor industry'),

@@ -1,0 +1,67 @@
+V82流程圖、逐字稿與程式一致性查核
+日期：2026/10/30（台灣時間）
+查核人：Family中PM
+結論：圖文與已核准v1.0規格的主幹大致相符；與目前程式尚有具體接線及實作差異，應標示「核准規則目標流程」，不能標示整線已實作完成。
+
+版本與範圍
+- 附件：V82_Traditional_Flowcharts-2.pdf，單頁3000×5050，頁尾v2；逐字稿採指揮官本輪貼文19站。
+- Fresh Read Drive V82.md v1.21.0，ID 1EObD96ptt3Io_YtTNGTWW1bms30wKguz。
+- 核准v1.0規格：系統工程/股票V80/文件歸檔/V82_v1.0_正式實作/V82_Three_Layer_Quant_Rules_Formal_Implementation_v1.0.docx；Git blob 5575d75fa57b8d0592e295f6fcef967ecbc0a254。
+- main a1bdecd0d4c2bd87fafe63d049edab1145ab92a7。
+- PR59施工快照27d41bdba846de9b74690f78091c88bf197b34c6，Draft／未合併。
+- main與PR的原生core_rules.py、deployment.py blob相同；新增v1.0技術producer及報告分析接線位於PR。
+- 本輪檢視相關來源、PDF文字與箭頭，並執行隔離合成元件測試；未修改策略、原生程式、家人DB或發出訂單。
+
+已核對一致
+1. 原生evaluate_technical()使用R>=3、Up=U>=1 AND C>=3 AND MA20_OK、Down=D>=1 AND A>=2；threshold_truth使用T/U三值。
+2. select_deployment_mode()優先Trend→Right→Left→Base；高優先UNKNOWN不向下選。
+3. 九階累積率10/20/30/45/60/75/85/95/100%，非當日全額買入。
+4. calculate_position_gap()為Target減去Confirmed+ActiveBuy-ActiveSell，活動訂單使用未成交數量及canonical valuation price。
+5. 原生資金上限MIN與合法數量向下取整；價格與交易單位必要未知有明確結果。
+
+差異A：M、日切片及cycle尚未完整接上原生金額路徑
+- v1.0 CMR8明定M1～M8、Base10/20%、Left15/25%、Right25%、Trend20%；信用／總經／適用估值乘數、G0/B0/B_current及cycle帳本。
+- PR approved_v04_technical.py:280–300已產生left_maturity_signals，但family_technical_bridge.apply_technical_source()傳入原生core的只有既有R/U/C/D/A與MA20。
+- W5/stock_engine.py:70–92沒有計算M切片或cycle帳本，而是直接呼叫build_buy_execution_plan；該函式deployment.py:139–203無M、r、G0、B0或cycle ledger參數。
+- 它支援外部required_known_caps，因此補齊具名slice cap與可信帳本後可沿用原MIN；現有來源producer未提供這段完整計算。
+- 元件合成實測：ProjectTarget1,000,000×.45=450,000；Confirmed250,000+ActiveBuy50,000=300,000；Gap150,000；available100,000。原函式未給slice cap時Maximum100,000；明確給37500 cap後Maximum37500。同組輸入換新intent再呼叫仍100,000，證明此函式本身不維護daily cycle；此為隔離元件測試，非真實家人訂單或整戶執行結果。
+
+差異B：報告Right與原生部署Right口徑不同
+- v1.0 CMR7.2／TECH4.1要求off_low AND R_ok，以及基本面、信用、非Down、適用估值與事件必要T+1。
+- W8/formal_mode_analysis.py:139–166有組合off_low、基本面等；但right式只用legal估值旗標，事件coverage仍NOT_VERIFIED，沒有在此完成適用事件T+1 consumer。
+- W5/stock_engine.py:71–72把state.technical.right_confirmation直接當right_add送入selector，並非傳入同一個完整Right predicate。
+- 應以同輪、版本綁定的完整Entry輸出作共同來源；保留R_ok為技術子條件。
+
+差異C：qP/qV、B2～B7及Trend8/9尚未形成完整原生producer
+- 圖中的PV2/PV3/CMR7.4是核准規格；原生resolve_deployment_stage()接受外部已裁決left_stage/trend_stage，不自行計算qP/qV。
+- W8/formal_mode_analysis.py gap_matrix明列qV/qP為PRODUCER_AND_REQUIRED_SOURCE_NOT_CONNECTED。
+- W8/deployment_evidence_sources.py:64–70目前把left_stage與trend_stage設None並列formal_stage_reference缺口。
+- 原生Base/Right resolver直接回1/8；報告包裝另用stage_facts遮罩未知，兩邊需統一Stage完整資格。
+- 元件測試：Trend resolver傳入STAGE_4可回STAGE_4；表示底層接受外部裁決，沒有自行強制核准8/9 profile。整合時需以具名restriction來源驗證，不能把此測試當成真實流程曾選錯階的證據。
+
+差異D：高風險分支的分析箭頭不足
+- 圖先在Gate菱形走TRUE後結束新增路徑；右框雖說保留Right合法分析，卻沒有接回分析專用Mode/Stage/Target/Gap的分支。
+- v1.0 CMR7.3明定Gate可關新增Permission，同輪Right自身仍成立時保留Mode/Stage/Target/Gap；Left安全變FALSE。
+- 必要UNKNOWN也要按依賴分流；只有execution cash未知，不應切斷已具備資料的市場Mode分析。
+- 圖需補「分析繼續／新增0」的可追蹤路徑，逐字稿第9站同步導讀。
+
+差異E：逐字稿簡化／圖面文字須補精確性
+- 第13站與圖中公式需保留PV3的A_normal/A_cheap適用性分流：非Forward PE或正式證實無固定range按核准中性規則；applicability未知仍未知，不能把所有標的綁固定PE。
+- 第17/18站及圖右下目前僅列已結算現金；依指揮官此前已確認說明，分析規劃額度要明列「已授權現金＋可動用SGOV子彈池」，扣除保留、占用與費用，並與送單時已結算可用現金分欄。SGOV轉現金只計一次，logical bucket／防守底倉／未授權出售部分分開。
+- 第18站「策略額度37500，但現金與配置限制只容許20000」作為已確認所有可執行限制後的假設成立；若只是看現金20000而忽略已授權可動用SGOV80000，則與先前範例不同，須把假設寫明。
+- Stage4、Gap150000、M成熟率25%、乘數1→37500的教學算式正確；它描述核准規則的預期額度，而非目前原生函式已自動算出。
+- B_current必須保持MIN(B0,G0×current rates/multipliers)，使用cycle初始固定G0；同日成交或換run_id不重置日預算。
+
+中PM處理順序
+1. 規格維持已核准V82＋v1.0；沿用正確技術producer、selector、gap及MIN，不整套重做。
+2. 圖面補Gate/UNKNOWN的分析與執行分流、range適用性、SGOV規劃與結算分層；逐字稿同步框名與箭頭。
+3. 程式施工同一工作線補PV2/PV3/Stage來源、統一完整Right Entry、接M與CMR8 daily cycle／slice cap到原MIN、再接既有共同資金保全。
+4. 驗收最少覆蓋：37500正向例、M未知對Base/Left與Right/Trend差異、同日重跑/部分成交/取消待確認、Gate下Right保留分析、qV=60邊界及range N/A、同桶共享資金、SGOV不重算。
+5. 本輪完成差異查核與治理登錄；程式修正及整線回歸列為後續具體工項，不在本輪改動正在施工的PR。
+
+主要來源定位
+- PR59：https://github.com/a23882005/LivingWaterAI/pull/59
+- core_rules.py：系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py
+- deployment.py：同目錄deployment.py
+- W5/stock_engine.py；W5/family_technical_bridge.py
+- W8/approved_v04_technical.py；W8/formal_mode_analysis.py；W8/deployment_evidence_sources.py

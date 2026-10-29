@@ -1730,5 +1730,19 @@
       }
     ],
     "scope": "Word教學圖解歸檔；沿用正式規則與工程驗收狀態"
+  },
+  "v82_completion_20261030": {
+    "status": "IN_PROGRESS",
+    "baseline": "27d41bdba846de9b74690f78091c88bf197b34c6",
+    "pm_audit_merge": "38ff92c90131d47f2c4d2d04dfb4713feca7de31",
+    "phase1": {
+      "scope": "PV2 own qP/qV, PV3 stages2-7, named range/restrictions, full Right and Trend8/9 native functions",
+      "tests_passed": 44,
+      "family_menu04_integrated": false,
+      "production": "HOLD",
+      "trade_action": "NO_TRADE"
+    },
+    "v75_conflict_work": "PAUSED_PENDING_DOT",
+    "private_db_changed": false
   }
 }

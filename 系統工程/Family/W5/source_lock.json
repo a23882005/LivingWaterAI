@@ -398,6 +398,30 @@
       },
       "git_blob_sha": "acaabb45289be2aa800f004c6590534acce5752c",
       "size": 4378
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_profiles.py",
+      "sha256": "105ceb6a526a9e9b262401b0602e7d2ad6d99044adfba7d97566bb240b5bf442",
+      "git_blob_sha": "f398f5e4a9eb82b6196c1146192695614d6483d2",
+      "size": 12180,
+      "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "New approved native producer; prior frozen functions unchanged; not production cutover approval"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py",
+      "sha256": "02774a6161565b63c3f39c3351df395c3da31b69b6f43d835b8a24500ec0316d",
+      "git_blob_sha": "af079043e172044d06cf10ad99cea3bb34a4a198",
+      "size": 15536,
+      "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "New approved native producer; prior frozen functions unchanged; not production cutover approval"
+      }
     }
   ]
 }

@@ -136,6 +136,11 @@ def assess(issuer,contract,raw,parameters,evaluation_at,*,authorized_universe,
         amount=number(intended_order_amount)
         if amount<0 or not order_source:raise PermissionError('V75_QUALITY_BOUND_ORDER_AMOUNT_REQUIRED')
         if volume is not None:flat['order_to_median_dollar_volume_pct']=str(amount/number(volume)*100)
+    distribution=facts.get('distribution_source_observation')
+    if distribution:
+        proof['distribution_source']=deepcopy(distribution)
+        if distribution.get('complete_source_breakdown'):
+            flat['trailing_12m_roc_pct']=distribution['as_reported_roc_pct']
     # The captured issuer reports 30 CALENDAR days, not the required 20
     # trading days. Distribution zero columns are likewise not sufficient
     # when the issuer explicitly says current-year classification is pending.
@@ -150,7 +155,8 @@ def assess(issuer,contract,raw,parameters,evaluation_at,*,authorized_universe,
         'order_source':deepcopy(order_source),'issuer_source_reference':issuer['source_reference'],
         'issuer_source_sha256':issuer['source_sha256'],'source_available_at':issuer['available_at'],
         'known_auxiliary_observations':{'bid_ask_spread_30_calendar_days':deepcopy(facts.get('bid_ask_spread_30_calendar_days')),
-            'distribution_characterization':deepcopy(facts.get('distribution_characterization'))},
+            'distribution_characterization':deepcopy(facts.get('distribution_characterization')),
+            'distribution_source_observation':deepcopy(distribution)},
         'component_producer':'ORIGINAL_PRED_010_A_B_C_THRESHOLDS_SOURCE_ADAPTER',
         'top_level_aggregation_owner':'UNCHANGED_V75_RUNTIME_PRED_010','trade_action':'NO_TRADE'}
 

@@ -175,8 +175,10 @@ def build(report,request):
         point=current.get('current') or {}
         if point.get('value') is not None:
             name='官方組合到期殖利率' if current['basis']=='OFFICIAL_PORTFOLIO_YTM' else '官方30-Day SEC Yield'
-            intro.append(symbol+' '+point['observed_date']+' '+name+' '+point['value']+
-                '%；第008項仍需同口徑週資料歷史，不以現金配息收益率推算百分位。')
+            reference=current.get('predicate_reference')
+            intro.append(symbol+' '+point['observed_date']+' '+name+' '+point['value']+'%；'+
+                ('第008項採固定'+str(reference['selected_tenor_months'])+'M Treasury備援，按每週最後公布值比較；此為Treasury基準，保留官方YTM單點。'
+                if reference else '第008項仍需同口徑週資料歷史，不以現金配息收益率推算百分位。'))
         quality=(report.get('native_bond_source',{}).get('etf_quality_assessments',{}).get(symbol)
             or pool.get('etf_quality_assessments',{}).get(symbol))
         if quality:

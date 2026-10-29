@@ -301,7 +301,9 @@ def read(source,evaluation_at):
     from v75_official_release_inputs import qualify as qualify_releases
     out=qualify_releases(out,evaluation_at)
     from v75_sofr_horizon_inputs import extend as extend_sofr
-    return extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
+    out=extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
+    from v75_handoff_inputs import extend as extend_handoff
+    return extend_handoff(out,manifest.get('source_handoff'),data,evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):
@@ -320,7 +322,7 @@ def slot(pool,pid,asset,previous,evaluation_at):
         fresh=pool['etf_quality_assessments'][asset]['input_freshness_verified']
     missing=deepcopy(pool.get('asset_unprovided_inputs',{}).get(asset,{}).get(pid,
         pool['unprovided_inputs'].get(pid,[])))
-    return {'metrics':deepcopy(metrics),'original_result':result.model_dump(mode='json'),
+    entry={'metrics':deepcopy(metrics),'original_result':result.model_dump(mode='json'),
         'input_coverage':'PARTIAL_RAW_METRICS' if missing else 'COMPLETE_RAW_METRICS',
         'unprovided_inputs':missing,
         'source_pool_digest':digest(pool),'source_available_at':pool['available_at'],
@@ -328,6 +330,9 @@ def slot(pool,pid,asset,previous,evaluation_at):
         'original_default_freshness_is_not_attestation':True,
         'original_result_as_of_basis':'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE',
         'previous_observation':deepcopy(previous)}
+    if pid=='PRED-008' and asset+'.PRED-008' in pool['calculations']:
+        entry['yield_reference']=deepcopy(pool['calculations'][asset+'.PRED-008'])
+    return entry
 
 
 def apply(observations,pool,*,evaluation_at,repo_root,macro=None):

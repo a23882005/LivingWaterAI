@@ -167,6 +167,15 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                     'trailing_12m_roc_pct_with_complete_issuer_breakdown':'近12月配息來源與ROC分解'}
                 missing=[missing_labels[k] for k in quality['unprovided_inputs'] if k in missing_labels]
                 if missing:text.append('品質來源待補：'+'、'.join(missing)+'。')
+                distribution=quality.get('calculations',{}).get('distribution_source')
+                if distribution:
+                    text.append('已核對發行商'+str(distribution['periods'])+'期配息明細；'+
+                        ('2026成分仍屬暫定，保留品質未定。' if distribution['provisional_issuer_components'] else
+                         '2025稅務分解與2026缺漏分列，未把缺少的ROC補0。'))
+            yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
+            if yield_source:
+                text.append('第008項採固定'+str(yield_source['selected_tenor_months'])+
+                    'M Treasury久期匹配備援，週取最後公布值；官方基金YTM／SEC yield單點另列。')
             technical=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-009',{})
             state=technical.get('original_result',{}).get('aggregate_state')
             if technical.get('deployment_input_eligible') and state:

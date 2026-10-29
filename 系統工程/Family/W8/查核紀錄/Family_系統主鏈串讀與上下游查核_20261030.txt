@@ -1,3 +1,18 @@
+【再次複核裁定｜2026/10/30｜取代先前疑點的籠統表述】
+PR59 head重新確認仍為f6ddf599fa0bda5303895046b5175addf03e8de2。
+必須續作的修正，依下列順序：
+• V82完整Entry與正式選階接線：stock_engine.py:71–73目前仍用R_ok子條件與外部stage；改接已新增的完整Right、own_history、approved_profiles，統一分析與部署的來源／定義。保留第一段已完成函式。
+• 買入速度與同日cycle：依核准v1.0接M、日切片、乘數、G0/B0/B_current、spent/committed；同日換run接續額度，取消待確認保留占用，與活動訂單曝險分別核對。
+• 多標的共同資金：native_funding_advice.py:207明列正額度仍需共同分配，deployment_evidence_sources.py:69仍保留正額度必要cap未知。補V70剩餘容量與多標的分配後的實際cap，串Work6／SGOV／保護持倉／Work9；現有guard繼續使用。
+• W6正式結果承接：w6_current_data.py:52–59只驗engine部分外框，:164起另算target/drift。補原canonical內容、digest、目標版本、分母、保護持倉語意與原有輸出資格的綁定；依報告種類沿用正式規則，不增加一律要求正資金／完全技術確認的門檻。
+• W6來源轉接：formal_report_source.py由DB目標表取值，但Joseph的核准目標另有正式外部來源；沿既有核准證據無損承接，並接四雷達及八組章節的可信來源。可信外部producer的注入方式本身是合法設計，待補的是實際實作／映射／同輪驗收證據。
+• 獨立內文HTML：w6_member_render.py在瀏覽器分頁後保存完整DOM，再確認report.html獨立開啟包含14章內容，與PDF／index同輪一致。此為已確認的輸出內容缺陷；既有PDF與翻頁閱讀器保留。
+• 最後整線驗收：同組輸入追到正式金額、Work9、Mentor、報告、Drive讀回；這是交付驗證工作，不另起新架構。
+釐清：C使用Target−Current，W6圖示使用Current−Target且已標示，正負號本身不是算錯。要修的是canonical來源與具名展示轉換，避免不同定義的值被當成同欄位。
+釐清：DB integrity/FK正常，目標外部核准與callback注入均不因此判定故障；補接線即可。V70／V82／V75既定分工、按需執行架構、核准配色母版與私人DB schema沿用。
+責任：既有Codex沿PR59施工V82與整線接線；中PM負責範圍／契約、報告與HTML修正的統整及獨立驗收。此輪完成再複核與修正清單登記，尚未修改runtime。
+
+
 活水AI Family｜中PM系統主鏈串讀與上下游契約查核
 查核日期：2026/10/30（台灣時間）
 查核者：Family中PM／總PM

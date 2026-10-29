@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-28T01:30:22.570Z",
+  "updated_at": "2026-10-29T08:03:13+08:00",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "Family中PM（總PM）下一對話接任者本人",
-  "next_action": "Total PM personally completes the existing PR59 native input assembly and full original FamilyRunner → Mentor for Joseph and MOU. Existing holdings are official by explicit Owner decision. The concrete remaining engineering issue is absent native_bundle and associated source contexts; do not return to Owner for the same holdings confirmation.",
+  "next_owner": "New conversation Family中PM／全專案總PM，親自執行剩餘工程並負責Gate與治理",
+  "next_action": "Read 20261029 three handoff ZIPs then fresh PR59/live governance; apply approved V82 v1.0 and current MOU 17-target fixed-ID DB, coordinate existing worker and complete/independently accept Joseph/MOU menu04, then remaining W8 processes and Gate D/E. Earlier active_04_focus snapshots are historical where superseded.",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1586,5 +1586,116 @@
       "trade_action": "NO_TRADE",
       "full04_acceptance": "NOT_PASSED"
     }
+  },
+  "mou_same_id_writeback_20261029": {
+    "status": "PASS",
+    "scope": "Owner-authorized replacement of existing official MOU DB with reviewed approved-target version; full menu04/Gate acceptance unchanged",
+    "official_file_id_preserved": true,
+    "official_file_name": "mou.db",
+    "official_bytes": 667648,
+    "official_sha256": "2f1909ae3b6044fc7271cc107510f4c993da6af6993fd7f09c33b942c21d961c",
+    "pre_update_backup": "VERIFIED_EXACT_BYTES_IN_PRIVATE_BACKUP",
+    "schema": "UNCHANGED",
+    "existing_rows": "PRESERVED_EXCEPT_TWO_ACCOUNT_DISPLAY_LABELS",
+    "approved_target_rows": 17,
+    "approved_target_weight_units": 1000000,
+    "target_status": "CONFIRMED_COMPLETE",
+    "remote_readback": "EXACT_BYTES_AND_SHA256_MATCH",
+    "integrity_check": "ok",
+    "foreign_key_violations": 0,
+    "private_receipt_drive_id": "1LtCd-U0wixCKIT0J-9i05CMDDETWWTaS",
+    "drive_governance": "ENGINEERING_FILES_MASTER_WBS_UPDATED"
+  },
+  "handoff_20261029": {
+    "role": "Family中PM＝全專案總PM＝剩餘工程直接執行者",
+    "status": "HANDOFF_PACKAGES_VERIFIED__ENGINEERING_IN_PROGRESS",
+    "read_order": [
+      "ZIP1",
+      "ZIP2",
+      "ZIP3"
+    ],
+    "packages": [
+      {
+        "name": "Family_W8_20261029_080313_ZIP1_中PM總PM職責與最高架構_複核修訂版.zip",
+        "bytes": 89667,
+        "sha256": "8ad3ba8aff3c964690662e8ac59cd2231961f098d6492ca47857d80364d5aead",
+        "payload_files": 7
+      },
+      {
+        "name": "Family_W8_20261029_080313_ZIP2_已完成工程與正式來源證據_複核修訂版.zip",
+        "bytes": 817663,
+        "sha256": "0f9f1d4570609c8db038249b49da229274e4e3bbc5d1d0d3e13456d4ac9fca18",
+        "payload_files": 23
+      },
+      {
+        "name": "Family_W8_20261029_080313_ZIP3_剩餘工序與四戶Gate驗收_複核修訂版.zip",
+        "bytes": 8901,
+        "sha256": "315225d8e7eb4c576e8c75549f08e36d03415fe43c5e14df5f67e86070079667",
+        "payload_files": 7
+      }
+    ],
+    "remote_validation": "3/3_EXACT_BYTES_SHA256_CRC__37_PAYLOAD_SIZE_SHA256_PASS",
+    "uat_rows": 56,
+    "latest_pr59_head": "0334f9ae82f42b6a3786f7e1e2dd31cf1f52b0c3",
+    "pr59_status": "OPEN_DRAFT_UNMERGED",
+    "latest_pr_head_ci_observation": "Latest head observed 0334f9a; old e11 CI snapshot is historical; this handoff review did not rerun engineering CI",
+    "latest_status_overrides_older_focus_snapshot": true,
+    "latest_engineering": "PR59 remains open/draft/unmerged; official W1 confirmed-target reader and approval-lineage/account/instrument binding advanced; full native deployment and customer FamilyRunner/Work9/Mentor acceptance pending",
+    "approved_v82_v1": "APPROVED_FOR_IMPLEMENTATION_ON_20261028; explicit revisions override old candidate labels",
+    "mou_database": "Original fixed-ID DB updated and verified 20261029, 17 confirmed targets; see mou_same_id_writeback_20261029",
+    "execution_mode": "ChatGPT on demand; GitHub code; Drive independent DB/report; no Hostinger/Render persistent host",
+    "next_owner": "New conversation Family Total PM, hands-on, full governance and Gate responsibility",
+    "next_sequence": [
+      "Coordinate/accept existing PR59 work and finish Joseph/MOU menu04",
+      "Remaining DB same-ID persistence per live evidence",
+      "Menu11 transaction/holdings/cash/zero position sync",
+      "Menu13/12 W6 reports produce/save/readback/lookup",
+      "Four households x14 real E2E",
+      "Gate D / four Projects rollout / trial fixes / Gate E / closeout"
+    ],
+    "private_links": "Drive engineering/file management/Master WBS",
+    "index": "系統工程/Family/W8/20261029_中PM總PM三ZIP正式交接索引.md",
+    "rechecked_at": "2026-10-29T08:03:13+08:00",
+    "review_corrections": [
+      "Explicit Total PM scope, authority, hands-on execution and honest reviewer identity",
+      "Five governance records: contents, file identities, backup/writeback/readback/recovery/sync",
+      "Full repo paths with Family parent directory; eight Project file pointers and four report folders",
+      "Fresh PR head and commit snapshot; official W1 target updates and dependency changes disclosed",
+      "Gate D then PROD/four Projects rollout then TRIAL then Gate E and final closeout; 56-row menu blob checked"
+    ]
+  },
+  "handoff_acceptance_20261029": {
+    "status": "ACCEPTED_IN_NEW_CONVERSATION",
+    "role": "Family中PM＝全案總PM；剩餘工程執行、驗收與治理",
+    "zip_crc_pass": 3,
+    "payload_sha_size_pass": 37,
+    "observed_pr59_head": "3772bd7586a71878617f93524bb0d685dd6af39e",
+    "observed_pr59_state": "OPEN_DRAFT_NOT_HANDED_BACK",
+    "observed_base_sha": "f40ecc84a711fb2b50d8b7572e63ab08dc643d0a",
+    "governance": "Drive施工管理、Family檔案管理、MasterWBS已備份、原ID登記並讀回",
+    "next": "總PM先唯讀核對PR59最新差異與實跑證據，維持單一施工線；依既定WBS接續Joseph/MOU04與原FamilyRunner/Work9/Mentor驗收",
+    "engineering_status": "W8 IN_PROGRESS；本次交接完整性驗證維持既有Gate狀態",
+    "runtime": "GitHub code / Drive DB and reports / ChatGPT on demand"
+  },
+  "architecture_video_archive_20261029": {
+    "status": "OWNER_APPROVED_ARCHIVED",
+    "path": "系統工程/Family/文件歸檔/十四項選單程式與DB架構圖/活水AI-系統架構圖-說明小影片.mp4",
+    "sha256": "78fc5e5d4c4e305ec71e2ad45c76825216ce0f8736b18500edc707e62f397d76",
+    "bytes": 6835303,
+    "duration_seconds": 76.875,
+    "drive_location": "系統工程",
+    "maintenance_owner": "Family中PM",
+    "scope": "Documentation archive; existing engineering acceptance unchanged"
+  },
+  "user_manual_video_archive_20261029": {
+    "status": "OWNER_APPROVED_ARCHIVED",
+    "path": "系統工程/Family/文件歸檔/家人使用手冊說明影片/活水AI-家人使用手冊-說明小影片.mp4",
+    "sha256": "15c917f98a7be1ab7a379a04e58504f9f4165f62e86cc124692eb095773d0278",
+    "bytes": 5584613,
+    "duration_seconds": 182,
+    "drive_location": "系統工程",
+    "maintenance_owner": "Family中PM",
+    "approved_edition": "粉紅封面3秒翻頁版",
+    "scope": "Documentation archive; engineering acceptance unchanged"
   }
 }

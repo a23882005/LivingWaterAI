@@ -1,0 +1,12 @@
+{
+  "revision": "v1.2",
+  "date": "2026/10/29",
+  "code_baseline": "60fd1d5f062ad7b3b20a713d44198e927fc0c212",
+  "sources_verified_on": "2026/10/29; prior readback reused",
+  "pages": 6,
+  "public_sha256": "ab96aa1101f330734aa8c52690d0edf0c79678988bac5904f44b35bd51964b29",
+  "public_bytes": 520757,
+  "drive_sha256": "7d3e3be3738078a3b38911de240a587eecceba5c40feda9fac3bc6beabe0e213",
+  "drive_bytes": 522554,
+  "qa": "6/6 pages and 14/14 menu items; full color; 10 private edition links; text and pixels match after font subsetting; no text out of page"
+}

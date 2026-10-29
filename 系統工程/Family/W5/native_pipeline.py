@@ -118,6 +118,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     unified=work9.build_unified_deployment(unified_request)
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
+        **({'predicate_amendments':deepcopy(bond['predicate_amendments'])} if bond.get('predicate_amendments') else {}),
         'stock_source':deepcopy(stock_source),'family_sources':deepcopy(family_sources),
         'target_unit_projection':target_projection,
         'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,

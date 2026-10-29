@@ -39,6 +39,8 @@ class FamilyRunner:
     def _validate(self,request):
         ctx=deepcopy(self.context_provider())
         prepared=prepare_input(request,trusted_context=ctx)
+        from v75_pred007_source import bind as bind_pred007
+        amendment=bind_pred007(request,ctx)
         from native_target_source import bind as bind_native_targets
         native_targets=bind_native_targets(request,ctx)
         bundle=request.get('native_bundle')
@@ -65,6 +67,7 @@ class FamilyRunner:
         prepared.payload['stock_source']=bind_stock_source(request,prepared,binding)
         prepared.payload['family_sources']={'funding':bind_funding_source(request,ctx),
             'macro':validate_macro_consumers(request),'bond':bind_bond_sources(request,prepared,binding)}
+        if amendment is not None:prepared.payload['family_sources']['pred007_amendment']=amendment
         values=bind_position_values(request,prepared,ctx)
         prepared.payload['family_sources']['valuation']=values
         prepared.payload['family_sources']['protection']=bind_stock_protection(request,prepared,ctx,values)
@@ -79,6 +82,11 @@ class FamilyRunner:
         prepared,ctx=self._validate(request)
         native=run_native_pipeline(self.repo_path,apply_technical_source(request['native_bundle'],prepared.payload['technical_intake']),
             prepared.payload['stock_source'],prepared.payload['family_sources'])
+        amendment=prepared.payload['family_sources'].get('pred007_amendment')
+        if native.get('status')!='NATIVE_PIPELINE_COMPLETE' and amendment is not None:
+            error=BoundaryError('NATIVE_RESULT_INCOMPLETE','native.status',status='DATA_UNAVAILABLE')
+            error.issue.update(native_status=native.get('status'),pred007_amendment=deepcopy(amendment))
+            raise error
         require(native.get('status')=='NATIVE_PIPELINE_COMPLETE','NATIVE_RESULT_INCOMPLETE','native.status',status='DATA_UNAVAILABLE')
         u=native['unified_result']
         mentor=explain_native(self.repo_path,native['work9_request'],u,trusted_context={
@@ -87,6 +95,10 @@ class FamilyRunner:
             'data_provenance':ctx['native_binding']['data_provenance'],'expected_result_digest':digest(u),
             'expected_bond_context_digest':digest(prepared.payload['family_sources']['bond_targets'])},
             bond_context=prepared.payload['family_sources']['bond_targets'])
+        amendment=prepared.payload['family_sources'].get('pred007_amendment')
+        if amendment is not None:
+            from v75_pred007_source import describe
+            mentor['liquidity_amendment']={'assessment':deepcopy(amendment),'explanation':describe(amendment)}
         return {'schema_version':'Family.W5.result.v1','status':'OK','client_id':request['client_id'],
             'request_id':request['request_id'],'run_id':request['run_id'],'owner':deepcopy(request['owner']),
             'input_digest':input_digest(request),'target_binding':deepcopy(prepared.payload['target_binding']),
@@ -101,6 +113,8 @@ class FamilyRunner:
             if self.native_source_report is not None:
                 ctx=deepcopy(self.context_provider())
                 prepare_input(frozen,trusted_context=ctx)
+                from v75_pred007_source import bind as bind_pred007
+                bind_pred007(frozen,ctx)
                 report=deepcopy(self.native_source_report)
                 require(report.get('schema_version')=='Family.W8.NativeSourceProduction.v1'
                     and report.get('status') in ('BLOCKED_BY_ORIGINAL_ADAPTER','SOURCE_STAGE_INCOMPLETE')

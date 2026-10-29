@@ -173,6 +173,10 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
                         ('2026成分仍屬暫定，保留品質未定。' if distribution['provisional_issuer_components'] else
                          '2025稅務分解與2026缺漏分列，未把缺少的ROC補0。'))
             yield_source=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-008',{}).get('yield_reference')
+            liquidity=bond_source.get('predicate_observations',{}).get(symbol,{}).get('PRED-007',{}).get('amendment_assessment')
+            if liquidity:
+                from v75_pred007_source import describe
+                text.append(describe(liquidity))
             if yield_source:
                 text.append('第008項採固定'+str(yield_source['selected_tenor_months'])+
                     'M Treasury久期匹配備援，週取最後公布值；官方基金YTM／SEC yield單點另列。')

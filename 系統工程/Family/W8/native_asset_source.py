@@ -426,6 +426,12 @@ class AssetSourceProducer:
         supplement=read_bond_supplement(self.bond_market_supplement_source,when)
         from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
         macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
+        amendment=(macro_inputs or {}).get('usd_pred007_amendment')
+        if amendment:
+            req['expected_versions']['v75_pred007']=ctx['expected_versions']['v75_pred007']=amendment['rule_identity']['effective_predicate_version']
+            ctx['v75_pred007_source']=deepcopy(amendment['metrics']['amendment_source'])
+            ctx['v75_pred007_legacy_candidates']=deepcopy(amendment['metrics']['legacy_candidates'])
+            req['v75_pred007_source_digest']=amendment['source_digest']
         observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
         observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
         from qualified_equity_inputs import read as read_equities,apply as apply_equities

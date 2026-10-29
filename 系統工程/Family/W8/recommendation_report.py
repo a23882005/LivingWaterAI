@@ -165,6 +165,9 @@ def build(report,request):
         intro.append('原V70股票戰術總額度：'+str(tactical['allocation']['sTot'])+'%，'+money(tactical['amounts']['stock'],tactical['currency'])+'；此為股票總池額度，非單檔補倉金額。')
     supplement=report.get('bond_market_supplement')
     pool=report.get('v75_macro_inputs') or {}
+    if pool.get('usd_pred007_amendment'):
+        from v75_pred007_source import describe
+        intro.append(describe(pool['usd_pred007_amendment']['assessment']))
     for symbol in ('SGOV','SPSB'):
         history=pool.get('income_observations',{}).get(symbol,{}).get('calculation')
         if history:

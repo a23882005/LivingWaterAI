@@ -303,10 +303,16 @@ def read(source,evaluation_at):
     from v75_sofr_horizon_inputs import extend as extend_sofr
     out=extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
     from v75_handoff_inputs import extend as extend_handoff
-    return extend_handoff(out,manifest.get('source_handoff'),data,evaluation_at)
+    out=extend_handoff(out,manifest.get('source_handoff'),data,evaluation_at)
+    from v75_pred007_inputs import extend as extend_pred007
+    return extend_pred007(out,manifest.get('pred007_amendment_source'),evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):
+    if pid=='PRED-007':
+        from v75_pred007_inputs import slot as amended_slot
+        amended=amended_slot(pool,asset,evaluation_at,previous)
+        if amended is not None:return amended
     metrics=pool['asset_metrics'].get(asset,{}).get(pid,pool['shared_metrics'].get(pid))
     if metrics is None:return None
     from v75_runtime.predicates import EVALUATORS

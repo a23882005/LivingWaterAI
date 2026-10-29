@@ -67,7 +67,8 @@ def c7_bucket_preflight(root,request,analysis,context):
 def completion_gaps(analysis,missing):
     bond=analysis.get('native_bond_source') or {};observed=bond.get('predicate_observations') or {}
     spec=[];data=[]
-    if any(v.get('PRED-007',{}).get('original_result',{}).get('assessment_status')!='VALID' for v in observed.values()):
+    amended=any(v.get('PRED-007',{}).get('rule_identity',{}).get('amendment_id')=='V75-PRED007-20261029-01' for v in observed.values())
+    if not amended and any(v.get('PRED-007',{}).get('original_result',{}).get('assessment_status')!='VALID' for v in observed.values()):
         spec=[{'field':field,'reason':'Formal v1.0.3 has bps thresholds but no complete comparison definition'}
             for field in ('SOFR_OIS.sofr_leg_definition','SOFR_OIS.ois_leg_definition',
                 'SOFR_OIS.comparison_tenor','FRA_OIS.forward_start_period','FRA_OIS.contract_tenor',
@@ -75,6 +76,9 @@ def completion_gaps(analysis,missing):
         if any('treasury_market_depth_percentile_3y' not in v.get('PRED-007',{}).get('metrics',{}) for v in observed.values()):
             data.append({'field':'PRED-007.treasury_market_depth_percentile_3y',
                 'reason':'BrokerTec three-year raw market depth and usage entitlement not acquired; yields are not depth'})
+    if amended and any(any(x['candidate']=='D' for x in v.get('PRED-007',{}).get('amendment_assessment',{}).get('missing_candidates',[])) for v in observed.values()):
+        data.append({'field':'PRED-007.treasury_market_depth_percentile_3y',
+            'reason':'Not acquired; authorized 3/4 VALID aggregation may proceed with PARTIAL_COVERAGE; not a standalone blocker'})
     if 'SPSB' in observed and observed['SPSB'].get('PRED-008',{}).get('original_result',{}).get('assessment_status')!='VALID':
         data.append({'field':'SPSB.PRED-008.five_year_weekly_YTM_or_SEC_yield',
             'reason':'Same-basis weekly history not acquired; current yield/NAV/distribution yield cannot substitute'})

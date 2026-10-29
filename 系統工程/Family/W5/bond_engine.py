@@ -105,8 +105,16 @@ def run_bond_engine(repo_path, adapter_request, asset_evidence, policy_sources=N
                 raise BondEvidenceError('FUTURE_EVIDENCE')
             if set(facts['metrics']) != set(EVALUATORS):
                 raise BondEvidenceError('PREDICATE_COVERAGE')
-            predicates = [fn(facts['metrics'][pid], observed, [facts['source_reference']])
-                          for pid, fn in EVALUATORS.items()]
+            predicates=[]
+            for pid,fn in EVALUATORS.items():
+                metrics=facts['metrics'][pid]
+                if pid=='PRED-007' and 'amendment_source' in metrics:
+                    from v75_pred007_source import evaluate as amended_pred007
+                    value,assessment=amended_pred007(metrics,run.analysis_timestamp.isoformat(),run.currency)
+                    result.setdefault('predicate_amendments',{})[item.asset_id]=assessment
+                    trace.append('V75.PRED-007:V75-PRED007-20261029-01@1.0:explicit_version_mapping')
+                else:value=fn(metrics,observed,[facts['source_reference']])
+                predicates.append(value)
             trace.append('V75.predicates.PRED-001..010:' + item.asset_id)
             result['predicate_results'][item.asset_id] = [p.model_dump(mode='json') for p in predicates]
             evaluated[item.asset_id]=predicates

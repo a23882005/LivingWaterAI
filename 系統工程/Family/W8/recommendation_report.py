@@ -122,6 +122,21 @@ def build(report,request):
         intro[-1]='本人已確認無掛單；其餘配置、模式及資金限制各自列示。'
     if (report.get('new_investment_scenario') or {}).get('total_new_investment_amount')=='0':
         intro.insert(1,'本輪不新增外部資金，新增投入為0；既有現金與持倉保留。')
+    account=report.get('account_funding_check')
+    if account:
+        checked=sum(c['status']=='PASSED' for c in account['adapter_checks'].values())
+        intro.append('帳戶股債資金核對：'+str(checked)+'檔已通過帳戶／可用現金／股債預算隔離檢查。')
+        budget=account.get('known_claims_budget_check')
+        if budget and budget['status']=='PASSED':
+            values=budget['result']
+            counted_classes={c['asset_class'] for c in account['claims']}
+            intro.append('已取得原生金額的'+str(account['coverage']['native_amounts_counted'])+'檔合計：股票 '+
+                money(values['equity_used'] if 'EQUITY' in counted_classes else None,request['owner']['currency'])+'、債券 '+
+                money(values['bond_used'] if 'BOND' in counted_classes else None,request['owner']['currency'])+'。尚有'+
+                str(account['coverage']['unresolved_native_decisions'])+'檔金額未定，未以0補入；全戶共同部署保全尚未通過。')
+        elif budget and budget['status']=='REJECTED':
+            intro.append('已產生的原生金額超出帳戶資金或不符合資金契約，停止合併建議。')
+        intro.append('現有SGOV持倉、核准目標與歷史角色金額均未轉成可買股票的現金；角色來源與目前分帳缺口保留。')
     tactical=next((p['current_analysis'].get('v70_tactical_budget') for p in positions if p['current_analysis'].get('v70_tactical_budget')),None)
     if tactical:
         current=tactical.get('current_stock_bond_reference')
@@ -166,6 +181,7 @@ def build(report,request):
         'net_after_orders_status':'OWNER_CONFIRMED_NO_OPEN_ORDERS' if all_orders_confirmed else 'PENDING_OWNER_ORDER_CONFIRMATION',
         'analysis_status':report['status'],'full_native_deployment_complete':False,
         'rows':rows,'bond_advisory_comparison':deepcopy(comparison),
+        'account_funding_check':deepcopy(account),
         'markdown':markdown,'html':html,'trade_action':'NO_TRADE'}
     out['digest']=digest(out)
     return out

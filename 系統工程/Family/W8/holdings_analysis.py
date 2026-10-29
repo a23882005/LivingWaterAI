@@ -476,6 +476,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 if row['instrument_id'] in bond['requested_instruments']:
                     row['current_analysis']['native_bond_source']=bond_delivery(bond)
                     row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
+        from account_funding_check import build as check_account_funding
+        report['account_funding_check']=check_account_funding(producer.root,request,report)
+        report['call_trace']+=report['account_funding_check']['call_trace']
     from runtime_loader import load_c_module
     from mentor_bridge import explain_holdings_recommendations
     work9=load_c_module(producer.root,9)
@@ -573,6 +576,9 @@ class HoldingsAnalysisRunner:
         from bond_policy_audit import validate as validate_bond_policy
         validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)
+        if report.get('account_funding_check') is not None:
+            from account_funding_check import validate as validate_account_funding
+            validate_account_funding(root,request,report)
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

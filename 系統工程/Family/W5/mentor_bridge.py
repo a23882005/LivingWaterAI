@@ -150,6 +150,11 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         if facts.get('recommendation',{}).get('approved_no_new_buy'):
             text.append('原C依既有完整核准配置算出長期目標0%，因此此配置基準不新增；不是重新最佳化的提案，也不代表必須立即賣出。' if facts['recommendation'].get('approved_no_new_buy_source',{}).get('basis')=='ORIGINAL_C6_COMPLETE_APPROVED_TARGET_LOOKUP' else '本人正式長期目標明訂0%，因此不新增；這是既有核准配置政策，不等於必須立即賣出，賣出金額仍需原生依據。')
         native_funding=facts.get('native_funding_advice',{})
+        bond_source=facts.get('native_bond_source')
+        if bond_source:
+            text.append('原Work5／V75來源檢查：'+bond_source['status']+'；SGOV實體持股與債券桶／子彈桶分開，尚未產生完整債券部署建議。')
+            fields=list(dict.fromkeys(i['field_path'] for i in bond_source['issues']))
+            if fields:text.append('V75仍缺：'+'、'.join(fields)+'。')
         if native_funding.get('status')=='CASH_TRIAL_ADVICE_COMPUTED':
             plan=native_funding['native_plan']
             text.append(f"原Work3／Work4及V82金額規劃已執行：本輪缺漏可用現金按0試算，現金買入建議 {source['owner']['currency']} {plan['execution_amount']}；這不代表既有現金餘額或持股缺口為0，既有資產調整及扣掛單淨額另列。")

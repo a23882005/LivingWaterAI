@@ -351,6 +351,7 @@ class AssetSourceProducer:
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
             approved_rule_profile=self.approved_rule_profile,
             allow_independent_close_analysis=self.flow=='HOLDINGS_ANALYSIS',
+            approved_target=req.get('confirmed_target'),
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
         from new_investment_scenario import build_plan,apply_plan,wire_number

@@ -42,11 +42,11 @@ def delivery(item):
         if k not in ('work3_input','stock_request','work4_result')}
 
 
-def build(producer,request,report,*,trial,investment,tactical):
-    """Consume verified same-member sources; preserve every native rejection."""
+def build_shared_inputs(producer,request,report,*,trial,investment,tactical):
+    """One source envelope for both original stock and bond adapters."""
     run=request['run_id'];owner=request['owner'];snapshot=request['client_snapshot']['payload']
     ref='DB:'+snapshot['source_sha256'];macro=request['macro_snapshot'];when=request['evaluation_at']
-    w3=load_c_module(producer.root,3);w4=load_c_module(producer.root,4)
+    w3=load_c_module(producer.root,3);w5=load_c_module(producer.root,5)
     native_owner={k:owner[k] for k in ('broker','account')};native_owner['funding_domain']='US_BROKER'
     contexts,cash_sources=producer.funding_contexts(snapshot,native_owner,trial,run,ref)
     from new_investment_scenario import apply_plan,wire_number
@@ -89,14 +89,14 @@ def build(producer,request,report,*,trial,investment,tactical):
     envelope={'contract_name':w3.WORK2_ENVELOPE_NAME,'contract_version':w3.WORK2_ENVELOPE_VERSION,
         'baseline_id':w3.BASELINE_ID,'run_id':run,'owner':native_owner,'currency':owner['currency'],
         'settlement':{'cash_basis':'AVAILABLE','cash_state':deepcopy(trial['cash_state']),
-            'source_status':'TRIAL_MISSING_CASH_ZERO'},
+            'source_status':'UNKNOWN'},
         'final_target':{'allocation_id':draft['allocation_id'],'authorization_reference':draft['allocation_id'],
             'confirmation_proof':{k:target['confirmation_evidence'][k] for k in ('confirmed_at','confirmed_by')},
             'payload':{'instrument_targets':converted}},
         'remaining_target_gap':{'v82':{'mode':'V82_EXISTING_RUNTIME_DERIVED','payload':{'source_owned':True}},
             'v75':{'mode':'V75_EXISTING_EXPLICIT_GAP','payload':{'remaining_target_gap_amount':None}}},
         'executable_budget':legs,'temporal':{'as_of':when,'data_as_of':{'W1':request['client_snapshot']['as_of'],'V70':macro['asOf']}},
-        'versions':{'rule':request['expected_versions'],'data':{'W1':snapshot['source_sha256']},'schema':{'Family':'W5.request.v1'}},
+        'versions':{'rule':{**request['expected_versions'],'V75':w5.V75_RULE_VERSION},'data':{'W1':snapshot['source_sha256']},'schema':{'Family':'W5.request.v1'}},
         'lineage':{'source_reference_ids':[ref],'upstream_snapshot_ids':{'v70':v70id,'c7':None}},
         'reason_status':{'source_reason_codes':{'C7':['C7_FULL_FRAMEWORK_NOT_PRODUCED']},'source_status_codes':{'C7':'FUNDING_CONTEXT_ONLY'},'integration_diagnostics':[]},
         'sgov_boundary':{'v70_original_dry_powder':{'amount':({'amount':amounts['dry_powder'],'currency':owner['currency']} if amounts else None),'weight':None,'source_status':'KNOWN' if amounts else 'UNKNOWN'},
@@ -114,6 +114,27 @@ def build(producer,request,report,*,trial,investment,tactical):
             'context_version':'Family.W8.CurrentAdvice.v1','as_of':when,'data_as_of':{'macro':macro['asOf']},
             'payload':{'macro':deepcopy(macro['payload']),'cash_trial':deepcopy(trial)},
             'source_reference_ids':[ref],'versions':{'source_db':snapshot['source_sha256']}}}
+    bond_markets={r['instrument_id']:deepcopy(r.get('market')) for r in report['analysis_result']['positions']
+        if r['native_product_identity'].get('engine_route')=='V75_PREDICATES' and r.get('market')}
+    bond_markets.update(deepcopy(report.get('bond_target_market_observations',{})))
+    shared=work3_input['shared_decision_context']
+    shared['payload']['bond_market_observations']=bond_markets
+    shared['data_as_of']['bond_market_source_verification']={k:v['provider_verified_at']
+        for k,v in bond_markets.items() if v.get('provider_verified_at')}
+    shared['source_reference_ids'].append('BOND-MARKET:'+digest(bond_markets))
+    return {'work3_input':work3_input,'c7_funding_context':c7,'budget':budget}
+
+
+def build(producer,request,report,*,trial,investment,tactical,shared_inputs=None):
+    """Consume verified same-member sources; preserve every native rejection."""
+    run=request['run_id'];owner=request['owner'];snapshot=request['client_snapshot']['payload']
+    draft=request['confirmed_target']['payload']['draft']
+    w3=load_c_module(producer.root,3);w4=load_c_module(producer.root,4)
+    shared=shared_inputs or build_shared_inputs(producer,request,report,
+        trial=trial,investment=investment,tactical=tactical)
+    work3_input=deepcopy(shared['work3_input']);c7=deepcopy(shared['c7_funding_context'])
+    budget=shared['budget']
+    converted=work3_input['work2_envelope']['final_target']['payload']['instrument_targets']
     results={};trace=[]
     for row in report['analysis_result']['positions']:
         identity=row['native_product_identity'];advice=row['current_analysis'];symbol=row['symbol']
@@ -122,9 +143,7 @@ def build(producer,request,report,*,trial,investment,tactical):
             'full_native_canonical_complete':False,'trade_action':'NO_TRADE','issues':[]}
         results[row['instrument_id']]=out
         if identity.get('engine_route')=='V75_PREDICATES':
-            out['status']='BOND_ROUTE_PENDING'
-            out['issues']=[{'field_path':'bond_request','code':'V75_FUNDING_SOURCE_PRODUCER_REQUIRED',
-                'owner_input_required':False}]
+            out['status']='BOND_DELEGATED_TO_V75'
             continue
         missing=[]
         if not row.get('core_observation'):missing.append('native_product_identity.core_route' if identity.get('asset_type') is not None else 'native_product_identity.asset_type_and_core')

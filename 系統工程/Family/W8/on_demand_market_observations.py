@@ -235,7 +235,8 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
                                      official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
-                                     approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False):
+                                     approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False,
+                                     approved_target=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -263,6 +264,21 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                 'instrument_key': None, 'ticker': symbol, 'identity_state': 'SOURCE_SYMBOL_ONLY'}
             instrument['holding_source_reference'] = row['source_row'].get('source_reference')
             instruments.append(instrument);seen.add(symbol)
+    if approved_target is not None:
+        draft=approved_target.get('payload',{}).get('draft',{})
+        if draft.get('identity',{}).get('client_id')!=snapshot['client_id']:
+            raise PermissionError('OBSERVATION_TARGET_CLIENT_MISMATCH')
+        seen={r.get('ticker') for r in instruments}
+        # Target-only symbols are appended after accepted holdings so they
+        # cannot replace a holding's independently verified listing/currency.
+        for line in draft.get('target_lines',[]):
+            symbol=line.get('ticker')
+            if not symbol or symbol in seen:continue
+            instruments.append({'instrument_key':'APPROVED_TARGET:'+line['instrument_id'],
+                'ticker':symbol,'identity_state':'SOURCE_SYMBOL_ONLY',
+                'approved_target_reference':{'target_hash':approved_target.get('target_hash'),
+                    'target_instrument_id':line['instrument_id']}})
+            seen.add(symbol)
     assets, missing = [], []
     base = Path(repo_root).resolve() / 'data/market_history/global'
     manifest_path = base / 'manifest.json'

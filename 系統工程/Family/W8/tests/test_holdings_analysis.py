@@ -495,8 +495,8 @@ class NativeFundingAdviceTest(unittest.TestCase):
         row['native_product_identity']={'engine_route':'V75_PREDICATES','asset_type':None,'asset_grade':'UNKNOWN'}
         out=F.build(p,r,report,trial=trial,investment=investment,tactical=tactical)
         item=out['items'][row['instrument_id']]
-        self.assertEqual(item['status'],'BOND_ROUTE_PENDING')
-        self.assertEqual(item['issues'][0]['field_path'],'bond_request')
+        self.assertEqual(item['status'],'BOND_DELEGATED_TO_V75')
+        self.assertEqual(item['issues'],[])
         self.assertEqual(item['call_trace'],[])
         self.assertNotIn('stock_request',item);self.assertNotIn('native_plan',item)
 

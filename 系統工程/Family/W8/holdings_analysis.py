@@ -435,20 +435,34 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     if (getattr(producer,'native_funding_advice_enabled',False) and investment
         and investment.get('total_new_investment_amount') is not None
         and request.get('macro_snapshot') and trial.get('cash_state')):
-        from native_funding_advice import build as build_native_funding_advice,delivery as funding_delivery
+        from native_bond_source import target_market_observations
+        report['bond_target_market_observations']=target_market_observations(request,observations,rows,root=producer.root)
+        from native_funding_advice import build as build_native_funding_advice,delivery as funding_delivery,build_shared_inputs
+        shared=build_shared_inputs(producer,request,report,trial=trial,investment=investment,tactical=tactical)
         funding=build_native_funding_advice(producer,request,report,trial=trial,
-            investment=investment,tactical=tactical)
+            investment=investment,tactical=tactical,shared_inputs=shared)
         report['native_funding_advice']=funding
         report['deployment_status']['native_funding_components']={
             'computed':sum(i['status']=='CASH_TRIAL_ADVICE_COMPUTED' for i in funding['items'].values()),
             'rejected':sum(i['status']=='NATIVE_CONTRACT_REJECTED' for i in funding['items'].values()),
             'input_unavailable':sum(i['status']=='INPUT_UNAVAILABLE' for i in funding['items'].values()),
             'bond_route_pending':sum(i['status']=='BOND_ROUTE_PENDING' for i in funding['items'].values()),
+            'bond_delegated_to_v75':sum(i['status']=='BOND_DELEGATED_TO_V75' for i in funding['items'].values()),
             'funding_bound_pending_stage':sum(i['status']=='FUNDING_BOUND' for i in funding['items'].values())}
         report['call_trace']+=funding['call_trace']
         for row in rows:
             row['current_analysis']['native_funding_advice']=funding_delivery(funding['items'][row['instrument_id']])
             row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
+        from native_bond_source import build as build_native_bond_source,delivery as bond_delivery
+        bond=build_native_bond_source(producer.root,request,report,shared_inputs=shared,
+            fx_observation=producer.fx_observation,strategic_policy=producer.v70_strategic_policy)
+        if bond is not None:
+            report['native_bond_source']=bond
+            report['call_trace'] += [{'function':name} for name in bond['call_trace']]
+            for row in rows:
+                if row['instrument_id'] in bond['requested_instruments']:
+                    row['current_analysis']['native_bond_source']=bond_delivery(bond)
+                    row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
     from runtime_loader import load_c_module
     from mentor_bridge import explain_holdings_recommendations
     work9=load_c_module(producer.root,9)
@@ -462,6 +476,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
     report['work9_request']=work9_request;report['work9_result']=work9_result
     report['backend_outputs']={'work9_recommendation_return':'COMPLETED','mentor':'SOURCE_BOUND_SCOPED_EXPLANATION',
         'full_deployment_work9':'NOT_RUN'}
+    if report.get('native_bond_source'):
+        report['backend_outputs']['v75_source_check']=report['native_bond_source']['status']
     report['mentor']=explain_holdings_recommendations(producer.root,work9_request,work9_result,trusted_context=mentor_context)
     report['call_trace'] += [{'function':'C8C9.Work9.build_holdings_recommendation_return'},
         {'function':'W5.explain_holdings_recommendations'}]
@@ -529,6 +545,8 @@ class HoldingsAnalysisRunner:
         validate_loop2_targets(root,request,self.context,report)
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
+        from native_bond_source import validate as validate_native_bond_source
+        validate_native_bond_source(root,request,report)
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

@@ -111,6 +111,42 @@ class ObservationsTest(unittest.TestCase):
         self.snapshot['tables']['portfolio_instrument'][0]['quote_currency']='CHF'
         self.assertEqual(self.build()['missing'][0]['code'],'ANALYSIS_MARKET_ALIAS_IDENTITY_MISMATCH')
 
+    def test_approved_unheld_bond_uses_cache_without_creating_a_holding(self):
+        self.manifest['items']['SPSB']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'SPSB.csv';self.write()
+        self.snapshot['tables'].update(portfolio_position=[],portfolio_instrument=[])
+        target={'payload':{'draft':{'identity':{'client_id':'MEMBER'},'target_lines':[
+            {'instrument_id':'APPROVED_SPSB','ticker':'SPSB'}]}}}
+        before=deepcopy((self.snapshot,target))
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',approved_target=target)
+        self.assertEqual(out['missing'],[])
+        self.assertEqual(out['assets'][0]['symbol'],'SPSB')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'SOURCE_SYMBOL_ONLY')
+        self.assertEqual((self.snapshot,target),before)
+        target['payload']['draft']['identity']['client_id']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'TARGET_CLIENT_MISMATCH'):
+            M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',approved_target=target)
+
+    def test_approved_target_cannot_replace_sealed_holding_listing(self):
+        self.configure_vwra_alias();self.snapshot['tables']['portfolio_position']=[]
+        self.snapshot['payload_digest']=digest(self.snapshot['tables'])
+        holdings={'client_id':'MEMBER','source_db_sha256':'a'*64,
+            'snapshot_digest':self.snapshot['payload_digest'],'analysis_security_positions':[
+                {'symbol':'VWRA','instrument':deepcopy(self.snapshot['tables']['portfolio_instrument'][0]),
+                 'source_row':{'source_reference':'SYNTHETIC_SEALED_HOLDING'}}]}
+        target={'payload':{'draft':{'identity':{'client_id':'MEMBER'},'target_lines':[
+            {'instrument_id':'APPROVED_VWRA','ticker':'VWRA'}]}}}
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',
+                official_holdings=holdings,approved_target=target)
+        self.assertEqual(out['missing'],[])
+        self.assertEqual(out['assets'][0]['provider_symbol'],'VWRA.L')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'KNOWN')
+
     def test_bad_prefix_uses_contiguous_suffix_without_repair_or_middle_row_deletion(self):
         self.configure_vwra_alias();self.rows[0]['High']=1;self.write();before=self.path.read_bytes()
         with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:

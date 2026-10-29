@@ -39,6 +39,8 @@ class FamilyRunner:
     def _validate(self,request):
         ctx=deepcopy(self.context_provider())
         prepared=prepare_input(request,trusted_context=ctx)
+        from native_target_source import bind as bind_native_targets
+        native_targets=bind_native_targets(request,ctx)
         bundle=request.get('native_bundle')
         require(isinstance(bundle,dict),'NATIVE_INPUT_MAPPING_REQUIRED','native_bundle',status='DATA_UNAVAILABLE')
         binding=ctx.get('native_binding',{})
@@ -66,8 +68,8 @@ class FamilyRunner:
         values=bind_position_values(request,prepared,ctx)
         prepared.payload['family_sources']['valuation']=values
         prepared.payload['family_sources']['protection']=bind_stock_protection(request,prepared,ctx,values)
-        prepared.payload['family_sources']['target']=bind_target_source(request)
-        prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding)
+        prepared.payload['family_sources']['target']=bind_target_source(request,projection=native_targets)
+        prepared.payload['family_sources']['bond_targets']=bind_bond_targets(request,prepared,binding,projection=native_targets)
         prepared.payload['family_sources']['v70']=bind_v70_source(request,ctx)
         prepared.payload['family_sources']['c7']=bind_c7_source(self.repo_path,request,ctx)
         if ctx.get('technical_source') is None:bind_technical_source(self.repo_path,request,ctx)

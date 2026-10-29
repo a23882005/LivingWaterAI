@@ -334,6 +334,11 @@ class AssetSourceProducer:
             req['confirmed_target']=view;ctx['approved_document_target_source']=proof;ctx['target_hash']=view['target_hash']
             if ctx.get('approved_document_account_scope'):
                 ctx['approved_document_account_scope']['source']=deepcopy(proof)
+        from native_target_source import produce as produce_native_targets
+        if req.get('confirmed_target') is not None:
+            native_targets=produce_native_targets(req,self.fx_observation)
+            ctx['native_target_source']=native_targets
+            req['native_target_source_digest']=digest(native_targets)
         prepared=prepare_input(req,trusted_context=ctx)
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')

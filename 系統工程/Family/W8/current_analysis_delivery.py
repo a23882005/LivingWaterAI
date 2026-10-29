@@ -188,6 +188,13 @@ def source_target_in_currency(target,currency,fx_observation=None):
     if target.get('value_state')!='KNOWN':return None
     if target.get('currency')==currency:return {'amount':target['amount'],'currency':currency,'source_column':target.get('source_column')}
     if currency!='USD':return None
+    if fx_observation is not None:
+        from fx_conversion import convert
+        value=convert(target['amount'],target.get('currency'),currency,fx_observation)
+        if value is not None:
+            return {'amount':str(value),'currency':currency,'source_column':'DATED_PUBLIC_FX_CONVERSION',
+                'fx_observation':deepcopy(fx_observation),
+                'original_source_money':deepcopy(target)}
     matches=re.findall(r'US\$\s*([0-9][0-9,]*(?:\.[0-9]+)?)',target.get('source_row',''))
     if len(matches)!=1:
         from fx_conversion import convert

@@ -50,6 +50,18 @@ class RecommendationOutputTest(unittest.TestCase):
         self.assertIn('active_orders_and_fill_reconciliation',out['missing_fields'])
         self.assertIsNone(out['buy_gap_amount'])
 
+    def test_same_run_fx_takes_precedence_over_old_approximate_usd_column(self):
+        target=self.row['formal_conclusion']['approved_project_target']
+        target.update(currency='TWD',amount='31500',source_row='| SYNTHETIC | NT$31,500 | US$1,000.00 |')
+        before=deepcopy(target)
+        fx={'base_currency':'USD','quote_currency':'TWD','quote_per_base':'35',
+            'as_of':'2026-10-27','source_url':'https://example.test/fx'}
+        out=recommendation_amounts(self.row,self.judgment,ROOT,fx_observation=fx)
+        self.assertEqual(out['calculation_target']['amount'],'900')
+        self.assertEqual(out['confirmed_holdings_component']['positive_gap_amount'],'355.00')
+        self.assertEqual(out['calculation_target']['fx_observation'],fx)
+        self.assertEqual(target,before)
+
     def test_cross_currency_is_not_subtracted_without_fx(self):
         self.row['formal_conclusion']['approved_project_target']['currency']='TWD'
         out=self.compute()

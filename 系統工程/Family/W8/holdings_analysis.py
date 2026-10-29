@@ -432,6 +432,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             [dict(p,scope='CASH_DIAGNOSTIC__DOES_NOT_BLOCK_HOLDING_ANALYSIS') for p in trial['issues']],
         'source_refs':[s for r in rows for s in r['source_refs']], 'call_trace':trace,
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
+    if context.get('native_target_source') is not None:
+        report['native_target_source']=deepcopy(context['native_target_source'])
     if (getattr(producer,'native_funding_advice_enabled',False) and investment
         and investment.get('total_new_investment_amount') is not None
         and request.get('macro_snapshot') and trial.get('cash_state')):
@@ -543,6 +545,10 @@ class HoldingsAnalysisRunner:
             raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
         from loop2_target_projection import validate as validate_loop2_targets
         validate_loop2_targets(root,request,self.context,report)
+        if request.get('native_target_source_digest') is not None:
+            from native_target_source import bind as bind_native_targets
+            if bind_native_targets(request,self.context)!=report.get('native_target_source'):
+                raise PermissionError('NATIVE_TARGET_DELIVERY_REPLAY_MISMATCH')
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
         from native_bond_source import validate as validate_native_bond_source

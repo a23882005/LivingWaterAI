@@ -186,6 +186,14 @@ def classification(symbol, source, product_source=None):
                         'source_reference':proof['source_reference'],'source_sha256':sha256(raw).hexdigest()},
                     company_identity=deepcopy(proof),analysis_capabilities=['V82_INDIVIDUAL_COMPONENT_CORE'],
                     valuation_waterfall=[])
+                assessment_path=HERE/'company_grade_evidence.json'
+                if assessment_path.is_file():
+                    assessment_raw=assessment_path.read_bytes()
+                    from company_grade_evidence import classify as classify_company_grade
+                    assessment=classify_company_grade(symbol,json.loads(assessment_raw),text)
+                    if assessment is not None:
+                        result.update(assessment)
+                        result['grade_evidence']['source_sha256']=sha256(assessment_raw).hexdigest()
                 if (symbol in ('NVDA','AVGO') and '## 32.8 Semiconductor｜半導體' in text
                     and 'Forward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield' in text):
                     result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD']

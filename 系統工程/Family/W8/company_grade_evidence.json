@@ -1,0 +1,1243 @@
+{
+  "schema_version": "Family.W8.PublicCompanyGradeEvidence.v1",
+  "items": {
+    "MSFT": {
+      "symbol": "MSFT",
+      "company_cik": 789019,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "B",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "MATURE_DIVERSIFIED_PROFITABLE_COMPANY",
+      "assessment_rationale": "成熟的生產力、雲端與個人運算多業務；三個年度均獲利且營運現金流為正。依大型成熟公司證據採B；競爭、資安與AI投資風險保留。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001193125-26-323660",
+        "filingDate": "2026-07-29",
+        "reportDate": "2026-06-30",
+        "acceptanceDateTime": "2026-07-29T20:08:01.000Z",
+        "primaryDocument": "msft-20260630.htm",
+        "form": "10-K",
+        "cik": 789019,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+          "source_sha256": "58cfe527acf7581ee8294bd53f9a65cc27f625cfb9105ed9279a3f36c32c6969",
+          "available_at": "2026-10-29T02:07:28.343985+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+          "source_sha256": "464cc12cc4796c90a6a0c709eb4920788aa7d4d5eee8b44f2d11d7d44804ae37",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "three segments: Productivity and Business Processes"
+        },
+        {
+          "text": "We face intense competition across all markets for our products and services, which could adversely affect our results of operations.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "We face intense competition across all markets"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "periods": [
+            {
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "value": "245122000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "value": "281724000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2025-07-01",
+              "end": "2026-06-30",
+              "value": "331839000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "value": "88136000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "value": "101832000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2025-07-01",
+              "end": "2026-06-30",
+              "value": "133749000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "value": "118548000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "value": "136162000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            },
+            {
+              "start": "2025-07-01",
+              "end": "2026-06-30",
+              "value": "182935000000",
+              "unit": "USD",
+              "filed": "2026-07-29",
+              "form": "10-K",
+              "accession": "0001193125-26-323660"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "MDT": {
+      "symbol": "MDT",
+      "company_cik": 1613103,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "B",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "MATURE_DIVERSIFIED_PROFITABLE_COMPANY",
+      "assessment_rationale": "長期經營、跨國醫療器材產品組合，三個年度均獲利且營運現金流為正。採大型成熟公司B；產品責任與監管風險保留。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001628280-26-044354",
+        "filingDate": "2026-06-18",
+        "reportDate": "2026-04-24",
+        "acceptanceDateTime": "2026-06-18T20:27:27.000Z",
+        "primaryDocument": "mdt-20260424.htm",
+        "form": "10-K",
+        "cik": 1613103,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026044354/mdt-20260424.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026044354/mdt-20260424.htm",
+          "source_sha256": "1e418aaf854d49dd6e9f54e29f765c8c99cea7c2200b44171a9783ce72caab57",
+          "available_at": "2026-10-29T02:07:32.926049+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001613103.json",
+          "source_sha256": "38fb8ec4139e6db2fa9bcd6cce1c3de5d9fcb3838ad9a63a2e3c74a7afc79b27",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Medtronic plc, headquartered in Galway, Ireland, is the leading global healthcare technology company. Medtronic was founded in 1949 and today serves healthcare systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us “to contribute to human welfare by the application of biomedical engineering in the research, design, manufacture, and sale of products to alleviate pain, restore health, and extend life.”",
+          "section": "Business / Risk Factors",
+          "search_anchor": "was founded in 1949"
+        },
+        {
+          "text": "Medtronic plc, headquartered in Galway, Ireland, is the leading global healthcare technology company. Medtronic was founded in 1949 and today serves healthcare systems, physicians, clinicians, and patients in more than 150 countries worldwide. We remain committed to a mission written by our founder in 1960 that directs us “to contribute to human welfare by the application of biomedical engineering in the research, design, manufacture, and sale of products to alleviate pain, restore health, and extend life.”",
+          "section": "Business / Risk Factors",
+          "search_anchor": "more than 150 countries"
+        },
+        {
+          "text": "•liabilities, claims, litigation, investigations, or other adverse developments relating to acquired businesses or the business practices of acquired companies, including investigations by governmental entities, potential Foreign Corrupt Practices Act (FCPA) or product liability claims, intellectual property disputes, earnout or other contingent payment disputes, or other unanticipated liabilities,",
+          "section": "Business / Risk Factors",
+          "search_anchor": "product liability"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "periods": [
+            {
+              "start": "2023-04-29",
+              "end": "2024-04-26",
+              "value": "32364000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2024-04-27",
+              "end": "2025-04-25",
+              "value": "33537000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2025-04-26",
+              "end": "2026-04-24",
+              "value": "36364000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2023-04-29",
+              "end": "2024-04-26",
+              "value": "3676000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2024-04-27",
+              "end": "2025-04-25",
+              "value": "4662000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2025-04-26",
+              "end": "2026-04-24",
+              "value": "4801000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-04-29",
+              "end": "2024-04-26",
+              "value": "6787000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2024-04-27",
+              "end": "2025-04-25",
+              "value": "7044000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            },
+            {
+              "start": "2025-04-26",
+              "end": "2026-04-24",
+              "value": "7330000000",
+              "unit": "USD",
+              "filed": "2026-06-18",
+              "form": "10-K",
+              "accession": "0001628280-26-044354"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "ZTS": {
+      "symbol": "ZTS",
+      "company_cik": 1555280,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "B",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "MATURE_DIVERSIFIED_PROFITABLE_COMPANY",
+      "assessment_rationale": "多物種、多產品的成熟動物醫療業務，三個年度均獲利且營運現金流為正。採B；產品、法規及競爭風險保留。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001555280-26-000011",
+        "filingDate": "2026-02-12",
+        "reportDate": "2025-12-31",
+        "acceptanceDateTime": "2026-02-12T21:49:26.000Z",
+        "primaryDocument": "zts-20251231.htm",
+        "form": "10-K",
+        "cik": 1555280,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1555280/000155528026000011/zts-20251231.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1555280/000155528026000011/zts-20251231.htm",
+          "source_sha256": "162474befc8b3e92ac12fef75d1da1e2b29ade4beed257a2e85de89dd61e2e92",
+          "available_at": "2026-10-29T02:07:38.378126+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001555280.json",
+          "source_sha256": "b07a62edd0c62eecc2fb932a17063b7f406b6355ca6ec9a658407a39c1b87445",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Zoetis Inc. is a global leader in the animal health industry, focused on the discovery, development, manufacture and commercialization of medicines, vaccines, diagnostic products and services, biodevices, genetic tests and precision animal health. We have a diversified business, commercializing products across eight core species: dogs, cats and horses (collectively, companion animals) and cattle, swine, poultry, fish and sheep (collectively, livestock); and within seven major product categories: parasiticides, vaccines, dermatology, anti-infectives, pain and sedation, other pharmaceutical and animal health diagnostics. With a legacy of nearly 75 years, we continue to pioneer ways to predict, prevent, detect, and treat animal illness, supporting those raising and caring for animals worldwide - from veterinarians and pet owners to livestock producers.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "diversified business"
+        },
+        {
+          "text": "Zoetis Inc. is a global leader in the animal health industry, focused on the discovery, development, manufacture and commercialization of medicines, vaccines, diagnostic products and services, biodevices, genetic tests and precision animal health. We have a diversified business, commercializing products across eight core species: dogs, cats and horses (collectively, companion animals) and cattle, swine, poultry, fish and sheep (collectively, livestock); and within seven major product categories: parasiticides, vaccines, dermatology, anti-infectives, pain and sedation, other pharmaceutical and animal health diagnostics. With a legacy of nearly 75 years, we continue to pioneer ways to predict, prevent, detect, and treat animal illness, supporting those raising and caring for animals worldwide - from veterinarians and pet owners to livestock producers.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "nearly 75 years"
+        },
+        {
+          "text": "Although our business is the largest based on revenue in the animal health industry (which includes medicines, vaccines and diagnostics), we face competition in the regions in which we compete. Principal drivers of competition vary depending on the particular region, species, product category and individual product, and include new product development, quality, price, service and promotion to veterinary professionals, pet owners and livestock producers.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "we face competition"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "Revenues",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "8544000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "9256000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "9467000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "2344000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "2486000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "2673000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "2353000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "2953000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "2904000000",
+              "unit": "USD",
+              "filed": "2026-02-12",
+              "form": "10-K",
+              "accession": "0001555280-26-000011"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "GOOG": {
+      "symbol": "GOOG",
+      "company_cik": 1652044,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "B",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "MATURE_DIVERSIFIED_PROFITABLE_COMPANY",
+      "assessment_rationale": "成熟的大型服務與雲端業務，三個年度均獲利且營運現金流為正。結構部署級別採B；搜尋反壟斷判決及救濟措施須另進事件／Hard Gate審查，B不表示風險已排除。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001652044-26-000018",
+        "filingDate": "2026-02-05",
+        "reportDate": "2025-12-31",
+        "acceptanceDateTime": "2026-02-05T02:56:03.000Z",
+        "primaryDocument": "goog-20251231.htm",
+        "form": "10-K",
+        "cik": 1652044,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "7c2de6f1a72540a978a1437c60677e568a3ece2b8cf60771605949b87a6ce49d",
+          "available_at": "2026-10-29T02:07:39.819139+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
+          "source_sha256": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier models that serve our businesses, which is reported in Alphabet-level activities. Alphabet's structure is about helping each of our businesses prosper through strong leaders and independence.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "Google Services and Google Cloud"
+        },
+        {
+          "text": "We have built world-class advertising technologies for advertisers, agencies, and publishers to power their digital marketing businesses. Our advertising solutions help millions of companies grow their businesses through our wide range of products across devices and formats, and we aim to ensure positive user experiences by serving the right ads at the right time and by building deep partnerships with brands and agencies. AI has been foundational to our advertising business for more than a decade. Products like Demand Gen, Performance Max, and Product Studio use the full power of our AI to help advertisers find untapped and incremental conversion opportunities.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "advertising solutions help millions"
+        },
+        {
+          "text": "For example, the DOJ and a number of state Attorneys General filed a lawsuit concerning our Search and Search advertising practices and our compliance with US antitrust laws. In August 2024, the US District Court for the District of Columbia ruled against Google, and in December 2025, entered a final judgment requiring remedies, which, among other things, imposes restrictions on how we distribute our services and requires us to share certain search data with and offer syndication services to certain competitors. In January 2026, we appealed the final judgment and moved to pause implementation of certain remedies. In February 2026, the DOJ and state Attorneys General also appealed.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "entered a final judgment requiring remedies"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "Revenues",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "307394000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "350018000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "402836000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "73795000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "100118000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "132170000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "101746000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "125299000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "164713000000",
+              "unit": "USD",
+              "filed": "2026-02-05",
+              "form": "10-K",
+              "accession": "0001652044-26-000018"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "ADBE": {
+      "symbol": "ADBE",
+      "company_cik": 796343,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "B",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "MATURE_DIVERSIFIED_PROFITABLE_COMPANY",
+      "assessment_rationale": "成熟創意、文件與數位體驗業務，三個年度均獲利且營運現金流為正。結構部署級別採B；生成式AI競爭與成長轉型須另評Thesis，不宣告安全通過。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0000796343-26-000003",
+        "filingDate": "2026-01-15",
+        "reportDate": "2025-11-28",
+        "acceptanceDateTime": "2026-01-15T22:01:55.000Z",
+        "primaryDocument": "adbe-20251128.htm",
+        "form": "10-K",
+        "cik": 796343,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634326000003/adbe-20251128.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634326000003/adbe-20251128.htm",
+          "source_sha256": "53c6e51fb37c222bf623ee2622c45679caf76e5b1b63502a58b1942b25a78977",
+          "available_at": "2026-10-29T02:07:44.096110+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000796343.json",
+          "source_sha256": "86a5689aa9aa7b0f9e95be21b48b0305376e014c8dbf3b8bb3b4b131f1b6a0c4",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Adobe’s mission is to empower everyone to create. We build innovative platforms and tools that unleash creativity, productivity and personalized customer experiences. For over four decades, our innovations have transformed how people everywhere engage across all types of media. Adobe’s solutions are the foundation of digital experiences, starting with the first creative spark, to the creation and development of all content and media, to the personalized delivery across every channel.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "over four decades"
+        },
+        {
+          "text": "In fiscal 2025, our business consisted of three reportable segments: Digital Media, Digital Experience and Publishing and Advertising. Spanning both our Digital Media and Digital Experience segments, we drove business success through customer-focused innovation and go-to-market strategies.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "three reportable segments: Digital Media"
+        },
+        {
+          "text": "We participate in a highly competitive and rapidly evolving environment where our competitors include companies of various sizes and both public and private companies, including large, global companies and smaller companies with more specialized focuses, new entrants, and AI or cloud-native companies. We compete with software companies, AI companies, hardware manufacturers, operating system developers, and social media companies across our business. The markets for our solutions are characterized by rapid technological innovation, new industry standards, evolving distribution and sales models, limited barriers to entry, short product lifecycles, customer price sensitivity, global economic conditions and the frequent entry of new solutions or competitors.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "highly competitive and rapidly evolving"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "Revenues",
+          "periods": [
+            {
+              "start": "2022-12-03",
+              "end": "2023-12-01",
+              "value": "19409000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2023-12-02",
+              "end": "2024-11-29",
+              "value": "21505000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2024-11-30",
+              "end": "2025-11-28",
+              "value": "23769000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2022-12-03",
+              "end": "2023-12-01",
+              "value": "5428000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2023-12-02",
+              "end": "2024-11-29",
+              "value": "5560000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2024-11-30",
+              "end": "2025-11-28",
+              "value": "7130000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2022-12-03",
+              "end": "2023-12-01",
+              "value": "7302000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2023-12-02",
+              "end": "2024-11-29",
+              "value": "8056000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            },
+            {
+              "start": "2024-11-30",
+              "end": "2025-11-28",
+              "value": "10031000000",
+              "unit": "USD",
+              "filed": "2026-01-15",
+              "form": "10-K",
+              "accession": "0000796343-26-000003"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "NVDA": {
+      "symbol": "NVDA",
+      "company_cik": 1045810,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "D",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "ELEVATED_COMPANY_SPECIFIC_EXPOSURE",
+      "assessment_rationale": "出口管制直接限制資料中心市場，且兩大直接客戶合計36%收入。採較嚴格的公司特有風險部署D；不把D推成Thesis破壞或Hard Gate。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001045810-26-000021",
+        "filingDate": "2026-02-25",
+        "reportDate": "2026-01-25",
+        "acceptanceDateTime": "2026-02-25T21:42:19.000Z",
+        "primaryDocument": "nvda-20260125.htm",
+        "form": "10-K",
+        "cik": 1045810,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+          "source_sha256": "30825bb4d74e272c17edfb01dfc765bdb9c7a7927ab09d8501342e52b092122c",
+          "available_at": "2026-10-29T02:07:43.267180+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json",
+          "source_sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Over the past three years, we have been subject to a series of shifting and expanding export control restrictions, impacting our ability to serve customers outside the United States.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "shifting and expanding export control restrictions"
+        },
+        {
+          "text": "We have experienced periods where we receive a significant amount of our revenue from a limited number of customers, and this trend may continue. For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of these partners, we are selling multiple products and systems in our portfolio through their channels. Our operating results depend on sales to our partner network, as well as the ability of these partners to sell products that incorporate our technologies. We have a small number of partners that are involved in system integration with our key customers. As our system design becomes increasingly complex, system integrators may be unable to meet specifications of our key customers. Changes in our partners' or customers' business models or their ownership can reduce the number of partners available to us and harm our ability to sell our advanced data center syst",
+          "section": "Business / Risk Factors",
+          "search_anchor": "one direct customer represented 22%"
+        },
+        {
+          "text": "nt of our revenue from a limited number of customers, and this trend may continue. For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment. With several of these partners, we are selling multiple products and systems in our portfolio through their channels. Our operating results depend on sales to our partner network, as well as the ability of these partners to sell products that incorporate our technologies. We have a small number of partners that are involved in system integration with our key customers. As our system design becomes increasingly complex, system integrators may be unable to meet specifications of our key customers. Changes in our partners' or customers' business models or their ownership can reduce the number of partners available to us and harm our ability to sell our advanced data center systems to customers. In the future, these partners may decide to purchase",
+          "section": "Business / Risk Factors",
+          "search_anchor": "another direct customer represented 14%"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "Revenues",
+          "periods": [
+            {
+              "start": "2023-01-30",
+              "end": "2024-01-28",
+              "value": "60922000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2024-01-29",
+              "end": "2025-01-26",
+              "value": "130497000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2025-01-27",
+              "end": "2026-01-25",
+              "value": "215938000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "NetIncomeLoss",
+          "periods": [
+            {
+              "start": "2023-01-30",
+              "end": "2024-01-28",
+              "value": "29760000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2024-01-29",
+              "end": "2025-01-26",
+              "value": "72880000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2025-01-27",
+              "end": "2026-01-25",
+              "value": "120067000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-01-30",
+              "end": "2024-01-28",
+              "value": "28090000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2024-01-29",
+              "end": "2025-01-26",
+              "value": "64089000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            },
+            {
+              "start": "2025-01-27",
+              "end": "2026-01-25",
+              "value": "102718000000",
+              "unit": "USD",
+              "filed": "2026-02-25",
+              "form": "10-K",
+              "accession": "0001045810-26-000021"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "AVGO": {
+      "symbol": "AVGO",
+      "company_cik": 1730168,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "D",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "ELEVATED_COMPANY_SPECIFIC_EXPOSURE",
+      "assessment_rationale": "前五大最終客戶約40%收入，半導體需求循環及AI轉型帶來公司特有集中風險。採D；保留軟體業務與正向現金流，D不等同不准投資。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001730168-25-000121",
+        "filingDate": "2025-12-18",
+        "reportDate": "2025-11-02",
+        "acceptanceDateTime": "2025-12-18T21:04:47.000Z",
+        "primaryDocument": "avgo-20251102.htm",
+        "form": "10-K",
+        "cik": 1730168,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm",
+          "source_sha256": "2c528797c85bd501fe8611b7b79db8da15ab9ff4fe2cdd267f07070c94585b70",
+          "available_at": "2026-10-29T02:07:30.354009+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001730168.json",
+          "source_sha256": "3bdb6644c12addf1e63c4dc861008d7804fbf3d3f5aa6eb9b97f72c0e89a7adf",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "We sell our products and solutions through our direct sales force and a select network of distributors and channel partners globally. Distributors and OEMs, or their contract manufacturers (“CMs”), typically account for the substantial majority of our semiconductor sales. A relatively small number of customers account for a significant portion of our net revenue. Sales to distributors accounted for 48% of our net revenue for each of the fiscal years 2025 and 2024. We believe aggregate sales to our top five end customers, through all channels, accounted for approximately 40% of our net revenue for each of the fiscal years 2025 and 2024. We expect to continue to experience significant customer concentration in future periods. The loss of, or significant decrease in demand from, any of our top five end customers could have a material adverse effect on our business, results of operations and financial condition.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "top five end customers"
+        },
+        {
+          "text": "•We operate in a highly cyclical semiconductor industry that is undergoing profound change due to AI.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "highly cyclical semiconductor industry"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+          "periods": [
+            {
+              "start": "2022-10-31",
+              "end": "2023-10-29",
+              "value": "35819000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2023-10-30",
+              "end": "2024-11-03",
+              "value": "51574000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2024-11-04",
+              "end": "2025-11-02",
+              "value": "63887000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "ProfitLoss",
+          "periods": [
+            {
+              "start": "2022-10-31",
+              "end": "2023-10-29",
+              "value": "14082000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2023-10-30",
+              "end": "2024-11-03",
+              "value": "5895000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2024-11-04",
+              "end": "2025-11-02",
+              "value": "23126000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2022-10-31",
+              "end": "2023-10-29",
+              "value": "18085000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2023-10-30",
+              "end": "2024-11-03",
+              "value": "19962000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            },
+            {
+              "start": "2024-11-04",
+              "end": "2025-11-02",
+              "value": "27537000000",
+              "unit": "USD",
+              "filed": "2025-12-18",
+              "form": "10-K",
+              "accession": "0001730168-25-000121"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    },
+    "IBKR": {
+      "symbol": "IBKR",
+      "company_cik": 1381197,
+      "asset_type": "INDIVIDUAL_STOCK",
+      "asset_grade": "D",
+      "assessment_kind": "SOURCE_BACKED_STRUCTURAL_DEPLOYMENT_CLASSIFICATION",
+      "grade_basis": "ELEVATED_COMPANY_SPECIFIC_EXPOSURE",
+      "assessment_rationale": "成熟券商但曝險含客戶保證金融資、抵押品跳空與交易對手風險。採較嚴格公司特有風險部署D；不以金融業負債套工業公司槓桿規則，也不宣告目前有違約。",
+      "assessment_is_owner_approval": false,
+      "assessment_is_current_safety_clearance": false,
+      "rule": "V82.md Canonical Asset Grade §2.1.4",
+      "filing": {
+        "accessionNumber": "0001381197-26-000062",
+        "filingDate": "2026-02-27",
+        "reportDate": "2025-12-31",
+        "acceptanceDateTime": "2026-02-27T21:08:27.000Z",
+        "primaryDocument": "ibkr-20251231.htm",
+        "form": "10-K",
+        "cik": 1381197,
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1381197/000138119726000062/ibkr-20251231.htm"
+      },
+      "sources": [
+        {
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1381197/000138119726000062/ibkr-20251231.htm",
+          "source_sha256": "fcfda9fcae12faeb193df32c4d5956a16423b9bfe846ac0b821ee932a95ef4a8",
+          "available_at": "2026-10-29T02:07:42.413386+00:00",
+          "kind": "OFFICIAL_SEC_ANNUAL_FILING"
+        },
+        {
+          "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001381197.json",
+          "source_sha256": "efd2d69dcd97c3d688a418dfc24383ec476309c1919159be5d541fb75f80048f",
+          "kind": "OFFICIAL_SEC_COMPANYFACTS"
+        }
+      ],
+      "excerpts": [
+        {
+          "text": "Since the launching of our electronic brokerage business in 1993, we have grown to approximately 4.4 million institutional and individual brokerage customers. We provide our customers with what we believe to be one of the most effective and efficient automated brokerage platforms in the industry.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "4.4 million institutional and individual"
+        },
+        {
+          "text": "We are exposed to the risk of loss if a customer, counterparty or issuer fails to perform its obligations under contractual terms. Our counterparty risk is primarily from margin loans extended to customers, securities purchased under agreements to resell (“repos”), securities borrowing and lending arrangements, cash and/or collateral deposited with clearing houses, exchanges, banks, securities firms and other financial counterparties, all of which may result in credit exposure in the event the counterparty defaults on their obligations to us due to bankruptcy, lack of liquidity, operational failure or other reasons.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "margin loans extended to customers"
+        },
+        {
+          "text": "Our customer margin credit exposure is to a great extent mitigated by our policy of automatically evaluating each account throughout the trading day and closing out positions automatically for accounts that are found to be under-margined. While this methodology is effective in most situations, it may not be effective in situations in which no liquid market exists for the relevant securities or commodities or in which, for any reason, automatic liquidation for certain accounts has been disabled. If no liquid market exists or automatic liquidation has been disabled, we are subject to risks inherent in extending credit, especially during periods of rapidly declining markets. Any loss or expense incurred due to defaults by our customers in failing to repay margin loans or to maintain adequate collateral for these loans would cause harm to our business, financial condition and results of operations.",
+          "section": "Business / Risk Factors",
+          "search_anchor": "defaults by our customers in failing to repay margin loans"
+        }
+      ],
+      "financial_evidence": {
+        "revenue": {
+          "namespace": "us-gaap",
+          "tag": "RevenuesNetOfInterestExpense",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "4340000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "5185000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "6205000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            }
+          ]
+        },
+        "net_income": {
+          "namespace": "us-gaap",
+          "tag": "ProfitLoss",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "2812000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "3407000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "4357000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            }
+          ]
+        },
+        "operating_cashflow": {
+          "namespace": "us-gaap",
+          "tag": "NetCashProvidedByUsedInOperatingActivities",
+          "periods": [
+            {
+              "start": "2023-01-01",
+              "end": "2023-12-31",
+              "value": "4544000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2024-01-01",
+              "end": "2024-12-31",
+              "value": "8724000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            },
+            {
+              "start": "2025-01-01",
+              "end": "2025-12-31",
+              "value": "15811000000",
+              "unit": "USD",
+              "filed": "2026-02-27",
+              "form": "10-K",
+              "accession": "0001381197-26-000062"
+            }
+          ]
+        }
+      },
+      "grade_scope": "ONLY_DEPLOYMENT_SPEED_CONCENTRATION_VALUATION_LOOKTHROUGH_POSITION_DATA_REQUIREMENTS",
+      "no_fixed_position_limit_or_target_inferred": true,
+      "thesis_risk_event_valuation_and_hard_gate_separate": true
+    }
+  }
+}

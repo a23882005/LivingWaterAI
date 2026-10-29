@@ -1,10 +1,13 @@
 {
-  "file": "Family_Menu14_Program_DB_Architecture.pdf",
+  "revision": "v1.1",
+  "date": "2026/10/29",
+  "code_baseline": "60fd1d5f062ad7b3b20a713d44198e927fc0c212",
+  "sources_verified_on": "2026/10/29; prior readback reused",
   "pages": 6,
-  "sha256": "2a92d64cb94a867cd9f82d8dfc1295b6f2bf3cfe68b1952881a9d70fa8b3b32f",
-  "bytes": 516579,
-  "removed_private_link_annotations": 9,
-  "visual_and_text_match_drive_version": true,
-  "publication_scope": "public-repository copy; personal resource hyperlinks remain only in private Drive original",
-  "font_subset": "retain original glyph IDs; 6/6 pages text and rendered pixels identical"
+  "private_link_annotations_removed": 9,
+  "public_sha256": "0a2fe35d1e65c07701f352e7a733afc2880333726684c080a55985bbc847b705",
+  "public_bytes": 518838,
+  "drive_sha256": "a16ff54152d8bb9d040cfdcd6e65173c356648098c62179c2a7c7434c0b5298f",
+  "drive_bytes": 520635,
+  "qa": "6 pages; 14 items; page bounds; 10 private edition links; text and pixels match after font subsetting"
 }

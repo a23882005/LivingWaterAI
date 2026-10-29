@@ -436,6 +436,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         report['native_target_source']=deepcopy(context['native_target_source'])
     if observations.get('bond_market_supplement') is not None:
         report['bond_market_supplement']=deepcopy(observations['bond_market_supplement'])
+    if observations.get('v75_macro_inputs') is not None:
+        report['v75_macro_inputs']=deepcopy(observations['v75_macro_inputs'])
     from bond_policy_audit import build as audit_bond_policy
     policy_audit=audit_bond_policy(request,context)
     if policy_audit is not None:report['bond_policy_audit']=policy_audit
@@ -444,6 +446,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         and request.get('macro_snapshot') and trial.get('cash_state')):
         from native_bond_source import target_market_observations
         report['bond_target_market_observations']=target_market_observations(request,observations,rows,root=producer.root)
+        from native_source_freshness import build as assess_native_source_freshness
+        report['native_source_freshness']=assess_native_source_freshness(producer.root,request,report)
         from native_funding_advice import build as build_native_funding_advice,delivery as funding_delivery,build_shared_inputs
         shared=build_shared_inputs(producer,request,report,trial=trial,investment=investment,tactical=tactical)
         funding=build_native_funding_advice(producer,request,report,trial=trial,
@@ -557,8 +561,13 @@ class HoldingsAnalysisRunner:
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
         from native_bond_source import validate as validate_native_bond_source
+        if report.get('native_source_freshness') is not None:
+            from native_source_freshness import validate as validate_native_source_freshness
+            validate_native_source_freshness(root,request,report)
         from v75_market_supplement import validate as validate_bond_supplement
         validate_bond_supplement(request,self.context,report,root)
+        from v75_macro_inputs import validate as validate_v75_macro_inputs
+        validate_v75_macro_inputs(request,self.context,report,root)
         from bond_policy_audit import validate as validate_bond_policy
         validate_bond_policy(request,self.context,report)
         validate_native_bond_source(root,request,report)

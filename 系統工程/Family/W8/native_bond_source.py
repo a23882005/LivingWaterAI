@@ -80,12 +80,15 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
     if market_payload!=expected:raise PermissionError('BOND_SOURCE_MARKET_BINDING_MISMATCH')
     if inp['shared_decision_context']['payload'].get('bond_market_supplement')!=report.get('bond_market_supplement'):
         raise PermissionError('BOND_SOURCE_SUPPLEMENT_BINDING_MISMATCH')
+    if inp['shared_decision_context']['payload'].get('v75_macro_inputs')!=report.get('v75_macro_inputs'):
+        raise PermissionError('BOND_SOURCE_MACRO_INPUT_BINDING_MISMATCH')
     result={'schema_version':'Family.W8.NativeBondSource.v1','client_id':request['client_id'],
         'run_id':run,'owner':deepcopy(owner),'source_db_sha256':snapshot['source_sha256'],
         'status':'SOURCE_INCOMPLETE','requested_instruments':[r['instrument_id'] for r in rows],
         'shared_inputs':shared,'source_fx':deepcopy(fx_observation),
         'strategic_policy':deepcopy(strategic_policy),'call_trace':[], 'issues':[],
         'policy_audit':deepcopy(report.get('bond_policy_audit')),
+        'source_freshness':deepcopy(report.get('native_source_freshness')),
         'targets':{},'physical_holdings':{},'predicate_observations':{},
         'sgov_role_source_rows':{k:deepcopy(snapshot['tables'].get(k,[]))
             for k in ('sgov_role_proposal','sgov_role_confirmation')},
@@ -146,6 +149,8 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
     times=[r.get('provider_verified_at') for r in market_payload.values() if r['symbol'] in target_symbols]
     if report.get('bond_market_supplement'):
         times.append(report['bond_market_supplement']['available_at'])
+    if report.get('v75_macro_inputs'):
+        times.append(report['v75_macro_inputs']['available_at'])
     if any(not t for t in times):
         gaps.append({'code':'V75_SOURCE_CAPTURE_TIME_REQUIRED','field_path':'market_snapshot.data_timestamp'})
         return result
@@ -154,6 +159,7 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
             raise PermissionError('BOND_SOURCE_FUTURE_MARKET_CAPTURE')
     market_at=max(times,key=lambda t:datetime.fromisoformat(t.replace('Z','+00:00')))
     v70=inp['v70_runtime_context'];boundary=inp['work2_envelope']['sgov_boundary']
+    freshness=report.get('native_source_freshness') or {}
     def role(name):
         value=boundary[name]
         return {'status':'KNOWN' if value is not None else 'UNKNOWN','value':deepcopy(value)}
@@ -165,9 +171,9 @@ def build(root,request,report,*,shared_inputs,fx_observation,strategic_policy):
         'existing_bond_holdings':existing,'target_bond_holdings':targets,
         'authorized_universe':[t['asset_id'] for t in targets if Decimal(t['target_amount']['amount'])>0],
         'market_snapshot':{'data_timestamp':market_at,'data_source':'VERIFIED_CACHE_CAPTURE__NOT_EXCHANGE_CLOSE_ATTESTATION',
-            'freshness_state':'UNKNOWN','payload':deepcopy(market_payload),'source_lineage':deepcopy(refs)},
+            'freshness_state':freshness.get('market',{}).get('state','UNKNOWN'),'payload':deepcopy(market_payload),'source_lineage':deepcopy(refs)},
         'v70_snapshot':{'data_timestamp':v70['snapshot_as_of'],'data_source':'V70.RUNTIME_CONTEXT',
-            'freshness_state':'UNKNOWN','payload':deepcopy(v70['payload']),'source_lineage':deepcopy(v70['source_reference_ids'])},
+            'freshness_state':freshness.get('v70',{}).get('state','UNKNOWN'),'payload':deepcopy(v70['payload']),'source_lineage':deepcopy(v70['source_reference_ids'])},
         'sgov_bond_bucket_amount':role('sgov_bond_bucket_amount'),
         'sgov_dry_powder_bucket_amount':role('sgov_dry_powder_bucket_amount'),
         'source_reference_ids':deepcopy(refs),'data_as_of':{'market':market_at,'v70':v70['snapshot_as_of']}}

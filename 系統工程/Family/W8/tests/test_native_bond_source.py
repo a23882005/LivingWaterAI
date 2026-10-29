@@ -12,7 +12,7 @@ import native_bond_source as B
 
 
 class NativeBondSourceTest(unittest.TestCase):
-    def case(self,supplement=None):
+    def case(self,supplement=None,macro_inputs=None):
         p,req,report,trial,investment,tactical=holding_tests.NativeFundingAdviceTest().case()
         req['owner']['funding_domain']='INVESTMENT'  # Family purpose is not the native broker domain.
         req['client_snapshot']['payload']['tables']={'sgov_role_proposal':[],'sgov_role_confirmation':[]}
@@ -28,6 +28,7 @@ class NativeBondSourceTest(unittest.TestCase):
             {'instrument_id':'SGOV_DRY','ticker':'SGOV','target_amount':
             {'value_state':'KNOWN','amount':'300','currency':'USD'}}]
         if supplement is not None:report['bond_market_supplement']=deepcopy(supplement)
+        if macro_inputs is not None:report['v75_macro_inputs']=deepcopy(macro_inputs)
         shared=build_shared_inputs(p,req,report,trial=trial,investment=investment,tactical=tactical)
         strategy={'client_id':req['client_id'],'bond_percent':20,'life_stage_code':'L7',
             'source_reference':'SYNTHETIC_EXISTING_STRATEGIC_SOURCE'}
@@ -90,6 +91,15 @@ class NativeBondSourceTest(unittest.TestCase):
         self.assertEqual(shared,before)
         shared['work3_input']['shared_decision_context']['payload']['bond_market_supplement']['source_sha256']='f'*64
         with self.assertRaisesRegex(PermissionError,'SUPPLEMENT_BINDING'):self.build(p,req,report,shared,strategy)
+
+    def test_macro_input_pool_retains_shared_asof_and_source_identity(self):
+        pool={'available_at':'2026-10-27T22:02:00Z','manifest_sha256':'9'*64}
+        p,req,report,shared,strategy=self.case(macro_inputs=pool)
+        out=self.build(p,req,report,shared,strategy)
+        self.assertEqual(out['status'],'ORIGINAL_V75_SOURCE_CHECKED_WITH_GAPS',out['issues'])
+        self.assertEqual(out['adapter_result']['v75_runtime_input']['market_snapshot']['data_timestamp'],pool['available_at'])
+        report['v75_macro_inputs']['manifest_sha256']='8'*64
+        with self.assertRaisesRegex(PermissionError,'MACRO_INPUT_BINDING'):self.build(p,req,report,shared,strategy)
 
     def test_advisory_native_map_preserves_approval_cash_and_dry_role(self):
         p,req,report,shared,strategy=self.case()

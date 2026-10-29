@@ -127,6 +127,11 @@ def build_shared_inputs(producer,request,report,*,trial,investment,tactical):
         shared['payload']['bond_market_supplement']=deepcopy(supplement)
         shared['data_as_of']['bond_market_supplement_available_at']=supplement['available_at']
         shared['source_reference_ids'].append('BOND-MARKET-SUPPLEMENT:'+digest(supplement))
+    if report.get('v75_macro_inputs') is not None:
+        source=report['v75_macro_inputs']
+        shared['payload']['v75_macro_inputs']=deepcopy(source)
+        shared['data_as_of']['v75_macro_inputs_available_at']=source['available_at']
+        shared['source_reference_ids'].append('V75-MACRO-INPUTS:'+digest(source))
     return {'work3_input':work3_input,'c7_funding_context':c7,'budget':budget}
 
 

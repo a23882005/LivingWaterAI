@@ -268,7 +268,7 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
@@ -281,6 +281,7 @@ class AssetSourceProducer:
         self.loop2_target_projection_policy=deepcopy(loop2_target_projection_policy)
         self.official_target_base_source=deepcopy(official_target_base_source)
         self.bond_market_supplement_source=deepcopy(bond_market_supplement_source)
+        self.v75_macro_source_manifest=deepcopy(v75_macro_source_manifest)
         if account_presence_policy is not None and (account_presence_policy.get('schema_version')!='Family.W8.AccountPresencePolicy.v1'
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
@@ -314,6 +315,8 @@ class AssetSourceProducer:
         req=deepcopy(self.req);ctx=deepcopy(self.ctx)
         if self.bond_market_supplement_source is not None:
             ctx['bond_market_supplement_source']=deepcopy(self.bond_market_supplement_source)
+        if self.v75_macro_source_manifest is not None:
+            ctx['v75_macro_source_manifest']=deepcopy(self.v75_macro_source_manifest)
         when=datetime.now(timezone.utc).isoformat();run='family-04-'+uuid.uuid4().hex
         req.update(run_id=run,request_id=run+'-request',evaluation_at=when)
         req['client_snapshot']['as_of']=when
@@ -369,6 +372,9 @@ class AssetSourceProducer:
         from v75_market_supplement import read as read_bond_supplement,apply as apply_bond_supplement
         supplement=read_bond_supplement(self.bond_market_supplement_source,when)
         observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
+        from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
+        macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
+        observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root)
         from new_investment_scenario import build_plan,apply_plan,wire_number
         investment=build_plan(snapshot,req['owner'],self.new_investment_policy)
         from v70_tactical_input import calculate

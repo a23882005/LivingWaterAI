@@ -222,3 +222,4 @@ jobs:
           '系統工程/Family/W8/tests/test_current_allocation_source.py'
           '系統工程/Family/W8/tests/test_portfolio_current_source.py'
           '系統工程/Family/W8/tests/test_deployment_c7_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_progress_review.py'

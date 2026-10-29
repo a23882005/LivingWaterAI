@@ -57,6 +57,16 @@ class TargetReadinessTest(unittest.TestCase):
         self.assertEqual(result['configuration_review'],review)
         self.assertIsNot(result['configuration_review'],review)
         self.assertIsNone(result['mentor']);self.assertIsNone(result['canonical_result'])
+        progress={'schema_version':'Family.W8.DeploymentProgressReview.v1',
+            **{k:deepcopy(review[k]) for k in ('client_id','run_id','evaluation_at','owner','source_db_sha256')},
+            'full_native_pipeline_complete':False,'full_native_mentor_reached':False,'trade_action':'NO_TRADE',
+            'account_funding_check':{'conservation_status':'BLOCKED_MISSING_NATIVE_DECISIONS'}}
+        review['deployment_progress']=progress
+        self.assertEqual(obj.deployment_pace({})['configuration_review']['deployment_progress'],progress)
+        progress['owner']['account']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'DEPLOYMENT_PROGRESS_BINDING'):
+            obj.deployment_pace({})
+        review.pop('deployment_progress')
         for key,value in [('client_id','OTHER'),('run_id','OTHER'),('source_db_sha256','OTHER'),
                           ('full_native_mentor_reached',True)]:
             before=deepcopy(review);review[key]=value

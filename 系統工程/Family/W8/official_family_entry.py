@@ -241,6 +241,15 @@ class OfficialFamilyEntry:
                     or review.get('trade_action') != 'NO_TRADE'):
                     raise PermissionError('OFFICIAL_CONFIGURATION_REVIEW_BINDING_MISMATCH')
                 result['configuration_review'] = deepcopy(review)
+                progress = review.get('deployment_progress')
+                if progress is not None:
+                    if (progress.get('schema_version') != 'Family.W8.DeploymentProgressReview.v1'
+                        or any(progress.get(k) != review.get(k) for k in
+                            ('client_id','run_id','owner','evaluation_at','source_db_sha256'))
+                        or progress.get('full_native_pipeline_complete') is not False
+                        or progress.get('full_native_mentor_reached') is not False
+                        or progress.get('trade_action') != 'NO_TRADE'):
+                        raise PermissionError('OFFICIAL_DEPLOYMENT_PROGRESS_BINDING_MISMATCH')
             if source_failure_bound:
                 result.update(source_production=decision.get('source_production'),
                     call_trace=decision.get('call_trace',[]),mentor=decision.get('mentor'))

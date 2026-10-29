@@ -103,6 +103,17 @@ def bind_c7_source(repo_path, request, context):
             'original_c7_issues': deepcopy(result['issues']),
             'full_native_pipeline_complete': False, 'full_native_mentor_reached': False,
             'trade_action': 'NO_TRADE'}
+        progress = source.get('continuation_review')
+        if progress is not None:
+            require(progress.get('schema_version') == 'Family.W8.DeploymentProgressReview.v1'
+                and all(progress.get(k) == request.get(k) for k in ('client_id','run_id','owner','evaluation_at'))
+                and progress.get('source_db_sha256') == request['client_snapshot']['payload']['source_sha256']
+                and progress.get('full_native_pipeline_complete') is False
+                and progress.get('full_native_mentor_reached') is False
+                and progress.get('trade_action') == 'NO_TRADE'
+                and progress.get('digest') == digest({k:v for k,v in progress.items() if k != 'digest'}),
+                'C7_CONTINUATION_REVIEW_BINDING_MISMATCH', 'c7_source.continuation_review')
+            error.issue['configuration_review']['deployment_progress'] = deepcopy(progress)
         raise error
     require(digest(result) == digest(request['native_bundle']['asset_framework']),
             'C7_COMPUTED_FRAMEWORK_MISMATCH', 'native_bundle.asset_framework')

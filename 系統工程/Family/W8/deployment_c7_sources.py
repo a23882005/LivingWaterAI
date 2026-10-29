@@ -222,6 +222,10 @@ def extend(root, request, analysis, prepared, context, sources):
             'holding_policy_state': 'NO_NEW_PREFERENCE_DECISIONS_INFERRED__W1_POLICY_BINDING_STILL_REQUIRED',
             'original_approved_money_projection': deepcopy(projection['denominator'])}}
     computed = run_c7_engine(root, source)
+    from deployment_progress_review import build as build_progress_review
+    source['continuation_review'] = build_progress_review(root, request, analysis,
+        work6['result'], computed['result'], [*out['native_bundle'], 'asset_framework'])
+    computed = run_c7_engine(root, source)
     out['native_bundle']['asset_framework'] = computed['result']
     out['trusted_context']['c7_source'] = source
     out['component_results']['configuration'] = {'work6': work6, 'c7': computed,

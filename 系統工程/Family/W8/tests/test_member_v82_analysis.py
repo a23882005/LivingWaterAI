@@ -101,6 +101,33 @@ class MemberV82Tests(TestCase):
         self.assertEqual(rows['VT']['coverage_basis'],'TARGET_ONLY')
         self.assertEqual(rows['VT']['holdings'],[])
 
+    def test_preclose_acquisition_replayed_after_close_reports_stale_expected_session(self):
+        descriptor=self.market('VT')
+        calendar=json.loads(Path(descriptor['calendar_source']['local_path']).read_text())
+        last=calendar['sessions'][-1]
+        close=datetime.fromisoformat(last['close_at'])
+        descriptor['retrieved_at']=(close-timedelta(minutes=1)).isoformat()
+        value=read_market(descriptor,symbol='VT',evaluation_at=self.at,repo_root=ROOT,
+            profile=load_profile(HERE/'owner_approved_v10.json'),is_etf=True)
+        self.assertNotEqual(value['observed_date'],last['session_id'])
+        self.assertEqual(value['latest_expected_completed_session'],last['session_id'])
+        self.assertIn(last['session_id'],{r['date'] for r in value['history_quality']['excluded_uncompleted_rows']})
+
+    def test_delayed_provider_quote_is_not_promoted_to_final_close_after_exchange_close(self):
+        descriptor=self.market('VT')
+        calendar=json.loads(Path(descriptor['calendar_source']['local_path']).read_text())
+        last=calendar['sessions'][-1];close=datetime.fromisoformat(last['close_at'])
+        descriptor['retrieved_at']=(close+timedelta(minutes=5)).isoformat()
+        path=Path(descriptor['local_path']);raw=json.loads(path.read_text())
+        raw['chart']['result'][0]['meta']['regularMarketTime']=int((close-timedelta(minutes=15)).timestamp())
+        path.write_text(json.dumps(raw));descriptor['sha256']=sha256(path.read_bytes()).hexdigest()
+        value=read_market(descriptor,symbol='VT',evaluation_at=self.at,repo_root=ROOT,
+            profile=load_profile(HERE/'owner_approved_v10.json'),is_etf=True)
+        self.assertNotEqual(value['observed_date'],last['session_id'])
+        self.assertEqual(value['latest_expected_completed_session'],last['session_id'])
+        excluded={r['date']:r['reason'] for r in value['history_quality']['excluded_uncompleted_rows']}
+        self.assertEqual(excluded[last['session_id']],'PROVIDER_LATEST_BAR_FINAL_CLOSE_NOT_CONFIRMED')
+
     def test_cash_remains_in_weight_denominator_and_bond_is_separate(self):
         coverage=self.coverage()
         self.assertEqual(coverage['approval_weight_denominator'],'1')

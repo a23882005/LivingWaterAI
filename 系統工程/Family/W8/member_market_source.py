@@ -57,6 +57,7 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
     # current-session quote must not become a final close when replayed later.
     cutoff = min(time(evaluation_at), time(source['retrieved_at']))
     completed = [r for r in sessions if time(r['close_at']) <= cutoff]
+    evaluation_completed = [r for r in sessions if time(r['close_at']) <= time(evaluation_at)]
     if not completed:
         raise ValueError('MEMBER_MARKET_NO_COMPLETED_SESSIONS')
     by_date = {r['session_id']: r for r in completed}
@@ -66,6 +67,10 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
     if any(len(quotes[k]) != len(stamps) for k in ('open', 'high', 'low', 'close', 'volume')):
         raise ValueError('MEMBER_MARKET_ARRAY_LENGTH')
     rows = {}; close_rows = {}; excluded = []; invalid = []; seen_dates = set()
+    quote_stamp=meta.get('regularMarketTime')
+    quote_at=(datetime.fromtimestamp(quote_stamp,ZoneInfo(source['timezone']))
+        if type(quote_stamp) in (int,float) else None)
+    acquired_day=time(source['retrieved_at']).astimezone(ZoneInfo(source['timezone'])).date().isoformat()
     for i, stamp in enumerate(stamps):
         date = datetime.fromtimestamp(stamp, ZoneInfo(source['timezone'])).date().isoformat()
         if date in seen_dates:
@@ -73,6 +78,13 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
         seen_dates.add(date)
         if date not in by_date:
             excluded.append({'date': date, 'reason': 'SESSION_NOT_COMPLETED_AT_ACQUISITION_OR_NOT_IN_CALENDAR'})
+            continue
+        if date==acquired_day and (quote_at is None or quote_at<time(by_date[date]['close_at']) or quote_at>cutoff):
+            # A delayed current quote can still inhabit today's daily bar
+            # after the exchange closes. Calendar completion alone does not
+            # attest that the provider has published the final daily close.
+            excluded.append({'date':date,'reason':'PROVIDER_LATEST_BAR_FINAL_CLOSE_NOT_CONFIRMED',
+                'provider_regular_market_time':quote_at.isoformat() if quote_at else None})
             continue
         values = {k.title(): quotes[k][i] for k in ('open', 'high', 'low', 'close', 'volume')}
         try:
@@ -128,7 +140,10 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
         market_identity={'exchange': source['exchange'], 'currency': source['currency'],
                          'provider_symbol': source['provider_symbol'], 'provider_type': meta['instrumentType']},
         completed_session_close_at=by_date[used[-1]['Date']]['close_at'],
-        latest_expected_completed_session=completed[-1]['session_id'],
+        # Acquisition bounds which source bars may be consumed; evaluation
+        # bounds which completed session is now expected. A pre-close capture
+        # replayed after the close must not certify its own stale cutoff fresh.
+        latest_expected_completed_session=evaluation_completed[-1]['session_id'],
         history_quality={'excluded_uncompleted_rows': excluded, 'invalid_source_rows': invalid,
             'discarded_before_last_gap': len(valid_dates)-len(used),
             'scope': 'CONTIGUOUS_PROVIDER_OHLC_OBSERVATIONS__NOT_PIT_WEALTH',

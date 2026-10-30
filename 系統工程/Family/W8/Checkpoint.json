@@ -1821,9 +1821,17 @@
     "checked_toc_links": 13,
     "zip_artifacts_byte_identical": true,
     "browser_rerender": "PENDING_CHROMIUM_DOWNLOAD_INVALID_ARCHIVE",
-    "remote_branch": "NOT_CREATED",
-    "public_export": "AUTO_REVIEW_REJECTED_16_CODE_AND_TEXT_QA__AWAIT_EXPLICIT_EXPORT_APPROVAL",
+    "remote_branch": "family/report-canonical-html-20261030",
+    "public_export": "OWNER_EXPLICITLY_APPROVED__16_FILES_PUBLISHED_AND_READBACK_VERIFIED",
     "formal_producers_and_real_drive_E2E": "PENDING",
-    "governance": "Three original private Drive records backed up and updated; exact private source links retained there."
+    "governance": "Three original private Drive records backed up and updated; exact private source links retained there.",
+    "remote_commit": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
+    "draft_pr": "https://github.com/a23882005/LivingWaterAI/pull/60",
+    "remote_content_verified": 16
+  },
+  "owner_PM_engineering_authority_20261030": {
+    "decision": "Owner approved this exact 16-file public report code/text QA export and Draft PR; same-scope routine engineering submissions, tests and governance are middle-PM responsibility and may proceed without repeated permission.",
+    "public_report_scope": "16 approved code/synthetic-tests/documentation/text-QA files only",
+    "record": "Original private Drive PM governance"
   }
 }

@@ -317,13 +317,14 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None,core_sources=None,run_binding=None,observation_cache=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None,core_sources=None,run_binding=None,observation_cache=None,family_c7_assembly_inputs=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.broker_snapshot_source=deepcopy(broker_snapshot_source)
         self.qualified_equity_source_manifest=deepcopy(qualified_equity_source_manifest)
         self.core_sources=deepcopy(core_sources or {})
         self.run_binding=deepcopy(run_binding)
         self.observation_cache=observation_cache
+        self.family_c7_assembly_inputs=deepcopy(family_c7_assembly_inputs)
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
@@ -440,6 +441,19 @@ class AssetSourceProducer:
         if self.flow=='DEPLOYMENT' and trial['issues']:
             raise ValueError(trial['issues'][0]['code']+':'+trial['issues'][0]['field_path'])
         if self.flow=='DEPLOYMENT' and self.run_binding is not None:
+            if self.family_c7_assembly_inputs is not None and ctx.get('family_c7_scope_source') is None:
+                from family_c7_source_assembly import assemble_original_producers
+                assembly=assemble_original_producers(self,req,ctx,prepared,trial)
+                if assembly.get('source_descriptor') is None:
+                    return {'request':req,'trusted_context':ctx,'source_production':{
+                        'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':assembly['issues'],
+                        'family_scope_assembly':assembly,
+                        'call_trace':['W8.AssetSourceProducer:original_member_bootstrap','W5.prepare_input',*assembly['call_trace']],
+                        'independent_member_stock_components_already_computed':True,
+                        'no_financial_engine_or_ledger_claimed':True},
+                        'source_metadata':{'client_id':req['client_id'],'run_id':run,'source_db_sha256':snapshot['source_sha256']}}
+                ctx['family_c7_scope_source']=deepcopy(assembly['source_descriptor'])
+                ctx['family_c7_source_assembly_digest']=assembly['digest']
             from deployment_c7_sources import member_scope_preflight
             missing=member_scope_preflight(req,ctx)
             if missing is not None:

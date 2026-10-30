@@ -162,10 +162,23 @@ def extend(root, request, analysis, prepared, context, sources):
             'code':family_source['missing'],'field_path':'family_c7_scope_source',
             'engineering_scope':'NEW_FAMILY_PROFILE__NO_LEGACY_CONFIRM_FALLBACK'})
         return out
-    current = current_allocation(request, analysis, prepared, context)
+    assembled_current=family_source.get('current_allocation') if family_source is not None else None
+    if assembled_current is not None:
+        current={'scope':'ORIGINAL_RECONCILED_PORTFOLIO_SOURCE',
+            'portfolio_nav':{'state':'KNOWN','value':str(assembled_current['denominator']['amount']),
+                'currency':assembled_current['denominator']['currency'],'as_of':assembled_current['as_of'],
+                'reason':'SOURCE_BOUND_RECONCILIATION__NOT_CASH_TRIAL'},
+            'snapshot':deepcopy(assembled_current),'source_scope_digest':digest(family_source['family_scope'])}
+    else:current=current_allocation(request, analysis, prepared, context)
     out['component_results']['current_allocation'] = current
     portfolio = None
-    if context.get('portfolio_market_source') is not None:
+    if assembled_current is not None:
+        portfolio={'denominator':{'state':'KNOWN','value':str(assembled_current['denominator']['amount']),
+            'currency':assembled_current['denominator']['currency']},'scope':'ORIGINAL_RECONCILED_PORTFOLIO_SOURCE',
+            'cash_assumptions':[],'positions':[], 'portfolio_nav':deepcopy(assembled_current['denominator']),
+            'output_digest':digest(assembled_current)}
+        out['component_results']['portfolio_current_comparison']=deepcopy(portfolio)
+    elif context.get('portfolio_market_source') is not None:
         from portfolio_current_source import build as portfolio_current
         portfolio = portfolio_current(request, analysis, current, out, context['portfolio_market_source'])
         out['component_results']['portfolio_current_comparison'] = portfolio
@@ -235,7 +248,9 @@ def extend(root, request, analysis, prepared, context, sources):
         'confirmation_status': 'PENDING', 'confirmed_at': None, 'confirmed_by': None,
         'source_reference_ids': [target_ref]}
     current_slot = {'value_state': 'UNKNOWN', 'snapshot': None, 'reason': current['portfolio_nav']['reason']}
-    if comparison_ready:
+    if assembled_current is not None:
+        current_slot={'value_state':'KNOWN','snapshot':deepcopy(assembled_current),'reason':'ORIGINAL_RECONCILED_PORTFOLIO_SOURCE'}
+    elif comparison_ready:
         current_lines = []
         approved_by_symbol = {r['ticker']: r for r in lines}
         for position in portfolio['positions']:

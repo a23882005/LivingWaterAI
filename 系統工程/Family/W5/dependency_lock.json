@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "33107682068b453d6444bd77af112943bcf5f8263fddbd1bacf7d27fd5466eb2"
+    "sha256": "32849f0035216179f328899444dbcadd80b7e0852454d0f37dbe51eba201d8c7"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -407,7 +407,7 @@
   },
   {
     "path": "系統工程/Family/W8/deployment_c7_sources.py",
-    "sha256": "e5484e3efff21cad2d65f323ec23b75479ed79af730c949c0190ee20444ce6e5"
+    "sha256": "29ae6e119ded6a0048bc3a0095537dfcf312ddbead31f4c41ecfedd822c1ac0f"
   },
   {
     "path": "系統工程/Family/W5/family_runner.py",
@@ -415,19 +415,19 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_chain.py",
-    "sha256": "3952a22c7c6d1eab5bbe4f2bc962e285b0b9feffe375391090bb1537c9e455a3"
+    "sha256": "a6fe16980a48913af0b34ee0e8e282b1da66612b6ef151d5d180aa7f450c9393"
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
-    "sha256": "194c5183706431038c9f87720e4aea6ba9c88374a4c5631948bb7d70991f985d"
+    "sha256": "cbeed6b9f8b20904df07941701a726af8dc0c1141050a5306f1e91df997fdda2"
   },
   {
     "path": "系統工程/Family/W8/member_financial_producer.py",
-    "sha256": "6f837dfa7ced7ba3f0f8d29e101e4c8558e5bfee07c4b8f5e96ef3cbe8465994"
+    "sha256": "ff7b8ee1a2d1fe69a9ed63fef4129a11f6e28e678dcab110794bbd4669346220"
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
-    "sha256": "ec493cea6c3ebb63e9a6b838a8b704f41a2b8f9065735c991227f90477b96b31"
+    "sha256": "4e9c7e902875bd865f131c41d4a54cea22efb1535a9a6ccffc37b5df4be08d90"
   },
   {
     "path": "系統工程/Family/W8/same_run_market_cache.py",
@@ -444,5 +444,9 @@
   {
     "path": "系統工程/Family/W8/member_funding_summary.py",
     "sha256": "d617b5f5f087d77a05b067375141ffd5994f3ed5fffe4c7c94e9534e6f239f35"
+  },
+  {
+    "path": "系統工程/Family/W8/family_c7_source_assembly.py",
+    "sha256": "d1e165968d7e3f70321fb00c3e37e5263a4fa203bab6b226d535cb0882137281"
   }
 ]

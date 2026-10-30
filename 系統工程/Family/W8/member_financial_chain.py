@@ -177,6 +177,8 @@ def complete_report(report,request,config,root):
     out['summary']['original_asset_producer_calls']=sum('W8.AssetSourceProducer' in r.get('financial_source_attempt',{}).get('call_trace',[])
         for r in out['positions'])
     out['summary']['original_financial_packs_created']=sum(bool(r.get('financial_source_attempt',{}).get('created_pack_descriptor')) for r in out['positions'])
+    out['summary']['c7_original_source_assemblies']=sum(bool(r.get('financial_source_attempt',{}).get('family_scope_assembly')) for r in out['positions'])
+    out['summary']['c7_schema83_sources_assembled']=sum(bool(r.get('financial_source_attempt',{}).get('family_scope_assembly',{}).get('source_descriptor')) for r in out['positions'])
     if all_complete:
         out['status']='FINANCIAL_PIPELINE_COMPLETE'
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}

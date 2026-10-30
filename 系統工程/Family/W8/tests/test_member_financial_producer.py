@@ -13,7 +13,7 @@ from family_input import digest
 def case(tmp_path):
     owner={'client_id':'SYNTHETIC_CLIENT','broker':'SYNTHETIC_BROKER','account':'SYNTHETIC_ACCOUNT','currency':'USD','funding_domain':'SYNTHETIC_DOMAIN'}
     req={'client_id':owner['client_id'],'run_id':'SYNTHETIC_RUN','evaluation_at':'2026-10-30T00:00:00Z','question':'SYNTHETIC_TEST',
-        'client_snapshot':{'payload':{'source_sha256':'a'*64,'client_id':owner['client_id']}},
+        'client_snapshot':{'payload':{'source_sha256':'a'*64,'client_id':owner['client_id'],'tables':{}}},
         'confirmed_target':{'target_version':2,'payload':{'draft':{'target_lines':[{'ticker':'SYNTHETIC_ASSET',
             'target_amount':{'value_state':'KNOWN','amount':'1000','currency':'USD'}}]}}},
         'macro_snapshot':{'synthetic':'prequalified macro; factory stub only'}}

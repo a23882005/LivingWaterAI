@@ -30,10 +30,14 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         'source_descriptor_digest':digest(descriptor),'qualified_financial_pack':False,
         'call_trace':['W8.member_financial_producer'],'trade_action':'NO_TRADE'}
     cfg=deepcopy(data.get('configuration'))
+    def root_inventory(seed_context=None):
+        from family_c7_source_assembly import assemble
+        return assemble(root,request,seed_context or {},artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
     if cfg is None:
         gaps=deepcopy(data.get('missing_source_facts') or [])
         if not gaps:raise PermissionError('MEMBER_PRODUCER_EXACT_ROOT_GAPS_REQUIRED')
         return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','known_source_inputs':deepcopy(data.get('known_source_inputs',{})),
+            'family_scope_assembly':root_inventory(),
             'issues':gaps,'source_reference':data['source_reference']},None
     seed=cfg.get('request_seed') or {};context=cfg.get('context_seed') or {};owner=seed.get('owner') or {}
     if (seed.get('client_id')!=request['client_id'] or seed.get('client_snapshot',{}).get('payload')!=request['client_snapshot']['payload']
@@ -51,7 +55,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     unavailable=[i for i,row in enumerate(lines) if row.get('target_amount',{}).get('value_state')!='KNOWN'
         or row['target_amount'].get('amount') is None or not row['target_amount'].get('currency')]
     if not lines or unavailable:
-        return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','issues':[{
+        return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','family_scope_assembly':root_inventory(), 'issues':[{
             'code':'CURRENT_APPROVED_INVESTMENT_POOL_MONEY_BASE_REQUIRED',
             'field_path':'confirmed_target.payload.draft.target_lines'+('['+str(i)+'].target_amount' if i is not None else ''),
             'kind':'EXTERNAL_ROOT_FACT_REQUIRED','value_state':'UNKNOWN','historical_bootstrap_money_substituted':False}
@@ -63,6 +67,9 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     cfg.update(repo_root=root,focus_symbol=symbol,flow='DEPLOYMENT',observation_cache=observation_cache,run_binding={
         'client_id':request['client_id'],'run_id':request['run_id'],'evaluation_at':request['evaluation_at'],
         'source_db_sha256':data['source_db_sha256'],'owner':deepcopy(owner),'macro_snapshot':deepcopy(request['macro_snapshot'])})
+    cfg['family_c7_assembly_inputs']={'schema_version':'Family.W8.C7AssemblyInputs.v1',
+        'artifact_directory':str(Path(data['artifact_directory'])/'c7_sources'),
+        'portfolio_reconciliation_source':deepcopy(data.get('portfolio_reconciliation_source'))}
     if producer_factory is None:
         from native_asset_source import AssetSourceProducer
         producer_factory=AssetSourceProducer
@@ -100,6 +107,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         file.write_text(json.dumps(pack,ensure_ascii=False,indent=2)+'\n')
         return {**attempt,'status':production.get('status','SOURCE_STAGE_INCOMPLETE'),
             'issues':deepcopy(production.get('source_validation_issues') or [production.get('first_failure')]),
+            **({'family_scope_assembly':deepcopy(production['family_scope_assembly'])} if production.get('family_scope_assembly') else {}),
             'raw_producer_artifact':{'local_path':str(file),'sha256':sha256(file.read_bytes()).hexdigest()},
             'call_trace':attempt['call_trace']+production.get('call_trace',[])},None
     if not isinstance(pack.get('native_sources'),dict):

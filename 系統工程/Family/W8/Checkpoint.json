@@ -2136,5 +2136,23 @@
     "physical_mobile_UAT": "OWNER_DEFERRED",
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "owner_latest_four_DB_reports_request_20261031": {
+    "status": "ASSIGNED_IN_PR60__ORIGINAL_CODEX_SESSION_ACK_PENDING",
+    "owner": "Original report Codex PR60",
+    "PM": "Family middle PM",
+    "members": [
+      "Joseph",
+      "MOU",
+      "Arthur",
+      "Lilian"
+    ],
+    "source_policy": "Fresh official per-member DB readback; latest downloaded bytes/SHA; existing sources, new run, original data as-of preserved",
+    "required_outputs": "Four PDF direct links to Owner; 20 official artifacts and manifest; complete private evidence to PM",
+    "private_instruction": "Google Drive root/TEMP/Family_四戶最新DB報告_Codex施工單_20261031.txt",
+    "code_baseline": "1fe71862d7b3b69b55cd09c9796e7ff26e599e07",
+    "financial_line": "PR59 unchanged; missing formal inputs remain SOURCE_REVIEW",
+    "report_DB_writes": 0,
+    "trade_authorization": "NONE"
   }
 }

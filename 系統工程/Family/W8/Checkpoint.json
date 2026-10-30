@@ -1804,5 +1804,26 @@
     "next": "原Codex完成四戶逐檔V82真實來源測試與必要隔離邊界／修錯回歸，逐戶回交；中PM獨立驗收。",
     "separate_report_html_contract": "PRESERVED",
     "latest_owner_instruction": "4戶V82都測一遍"
+  },
+  "report_html_PM_review_20261030": {
+    "status": "PARTIAL_ACCEPTANCE_CONTRACT_AND_STATIC_ARTIFACTS_PASS__BROWSER_AND_LIVE_E2E_PENDING",
+    "base": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+    "implementation": "95f2461cfe00080c31303699aedd3837b346dec2",
+    "local_head": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0",
+    "package_sha256": "6f10fe4f69568281703da2e5e2b12899b15d977848dba82f5358c2f253693305",
+    "verified_payloads": 41,
+    "total_zip_entries": 42,
+    "allowed_changed_files": 16,
+    "independent_PM_tests": 25,
+    "independent_PM_subtests": 32,
+    "chapters": 14,
+    "physical_pages": 16,
+    "checked_toc_links": 13,
+    "zip_artifacts_byte_identical": true,
+    "browser_rerender": "PENDING_CHROMIUM_DOWNLOAD_INVALID_ARCHIVE",
+    "remote_branch": "NOT_CREATED",
+    "public_export": "AUTO_REVIEW_REJECTED_16_CODE_AND_TEXT_QA__AWAIT_EXPLICIT_EXPORT_APPROVAL",
+    "formal_producers_and_real_drive_E2E": "PENDING",
+    "governance": "Three original private Drive records backed up and updated; exact private source links retained there."
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-30T00:52:54.704Z",
+  "updated_at": "2026-10-30T04:13:59.397Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原Codex：四戶V82測試／修錯；中PM：協調、驗收及治理",
-  "next_action": "原Codex完成四戶逐檔V82真實來源測試與必要隔離邊界／修錯回歸，逐戶回交；中PM獨立驗收。",
+  "next_owner": "原V82 Codex：PR59具名來源與金融／ledger接線續工；原報告Codex：PR60三項；中PM：C7契約協調、獨立驗收及治理",
+  "next_action": "保留四戶32檔元件獨立驗收PASS；V82原線依PR59中PM裁決完成具名外部來源、工程接線與正式帳本／完整金融主鏈。中PM協調C7長期目標/當輪天花板契約後裁定，並複驗最終四戶整線；PR60依原獨立契約續工。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1805,132 +1805,122 @@
     "separate_report_html_contract": "PRESERVED",
     "latest_owner_instruction": "4戶V82都測一遍"
   },
-  "v82_completion_20261030": {
-    "status": "CYCLE_PENDING_RELEASE_FIXED__PM_RECHECK_PENDING",
-    "baseline": "27d41bdba846de9b74690f78091c88bf197b34c6",
-    "pm_audit_merge": "38ff92c90131d47f2c4d2d04dfb4713feca7de31",
-    "phase1": {
-      "scope": "PV2 own qP/qV, PV3 stages2-7, named range/restrictions, full Right and Trend8/9 native functions",
-      "tests_passed": 44,
-      "family_menu04_integrated": false,
-      "production": "HOLD",
-      "trade_action": "NO_TRADE"
-    },
-    "v75_conflict_work": "PAUSED_PENDING_DOT",
-    "private_db_changed": false,
-    "phase1_commit": "f6ddf599fa0bda5303895046b5175addf03e8de2",
-    "pm_chain_audit_merge": "7fb06304d4bf5b7669d9691ae1ca252d768b6c54",
-    "phase2": {
-      "status": "IMPLEMENTED_REGRESSION_AND_PRIVATE_REPLAY_COMPLETE__PM_ACCEPTANCE_PENDING",
-      "component_version": "V82_APPROVED_IMPLEMENTATION_1.0",
-      "decimal_version": "V82_EXECUTION_DECIMAL_1.0.1",
-      "scope": [
-        "shared full Right and stage contract",
-        "own-history qP/qV qualification",
-        "M and daily slice",
-        "persistent planning cycle and original MIN",
-        "shared cash and SGOV layers",
-        "original FamilyRunner Work9 Mentor integration"
-      ],
-      "family_menu04_integrated": true,
-      "validation": {
-        "W5_full_passed": 445,
-        "W8_full_passed": 621,
-        "native_W6_W7_W8_W9_W10_passed": 226,
-        "source_dependency_hashes_passed": 121
-      },
-      "synthetic_stage4": {
-        "project_target": "1000000",
-        "target": "450000",
-        "projected": "300000",
-        "gap": "150000",
-        "mature_slice": "37500",
-        "immature_slice": "22500",
-        "cash_only_20000_execution": "20000",
-        "planning_cash_plus_authorized_SGOV": "100000",
-        "settled_cash": "20000"
-      },
-      "actual_Joseph_MOU_replay": {
-        "Joseph": {
-          "holdings_coverage": {
-            "requested": 10,
-            "returned": 10,
-            "partial": 10,
-            "blocked": 0
-          },
-          "approved_v82_positions": 9,
-          "work6_status": "FINAL_TARGET_CONFIRMED",
-          "c7_status": "RETURN_TO_V70",
-          "drift_rows": 21,
-          "account_funding_status": "BLOCKED_MISSING_NATIVE_DECISIONS",
-          "planning_book_cycles": 0,
-          "planning_book_intents": 0,
-          "official_db_unchanged": true
-        },
-        "MOU": {
-          "holdings_coverage": {
-            "requested": 16,
-            "returned": 16,
-            "partial": 16,
-            "blocked": 0
-          },
-          "approved_v82_positions": 15,
-          "work6_status": "FINAL_TARGET_CONFIRMED",
-          "c7_status": "RETURN_TO_V70",
-          "drift_rows": 19,
-          "account_funding_status": "BLOCKED_MISSING_NATIVE_DECISIONS",
-          "planning_book_cycles": 0,
-          "planning_book_intents": 0,
-          "official_db_unchanged": true,
-          "approved_SGOV_long_term_weight": "0.20"
-        }
-      },
-      "independent_middle_pm_acceptance": "PENDING",
-      "production": "HOLD",
-      "trade_action": "NO_TRADE",
-      "guide": "系統工程/Family/W8/V82_IMPLEMENTATION_GUIDE.md",
-      "private_db_changed": false,
-      "code_tested_commit": "48e896128a94eaa2132f9d210fbbcb94d9ec8ed1",
-      "CI_code_commit": "48e896128a94eaa2132f9d210fbbcb94d9ec8ed1",
-      "CI_workflows_passed": 6,
-      "full_04_acceptance": false,
-      "formal_Drive_cycle_sync_acceptance": false,
-      "formal_Drive_cycle_sync_gap": "Operator same-ID read/write/readback integration and cross-environment broker receipts remain unaccepted; local SQLite/CAS and Family guards tested",
-      "public_review": "系統工程/Family/W8/查核紀錄/V82_核准補齊工程與兩戶實跑回交_20261030.txt",
-      "remote_preserved_at_close": {
-        "main": "946a2a4",
-        "pm_refinement": "1a9990d",
-        "financial_program_blobs_unchanged_from": "48e8961",
-        "private_replay_source_revision": "48e8961",
-        "updated_market_cache_regression": "W8_FULL_621_PASS_AFTER_MAIN_946a2a4_MERGE"
-      }
-    }
+  "report_html_PM_review_20261030": {
+    "status": "PARTIAL_ACCEPTANCE_CONTRACT_AND_STATIC_ARTIFACTS_PASS__BROWSER_AND_LIVE_E2E_PENDING",
+    "base": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+    "implementation": "95f2461cfe00080c31303699aedd3837b346dec2",
+    "local_head": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0",
+    "package_sha256": "6f10fe4f69568281703da2e5e2b12899b15d977848dba82f5358c2f253693305",
+    "verified_payloads": 41,
+    "total_zip_entries": 42,
+    "allowed_changed_files": 16,
+    "independent_PM_tests": 25,
+    "independent_PM_subtests": 32,
+    "chapters": 14,
+    "physical_pages": 16,
+    "checked_toc_links": 13,
+    "zip_artifacts_byte_identical": true,
+    "browser_rerender": "PENDING_CHROMIUM_DOWNLOAD_INVALID_ARCHIVE",
+    "remote_branch": "family/report-canonical-html-20261030",
+    "public_export": "OWNER_EXPLICITLY_APPROVED__16_FILES_PUBLISHED_AND_READBACK_VERIFIED",
+    "formal_producers_and_real_drive_E2E": "PENDING",
+    "governance": "Three original private Drive records backed up and updated; exact private source links retained there.",
+    "remote_commit": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
+    "draft_pr": "https://github.com/a23882005/LivingWaterAI/pull/60",
+    "remote_content_verified": 16,
+    "execution_owner": "原報告／HTML Codex",
+    "PM_owner": "Family中PM：契約、協調、治理、獨立驗收及Gate",
+    "continuation_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6514477704"
   },
-  "cycle_pending_release_20261030": {
-    "issue": "V82-CYCLE-PENDING-RELEASE",
-    "status": "FIXED_TESTED__INDEPENDENT_PM_RECHECK_PENDING",
-    "base_commit": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
-    "PM_audit_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
-    "PM_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6511847368",
-    "implementation_version": "V82_DAILY_SLICE_LEDGER_1.0.1",
-    "runtime_sha256": "d090359deffa7a0e578a0005775a7f4e2ec306d63874c5d6e33a44a43ae70574",
-    "new_cases": 35,
-    "targeted_passed": 51,
-    "W5_full_passed": 480,
-    "W8_full_passed": 621,
-    "source_dependency_hashes_passed": 121,
-    "original_PM_probe_before": "ACCEPTED_AND_PERSISTED__ROOM_25",
-    "original_PM_probe_after": "REJECTED__CYCLE_UNCONFIRMED_COMMITMENT_REDUCTION",
-    "mature_B0": "37500.00",
-    "immature_B0": "22500.00",
-    "event_and_SQLite_share_guard": true,
-    "cycle_profile_key_G0_B0_rates_Stage_unchanged": true,
-    "private_two_household_E2E_rerun": false,
-    "private_DB_changed": false,
-    "formal_Drive_cycle_sync_acceptance": false,
-    "C7_conflict_and_source_gaps": "UNCHANGED",
-    "report_HTML": "INDEPENDENT_CODEX_LINE_UNTOUCHED",
+  "owner_PM_engineering_authority_20261030": {
+    "decision": "Owner approved this exact 16-file public report code/text QA export and Draft PR; same-scope routine engineering submissions, tests and governance are middle-PM responsibility and may proceed without repeated permission.",
+    "public_report_scope": "16 approved code/synthetic-tests/documentation/text-QA files only",
+    "record": "Original private Drive PM governance"
+  },
+  "owner_PM_governance_Codex_construction_20261030": {
+    "decision": "Codex負責施工、除錯、環境修復、整線與補測；中PM盡量不親自施工，負責契約、範圍、依賴與版本協調、治理、獨立驗收及Gate。",
+    "supersedes": "中PM接續瀏覽器重跑、真人資料整線及Drive正式保存讀回，以及中PM預設親自施工的安排。",
+    "report_execution_owner": "原報告／HTML Codex，沿PR60",
+    "report_remaining": [
+      "瀏覽器7項重跑及回歸",
+      "四戶真人資料producer至完整報告整線",
+      "四戶Drive正式保存、重新下載校驗、manifest及Menu12讀回"
+    ],
+    "members": [
+      "Joseph",
+      "MOU",
+      "Arthur",
+      "Lilian"
+    ],
+    "continuation_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6514477704",
+    "dispatch_status": "CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_NOT_OBSERVED",
+    "acceptance": "中PM收到同一最終版本逐戶證據後獨立驗收；尚未整線PASS。",
+    "v82_execution_owner": "原V82 Codex，PR59四戶V82重跑維持原契約"
+  },
+  "v82_four_household_PM_acceptance_20261030": {
+    "fixed_commit": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+    "verdict": "PARTIAL_PASS_SOURCE_BOUND_COMPONENTS__FULL_FINANCIAL_CHAIN_PENDING",
+    "review_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6514793947",
+    "members": {
+      "Joseph": {
+        "expected": 11,
+        "component_pass": 11,
+        "full_chain_pass": 0
+      },
+      "MOU": {
+        "expected": 16,
+        "component_pass": 16,
+        "full_chain_pass": 0
+      },
+      "Arthur": {
+        "expected": 2,
+        "component_pass": 2,
+        "full_chain_pass": 0
+      },
+      "Lilian": {
+        "expected": 3,
+        "component_pass": 3,
+        "full_chain_pass": 0
+      }
+    },
+    "independent_PM": {
+      "targeted_tests": 122,
+      "subtests": 8,
+      "menu04_saved_cutoff_replays": 4,
+      "assets_recomputed": 32,
+      "exact_git_blobs": 442,
+      "source_dependency_hashes": 121,
+      "original_package_manifest_files": 268,
+      "restored_paths": 274,
+      "db_integrity_pass": 4,
+      "github_CI_success": 6,
+      "stale_completed_session_rows_at_archived_cutoff": 7
+    },
+    "private_PM_evidence": {
+      "location": "Google Drive root/TEMP",
+      "name": "V82_d8dea45_中PM獨立驗收證據_20261030.zip",
+      "bytes": 17980,
+      "sha256": "77dbc75abd394ea459d9b15e1d73fe8fa1ac73d37e96b41099989d71d0f34f43",
+      "remote_redownload_sha_crc_manifest_pass": true
+    },
+    "formal_financial_result": "ANALYSIS_PARTIAL; canonical_result and final amount null; full Work9/Mentor pending",
+    "next_execution_owner": "原V82 Codex",
+    "PM_owner": "Family中PM：C7契約協調/裁定、版本/共享治理、獨立複驗/Gate",
+    "external_source_work": [
+      "own-history PIT/raw-price/corporate-action/calendar/listing qualification",
+      "safety/credit/events/ETF structure and order/fill evidence",
+      "refresh named stale/incomplete market sources with new runs"
+    ],
+    "engineering_work": [
+      "classification/valuation class and named Waterfall producers",
+      "same-run Work3/C7/Work4/target money/valuation price/FX/funding/execution constraints",
+      "source-bound daily cycle and official Drive ledger persistence/readback",
+      "four-member full amount/cap/MIN/lot/Work9/Mentor integration"
+    ],
+    "C7_contract_status": "PM_COORDINATION_REQUIRED__APPROVED_TARGETS_AND_ORIGINAL_RETURN_RULE_PRESERVED",
+    "construction_start_status": "CONTINUATION_CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_PENDING_OBSERVATION",
+    "report_line": "PR60 continues under separate original report Codex contract",
     "production": "HOLD",
-    "trade_action": "NO_TRADE"
+    "trade_authorization": "NONE"
   }
 }

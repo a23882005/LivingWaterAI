@@ -1,4 +1,4 @@
-# 最後修改日期時間：2026/10/18 17:10（台灣時間）｜檔案名稱：email-action-results.yml｜版本：Gmail 成功／失敗執行結果通知
+# 最後修改日期：2026/10/30（台灣時間）｜檔案名稱：email-action-results.yml｜版本：Gmail 實際結果分類通知
 name: LivingWaterAI Gmail Action result reports
 
 on:
@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout report sender
         uses: actions/checkout@v4
+      - name: Verify notification conclusion classification
+        run: python -m unittest discover -s tests -p test_action_gmail_conclusions.py -v
       - name: Select the source run artifact
         id: artifact
         env:
@@ -54,6 +56,8 @@ jobs:
           SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
           SOURCE_RUN_URL: ${{ github.event.workflow_run.html_url }}
           SOURCE_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          SOURCE_RUN_EVENT: ${{ github.event.workflow_run.event }}
+          SOURCE_RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
           SOURCE_RUN_CREATED_AT: ${{ github.event.workflow_run.created_at }}
           SOURCE_RUN_UPDATED_AT: ${{ github.event.workflow_run.updated_at }}
         run: python scripts/send_action_gmail_report.py --artifact-dir run-artifact

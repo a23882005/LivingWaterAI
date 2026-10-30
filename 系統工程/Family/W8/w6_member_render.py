@@ -32,6 +32,8 @@ def _safe(text):
 
 
 def _format_money(value):
+    if value is None:
+        return "UNKNOWN"
     from decimal import Decimal
     return f"{Decimal(str(value)):,.2f}"
 
@@ -39,6 +41,12 @@ def _format_money(value):
 def _format_pct(value):
     from decimal import Decimal
     return f"{Decimal(str(value))*100:.2f}%"
+
+
+def _instrument_label(row):
+    code=row["代碼"]
+    label=row.get("顯示名稱")
+    return code+("／"+label if label and label!=code else "")
 
 
 def _table(columns, rows):
@@ -82,39 +90,56 @@ def _radar_panels(radar):
     if (not isinstance(radar,dict) or not radar.get("source_reference")
             or radar.get("data_provenance")!="SOURCE_BACKED"):
         raise ValueError("W6_CANONICAL_FOUR_RADAR_REQUIRED")
-    keys=("current_defense","current_attack","target_defense","target_attack")
-    names=("目前防禦","目前攻擊","目標防禦","目標攻擊")
+    keys=radar.get("view_order",("current_defense","current_attack","target_defense","target_attack"))
+    labels={"current_defense":"目前防禦","current_attack":"目前攻擊",
+            "target_defense":"目標防禦","target_attack":"目標攻擊"}
     axes=("牛市初期","牛市中期","牛市末期","正常修正","景氣衰退","金融危機")
+    if "axes" in radar:
+        axes=tuple(x["label_zh"] for x in radar["axes"])
     views=radar.get("views",{})
-    if set(views)!=set(keys):
+    if set(views)!=set(labels) or len(keys)!=4 or set(keys)!=set(labels) or len(axes)!=6:
         raise ValueError("W6_FOUR_RADAR_INCOMPLETE")
     result=[]
-    for key,label in zip(keys,names):
+    for key in keys:
+        label=labels[key]
         vals=views[key].get("levels")
-        if not isinstance(vals,list) or len(vals)!=6 or any(type(n)!=int or n<1 or n>6 for n in vals):
+        if not isinstance(vals,list) or len(vals)!=6 or any(
+                not (n is None and radar.get("allow_unknown") is True) and
+                (type(n)!=int or n<1 or n>6) for n in vals):
             raise ValueError("W6_RADAR_SCORES_INVALID")
         color="#245C50" if "defense" in key else "#AB843A"
         cx,cy,R=225,185,110
         a=[i*math.pi/3-math.pi/2 for i in range(6)]
-        pts=[(cx+R*v/6*math.cos(ang),cy+R*v/6*math.sin(ang)) for ang,v in zip(a,vals)]
+        pts=[(cx+R*v/6*math.cos(ang),cy+R*v/6*math.sin(ang)) for ang,v in zip(a,vals) if v is not None]
         outline=' '.join(f"{x:.1f},{y:.1f}" for x,y in pts)
-        pieces=[f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="#bfcfc3" />',
-                f'<polygon points="{outline}" fill="{color}" fill-opacity="0.22" stroke="{color}" stroke-width="3"/>']
+        pieces=[f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="#bfcfc3" />']
+        if None not in vals:
+            pieces.append(f'<polygon points="{outline}" fill="{color}" fill-opacity="0.22" stroke="{color}" stroke-width="3"/>')
+        else:
+            pieces.append(f'<text x="{cx}" y="{cy}" text-anchor="middle" font-size="16">UNKNOWN／待來源補齊</text>')
         for ang,axis in zip(a,axes):
             x,y=cx+(R+36)*math.cos(ang),cy+(R+36)*math.sin(ang)
-            pieces.append(f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" font-size="14">{axis}</text>')
+            # Wrap long canonical Chinese labels without shortening/relabeling.
+            lines=[axis[i:i+7] for i in range(0,len(axis),7)]
+            spans=''.join(f'<tspan x="{x:.1f}" dy="{0 if i==0 else 17}">{_safe(t)}</tspan>'
+                          for i,t in enumerate(lines))
+            pieces.append(f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" font-size="14">{spans}</text>')
         result.append('<article><h3>'+_safe(label)+'</h3><svg viewBox="0 0 450 380">'+''.join(pieces)+'</svg>'+
-                      '<small>六級評等，非報酬預測；來源：'+_safe(radar["source_reference"])+"</small></article>")
+                      '<small class="source-reference">六級評等，非報酬預測；來源：'+_safe(radar["source_reference"])+"</small></article>")
     return '<div class="grid radar">'+''.join(result)+'</div>'
 
 
-def _section_items(items):
+def _section_items(items, *, envelope=None):
     output=[]
     for item in items:
         title=_safe(item.get("heading"))
         body=_safe(item.get("body"))
         src=_safe(item.get("source_reference"))
-        output.append("<article><h3>"+title+"</h3><p>"+body+"</p><small>來源："+src+"</small></article>")
+        if envelope and envelope.get("as_of"):
+            src+="；資料日期："+_safe(envelope["as_of"])
+        if envelope and envelope.get("scope"):
+            src+="；來源範圍："+_safe(envelope["scope"])
+        output.append('<article><h3>'+title+'</h3><p>'+body+'</p><small class="source-reference">來源：'+src+'</small></article>')
     return output
 
 
@@ -138,18 +163,32 @@ def _build_blocks(data):
     parts={i:[] for i in range(1,15)}
     parts[1]=['<div id="toc"></div>']
     parts[2]=[_card("投資池目前已確認市值（新台幣）", "NT$"+_format_money(data["current_total_twd"])),
-              _card("長期目標配置", "依本人正式確認的 Final Target v"+_safe(data.get("target_version","待核對"))),
-              _card("本次投資分析", "同輪 W5／V70／V82／債券V75／Mentor 結果；僅供投資教育，交易由本人決定。"),
-              _card("行情資料日期",data["market_as_of"]),
+              _card("長期目標配置", ("依本人正式確認的 Final Target v"+_safe(data["target_version"]))
+                    if data.get("target_version") is not None else "UNKNOWN；尚待核准目標來源。"),
+              _card("本次投資分析", ("同輪正式計算結果" if data.get("report_scope")=="CANONICAL_CALCULATION"
+                    else "來源回顧；未提供的正式計算結果保留 UNKNOWN")+"；僅供投資教育，交易由本人決定。"),
+              _card(data.get("market_as_of_label","行情資料日期"),data["market_as_of"]),
               _card("本人正式來源", "客戶別"+data["member_alias"]+"；DB摘要已綁定，完整來源存本輪檔案紀錄。")]
     parts[3]=['<div class="piegrid"><div>'+_pie(actual)+'</div><div>'+_table(
-        ["編號","代碼／標的","目前比例","新台幣市值"],[[i+1,row["代碼"],_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(actual)])+'</div></div>']
+        ["編號","代碼／標的","目前比例","新台幣市值"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(actual)])+'</div></div>']
     parts[4]=['<div class="bars">'+''.join(
-        '<div class="barrow"><span>'+_safe(row["代碼"])+
+        '<div class="barrow"><span>'+_safe(_instrument_label(row))+
         '</span><div><i style="width:'+str(min(100.,float(row["權重"])*100))+
         '%"></i></div><b>'+_format_pct(row["權重"])+"</b></div>" for row in actual)+'</div>']
+    if data.get("current_value_state")=="UNKNOWN":
+        parts[2][0]=_card("目前投資池市值", "UNKNOWN；尚未取得完整同輪市值、現金範圍及匯率來源。")
+        records=data.get("source_position_records",[])
+        parts[3]=[_card("持倉資料範圍", "以下為本人資料庫已記錄的持倉及各自日期；不代表已完成目前市值核對。")]
+        if records:
+            for i in range(0,len(records),8):
+                parts[3].append(_table(["標的","帳戶","已記錄數量","來源日期"], [
+                    [r.get("ticker"),r.get("account_key"),r.get("quantity"),r.get("as_of_utc")]
+                    for r in records[i:i+8]]))
+        else:
+            parts[3].append(_card("持倉資料狀態", "UNKNOWN；缺少已記錄持倉不表示持倉為零。"))
+        parts[4]=[_card("目前比例與統計", "UNKNOWN；市值分母尚未核實，不以舊值、零或推算比例填入。")]
     parts[5]=['<div class="piegrid"><div>'+_pie(target)+'</div><div>'+_table(
-        ["編號","代碼／標的","目標比例","目標金額（新台幣）"],[[i+1,row["代碼"],_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(target)])+'</div></div>']
+        ["編號","代碼／標的","目標比例","目標金額（新台幣）"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(target)])+'</div></div>']
     for i in range(0,len(drift),9):
         dual=[]
         for row in drift[i:i+9]:
@@ -160,11 +199,22 @@ def _build_blocks(data):
                 '</span><div><small>目前 '+cp+'</small><i style="height:11px;background:#64899B;width:'+str(current_width)+
                 '%"></i><small>目標 '+tp+'</small><i style="height:11px;background:#D99042;width:'+str(target_width)+
                 '%"></i></div><b>NT$'+_format_money(row["差異TWD"])+"</b></div>")
+            if row.get("protected"):
+                dual.append('<div class="note">'+_safe(row["標的"])+
+                            '：保留既有持倉（HOLD_PROTECTED）；風險說明不等於賣出指示。</div>')
         parts[6].append('<div class="bars">'+''.join(dual)+'</div>')
     parts[6].append('<div class="note">藍＝目前、金＝目標；差額＝目前－目標。逐檔呈現，無「其他」合併。</div>')
+    if not target:
+        parts[5]=[_card("目標配置資料狀態", "UNKNOWN；尚待核准目標來源，不以零比例表示缺值。")]
+    if not drift:
+        parts[6]=[_card("漂移資料狀態", "UNKNOWN；尚待正式目標及漂移來源，不以零差額表示缺值。")]
     for number,name in CONTENTS.items():
-        parts[number]=_section_items(sections[name])
-    parts[9].insert(0,_radar_panels(data.get("approved_radar")))
+        envelope=data.get("report_source_lineage",{}).get("sections",{}).get(name)
+        parts[number]=_section_items(sections[name],envelope=envelope)
+    if data.get("approved_radar") is None and data.get("report_scope")=="SOURCE_REVIEW":
+        parts[9].insert(0,_card("四雷達資料狀態", "UNKNOWN；本次未提供正式雷達來源，不補零或沿用舊分數。"))
+    else:
+        parts[9].insert(0,_radar_panels(data.get("approved_radar")))
     return [{"chapter":i,"title":CHAPTERS[i-1],"parts":parts[i]} for i in range(1,15)]
 
 
@@ -188,6 +238,9 @@ def _source_html(data,css,images,blocks):
         css=css.replace("assets/"+name, "data:"+mime+";base64,"+base64.b64encode(byte).decode())
     css=re.sub(r"@font-face\{[^}]+\}","",css)  # do not redistribute fonts
     css=css.replace("font:21px Report,", "font:21px ")
+    # Keep every source character and the approved type size. Long URLs, paths
+    # and hashes may wrap inside source cards, including the radar grid.
+    css+='\n.source-reference{display:block;overflow-wrap:anywhere;word-break:normal}'
     person=_safe(data["member_alias"])
     identity=_safe(data["run_id"])
     embedded=json.dumps(blocks,ensure_ascii=False).replace("<","\\u003c")
@@ -196,15 +249,17 @@ def _source_html(data,css,images,blocks):
            '<p style="text-align:center">Portfolio Review & Allocation Report</p>'
            '<div class="note">一脈活水，流過歲月；讓資產在歲月裡生長。</div>'
            '<dl>報告版本　Family W6 v16　四戶動態資料版<br>分析時間　'+_safe(data["evaluation_at"])+
-           '<br>資料日期　'+_safe(data["market_as_of"])+
+           '<br>'+_safe(data.get("market_as_of_label","資料日期"))+'　'+_safe(data["market_as_of"])+
+           '<br>報告編號　'+identity+
            '<br>目的　　教育、風險與資產配置分析；由客戶自己決定是否交易</dl></div>'
            '<div class="foot"><span>活水AI理財教練・Confidential</span><span>交易授權 NONE</span></div></section>')
     return ('<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">'
             '<title>'+person+' 配置報告</title><style>'+css+'</style></head><body>'+cover+
             '<main id="pages"></main><script type="application/json" id="blocks">'+embedded+
             '</script><script type="application/json" id="lineage">'+
-            json.dumps({"source_digest":data["source_digest"],"current_digest":data["digest"],
-                        "engine_sha":data["engine_result_sha256"],"run_id":data["run_id"]})+
+            json.dumps({"client_id":data["client_id"],"source_digest":data["source_digest"],"current_digest":data["digest"],
+                        "data_as_of":data["market_as_of"],"engine_sha":data["engine_result_sha256"],"run_id":data["run_id"]},
+                       ensure_ascii=False).replace("<","\\u003c")+
             '</script></body></html>')
 
 # Page assembly is the same W6 v16 dynamic block-paginator, with the member
@@ -271,9 +326,26 @@ def render_current_w6(data, w6_zip, *, executable=None):
             if result["physical_pages"]>45 or len(result["chapters"])!=14:
                 raise ValueError("W6_PAGE_MAP_INVALID")
             qa=page.evaluate("""() => ({broken:[...document.images].filter(x=>!x.complete||!x.naturalWidth).length,
-               overflow:[...document.querySelectorAll('.page')].filter(p=>[...p.querySelectorAll('.part')].some(x=>x.getBoundingClientRect().bottom>p.getBoundingClientRect().top+1400)).length})""")
-            if qa["broken"] or qa["overflow"]:
+               overflow:[...document.querySelectorAll('.page')].filter(p=>[...p.querySelectorAll('.part')].some(x=>x.getBoundingClientRect().bottom>p.getBoundingClientRect().top+1400)).length,
+               horizontal_overflow:[...document.querySelectorAll('.page,.source-reference')].filter(n=>n.scrollWidth>n.clientWidth+1).length,
+               source_overflow:[...document.querySelectorAll('.source-reference')].filter(n=>{
+                 const card=n.closest('article'),b=card.getBoundingClientRect(),s=getComputedStyle(card);
+                 const left=b.left+parseFloat(s.borderLeftWidth)+parseFloat(s.paddingLeft);
+                 const right=b.right-parseFloat(s.borderRightWidth)-parseFloat(s.paddingRight);
+                 const range=document.createRange();range.selectNodeContents(n);
+                 return [n.getBoundingClientRect(),...range.getClientRects()].some(r=>r.left<left-1||r.right>right+1);
+               }).length})""")
+            if any(qa.values()):
                 raise ValueError("W6_VISUAL_CONTENT_QA_FAILED")
+            # Persist the exact paginated DOM used by PDF and page captures.
+            # The source file has an empty #pages and an inert JSON block; it
+            # cannot reproduce the body when opened without this browser job.
+            page.evaluate("""map => {
+                const node=document.createElement('script');
+                node.type='application/json';node.id='page-map';
+                node.textContent=JSON.stringify(map);document.body.append(node);
+            }""",result)
+            (out/"report.html").write_text(page.content(),encoding="utf-8")
             page.pdf(path=str(out/"report.pdf"),print_background=True,prefer_css_page_size=True)
             pngs={}
             for i in range(result["physical_pages"]):
@@ -293,6 +365,7 @@ def render_current_w6(data, w6_zip, *, executable=None):
             z.writestr("README.txt","活水AI W6 v16・先解壓縮，再開啟 index.html。")
             for name,raw in pngs.items():z.writestr(name,raw)
             z.writestr("report.pdf",pdf)
+            z.writestr("report.html",html_bytes)
         artifacts={"report.pdf":pdf,"index.html":reader,"report.html":html_bytes,
                    "report.zip":zipmem.getvalue()}
         return {"qa_passed":True,"renderer_contract":"Family.W6.v16.parameterized",
@@ -300,4 +373,5 @@ def render_current_w6(data, w6_zip, *, executable=None):
                 "source_digest":data["source_digest"],"w6_current_digest":data["digest"],
                 "run_id":data["run_id"],"data_as_of":data["market_as_of"],
                 "analysis_version":"W6-v16-parameterized", "page_count":result["physical_pages"],
+                "report_scope":data.get("report_scope"),"content_state":data.get("report_content_state"),
                 "artifacts":artifacts}

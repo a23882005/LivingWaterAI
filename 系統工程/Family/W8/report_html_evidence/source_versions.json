@@ -16,7 +16,7 @@
     "on_demand_w6.py": "c22ef951b70368629e86db3e8ba2f61e1d15427d70f65b42df33cf7fe1042fd7",
     "on_demand_report_delivery.py": "951102c5a55d959212e1e9cfc400a114eea75e7e6de37e1dce62e7b0e85fd0ae",
     "report_canonical_adapter.py": "b0d4b287def35bacd68452580dbbd10aec7f878f62a17f3499cdb24b15b7b29d",
-    "w6_current_data.py": "e88ee749384e9d939e4874e6052e0a35851168bb3d8e2a355ff51aa94cc80483",
+    "w6_current_data.py": "ce31b75220453fba1c60cd382a332396303c98b5c4b3d53387963c1233455b04",
     "w6_member_render.py": "d202e7f6454d42c8ab34e1ec67cf8945f323a13fe41ab9a701aafd5ec80c5021"
   },
   "original_local_head_preserved": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0",
@@ -28,5 +28,19 @@
     "frozen_upstream_source_unchanged": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
     "main_allowlist_overlap": false,
     "shared_governance_files_modified": false
+  },
+  "latest_db_source_review": {
+    "base_commit": "1fe71862d7b3b69b55cd09c9796e7ff26e599e07",
+    "renderer_unchanged_from_accepted_1fe71862": true,
+    "main_checked": "494a0a5dd0171905c9314afedc4cfa51a1f4ed97",
+    "main_allowed_file_overlap": false,
+    "PR59_head_observed_only": "ac1d73715a837796a729616005f18575fc9c3afd",
+    "native_financial_producer_consumed": false,
+    "reader": "Family/W5/family_input.read_snapshot",
+    "formal_source": "formal_report_source.build_report_source",
+    "current_adapter": "w6_current_data.build_w6_current_data",
+    "renderer": "on_demand_w6.OnDemandW6Renderer",
+    "production_change": "Allow explicitly unknown NAV only in validated SOURCE_REVIEW without canonical C",
+    "private_DB_or_shared_governance_writes": 0
   }
 }

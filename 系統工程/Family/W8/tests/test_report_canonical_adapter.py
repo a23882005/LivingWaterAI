@@ -235,6 +235,35 @@ class CanonicalReportTests(unittest.TestCase):
         self.assertNotIn("canonical_lineage", out)
         self.assertIn("UNKNOWN", str(F.R._build_blocks(out)))
 
+    def test_db_only_review_preserves_facts_without_a_fabricated_native_result(self):
+        c=F.db_review_case();frozen=deepcopy(c);out=F.current(c)
+        self.assertEqual(out['report_scope'],'SOURCE_REVIEW')
+        self.assertIsNone(out['current_total_twd'])
+        self.assertEqual(out['actual'],[]);self.assertEqual(out['drift'],[])
+        self.assertIsNone(out['approved_radar'])
+        self.assertEqual(out['source_position_records'],c['source']['actual_position_records'])
+        self.assertEqual({r['代碼']:r['權重'] for r in out['target']},{'KEEP':'0.4','BOTH':'0.4','NEW':'0.2'})
+        self.assertTrue(all(r['市值TWD'] is None for r in out['target']))
+        self.assertIsNone(out['report_source_lineage']['action'])
+        self.assertNotIn('member_analysis',out['report_source_lineage'])
+        self.assertEqual(c,frozen)
+
+    def test_db_only_review_still_requires_explicit_unknown_valuation_and_source_bindings(self):
+        for field,value in (('valuation_state',None),('market_as_of_basis',None),('source_db_sha256','b'*64)):
+            with self.subTest(field=field):
+                c=F.db_review_case();c['market'][field]=value
+                with self.assertRaises((ValueError,PermissionError)):F.current(c)
+        c=F.db_review_case();binding=c['engine']['report_sources']
+        binding['request']['client_snapshot']['payload']['tables']['portfolio_position'][0]['quantity_decimal']='999'
+        binding['digest']=F.A.digest({k:v for k,v in binding.items() if k!='digest'})
+        with self.assertRaises(ValueError):F.current(c)
+
+    def test_unknown_nav_cannot_skip_existing_canonical_or_complete_scope_checks(self):
+        c=F.db_review_case();F.refresh(c,scope='SOURCE_REVIEW',result=False,c7=True)
+        with self.assertRaises(PermissionError):F.current(c)
+        c=F.db_review_case();F.refresh(c,scope='CANONICAL_CALCULATION',result=False,c7=False)
+        with self.assertRaises(ValueError):F.current(c)
+
     def test_full_claim_requires_c_and_work9_but_review_retains_failure(self):
         c = self.c; F.refresh(c, result=False)
         with self.assertRaisesRegex(ValueError, "W6_CANONICAL_WORK9_REQUIRED"): F.current(c)

@@ -41,6 +41,8 @@ class RenderedHTMLTests(unittest.TestCase):
         cls.member=F.R.render_current_w6(F.D.build_w6_current_data(member["source"],**inputs),archive)
         cls.long_current=F.current(F.long_reference_case())
         cls.long_rendered=F.R.render_current_w6(cls.long_current,archive)
+        cls.db_current=F.current(F.db_review_case())
+        cls.db_rendered=F.R.render_current_w6(cls.db_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:
@@ -69,6 +71,9 @@ class RenderedHTMLTests(unittest.TestCase):
             long_folder=target/'long_reference';long_folder.mkdir(exist_ok=True)
             for name,raw in cls.long_rendered['artifacts'].items():(long_folder/name).write_bytes(raw)
             (long_folder/'current.synthetic.json').write_text(json.dumps(cls.long_current,ensure_ascii=False,indent=2),encoding='utf-8')
+            db_folder=target/'db_review';db_folder.mkdir(exist_ok=True)
+            for name,raw in cls.db_rendered['artifacts'].items():(db_folder/name).write_bytes(raw)
+            (db_folder/'current.synthetic.json').write_text(json.dumps(cls.db_current,ensure_ascii=False,indent=2),encoding='utf-8')
 
     def test_native_member_review_renders_unknown_nav_and_source_dated_holdings(self):
         page=self.context(java_script_enabled=False).new_page()
@@ -83,6 +88,20 @@ class RenderedHTMLTests(unittest.TestCase):
         self.assertEqual(len(set(page.locator("[data-chapter]").evaluate_all(
             "nodes=>nodes.map(n=>n.dataset.chapter)"))),14)
         self.receipt["checks"]["partial_native_member_unknown_nav_and_original_facts"]="PASS_SYNTHETIC"
+
+    def test_db_only_report_renders_new_current_without_claiming_native_financial_analysis(self):
+        page=self.context(java_script_enabled=False).new_page()
+        page.set_content(self.db_rendered['artifacts']['report.html'].decode())
+        text=page.locator('body').inner_text()
+        self.assertIn('已記錄數量',text)
+        self.assertIn('來源查核時點（市值尚未核實）',text)
+        self.assertIn('UNKNOWN；尚未取得完整同輪市值',text)
+        self.assertNotIn('原逐檔分析狀態',text)
+        self.assertEqual(page.locator('#toc a').count(),13)
+        self.assertEqual(len(set(page.locator('[data-chapter]').evaluate_all('ns=>ns.map(n=>n.dataset.chapter)'))),14)
+        lineage=json.loads(page.locator('#lineage').text_content())
+        self.assertEqual(lineage['current_digest'],self.db_current['digest'])
+        self.receipt['checks']['fresh_db_review_without_native_analysis']='PASS_SYNTHETIC'
 
     def context(self, **kwargs):
         context = self.browser.new_context(**kwargs)

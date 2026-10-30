@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
   "date": "2026-10-31",
-  "status": "LAYOUT_REPAIR_AND_20_FRESH_PRIVATE_READBACKS_COMPLETE__PM_REACCEPTANCE_PENDING",
+  "status": "LATEST_DB_FOUR_SOURCE_REVIEW_REPORTS_ARCHIVED__PM_ACCEPTANCE_PENDING",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -29,13 +29,13 @@
     "tests/test_on_demand_w6.py"
   ],
   "validation": {
-    "pytest_passed": 257,
-    "subtests_passed": 65,
+    "pytest_passed": 261,
+    "subtests_passed": 68,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "canonical_contract_tests": 35,
-    "real_browser_tests": 10,
+    "canonical_contract_tests": 38,
+    "real_browser_tests": 11,
     "physical_pages": 16,
     "chapters": 14,
     "all_static_pages_equal_zip_png": true,
@@ -64,8 +64,8 @@
     "Android/iOS device UAT remains deferred; managed file:// policy is preserved",
     "Middle PM independently accepts the final source-review report and verifies remaining formal financial integration"
   ],
-  "next_responsible_owner": "Family middle PM: independently recheck repaired source references and Gate; coordinate separate upstream versions",
-  "independent_acceptance": "BASELINE_DATA_AND_PERSISTENCE_SEGMENTS_PASS__REPAIRED_LAYOUT_PENDING_PM_RECHECK",
+  "next_responsible_owner": "Family middle PM: independently accept latest-DB reports; freeze PR59 financial source versions before later integration",
+  "independent_acceptance": "LAYOUT_AT_1fe71862_PM_PASS_CLOSED__LATEST_DB_REPORTS_PENDING",
   "resume": [
     "Checkout this draft PR head and read Report_HTML_Contract_20261030.md",
     "Verify latest main/PR59 and allowed-file overlaps before editing",
@@ -141,8 +141,39 @@
     "real_artifact_and_manifest_fresh_readbacks": 20,
     "private_db_writes": 0,
     "financial_engines_rerun": false,
-    "middle_pm_layout_reacceptance": "PENDING",
+    "middle_pm_layout_reacceptance": "PASS_CLOSED_AT_1fe71862",
     "current_remote_db_versions": "SEPARATE_FROM_FROZEN_REPLAY__PRIVATE_SHA_COMPARISON_RECORDED",
-    "private_entry": "Google Drive root/TEMP/Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt"
+    "private_entry": "Google Drive root/TEMP/Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt",
+    "PM_review": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6531741680"
+  },
+  "latest_db_reports": {
+    "reports": 4,
+    "scope": "SOURCE_REVIEW",
+    "fresh_official_DB_reads": 4,
+    "new_run_per_member": true,
+    "physical_pages": [
+      23,
+      23,
+      15,
+      16
+    ],
+    "total_pages": 77,
+    "source_cards": 76,
+    "quoted_dated_record_cards": 39,
+    "all_saved_pages_exact_zip_png": true,
+    "source_text_ranges_and_pdf_boxes": "PASS",
+    "narrow_offline_readers": 4,
+    "formal_artifact_and_manifest_fresh_readbacks": 20,
+    "published_manifest_and_engineering_lookup": "4_OF_4_PASS",
+    "final_fresh_DB_bytes_equal_start": true,
+    "db_writes": 0,
+    "financial_engine_runs": 0,
+    "old_native_results_reused": false,
+    "current_NAV_target_amounts_drift_radars": "UNKNOWN",
+    "financial_research": "PARTIAL_DB_QUOTES_AND_SCOPE_NOTES__FORMAL_RESEARCH_PENDING",
+    "Owner_output": "Four direct PDF links plus HTML/ZIP in private delivery entry",
+    "middle_PM_acceptance": "PENDING",
+    "full_financial_or_end_user_login_UAT": "NOT_ASSERTED",
+    "assignment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6531912321"
   }
 }

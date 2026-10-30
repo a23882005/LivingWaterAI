@@ -170,6 +170,16 @@ def current(c=None):
     return D.build_w6_current_data(c["source"], c["market"], c["engine"])
 
 
+def db_review_case():
+    """Fresh DB facts, no analysis result and no verified market valuation."""
+    c=case();c['sections']={}
+    c['market'].update(verified=False,valuation_state='UNKNOWN',
+        market_as_of=AT,market_as_of_basis='SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION')
+    c['engine']['status']='DATA_UNAVAILABLE'
+    refresh(c,scope='SOURCE_REVIEW',result=False,c7=False)
+    return c
+
+
 def long_reference_case():
     """Long unbroken URL/path/hash and Chinese punctuation, all invented."""
     c=case()

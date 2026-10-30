@@ -60,9 +60,11 @@ def build_w6_current_data(source, market, engine):
         raise ValueError("W6_VERIFIED_MARKET_AND_ENGINE_REQUIRED")
     adapter=_adapter()
     prepared=adapter.prepare_report_sources(source,market,engine)
-    member_review=(prepared is not None and prepared["scope"]=="SOURCE_REVIEW"
-                   and prepared["lineage"].get("member_analysis") is not None)
-    unknown_nav=(member_review and market.get("valuation_state")=="UNKNOWN"
+    # A verified DB-only source review need not invent a native analysis to
+    # report dated holdings and approved targets with an unknown NAV.
+    source_review=(prepared is not None and prepared["scope"]=="SOURCE_REVIEW"
+                   and prepared["canonical"] is None)
+    unknown_nav=(source_review and market.get("valuation_state")=="UNKNOWN"
                  and market.get("verified") is False
                  and market.get("market_as_of_basis")=="SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION")
     client=source["client_id"]

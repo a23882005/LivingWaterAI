@@ -1,15 +1,15 @@
-# PR60 來源文字換行補修證據（2026-10-31）
+# 四戶最新正式 DB 報告：SOURCE_REVIEW（2026-10-31）
 
-中 PM 對 81e741da 的資料承接、靜態產物及正式保存／工程查閱已分段 PASS；本輪修正 REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW，排版待中 PM 複驗。共用 W8 README／Checkpoint 仍由中 PM 維護，本線沒有修改。
+中 PM 已正式驗收 1fe71862 的來源換行與保存，排版缺陷 CLOSED；本輪沿該 renderer 產製最新 DB 報告，沒有改動已驗收版型／來源樣式。
 
-- 准改範圍：原 19 個檔案內，本次修改 12 檔，完整路徑見 changed_files.json 的 layout_repair_changed_files。
-- 程式只改 w6_member_render.py：章節及雷達來源共用完整換行樣式，保留 18px 字級；QA 同時檢查來源文字 Range、卡片內緣及 scrollWidth/clientWidth。來源、lineage、日期、scope 與數字不截斷、不刪除。
-- 257 項＋65 子案例通過，10 項真實 Chromium 測試，0 failures/errors/skips。新增合成長 URL／路徑／64 位 SHA／中文標點案例，驗 12 張來源卡、PDF 字框及全部頁面 PNG／HTML 同源；JUnit 與命令見 validation.json。
-- 本機合成證據在 /workspace/report-layout-20261031/final-synthetic/：report.html、report.pdf、index.html、report.zip、mobile.png；long_reference/ 保存新增長字串案例的完整四種產物。artifact_hashes.json 可核對 bytes／SHA。所有公開 QA 只含合成資料。
-- 四戶按中 PM 指定凍結來源重出 17／19／15／15 頁，共 66 頁；60 張來源卡（含 32 張估值來源）全文相等、文字範圍及 PDF 字框在卡片內，全部保存頁與 ZIP PNG 像素相等。current digest、核准比例、run、資料日期不變。四戶 SOURCE_REVIEW、缺值 UNKNOWN 保留。
-- 新 20 份正式原件／manifest 已依本人 Sources 資料夾與新台灣時間檔名保存，舊報告保留；全新下載、私人父目錄、bytes／SHA、run／DB 綁定及工程 Menu12 查閱通過。現行正式 DB 的後續版本另列私人 SHA 比對，沒有混入凍結資料，沒有 DB 寫入或金融重算。
-- 完整私人證據：Google Drive 根目錄／TEMP／Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt；完整包同目錄 Family_Report_HTML_PR60_排版補修完整成果_待中PM複驗_20261031.zip。私人報告、圖片及完整來源不放公開 GitHub。
+唯一產生程式修改 w6_current_data.py：具完整本人／DB／snapshot／run 驗證的 SOURCE_REVIEW，在沒有 canonical C 且明示 UNKNOWN／未核實市值時，可以引用已記錄持倉及核准比例，不再要求先有原生 V82 分析結果。舊 API、完整計算／已知 C 的閘門、W5 snapshot 驗證及市場／交易資格保持。沒有假造 MemberV82 result 或重跑金融引擎。
 
-核准 v16 母包 SHA、六支產生程式 SHA、凍結上游版本與最新 metadata 查核見 source_versions.json。本機 Chromium 需已授權的執行權限；file:// 仍實測 ERR_BLOCKED_BY_ADMINISTRATOR，沒有繞過。四戶離線窄畫面 reader 通過；真人 Project 密碼登入 UAT 未執行，Android/iOS 實機依 Owner 暫緩。完整金融整線與全案 Gate 不由本輪宣告 PASS。
+- 261 項＋68 子案例，11 項真實 Chromium，0 failures/errors/skips。新增 DB-only SOURCE_REVIEW、未知市值標示／DB綁定拒絕及 C 完整性回歸；新增 browser 驗完整14章／13目錄／新current並無假原生分析。原來源水平／高度、PDF字框、PNG／HTML／ZIP／reader及窄畫面回歸保留。
+- 四戶新23／23／15／16共77頁，76張來源卡逐字／瀏覽器範圍／PDF字框通過，全部保存頁與ZIP PNG像素相等。核准配置、18px來源字級、v16配色與renderer全檔和1fe71862相同。
+- 四戶本輪全新下載正式DB，分別新run；最新已記錄持倉／核准目標及具日期的歷史或本人申報資料可引用，後者具PARTIAL範圍，不作當前市值／FX／可部署本金。完整研究與同輪C／Work9／Mentor缺項具名UNKNOWN，原資料日期與產製時間分開。已撤回本金不恢復。
+- 新PDF／完整內文HTML／reader／ZIP／manifest共20件已存本人Sources正式folder，新台灣時間檔名並保留舊報告。20件全新下載，bytes/SHA/private parent/run/DB/current及工程Menu12通過；四份正式DB再次新下載與起始完全相同，0 DB寫入。
+- 全部私人來源、個別報告、逐頁PNG、收據及缺項矩陣位於Google Drive根目錄／TEMP的 Family_四戶最新DB報告_完成入口_<實際台灣時間>.txt 與 Family_四戶最新DB報告_中PM回交_<同時間>.zip。Owner另取得四份直接PDF與HTML/ZIP連結；中PM獨立驗收，未宣告整體PASS。
 
-歷史：原輪 241＋51／7 個 browser；前輪 255＋65／8 個 browser／69 頁，相關舊發布受阻診斷均為封存歷史。當前狀態以本 PR 最新提交及本輪私人複驗入口為準。
+本機合成完整證據：/workspace/report-latestdb-20261031/synthetic/；db_review/為新增案例，long_reference/為既有水平回歸。公開只有合成程式、去私人化JUnit／QA／SHA；原始JUnit及真人報告留私人交付。實際命令、數量及版本見validation.json與source_versions.json；改13檔都在原19檔准改清單，沒有改共用W8 README／Checkpoint或PR59程式。
+
+四戶離線窄畫面reader通過；file://仍實測ERR_BLOCKED_BY_ADMINISTRATOR，沒有繞過。真人Project密碼登入UAT未執行，Android/iOS實機依Owner暫緩。原PR59繼續金融組裝，中PM鎖定正式同輪producer/schema後再交報告線整合。

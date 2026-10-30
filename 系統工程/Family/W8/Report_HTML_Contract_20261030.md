@@ -141,3 +141,16 @@ Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫
 四戶新 PDF／完整 report.html／index.html／ZIP／manifest 共 20 份原件已保存至本人 Sources 的原正式資料夾，使用新台灣時間檔名、保留舊歷史。全新下載 bytes／SHA／私人父目錄／run／DB 綁定及工程 Menu12 查閱通過。完整證據位於 Google Drive 根目錄／TEMP／`Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt`，包名 `Family_Report_HTML_PR60_排版補修完整成果_待中PM複驗_20261031.zip`。依入口先讀 00，再讀 01 清單及 reports/各戶。公開僅為原 19 檔准改範圍內的程式／合成測試／去私人化文字 QA；本輪實際改 12 檔。
 
 本輪沒有改正式 DB、金融 producer、核准權重、共用 README 或共用 Checkpoint。四戶保持 SOURCE_REVIEW，完整同輪 C／Work9／Mentor 與其餘七組正式 envelope 由中 PM 鎖定上游後另整合。file:// 政策、真人登入及實機 UAT 的分列狀態沿用原規則；排版與全案 Gate 交中 PM 複驗，沒有自行宣告整體 PASS。
+
+
+## 2026-10-31 四戶最新正式 DB 報告
+
+排版與保存的 1fe71862 已由中 PM 於 PR60 issuecomment-6531741680 正式 PASS、缺陷 CLOSED。本輪依 issuecomment-6531912321 與私人施工單，新下載每戶正式 DB／Sources，以本次 bytes／SHA 為基準，由原 W5 read_snapshot → formal_report_source → OnDemandW6Renderer 產生各自新 run／current；沒有把舊凍結報告改名，也沒有沿用舊原生金融 result。
+
+`w6_current_data.build_w6_current_data` 只在準備完成且已驗本人、DB SHA、snapshot tables digest、run、時點與 owner 的 SOURCE_REVIEW、沒有 canonical C、market 明示 verified=false／valuation_state=UNKNOWN／SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION 時，容許缺 NAV。原有 unknown 分支保留已記錄數量與各自日期、已核准目標比例；current_total、目前權重／金額、目標金額、漂移及雷達仍 UNKNOWN。已知 C／完整計算及未附可信 sidecar 的舊入口不藉此放寬。公開 options/API 不增加欄位。
+
+原 DB 的具日期申報／歷史參考可以由可信 operator producer 以原 source_views envelope 的 PARTIAL 引用；source_id、rules_sha、原件 as-of、scope、逐欄原值及來源保留。這些是 DB 原件，不代表正式金融研究完成，不把舊價或預計／已撤回本金變為本輪現值或可用額度。未供完整同輪 C／Work9／Mentor、FX、現金範圍及研究內容具名 UNKNOWN。核准目標與確認版本保持，既有外部核准文件沿原只讀驗證器，沒有新簽署或 DB 回寫。
+
+唯一產生程式變更 w6_current_data.py；w6_member_render.py 與 1fe71862 byte-for-byte 相同。新增三項 adapter 與一項 browser 回歸；完整261項＋68子案例、11項Chromium，0 failures/errors/skips。四戶23／23／15／16共77頁，76張來源卡與全部逐頁PNG／PDF／HTML／ZIP／reader QA通過。
+
+新20件原件依本人Sources原folder、新台灣時間檔名保存，舊報告歷史保留；全部全新下載核對bytes／SHA／private parent／run／DB／current及工程Menu12查閱。四份正式DB再新下載與本輪起始完全相同。Owner回交四份直接PDF、各戶HTML／ZIP，私人完成入口與完整回交ZIP使用實際台灣時間命名並存Drive根目錄／TEMP，含新20檔索引、來源版本／日期／缺項、測試、逐頁視覺及保存收據。中PM獨立驗收本輪報告，金融源組裝PR59沿原線待其另鎖版本；共用README／Checkpoint由中PM維護。

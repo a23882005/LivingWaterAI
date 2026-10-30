@@ -975,7 +975,7 @@
     "android_ios_device_uat": "DEFERRED"
   },
   "next_owner": "接任Family中PM／全專案總PM本人",
-  "next_action": "總PM親自接收私人回交與兩戶04；定位C7、正式Drive帳本及合格來源；依既有獨立契約核對報告HTML線，再續11/13/12與56項。",
+  "next_action": "總PM本人核對正式規則及V70→Work6→C7分類、分母、乾火藥語意與既有調整程序；保留已核准權重與C7檢查。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1775,5 +1775,21 @@
     "next": "總PM親自接收私人回交與兩戶04；定位C7、正式Drive帳本及合格來源；依既有獨立契約核對報告HTML線，再續11/13/12與56項。",
     "scope": "隔離原生元件與SQLite獨立驗收；完整Family整線持續進行。",
     "existing_gates": "W6既有裁定、W7 PASS/CLOSED沿用；W8 IN_PROGRESS"
+  },
+  "private_handoff_review_20261030": {
+    "status": "PRIVATE_PAYLOAD_RESTORED_AND_ARCHIVED_C7_INPUT_RESULT_RECONCILED",
+    "zip_bytes": 19094520,
+    "zip_sha256": "1e56feb6170a7930499f7a5d86bdc662340eac03c2cb0352b25a0a6838370240",
+    "zip_crc": "PASS",
+    "manifest_entries": 8,
+    "private_paths_verified": 287,
+    "unique_blobs": 276,
+    "archived_code_commit": "48e896128a94eaa2132f9d210fbbcb94d9ec8ed1",
+    "archived_head": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+    "reconciled_V70_bucket_fields": 6,
+    "current_code_household_E2E_rerun": false,
+    "git_bundle_full_tree_restore": "PENDING_PRIOR_PACKAGE_BASE",
+    "c7": "Approved long-term asset buckets differ from same-run V70 tactical buckets; exact private values retained in Drive governance.",
+    "next": "總PM本人核對正式規則及V70→Work6→C7分類、分母、乾火藥語意與既有調整程序；保留已核准權重與C7檢查。"
   }
 }

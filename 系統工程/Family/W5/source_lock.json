@@ -458,14 +458,29 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
-      "sha256": "0c22bc7ff5232fdfd10587d8c3b9ddef05c8400f736698d413d344bd0b1dfe26",
-      "git_blob_sha": "e8573bcc12e69d8d04338dbba7aede674d2a34fb",
-      "size": 17525,
-      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "sha256": "d090359deffa7a0e578a0005775a7f4e2ec306d63874c5d6e33a44a43ae70574",
+      "git_blob_sha": "aadb4d0715358648bee02d4a8e64c4e1f04e14a2",
+      "size": 18404,
+      "family_revision": "OWNER_20261030_PM6511847368_PENDING_RELEASE",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
-        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+        "scope": "CMR-SLICE-01 / MR42: conserve live filled+remaining commitment in event and SQLite paths; terminal release requires confirmation. No Stage/rate/G0/B0/cycle identity change.",
+        "pm_review_url": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6511847368"
+      },
+      "implementation_version": "V82_DAILY_SLICE_LEDGER_1.0.1",
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+        "sha256": "0c22bc7ff5232fdfd10587d8c3b9ddef05c8400f736698d413d344bd0b1dfe26",
+        "git_blob_sha": "e8573bcc12e69d8d04338dbba7aede674d2a34fb",
+        "size": 17525,
+        "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+        "authorization": {
+          "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+          "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+          "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+        },
+        "commit": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56"
       }
     },
     {

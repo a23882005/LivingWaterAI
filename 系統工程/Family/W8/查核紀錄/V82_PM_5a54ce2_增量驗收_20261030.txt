@@ -1,0 +1,41 @@
+Family中PM｜PR59增量驗收查核
+2026/10/30（台灣時間）
+鎖定提交：5a54ce25c1dedc39c781aa2e6acd9f867b581d56
+狀態：已核對提交／CI／核心接線並執行隔離元件重現；待修一項帳本邊界後續驗，尚未完成私人包與兩戶整線獨立驗收。
+
+已核實
+• PR59 Draft/open/未合併，head與回交5a54ce2一致。
+• 該提交六個PR workflow全部completed/success：40974457843、40974457915、40974457841、40974457828、40974457842、40974457978。
+• 新增V82 workflow 40974457978的contract-regression實際步驟包含來源核對、完整Family W5/W8合成回歸及artifact上傳，均success。
+• 程式已由stock_engine的approved_v10_context分支進approved_decision.evaluate，消費完整Right／正式Stage；slice_cap與shared allocation送入既有MIN。FamilyRunner／native_pipeline新增發布前本地計畫保存鏈。
+• 獨立核對9份原生元件檔Git blob與該提交一致。以隔離純函式載入方式重算Left Gap150000，M成熟B0=37500，未成熟22500，與施工者結果一致。
+• W5 445、W8 621、原生226等數量來自施工回交與CI證據，本輪沒有重跑全部集合。私人287路徑還原與兩戶10／16來源重播尚待另行獨立核對。
+
+增量發現 V82-CYCLE-PENDING-RELEASE｜高優先、待修
+位置：股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py，update_intent約206～221行；CycleLedgerStore.save亦可保存該結果。
+正式依據：已核准v1.0 CMR-SLICE-01／CMR8及MR42：Cancel requested仍占commitment；確認取消／過期／拒絕或正式解除本地未送計畫才釋放未成交承諾，已成交額保持。
+
+合成重現：
+owner／session／asset均合成，G0=100、Left成熟率25%、B0=25。
+PLANNED→OPEN：filled=0、remaining=25，committed=25、room=0。
+OPEN→CANCEL_PENDING，receipt.release_confirmed=False，filled仍0但remaining傳0。
+實際：update_intent接受，committed=0、room=25；CycleLedgerStore.save也保存成功。
+預期：取消尚未確認時保留原未成交承諾，或拒絕這筆互相矛盾的縮額事件。確認成交可把承諾轉為spent，不能讓無確認的取消／替換釋放額度。
+原因：目前僅對RELEASED狀態要求release_confirmed；對LIVE狀態的filled+remaining總額下降沒有對應防護。incremental=max(new_total-old_total,0)只檢查增加，之後直接覆寫remaining。
+既有test_cancel_request_keeps_commitment_and_confirmation_alone_releases把remaining維持原額，已涵蓋正常案例，但未涵蓋取消待確認事件帶較小remaining的反例。
+
+請原Codex沿PR59作最小修正並回交：
+• 補取消待確認／替換待確認時未核實縮額的守恆檢查；核實成交則spent增加、相應remaining減少，合計占額不憑空消失。
+• 測試remaining從25降為0及部分降低、部分成交後cancel pending、確認cancel後釋放、replace pending、重複事件／新worker，以及持久化後同日重跑。
+• 核對直接storage更新路徑的一致性，避免只擋一個呼叫入口。保持原金融率、B0與daily cycle規則，毋須重寫既有Stage或M成果。
+• 修正提交後回交最新commit、針對性測試與W5/W8必要回歸；中PM重跑此反例並續驗。
+
+後續範圍
+正式Drive帳本同步／跨環境、合格真實來源及兩戶C7桶值衝突維持原列缺口，各依原正式程序處理。
+C7 RETURN_TO_V70在回交說明為長期核准桶總額與當輪V70桶值不同；本輪只查核回交說明與原流程，未讀私人數值，不先改配置或C7門檻。
+報告／HTML已另包交新Codex；此項帳本問題回原V82線，不混入報告工項。
+無私人DB／券商操作。本輪只產驗收紀錄與合成probe，未修改runtime程式。
+
+可重現證據
+probe_ledger_review.py、ledger_review_results.json與原生檔blob核對來源保存於中PM作業區；同版probe與JSON隨GitHub本次查核提交歸檔。
+元件載入只略過套件__init__的相依import，未替換被測函式；不執行或模擬JSON schema／資金驗證，不當作Family端到端結果。

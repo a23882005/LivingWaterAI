@@ -53,3 +53,9 @@ planning_ledger_source帶owner/local_path/source_reference/planning_write_author
 本輪改檔／測試／實跑結果見最新Checkpoint與查核紀錄。新增CI只跑合成W5/W8回歸，不讀私人DB、不碰券商。V75衝突施工暫停待DOT；既有SGOV／SPSB查核不重做。MOU核准SGOV20%與Joseph正式目標保留，不展開Arthur/Lilian。圖文Gate／UNKNOWN、range與SGOV分層修訂由中PM協調。
 
 程式接線與真實來源完整度分開驗收；兩戶C7或必要來源未過即明列欄位及契約，不宣稱全功能完成。Production HOLD、NO_TRADE，中PM獨立驗收尚待執行。
+
+## 2026/10/30 中PM取消待確認邊界修補
+
+驗收項 `V82-CYCLE-PENDING-RELEASE`：`daily_slice.update_intent` 與 `CycleLedgerStore.save` 共用意圖狀態／占額守恆校驗。LIVE意圖的 `filled_amount + remaining_amount` 不得因未確認縮額而下降，包括CANCEL_PENDING、REPLACE_PENDING及改標其他LIVE狀態；單獨release_confirmed旗標不能使pending變成已確認釋放。核實部分成交可把committed轉成spent，確認終止後才釋放未成交額；直接SQLite存檔同樣拒絕缺確認的終止狀態及未核實縮額。
+
+修補版本 `V82_DAILY_SLICE_LEDGER_1.0.1`；cycle schema、profile、id、G0/B0、模式率、Stage及原MIN不變，既有cycle不重開。`test_v10_pending_commitment.py`補35個反例與正向／持久化案例；含既有日切片測試共51項。中PM原始probe未改，複製至私人目錄分別跑修補前／後，避免覆寫其歷史查核結果。完整回歸與最新提交見Checkpoint的新 `cycle_pending_release_20261030` 紀錄。此次不重跑真人兩戶、不動正式DB或券商；Drive同步、真實來源、C7與獨立報告／HTML線保持各自追蹤。

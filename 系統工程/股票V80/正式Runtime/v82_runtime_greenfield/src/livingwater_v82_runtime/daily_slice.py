@@ -17,6 +17,7 @@ from .enums import NormalDeploymentMode
 
 LIVE=frozenset(('PLANNED','SUBMITTED','OPEN','PARTIAL_FILL','CANCEL_PENDING','REPLACE_PENDING'))
 RELEASED=frozenset(('CANCELLED','EXPIRED','REJECTED','LOCAL_RELEASED','FILLED'))
+LEDGER_IMPLEMENTATION_VERSION='V82_DAILY_SLICE_LEDGER_1.0.1'
 
 
 def digest(value):
@@ -152,6 +153,24 @@ def open_cycle(*, owner, session_id, exchange, asset_id, opened_at, gap, speed_r
         'cash_reservation_created':False,'trade_action':'NO_TRADE'}
 
 
+def _validate_intent_transition(before,after):
+    """Live commitments move to spent on fills; only confirmed terminals release."""
+    if after['state'] in RELEASED and after.get('receipt',{}).get('release_confirmed') is not True:
+        raise ValueError('CYCLE_RELEASE_CONFIRMATION_REQUIRED')
+    if before is None:return
+    old_filled,new_filled=(_amount(r['filled_amount']) for r in (before,after))
+    if new_filled<old_filled:raise ValueError('CYCLE_FILL_MUST_NOT_DECREASE')
+    if before['state'] in RELEASED and after['state'] in LIVE:
+        raise ValueError('TERMINAL_INTENT_CANNOT_REOPEN')
+    if after['state'] in LIVE:
+        old_remaining,new_remaining=(_amount(r['remaining_amount']) for r in (before,after))
+        values=(old_filled,new_filled,old_remaining,new_remaining)
+        with localcontext() as ctx:
+            ctx.prec=max(80,max(v.adjusted() for v in values)-min(v.as_tuple().exponent for v in values)+2)
+            if new_filled+new_remaining<old_filled+old_remaining:
+                raise ValueError('CYCLE_UNCONFIRMED_COMMITMENT_REDUCTION')
+
+
 def validate_cycle(cycle):
     if cycle.get('schema_version')!='V82.DailySliceCycle.v1':raise ValueError('CYCLE_SCHEMA_MISMATCH')
     expected=cycle_id(**{k:cycle[k] for k in ('owner','session_id','exchange','asset_id','profile_version')})
@@ -161,6 +180,7 @@ def validate_cycle(cycle):
     spent=committed=Decimal(0)
     for iid,item in cycle['intents'].items():
         if not iid or item['intent_id']!=iid or item['state'] not in LIVE|RELEASED:raise ValueError('CYCLE_INTENT_IDENTITY_OR_STATE')
+        _validate_intent_transition(None,item)
         spent+=_amount(item['filled_amount'])
         if item['state'] in LIVE:committed+=_amount(item['remaining_amount'])
         elif _amount(item['remaining_amount'])!=0:raise ValueError('TERMINAL_INTENT_HAS_COMMITMENT')
@@ -204,11 +224,10 @@ def update_intent(cycle, *, event_id, intent_id, state, filled_amount, remaining
         if out['events'][event_id]!=digest(event):raise ValueError('CYCLE_EVENT_IDEMPOTENCY_CONFLICT')
         return out
     before=out['intents'].get(intent_id)
+    _validate_intent_transition(before,event)
     if before:
-        if _amount(filled_amount)<_amount(before['filled_amount']):raise ValueError('CYCLE_FILL_MUST_NOT_DECREASE')
         if datetime.fromisoformat(receipt['available_at'].replace('Z','+00:00'))<datetime.fromisoformat(before['receipt']['available_at'].replace('Z','+00:00')):
             raise ValueError('CYCLE_LIFECYCLE_TIME_REVERSED')
-        if before['state'] in RELEASED and state in LIVE:raise ValueError('TERMINAL_INTENT_CANNOT_REOPEN')
     if state in RELEASED and _amount(remaining_amount)!=0:raise ValueError('TERMINAL_INTENT_HAS_COMMITMENT')
     old_total=(_amount(before['filled_amount'])+(_amount(before['remaining_amount']) if before['state'] in LIVE else 0)) if before else Decimal(0)
     new_total=_amount(filled_amount)+(_amount(remaining_amount) if state in LIVE else 0)
@@ -260,8 +279,8 @@ class CycleLedgerStore:
                     if any(cycle['events'].get(k)!=v for k,v in previous['events'].items()):raise ValueError('CYCLE_HISTORY_CANNOT_BE_RESET')
                     for iid,item in previous['intents'].items():
                         current=cycle['intents'].get(iid)
-                        if current is None or _amount(current['filled_amount'])<_amount(item['filled_amount']):raise ValueError('CYCLE_FILL_MUST_NOT_DECREASE')
-                        if item['state'] in RELEASED and current['state'] in LIVE:raise ValueError('TERMINAL_INTENT_CANNOT_REOPEN')
+                        if current is None:raise ValueError('CYCLE_FILL_MUST_NOT_DECREASE')
+                        _validate_intent_transition(item,current)
                 for iid in cycle['intents']:
                     scope=digest({'owner':cycle['owner'],'asset_id':cycle['asset_id'],'intent_id':iid})
                     old=db.execute('SELECT cycle_id FROM intent_owner WHERE scope=?',(scope,)).fetchone()

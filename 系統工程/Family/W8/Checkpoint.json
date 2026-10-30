@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-30T04:13:59.397Z",
+  "updated_at": "2026-10-30T13:09:00.591Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原V82 Codex：PR59具名來源與金融／ledger接線續工；原報告Codex：PR60三項；中PM：C7契約協調、獨立驗收及治理",
-  "next_action": "保留四戶32檔元件獨立驗收PASS；V82原線依PR59中PM裁決完成具名外部來源、工程接線與正式帳本／完整金融主鏈。中PM協調C7長期目標/當輪天花板契約後裁定，並複驗最終四戶整線；PR60依原獨立契約續工。",
+  "next_owner": "原V82 Codex：依C7正式B方案施工及四戶金融整線；原報告Codex：PR60；中PM：版本/依賴治理與獨立驗收/Gate",
+  "next_action": "原V82 Codex納入main 27e48e7正式C7契約及最新治理，實作新scope與四戶同輪financial_sources，補根事實後驗真實Gap/cycle/資金/MIN/lot/Work9-Mentor及Drive帳本讀回。中PM獨立驗收；C7 A/B方案選擇已完成。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1917,10 +1917,70 @@
       "source-bound daily cycle and official Drive ledger persistence/readback",
       "four-member full amount/cap/MIN/lot/Work9/Mentor integration"
     ],
-    "C7_contract_status": "PM_COORDINATION_REQUIRED__APPROVED_TARGETS_AND_ORIGINAL_RETURN_RULE_PRESERVED",
+    "C7_contract_status": "B_FORMALLY_APPROVED_FOR_IMPLEMENTATION__SEE_C7_contract_decision_20261030",
     "construction_start_status": "CONTINUATION_CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_PENDING_OBSERVATION",
     "report_line": "PR60 continues under separate original report Codex contract",
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "v82_financial_PM_acceptance_20261030": {
+    "fixed_commit": "d66774c7c124e6bb4524bedd4e49b16081a15c40",
+    "verdict": "PARTIAL_PASS_COMPONENT_WIRING_AND_DRIVE_LEDGER_RESOURCES__FULL_FINANCIAL_CHAIN_PENDING",
+    "PR59_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6523591425",
+    "member_component_pass": {
+      "Joseph": 11,
+      "MOU": 16,
+      "Arthur": 2,
+      "Lilian": 3
+    },
+    "full_financial_pass": {
+      "Joseph": 0,
+      "MOU": 0,
+      "Arthur": 0,
+      "Lilian": 0
+    },
+    "financial_source_packs_per_member": 0,
+    "qP_qV_complete_assets": 0,
+    "PM_checks": {
+      "new_targeted_tests": 54,
+      "subtests": 18,
+      "legacy_C7_probes": 3,
+      "source_locks": 121,
+      "changed_blobs": 22,
+      "same_commit_CI_success": 6,
+      "package_manifest_files": 298,
+      "restore_paths": 295,
+      "remote_member_DBs": 4,
+      "remote_ledgers": 4,
+      "unchanged_original_tables": [
+        46,
+        52,
+        46,
+        46
+      ],
+      "initialized_real_cycles": 0,
+      "stale_completed_session_rows": 8
+    },
+    "private_PM_package": {
+      "location": "Google Drive root/TEMP",
+      "name": "V82_d66774c_中PM驗收與C7裁定_20261030.zip",
+      "bytes": 11837,
+      "sha256": "b9bbee206b67273e44e6059b871e2b6eb4c85b6a8a9e9769c552aee6ba7e1016",
+      "remote_sha_crc_manifest_pass": true
+    },
+    "next_execution_owner": "原V82 Codex：C7新scope/四戶原producer同輪金融pack/根事實/Gap-cycle-Work9-Mentor與Drive帳本",
+    "PM_owner": "Family中PM：正式契約、依賴/版本協調、獨立複驗及Gate",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
+  },
+  "C7_contract_decision_20261030": {
+    "decision": "B_APPROVED_FOR_IMPLEMENTATION",
+    "profile": "FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1",
+    "contract_path": "系統工程/Family/W8/契約/V82_C7_長期目標與當輪額度分離_中PM裁定_v1.0_20261030.md",
+    "decision_document_commit": "27e48e7b2f961545f4b13098e8cbae42fd0771ae",
+    "authority": "Fresh Read V82.md v1.21.0 Engineering63-A/B/C and approved v1.0 CMR9.1; Owner-delegated PM governance",
+    "semantics": "Preserve approved long-term Project Target and money base. Consume same-run V70 total ceiling; subtract canonical occupied exposure once, then cap by authorized incremental funding; preserve protected and old-scope guards.",
+    "runtime_status": "NEW_SCOPE_IMPLEMENTATION_AND_PM_ACCEPTANCE_PENDING",
+    "gate_status": "CONSTRUCTION_AUTHORIZED__NO_PRODUCTION_OR_TRADING_RELEASE"
   }
 }

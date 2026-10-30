@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 from runtime_loader import load_c_module
+from mentor_scope import advice_scope_fields
 
 CATALOG_SHA256='2c19102d99d21824516069b9dd2db906776caf97d4c9b90b3d740e1b960368f7'
 
@@ -204,7 +205,7 @@ def explain_native(repo_path,work9_request,unified,*,trusted_context,llm_suggest
         'canonical_deployment_result_sha256':original['canonical_deployment_result_sha256'],
         'source_result_digest':native._digest(original),'source_bindings':deepcopy(original['source_bindings']),
         'items':rows,'unknown_reason_codes':unknown,'reason_catalog_sha256':CATALOG_SHA256,
-        'production':'HOLD','trade_action':'NO_TRADE','execution_advice_allowed':True,'recommendations_allowed':True,'broker_execution_allowed':False}
+        **advice_scope_fields()}
 
 
 def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trusted_context,llm_suggested_changes=()):
@@ -313,5 +314,4 @@ def explain_holdings_recommendations(repo_path,work9_request,work9_result,*,trus
         'scope':source['scope'],'client_id':source['client_id'],'run_id':source['run_id'],
         'owner':deepcopy(source['owner']),'source_db_sha256':source['source_db_sha256'],
         'source_result_digest':native._digest(source),'mentor_return':deepcopy(source['mentor_return']),
-        'items':rows,'execution_advice_allowed':True,'broker_execution_allowed':False,
-        'full_native_deployment_mentor':False,'trade_action':'NO_TRADE'}
+        'items':rows,'full_native_deployment_mentor':False,**advice_scope_fields()}

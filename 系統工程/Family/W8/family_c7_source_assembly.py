@@ -207,7 +207,12 @@ class SourceAssembler:
         snapshot=self.request['client_snapshot']['payload'];tables=snapshot['tables']
         if facts is None:
             from w1_portfolio_observations import normalize
+            from c7_source_qualification import w1_binding_at_cutoff
             review=normalize(self.request)
+            bound_owners=[deepcopy(r['owner_candidate']) for r in review['accounts']
+                if r['binding_qualification']=='ORIGINAL_W5_OWNER_BINDING_PASSED'
+                and w1_binding_at_cutoff(self.request,r['owner_candidate'])]
+            complete_owners=bound_owners if bound_owners and len(bound_owners)==len(review['accounts']) else None
             counts={k:len(tables.get(k,[])) for k in ('portfolio_account','account_broker_link','account_ownership',
                 'funding_account_domain_link','cash_balance_snapshot','holding_policy_proposal','holding_policy_confirmation')}
             locator={'source_db_sha256':snapshot['source_sha256'],'table_row_counts':counts}
@@ -219,7 +224,8 @@ class SourceAssembler:
                 ('preference_locks','C7_CONFIRMED_HOLDING_DIRECTIVES_REQUIRED'),
                 ('portfolio_caps','C7_CLIENT_GLOBAL_CAP_APPLICABILITY_REQUIRED'),
                 ('funding_buckets','C7_SETTLED_AVAILABLE_RESERVED_AND_AUTHORIZATION_REQUIRED')]:
-                scope[path]=self.field(path,None,state=ADAPTER if path in ('account_owners','current_nav','exposures') else MISSING,
+                value=complete_owners if path=='account_owners' else None
+                scope[path]=self.field(path,value,state=DIRECT if value is not None else ADAPTER if path in ('account_owners','current_nav','exposures') else MISSING,
                     code=code,sources=[locator])
             # Exact original observations are retained, never promoted to net
             # available cash or to a complete book by table absence.
@@ -231,6 +237,7 @@ class SourceAssembler:
             self.inventory['account_owners']['qualification_review']={
                 'producer':'W8.w1_portfolio_observations.normalize -> W5.family_boundary.bind_owner',
                 'qualified_account_count':review['qualified_account_count'],
+                'qualified_at_cutoff_count':len(bound_owners),
                 'accounts':[{'account_key':r['account_key'],'missing_original_fields':r['missing_binding_fields']}
                     for r in review['accounts']]}
             return None
@@ -483,6 +490,8 @@ class SourceAssembler:
             path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
             out.update(status='SOURCE_ASSEMBLED__ORIGINAL_C7_VALIDATION_PENDING',
                 source_descriptor={'local_path':str(path),'sha256':sha256(path.read_bytes()).hexdigest()})
+        from c7_source_qualification import annotate
+        annotate(out,req)
         out['digest']=digest(out)
         return out
 
@@ -571,5 +580,7 @@ def assemble_original_producers(producer,request,context,prepared,trial):
         out['field_inventory']=list(assembler.inventory.values());out['issues']=assembler.issues
     out['call_trace']=['W8.family_c7_source_assembly.assemble_original_producers','W8.v70_tactical_input.calculate',
         'W8.family_c7_source_assembly:original_approval_and_portfolio_business_records']
+    from c7_source_qualification import annotate
+    annotate(out,request)
     out['digest']=digest({k:v for k,v in out.items() if k!='digest'})
     return out

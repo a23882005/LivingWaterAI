@@ -1,3 +1,31 @@
+## 2026/10/31｜金融／報告交接工單 v1.0 已備妥
+
+中PM已固定PR59 `d250d3c` producer與PR60 `4319556` consumer的介面基準，確認「建議呈現／券商不執行」語意。第一階段交原報表Codex限修Mentor接收相容性，新增明確准改W6/runtime/report_receiver.py；既有金融producer與77頁報告成果保留。完整真人金融章節待合格來源及中PM另鎖交接版本後進入第二階段。
+
+179列資格待辦已依本人／具體需求去重為36組、全列映射；404個原件缺欄仍按原金融清單追蹤。私人成果存Drive根目錄/TEMP，正式工單見[介面契約](W8/契約/Family_金融報告交接與Mentor接收相容_中PM工單_v1.0_20261031.md)。原Codex會話ACK待回覆；Production HOLD／交易NONE。
+
+## 2026/10/31｜最新兩份回交已完成分段獨立驗收
+
+PR59 `d250d3c`：現金正規化52項定向、151來源鎖、10遠端blob、四戶32檔原producer→Menu04精確重播及8份正式DB/帳本新下載核對通過。PR60 `4319556`：四戶current重建、38＋8項測試（46＋3子案例分列）、13遠端blob、77頁76來源卡PDF全文/邊界及20份正式檔案保存/查閱核對通過。各自同head CI為6組/1組success。
+
+本次PR60驗收限SOURCE_REVIEW資料、靜態排版與保存；PM獨立Chromium/PNG逐像素/窄畫面reader為NOT_RUN，施工者browser證據分列。保留ac1d737與1fe71862原PASS及來源超界CLOSED。
+
+已確認後續整合項 `FAMILY-MENTOR-SCOPE-CONSUMER`：PR59 Mentor建議權限與PR60接收器的 `MENTOR_EXECUTION_SCOPE` 要求需由PM鎖語意後交原Codex對接。完整金融PASS0、真實cycle0、Production HOLD／交易NONE，兩PR Draft未合併。下一步由PM集中核對既有原件/資格、鎖producer/schema並形成整合工單，接續完整金融與報告章節、56項及既定Gate。
+
+詳細裁定：[本輪驗收](W8/查核紀錄/PM_d250_4319556_分段驗收_20261031.md)。下方舊「待獨立驗收」為歷史截點，最新狀態以本段及Checkpoint的pm_incremental_acceptance_20261031為準。
+
+<!-- PM_HANDOFF_20261031_V2 -->
+## 20261031 中PM總PM交接 v2：最新狀態
+
+- PR59 最新 `d250d3c`（6組CI success）、PR60 最新 `4319556`（1組CI success）均已回交，**待中PM獨立驗收**；兩PR仍Draft未合併。
+- 保留 `ac1d737` 金融分段PASS、`1fe71862` 排版/保存PASS與來源超界CLOSED。四戶最新DB報告已發布，舊「未回交/公開受阻」僅屬歷史。
+- 四戶完整金融PASS **0**、真實cycle **0**；Production **HOLD**／交易 **NONE**。真人Project UAT待完成，實機Android/iOS依Owner暫緩。
+- 中PM＝全專案總PM，管契約/工程治理/整合/獨立驗收/Gate/發布/試用/結案；盡量由原Codex施工。
+- 三ZIP、入口及校驗收據在 **Google Drive根目錄/TEMP**；先讀 `Family_PM_20261031_新對話交接入口_v2.txt`。三包新下載SHA/CRC/58新payload與56矩陣完整性通過；不是新兩段業務PASS。
+- 接續順序與檔名/SHA見 [交接索引](W8/20261031_中PM總PM三ZIP正式交接索引_v2.md)。私人來源/檔案ID留在私人包，公開僅保存治理摘要。
+
+下方既有紀錄保留作歷史；衝突時以本段及Checkpoint最新交接欄位為準。
+
 ## 2026/10/31｜PR59正式來源assembler分段PASS，四戶原件與報告續辦
 
 固定提交 `ac1d73715a837796a729616005f18575fc9c3afd`：中PM126項定向、150來源鎖、16改檔Git blob、556 payload/552還原映射及四戶32檔原Menu04完整重播通過；DB/ledger8份另新下載SHA/SQLite integrity/FK通過，四帳本各0cycle。同提交六組CI success已直接核對，施工者W5 538/W8 746/111定向與PM實測分列。

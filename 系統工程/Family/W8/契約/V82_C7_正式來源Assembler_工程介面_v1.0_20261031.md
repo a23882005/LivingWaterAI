@@ -41,6 +41,12 @@
 
 全來源結構可組裝時寫 `Family.W8.C7FamilyScopeSource.v1`：schema83、原件references/hash、完整Current snapshot；狀態為 `SOURCE_ASSEMBLED__ORIGINAL_C7_VALIDATION_PENDING`。原reader再次讀回並驗原件SHA，交原Work6／C7、原Gap／切片／MIN／帳本／Work9。來源組裝本身不核准金融決策。新scope最高仍READY_FOR_PM_GATE，a78/a79及Work8 release沿原Gate。
 
+`source_qualification`（`Family.W8.C7SourceQualification.v1`）補充逐欄依賴與去重的業務原件需求，不取代原三類inventory或C7驗證。已可交原consumer、Codex接線、等待具名原件分列；原件再分未提供與已存在但未合格。每個衍生欄位連至原投資池／帳戶／NAV／完整book／資金與授權／保護／cap要求，附原DB、table/row digest、時間與下一責任，不把digest或schema JSON要求交給本人。已知NAV不因缺book改未知，明確0及有完整證明的空清單不改成缺件。
+
+原W1全帳戶已各自通過既有 `bind_owner` 時，`account_owners` 可先獨立接入schema83候選；其他NAV、book及資金守門仍保留。若只有部分帳戶合格，保持完整owner集合UNKNOWN，不以子集冒充全戶涵蓋。新依賴清單不放寬或新增金融Gate，完整schema83仍交原consumer判斷。
+
+此獨立接線仍檢查原件 `as_of/created/recorded/reconciled` 的原時間；未知可得時間與cutoff後才記錄的身份片段保持待資格，不以較早as_of掩蓋後來才可得的原件。這是既有來源cutoff界線，不要求本人另製帳號、JSON或新增投資門檻。
+
 原V70數值函式的執行時鐘綁定request.evaluation_at，使其calculatedAt與同cutoff的原件hash可精確重播；HTML、feed、allocation base與原算式不變。這是計算時鐘，不能取代任何原始觀測的as_of／available_at；執行的實際牆鐘時間另存在run_receipt。
 
 真實cycle只在合格Gap、permission、session及book成立後初始化。原SQLite交易、G0/B0、pending不提前釋放、Drive單序列writer／寫前重查／備份／原ID／重新下載讀回均沿用；沒有Drive分散式CAS，也沒有下單、取消、換匯或購買資料。

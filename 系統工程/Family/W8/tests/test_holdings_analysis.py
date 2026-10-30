@@ -409,6 +409,10 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(item['recommendation']['recommended_buy_amount']['status'],'UNKNOWN')
         self.assertIn('既有現金及資產調整另計',item['explanation'])
         self.assertFalse(report['mentor']['broker_execution_allowed'])
+        from mentor_scope import validate_advice_scope
+        scope=validate_advice_scope(report['mentor'])
+        self.assertIs(scope['execution_advice_allowed'],True)
+        self.assertIs(scope['financial_mutation_allowed'],False)
         with patch.object(H,'prepare_input',return_value=self.prepared):
             self.assertEqual(H.HoldingsAnalysisRunner(context=self.context,report=report).analyze(self.request)['mentor'],report['mentor'])
 

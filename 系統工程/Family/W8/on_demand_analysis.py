@@ -161,6 +161,32 @@ class OnDemandAnalysisProvider:
                 owner_decision=self.official_holdings_decision,
                 evaluation_at=request['evaluation_at'],
                 previous_snapshot=self.official_holdings_previous_snapshot)
+        if 'member_v82_report' in pack:
+            if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
+            from family_input import digest
+            from member_v82_analysis import MemberV82Runner,SCHEMA
+            report=pack['member_v82_report'];config=context.get('member_v82_config',{})
+            if (request.get('schema_version')!='Family.W8.MemberV82Request.v1'
+                or report.get('schema_version')!=SCHEMA or report.get('status')!='ANALYSIS_PARTIAL'
+                or any(report.get(k)!=request.get(k) for k in ('client_id','run_id','evaluation_at'))
+                or metadata.get('run_id')!=request.get('run_id')
+                or config.get('client_id')!=client or config.get('source_db_sha256')!=sha
+                or report.get('source_db_sha256')!=sha
+                or report.get('request_digest')!=digest(request) or report.get('config_digest')!=digest(config)
+                or report.get('report_digest')!=digest({k:v for k,v in report.items() if k!='report_digest'})
+                or report.get('canonical_result') is not None
+                or report.get('full_native_pipeline_complete') is not False
+                or report.get('full_native_mentor_reached') is not False
+                or report.get('cash_overlay_applied') is not False
+                or report.get('trade_authorization')!='NONE' or report.get('trade_action')!='NO_TRADE'
+                or request.get('trade_authorization')!='NONE' or context.get('trade_authorization')!='NONE'):
+                raise PermissionError('ON_DEMAND_MEMBER_V82_BINDING_MISMATCH')
+            _iso(request['evaluation_at'])
+            context=deepcopy(context)
+            context['member_v82_analysis_binding']={'schema_version':'Family.W8.MemberV82Binding.v1',
+                'client_id':client,'run_id':request['run_id'],'source_db_sha256':sha,
+                'report_digest':report['report_digest'],'source_data_provenance':'SOURCE_BACKED'}
+            return deepcopy(request),MemberV82Runner(repo_root=self.repo_root,context=context,report=report)
         if 'analysis_report' in pack:
             if str(W5_DIR) not in sys.path:sys.path.insert(0,str(W5_DIR))
             here=str(Path(__file__).resolve().parent)

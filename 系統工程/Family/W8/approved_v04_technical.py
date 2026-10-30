@@ -9,7 +9,7 @@ from decimal import Decimal,InvalidOperation,localcontext,ROUND_HALF_EVEN
 from pathlib import Path
 from types import SimpleNamespace
 import hashlib,json
-from technical_source_bridge import NAMES,_originals
+from technical_source_bridge import NAMES,_originals,predicate_votes
 import approved_v04_numeric as n
 D=Decimal
 U='UNKNOWN';T='TRUE';F='FALSE'
@@ -58,7 +58,7 @@ def produce(rows,*,profile,is_etf=None,close_only=False):
             # confirmed today cannot leak into yesterday's Up evidence.
             previous=_produce(rows[:-1],profile=profile,is_etf=is_etf,close_only=close_only)
             result['trend_timing_inputs']['previous_technical']={
-                k:[r['truth'] for r in previous['signals'][k]] for k in ('up_price','up_confirm')}
+                k:predicate_votes(previous['signals'][k]) for k in ('up_price','up_confirm')}
             result['trend_timing_inputs']['previous_technical']['ma20_ok']=previous['ma20_ok']
         return result
 

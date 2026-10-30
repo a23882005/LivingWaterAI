@@ -122,7 +122,12 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
         raise ValueError('OBSERVATION_V75_SOURCE_MISMATCH')
     from v75_runtime.predicates import EVALUATORS
     from v75_runtime.work3 import US_LISTED_ASSETS, TW_LISTED_ASSETS
-    metrics, sources = _macro_metrics(macro, evaluation_at)
+    if macro is None:
+        if asset_id in US_LISTED_ASSETS | TW_LISTED_ASSETS:
+            raise ValueError('OBSERVATION_BOND_MACRO_SOURCE_REQUIRED')
+        metrics, sources = {}, {}
+    else:
+        metrics, sources = _macro_metrics(macro, evaluation_at)
     # Only numeric comparisons are mapped. KD formula compatibility and the
     # named right/trim event producers are still separate required sources.
     mapping = {'low_td_count': 'low_td9_setup', 'high_td_count': 'high_td9_setup',

@@ -54,6 +54,10 @@ def classification(symbol, source, product_source=None):
     index=EXAMPLES.get(symbol)
     name=FORMAL_CLASSES[index] if index is not None else 'UNKNOWN'
     framework='第四十九章｜VT／VWRA型' if index==0 else '第四十六章｜QQQ型' if symbol=='QQQ' else None
+    extra_framework=('第四十八章｜S&P 500／VOO型' if symbol in ('VOO','SPY') else
+        '第五十章｜0050型' if symbol=='0050' else None)
+    if framework is None and extra_framework and '# '+extra_framework in text:
+        framework=extra_framework
     if framework and '# '+framework not in text:
         raise ValueError('FORMAL_FRAMEWORK_NOT_IN_SOURCE')
     result={'symbol':symbol,'primary_class':name,'primary_framework':framework,
@@ -762,38 +766,42 @@ class AssetSourceProducer:
             cash_sources[domain]=trial
         return contexts,cash_sources
 
-    def core_observation(self, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None):
-        from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
-        path=self.root/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
-        if str(path) not in sys.path:sys.path.insert(0,str(path))
-        from livingwater_v82_runtime.core_rules import evaluate_core_rule_state,EvidenceFact
-        from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
-        from technical_source_bridge import predicate_votes
-        groups={k:[PredicateTruth(value) for value in predicate_votes(values)]
-                for k,values in observed['observed_named_signals'].items()}
-        gaps=unresolved_core_contracts(observed,broad_etf)
-        if valuation_waterfall==[]:
-            gaps.append({'field_path':'valuation.product_specific_waterfall','kind':'DEFINITION_OR_PRODUCER_UNRESOLVED',
-                'reason':'Company valuation_class producer is not connected; no global ETF valuation fallback is used',
-                'sot_section':'V82.md §32.6A Individual Stock routing'})
-        safety=[EvidenceFact(name=g['field_path'],value='UNKNOWN',
-                requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
-                freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
-                source_reference=observed['source_path']) for g in gaps if g['field_path'].startswith('safety.')]
-        arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(GLOBAL_ETF_WATERFALL if valuation_waterfall is None else valuation_waterfall),
-            'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
-            **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
-            'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
-            'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth(
-                observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN'))}
-        result=evaluate_core_rule_state(**arguments)
-        serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
-            asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))
-        return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
-                default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
-            'actual_inputs':serialize(arguments),'input_gaps':gaps,
-            'valuation_path_audit':valuation_path_audit(valuation_metrics or [],arguments['valuation_waterfall']),
-            'structural_confirmation_applicability':'INAPPLICABLE_COMPANY_THESIS' if broad_etf else 'REQUIRED',
-            'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
-            'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',
-            'etf_structure_safety':'UNKNOWN__RETAINED_IN_SAFETY_SUFFICIENCY'}
+    def core_observation(self, observed, **kwargs):
+        return native_core_observation(self.root, observed, **kwargs)
+
+
+def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None):
+    from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
+    path=Path(root)/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
+    if str(path) not in sys.path:sys.path.insert(0,str(path))
+    from livingwater_v82_runtime.core_rules import evaluate_core_rule_state,EvidenceFact
+    from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
+    from technical_source_bridge import predicate_votes
+    groups={k:[PredicateTruth(value) for value in predicate_votes(values)]
+            for k,values in observed['observed_named_signals'].items()}
+    gaps=unresolved_core_contracts(observed,broad_etf)
+    if valuation_waterfall==[]:
+        gaps.append({'field_path':'valuation.product_specific_waterfall','kind':'DEFINITION_OR_PRODUCER_UNRESOLVED',
+            'reason':'Asset-specific valuation_class producer is not connected; no global ETF valuation fallback is used',
+            'sot_section':'V82.md §32.6 / §32.6A product-specific routing'})
+    safety=[EvidenceFact(name=g['field_path'],value='UNKNOWN',
+            requirement=RequirementLevel.SAFETY_REQUIRED,data_quality=DataQuality.UNKNOWN,
+            freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
+            source_reference=observed['source_path']) for g in gaps if g['field_path'].startswith('safety.')]
+    arguments={'valuation_metrics':valuation_metrics or [],'valuation_waterfall':list(GLOBAL_ETF_WATERFALL if valuation_waterfall is None else valuation_waterfall),
+        'fundamental_fields':fundamental_fields or [],'safety_facts':safety,
+        **groups,'hard_gate_predicates':[PredicateTruth.UNKNOWN],
+        'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
+        'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth(
+            observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN'))}
+    result=evaluate_core_rule_state(**arguments)
+    serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
+        asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))
+    return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
+            default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
+        'actual_inputs':serialize(arguments),'input_gaps':gaps,
+        'valuation_path_audit':valuation_path_audit(valuation_metrics or [],arguments['valuation_waterfall']),
+        'structural_confirmation_applicability':'INAPPLICABLE_COMPANY_THESIS' if broad_etf else 'REQUIRED',
+        'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
+        'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',
+        'etf_structure_safety':'UNKNOWN__RETAINED_IN_SAFETY_SUFFICIENCY'}

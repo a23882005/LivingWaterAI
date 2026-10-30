@@ -104,6 +104,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        official_drive_file_id, verified_drive_sha256,
                        trusted_analysis_source_producer=None,
                        native_source_config=None,
+                       member_v82_source_config=None,
                        official_holdings_decision=None,
                        official_holdings_previous_snapshot=None,
                        trusted_w6_current_input_producer=None,
@@ -121,6 +122,14 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     source_module=_load(ROOT/"on_demand_current_sources.py","family_w8_current_sources")
+    if member_v82_source_config is not None:
+        if trusted_analysis_source_producer is not None or native_source_config is not None:
+            raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
+        config=dict(member_v82_source_config)
+        if config.get('client_id')!=client_id or config.get('source_db_sha256')!=verified_drive_sha256:
+            raise PermissionError('MEMBER_V82_CONFIG_CLIENT_OR_DB_MISMATCH')
+        member=_load(ROOT/'member_v82_analysis.py','family_w8_member_v82_source')
+        trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
     if native_source_config is not None:
         if trusted_analysis_source_producer is not None:
             raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')

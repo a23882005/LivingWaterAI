@@ -194,6 +194,8 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
     if target['value_state']=='KNOWN' and target.get('currency')!=request['owner']['currency']:missing.append('verified_same_run_target_FX')
     if not row.get('position_valuation_allowed',False):missing.append('canonical_valuation_price_identity_and_validity')
+    if row['holding'].get('quantity_state')!='KNOWN' or row['holding'].get('quantity') is None:
+        missing.append('confirmed_position_quantity')
     if orders['status']!='VERIFIED' and not orders.get('complete_for_open_order_exposure'):
         missing.append('active_orders_and_fill_reconciliation')
     gap={'status':'NOT_RUN_REQUIRED_INPUTS_UNRESOLVED','value':None,'missing_fields':missing,

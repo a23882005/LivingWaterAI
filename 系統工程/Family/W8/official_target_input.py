@@ -51,7 +51,12 @@ def read_base(source):
             'source_sha256': source['source_sha256']}
 
 
-def build(snapshot, *, evaluation_at, base_source):
+def read_confirmed_weights(snapshot, *, evaluation_at):
+    """Read the latest approval independently of its unprovided money base.
+
+    Cash participates in the original 100% denominator even without a ticker.
+    This source view grants neither funding nor a newly signed approval.
+    """
     if (snapshot.get('data_provenance') != 'SOURCE_BACKED'
             or snapshot.get('payload_digest') != digest(snapshot['tables'])):
         raise PermissionError('OFFICIAL_TARGET_SNAPSHOT_MISMATCH')
@@ -77,9 +82,6 @@ def build(snapshot, *, evaluation_at, base_source):
             or _time(version['confirmed_at_utc']) > at
             or _time(version['created_at_utc']) > at):
         raise ValueError('OFFICIAL_TARGET_NOT_CURRENT_COMPLETE_CONFIRMED')
-    base = read_base(base_source)
-    if _time(base_source['source_available_at']) > at:
-        raise ValueError('OFFICIAL_TARGET_FUTURE_BASE')
     rows = [r for r in tables.get('final_target_allocation', [])
             if r['target_key'] == version['target_key'] and r['version_no'] == latest]
     if (not rows or any(r.get('client_id') != client
@@ -91,6 +93,32 @@ def build(snapshot, *, evaluation_at, base_source):
             or sum(r['weight_units'] for r in rows) != 1000000
             or len({r['instrument_key'] for r in rows}) != len(rows)):
         raise ValueError('OFFICIAL_TARGET_ALLOCATION_INVALID')
+    instruments = []
+    for row in sorted(rows, key=lambda r: r['instrument_key']):
+        matches = [r for r in tables['portfolio_instrument']
+                   if r['instrument_key'] == row['instrument_key']]
+        if (len(matches) != 1 or matches[0].get('client_id') != client
+                or matches[0].get('identity_state') != 'KNOWN'
+                or (not matches[0].get('ticker') and matches[0].get('instrument_type') != 'CASH')):
+            raise ValueError('OFFICIAL_TARGET_INSTRUMENT_AMBIGUOUS')
+        instruments.append(deepcopy(matches[0]))
+    return {'version': deepcopy(version), 'allocations': deepcopy(sorted(rows,
+                key=lambda r: r['instrument_key'])), 'instruments': instruments,
+            'weight_denominator_units': 1000000,
+            'source_db_sha256': snapshot['source_sha256'],
+            'money_base_asserted': False, 'approval_created': False}
+
+
+def build(snapshot, *, evaluation_at, base_source):
+    approved = read_confirmed_weights(snapshot, evaluation_at=evaluation_at)
+    if approved is None:
+        return None
+    client = snapshot['client_id']; version = approved['version']
+    latest = version['version_no']; rows = approved['allocations']
+    tables = snapshot['tables']; at = _time(evaluation_at)
+    base = read_base(base_source)
+    if _time(base_source['source_available_at']) > at:
+        raise ValueError('OFFICIAL_TARGET_FUTURE_BASE')
     lines = []
     for row in sorted(rows, key=lambda r: r['instrument_key']):
         matches = [r for r in tables['portfolio_instrument']

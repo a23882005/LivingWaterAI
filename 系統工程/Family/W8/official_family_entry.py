@@ -197,6 +197,22 @@ class OfficialFamilyEntry:
             or request.get("client_snapshot", {}).get("payload", {}).get("source_sha256") != current["source_sha256"]):
             raise PermissionError("OFFICIAL_ANALYSIS_SOURCE_MISMATCH")
         context = runner.context_provider()
+        member_binding=context.get('member_v82_analysis_binding',{})
+        if member_binding:
+            if (member_binding.get('schema_version')!='Family.W8.MemberV82Binding.v1'
+                or member_binding.get('client_id')!=self.client_id or context.get('client_id')!=self.client_id
+                or member_binding.get('run_id')!=request.get('run_id')
+                or member_binding.get('source_db_sha256')!=current['source_sha256']
+                or member_binding.get('source_data_provenance')!='SOURCE_BACKED'):
+                raise PermissionError('OFFICIAL_MEMBER_V82_BINDING_MISMATCH')
+            decision=runner.analyze(request)
+            if (decision.get('report_digest')!=member_binding['report_digest']
+                or decision.get('canonical_result') is not None
+                or decision.get('full_native_pipeline_complete') is not False
+                or decision.get('full_native_mentor_reached') is not False
+                or decision.get('trade_action')!='NO_TRADE'):
+                raise PermissionError('OFFICIAL_MEMBER_V82_RESULT_MISMATCH')
+            return {**decision,'source_sha256':current['source_sha256']}
         analysis_binding=context.get('holdings_analysis_binding',{})
         if analysis_binding:
             if (analysis_binding.get('schema_version')!='Family.W8.HoldingsAnalysisBinding.v1'

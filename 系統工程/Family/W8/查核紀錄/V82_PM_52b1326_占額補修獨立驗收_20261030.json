@@ -1,0 +1,122 @@
+{
+  "head": "52b1326290d22b063e79f5b40e6e7a560216ad35",
+  "scope": "ISOLATED_SYNTHETIC_COMPONENTS_EVENT_AND_SQLITE",
+  "passed": 30,
+  "checks": [
+    "event CANCEL_PENDING 0 0",
+    "storage CANCEL_PENDING 0 0",
+    "event CANCEL_PENDING 0 24",
+    "storage CANCEL_PENDING 0 24",
+    "event CANCEL_PENDING 10 0",
+    "storage CANCEL_PENDING 10 0",
+    "event CANCEL_PENDING 10 14",
+    "storage CANCEL_PENDING 10 14",
+    "fill-confirm-release-reload-idempotency CANCEL_PENDING CANCELLED",
+    "fill-confirm-release-reload-idempotency CANCEL_PENDING EXPIRED",
+    "fill-confirm-release-reload-idempotency CANCEL_PENDING REJECTED",
+    "event REPLACE_PENDING 0 0",
+    "storage REPLACE_PENDING 0 0",
+    "event REPLACE_PENDING 0 24",
+    "storage REPLACE_PENDING 0 24",
+    "event REPLACE_PENDING 10 0",
+    "storage REPLACE_PENDING 10 0",
+    "event REPLACE_PENDING 10 14",
+    "storage REPLACE_PENDING 10 14",
+    "fill-confirm-release-reload-idempotency REPLACE_PENDING CANCELLED",
+    "fill-confirm-release-reload-idempotency REPLACE_PENDING EXPIRED",
+    "fill-confirm-release-reload-idempotency REPLACE_PENDING REJECTED",
+    "storage confirmation CANCELLED",
+    "storage confirmation EXPIRED",
+    "storage confirmation REJECTED",
+    "storage confirmation LOCAL_RELEASED",
+    "storage confirmation FILLED",
+    "mature37500",
+    "immature22500",
+    "original-counterexample-rejected"
+  ],
+  "real_private_DB_or_broker_changes": false,
+  "loader": "package __init__ imports bypassed; original native functions unchanged; full Family E2E outside this probe",
+  "reproduction": {
+    "probe_ledger_review.py": "import pathlib,sys,types,json,tempfile\nfrom decimal import Decimal\nr=(pathlib.Path(sys.argv[1])/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime' if len(sys.argv)>1 else pathlib.Path(__file__).parent/'source/系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime')\n# Isolated pure-function probe: bypass only package __init__ side-effect imports.\n# This does not run or substitute any funding/JSON-schema validation or E2E.\npkg=types.ModuleType('livingwater_v82_runtime');pkg.__path__=[str(r)];sys.modules['livingwater_v82_runtime']=pkg\nfrom livingwater_v82_runtime.daily_slice import maturity,speed,open_cycle,cycle_room,update_intent,CycleLedgerStore\nowner={'client_id':'SYNTHETIC','broker':'SYNTHETIC','account':'A','currency':'USD','funding_domain':'US_DIRECT'}\nat='2026-10-30T20:00:00Z';session='2026-10-30'\ndef rates(n):\n return speed(mode='Left Overweight',maturity_result=maturity([{'id':'M'+str(i+1),'truth':'TRUE' if i<n else 'FALSE'} for i in range(8)]),credit_level=0,core_etf='TRUE',high_beta='FALSE',macro_pressure='FALSE',extreme_valuation='OFF')\ns=rates(3)\ndef cycle(gap):return open_cycle(owner=owner,session_id=session,exchange='SYNTHETIC_X',asset_id='SYNTHETIC',opened_at=at,gap=gap,speed_result=s,permission=True,exposure_reconciled=True,session_open=True)\ndef room(c):return cycle_room(c,speed_result=s,permission=True,trend_allowed=True,session_id=session,session_open=True)\ndef event(c,eid,state,filled,remaining,release=False):\n return update_intent(c,event_id=eid,intent_id='I1',state=state,filled_amount=filled,remaining_amount=remaining,\n  receipt={'owner':owner,'asset_id':'SYNTHETIC','source_reference':'SYNTHETIC_RECEIPT','source_hash':'SYNTHETIC_HASH','as_of':at,'available_at':at,'release_confirmed':release},\n  evaluation_at=at,speed_result=s,permission=True,trend_allowed=True,session_id=session,session_open=True)\nc=cycle('100');c=event(c,'PLAN','PLANNED','0','25');c=event(c,'OPEN','OPEN','0','25')\nbefore=room(c)\npending_keep=event(c,'PENDING_KEEP','CANCEL_PENDING','0','25')\ntry:\n pending_drop=event(c,'PENDING_DROP','CANCEL_PENDING','0','0')\n drop={'accepted':True,'room':room(pending_drop)}\n with tempfile.TemporaryDirectory() as d:\n  store=CycleLedgerStore(pathlib.Path(d)/'planning.sqlite',create=True);store.save(c,expected_revision=None)\n  store.save(pending_drop,expected_revision=c['revision']);drop['persisted']=store.get(c['slice_cycle_id'])==pending_drop\nexcept ValueError as e:drop={'accepted':False,'error':str(e)}\nreceipt={'scope':'ISOLATED_SYNTHETIC_NATIVE_COMPONENT_PROBE','head':'52b1326290d22b063e79f5b40e6e7a560216ad35',\n 'mature_150000_B0':cycle('150000')['B0'],'immature_150000_B0':open_cycle(owner=owner,session_id=session,exchange='SYNTHETIC_X',asset_id='SYNTHETIC',opened_at=at,gap='150000',speed_result=rates(0),permission=True,exposure_reconciled=True,session_open=True)['B0'],\n 'before_pending':before,'pending_unchanged_room':room(pending_keep),'pending_zero_remaining_without_release':drop,\n 'expected':'Cancellation/replacement pending without confirmed release must retain prior unfilled commitment, adjusting only verified fills; malformed shrink must be rejected or preserve that commitment.',\n 'real_orders_or_private_db_changed':False}\npathlib.Path(__file__).with_name('ledger_review_results.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2))\nprint(json.dumps(receipt,ensure_ascii=False,indent=2))\n",
+    "verify_pending.py": "import runpy,pathlib,copy,tempfile,json\nfrom decimal import Decimal\nr=runpy.run_path(str(pathlib.Path(__file__).with_name('probe_ledger_review.py')))\nevent,cycle,room,Store=(r[k] for k in ('event','cycle','room','CycleLedgerStore'))\nchecks=[]\ndef opened(filled):\n c=event(cycle('100'),'PLAN','PLANNED','0','25')\n c=event(c,'OPEN','OPEN','0','25')\n return event(c,'FILL','PARTIAL_FILL',filled,str(25-int(filled))) if filled!='0' else c\nfor pending in ('CANCEL_PENDING','REPLACE_PENDING'):\n for filled in ('0','10'):\n  for remaining in ('0',str(24-int(filled))):\n   c=opened(filled);original=copy.deepcopy(c)\n   try:event(c,'BAD',pending,filled,remaining)\n   except ValueError as e:assert str(e)=='CYCLE_UNCONFIRMED_COMMITMENT_REDUCTION'\n   else:raise AssertionError('event accepted shrink')\n   assert c==original and Decimal(room(c)['cycle_room'])==0\n   checks.append('event '+pending+' '+filled+' '+remaining)\n   with tempfile.TemporaryDirectory() as d:\n    st=Store(pathlib.Path(d)/'ledger.sqlite',create=True);st.save(c,expected_revision=None)\n    bad=copy.deepcopy(c);bad['revision']+=1;bad['intents']['I1'].update(state=pending,remaining_amount=remaining)\n    try:st.save(bad,expected_revision=c['revision'])\n    except ValueError as e:assert str(e)=='CYCLE_UNCONFIRMED_COMMITMENT_REDUCTION'\n    else:raise AssertionError('storage accepted shrink')\n    assert Store(st.path).get(c['slice_cycle_id'])==c\n   checks.append('storage '+pending+' '+filled+' '+remaining)\n for terminal in ('CANCELLED','EXPIRED','REJECTED'):\n  c=event(opened('0'),'PENDING',pending,'0','25')\n  c=event(c,'FILLED10',pending,'10','15')\n  assert tuple(Decimal(room(c)[k]) for k in ('cycle_spent','cycle_committed','cycle_room'))==(10,15,0)\n  assert event(c,'FILLED10',pending,'10','15')==c\n  with tempfile.TemporaryDirectory() as d:\n   st=Store(pathlib.Path(d)/'ledger.sqlite',create=True);st.save(c,expected_revision=None)\n   c2=event(c,'CONFIRMED',terminal,'10','0',True);st.save(c2,expected_revision=c['revision'])\n   reread=Store(st.path).get(c2['slice_cycle_id']);assert reread==c2\n   assert event(reread,'CONFIRMED',terminal,'10','0',True)==reread\n   assert tuple(Decimal(room(reread)[k]) for k in ('cycle_spent','cycle_committed','cycle_room'))==(10,0,15)\n  checks.append('fill-confirm-release-reload-idempotency '+pending+' '+terminal)\nfor terminal in ('CANCELLED','EXPIRED','REJECTED','LOCAL_RELEASED','FILLED'):\n c=opened('0')\n with tempfile.TemporaryDirectory() as d:\n  st=Store(pathlib.Path(d)/'ledger.sqlite',create=True);st.save(c,expected_revision=None)\n  bad=copy.deepcopy(c);bad['revision']+=1;bad['intents']['I1'].update(state=terminal,remaining_amount='0')\n  try:st.save(bad,expected_revision=c['revision'])\n  except ValueError as e:assert str(e)=='CYCLE_RELEASE_CONFIRMATION_REQUIRED'\n  else:raise AssertionError('unconfirmed terminal accepted')\n  assert st.get(c['slice_cycle_id'])==c\n checks.append('storage confirmation '+terminal)\nreceipt=r['receipt'];assert receipt['mature_150000_B0']=='37500.00' and receipt['immature_150000_B0']=='22500.00'\nassert receipt['pending_zero_remaining_without_release']['accepted'] is False\nchecks.extend(['mature37500','immature22500','original-counterexample-rejected'])\nresult={'head':receipt['head'],'scope':'ISOLATED_SYNTHETIC_COMPONENTS_EVENT_AND_SQLITE','passed':len(checks),'checks':checks,'real_private_DB_or_broker_changes':False,'loader':'package __init__ imports bypassed; original native functions unchanged; full Family E2E outside this probe'}\npathlib.Path(__file__).with_name('acceptance_results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))\nprint('INDEPENDENT PM CHECKS PASS',len(checks))\n"
+  },
+  "source_blobs": {
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_profiles.py": "7a3e33f85cb064b178ab5c3d79302b26cd1e4f21",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/slice_allocation.py": "3932103116ebcb906a74ec1f4be4ad24c4fb73c0",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py": "ef5f021b20be617e2e2c4012d3a69ce5cada82f5",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/models.py": "593b636c476fd8b95ab28590bf7d991dd53af4bc",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py": "852ce6974bf56773730d3f6f77885c3a27d7d6a5",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py": "6341e06250d0180d5a9f46d0f8e9334f1ed57ca6",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py": "aadb4d0715358648bee02d4a8e64c4e1f04e14a2",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py": "0af7b812464bd491615466bbf9179e96edfa4d5a",
+    "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/enums.py": "12ff08193e486a53eea41f133a2be21625efbc7f"
+  },
+  "handoff": {
+    "zip_crc_sha_pass": 3,
+    "payloads_verified": 53,
+    "matrix_rows_unique": 56
+  },
+  "ci": [
+    {
+      "id": 40982454718,
+      "name": "Family W8 report isolation regression",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 48,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454718/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454718/logs",
+      "workflow_id": 395823728
+    },
+    {
+      "id": 40982454626,
+      "name": "Family menu unit tests",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 58,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454626/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454626/logs",
+      "workflow_id": 395151077
+    },
+    {
+      "id": 40982454632,
+      "name": "Family W8 authenticated MCP integration",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 78,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454632/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454632/logs",
+      "workflow_id": 396437893
+    },
+    {
+      "id": 40982454585,
+      "name": "Family W8 official entry syntax",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 62,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454585/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454585/logs",
+      "workflow_id": 396422579
+    },
+    {
+      "id": 40982454597,
+      "name": "Family V82 approved profile and cycle regression",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 3,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454597/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454597/logs",
+      "workflow_id": 401198910
+    },
+    {
+      "id": 40982454580,
+      "name": "Family W8 post-trade regression",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 79,
+      "jobs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454580/jobs",
+      "logs_url": "https://api.github.com/repos/a23882005/LivingWaterAI/actions/runs/40982454580/logs",
+      "workflow_id": 396747410
+    }
+  ],
+  "verdict": "PASS_FOR_V82_CYCLE_PENDING_RELEASE_COMPONENT_SCOPE; full Family W8 acceptance remains in progress."
+}

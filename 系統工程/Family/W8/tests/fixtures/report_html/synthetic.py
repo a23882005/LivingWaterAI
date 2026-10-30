@@ -170,6 +170,21 @@ def current(c=None):
     return D.build_w6_current_data(c["source"], c["market"], c["engine"])
 
 
+def long_reference_case():
+    """Long unbroken URL/path/hash and Chinese punctuation, all invented."""
+    c=case()
+    reference=("https://synthetic.invalid/"+"UnbrokenReference"*14+
+               "/frozen/source/result.json#"+"a1"*32+"；路徑／資料來源（完整保留）。")
+    for name,envelope in c["sections"].items():
+        envelope["payload"][0]["source_reference"]=reference+name
+        envelope["scope"]="SYNTHETIC_LONG_REFERENCE_SCOPE"
+    # A narrower radar card exercises the same wrapping style without making
+    # the approved, indivisible four-panel grid exceed its page-height limit.
+    c["c7"]["original_source"]["source_reference"]="RADARREFERENCE"*2
+    refresh(c)
+    return c
+
+
 def member_case():
     c=case();snapshot=deepcopy(c["snapshot"])
     snapshot["tables"]["final_target_version"]=[{"client_id":CLIENT,"target_key":"MAIN",

@@ -17,7 +17,16 @@
     "on_demand_report_delivery.py": "951102c5a55d959212e1e9cfc400a114eea75e7e6de37e1dce62e7b0e85fd0ae",
     "report_canonical_adapter.py": "b0d4b287def35bacd68452580dbbd10aec7f878f62a17f3499cdb24b15b7b29d",
     "w6_current_data.py": "e88ee749384e9d939e4874e6052e0a35851168bb3d8e2a355ff51aa94cc80483",
-    "w6_member_render.py": "6f4fbb2e1beaa71b29029ba5c74811960c01c287fd43143f839dd8d9d7c20171"
+    "w6_member_render.py": "d202e7f6454d42c8ab34e1ec67cf8945f323a13fe41ab9a701aafd5ec80c5021"
   },
-  "original_local_head_preserved": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0"
+  "original_local_head_preserved": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0",
+  "layout_repair": {
+    "base_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+    "pm_repair_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+    "main_metadata_checked": "434091b9adbe614d30e6bd7cc0e33d263cfcd3be",
+    "pr59_head_observed_only": "6a9dddd15dd19d3e668c20ac0033e1b99f7a6cba",
+    "frozen_upstream_source_unchanged": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+    "main_allowlist_overlap": false,
+    "shared_governance_files_modified": false
+  }
 }

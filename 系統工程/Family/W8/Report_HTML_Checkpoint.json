@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
-  "date": "2026-10-30",
-  "status": "PR60_SOURCE_REVIEW_REPORTS_ARCHIVED__INDEPENDENT_PM_ACCEPTANCE_PENDING",
+  "date": "2026-10-31",
+  "status": "LAYOUT_REPAIR_AND_20_FRESH_PRIVATE_READBACKS_COMPLETE__PM_REACCEPTANCE_PENDING",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -29,13 +29,13 @@
     "tests/test_on_demand_w6.py"
   ],
   "validation": {
-    "pytest_passed": 255,
+    "pytest_passed": 257,
     "subtests_passed": 65,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
     "canonical_contract_tests": 35,
-    "real_browser_tests": 8,
+    "real_browser_tests": 10,
     "physical_pages": 16,
     "chapters": 14,
     "all_static_pages_equal_zip_png": true,
@@ -64,8 +64,8 @@
     "Android/iOS device UAT remains deferred; managed file:// policy is preserved",
     "Middle PM independently accepts the final source-review report and verifies remaining formal financial integration"
   ],
-  "next_responsible_owner": "Family middle PM: independent acceptance, remaining upstream coordination and Gate; report Codex: corrections on findings",
-  "independent_acceptance": "PENDING",
+  "next_responsible_owner": "Family middle PM: independently recheck repaired source references and Gate; coordinate separate upstream versions",
+  "independent_acceptance": "BASELINE_DATA_AND_PERSISTENCE_SEGMENTS_PASS__REPAIRED_LAYOUT_PENDING_PM_RECHECK",
   "resume": [
     "Checkout this draft PR head and read Report_HTML_Contract_20261030.md",
     "Verify latest main/PR59 and allowed-file overlaps before editing",
@@ -76,7 +76,7 @@
   "artifact_location": "Private Drive household report folders / private TEMP evidence entry",
   "artifact_upload_status": "FOUR_PRIVATE_REPORTS_AND_MANIFESTS_FRESH_READBACK_VERIFIED",
   "github_publication": {
-    "status": "ORIGINAL_16_FILES_PUBLISHED_BY_PM_AFTER_OWNER_APPROVAL",
+    "status": "PR60_PUBLISHED_AT_81e741da__LAYOUT_REPAIR_ON_SAME_19_FILE_SCOPE",
     "repository": "a23882005/LivingWaterAI",
     "visibility": "public",
     "branch": "family/report-canonical-html-20261030",
@@ -93,7 +93,7 @@
         "Public repo handoff names the exact user-provided Drive package, repository, independent branch and Draft PR",
         "All 14 package baseline Git blobs match public repo base"
       ],
-      "next": "Obtain explicit user authorization for this exact 16-file source/text-only export; do not bypass the rejection"
+      "next": "HISTORICAL__RESOLVED_BY_OWNER_AUTHORIZATION_AND_PUBLICATION_AT_81e741da"
     },
     "continuation_scope": "Source, synthetic tests and deidentified text QA only; private output remains in private Drive"
   },
@@ -123,5 +123,26 @@
       "w6_member_render.py": "6f4fbb2e1beaa71b29029ba5c74811960c01c287fd43143f839dd8d9d7c20171"
     },
     "private_evidence_entry": "Google Drive root/TEMP/Family_Report_HTML_PR60_續工驗收入口_20261030.txt"
+  },
+  "layout_repair": {
+    "contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+    "base_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+    "defect": "REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW",
+    "synthetic_source_cards": 12,
+    "long_url_path_sha_and_chinese_punctuation": true,
+    "text_ranges_and_scroll_widths": "PASS",
+    "pdf_source_card_and_page_boxes": "PASS",
+    "all_source_characters_asof_scope_preserved": "PASS",
+    "font_size": "18px_UNCHANGED",
+    "frozen_real_reports": 4,
+    "real_source_cards": 60,
+    "real_valuation_source_cards": 32,
+    "real_physical_pages": 66,
+    "real_artifact_and_manifest_fresh_readbacks": 20,
+    "private_db_writes": 0,
+    "financial_engines_rerun": false,
+    "middle_pm_layout_reacceptance": "PENDING",
+    "current_remote_db_versions": "SEPARATE_FROM_FROZEN_REPLAY__PRIVATE_SHA_COMPARISON_RECORDED",
+    "private_entry": "Google Drive root/TEMP/Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt"
   }
 }

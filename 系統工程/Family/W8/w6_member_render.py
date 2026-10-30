@@ -125,7 +125,7 @@ def _radar_panels(radar):
                           for i,t in enumerate(lines))
             pieces.append(f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" font-size="14">{spans}</text>')
         result.append('<article><h3>'+_safe(label)+'</h3><svg viewBox="0 0 450 380">'+''.join(pieces)+'</svg>'+
-                      '<small>六級評等，非報酬預測；來源：'+_safe(radar["source_reference"])+"</small></article>")
+                      '<small class="source-reference">六級評等，非報酬預測；來源：'+_safe(radar["source_reference"])+"</small></article>")
     return '<div class="grid radar">'+''.join(result)+'</div>'
 
 
@@ -139,7 +139,7 @@ def _section_items(items, *, envelope=None):
             src+="；資料日期："+_safe(envelope["as_of"])
         if envelope and envelope.get("scope"):
             src+="；來源範圍："+_safe(envelope["scope"])
-        output.append("<article><h3>"+title+"</h3><p>"+body+"</p><small>來源："+src+"</small></article>")
+        output.append('<article><h3>'+title+'</h3><p>'+body+'</p><small class="source-reference">來源：'+src+'</small></article>')
     return output
 
 
@@ -238,6 +238,9 @@ def _source_html(data,css,images,blocks):
         css=css.replace("assets/"+name, "data:"+mime+";base64,"+base64.b64encode(byte).decode())
     css=re.sub(r"@font-face\{[^}]+\}","",css)  # do not redistribute fonts
     css=css.replace("font:21px Report,", "font:21px ")
+    # Keep every source character and the approved type size. Long URLs, paths
+    # and hashes may wrap inside source cards, including the radar grid.
+    css+='\n.source-reference{display:block;overflow-wrap:anywhere;word-break:normal}'
     person=_safe(data["member_alias"])
     identity=_safe(data["run_id"])
     embedded=json.dumps(blocks,ensure_ascii=False).replace("<","\\u003c")
@@ -323,8 +326,16 @@ def render_current_w6(data, w6_zip, *, executable=None):
             if result["physical_pages"]>45 or len(result["chapters"])!=14:
                 raise ValueError("W6_PAGE_MAP_INVALID")
             qa=page.evaluate("""() => ({broken:[...document.images].filter(x=>!x.complete||!x.naturalWidth).length,
-               overflow:[...document.querySelectorAll('.page')].filter(p=>[...p.querySelectorAll('.part')].some(x=>x.getBoundingClientRect().bottom>p.getBoundingClientRect().top+1400)).length})""")
-            if qa["broken"] or qa["overflow"]:
+               overflow:[...document.querySelectorAll('.page')].filter(p=>[...p.querySelectorAll('.part')].some(x=>x.getBoundingClientRect().bottom>p.getBoundingClientRect().top+1400)).length,
+               horizontal_overflow:[...document.querySelectorAll('.page,.source-reference')].filter(n=>n.scrollWidth>n.clientWidth+1).length,
+               source_overflow:[...document.querySelectorAll('.source-reference')].filter(n=>{
+                 const card=n.closest('article'),b=card.getBoundingClientRect(),s=getComputedStyle(card);
+                 const left=b.left+parseFloat(s.borderLeftWidth)+parseFloat(s.paddingLeft);
+                 const right=b.right-parseFloat(s.borderRightWidth)-parseFloat(s.paddingRight);
+                 const range=document.createRange();range.selectNodeContents(n);
+                 return [n.getBoundingClientRect(),...range.getClientRects()].some(r=>r.left<left-1||r.right>right+1);
+               }).length})""")
+            if any(qa.values()):
                 raise ValueError("W6_VISUAL_CONTENT_QA_FAILED")
             # Persist the exact paginated DOM used by PDF and page captures.
             # The source file has an empty #pages and an inert JSON block; it

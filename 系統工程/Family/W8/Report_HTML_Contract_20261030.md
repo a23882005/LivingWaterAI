@@ -126,3 +126,18 @@ python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q
 Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫 `verify_report_lookup`，核對實際下載的 manifest／PDF／HTML／ZIP、私人父目錄、本人／run／DB SHA／日期與逐檔 bytes／SHA。這不提供登入或宣稱真人 Project 登入 UAT；Android／iOS 實機 UAT 依 Owner 暫緩，受管 `file://` 限制仍照實記錄。四戶私人位置與讀回收據僅列在私人回交入口。
 
 續工回歸為 255 項＋65 子案例、8 項 Chromium 測試，0 failures／errors／skips。四戶 SOURCE_REVIEW 的正式報告與 manifest 已逐戶保存並從原 ID 全新下載核對，69 頁保存 HTML 與 ZIP PNG 像素一致；四戶離線窄畫面 reader 及工程執行環境的 Menu12 查閱驗證通過。最後再下載四份本人 DB，與開工位元組完全一致。完整證據入口為私人 Google Drive 根目錄／TEMP／`Family_Report_HTML_PR60_續工驗收入口_20261030.txt`。這些是報告及保存工程結果；完整金融整線、真人 Project 登入 UAT 與中 PM 獨立驗收仍未宣稱 PASS。
+
+
+## 2026-10-31 中 PM 排版補修：來源長字串完整換行
+
+補修契約位於 PR60 的 issuecomment-6527625954，鎖定基準 81e741da51d79307210dbe061c0f65178ed733aa。中 PM 已獨立完成 43 項＋46 子案例，資料來源承接、靜態同源產物與正式保存／工程查閱分段 PASS；排版問題為 32 列估值來源字串超出卡片，不能由原高度 overflow=0 代表水平通過。
+
+`w6_member_render._section_items` 與 `_radar_panels` 為來源 small 指定同一 source-reference 樣式；`_source_html` 僅增加 display:block、overflow-wrap:anywhere 與 word-break:normal。保留原 v16 CSS、字級、配色、圖表、來源全文／SHA／日期／scope 及 lineage；沒有截斷或隱藏來源。`render_current_w6` 在原高度 QA 之外，驗來源文字 Range 與來源容器位於卡片內緣、來源及頁面的 scrollWidth 不超 clientWidth，失敗仍拒絕產出。
+
+新增合成長 URL、不可斷路徑、64 位 SHA 與中文標點案例。實際 Chromium 驗八組章節及四個雷達來源共 12 卡的文字範圍、容器及頁面寬度，並以 PDF 實際文字框核對卡片／頁面及全文，保留全部頁面 PNG 像素、ZIP 同源正文／PDF／reader、14 章／13 目錄目標／頁碼與窄畫面操作。核准四雷達 grid 仍使用原分頁與高度限制，過高的單一區塊仍會被原 QA 拒絕。
+
+本輪回歸 257 項＋65 子案例、10 項 Chromium，0 failures/errors/skips。四戶按原凍結輸入重出 17／19／15／15 共 66 頁；60 張來源卡含全部 32 張估值來源逐字相同，text Range、scrollWidth 及 PDF 字框檢查通過。全部 saved HTML 與 ZIP PNG 逐頁像素相等；current digest、來源 DB SHA、核准目標、run、資料日期不變。正式 DB 已有後續版本，私人回交另列最新原件 SHA 與凍結值；本次純排版重出不混入新版 DB 或新版 PR59 分析。
+
+四戶新 PDF／完整 report.html／index.html／ZIP／manifest 共 20 份原件已保存至本人 Sources 的原正式資料夾，使用新台灣時間檔名、保留舊歷史。全新下載 bytes／SHA／私人父目錄／run／DB 綁定及工程 Menu12 查閱通過。完整證據位於 Google Drive 根目錄／TEMP／`Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt`，包名 `Family_Report_HTML_PR60_排版補修完整成果_待中PM複驗_20261031.zip`。依入口先讀 00，再讀 01 清單及 reports/各戶。公開僅為原 19 檔准改範圍內的程式／合成測試／去私人化文字 QA；本輪實際改 12 檔。
+
+本輪沒有改正式 DB、金融 producer、核准權重、共用 README 或共用 Checkpoint。四戶保持 SOURCE_REVIEW，完整同輪 C／Work9／Mentor 與其餘七組正式 envelope 由中 PM 鎖定上游後另整合。file:// 政策、真人登入及實機 UAT 的分列狀態沿用原規則；排版與全案 Gate 交中 PM 複驗，沒有自行宣告整體 PASS。

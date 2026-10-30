@@ -1,21 +1,15 @@
-PR60 已由中 PM 發布原 16 檔，遠端起點 b6a146b；下方 241＋51 與舊工作區位置是原輪驗證。續工新增原生部分分析、缺市值呈現、可信外部目標／現金／同工具角色與交付查閱測試；最新數量及命令見 validation.json。私人四戶證據與正式 Drive 讀回另在私人 TEMP 入口，沒有放進本公開目錄。整體仍待中 PM 獨立驗收。
+# PR60 來源文字換行補修證據（2026-10-31）
 
-# 合成報告／HTML 驗收證據
+中 PM 對 81e741da 的資料承接、靜態產物及正式保存／工程查閱已分段 PASS；本輪修正 REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW，排版待中 PM 複驗。共用 W8 README／Checkpoint 仍由中 PM 維護，本線沒有修改。
 
-本目錄所有測試數字、ID、持倉、核准記錄、C／Work9 回覆與正文均出自 `../tests/fixtures/report_html/synthetic.py`；Arthur 只是既有受准報表 alias。未讀私人 DB 或歷史客戶數字，沒有真實 Drive 上傳。原 W6 圖像／CSS／reader 只取核准母包的指定參考資產。
+- 准改範圍：原 19 個檔案內，本次修改 12 檔，完整路徑見 changed_files.json 的 layout_repair_changed_files。
+- 程式只改 w6_member_render.py：章節及雷達來源共用完整換行樣式，保留 18px 字級；QA 同時檢查來源文字 Range、卡片內緣及 scrollWidth/clientWidth。來源、lineage、日期、scope 與數字不截斷、不刪除。
+- 257 項＋65 子案例通過，10 項真實 Chromium 測試，0 failures/errors/skips。新增合成長 URL／路徑／64 位 SHA／中文標點案例，驗 12 張來源卡、PDF 字框及全部頁面 PNG／HTML 同源；JUnit 與命令見 validation.json。
+- 本機合成證據在 /workspace/report-layout-20261031/final-synthetic/：report.html、report.pdf、index.html、report.zip、mobile.png；long_reference/ 保存新增長字串案例的完整四種產物。artifact_hashes.json 可核對 bytes／SHA。所有公開 QA 只含合成資料。
+- 四戶按中 PM 指定凍結來源重出 17／19／15／15 頁，共 66 頁；60 張來源卡（含 32 張估值來源）全文相等、文字範圍及 PDF 字框在卡片內，全部保存頁與 ZIP PNG 像素相等。current digest、核准比例、run、資料日期不變。四戶 SOURCE_REVIEW、缺值 UNKNOWN 保留。
+- 新 20 份正式原件／manifest 已依本人 Sources 資料夾與新台灣時間檔名保存，舊報告保留；全新下載、私人父目錄、bytes／SHA、run／DB 綁定及工程 Menu12 查閱通過。現行正式 DB 的後續版本另列私人 SHA 比對，沒有混入凍結資料，沒有 DB 寫入或金融重算。
+- 完整私人證據：Google Drive 根目錄／TEMP／Family_Report_HTML_PR60_排版補修複驗入口_20261031.txt；完整包同目錄 Family_Report_HTML_PR60_排版補修完整成果_待中PM複驗_20261031.zip。私人報告、圖片及完整來源不放公開 GitHub。
 
-- 工作區 `/workspace/report-evidence/report.html`：已保存完整分頁 DOM，可檢視 14 章正文／目錄／頁碼；無需分頁程式。
-- 同工作區 `report.pdf`／`index.html`／`report.zip`：與 HTML 同一 DOM 的 16 實體頁及完整 reader／原 PNG。
-- 同工作區 `contact.jpg`：全部 16 頁總覽；`radar.png`／`drift.png` 是原始頁面 PNG，`mobile.png` 是 390×844 手機截圖。
-- `render_qa.json`：七項瀏覽器驗證、逐頁 overflow／頁碼／內嵌圖片狀態。16 頁保存 HTML 與 ZIP 原 PNG 逐頁像素完全一致。
-- 工作區 `current.synthetic.json`：傳給 renderer 的完整合成 CurrentData 與 canonical sidecar。
-- `junit.xml`／`validation.json`：W8＋W6 完整回歸，241 PASS，51 subtests PASS，0 failures/errors/skips；含實際命令、環境及母版 SHA；JUnit 另將 51 個子案例列為獨立 records。
-- `artifact_hashes.json`：完整四種工作區產物的 bytes／SHA256。
+核准 v16 母包 SHA、六支產生程式 SHA、凍結上游版本與最新 metadata 查核見 source_versions.json。本機 Chromium 需已授權的執行權限；file:// 仍實測 ERR_BLOCKED_BY_ADMINISTRATOR，沒有繞過。四戶離線窄畫面 reader 通過；真人 Project 密碼登入 UAT 未執行，Android/iOS 實機依 Owner 暫緩。完整金融整線與全案 Gate 不由本輪宣告 PASS。
 
-自動核准審查以「報告衍生圖片可能敏感、GitHub 目的地未獲確認」拒絕圖片外傳。本 PR 改為只提交程式、合成測試與文字證據；完整報告／圖片留在上述工作區回交，沒有以其他編碼繞過該拒絕。
-
-瀏覽器政策禁止 `file://`，因此直接雙擊開檔仍待中 PM 環境驗收。此處離線驗證使用保存檔原始位元組、停用 JavaScript，未注入 PAGINATION_SCRIPT；reader 同時驗證 data URI fallback 與離線 local-asset route 的同目錄 PNG。這不是繞過該政策或宣稱 file:// 已通過。
-
-最短重現程序、producer→consumer 映射與剩餘上游責任見 [本線契約](../Report_HTML_Contract_20261030.md)。未提供核准母包時瀏覽器測試會明確 skip；本次完整執行已提供同 SHA 母包，沒有跳過。
-
-逐頁人工覆核：已檢視全部頁面總覽、原尺寸雷達／漂移頁及手機截圖；封面、頁框與綠金配色沿母版，中文長名及六軸長標籤可見，沒有截出頁框。實體第 10～11 頁同屬第 9 章，是內容分頁；封面不編號，正文為 1/15～15/15。
+歷史：原輪 241＋51／7 個 browser；前輪 255＋65／8 個 browser／69 頁，相關舊發布受阻診斷均為封存歷史。當前狀態以本 PR 最新提交及本輪私人複驗入口為準。

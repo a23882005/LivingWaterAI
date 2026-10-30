@@ -9,6 +9,8 @@
   "checks": {
     "all_pages_static_zip_png_pixel_equal": "PASS",
     "canonical_current_render_staging_mock_receipts_readbacks": "PASS_MOCK_ONLY_NO_DRIVE_WRITE",
+    "long_reference_pdf_text_preserved_and_all_png_pages_equal": "PASS_SYNTHETIC",
+    "long_reference_ranges_and_container_widths": "PASS_SYNTHETIC_12_SOURCE_CARDS",
     "mobile_offline_data_uri_toc_arrows_tap_multitouch": "PASS",
     "partial_native_member_unknown_nav_and_original_facts": "PASS_SYNTHETIC",
     "partial_review_unknown_target_drift_radar_sections_14_chapters": "PASS",
@@ -129,6 +131,572 @@
       "overflow": 0,
       "footer": "15 / 15",
       "background_inline": true
+    }
+  ],
+  "long_reference_geometry": [
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。bond；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 7,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 929.125,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。market；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 8,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 944.875,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "六級評等，非報酬預測；來源：RADARREFERENCERADARREFERENCE",
+      "page": 9,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 543.5,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 747.0625,
+        "right": 543.5,
+        "bottom": 808.25
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 749.0625,
+          "right": 362,
+          "bottom": 775.0625
+        },
+        {
+          "left": 110,
+          "top": 779.65625,
+          "right": 423.140625,
+          "bottom": 805.65625
+        }
+      ],
+      "scroll_width": 434,
+      "client_width": 434,
+      "font_size": "18px"
+    },
+    {
+      "text": "六級評等，非報酬預測；來源：RADARREFERENCERADARREFERENCE",
+      "page": 9,
+      "page_width": 1087,
+      "card_left": 591.5,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 591.5,
+        "top": 747.0625,
+        "right": 1025,
+        "bottom": 808.25
+      },
+      "lines": [
+        {
+          "left": 591.5,
+          "top": 749.0625,
+          "right": 843.5,
+          "bottom": 775.0625
+        },
+        {
+          "left": 591.5,
+          "top": 779.65625,
+          "right": 904.640625,
+          "bottom": 805.65625
+        }
+      ],
+      "scroll_width": 434,
+      "client_width": 434,
+      "font_size": "18px"
+    },
+    {
+      "text": "六級評等，非報酬預測；來源：RADARREFERENCERADARREFERENCE",
+      "page": 9,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 543.5,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 1267.3125,
+        "right": 543.5,
+        "bottom": 1328.5
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 1269.3125,
+          "right": 362,
+          "bottom": 1295.3125
+        },
+        {
+          "left": 110,
+          "top": 1299.90625,
+          "right": 423.140625,
+          "bottom": 1325.90625
+        }
+      ],
+      "scroll_width": 434,
+      "client_width": 434,
+      "font_size": "18px"
+    },
+    {
+      "text": "六級評等，非報酬預測；來源：RADARREFERENCERADARREFERENCE",
+      "page": 9,
+      "page_width": 1087,
+      "card_left": 591.5,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 591.5,
+        "top": 1267.3125,
+        "right": 1025,
+        "bottom": 1328.5
+      },
+      "lines": [
+        {
+          "left": 591.5,
+          "top": 1269.3125,
+          "right": 843.5,
+          "bottom": 1295.3125
+        },
+        {
+          "left": 591.5,
+          "top": 1299.90625,
+          "right": 904.640625,
+          "bottom": 1325.90625
+        }
+      ],
+      "scroll_width": 434,
+      "client_width": 434,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。radar；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 10,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 929.859375,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。valuation；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 11,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 963.59375,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。actions；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 12,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 946.125,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。risks；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 13,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 923.671875,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。education；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 14,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 969.484375,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
+    },
+    {
+      "text": "來源：https://synthetic.invalid/UnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReferenceUnbrokenReference/frozen/source/result.json#a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1；路徑／資料來源（完整保留）。institutions；資料日期：2026-10-01T00:00:00Z；來源範圍：SYNTHETIC_LONG_REFERENCE_SCOPE",
+      "page": 15,
+      "page_width": 1087,
+      "card_left": 110,
+      "card_right": 1025,
+      "page_left": 24,
+      "box": {
+        "left": 110,
+        "top": 454.375,
+        "right": 1025,
+        "bottom": 637.9375
+      },
+      "lines": [
+        {
+          "left": 110,
+          "top": 456.375,
+          "right": 164,
+          "bottom": 482.375
+        },
+        {
+          "left": 110,
+          "top": 486.96875,
+          "right": 1019.765625,
+          "bottom": 512.96875
+        },
+        {
+          "left": 110,
+          "top": 517.5625,
+          "right": 1018.234375,
+          "bottom": 543.5625
+        },
+        {
+          "left": 110,
+          "top": 548.15625,
+          "right": 1021.078125,
+          "bottom": 574.15625
+        },
+        {
+          "left": 110,
+          "top": 578.75,
+          "right": 1010.265625,
+          "bottom": 604.75
+        },
+        {
+          "left": 110,
+          "top": 609.34375,
+          "right": 980.40625,
+          "bottom": 635.34375
+        }
+      ],
+      "scroll_width": 915,
+      "client_width": 915,
+      "font_size": "18px"
     }
   ]
 }

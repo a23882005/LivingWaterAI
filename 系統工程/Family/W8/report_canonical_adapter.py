@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import importlib
 import json
+import re
 from pathlib import Path
 import sys
 from threading import RLock
@@ -82,7 +83,7 @@ def _same_target(a, b):
     return content(a) == content(b)
 
 
-def resolve_targets(source, approved_target=None, target_context=None):
+def resolve_targets(source, approved_target=None, target_context=None, *, validator=None):
     """Optional original W2 record -> W6 detail, through W5/W6 validation.
 
     A historical signing time/run remains historical. The separate trusted
@@ -106,12 +107,19 @@ def resolve_targets(source, approved_target=None, target_context=None):
             "W6_EXTERNAL_TARGET_VERSION_CONFLICT")
     require(isinstance(ctx.get("target_key"), str) and bool(ctx["target_key"].strip()),
             "W6_TARGET_KEY_INVALID")
-    boundary = _runtime("family_boundary", "W5")
+    if validator is None:
+        validator = _runtime("family_boundary", "W5").validate_target
+        rules_sha = sha256((FAMILY / "W5/family_boundary.py").read_bytes()).hexdigest()
+    else:
+        # The operator may supply the actual newer upstream validator without
+        # copying or merging an independently owned financial implementation.
+        require(callable(validator) and re.fullmatch(r"[0-9a-f]{64}",str(ctx.get("validator_rules_sha",""))),
+                "W6_EXTERNAL_TARGET_VALIDATOR_LINEAGE")
+        rules_sha = ctx["validator_rules_sha"]
     receipt = _runtime("target_receipt", "W6/runtime").receive_target(
         approved_target, client_id=source["client_id"], report_run_id=ctx.get("run_id"),
         evaluation_at=_time(ctx.get("evaluation_at")), source_id=ctx.get("source_id"),
-        rules_sha=sha256((FAMILY / "W5/family_boundary.py").read_bytes()).hexdigest(),
-        validator=boundary.validate_target)
+        rules_sha=rules_sha, validator=validator)
     record = approved_target["payload"]
     lines = record["draft"].get("target_lines")
     require(isinstance(lines, list) and bool(lines), "W6_EXTERNAL_TARGET_LINES_REQUIRED")
@@ -135,10 +143,29 @@ def resolve_targets(source, approved_target=None, target_context=None):
         rows.append({"instrument_key": instrument, "ticker": identity["ticker"],
                      "label": identity.get("label") or identity.get("instrument_label") or identity["ticker"],
                      "weight_units": int(units), "weight_fraction": str(weight)})
+    groups=ctx.get("same_instrument_display_groups",{})
+    require(isinstance(groups,dict),"W6_EXTERNAL_TARGET_ID_MAPPING")
+    source_rows=tuple(zip(lines,rows));grouped_ids=set()
+    for instrument,ids in groups.items():
+        require(isinstance(ids,list) and len(ids)>1 and all(isinstance(i,str) for i in ids)
+                and len(set(ids))==len(ids) and not grouped_ids.intersection(ids),"W6_EXTERNAL_TARGET_DISPLAY_GROUP")
+        grouped_ids.update(ids)
+        selected=[(raw,row) for raw,row in source_rows if raw["instrument_id"] in ids]
+        require(instrument in catalog and len(selected)==len(ids)
+                and all(row["instrument_key"]==instrument and row["ticker"]==catalog[instrument].get("ticker")
+                        for raw,row in selected),"W6_EXTERNAL_TARGET_DISPLAY_GROUP")
+        combined=deepcopy(selected[0][1]);combined["weight_units"]=sum(row["weight_units"] for raw,row in selected)
+        combined["weight_fraction"]=str(Decimal(combined["weight_units"])/1000000)
+        combined["source_instrument_ids"]=deepcopy(ids)
+        rows=[row for row in rows if row["instrument_key"]!=instrument]+[combined]
     require(sum(x["weight_units"] for x in rows) == 1000000
             and len({x["ticker"] for x in rows}) == len(rows), "W6_EXTERNAL_TARGET_NOT_COMPLETE")
+    evidence = record["confirmation_evidence"]
+    document = evidence.get("action") == "READ_EXISTING_APPROVAL"
     detail = {"target_key": ctx["target_key"], "version_no": approved_target["target_version"],
-              "confirmed_at_utc": record["confirmation_evidence"]["confirmed_at"],
+              "confirmed_at_utc": evidence.get("original_confirmed_at") if document else evidence["confirmed_at"],
+              "confirmation_time_basis": evidence.get("time_basis","ORIGINAL_CONFIRMATION_TIME"),
+              "source_available_at": evidence.get("confirmed_at") if document else None,
               "confirmation_source_reference": deepcopy(record["confirmation_evidence"]["source_reference_ids"]),
               "allocations": rows, "external_target_receipt": receipt}
     db_versions = [x for x in source.get("confirmed_target_versions", []) if x["target_key"] == ctx["target_key"]]
@@ -171,6 +198,183 @@ def make_report_sources(source, request, result=None, *, c7=None, sections=None,
            "target_context": deepcopy(target_context)}
     out["digest"] = digest(out)
     return out
+
+
+def _member_analysis(source, request, result, producer, *, targets=None):
+    """Verify the original all-account Menu04 report without treating it as Work9."""
+    require(isinstance(result, dict) and result.get("schema_version") == "Family.W8.MemberV82Analysis.v1"
+            and result.get("status") == "ANALYSIS_PARTIAL", "W6_MEMBER_ANALYSIS_REQUIRED")
+    require(request.get("schema_version") == "Family.W8.MemberV82Request.v1"
+            and request.get("client_id") == source["client_id"]
+            and request.get("trade_authorization") == "NONE", "W6_MEMBER_REQUEST_REQUIRED")
+    for key, expected in (("client_id", source["client_id"]), ("run_id", request.get("run_id")),
+                          ("evaluation_at", request.get("evaluation_at")),
+                          ("source_db_sha256", source["source_db_sha256"])):
+        require(expected is not None and result.get(key) == expected, "W6_MEMBER_ANALYSIS_BINDING")
+    require(result.get("request_digest") == digest(request), "W6_MEMBER_REQUEST_DIGEST")
+    approved = request.get("confirmed_target") or {}
+    targets = source.get("current_confirmed_target_details", []) if targets is None else targets
+    if targets:
+        key = approved.get("original_confirmation", {}).get("target_key")
+        matches = [x for x in targets if x["version_no"] == approved.get("target_version")
+                   and (key is None or x["target_key"] == key)]
+        require(len(matches) == 1, "W6_MEMBER_TARGET_VERSION")
+        lines = approved.get("payload", {}).get("draft", {}).get("target_lines", [])
+        require(len({x.get("instrument_id") for x in lines})==len(lines),"W6_MEMBER_TARGET_CONFLICT")
+        catalog = {r["instrument_key"]: r for r in source.get("source_instruments", [])}
+        def symbol(line):
+            instrument=catalog.get(line.get("instrument_id"),{})
+            currency=instrument.get("quote_currency")
+            if (line.get("ticker") is None and instrument.get("instrument_type")=="CASH"
+                    and isinstance(currency,str) and re.fullmatch(r"[A-Z]{3}",currency)):
+                return currency+"_CASH"
+            return line.get("ticker")
+        role_groups={iid:r for r in matches[0]["allocations"] for iid in r.get("source_instrument_ids",[])}
+        pairs={}
+        for line in lines:
+            code=symbol(line);weight=_metric(line.get("weight"));group=role_groups.get(line.get("instrument_id"))
+            require(code not in pairs or group is not None and group["ticker"]==code,"W6_MEMBER_TARGET_CONFLICT")
+            pairs[code]=pairs.get(code,Decimal(0))+weight
+        require(pairs == {
+            x["ticker"]: Decimal(x["weight_units"])/1000000 for x in matches[0]["allocations"]},
+            "W6_MEMBER_TARGET_CONFLICT")
+    snap = request.get("client_snapshot", {}).get("payload", {})
+    require(snap.get("client_id") == source["client_id"]
+            and snap.get("source_sha256") == source["source_db_sha256"]
+            and snap.get("payload_digest") == source["snapshot_payload_sha256"]
+            and isinstance(snap.get("tables"), dict)
+            and digest(snap["tables"]) == source["snapshot_payload_sha256"], "W6_MEMBER_SNAPSHOT_BINDING")
+    owner = request.get("owner", {})
+    require(owner.get("client_id") == source["client_id"] and owner.get("scope") == "ALL_MEMBER_ACCOUNTS"
+            and all(owner.get(k) is None for k in ("broker", "account", "currency", "funding_domain")),
+            "W6_MEMBER_OWNER_SCOPE")
+    # OfficialFamilyEntry appends source_sha256 after the native report digest.
+    require(result.get("source_sha256", source["source_db_sha256"]) == source["source_db_sha256"]
+            and result.get("report_digest") == digest({k: v for k, v in result.items()
+                    if k not in ("report_digest", "source_sha256")}), "W6_MEMBER_RESULT_DIGEST")
+    require(result.get("canonical_result") is None and result.get("mentor") is None
+            and result.get("full_native_pipeline_complete") is False
+            and result.get("full_native_mentor_reached") is False
+            and result.get("database_written") is False and result.get("trade_authorization") == "NONE"
+            and result.get("trade_action") == "NO_TRADE", "W6_MEMBER_REVIEW_SCOPE_ONLY")
+    require(isinstance(producer, dict) and bool(producer.get("source_id"))
+            and re.fullmatch(r"[0-9a-f]{64}", str(producer.get("rules_sha", "")))
+            and producer.get("result_sha256") == digest(result), "W6_MEMBER_PRODUCER_RECEIPT")
+    universe = result.get("universe", {})
+    require(universe.get("client_id") == source["client_id"]
+            and universe.get("source_db_sha256") == source["source_db_sha256"]
+            and universe.get("universe_digest") == digest({k: v for k, v in universe.items() if k != "universe_digest"}),
+            "W6_MEMBER_UNIVERSE_DIGEST")
+    rows = result.get("positions")
+    require(isinstance(rows, list) and len(rows) == universe.get("expected_count")
+            == result.get("summary", {}).get("tested"), "W6_MEMBER_COVERAGE")
+    expected = {r["symbol"] for r in universe.get("assets", [])}
+    require(len(expected) == len(rows) and {r.get("symbol") for r in rows} == expected, "W6_MEMBER_COVERAGE")
+    for row in rows:
+        require(row.get("owner") == owner and row.get("result_digest") == digest(
+                {k: v for k, v in row.items() if k != "result_digest"}), "W6_MEMBER_ITEM_DIGEST")
+        require(row.get("proposed_amount") is None and row.get("full_native_pipeline_complete") is False
+                and row.get("trade_action") == "NO_TRADE" and row.get("trade_authorization") == "NONE",
+                "W6_MEMBER_ITEM_REVIEW_ONLY")
+        conclusion = row.get("formal_conclusion")
+        if conclusion is not None:
+            binding = conclusion.get("binding", {})
+            require(all(binding.get(k) == expected for k, expected in (
+                ("client_id", source["client_id"]), ("run_id", request["run_id"]),
+                ("owner", owner), ("source_db_sha256", source["source_db_sha256"]),
+                ("request_digest", result["request_digest"]))), "W6_MEMBER_CONCLUSION_BINDING")
+    return deepcopy(result)
+
+
+def member_review_sections(source, request, result, producer, *, targets=None):
+    """Quote existing partial analysis; this does not produce new research."""
+    original = _member_analysis(source, request, result, producer, targets=targets)
+    source_id = producer["source_id"]
+    payload = []
+    for row in original["positions"]:
+        conclusion = row.get("formal_conclusion") or {}
+        classification = conclusion.get("classification") or row.get("native_product_identity") or {}
+        payload.append({"heading": row["symbol"] + "｜" + str(classification.get("primary_class") or "UNKNOWN"),
+            "body": "原逐檔分析狀態：" + str(conclusion.get("status") or row.get("execution_status"))
+                    + "。資料尚不足，正式判斷待補；新增金額尚未提供。",
+            "source_reference": source_id + "#" + row["symbol"] + ":" + row["result_digest"]})
+    if not payload:
+        return {}
+    return {"valuation": {"client_id": source["client_id"], "run_id": request["run_id"],
+        "section": "valuation", "value_state": "KNOWN", "scope": "PARTIAL_MEMBER_V82_ANALYSIS",
+        "source_id": source_id, "rules_sha": sha256(Path(__file__).read_bytes()).hexdigest(),
+        "upstream_rules_sha": producer["rules_sha"], "as_of": request["evaluation_at"],
+        "payload": payload, "payload_sha256": digest(payload)}}
+
+
+def make_member_review_inputs(source, request, result, *, source_id, rules_sha, sections=None,
+                              approved_target=None,target_context=None,target_validator=None):
+    """Concrete current-input producer for the existing Menu04 partial result.
+
+    No verified portfolio NAV is present in this output. Known target weights,
+    source-dated holdings and native analysis remain usable; amounts, drift and
+    C radars remain UNKNOWN. A later complete W5 run uses the original path.
+    """
+    producer = {"source_id": source_id, "rules_sha": rules_sha, "result_sha256": digest(result)}
+    targets,receipt=resolve_targets(source,approved_target,target_context,validator=target_validator)
+    _member_analysis(source, request, result, producer,targets=targets)
+    prose = member_review_sections(source, request, result, producer,targets=targets)
+    supplied = deepcopy(sections or {})
+    require(not set(prose) & set(supplied), "W6_MEMBER_SECTION_PRODUCER_CONFLICT")
+    prose.update(supplied)
+    binding = make_report_sources(source, request, result, sections=prose)
+    binding["member_producer"] = producer
+    if receipt is not None:
+        binding["approved_target_transfer"]={"targets":targets,"receipt":receipt,"context":deepcopy(target_context)}
+    binding["digest"] = digest({k: v for k, v in binding.items() if k != "digest"})
+    common = {"client_id": source["client_id"], "source_db_sha256": source["source_db_sha256"],
+              "run_id": request["run_id"], "data_provenance": "SOURCE_BACKED"}
+    return {"market": {**common, "verified": False, "valuation_state": "UNKNOWN",
+                       "market_as_of": request["evaluation_at"],
+                       "market_as_of_basis": "SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION"},
+            "engine": {**common, "status": result["status"], "evaluation_at": request["evaluation_at"],
+                       "trade_authorization": "NONE", "report_sources": binding}}
+
+
+def _member_sources(source, market, engine, binding):
+    require(binding["scope"] == "SOURCE_REVIEW" and binding.get("c7") is None
+            and binding.get("target_context") is None, "W6_MEMBER_REVIEW_SCOPE_ONLY")
+    request, result = binding["request"], binding["result"]
+    require(request.get("run_id") == engine["run_id"] and request.get("evaluation_at") == engine["evaluation_at"],
+            "W6_MEMBER_ENGINE_BINDING")
+    targets=None;approved=source.get("external_target_receipt")
+    transfer=binding.get("approved_target_transfer")
+    if transfer is not None:
+        require(isinstance(transfer,dict),"W6_MEMBER_TARGET_TRANSFER")
+        ctx=transfer.get("context",{})
+        require(all(ctx.get(k)==v for k,v in (("client_id",source["client_id"]),
+            ("source_db_sha256",source["source_db_sha256"]),("snapshot_payload_sha256",source["snapshot_payload_sha256"]),
+            ("run_id",request["run_id"]),("evaluation_at",request["evaluation_at"]))),"W6_MEMBER_TARGET_TRANSFER")
+        approved=_runtime("source_views","W6/runtime").canonical_section(transfer.get("receipt"),
+            client_id=source["client_id"],run_id=request["run_id"],section="target")
+        payload=approved.get("payload",{})
+        require(approved.get("value_state")=="KNOWN" and approved.get("source_id")==ctx.get("source_id")
+                and payload.get("target_version")==ctx.get("expected_target_version")
+                and payload.get("target_hash")==ctx.get("expected_target_hash")
+                and (ctx.get("validator_rules_sha") is None or approved.get("rules_sha")==ctx["validator_rules_sha"])
+                and _time(approved["as_of"])<=_time(request["evaluation_at"]),"W6_MEMBER_TARGET_TRANSFER")
+        targets=transfer.get("targets")
+        require(isinstance(targets,list) and any(x.get("target_key")==ctx.get("target_key")
+            and x.get("version_no")==ctx.get("expected_target_version") for x in targets),"W6_MEMBER_TARGET_TRANSFER")
+        for prior in source.get("current_confirmed_target_details",[]):
+            matches=[x for x in targets if x.get("target_key")==prior["target_key"]]
+            require(len(matches)==1 and _same_target(prior,matches[0]),"W6_DB_EXTERNAL_TARGET_CONFLICT")
+    original = _member_analysis(source, request, result, binding.get("member_producer"),targets=targets)
+    sections, receipts = _sections(binding.get("sections", {}), source, request["run_id"], _time(request["evaluation_at"]))
+    output={"scope": "SOURCE_REVIEW", "sections": sections, "radar": None, "canonical": None,
+            "lineage": {"binding_sha256": binding["digest"], "sections": receipts,
+                        "member_analysis": original, "member_producer": deepcopy(binding["member_producer"]),
+                        "request_sha256": digest(request), "result_sha256": digest(result),
+                        "valuation_state": "UNKNOWN", "missing": ["VERIFIED_PORTFOLIO_NAV_AND_FX",
+                            "SAME_RUN_C_WORK6_7", "SAME_RUN_WORK9_AND_MENTOR"],
+                        "approved_target": deepcopy(approved)}}
+    if targets is not None:output["targets"]=deepcopy(targets)
+    return output
 
 
 def _sections(envelopes, source, run_id, evaluated):
@@ -240,6 +444,8 @@ def prepare_report_sources(source, market, engine):
         require(expected is not None and binding.get(key) == expected, "W6_REPORT_SOURCE_BINDING")
     require(binding.get("scope") in ("SOURCE_REVIEW", "CANONICAL_CALCULATION"), "W6_REPORT_SCOPE")
     request = binding.get("request")
+    if isinstance(request, dict) and request.get("schema_version") == "Family.W8.MemberV82Request.v1":
+        return _member_sources(source, market, engine, binding)
     require(isinstance(request, dict) and request.get("schema_version") == "Family.W5.request.v1"
             and request.get("client_id") == source["client_id"] and request.get("run_id") == engine["run_id"]
             and request.get("evaluation_at") == engine["evaluation_at"]

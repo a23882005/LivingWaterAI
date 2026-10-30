@@ -1,8 +1,8 @@
 # Family 報告來源承接與完整 HTML｜獨立施工契約及回交
 
-本地程式／合成驗證已完成，implementation commit `95f2461cfe00080c31303699aedd3837b346dec2`。工具自動核准審查另以「未明確核准向公開 repo 匯出程式及 QA」拒絕 16 檔文字提交；已核對公開交辦與 14 份基準 SHA 仍被拒絕。遠端分支與 Draft PR 尚未建立，待 Owner 對此確切公開目的地與 16 檔範圍的明確核准；本地分支、commit、patch、完整報告與證據均可驗收。
+正式施工位置為 [Draft PR60](https://github.com/a23882005/LivingWaterAI/pull/60)，分支 `family/report-canonical-html-20261030`。中 PM 已在 Owner 明確核准後發布原 16 檔，遠端起點為 `b6a146b33fa7aae8c725ebbe28cdd375a449aaf9`；原 `95f2461`／`e3bfae8` 本機成果保持。先前自動核准拒絕是歷史診斷，不能再當作遠端現況。
 
-本線只修改報告資料轉接、保存分頁 DOM 及對應合成測試。原 V82／每日切片／cycle／共同資金仍屬 PR59；不合入 PR59，不修改私人 DB、金融規則、共享 Checkpoint 或正式 Drive 報告。交付 Draft PR，由 Family 中 PM 獨立驗收。
+依 [PR60 續工裁定](https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6514477704)，本線負責瀏覽器重跑、四戶來源接線與本人報告的 Drive 保存／全新讀回。必要增量使用 `on_demand_w6.py` 的可信 producer 注入及 `on_demand_report_delivery.py` 的交付／查閱驗證；公開十四選單 API 與核准母版保持。原 V82／每日切片／cycle／共同資金仍屬 PR59；未合入 PR59，未修改私人 DB、金融規則、共享 Checkpoint。中 PM 負責來源與版本協調、獨立驗收及 Gate。
 
 開工 main `2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136`；施工期間同步 docs-only main，交付 base `036f8415cda9f24e8f51c8b73630effbf90f59e6`。介面對照 PR59 `5a54ce25c1dedc39c781aa2e6acd9f867b581d56`，准改檔案無交疊。分支 `family/report-canonical-html-20261030`。恢復入口為本目錄 `Report_HTML_Checkpoint.json`。
 
@@ -105,6 +105,24 @@ python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q
 
 ## 剩餘依賴與唯一下一責任
 
-下一責任：**Family 中 PM**。先獨立驗收此 Draft PR，再指定與原 Codex PR59 相容的正式上游版本、各章具名 producer、可信 current-input producer 中的 sidecar 注入，以及當事人授權環境的資料與 Drive 上傳／讀回／manifest 驗收。此線已完成隔離 adapter／合成測試／渲染保存；沒有接手 PR59 的 C7／V70 裁決、V82、共同資金或 cycle 缺陷。
+施工責任：**原報告 Codex**；獨立驗收與來源協調責任：**Family 中 PM**。真人來源與完整證據留私人 Drive，本 PR 只保存程式、合成測試與去私人化文字 QA。完整金融整線未就緒時，已知來源仍可交付 SOURCE_REVIEW，缺值具名保留 UNKNOWN；檔案完成保存不表示金融或中 PM 整體 PASS。
 
-恢復：checkout 本線 Draft PR head → 讀 Checkpoint／本契約 → 重跑上列 fixture → 對照最新 main／PR59 的准改檔交疊 → 只將中 PM 指定正式來源注入。遇到同檔並行變更時保留雙方差異，交中 PM 協調；其他無衝突工作可繼續。共享治理與正式資料寫入由中 PM 沿原流程處理。
+恢復：checkout 本線 Draft PR head → 讀 Checkpoint／本契約 → 重跑上列 fixture → 對照最新 main／PR59 的准改檔交疊 → 只將中 PM 指定正式來源注入。遇到同檔並行變更時保留雙方差異，交中 PM 協調；其他無衝突工作可繼續。共享治理與本人 DB 寫入由中 PM 依既有 writer 程序協調；本線只保存新的正式報告與證據。
+
+## PR60 續工：原生逐檔部分分析與正式保存
+
+續工參考 PR59 `d8dea452ec47e3fb27fbd31e8db15a89b4a36122` 的原輸出 `Family.W8.MemberV82Request.v1`／`Family.W8.MemberV82Analysis.v1`。這不是 W5／Work9 完整部署結果。`MemberAnalysisReportProducer` 將原 request／result、可信來源 ID 與原 producer 規則 SHA 注入既有 `{market, engine}` API；不修改共用分析 producer 或複製金融實作。
+
+`report_canonical_adapter._member_analysis` 核對本人／DB SHA／snapshot tables digest／run／時點／ALL_MEMBER_ACCOUNTS owner、原 request／report／逐檔 digest、universe 覆蓋及原正式判斷 binding。只有 SOURCE_REVIEW 可接這種部分分析；canonical_result、完整 Mentor 及執行金額不得由此補造。八組章節繼續使用原 receiver；估值章直接引用原逐檔分析，保留來源、時點及原值，其餘未提供的章節維持 UNKNOWN。
+
+未提供已核實的投資池市值／現金範圍／FX 時，`w6_current_data` 保留 `current_total_twd=null`、`actual=[]`、`drift=[]`；本人 DB 已記錄的數量與各自日期另列。已核准目標比例可展示，目標金額仍為 null；四雷達不補零。來源分析時點在報告明示「市值尚未核實」，不冒充即時估值。資料回顧仍保存完整 14 章、目錄與分頁正文。
+
+現金目標沿原 `instrument_type=CASH`／`quote_currency` 產生顯示身分，不創造股票 ticker。外部核准物件可以由 producer 呼叫原上游驗證器，再以 canonical target receipt 轉交；`MemberAnalysisReportProducer` 的 `approved_target/target_context/target_validator` 為可信設定，選單使用者仍只輸入 date／language。既有 Menu13 的 FormalReportSource digest 保持原來源綁定，目標增量位於 `engine.report_sources.approved_target_transfer`。新版原驗證器可從獨立的已鎖定上游程式載入，必須記錄其規則 SHA；本線不改 W5 驗證規則。READ_EXISTING_APPROVAL 保留原 action、原核准時間缺值及來源可取得時間，沒有新簽署事件。
+
+同一已登錄投資工具若分成多個內部角色，僅在 operator 明列 `same_instrument_display_groups`、映射到同一 DB instrument 且 ticker 一致時，才合計其顯示比例。原目標物件與角色 ID 完整保留；未明列的重複 ticker 仍拒絕，不合併不同投資工具。
+
+保存沿 `prepare_report_delivery → bind_connector_uploads → 實際 Drive upload → 各原件全新下載 → prepare_verified_manifest → manifest upload／全新下載 → verify_published_manifest`。沿用本人 Sources 的正式父資料夾與台灣時間檔名。manifest 同時記錄 `report_scope/content_state`，因此 COMPLETE 只代表檔案保存完成。
+
+Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫 `verify_report_lookup`，核對實際下載的 manifest／PDF／HTML／ZIP、私人父目錄、本人／run／DB SHA／日期與逐檔 bytes／SHA。這不提供登入或宣稱真人 Project 登入 UAT；Android／iOS 實機 UAT 依 Owner 暫緩，受管 `file://` 限制仍照實記錄。四戶私人位置與讀回收據僅列在私人回交入口。
+
+續工回歸為 255 項＋65 子案例、8 項 Chromium 測試，0 failures／errors／skips。四戶 SOURCE_REVIEW 的正式報告與 manifest 已逐戶保存並從原 ID 全新下載核對，69 頁保存 HTML 與 ZIP PNG 像素一致；四戶離線窄畫面 reader 及工程執行環境的 Menu12 查閱驗證通過。最後再下載四份本人 DB，與開工位元組完全一致。完整證據入口為私人 Google Drive 根目錄／TEMP／`Family_Report_HTML_PR60_續工驗收入口_20261030.txt`。這些是報告及保存工程結果；完整金融整線、真人 Project 登入 UAT 與中 PM 獨立驗收仍未宣稱 PASS。

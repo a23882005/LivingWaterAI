@@ -1,6 +1,8 @@
+PR60 已由中 PM 發布原 16 檔，遠端起點 b6a146b；下方 241＋51 與舊工作區位置是原輪驗證。續工新增原生部分分析、缺市值呈現、可信外部目標／現金／同工具角色與交付查閱測試；最新數量及命令見 validation.json。私人四戶證據與正式 Drive 讀回另在私人 TEMP 入口，沒有放進本公開目錄。整體仍待中 PM 獨立驗收。
+
 # 合成報告／HTML 驗收證據
 
-全部數字、ID、持倉、核准記錄、C／Work9 回覆與正文均出自 `../tests/fixtures/report_html/synthetic.py`；Arthur 只是既有受准報表 alias。未讀私人 DB 或歷史客戶數字，沒有真實 Drive 上傳。原 W6 圖像／CSS／reader 只取核准母包的指定參考資產。
+本目錄所有測試數字、ID、持倉、核准記錄、C／Work9 回覆與正文均出自 `../tests/fixtures/report_html/synthetic.py`；Arthur 只是既有受准報表 alias。未讀私人 DB 或歷史客戶數字，沒有真實 Drive 上傳。原 W6 圖像／CSS／reader 只取核准母包的指定參考資產。
 
 - 工作區 `/workspace/report-evidence/report.html`：已保存完整分頁 DOM，可檢視 14 章正文／目錄／頁碼；無需分頁程式。
 - 同工作區 `report.pdf`／`index.html`／`report.zip`：與 HTML 同一 DOM 的 16 實體頁及完整 reader／原 PNG。

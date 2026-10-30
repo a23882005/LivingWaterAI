@@ -32,6 +32,8 @@ def _safe(text):
 
 
 def _format_money(value):
+    if value is None:
+        return "UNKNOWN"
     from decimal import Decimal
     return f"{Decimal(str(value)):,.2f}"
 
@@ -165,7 +167,7 @@ def _build_blocks(data):
                     if data.get("target_version") is not None else "UNKNOWN；尚待核准目標來源。"),
               _card("本次投資分析", ("同輪正式計算結果" if data.get("report_scope")=="CANONICAL_CALCULATION"
                     else "來源回顧；未提供的正式計算結果保留 UNKNOWN")+"；僅供投資教育，交易由本人決定。"),
-              _card("行情資料日期",data["market_as_of"]),
+              _card(data.get("market_as_of_label","行情資料日期"),data["market_as_of"]),
               _card("本人正式來源", "客戶別"+data["member_alias"]+"；DB摘要已綁定，完整來源存本輪檔案紀錄。")]
     parts[3]=['<div class="piegrid"><div>'+_pie(actual)+'</div><div>'+_table(
         ["編號","代碼／標的","目前比例","新台幣市值"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(actual)])+'</div></div>']
@@ -173,6 +175,18 @@ def _build_blocks(data):
         '<div class="barrow"><span>'+_safe(_instrument_label(row))+
         '</span><div><i style="width:'+str(min(100.,float(row["權重"])*100))+
         '%"></i></div><b>'+_format_pct(row["權重"])+"</b></div>" for row in actual)+'</div>']
+    if data.get("current_value_state")=="UNKNOWN":
+        parts[2][0]=_card("目前投資池市值", "UNKNOWN；尚未取得完整同輪市值、現金範圍及匯率來源。")
+        records=data.get("source_position_records",[])
+        parts[3]=[_card("持倉資料範圍", "以下為本人資料庫已記錄的持倉及各自日期；不代表已完成目前市值核對。")]
+        if records:
+            for i in range(0,len(records),8):
+                parts[3].append(_table(["標的","帳戶","已記錄數量","來源日期"], [
+                    [r.get("ticker"),r.get("account_key"),r.get("quantity"),r.get("as_of_utc")]
+                    for r in records[i:i+8]]))
+        else:
+            parts[3].append(_card("持倉資料狀態", "UNKNOWN；缺少已記錄持倉不表示持倉為零。"))
+        parts[4]=[_card("目前比例與統計", "UNKNOWN；市值分母尚未核實，不以舊值、零或推算比例填入。")]
     parts[5]=['<div class="piegrid"><div>'+_pie(target)+'</div><div>'+_table(
         ["編號","代碼／標的","目標比例","目標金額（新台幣）"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(target)])+'</div></div>']
     for i in range(0,len(drift),9):
@@ -232,7 +246,7 @@ def _source_html(data,css,images,blocks):
            '<p style="text-align:center">Portfolio Review & Allocation Report</p>'
            '<div class="note">一脈活水，流過歲月；讓資產在歲月裡生長。</div>'
            '<dl>報告版本　Family W6 v16　四戶動態資料版<br>分析時間　'+_safe(data["evaluation_at"])+
-           '<br>資料日期　'+_safe(data["market_as_of"])+
+           '<br>'+_safe(data.get("market_as_of_label","資料日期"))+'　'+_safe(data["market_as_of"])+
            '<br>報告編號　'+identity+
            '<br>目的　　教育、風險與資產配置分析；由客戶自己決定是否交易</dl></div>'
            '<div class="foot"><span>活水AI理財教練・Confidential</span><span>交易授權 NONE</span></div></section>')
@@ -348,4 +362,5 @@ def render_current_w6(data, w6_zip, *, executable=None):
                 "source_digest":data["source_digest"],"w6_current_digest":data["digest"],
                 "run_id":data["run_id"],"data_as_of":data["market_as_of"],
                 "analysis_version":"W6-v16-parameterized", "page_count":result["physical_pages"],
+                "report_scope":data.get("report_scope"),"content_state":data.get("report_content_state"),
                 "artifacts":artifacts}

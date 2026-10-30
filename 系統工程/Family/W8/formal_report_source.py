@@ -164,7 +164,7 @@ def _confirmed_target_details(tables):
                    "confirmation_source_reference":version.get("confirmation_source_ref"),
                    "allocations":[{
                        "instrument_key":row["instrument_key"],
-                       "ticker":instruments[row["instrument_key"]].get("ticker"),
+                       "ticker":_report_ticker(instruments[row["instrument_key"]]),
                        "label":instruments[row["instrument_key"]].get("instrument_label"),
                        "weight_units":row["weight_units"],
                        "weight_fraction":str(Decimal(row["weight_units"])/Decimal(1000000))
@@ -175,8 +175,19 @@ def _confirmed_target_details(tables):
     return [latest[key] for key in sorted(latest)]
 
 
+def _report_ticker(instrument):
+    """Cash has a currency identity rather than an exchange ticker."""
+    ticker=instrument.get("ticker")
+    currency=instrument.get("quote_currency")
+    if (not ticker and instrument.get("instrument_type")=="CASH"
+            and isinstance(currency,str) and len(currency)==3
+            and currency.isascii() and currency.isupper() and currency.isalpha()):
+        return currency+"_CASH"
+    return ticker
+
+
 def build_report_source(snapshot, *, account, expected_client_id,
-                        approved_target=None, target_context=None):
+                        approved_target=None, target_context=None, approved_target_validator=None):
     if not isinstance(snapshot,dict) or snapshot.get("schema_version")!="Family.W5.W1Snapshot.v1":
         raise ValueError("VERIFIED_W5_SNAPSHOT_REQUIRED")
     if snapshot.get("client_id")!=expected_client_id or not isinstance(expected_client_id,str):
@@ -248,7 +259,7 @@ def build_report_source(snapshot, *, account, expected_client_id,
                                                    Path(__file__).with_name("report_canonical_adapter.py"))
         adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
         source["current_confirmed_target_details"],receipt=adapter.resolve_targets(
-            source,approved_target,target_context)
+            source,approved_target,target_context,validator=approved_target_validator)
         source["external_target_receipt"]=receipt
         source["reporting_flags"]["confirmed_target_available"]=bool(source["current_confirmed_target_details"])
     source["digest"]=_digest(source)

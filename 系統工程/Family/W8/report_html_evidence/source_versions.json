@@ -8,5 +8,16 @@
     "Checkpoint.json": "a42f21a637bb8ca60d1bfab2c513087d3396d6de"
   },
   "reference_pr59": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
-  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e"
+  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "continuation_start": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
+  "continuation_reference_pr59": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+  "tested_program_sha256": {
+    "formal_report_source.py": "06b432042a7f1a74392a07cd94f7139c56f84a6f954163df9d4683abf9b0e346",
+    "on_demand_w6.py": "c22ef951b70368629e86db3e8ba2f61e1d15427d70f65b42df33cf7fe1042fd7",
+    "on_demand_report_delivery.py": "951102c5a55d959212e1e9cfc400a114eea75e7e6de37e1dce62e7b0e85fd0ae",
+    "report_canonical_adapter.py": "b0d4b287def35bacd68452580dbbd10aec7f878f62a17f3499cdb24b15b7b29d",
+    "w6_current_data.py": "e88ee749384e9d939e4874e6052e0a35851168bb3d8e2a355ff51aa94cc80483",
+    "w6_member_render.py": "6f4fbb2e1beaa71b29029ba5c74811960c01c287fd43143f839dd8d9d7c20171"
+  },
+  "original_local_head_preserved": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0"
 }

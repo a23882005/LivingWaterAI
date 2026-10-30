@@ -2,21 +2,25 @@
   "report.html": {
     "bytes": 878021,
     "sha256": "b73b9b2613fdb6aeebd485c4d288a31cab02a9568909eaaac972793a81d2d0cf",
-    "retained_in_git": false
+    "retained_in_git": false,
+    "scope": "SYNTHETIC_ONLY"
   },
   "report.pdf": {
     "bytes": 1201232,
-    "sha256": "da6b6006737769de421de330595a796952530c0058e0fa44d2ed1802d1c2cf4f",
-    "retained_in_git": false
+    "sha256": "ea1e02e01ac790c254ed98ba4d24f472c2b56420cd217936e3b72d4fc9b627a1",
+    "retained_in_git": false,
+    "scope": "SYNTHETIC_ONLY"
   },
   "index.html": {
     "bytes": 9511969,
     "sha256": "e4bc3da7c8cfb09783be0d909693248abc21a8da228910f6d3e42c200599713b",
-    "retained_in_git": false
+    "retained_in_git": false,
+    "scope": "SYNTHETIC_ONLY"
   },
   "report.zip": {
-    "bytes": 15596729,
-    "sha256": "d27252ecc562eef275cf50a7db8c463689eaf27ac09480bb21d996e018d56cb1",
-    "retained_in_git": false
+    "bytes": 15596725,
+    "sha256": "d05c771195b1a883a1d20e95479dbf8c9101bbac7cb216677bddd4fcc231ed88",
+    "retained_in_git": false,
+    "scope": "SYNTHETIC_ONLY"
   }
 }

@@ -315,4 +315,149 @@ class ExternalTargetTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "W6_DB_EXTERNAL_TARGET_CONFLICT"): self.build()
 
 
+class MemberSourceReviewTests(unittest.TestCase):
+    def inputs(self,c):
+        return F.A.make_member_review_inputs(c["source"],c["request"],c["result"],
+            source_id="SYNTHETIC_NATIVE_MEMBER_REPORT",rules_sha="e"*64)
+
+    def test_partial_native_analysis_keeps_unknown_nav_and_known_target_weights(self):
+        c=F.member_case();inputs=self.inputs(c)
+        current=F.D.build_w6_current_data(c["source"],**inputs)
+        self.assertEqual(current["report_scope"],"SOURCE_REVIEW")
+        self.assertIsNone(current["current_total_twd"])
+        self.assertEqual(current["actual"],[])
+        self.assertEqual(current["drift"],[])
+        self.assertIsNone(current["approved_radar"])
+        self.assertEqual([r["權重"] for r in current["target"]],["0.4","0.4","0.2"])
+        self.assertTrue(all(r["市值TWD"] is None for r in current["target"]))
+        self.assertEqual(current["source_position_records"],c["source"]["actual_position_records"])
+        self.assertEqual(current["report_source_lineage"]["member_analysis"],c["result"])
+        self.assertEqual(len(current["verified_sections"]["valuation"]),3)
+        self.assertIn("UNKNOWN",current["verified_sections"]["bond"][0]["body"])
+
+    def test_rehashed_foreign_identity_owner_snapshot_or_target_is_rejected(self):
+        changes=[
+            lambda c:c["result"].update(client_id="foreign"),
+            lambda c:c["result"].update(run_id="other-run"),
+            lambda c:c["result"].update(source_db_sha256="b"*64),
+            lambda c:c["request"]["owner"].update(account="FOREIGN"),
+            lambda c:c["request"]["client_snapshot"]["payload"].update(payload_digest="b"*64),
+            lambda c:c["request"]["confirmed_target"].update(target_version=8),
+            lambda c:c["request"]["confirmed_target"]["payload"]["draft"]["target_lines"][0]["weight"].update(value=.5),
+            lambda c:c["result"]["positions"][0]["formal_conclusion"]["binding"].update(run_id="other"),
+        ]
+        for i,change in enumerate(changes):
+            with self.subTest(case=i):
+                c=F.member_case();change(c);F.member_refresh(c)
+                with self.assertRaises(ValueError):self.inputs(c)
+
+    def test_partial_result_cannot_claim_canonical_or_executable_amount(self):
+        for key,value in (("canonical_result",{}),("full_native_pipeline_complete",True),("mentor",{})):
+            with self.subTest(field=key):
+                c=F.member_case();c["result"][key]=value;F.member_refresh(c)
+                with self.assertRaisesRegex(ValueError,"W6_MEMBER_REVIEW_SCOPE_ONLY"):self.inputs(c)
+        c=F.member_case();c["result"]["positions"][0]["proposed_amount"]=100;F.member_refresh(c)
+        with self.assertRaisesRegex(ValueError,"W6_MEMBER_ITEM_REVIEW_ONLY"):self.inputs(c)
+        c=F.member_case();inputs=self.inputs(c);b=inputs["engine"]["report_sources"]
+        b["scope"]="CANONICAL_CALCULATION";b["digest"]=F.A.digest({k:v for k,v in b.items() if k!="digest"})
+        with self.assertRaisesRegex(ValueError,"W6_MEMBER_REVIEW_SCOPE_ONLY"):
+            F.D.build_w6_current_data(c["source"],**inputs)
+
+    def test_original_native_item_digest_and_universe_coverage_are_checked(self):
+        c=F.member_case();c["result"]["positions"][0]["formal_conclusion"]["status"]="CHANGED"
+        with self.assertRaisesRegex(ValueError,"W6_MEMBER_RESULT_DIGEST"):self.inputs(c)
+        c=F.member_case();c["result"]["positions"].pop();F.member_refresh(c)
+        with self.assertRaisesRegex(ValueError,"W6_MEMBER_COVERAGE"):self.inputs(c)
+
+    def test_unknown_valuation_does_not_relax_original_canonical_market_gate(self):
+        c=F.case();c["market"].update(verified=False,valuation_state="UNKNOWN",
+            market_as_of_basis="SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION")
+        with self.assertRaisesRegex(PermissionError,"W6_SAME_CLIENT_DB_AND_ENGINE_REQUIRED"):F.current(c)
+
+    def test_on_demand_producer_keeps_a_copy_of_original_inputs(self):
+        module=F.load("member_review_producer","on_demand_w6.py")
+        c=F.member_case();producer=module.MemberAnalysisReportProducer(c["request"],c["result"],
+            source_id="SYNTHETIC_NATIVE_MEMBER_REPORT",rules_sha="e"*64)
+        c["result"]["positions"].clear()
+        inputs=producer(c["source"],{})
+        self.assertEqual(len(inputs["engine"]["report_sources"]["result"]["positions"]),3)
+
+    def test_official_cash_target_uses_currency_identity_without_a_fake_ticker(self):
+        c=F.member_case();snapshot=c["request"]["client_snapshot"]["payload"]
+        instrument=next(x for x in snapshot["tables"]["portfolio_instrument"] if x["instrument_key"]=="NEW")
+        instrument.update(ticker=None,instrument_type="CASH",quote_currency="TWD")
+        snapshot["payload_digest"]=F.A.digest(snapshot["tables"])
+        c["source"]=F.S.build_report_source(snapshot,account="AR",expected_client_id=F.CLIENT)
+        c["request"]["confirmed_target"]["payload"]["draft"]["target_lines"][-1]["ticker"]=None
+        F.member_refresh(c)
+        current=F.D.build_w6_current_data(c["source"],**self.inputs(c))
+        cash=next(x for x in current["target"] if x["代碼"]=="TWD_CASH")
+        self.assertEqual(cash["權重"],"0.2")
+        self.assertIsNone(cash["市值TWD"])
+        self.assertIsNone(instrument["ticker"])
+
+    def test_document_validator_is_explicit_and_source_availability_is_not_a_signature(self):
+        c=F.case();target=c["request"]["confirmed_target"]
+        evidence=target["payload"]["confirmation_evidence"]
+        evidence.update(action="READ_EXISTING_APPROVAL",original_confirmed_at=None,
+            time_basis="APPROVAL_RECORD_AVAILABLE_BY__NOT_ORIGINAL_SIGNING_TIME")
+        target["payload"]["status"]="APPROVED_DOCUMENT_VIEW"
+        context=c["target_context"];context["validator_rules_sha"]="d"*64
+        with self.assertRaisesRegex(ValueError,"TARGET_NOT_CONFIRMED"):
+            F.A.resolve_targets(c["source"],target,context)
+        calls=[]
+        def upstream_validator(original,client,at):
+            calls.append((client,at.isoformat()))
+            self.assertEqual(original,target)
+            return original
+        details,receipt=F.A.resolve_targets(c["source"],target,context,validator=upstream_validator)
+        self.assertEqual(len(calls),1)
+        self.assertIsNone(details[0]["confirmed_at_utc"])
+        self.assertEqual(details[0]["source_available_at"],evidence["confirmed_at"])
+        self.assertEqual(receipt["payload"],target)
+        self.assertEqual(receipt["rules_sha"],"d"*64)
+
+    def test_two_roles_of_one_registered_instrument_need_an_explicit_display_group(self):
+        c=F.case();target=c["request"]["confirmed_target"]
+        lines=target["payload"]["draft"]["target_lines"]
+        first=lines.pop(0)
+        for role in ("KEEP_A","KEEP_B"):
+            lines.append({**first,"instrument_id":role,"weight":{"value_state":"KNOWN","value":.2}})
+        context=c["target_context"];context.update(validator_rules_sha="d"*64,
+            instrument_map={role:{"instrument_key":"KEEP","ticker":"KEEP"} for role in ("KEEP_A","KEEP_B")})
+        with self.assertRaisesRegex(ValueError,"W6_EXTERNAL_TARGET_NOT_COMPLETE"):
+            F.A.resolve_targets(c["source"],target,context,validator=lambda *args:target)
+        context["same_instrument_display_groups"]={"KEEP":["KEEP_A","KEEP_B"]}
+        details,receipt=F.A.resolve_targets(c["source"],target,context,validator=lambda *args:target)
+        keep=next(x for x in details[0]["allocations"] if x["ticker"]=="KEEP")
+        self.assertEqual(keep["weight_units"],400000)
+        self.assertEqual(keep["source_instrument_ids"],["KEEP_A","KEEP_B"])
+        self.assertEqual(receipt["payload"],target)
+
+    def test_existing_menu_source_digest_stays_bound_when_producer_supplies_external_target(self):
+        c=F.member_case();snapshot=c["request"]["client_snapshot"]["payload"]
+        snapshot["tables"]["final_target_version"]=[];snapshot["tables"]["final_target_allocation"]=[]
+        snapshot["payload_digest"]=F.A.digest(snapshot["tables"])
+        source=F.S.build_report_source(snapshot,account="AR",expected_client_id=F.CLIENT)
+        F.member_refresh(c)
+        context=F.case()["target_context"]
+        context.update(run_id=c["request"]["run_id"],snapshot_payload_sha256=snapshot["payload_digest"])
+        module=F.load("native_member_menu_producer","on_demand_w6.py")
+        producer=module.MemberAnalysisReportProducer(c["request"],c["result"],
+            source_id="SYNTHETIC_NATIVE_MEMBER_REPORT",rules_sha="e"*64,
+            approved_target=c["request"]["confirmed_target"],target_context=context)
+        inputs=producer(source,{})
+        current=F.D.build_w6_current_data(source,**inputs)
+        self.assertEqual(current["source_digest"],source["digest"])
+        self.assertEqual(source["current_confirmed_target_details"],[])
+        self.assertEqual(len(current["target"]),3)
+        transfer=inputs["engine"]["report_sources"]["approved_target_transfer"]
+        self.assertEqual(transfer["receipt"]["payload"],c["request"]["confirmed_target"])
+        transfer["context"]["source_db_sha256"]="f"*64
+        binding=inputs["engine"]["report_sources"]
+        binding["digest"]=F.A.digest({k:v for k,v in binding.items() if k!="digest"})
+        with self.assertRaisesRegex(ValueError,"W6_MEMBER_TARGET_TRANSFER"):
+            F.D.build_w6_current_data(source,**inputs)
+
+
 if __name__ == "__main__": unittest.main()

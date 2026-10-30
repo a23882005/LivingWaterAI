@@ -5,6 +5,7 @@ HTML/PDF/XLSX renderer. It requires current source-backed valuations and a
 verified W5/Mentor same-run output. It never reads old Joseph report_data.
 """
 from decimal import Decimal, InvalidOperation
+from copy import deepcopy
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -59,16 +60,21 @@ def build_w6_current_data(source, market, engine):
         raise ValueError("W6_VERIFIED_MARKET_AND_ENGINE_REQUIRED")
     adapter=_adapter()
     prepared=adapter.prepare_report_sources(source,market,engine)
+    member_review=(prepared is not None and prepared["scope"]=="SOURCE_REVIEW"
+                   and prepared["lineage"].get("member_analysis") is not None)
+    unknown_nav=(member_review and market.get("valuation_state")=="UNKNOWN"
+                 and market.get("verified") is False
+                 and market.get("market_as_of_basis")=="SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION")
     client=source["client_id"]
     same=(market.get("client_id")==engine.get("client_id")==client
           and market.get("source_db_sha256")==engine.get("source_db_sha256")==source["source_db_sha256"]
           and market.get("run_id")==engine.get("run_id")
           and (engine.get("status")=="OK" or (prepared is not None
                and prepared["scope"]=="SOURCE_REVIEW"
-               and engine.get("status") in ("DATA_UNAVAILABLE","REJECTED","BLOCKED","INVALID_INPUT","ERROR")))
+               and engine.get("status") in ("DATA_UNAVAILABLE","REJECTED","BLOCKED","INVALID_INPUT","ERROR","ANALYSIS_PARTIAL")))
           and engine.get("data_provenance")=="SOURCE_BACKED"
           and market.get("data_provenance")=="SOURCE_BACKED"
-          and market.get("verified") is True
+          and (market.get("verified") is True or unknown_nav)
           and engine.get("trade_authorization","NONE")=="NONE")
     if not same:
         raise PermissionError("W6_SAME_CLIENT_DB_AND_ENGINE_REQUIRED")
@@ -96,6 +102,35 @@ def build_w6_current_data(source, market, engine):
     allocations=target[0].get("allocations",[]) if target else []
     if target and (not allocations or sum(int(x["weight_units"]) for x in allocations)!=1000000):
         raise ValueError("W6_FINAL_TARGET_NOT_COMPLETE")
+    if unknown_nav:
+        # No inferred NAV, zero holdings, FX, target amounts, or drift. The
+        # original partial result remains separate from the dated DB facts.
+        rows=[]
+        for row in allocations:
+            units=row.get("weight_units")
+            if type(units) is not int or units<=0 or not row.get("ticker"):
+                raise ValueError("W6_TARGET_WEIGHT_INVALID")
+            rows.append({"代碼":row["ticker"],"顯示名稱":row.get("label") or row["ticker"],
+                         "權重":str(Decimal(units)/Decimal(1000000)),"市值TWD":None})
+        if len({x["代碼"] for x in rows})!=len(rows):
+            raise ValueError("W6_DUPLICATE_TARGET_SYMBOL")
+        out={"schema_version":"Family.W8.W6CurrentData.v1",
+             "client_id":client,"member_alias":source["member_alias"],
+             "source_db_sha256":source["source_db_sha256"],"source_digest":source["digest"],
+             "run_id":engine["run_id"],"market_as_of":market["market_as_of"],
+             "market_as_of_label":"來源查核時點（市值尚未核實）",
+             "evaluation_at":engine["evaluation_at"],"current_total_twd":None,
+             "current_value_state":"UNKNOWN","actual":[],"target":rows,"drift":[],
+             "source_position_records":deepcopy(source.get("actual_position_records",[])),
+             "engine_result_sha256":_sha(engine),"approved_radar":prepared["radar"],
+             "verified_sections":prepared["sections"],"report_source_lineage":prepared["lineage"],
+             "target_key":target[0]["target_key"] if target else None,
+             "target_version":target[0]["version_no"] if target else None,
+             "report_scope":"SOURCE_REVIEW","data_provenance":"SOURCE_BACKED",
+             "report_content_state":"SOURCE_REVIEW_READY__VALUATION_AND_FINANCIAL_PIPELINE_UNKNOWN",
+             "trade_authorization":"NONE"}
+        out["digest"]=_sha(out)
+        return out
     positions=source.get("actual_position_records",[])
     valuations=market.get("position_values_twd")
     if not isinstance(valuations,list):

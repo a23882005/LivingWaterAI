@@ -168,3 +168,52 @@ def refresh(c, *, scope="CANONICAL_CALCULATION", result=True, c7=True):
 def current(c=None):
     c = c or case()
     return D.build_w6_current_data(c["source"], c["market"], c["engine"])
+
+
+def member_case():
+    c=case();snapshot=deepcopy(c["snapshot"])
+    snapshot["tables"]["final_target_version"]=[{"client_id":CLIENT,"target_key":"MAIN",
+        "version_no":7,"lifecycle_state":"CONFIRMED","completeness_state":"COMPLETE",
+        "confirmed_at_utc":"2026-09-01T00:00:00Z","confirmation_source_ref":"SYNTHETIC_APPROVAL"}]
+    snapshot["tables"]["final_target_allocation"]=[{"client_id":CLIENT,"target_key":"MAIN",
+        "version_no":7,"instrument_key":x,"weight_units":w,"allocation_state":"ACCEPTED"}
+        for x,w in (("KEEP",400000),("BOTH",400000),("NEW",200000))]
+    snapshot["payload_digest"]=A.digest(snapshot["tables"])
+    source=S.build_report_source(snapshot,account="AR",expected_client_id=CLIENT)
+    owner={"client_id":CLIENT,"scope":"ALL_MEMBER_ACCOUNTS",
+           "broker":None,"account":None,"currency":None,"funding_domain":None}
+    request={"schema_version":"Family.W8.MemberV82Request.v1","client_id":CLIENT,
+        "run_id":"synthetic-member-review","evaluation_at":AT,"owner":owner,
+        "trade_authorization":"NONE","client_snapshot":{"payload":snapshot},
+        "confirmed_target":{**deepcopy(c["request"]["confirmed_target"]),
+                            "original_confirmation":{"target_key":"MAIN"}}}
+    rows=[{"instrument_id":symbol,"symbol":symbol,"owner":deepcopy(owner),
+        "proposed_amount":None,"full_native_pipeline_complete":False,"trade_action":"NO_TRADE",
+        "trade_authorization":"NONE","execution_status":"NATIVE_COMPONENTS_COMPUTED",
+        "formal_conclusion":{"status":"INCOMPLETE_REQUIRED_FACTS",
+            "classification":{"primary_class":"合成研究類別"},"binding":{
+                "client_id":CLIENT,"run_id":request["run_id"],"owner":deepcopy(owner),
+                "source_db_sha256":source["source_db_sha256"]}}}
+        for symbol in ("KEEP","BOTH","NEW")]
+    result={"schema_version":"Family.W8.MemberV82Analysis.v1","status":"ANALYSIS_PARTIAL",
+        "client_id":CLIENT,"run_id":request["run_id"],"evaluation_at":AT,
+        "source_db_sha256":source["source_db_sha256"],"universe":{"client_id":CLIENT,
+            "source_db_sha256":source["source_db_sha256"],"expected_count":len(rows),
+            "assets":[{"symbol":r["symbol"]} for r in rows]},"positions":rows,
+        "summary":{"tested":len(rows)},"canonical_result":None,"mentor":None,
+        "full_native_pipeline_complete":False,"full_native_mentor_reached":False,
+        "database_written":False,"trade_action":"NO_TRADE","trade_authorization":"NONE"}
+    c={"source":source,"request":request,"result":result}
+    member_refresh(c)
+    return c
+
+
+def member_refresh(c):
+    r=c["result"];r["request_digest"]=A.digest(c["request"])
+    for row in r["positions"]:
+        if row.get("formal_conclusion") is not None:
+            row["formal_conclusion"]["binding"]["request_digest"]=r["request_digest"]
+        row["result_digest"]=A.digest({k:v for k,v in row.items() if k!="result_digest"})
+    universe=r["universe"]
+    universe["universe_digest"]=A.digest({k:v for k,v in universe.items() if k!="universe_digest"})
+    r["report_digest"]=A.digest({k:v for k,v in r.items() if k not in ("report_digest","source_sha256")})

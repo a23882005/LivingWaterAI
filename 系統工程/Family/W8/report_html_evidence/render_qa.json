@@ -10,6 +10,7 @@
     "all_pages_static_zip_png_pixel_equal": "PASS",
     "canonical_current_render_staging_mock_receipts_readbacks": "PASS_MOCK_ONLY_NO_DRIVE_WRITE",
     "mobile_offline_data_uri_toc_arrows_tap_multitouch": "PASS",
+    "partial_native_member_unknown_nav_and_original_facts": "PASS_SYNTHETIC",
     "partial_review_unknown_target_drift_radar_sections_14_chapters": "PASS",
     "pdf_identity_dates_values_and_page_count": "PASS",
     "offline_static_body_14_chapters_13_toc_links": "PASS",

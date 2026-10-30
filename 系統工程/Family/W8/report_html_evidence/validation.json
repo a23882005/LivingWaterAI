@@ -1,21 +1,21 @@
 {
-  "scope": "SYNTHETIC_REPORT_INCREMENT_ONLY",
+  "scope": "SYNTHETIC_PR60_CONTINUATION_ONLY__REAL_EVIDENCE_IS_PRIVATE",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
-  "reference_pr59_head": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "reference_pr59_head": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
   "tests": {
     "name": "pytest",
     "errors": "0",
     "failures": "0",
     "skipped": "0",
-    "tests": "292",
-    "time": "26.635",
-    "timestamp": "2026-10-30T00:50:40.612869+00:00",
+    "tests": "320",
+    "time": "34.279",
+    "timestamp": "2026-10-30T04:16:30.969314+00:00",
     "hostname": "d2e5cd18e5f8"
   },
-  "pytest_summary": "241 passed, 1 warning, 51 subtests passed in 26.63s",
-  "browser_tests": 7,
-  "canonical_contract_tests": 25,
-  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=/workspace/report-node-deps/node_modules PYTHONPATH=/workspace/report-test-deps:/workspace/LivingWaterAI/系統工程/Family/W8:/workspace/LivingWaterAI/系統工程/Family/W5:/workspace/LivingWaterAI/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=/workspace/w6-approved.zip REPORT_HTML_EVIDENCE_DIR=/workspace/report-evidence python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --junitxml=/workspace/report-evidence/junit.xml",
+  "pytest_summary": "255 passed, 1 warning, 65 subtests passed in 34.28s",
+  "browser_tests": 8,
+  "canonical_contract_tests": 35,
+  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=/workspace/report-node-deps/node_modules PYTHONPATH=/workspace/report-test-deps:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W8:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W5:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=/workspace/w6-approved.zip REPORT_HTML_EVIDENCE_DIR=/workspace/report-resume-20261030/final-synthetic python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --junitxml=/workspace/report-resume-20261030/final-synthetic/junit.xml",
   "runtime_dependencies": {
     "pytest": "9.2.0",
     "jsdom": "26.1.0",
@@ -36,11 +36,34 @@
   "shared_checkpoint_changed": false,
   "direct_file_navigation": "NOT_VERIFIED: managed Chromium blocks file:// (ERR_BLOCKED_BY_ADMINISTRATOR); exact saved bytes loaded with set_content, no paginator injected",
   "environment_setup": "Initial broad collection needed the repository PYTHONPATH; pytest and original CI jsdom were installed outside the repo. First browser attempt hit managed file policy; final tests use saved bytes without paginator injection. No test failures or skips remain in final suite.",
-  "pytest_methods_passed": 241,
-  "pytest_subtests_passed": 51,
+  "pytest_methods_passed": 255,
+  "pytest_subtests_passed": 65,
   "junit_records_include_subtests": true,
   "original_work9_mentor_shape_test": "PASS_ORIGINAL_NORMALIZER_AND_MENTOR_ON_PUBLIC_SYNTHETIC_GOLDEN",
   "visible_original_section_asof": "PASS_ALL_EIGHT_GROUPS",
-  "external_artifact_export": "AUTO_REVIEW_REJECTED_REPORT_DERIVED_IMAGE_UPLOAD_TO_GITHUB; raw visual/HTML/PDF/ZIP retained only in workspace handoff; Git PR contains source and synthetic text QA",
-  "github_publication": "BLOCKED_BY_AUTO_REVIEW_AFTER_REPO_AND_PUBLIC_BASELINE_VERIFICATION; no remote branch or Draft PR created"
+  "external_artifact_export": "PRIVATE_DRIVE_ONLY__NO_RAW_REPORT_IMAGE_PDF_HTML_ZIP_IN_PUBLIC_PR",
+  "github_publication": "ORIGINAL_16_FILES_PUBLISHED_BY_PM_AS_b6a146b__CONTINUATION_ON_PR60",
+  "original_stage": {
+    "pytest_summary": "241 passed, 1 warning, 51 subtests passed in 26.63s",
+    "browser_tests": 7,
+    "canonical_contract_tests": 25,
+    "tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "292",
+      "time": "26.635",
+      "timestamp": "2026-10-30T00:50:40.612869+00:00",
+      "hostname": "d2e5cd18e5f8"
+    }
+  },
+  "continuation_private_execution": {
+    "status": "FOUR_SOURCE_REVIEW_REPORTS_ARCHIVED_AND_READBACK_VERIFIED",
+    "raw_evidence": "PRIVATE_DRIVE_ONLY",
+    "financial_or_independent_PM_acceptance": "NOT_ASSERTED",
+    "project_end_user_login_uat": "NOT_RUN",
+    "private_db_writes": 0
+  },
+  "public_junit_deidentification": "Two existing public-baseline fixture labels replace the client identifier with BASELINE_CLIENT_REDACTED; original JUnit remains unchanged in private evidence"
 }

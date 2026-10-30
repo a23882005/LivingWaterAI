@@ -35,6 +35,10 @@ class RenderedHTMLTests(unittest.TestCase):
         partial = F.case(); partial["sections"] = {}; partial["target_context"] = None
         F.refresh(partial, scope="SOURCE_REVIEW", result=False, c7=False)
         cls.partial = F.R.render_current_w6(F.current(partial), archive)
+        member=F.member_case()
+        inputs=F.A.make_member_review_inputs(member["source"],member["request"],member["result"],
+            source_id="SYNTHETIC_NATIVE_MEMBER_REPORT",rules_sha="e"*64)
+        cls.member=F.R.render_current_w6(F.D.build_w6_current_data(member["source"],**inputs),archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:
@@ -60,6 +64,20 @@ class RenderedHTMLTests(unittest.TestCase):
             for name, raw in cls.rendered["artifacts"].items(): (target / name).write_bytes(raw)
             (target / "current.synthetic.json").write_text(json.dumps(cls.current, ensure_ascii=False, indent=2), encoding="utf-8")
             (target / "render_qa.json").write_text(json.dumps(cls.receipt, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def test_native_member_review_renders_unknown_nav_and_source_dated_holdings(self):
+        page=self.context(java_script_enabled=False).new_page()
+        page.set_content(self.member["artifacts"]["report.html"].decode())
+        body=page.locator("body").inner_text()
+        self.assertIn("UNKNOWN；尚未取得完整同輪市值",body)
+        self.assertIn("來源查核時點（市值尚未核實）",body)
+        self.assertIn("已記錄數量",body)
+        self.assertIn("2026-10-29T20:00:00Z",body)
+        self.assertIn("合成研究類別",body)
+        self.assertEqual(page.locator("#toc a").count(),13)
+        self.assertEqual(len(set(page.locator("[data-chapter]").evaluate_all(
+            "nodes=>nodes.map(n=>n.dataset.chapter)"))),14)
+        self.receipt["checks"]["partial_native_member_unknown_nav_and_original_facts"]="PASS_SYNTHETIC"
 
     def context(self, **kwargs):
         context = self.browser.new_context(**kwargs)

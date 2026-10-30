@@ -1,6 +1,6 @@
 {
-  "allowlist": "PASS",
-  "changed_files": [
+  "allowlist": "PASS_PR60_CONTINUATION_CONTRACT",
+  "original_16_files": [
     "系統工程/Family/W8/Report_HTML_Checkpoint.json",
     "系統工程/Family/W8/Report_HTML_Contract_20261030.md",
     "系統工程/Family/W8/formal_report_source.py",
@@ -13,6 +13,32 @@
     "系統工程/Family/W8/report_html_evidence/source_versions.json",
     "系統工程/Family/W8/report_html_evidence/validation.json",
     "系統工程/Family/W8/tests/fixtures/report_html/synthetic.py",
+    "系統工程/Family/W8/tests/test_report_canonical_adapter.py",
+    "系統工程/Family/W8/tests/test_report_rendered_html.py",
+    "系統工程/Family/W8/w6_current_data.py",
+    "系統工程/Family/W8/w6_member_render.py"
+  ],
+  "added_allowed_producer_delivery_and_test_files": [
+    "系統工程/Family/W8/on_demand_w6.py",
+    "系統工程/Family/W8/on_demand_report_delivery.py",
+    "系統工程/Family/W8/tests/test_on_demand_w6.py"
+  ],
+  "changed_files": [
+    "系統工程/Family/W8/Report_HTML_Checkpoint.json",
+    "系統工程/Family/W8/Report_HTML_Contract_20261030.md",
+    "系統工程/Family/W8/formal_report_source.py",
+    "系統工程/Family/W8/on_demand_report_delivery.py",
+    "系統工程/Family/W8/on_demand_w6.py",
+    "系統工程/Family/W8/report_canonical_adapter.py",
+    "系統工程/Family/W8/report_html_evidence/README.md",
+    "系統工程/Family/W8/report_html_evidence/artifact_hashes.json",
+    "系統工程/Family/W8/report_html_evidence/changed_files.json",
+    "系統工程/Family/W8/report_html_evidence/junit.xml",
+    "系統工程/Family/W8/report_html_evidence/render_qa.json",
+    "系統工程/Family/W8/report_html_evidence/source_versions.json",
+    "系統工程/Family/W8/report_html_evidence/validation.json",
+    "系統工程/Family/W8/tests/fixtures/report_html/synthetic.py",
+    "系統工程/Family/W8/tests/test_on_demand_w6.py",
     "系統工程/Family/W8/tests/test_report_canonical_adapter.py",
     "系統工程/Family/W8/tests/test_report_rendered_html.py",
     "系統工程/Family/W8/w6_current_data.py",

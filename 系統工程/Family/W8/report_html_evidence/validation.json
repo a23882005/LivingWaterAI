@@ -1,0 +1,46 @@
+{
+  "scope": "SYNTHETIC_REPORT_INCREMENT_ONLY",
+  "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+  "reference_pr59_head": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "292",
+    "time": "26.635",
+    "timestamp": "2026-10-30T00:50:40.612869+00:00",
+    "hostname": "d2e5cd18e5f8"
+  },
+  "pytest_summary": "241 passed, 1 warning, 51 subtests passed in 26.63s",
+  "browser_tests": 7,
+  "canonical_contract_tests": 25,
+  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=/workspace/report-node-deps/node_modules PYTHONPATH=/workspace/report-test-deps:/workspace/LivingWaterAI/系統工程/Family/W8:/workspace/LivingWaterAI/系統工程/Family/W5:/workspace/LivingWaterAI/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=/workspace/w6-approved.zip REPORT_HTML_EVIDENCE_DIR=/workspace/report-evidence python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --junitxml=/workspace/report-evidence/junit.xml",
+  "runtime_dependencies": {
+    "pytest": "9.2.0",
+    "jsdom": "26.1.0",
+    "chromium": "154.0.8037.57"
+  },
+  "approved_zip_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "approved_source_asset_sha256": {
+    "sources/rebuild/src_v16/report.mjs": "7380f5e583cedcc24f550f9183c1f3e1445c2702e847111daa309647a8e77348",
+    "sources/rebuild/mother.html": "c754f2b745fa8fa96a983387aaeac343dad017eb747eff349c8a6ec3339bf537",
+    "assets/cover_reference.jpg": "ca319bc06a965d7d62751e7bb4c617860e31ef5848a2c5c06bb591b69b7d82a5",
+    "assets/header_reference.jpg": "1c218ae48088a24aa9cd5cebd70a366ce94b13f04dcbe7d17169b7427f21f4a7"
+  },
+  "git_diff_check": "PASS",
+  "compile_changed_python": "PASS",
+  "private_data_used": false,
+  "actual_drive_uploads": 0,
+  "financial_engines_run_by_new_fixture": false,
+  "shared_checkpoint_changed": false,
+  "direct_file_navigation": "NOT_VERIFIED: managed Chromium blocks file:// (ERR_BLOCKED_BY_ADMINISTRATOR); exact saved bytes loaded with set_content, no paginator injected",
+  "environment_setup": "Initial broad collection needed the repository PYTHONPATH; pytest and original CI jsdom were installed outside the repo. First browser attempt hit managed file policy; final tests use saved bytes without paginator injection. No test failures or skips remain in final suite.",
+  "pytest_methods_passed": 241,
+  "pytest_subtests_passed": 51,
+  "junit_records_include_subtests": true,
+  "original_work9_mentor_shape_test": "PASS_ORIGINAL_NORMALIZER_AND_MENTOR_ON_PUBLIC_SYNTHETIC_GOLDEN",
+  "visible_original_section_asof": "PASS_ALL_EIGHT_GROUPS",
+  "external_artifact_export": "AUTO_REVIEW_REJECTED_REPORT_DERIVED_IMAGE_UPLOAD_TO_GITHUB; raw visual/HTML/PDF/ZIP retained only in workspace handoff; Git PR contains source and synthetic text QA",
+  "github_publication": "BLOCKED_BY_AUTO_REVIEW_AFTER_REPO_AND_PUBLIC_BASELINE_VERIFICATION; no remote branch or Draft PR created"
+}

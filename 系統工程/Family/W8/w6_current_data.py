@@ -8,6 +8,15 @@ from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
+import importlib.util
+from pathlib import Path
+
+
+def _adapter():
+    spec=importlib.util.spec_from_file_location("family_w8_canonical_report",
+                                               Path(__file__).with_name("report_canonical_adapter.py"))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
 
 def _number(value, code):
     if value is None or isinstance(value,bool):
@@ -48,11 +57,15 @@ def build_w6_current_data(source, market, engine):
         raise ValueError("W6_VERIFIED_REPORT_SOURCE_REQUIRED")
     if not isinstance(market,dict) or not isinstance(engine,dict):
         raise ValueError("W6_VERIFIED_MARKET_AND_ENGINE_REQUIRED")
+    adapter=_adapter()
+    prepared=adapter.prepare_report_sources(source,market,engine)
     client=source["client_id"]
     same=(market.get("client_id")==engine.get("client_id")==client
           and market.get("source_db_sha256")==engine.get("source_db_sha256")==source["source_db_sha256"]
           and market.get("run_id")==engine.get("run_id")
-          and engine.get("status")=="OK"
+          and (engine.get("status")=="OK" or (prepared is not None
+               and prepared["scope"]=="SOURCE_REVIEW"
+               and engine.get("status") in ("DATA_UNAVAILABLE","REJECTED","BLOCKED","INVALID_INPUT","ERROR")))
           and engine.get("data_provenance")=="SOURCE_BACKED"
           and market.get("data_provenance")=="SOURCE_BACKED"
           and market.get("verified") is True
@@ -67,7 +80,7 @@ def build_w6_current_data(source, market, engine):
     # Lilian, for example, uses LONG_TERM, not the provisional MAIN name.
     # Never silently take the first or an older confirmed target when there
     # are multiple distinct confirmed target purposes.
-    targets=source.get("current_confirmed_target_details",[])
+    targets=(prepared or {}).get("targets",source.get("current_confirmed_target_details",[]))
     if not isinstance(targets,list):
         raise ValueError("W6_FINAL_TARGET_NOT_CONFIRMED")
     key=market.get("confirmed_target_key")
@@ -75,12 +88,13 @@ def build_w6_current_data(source, market, engine):
         raise ValueError("W6_TARGET_KEY_INVALID")
     target=[x for x in targets if isinstance(x,dict)
             and (key is None or x.get("target_key")==key)]
-    if not target:
+    partial=prepared is not None and prepared["scope"]=="SOURCE_REVIEW"
+    if not target and not partial:
         raise ValueError("W6_FINAL_TARGET_NOT_CONFIRMED")
-    if len(target)!=1:
+    if len(target)>1:
         raise ValueError("W6_MULTIPLE_CONFIRMED_TARGETS_REQUIRE_KEY")
-    allocations=target[0].get("allocations",[])
-    if not allocations or sum(int(x["weight_units"]) for x in allocations)!=1000000:
+    allocations=target[0].get("allocations",[]) if target else []
+    if target and (not allocations or sum(int(x["weight_units"]) for x in allocations)!=1000000):
         raise ValueError("W6_FINAL_TARGET_NOT_COMPLETE")
     positions=source.get("actual_position_records",[])
     valuations=market.get("position_values_twd")
@@ -155,7 +169,8 @@ def build_w6_current_data(source, market, engine):
             for code,row in sorted(current.items(),
                                    key=lambda kv:(-kv[1]["市值TWD"],kv[0]))]
     target_rows=[]
-    for row in allocations:
+    canonical=(prepared or {}).get("canonical")
+    for row in ([] if canonical else allocations):
         units=row["weight_units"]
         if type(units) is not int or units<=0:
             raise ValueError("W6_TARGET_WEIGHT_INVALID")
@@ -169,7 +184,7 @@ def build_w6_current_data(source, market, engine):
         raise ValueError("W6_DUPLICATE_TARGET_SYMBOL")
     target_map={x["代碼"]:x for x in target_rows}
     drift=[]
-    for code in sorted(set(current)|set(target_map)):
+    for code in ([] if canonical or not target_rows else sorted(set(current)|set(target_map))):
         cv=current.get(code,{}).get("市值TWD",Decimal(0))
         tv=Decimal(target_map[code]["市值TWD"]) if code in target_map else Decimal(0)
         drift.append({"標的":code,"實際金額TWD":str(cv),"目標金額TWD":str(tv),
@@ -190,10 +205,22 @@ def build_w6_current_data(source, market, engine):
         # Four-panel six-stage radar belongs to approved C/Mentor output only.
         "approved_radar":engine.get("approved_report_radar"),
         "verified_sections":engine.get("approved_w6_section_content"),
-        "target_key":target[0]["target_key"],
-        "target_version":target[0]["version_no"],
+        "target_key":target[0]["target_key"] if target else None,
+        "target_version":target[0]["version_no"] if target else None,
+        "report_scope":"DB_TARGET_SOURCE_REVIEW",
         "data_provenance":"SOURCE_BACKED",
-        "report_content_state":"CALCULATION_READY__W6_RENDER_AND_QA_REQUIRED",
+        "report_content_state":"SOURCE_REVIEW_READY__W6_RENDER_AND_QA_REQUIRED",
         "trade_authorization":"NONE"}
+    if prepared is not None:
+        out["report_scope"]=prepared["scope"]
+        out["approved_radar"]=prepared["radar"]
+        out["verified_sections"]=prepared["sections"]
+        out["report_source_lineage"]=prepared["lineage"]
+        display=adapter.canonical_display(prepared,actual,total,market)
+        if display is not None:
+            out.update(display)
+            out["canonical_final_target_id"]=canonical["final"]["allocation_id"]
+        if prepared["scope"]=="CANONICAL_CALCULATION":
+            out["report_content_state"]="CALCULATION_READY__W6_RENDER_AND_QA_REQUIRED"
     out["digest"]=_sha(out)
     return out

@@ -8,6 +8,8 @@ from collections import defaultdict
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import json
+import importlib.util
+from pathlib import Path
 
 
 def _digest(value):
@@ -173,7 +175,8 @@ def _confirmed_target_details(tables):
     return [latest[key] for key in sorted(latest)]
 
 
-def build_report_source(snapshot, *, account, expected_client_id):
+def build_report_source(snapshot, *, account, expected_client_id,
+                        approved_target=None, target_context=None):
     if not isinstance(snapshot,dict) or snapshot.get("schema_version")!="Family.W5.W1Snapshot.v1":
         raise ValueError("VERIFIED_W5_SNAPSHOT_REQUIRED")
     if snapshot.get("client_id")!=expected_client_id or not isinstance(expected_client_id,str):
@@ -221,6 +224,9 @@ def build_report_source(snapshot, *, account, expected_client_id):
             "client_id":expected_client_id,"member_alias":family[account],
             "source_db_sha256":snapshot.get("source_sha256"),
             "snapshot_payload_sha256":snapshot.get("payload_digest"),
+            "source_account_keys":sorted(x["account_key"] for x in tables.get("portfolio_account", [])),
+            "source_instruments":[dict(x) for x in tables.get("portfolio_instrument", [])],
+            "confirmed_target_versions":[dict(x) for x in versions],
             "report_scope":"AUTHENTICATED_HISTORICAL_OR_REPORTED_INPUT",
             "actual_position_records":positions,
             "actual_user_evidence":actual,
@@ -235,5 +241,15 @@ def build_report_source(snapshot, *, account, expected_client_id):
                 "deployable_cash_certified":False,
                 "w6_v16_renderer_data_complete":False},
             "trade_authorization":"NONE"}
+    if approved_target is not None or target_context is not None:
+        if snapshot.get("payload_digest")!=_digest(tables):
+            raise ValueError("W6_EXTERNAL_TARGET_SNAPSHOT_DIGEST")
+        spec=importlib.util.spec_from_file_location("family_w8_report_target_adapter",
+                                                   Path(__file__).with_name("report_canonical_adapter.py"))
+        adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
+        source["current_confirmed_target_details"],receipt=adapter.resolve_targets(
+            source,approved_target,target_context)
+        source["external_target_receipt"]=receipt
+        source["reporting_flags"]["confirmed_target_available"]=bool(source["current_confirmed_target_details"])
     source["digest"]=_digest(source)
     return source

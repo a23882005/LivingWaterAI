@@ -1,0 +1,12 @@
+{
+  "base": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+  "baseline_git_blobs": {
+    "formal_report_source.py": "8c7dde6d3582119a7fc56250d357af29536b5cda",
+    "w6_current_data.py": "e14010dcb44efdf5af0e818db6055ec865abf7ba",
+    "w6_member_render.py": "82fced51f2b51e4ecc50a3a2235900df99bdcd92",
+    "on_demand_w6.py": "95df26177eb1d065e2e1d0bc5aca090edff3ba68",
+    "Checkpoint.json": "a42f21a637bb8ca60d1bfab2c513087d3396d6de"
+  },
+  "reference_pr59": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e"
+}

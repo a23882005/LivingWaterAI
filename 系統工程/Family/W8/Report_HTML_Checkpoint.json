@@ -1,0 +1,88 @@
+{
+  "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
+  "date": "2026-10-30",
+  "status": "ISOLATED_IMPLEMENTATION_AND_QA_COMPLETE__GITHUB_EXPORT_APPROVAL_REQUIRED",
+  "branch": "family/report-canonical-html-20261030",
+  "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+  "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
+  "reference_pr59_head": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "implementation_commit": "95f2461cfe00080c31303699aedd3837b346dec2",
+  "draft_pr_url": null,
+  "scope": [
+    "C_FINAL_TARGET_DRIFT_PROTECTION_DISPLAY",
+    "APPROVED_TARGET_RADAR_SECTION_SOURCE_BINDING",
+    "PERSIST_PAGINATED_REPORT_HTML"
+  ],
+  "changes": [
+    "formal_report_source.py",
+    "w6_current_data.py",
+    "w6_member_render.py",
+    "report_canonical_adapter.py",
+    "tests/test_report_canonical_adapter.py",
+    "tests/test_report_rendered_html.py",
+    "tests/fixtures/report_html/synthetic.py",
+    "Report_HTML_Contract_20261030.md",
+    "Report_HTML_Checkpoint.json",
+    "report_html_evidence/ (synthetic text evidence only)"
+  ],
+  "validation": {
+    "pytest_passed": 241,
+    "subtests_passed": 51,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "canonical_contract_tests": 25,
+    "real_browser_tests": 7,
+    "physical_pages": 16,
+    "chapters": 14,
+    "all_static_pages_equal_zip_png": true,
+    "mock_staging_readbacks_manifest": "PASS_MOCK_ONLY",
+    "direct_file_open": "NOT_VERIFIED__MANAGED_CHROMIUM_FILE_URL_POLICY",
+    "git_diff_check": "PASS",
+    "compile": "PASS",
+    "original_work9_mentor_shape_test": "PASS_PUBLIC_SYNTHETIC_GOLDEN"
+  },
+  "approved_zip_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "preserved": {
+    "w6_engineering_gate": "PASS_WITH_DECLARED_SOURCE_GAPS",
+    "visual_version": "v16",
+    "engineering_ruling": "v16.4",
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "private_db_writes": 0,
+    "real_drive_uploads": 0,
+    "shared_checkpoint_modified": false,
+    "pr59_merged_into_branch": false
+  },
+  "evidence": "report_html_evidence/README.md",
+  "remaining_dependencies": [
+    "Middle PM selects the official compatible upstream revision and trusted producer sidecar injection",
+    "Middle PM identifies named producers and original envelopes for eight prose groups; missing groups remain UNKNOWN",
+    "Original PR59 owner retains C7/V70, V82, shared funding and cycle work",
+    "Middle PM performs authorized real-client integration, direct file open, Drive upload/readback and manifest acceptance"
+  ],
+  "next_responsible_owner": "Family中PM",
+  "independent_acceptance": "PENDING",
+  "resume": [
+    "Checkout this draft PR head and read Report_HTML_Contract_20261030.md",
+    "Verify latest main/PR59 and allowed-file overlaps before editing",
+    "Run test_report_canonical_adapter.py on the synthetic fixture",
+    "Provide the exact approved W6 archive and run test_report_rendered_html.py",
+    "Coordinate only the pinned real upstream data with the middle PM; do not modify PR59-owned programs or private DBs"
+  ],
+  "artifact_location": "/workspace/report-evidence",
+  "artifact_upload_status": "AUTO_REVIEW_REJECTED_GITHUB_IMAGE_EXPORT__LOCAL_HANDOFF_AVAILABLE",
+  "github_publication": {
+    "status": "BLOCKED_BY_AUTOMATIC_APPROVAL_REVIEW",
+    "action": "github_create_tree: 16 source/test/document/text-QA files",
+    "repository": "a23882005/LivingWaterAI",
+    "visibility": "public",
+    "stated_reason": "Private source code and QA evidence export lacks explicit authorization to this public destination",
+    "verified_checks": [
+      "Connected a23882005 account has admin/push permission",
+      "Public repo handoff names the exact user-provided Drive package, repository, independent branch and Draft PR",
+      "All 14 package baseline Git blobs match public repo base"
+    ],
+    "next": "Obtain explicit user authorization for this exact 16-file source/text-only export; do not bypass the rejection"
+  }
+}

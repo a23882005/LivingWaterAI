@@ -1,3 +1,13 @@
+## 2026/10/31｜最新兩份回交已完成分段獨立驗收
+
+PR59 `d250d3c`：現金正規化52項定向、151來源鎖、10遠端blob、四戶32檔原producer→Menu04精確重播及8份正式DB/帳本新下載核對通過。PR60 `4319556`：四戶current重建、38＋8項測試（46＋3子案例分列）、13遠端blob、77頁76來源卡PDF全文/邊界及20份正式檔案保存/查閱核對通過。各自同head CI為6組/1組success。
+
+本次PR60驗收限SOURCE_REVIEW資料、靜態排版與保存；PM獨立Chromium/PNG逐像素/窄畫面reader為NOT_RUN，施工者browser證據分列。保留ac1d737與1fe71862原PASS及來源超界CLOSED。
+
+已確認後續整合項 `FAMILY-MENTOR-SCOPE-CONSUMER`：PR59 Mentor建議權限與PR60接收器的 `MENTOR_EXECUTION_SCOPE` 要求需由PM鎖語意後交原Codex對接。完整金融PASS0、真實cycle0、Production HOLD／交易NONE，兩PR Draft未合併。下一步由PM集中核對既有原件/資格、鎖producer/schema並形成整合工單，接續完整金融與報告章節、56項及既定Gate。
+
+詳細裁定：[本輪驗收](W8/查核紀錄/PM_d250_4319556_分段驗收_20261031.md)。下方舊「待獨立驗收」為歷史截點，最新狀態以本段及Checkpoint的pm_incremental_acceptance_20261031為準。
+
 <!-- PM_HANDOFF_20261031_V2 -->
 ## 20261031 中PM總PM交接 v2：最新狀態
 

@@ -2138,7 +2138,7 @@
     "trade_authorization": "NONE"
   },
   "owner_latest_four_DB_reports_request_20261031": {
-    "status": "CODEX_RETURNED_AND_PR60_PUBLISHED__PM_INDEPENDENT_ACCEPTANCE_PENDING",
+    "status": "PM_ACCEPTED_SOURCE_REVIEW_STATIC_DATA_LAYOUT_AND_PERSISTENCE_SEGMENT",
     "owner": "Original report Codex PR60",
     "PM": "Family middle PM",
     "members": [
@@ -2230,5 +2230,70 @@
     "trade_authorization": "NONE",
     "public_submission_block": "PR60 previous rejection historical; latest 4319556 successfully published",
     "scope": "Handoff verification only; no new business delta independently accepted"
+  },
+  "pm_incremental_acceptance_20261031": {
+    "PR59": {
+      "commit": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
+      "verdict": "PASS_W1_NORMALIZATION_AND_SAVED_CUTOFF_MENU04_SEGMENT",
+      "independent_tests": 52,
+      "source_locks": 151,
+      "remote_changed_blobs": 10,
+      "CI_success": 6,
+      "Menu04_exact_replay": {
+        "Joseph": 11,
+        "MOU": 16,
+        "Arthur": 2,
+        "Lilian": 3
+      },
+      "inventory": {
+        "existing_bound": 522,
+        "needs_qualification": 179,
+        "original_not_provided": 404
+      },
+      "fresh_official_DB_ledgers": 8
+    },
+    "PR60": {
+      "commit": "4319556a67f83f1cf3fc754446a2c401335db3e1",
+      "verdict": "PASS_LATEST_DB_SOURCE_REVIEW_STATIC_DATA_LAYOUT_AND_PERSISTENCE_SEGMENT",
+      "independent_tests": [
+        38,
+        8
+      ],
+      "independent_subtests": [
+        46,
+        3
+      ],
+      "remote_changed_blobs": 13,
+      "CI_success": 1,
+      "source_current_reproductions": 4,
+      "pages": [
+        23,
+        23,
+        15,
+        16
+      ],
+      "source_cards": 76,
+      "fresh_official_files": 20,
+      "publication_and_Menu12": "4_OF_4_PASS",
+      "independent_browser": "NOT_RUN_NO_INSTALLED_BROWSER",
+      "prior_layout_defect": "CLOSED"
+    },
+    "integration_issue": {
+      "id": "FAMILY-MENTOR-SCOPE-CONSUMER",
+      "status": "OPEN_CONFIRMED_CROSS_BRANCH_CONTRACT",
+      "producer": "PR59 W5/mentor_bridge.py advice=True broker=False",
+      "consumer": "PR60 W6/runtime/report_receiver.py requires advice=False",
+      "reproduction": "test_actual_original_work9_and_mentor_output_shapes_are_consumed -> MENTOR_EXECUTION_SCOPE",
+      "next": "PM freeze advice/execution semantics and producer/schema contract before original Codex consumer integration"
+    },
+    "full_financial_household_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "PRs": "DRAFT_UNMERGED",
+    "private_evidence": "Google Drive root/TEMP/Family_PM_d250_4319556_分段獨立驗收_20261031.zip",
+    "evidence_sha256": "eaa226f48d673792953390b738f829c04369f6899391d673f634ab23f607f50d",
+    "execution_owner": "Original Codex workers; PM governs, coordinates and independently accepts",
+    "next_owner": "PM consolidates existing originals and prepares precise integration work order; no original Codex session ACK claimed"
   }
 }

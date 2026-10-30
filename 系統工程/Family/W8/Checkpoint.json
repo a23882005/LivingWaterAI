@@ -2063,7 +2063,8 @@
     "PM_owner": "Family中PM：派工、金融版本與章節來源協調、治理與獨立複驗",
     "full_financial_and_end_user_login": "PENDING_SEPARATE_ACCEPTANCE",
     "production": "HOLD",
-    "trade_authorization": "NONE"
+    "trade_authorization": "NONE",
+    "superseding_layout_review": "report_html_layout_PM_reacceptance_20261031; original finding preserved as historical evidence"
   },
   "v82_C7B_PM_acceptance_20261031": {
     "fixed_commit": "6a9dddd15dd19d3e668c20ac0033e1b99f7a6cba",
@@ -2097,5 +2098,43 @@
     "private_PM_package_name": "V82_6a9dddd_中PM獨立驗收與續工契約_20261031.zip",
     "private_package_location": "Google Drive root/TEMP",
     "private_identifiers_omitted": true
+  },
+  "report_html_layout_PM_reacceptance_20261031": {
+    "fixed_commit": "1fe71862d7b3b69b55cd09c9796e7ff26e599e07",
+    "verdict": "PASS_SOURCE_REVIEW_LAYOUT_AND_PERSISTENCE",
+    "defect": "REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW",
+    "defect_status": "CLOSED",
+    "independent_tests": 43,
+    "independent_subtests": 46,
+    "remote_changed_blobs": 12,
+    "package_payloads": 203,
+    "frozen_four_current_objects_exact_equal_previous_PM_baseline": true,
+    "pages": 66,
+    "page_counts": [
+      17,
+      19,
+      15,
+      15
+    ],
+    "source_cards": 60,
+    "valuation_source_cards": 32,
+    "actual_PDF_source_lines_verified": 124,
+    "PDF_card_and_page_bounds": "PASS",
+    "source_full_text_preserved": "PASS",
+    "fresh_remote_artifact_and_manifest_count": 20,
+    "fresh_hashes_private_parent_and_metadata": "PASS",
+    "publication_and_executor_lookup": "4_OF_4_PASS",
+    "contractor_browser_tests": 10,
+    "independent_browser_rerender": "NOT_RUN_CHROMIUM_UNAVAILABLE",
+    "CI_run": 41106158176,
+    "CI_status": "success",
+    "PM_review": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6531741680",
+    "private_PM_package": "Google Drive root/TEMP/Family_Report_HTML_PR60_中PM排版複驗PASS_20261031.zip",
+    "next_owner": "Original V82 Codex PR59: same-run source assembly and financial chain; middle PM: freeze upstream contract/version; original report Codex: subsequent formal envelopes integration",
+    "full_financial_gate": "OPEN",
+    "Project_end_user_login_UAT": "PENDING",
+    "physical_mobile_UAT": "OWNER_DEFERRED",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

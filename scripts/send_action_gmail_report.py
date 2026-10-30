@@ -1,4 +1,4 @@
-# 最後修改日期時間（台灣時間）：2026/10/18 16:46｜版本：V70-3-27 Gmail 通知 v1.7（成功及失敗）｜檔案名稱：send_action_gmail_report.py
+# 最後修改日期（台灣時間）：2026/10/30｜版本：Gmail 通知 v1.8（依實際結論分類）｜檔案名稱：send_action_gmail_report.py
 """Email LivingWaterAI Action outcomes, including failures with QA diagnostics."""
 import argparse
 import csv
@@ -139,7 +139,7 @@ def main():
     run_name = os.environ.get("SOURCE_RUN_NAME", "LivingWaterAI GitHub Actions")
     run_id = os.environ.get("SOURCE_RUN_ID", "unknown")
     run_url = os.environ.get("SOURCE_RUN_URL", "")
-    conclusion = os.environ.get("SOURCE_RUN_CONCLUSION", "success")
+    conclusion = (os.environ.get("SOURCE_RUN_CONCLUSION") or "unknown").strip().lower()
     created = os.environ.get("SOURCE_RUN_CREATED_AT", "")
     updated = os.environ.get("SOURCE_RUN_UPDATED_AT", "")
     def taipei_stamp(value):
@@ -158,9 +158,19 @@ def main():
         f"Run ID：{run_id}",
         f"執行紀錄：{run_url or '未提供'}",
     ]
-    failed = conclusion != "success"
+    subject_label = {
+        "success": "成功摘要",
+        "failure": "🚨失敗警報",
+        "timed_out": "🚨逾時警報",
+        "skipped": "略過通知",
+        "cancelled": "取消通知",
+        "neutral": "中性結果通知",
+        "action_required": "⚠️需要處理",
+        "stale": "⚠️執行狀態過期",
+    }.get(conclusion, "⚠️狀態待確認")
+    failed = conclusion in {"failure", "timed_out"}
     if failed:
-        lines.append("🚨 本次工作流程失敗；正式網站保留最後成功版本。")
+        lines.append("🚨 本次工作流程" + ("逾時。" if conclusion == "timed_out" else "失敗。"))
         qa_files = list(root.rglob("QA.json"))
         if qa_files:
             qa = load_json(qa_files[0]) or {}
@@ -170,11 +180,23 @@ def main():
         else:
             lines.append("未取得 QA.json；請查看 GitHub Actions 執行連結及失敗步驟。")
         lines.extend(["", "修復方向：依失敗步驟排查資料來源／月資料發布日／Hostinger上傳／線上驗證。"])
-    else:
+    elif conclusion == "success":
         if "11h Verified V70.3 Site Deploy" in run_name:
             lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
         lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "", *family_market_lines(), "",
                       "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
+    else:
+        event = os.environ.get("SOURCE_RUN_EVENT", "未提供")
+        branch = os.environ.get("SOURCE_RUN_HEAD_BRANCH", "未提供")
+        lines.extend([f"觸發方式：{event}", f"來源分支：{branch}"])
+        if conclusion == "skipped":
+            lines.append("本次工作流程已略過；請由執行紀錄查看工作條件。")
+            if "11h Verified V70.3 Site Deploy" in run_name and branch not in {"main", "未提供", ""}:
+                lines.append("略過原因：網站部署僅允許 main 主分支執行，本次來源為開發分支，符合部署保護條件。")
+        elif conclusion == "cancelled":
+            lines.append("本次工作流程已取消；請由執行紀錄確認取消時的步驟與部署狀態。")
+        else:
+            lines.append("請由執行紀錄確認此結論及需要處理的事項。")
     report_text = "\n".join(lines)
     print(report_text)
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -184,7 +206,7 @@ def main():
     msg = EmailMessage()
     msg["From"] = "a23882005@gmail.com"
     msg["To"] = "a23882005@gmail.com"
-    msg["Subject"] = f"[LivingWaterAI] {'🚨失敗警報' if failed else '成功摘要'} {start_time[:10]} {run_name}"
+    msg["Subject"] = f"[LivingWaterAI] {subject_label} {start_time[:10]} {run_name}"
     msg.set_content("\n".join(lines))
     archive = Path("action-result-artifact.zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:

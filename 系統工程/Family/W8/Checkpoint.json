@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "接任Family中PM／全專案總PM本人",
-  "next_action": "總PM本人核對正式規則及V70→Work6→C7分類、分母、乾火藥語意與既有調整程序；保留已核准權重與C7檢查。",
+  "next_owner": "原Codex：四戶04整線施工；Family中PM：統一治理及獨立驗收",
+  "next_action": "原Codex依PR59四戶契約接續施工與回交；中PM逐戶獨立驗收。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1791,5 +1791,17 @@
     "git_bundle_full_tree_restore": "PENDING_PRIOR_PACKAGE_BASE",
     "c7": "Approved long-term asset buckets differ from same-run V70 tactical buckets; exact private values retained in Drive governance.",
     "next": "總PM本人核對正式規則及V70→Work6→C7分類、分母、乾火藥語意與既有調整程序；保留已核准權重與C7檢查。"
+  },
+  "owner_four_household_codex_continuation_20261030": {
+    "scope": "Joseph/MOU/Arthur/Lilian Menu04 full integration on one final code commit and separate member-specific sources",
+    "worker": "Original Codex / PR59",
+    "PM": "Family middle PM / total PM: contract, coordination, independent acceptance and governance",
+    "comment_id": 6512785203,
+    "comment_url": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6512785203",
+    "dispatch_status": "FORMAL_PR_INSTRUCTION_POSTED__ORIGINAL_CODEX_CONVERSATION_START_NOT_OBSERVED",
+    "preserved_pass": "52b1326 pending commitment component fix",
+    "overall_acceptance": "PENDING_FOUR_HOUSEHOLD_COMPLETE_FLOW",
+    "next": "原Codex依PR59四戶契約接續施工與回交；中PM逐戶獨立驗收。",
+    "separate_report_html_contract": "PRESERVED"
   }
 }

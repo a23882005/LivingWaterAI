@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-30T00:52:54.704Z",
+  "updated_at": "2026-10-30T04:13:59.397Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原報告Codex：PR60剩餘三項；原V82 Codex：PR59四戶V82重跑；中PM：協調、獨立驗收及治理",
-  "next_action": "報告Codex依PR60最新續工契約完成瀏覽器重跑、四戶真人資料整線及Drive正式保存讀回；V82 Codex完成原四戶測試契約；各線回交同一最終版本逐戶證據後由中PM獨立驗收。",
+  "next_owner": "原V82 Codex：PR59具名來源與金融／ledger接線續工；原報告Codex：PR60三項；中PM：C7契約協調、獨立驗收及治理",
+  "next_action": "保留四戶32檔元件獨立驗收PASS；V82原線依PR59中PM裁決完成具名外部來源、工程接線與正式帳本／完整金融主鏈。中PM協調C7長期目標/當輪天花板契約後裁定，並複驗最終四戶整線；PR60依原獨立契約續工。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1856,5 +1856,71 @@
     "dispatch_status": "CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_NOT_OBSERVED",
     "acceptance": "中PM收到同一最終版本逐戶證據後獨立驗收；尚未整線PASS。",
     "v82_execution_owner": "原V82 Codex，PR59四戶V82重跑維持原契約"
+  },
+  "v82_four_household_PM_acceptance_20261030": {
+    "fixed_commit": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+    "verdict": "PARTIAL_PASS_SOURCE_BOUND_COMPONENTS__FULL_FINANCIAL_CHAIN_PENDING",
+    "review_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6514793947",
+    "members": {
+      "Joseph": {
+        "expected": 11,
+        "component_pass": 11,
+        "full_chain_pass": 0
+      },
+      "MOU": {
+        "expected": 16,
+        "component_pass": 16,
+        "full_chain_pass": 0
+      },
+      "Arthur": {
+        "expected": 2,
+        "component_pass": 2,
+        "full_chain_pass": 0
+      },
+      "Lilian": {
+        "expected": 3,
+        "component_pass": 3,
+        "full_chain_pass": 0
+      }
+    },
+    "independent_PM": {
+      "targeted_tests": 122,
+      "subtests": 8,
+      "menu04_saved_cutoff_replays": 4,
+      "assets_recomputed": 32,
+      "exact_git_blobs": 442,
+      "source_dependency_hashes": 121,
+      "original_package_manifest_files": 268,
+      "restored_paths": 274,
+      "db_integrity_pass": 4,
+      "github_CI_success": 6,
+      "stale_completed_session_rows_at_archived_cutoff": 7
+    },
+    "private_PM_evidence": {
+      "location": "Google Drive root/TEMP",
+      "name": "V82_d8dea45_中PM獨立驗收證據_20261030.zip",
+      "bytes": 17980,
+      "sha256": "77dbc75abd394ea459d9b15e1d73fe8fa1ac73d37e96b41099989d71d0f34f43",
+      "remote_redownload_sha_crc_manifest_pass": true
+    },
+    "formal_financial_result": "ANALYSIS_PARTIAL; canonical_result and final amount null; full Work9/Mentor pending",
+    "next_execution_owner": "原V82 Codex",
+    "PM_owner": "Family中PM：C7契約協調/裁定、版本/共享治理、獨立複驗/Gate",
+    "external_source_work": [
+      "own-history PIT/raw-price/corporate-action/calendar/listing qualification",
+      "safety/credit/events/ETF structure and order/fill evidence",
+      "refresh named stale/incomplete market sources with new runs"
+    ],
+    "engineering_work": [
+      "classification/valuation class and named Waterfall producers",
+      "same-run Work3/C7/Work4/target money/valuation price/FX/funding/execution constraints",
+      "source-bound daily cycle and official Drive ledger persistence/readback",
+      "four-member full amount/cap/MIN/lot/Work9/Mentor integration"
+    ],
+    "C7_contract_status": "PM_COORDINATION_REQUIRED__APPROVED_TARGETS_AND_ORIGINAL_RETURN_RULE_PRESERVED",
+    "construction_start_status": "CONTINUATION_CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_PENDING_OBSERVATION",
+    "report_line": "PR60 continues under separate original report Codex contract",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

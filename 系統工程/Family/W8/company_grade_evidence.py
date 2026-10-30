@@ -58,4 +58,31 @@ def classify(symbol, catalog, rule_text):
                 or Decimal(p['value']) <= 0):
                 raise ValueError('COMPANY_GRADE_COMPARABLE_FINANCIAL_EVIDENCE_REQUIRED')
             ends.add(p['end'])
-    return {'asset_grade': grade, 'grade_evidence': deepcopy(record)}
+    result={'asset_grade': grade, 'grade_evidence': deepcopy(record)}
+    if grade=='B':
+        result['primary_class']='大型成熟／高品質個股'
+        periods=sorted(record['financial_evidence']['net_income']['periods'],key=lambda r:r['end'])
+        values=[Decimal(r['value']) for r in periods]
+        # Classify an already assessed mature, profitable company using its
+        # comparable reported growth. This is a valuation route, not a forward
+        # earnings forecast, thesis clearance or new investment permission.
+        if (all(a<b for a,b in zip(values,values[1:]))
+            and '## 32.10 Profitable Growth Stock' in rule_text
+            and 'Forward P/E → EV/EBITDA → FCF Yield → EV/Sales' in rule_text):
+            result.update(primary_framework='V82.md §32.10 Profitable Growth Stock',
+                valuation_class='PROFITABLE_GROWTH',
+                valuation_waterfall=['FORWARD_PE','EV_EBITDA','FCF_YIELD','EV_SALES'],
+                valuation_rule_source='V82.md §32.6A S / §32.10',
+                framework_evidence={'source_reference':filing['source_url'],'periods':deepcopy(periods),
+                    'basis':'MATURE_PROFITABLE_COMPANY_WITH_COMPARABLE_REPORTED_GROWTH',
+                    'forward_growth_or_current_thesis_inferred':False})
+    if (symbol=='IBKR' and '券商' in record['assessment_rationale']
+        and '## 32.12 Financial Stocks' in rule_text
+        and 'P/TBV → P/B → Forward P/E' in rule_text):
+        result.update(primary_class='大型成熟／高品質個股',
+            primary_framework='V82.md §32.12 Financial Stocks',valuation_class='FINANCIAL',
+            valuation_waterfall=['PTBV','PB','FORWARD_PE'],valuation_rule_source='V82.md §32.6A S / §32.12',
+            framework_evidence={'source_reference':filing['source_url'],
+                'basis':'OFFICIAL_BROKER_BUSINESS_EVIDENCE__FINANCIAL_NOT_INDUSTRIAL',
+                'asset_grade_preserved':grade,'current_credit_safety_inferred':False})
+    return result

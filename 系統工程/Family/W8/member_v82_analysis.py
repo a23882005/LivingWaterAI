@@ -219,18 +219,27 @@ def build_report(request, config, repo_root):
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
         if market:
+            from v82_core_source import read as read_core_source
+            core_source=read_core_source(config.get('core_sources',{}).get(symbol),request,symbol)
             metrics, fundamentals = issuer_inputs(row['issuer_facts'],
                 allowed_metrics=cls.get('valuation_waterfall'))
             row['valuation_observations'] = metrics
+            if request.get('macro_snapshot') is not None:
+                from v10_source_observations import macro_observations,forward_observations
+                row['macro_observations']=macro_observations(request['macro_snapshot'],request['evaluation_at'])
+                forward=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'])
+                metrics,fundamentals=issuer_inputs(row['issuer_facts'],forward,allowed_metrics=cls.get('valuation_waterfall'))
+                row['valuation_observations']=metrics
             kwargs = {'valuation_waterfall': cls['valuation_waterfall']} if 'valuation_waterfall' in cls else {}
             row['core_observation'] = native_core_observation(repo_root, market,
                 valuation_metrics=metrics, fundamental_fields=fundamentals,
-                broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', **kwargs)
+                broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', qualified_core_source=core_source, **kwargs)
+            row['valuation_observations']=deepcopy(row['core_observation']['actual_inputs']['valuation_metrics'])
             if market.get('independent_close_observation'):
                 close = {**market, **market['independent_close_observation']}
                 row['independent_close_core_observation'] = native_core_observation(repo_root, close,
                     valuation_metrics=metrics, fundamental_fields=fundamentals,
-                    broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', **kwargs)
+                    broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', qualified_core_source=core_source, **kwargs)
             row['formal_conclusion'] = build_formal_conclusion(repo_root, row, request,
                 approved_source_descriptor=config.get('approved_sources', {}).get(symbol))
             conclusion = row['formal_conclusion']; analysis = conclusion['approved_v10_analysis']
@@ -313,12 +322,40 @@ class MemberV82SourceProducer:
         from formal_mode_analysis import native
         native(self.root)
         at = datetime.now(timezone.utc).isoformat(); run = 'member-v82-'+uuid.uuid4().hex
+        if self.config.get('run_binding') is not None:
+            binding=self.config['run_binding']
+            if (binding.get('client_id')!=snapshot['client_id'] or not binding.get('run_id')
+                or time(binding['evaluation_at'])>time(at)):
+                raise PermissionError('MEMBER_FINANCIAL_RUN_BINDING_MISMATCH')
+            at=binding['evaluation_at'];run=binding['run_id']
         request = {'schema_version': 'Family.W8.MemberV82Request.v1', 'client_id': snapshot['client_id'],
             'run_id': run, 'evaluation_at': at, 'question': payload['question'],
             'owner': {'client_id': snapshot['client_id'], 'scope': 'ALL_MEMBER_ACCOUNTS',
                 'account': None, 'broker': None, 'currency': None, 'funding_domain': None},
             'client_snapshot': {'payload': deepcopy(snapshot)}, 'trade_authorization': 'NONE'}
         request['confirmed_target'] = target_source(snapshot, self.config, at)
+        if self.config.get('macro_snapshot') is not None:
+            from market_bridge import read_macro_snapshot
+            saved=deepcopy(self.config['macro_snapshot'])
+            source_path=Path(saved['source_path'])
+            if not source_path.is_absolute():source_path=self.root/source_path
+            if sha256(source_path.read_bytes()).hexdigest()!=saved['source_sha256']:
+                raise PermissionError('MEMBER_MACRO_SOURCE_BYTES_CHANGED')
+            from v10_source_observations import checked_payload
+            checked_payload(saved,at)
+            if time(saved['capture_receipt']['captured_at'])>time(at):
+                raise PermissionError('MEMBER_MACRO_CAPTURE_AFTER_EVALUATION')
+            request['macro_snapshot']=saved
+        elif self.config.get('macro_source_enabled') is True:
+            from market_bridge import read_macro_snapshot
+            options={'source':self.config['macro_source']} if self.config.get('macro_source') else {}
+            request['macro_snapshot']=read_macro_snapshot(self.root,source_commit=self.config.get('source_commit'),
+                capture_bound=True,**options)
+            captured=datetime.now(timezone.utc).isoformat()
+            if self.config.get('run_binding') is not None and time(captured)>time(at):
+                raise PermissionError('MEMBER_PINNED_RUN_REQUIRES_PRECAPTURED_MACRO')
+            request['evaluation_at']=captured
+            request['confirmed_target']=target_source(snapshot,self.config,captured)
         report = build_report(request, self.config, self.root)
         return {'request': request, 'trusted_context': {'client_id': snapshot['client_id'],
             'trade_authorization': 'NONE', 'member_v82_config': deepcopy(self.config)},
@@ -337,4 +374,5 @@ class MemberV82Runner:
         expected = build_report(request, self.context['member_v82_config'], self.root)
         if expected != self.report:
             raise PermissionError('MEMBER_V82_NATIVE_SOURCE_REPLAY_MISMATCH')
-        return deepcopy(expected)
+        from member_financial_chain import complete_report
+        return complete_report(expected,request,self.context['member_v82_config'],self.root)

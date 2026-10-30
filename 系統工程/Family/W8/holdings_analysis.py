@@ -352,10 +352,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                     problems.append(issue('market.'+gap.lower(),gap,
                         'Provider cache numerics may be shown; formal exchange/session/deployment attestation is unavailable',source=observed['source_path']))
             problems.extend(signal_gaps(observed))
-            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_BROAD_EQUITY_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE'}:
+            if set(cls.get('analysis_capabilities',[])) & {'V82_GLOBAL_ETF_CORE','V82_BROAD_EQUITY_CORE','V82_QQQ_CORE','V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE','V82_TAIWAN_CORE','V82_US_LARGE_CORE','V82_OWN_BROAD_COMPONENT_CORE'}:
                 issuer=row['issuer_facts']
                 qqq='V82_QQQ_CORE' in cls.get('analysis_capabilities',[])
-                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE')),None)
+                special=next((cap for cap in cls.get('analysis_capabilities',[]) if cap in ('V82_SEMICONDUCTOR_CORE','V82_HEALTHCARE_CORE','V82_INDIVIDUAL_COMPONENT_CORE','V82_DEFENCE_CORE','V82_TAIWAN_CORE','V82_US_LARGE_CORE','V82_OWN_BROAD_COMPONENT_CORE')),None)
                 allowed_metrics=(cls['valuation_waterfall'] if special else
                     ['FORWARD_PE','EV_EBITDA','EV_SALES','FCF_YIELD'] if qqq else None)
                 current_metrics,fundamental_fields=issuer_inputs(issuer,row['valuation_observations'],allowed_metrics=allowed_metrics)
@@ -374,9 +374,13 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 if special:
                     row['native_product_identity']['engine_route']=special
                     waterfall={'valuation_waterfall':deepcopy(cls['valuation_waterfall'])}
+                from v82_core_source import read as read_core_source
+                qualified=read_core_source(getattr(producer,'core_sources',{}).get(symbol),request,symbol)
+                if qualified is not None:waterfall['qualified_core_source']=qualified
                 row['core_observation']=producer.core_observation(observed,
                     valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,
                     broad_etf=cls['asset_type']!='INDIVIDUAL_STOCK',**waterfall)
+                row['valuation_observations']=deepcopy(row['core_observation']['actual_inputs']['valuation_metrics'])
                 row['call_trace'].append('V82.evaluate_core_rule_state')
                 for candidate in row['core_observation']['valuation_path_audit']:
                     for field in candidate['missing_fields']:

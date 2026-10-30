@@ -7,7 +7,8 @@ import json,sqlite3,shutil,sys,unittest
 HERE=Path(__file__).resolve().parents[1];ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
 from on_demand_drive_io import Binding,digest,seal_working_copy
-from v82_ledger_drive import create_resource,inspect_ledger,stage_sync,LedgerWriteback,register_reference,read_reference,resolve_resource,cycle_snapshot
+from v82_ledger_drive import create_resource,inspect_ledger,stage_sync,LedgerWriteback,register_reference,read_reference,resolve_resource,cycle_snapshot,verify_planning_readback
+from family_input import digest as object_digest
 from formal_mode_analysis import native
 native(ROOT)
 from livingwater_v82_runtime.daily_slice import CycleLedgerStore,open_cycle,update_intent,speed,maturity
@@ -99,6 +100,28 @@ class LedgerDriveTests(unittest.TestCase):
         self.assertEqual(cycle_snapshot(resource,owner=self.owner,**args)['cycle'],cycle)
         self.assertIsNone(cycle_snapshot(resource,owner=self.owner,**(args|{'session_id':'2026-11-02'}))['cycle'])
         with self.assertRaises(PermissionError):cycle_snapshot(resource,owner=self.owner|{'client_id':'fam_'+'b'*32},**args)
+
+    def test_delivery_matches_exact_native_request_intent_and_new_remote_bytes(self):
+        self.register();cycle=self.cycle()
+        request={'owner':self.owner,'evaluation_at':'2026-10-30T00:03:00Z','native_bundle':{
+            'stock_evidence':{'approved_v10_context':{'identity':{'asset_id':'SYNTHETIC_ASSET'},
+                'cycle_snapshot':{'cycle':cycle,'ledger_path':str(self.working)}}}}}
+        rh=object_digest(request);iid='SYNTHETIC_INTENT'
+        proof={'owner':self.owner,'asset_id':'SYNTHETIC_ASSET','source_reference':'FAMILY_READONLY_RECOMMENDATION:'+rh,
+            'source_hash':object_digest({'request_digest':rh,'amount':'25','intent_id':iid}),
+            'as_of':request['evaluation_at'],'available_at':request['evaluation_at']}
+        updated=update_intent(cycle,event_id='LOCAL_PLAN:'+rh,intent_id=iid,state='PLANNED',filled_amount='0',remaining_amount='25',
+            receipt=proof,evaluation_at=request['evaluation_at'],speed_result=self.rates,permission=True,session_id='2026-10-30',session_open=True)
+        CycleLedgerStore(self.working).save(updated,expected_revision=None)
+        candidate=self.candidate();remote=self.root/'actual_new_download.db';shutil.copyfile(candidate,remote)
+        descriptor=self.descriptor()|{'local_path':str(remote),'sha256':digest(remote),'retrieved_at':'2026-10-30T00:05:00Z'}
+        local={'slice_cycle_id':cycle['slice_cycle_id'],'after_digest':object_digest(updated),'intent_id':iid,'planning_commitment':'25'}
+        result=verify_planning_readback(self.member_db,self.member,descriptor,request,local)
+        self.assertEqual(result['status'],'PERSISTED_REMOTE_VERIFIED');self.assertFalse(result['broker_submission_performed'])
+        with self.assertRaisesRegex(PermissionError,'CYCLE_MISMATCH'):
+            verify_planning_readback(self.member_db,self.member,descriptor,request,local|{'after_digest':'f'*64})
+        with self.assertRaisesRegex(PermissionError,'REQUEST_INTENT_MISMATCH'):
+            verify_planning_readback(self.member_db,self.member,descriptor,request|{'evaluation_at':'2026-10-30T00:02:00Z'},local)
 
     def test_creation_never_overwrites_a_file(self):
         before=self.original.read_bytes()

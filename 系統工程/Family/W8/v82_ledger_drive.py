@@ -301,3 +301,42 @@ def cycle_snapshot(resource, *, owner, asset_id, exchange, session_id):
         'cycle':cycle,'cycle_digest':object_digest(cycle),'ledger_path':resource['path'],
         'source_reference':'drive:'+resource['reference']['file_id'],
         'ledger_file_id':resource['reference']['file_id'],'ledger_sha256':resource['sha256']}
+
+
+def verify_planning_readback(member_db,member_binding,descriptor,request,local_receipt):
+    """A delivery acknowledgment, read after calculation; never market input.
+
+    The actual new Drive bytes must contain the native committed cycle and
+    this request's exact planning intent. A connector success flag or an old
+    creation hash alone cannot satisfy this check.
+    """
+    reference=read_reference(member_db,member_binding)
+    if (reference is None or descriptor.get('file_id')!=reference['file_id']
+        or descriptor.get('source_reference')!='drive:'+reference['file_id']
+        or descriptor.get('downloaded_from_drive') is not True
+        or _time(descriptor['retrieved_at'])<_time(request['evaluation_at'])):
+        raise PermissionError('LEDGER_DELIVERY_DOWNLOAD_BINDING_OR_TIME_MISMATCH')
+    binding=Binding(member_binding.account,member_binding.client_id,reference['file_id'],member_binding.family_alias)
+    resource=inspect_ledger(descriptor['local_path'],binding)
+    if (resource['sha256']!=descriptor.get('sha256')
+        or resource['header']['member_db_file_id']!=member_binding.file_id
+        or resource['header']['sync_revision']<1):
+        raise PermissionError('LEDGER_DELIVERY_RESOURCE_OR_REVISION_MISMATCH')
+    source=request['native_bundle']['stock_evidence']['approved_v10_context']
+    snapshot=source['cycle_snapshot'];before=snapshot['cycle']
+    if str(Path(descriptor['local_path']).resolve())==str(Path(snapshot['ledger_path']).resolve()):
+        raise ValueError('LEDGER_DELIVERY_REQUIRES_FRESH_REMOTE_PATH')
+    cycle=resource['cycles'].get(local_receipt['slice_cycle_id'])
+    if (cycle is None or cycle['owner']!=request['owner']
+        or cycle['asset_id']!=source['identity']['asset_id']
+        or object_digest(cycle)!=local_receipt.get('after_digest')):
+        raise PermissionError('LEDGER_DELIVERY_CYCLE_MISMATCH')
+    from v82_slice_bridge import _own_commit_replay
+    intent_id=local_receipt['intent_id']
+    if (not _own_commit_replay(before,cycle,object_digest(request),intent_id)
+        or cycle['intents'][intent_id]['remaining_amount']!=local_receipt['planning_commitment']):
+        raise PermissionError('LEDGER_DELIVERY_REQUEST_INTENT_MISMATCH')
+    return {**local_receipt,'status':'PERSISTED_REMOTE_VERIFIED','file_id':reference['file_id'],
+        'sha256':resource['sha256'],'sync_revision':resource['header']['sync_revision'],
+        'readback_retrieved_at':descriptor['retrieved_at'],'distributed_remote_cas_provided':False,
+        'requires_serialized_writer':True,'broker_submission_performed':False,'trade_authorization':'NONE'}

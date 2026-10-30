@@ -206,11 +206,15 @@ class OfficialFamilyEntry:
                 or member_binding.get('source_data_provenance')!='SOURCE_BACKED'):
                 raise PermissionError('OFFICIAL_MEMBER_V82_BINDING_MISMATCH')
             decision=runner.analyze(request)
-            if (decision.get('report_digest')!=member_binding['report_digest']
-                or decision.get('canonical_result') is not None
-                or decision.get('full_native_pipeline_complete') is not False
-                or decision.get('full_native_mentor_reached') is not False
-                or decision.get('trade_action')!='NO_TRADE'):
+            from family_input import digest
+            component=decision.get('component_report_digest',decision.get('report_digest'))
+            complete=decision.get('full_native_pipeline_complete') is True
+            if (component!=member_binding['report_digest']
+                or decision.get('report_digest')!=digest({k:v for k,v in decision.items() if k!='report_digest'})
+                or complete!=(decision.get('full_native_mentor_reached') is True)
+                or complete!=(decision.get('status')=='FINANCIAL_PIPELINE_COMPLETE')
+                or complete!=(decision.get('canonical_result') is not None)
+                or decision.get('trade_action')!='NO_TRADE' or decision.get('trade_authorization')!='NONE'):
                 raise PermissionError('OFFICIAL_MEMBER_V82_RESULT_MISMATCH')
             return {**decision,'source_sha256':current['source_sha256']}
         analysis_binding=context.get('holdings_analysis_binding',{})

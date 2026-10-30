@@ -68,6 +68,10 @@ def classification(symbol, source, product_source=None):
         identity_path=HERE/(symbol+'_product_identity.json')
         if identity_path.is_file():
             product_source={'local_path':str(identity_path),'sha256':sha256(identity_path.read_bytes()).hexdigest()}
+    if product_source is None and symbol in ('0050','VOO','VEA','00956') and '廣泛分散核心市場結構 → `A`' in text:
+        identity_path=HERE/(symbol+'_product_identity.json')
+        if identity_path.is_file():
+            product_source={'local_path':str(identity_path),'sha256':sha256(identity_path.read_bytes()).hexdigest()}
     if (product_source is None and symbol in ('SOXX','SMH','PPH','NATO')
         and '`SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`' in text):
         identity_path=HERE/(symbol+'_product_identity.json')
@@ -83,6 +87,13 @@ def classification(symbol, source, product_source=None):
             raise ValueError('PRODUCT_STRUCTURE_SOURCE_CHANGED')
         product=json.loads(raw)
         facts=product.get('excerpts',[])
+        if symbol in ('0050','VOO','VEA','00956'):
+            from broad_product_identity import classify as classify_broad_product
+            extra=classify_broad_product(symbol,product,text)
+            if extra is not None:
+                result.update(extra)
+                result['grade_evidence']['source_sha256']=product_source['sha256']
+                return result
         from equity_product_identity import classify as classify_equity_product
         extra=classify_equity_product(symbol,product,text)
         if extra is not None:
@@ -203,6 +214,8 @@ def classification(symbol, source, product_source=None):
                     result['valuation_waterfall']=['FORWARD_PE','EV_EBITDA','EV_SALES','PS','FCF_YIELD']
                     result['valuation_rule_source']='V82.md §32.8 Semiconductor'
                     result['primary_framework']='V82.md §32.8 Semiconductor'
+                    if result['asset_grade']=='D':
+                        result['primary_class']=FORMAL_CLASSES[10]
     return result
 
 
@@ -302,10 +315,11 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None,core_sources=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.broker_snapshot_source=deepcopy(broker_snapshot_source)
         self.qualified_equity_source_manifest=deepcopy(qualified_equity_source_manifest)
+        self.core_sources=deepcopy(core_sources or {})
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
@@ -770,7 +784,7 @@ class AssetSourceProducer:
         return native_core_observation(self.root, observed, **kwargs)
 
 
-def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None):
+def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None,qualified_core_source=None):
     from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
     path=Path(root)/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
     if str(path) not in sys.path:sys.path.insert(0,str(path))
@@ -779,7 +793,10 @@ def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf
     from technical_source_bridge import predicate_votes
     groups={k:[PredicateTruth(value) for value in predicate_votes(values)]
             for k,values in observed['observed_named_signals'].items()}
+    from v82_core_source import arguments as core_source_arguments
+    supplied,resolved=core_source_arguments(qualified_core_source,broad_etf=broad_etf)
     gaps=unresolved_core_contracts(observed,broad_etf)
+    gaps=[g for g in gaps if g['field_path'] not in resolved]
     if valuation_waterfall==[]:
         gaps.append({'field_path':'valuation.product_specific_waterfall','kind':'DEFINITION_OR_PRODUCER_UNRESOLVED',
             'reason':'Asset-specific valuation_class producer is not connected; no global ETF valuation fallback is used',
@@ -794,13 +811,26 @@ def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf
         'theses':[] if broad_etf else [{'state':'UNKNOWN'}],
         'structural_confirmation':PredicateTruth.UNKNOWN,'ma20_ok':PredicateTruth(
             observed.get('approved_technical',{}).get('ma20_ok','UNKNOWN'))}
+    # Keep every unresolved safety slot; one qualified fact cannot erase the
+    # other domains. The unchanged native arbiter decides permission.
+    arguments['safety_facts']+=supplied.pop('safety_facts',[])
+    if 'valuation_metrics' in supplied:
+        if any(r['metric_name'] not in arguments['valuation_waterfall'] for r in supplied['valuation_metrics']):
+            raise PermissionError('V82_CORE_VALUATION_OUTSIDE_OWN_WATERFALL')
+        bound={r['metric_name']:r for r in supplied['valuation_metrics']}
+        arguments['valuation_metrics']=[r for r in arguments['valuation_metrics'] if r['metric_name'] not in bound]+supplied.pop('valuation_metrics')
+    if 'fundamental_fields' in supplied:
+        bound={r['field_name']:r for r in supplied['fundamental_fields']}
+        arguments['fundamental_fields']=[r for r in arguments['fundamental_fields'] if r['field_name'] not in bound]+supplied.pop('fundamental_fields')
+    arguments.update(supplied)
     result=evaluate_core_rule_state(**arguments)
     serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
         asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))
     return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
             default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
         'actual_inputs':serialize(arguments),'input_gaps':gaps,
-        'valuation_path_audit':valuation_path_audit(valuation_metrics or [],arguments['valuation_waterfall']),
+        'valuation_path_audit':valuation_path_audit(arguments['valuation_metrics'],arguments['valuation_waterfall']),
+        'qualified_core_source':deepcopy(qualified_core_source),
         'structural_confirmation_applicability':'INAPPLICABLE_COMPANY_THESIS' if broad_etf else 'REQUIRED',
         'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
         'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',

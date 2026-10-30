@@ -38,11 +38,20 @@ def run_c7_engine(repo_path, source):
     module = load_original_configuration_module(root, 'work7.asset_framework')
     schemas = base / 'contracts_c7'
     data = deepcopy(source)
+    family_scope=data.get('family_scope')
+    if family_scope is not None:
+        require(data.get('schema_version')=='Family.W5.C7Source.v2',
+            'C7_VERSIONED_FAMILY_SCOPE_REQUIRED','c7_source.schema_version')
+        from work7.family_long_term import validate_scope
+        validate_scope(family_scope,data['canonical_input'],data['evaluated_at'])
+    elif data.get('schema_version')=='Family.W5.C7Source.v2':
+        require(False,'C7_FAMILY_SCOPE_SOURCE_REQUIRED','c7_source.family_scope')
     if data.get('work6_source') is not None:
         from configuration_source import run_work6_engine
         replay = run_work6_engine(root, data['work6_source'])
         require(data['work6_source']['canonical_input'] == data['canonical_input']
-                and data['work6_source']['evaluated_at'] == data['evaluated_at'],
+                and data['work6_source']['evaluated_at'] == data['evaluated_at']
+                and data['work6_source'].get('family_scope')==family_scope,
                 'C7_WORK6_SOURCE_IDENTITY_MISMATCH', 'c7_source.work6_source')
         require(replay['result'] == data['work6_result'],
                 'C7_WORK6_REPLAY_MISMATCH', 'c7_source.work6_result')
@@ -52,7 +61,8 @@ def run_c7_engine(repo_path, source):
         canonical_input_schema_path=schemas/'05_C_Canonical_Input.schema.json',
         work6_output_schema_path=schemas/'57_C_Work6_Mentor_Adjustment_Result.schema.json',
         work7_output_schema_path=schemas/'68_C_Work7_V70_Asset_Framework_Result.schema.json',
-        funding_context_schema_path=schemas/'80_C_Work7_Funding_Context.schema.json')
+        funding_context_schema_path=schemas/'80_C_Work7_Funding_Context.schema.json',
+        **({'family_scope':family_scope} if family_scope is not None else {}))
     return {'source_digest':digest(source), 'original_source':deepcopy(source), 'result':result,
             'call_trace':['C.Work7.run_asset_framework_integration'],
             'production':'HOLD', 'trade_action':'NO_TRADE'}
@@ -65,7 +75,7 @@ def bind_c7_source(repo_path, request, context):
         return None
     require(isinstance(source, dict), 'C7_SOURCE_REQUIRED', 'trusted_context.c7_source', status='DATA_UNAVAILABLE')
     require(request.get('c7_source_digest') == digest(source), 'C7_SOURCE_DIGEST_MISMATCH', 'c7_source_digest')
-    require(source.get('schema_version') == 'Family.W5.C7Source.v1' and
+    require(source.get('schema_version') in ('Family.W5.C7Source.v1','Family.W5.C7Source.v2') and
             all(source.get(k) for k in ('producer','version','source_reference')),
             'C7_SOURCE_PROVENANCE_REQUIRED', 'c7_source')
     require(source.get('family_owner') == request['owner'], 'C7_SOURCE_OWNER_MISMATCH', 'c7_source.family_owner')
@@ -73,6 +83,12 @@ def bind_c7_source(repo_path, request, context):
     require(identity['client_id'] == request['client_id'] and identity['run_id'] == request['run_id'],
             'C7_SOURCE_IDENTITY_MISMATCH', 'canonical_input.identity')
     require(source['evaluated_at'] == request['evaluation_at'], 'C7_EVALUATION_MISMATCH', 'c7_source.evaluated_at')
+    if source.get('schema_version')=='Family.W5.C7Source.v2':
+        scope=source.get('family_scope') or {}
+        require(scope.get('family_owner')==request['owner']
+            and scope.get('source_db_sha256')==request['client_snapshot']['payload']['source_sha256']
+            and str(scope.get('target_version'))==str(request['confirmed_target']['target_version']),
+            'C7_FAMILY_DB_TARGET_OR_OWNER_MISMATCH','c7_source.family_scope')
     if context['native_binding']['data_provenance'] == 'SOURCE_BACKED':
         require(isinstance(source.get('work6_source'), dict), 'C7_WORK6_SOURCE_REQUIRED',
                 'c7_source.work6_source', status='DATA_UNAVAILABLE')

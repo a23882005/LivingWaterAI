@@ -44,13 +44,26 @@ def run_work6_engine(root, source):
     with TemporaryDirectory(prefix='family-work6-') as directory:
         binding = Path(directory) / 'binding.json'
         binding.write_text(json.dumps(benchmark['binding'], ensure_ascii=False), encoding='utf-8')
-        result = module.run_mentor_adjustment_loop(
+        options={}
+        if source.get('family_scope') is not None:
+            if source.get('schema_version')!='Family.W5.Work6Source.v2':
+                raise PermissionError('C7_VERSIONED_WORK6_SCOPE_REQUIRED')
+            module=load_original_configuration_module(root,'work6.family_long_term_read')
+            run=module.run_existing_long_term
+            options['family_scope']=deepcopy(source['family_scope'])
+            result_schema=base/'84_Family_Existing_LongTerm_Work6_Result.schema.json'
+        else:
+            if source.get('schema_version')=='Family.W5.Work6Source.v2':
+                raise PermissionError('C7_WORK6_SCOPE_SOURCE_REQUIRED')
+            run=module.run_mentor_adjustment_loop
+            result_schema=base/'57_C_Work6_Mentor_Adjustment_Result.schema.json'
+        result = run(
             deepcopy(source['canonical_input']), adjustment_request=deepcopy(source['adjustment_request']),
             benchmark_path=source['benchmark_source']['local_path'], binding_path=binding,
             input_schema_path=base/'05_C_Canonical_Input.schema.json',
             output_schema_path=base/'06_C_Canonical_Output.schema.json',
             work6_request_schema_path=base/'56_C_Work6_Adjustment_Request.schema.json',
-            work6_output_schema_path=base/'57_C_Work6_Mentor_Adjustment_Result.schema.json',
-            evaluated_at=source['evaluated_at'])
+            work6_output_schema_path=result_schema,
+            evaluated_at=source['evaluated_at'],**options)
     return {'result': result, 'source_digest': digest(source),
-            'call_trace': ['C.Work6.run_mentor_adjustment_loop'], 'trade_action': 'NO_TRADE'}
+            'call_trace': ['C.Work6.run_existing_long_term' if options else 'C.Work6.run_mentor_adjustment_loop'], 'trade_action': 'NO_TRADE'}

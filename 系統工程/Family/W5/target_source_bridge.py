@@ -35,6 +35,11 @@ def bind_target_source(request,*,projection=None):
         lines[key] = row
     bundle = request['native_bundle']
     targets = bundle['asset_framework']['integrated_asset_framework']['instrument_targets']
+    if bundle['asset_framework'].get('contract_version')=='C-W7-FAMILY-LT-v1.0.0':
+        from work7.family_long_term import validate_result
+        evidence=validate_result(bundle['asset_framework'])
+        targets=[{'instrument_id':r['instrument_id'],'work6_final_target_weight':r['weight']['value']}
+            for r in evidence['approved_long_term_target']['positions']]
     ids = [row['instrument_id'] for row in targets]
     require(len(ids) == len(set(ids)) and set(ids) == set(lines),
             'TARGET_FRAMEWORK_COVERAGE_MISMATCH', 'asset_framework.instrument_targets')

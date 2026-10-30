@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 import json,sys
+from unittest.mock import patch
 HERE=Path(__file__).resolve().parents[1];ROOT=HERE.parents[2]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
 from member_financial_chain import read,calculate
@@ -87,3 +88,19 @@ class FinancialSourceTests(TestCase):
         self.assertTrue(value['full_native_pipeline_complete']);self.assertIsNotNone(value['mentor'])
         self.assertFalse(value['formal_deployment_ready'])
         self.assertEqual(value['drive_persistence_status'],'PENDING_DRIVE_BACKUP_UPDATE_READBACK')
+
+    def test_completed_analysis_is_distinct_from_pending_c7_pm_release(self):
+        from member_financial_chain import complete_report
+        report={'positions':[{'symbol':'SYNTHETIC_ASSET','call_trace':[],'missing_inputs':[],
+            'proposed_amount':None}],'summary':{},'status':'ANALYSIS_PARTIAL'}
+        report['report_digest']=digest(report)
+        financial={'full_native_pipeline_complete':True,'formal_deployment_ready':False,'mentor':{'synthetic':'original mentor result'},
+            'issue_codes':[],'call_trace':['SYNTHETIC_TEST_ONLY'],'canonical_v82_output':{'synthetic':True},
+            'canonical_amount':{'amount':'0','currency':'USD'},'drive_persistence_status':'NOT_REQUIRED_NO_POSITIVE_PLAN',
+            'native_result':{'native_result':{'c7_family_pm_gate':{'required':True,'work8_released':False}}}}
+        with patch('member_financial_chain.calculate',return_value=financial):
+            out=complete_report(report,self.parent,{'financial_sources':{'SYNTHETIC_ASSET':{}}},ROOT)
+        self.assertTrue(out['full_native_pipeline_complete']);self.assertTrue(out['full_native_mentor_reached'])
+        self.assertFalse(out['formal_deployment_ready'])
+        self.assertEqual(out['status'],'FINANCIAL_ANALYSIS_COMPLETE_PENDING_ORIGINAL_GATES')
+        self.assertEqual(out['positions'][0]['missing_inputs'][0]['reason'],'C7_PM_CONTRACT_SCHEMA_GATE_PENDING')

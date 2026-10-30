@@ -104,6 +104,9 @@ class FamilyRunner:
         if amendment is not None:
             from v75_pred007_source import describe
             mentor['liquidity_amendment']={'assessment':deepcopy(amendment),'explanation':describe(amendment)}
+        from family_ceiling_bridge import mentor_evidence
+        family_mentor=mentor_evidence(self.repo_path,prepared.payload['c7_computation'])
+        if family_mentor is not None:mentor['family_target_and_capacity']=family_mentor
         result={'schema_version':'Family.W5.result.v1','status':'OK','client_id':request['client_id'],
             'request_id':request['request_id'],'run_id':request['run_id'],'owner':deepcopy(request['owner']),
             'input_digest':input_digest(request),'target_binding':deepcopy(prepared.payload['target_binding']),

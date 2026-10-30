@@ -36,7 +36,7 @@ def _time(value):
     return d
 
 
-def run_stock_engine(repo_path, adapter_request, evidence, producer_contract):
+def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *, c7_computation=None):
     """producer_contract is trusted dispatch configuration, never request input."""
     req,facts=deepcopy(adapter_request),deepcopy(evidence)
     source=Path(repo_path).resolve()/V82_PATH
@@ -53,6 +53,12 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract):
     wire=built['v82_runtime_input']; binding=built['integration_binding']
     funded=native.validate_and_bind_funding(wire)
     cap=tactical_cap(req['work3_handoff'],'equity')
+    from family_ceiling_bridge import bind as bind_ceiling
+    family_ceiling=bind_ceiling(repo_path,c7_computation,req,facts)
+    if family_ceiling is not None:
+        cap={**cap,'amount':min(cap['amount'],family_ceiling['amount']),
+            'family_incremental_capacity':str(family_ceiling['amount']),
+            'family_c7_snapshot_id':family_ceiling['c7_snapshot_id']}
     for key in ('producer','version','exchange','currency','timeframe','adjustment','parameters'):
         if key not in producer_contract or facts.get(key)!=producer_contract[key]:
             raise StockEvidenceError('PRODUCER_CONTRACT_MISMATCH:'+key)
@@ -104,6 +110,9 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract):
         'built_input':built,'core_state':state,'deployment':stage,'tactical_cap':cap,'call_trace':trace,
         'evidence':facts,
         'production':'HOLD','trade_action':'NO_TRADE'}
+    if family_ceiling is not None:
+        result['family_ceiling_binding']={k:deepcopy(v) for k,v in family_ceiling.items() if k not in ('scope','canonical_input')}
+        trace.append('W5.C7_family_63B_incremental_capacity_to_existing_MIN')
     if approved is not None:
         result['approved_v10_analysis']=approved;trace.extend(approved['call_trace'])
     if stage.target_rate is None:
@@ -146,12 +155,18 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract):
         shared=None
         if allocation_request is not None and not no_new:
             own=[r for r in allocation_request.get('slices',[]) if r.get('asset_id')==binding['asset_id']]
-            if (allocation_request.get('owner')!=approved_context['identity']['owner'] or len(own)!=1
+            portfolio_request=family_ceiling is not None and allocation_request.get('schema_version')=='V82.FamilyPortfolioSliceAllocation.v1'
+            if not portfolio_request and (allocation_request.get('owner')!=approved_context['identity']['owner'] or len(own)!=1
                     or number(own[0].get('slice'),'0')!=number(sliced['cap'],'0')):
                 raise StockEvidenceError('SHARED_SLICE_SOURCE_MISMATCH')
-            shared=allocate(**allocation_request)
+            if family_ceiling is not None:
+                from family_ceiling_bridge import allocate as family_allocate
+                shared=family_allocate(repo_path,family_ceiling,allocation_request,
+                    asset_id=binding['asset_id'],daily_cap=sliced['cap'])
+            else:shared=allocate(**allocation_request)
         result['shared_slice_allocation']=shared
-        caps.append('0' if no_new else (shared or {}).get('allocations',{}).get(binding['asset_id']))
+        selected=(shared or {}).get('selected_allocation') if family_ceiling is not None else (shared or {}).get('allocations',{}).get(binding['asset_id'])
+        caps.append('0' if no_new else selected)
         if no_new:
             result['daily_slice']['unresolved_caps_retained_in_evidence']=deepcopy(facts['required_known_caps'])
             caps=[Decimal(0)]  # Known prohibition, not a fabricated observation.

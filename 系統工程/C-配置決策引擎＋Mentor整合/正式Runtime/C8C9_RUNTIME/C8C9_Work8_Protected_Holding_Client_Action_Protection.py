@@ -19,6 +19,7 @@ from functools import lru_cache
 from hashlib import sha256
 import json
 import math
+import importlib.util
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -230,8 +231,18 @@ def protect_client_action(request: Mapping[str, Any]) -> dict[str, Any]:
     c7 = _mapping(req.get("c_work7_asset_framework_result"), "c_work7_asset_framework_result")
     # RECHECK2 hardening: Work8 consumes a serialized C Work7 result directly, so
     # validate the exact frozen C7 schema before relying on a selected subset.
-    _schema(c7, _C7_SCHEMA, "C8C9.W8.C_WORK7_SCHEMA")
-    if c7.get("contract_name") != C_WORK7_CONTRACT_NAME or c7.get("contract_version") != C_WORK7_CONTRACT_VERSION:
+    family_version = c7.get("contract_version") == "C-W7-FAMILY-LT-v1.0.0"
+    if family_version:
+        # Explicit PM-approved profile; the frozen legacy schema remains exact.
+        spec=importlib.util.spec_from_file_location("c7_family_serialized_contract",_ROOT/"work7/family_long_term.py")
+        family=importlib.util.module_from_spec(spec);spec.loader.exec_module(family)
+        try:family.validate_result(c7)
+        except ValueError as exc:_fail("C8C9.W8.C_WORK7_FAMILY_SOURCE",str(exc))
+        if any(value != "PASS" for value in c7.get("hard_checks",{}).values()):
+            _fail("C8C9.W8.C_WORK7_FAMILY_HARD_CHECKS","All original C7 hard checks must pass")
+    else:
+        _schema(c7, _C7_SCHEMA, "C8C9.W8.C_WORK7_SCHEMA")
+    if c7.get("contract_name") != C_WORK7_CONTRACT_NAME or (not family_version and c7.get("contract_version") != C_WORK7_CONTRACT_VERSION):
         _fail("C8C9.W8.C_WORK7_CONTRACT", "C Work7 contract/version mismatch")
     identity = _mapping(c7.get("identity"), "c_work7.identity")
     if identity.get("run_id") != run_id:

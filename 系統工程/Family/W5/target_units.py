@@ -24,7 +24,14 @@ def project_target_units(calculation, c7_computation):
     if result['status']!='READY_FOR_PM_GATE':fail('FRAMEWORK_NOT_READY')
     binding=calculation['built_input']['integration_binding'];asset=binding['asset_id']
     if result['identity']['run_id']!=binding['run_id']:fail('RUN_MISMATCH')
+    family=result.get('contract_version')=='C-W7-FAMILY-LT-v1.0.0'
     snapshot=source['work6_result']['final_target']['snapshot']
+    if family:
+        from work7.family_long_term import validate_result
+        proof=validate_result(result)
+        # Native Gap uses the approved money pool. The effective C view on
+        # Current NAV is only for protection and portfolio-weight reporting.
+        snapshot=proof['approved_long_term_target']
     if snapshot['allocation_id']!=binding['authorization_reference']:fail('ALLOCATION_MISMATCH')
     row=single(snapshot['positions'],asset);target=single(result['integrated_asset_framework']['instrument_targets'],asset)
     amount=row['portfolio_amount'];weight=row['weight'];denom=snapshot['denominator']
@@ -35,7 +42,8 @@ def project_target_units(calculation, c7_computation):
     if nav<=0 or rate>1:fail('RANGE')
     # Same explicit source snapshot; tolerate only serialized float noise.
     if abs(money/nav-rate)>Decimal('1e-12'):fail('AMOUNT_WEIGHT_MISMATCH')
-    if abs(number(target['integrated_weight'])-rate)>Decimal('1e-12'):fail('C7_WEIGHT_MISMATCH')
+    if not family or not target['protected']:
+        if abs(number(target['integrated_weight'])-rate)>Decimal('1e-12'):fail('C7_WEIGHT_MISMATCH')
     if number(calculation['position_gap'].project_target_position_amount)!=money:fail('NATIVE_AMOUNT_MISMATCH')
     current=source['work6_result']['final_target_engine_result']['allocations']['current_allocation']
     if current['value_state']!='KNOWN':fail('CURRENT_UNKNOWN')
@@ -49,4 +57,6 @@ def project_target_units(calculation, c7_computation):
             'native_confirmed_amount':str(number(current_amount['amount'])),
             'canonical_target_weight':target['integrated_weight'],'canonical_unit':'portfolio_weight',
             'denominator':deepcopy(denom),'source_target':deepcopy(row),
+            **({'approved_long_term_weight':str(rate),'money_base_role':'ORIGINAL_APPROVED_INVESTMENT_POOL',
+                'effective_weight_base':deepcopy(proof['current_weight_and_drift_base'])} if family else {}),
             'c7_snapshot_id':result['work7_snapshot_id'],'source_digest':c7_computation['source_digest']}

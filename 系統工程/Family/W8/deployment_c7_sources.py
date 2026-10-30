@@ -5,12 +5,72 @@ tactical proposal. A source section being present does not mean C7 is ready.
 """
 from copy import deepcopy
 from decimal import Decimal
+from hashlib import sha256
+from pathlib import Path
+import json
 
 from family_input import digest
 from configuration_source import benchmark_source, run_work6_engine
 from c7_engine import run_c7_engine
 from current_allocation_source import build as current_allocation
 from deployment_readiness import c7_bucket_preflight
+
+FAMILY_PROFILE='FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1'
+
+
+def family_scope_source(request,context):
+    """Read original producer facts, never a pasted Work6/C7 result."""
+    profile=context.get('family_c7_profile')
+    descriptor=context.get('family_c7_scope_source')
+    if profile is None and descriptor is None:return None
+    if profile!=FAMILY_PROFILE:raise PermissionError('FAMILY_C7_EXPLICIT_APPROVED_PROFILE_REQUIRED')
+    if descriptor is None:return {'missing':'FAMILY_C7_ORIGINAL_SCOPE_FACTS_REQUIRED'}
+    raw=Path(descriptor['local_path']).read_bytes()
+    if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('FAMILY_C7_SCOPE_SOURCE_HASH_MISMATCH')
+    data=json.loads(raw);scope=data['family_scope']
+    if (data.get('schema_version')!='Family.W8.C7FamilyScopeSource.v1'
+        or any(data.get(k)!=request.get(k) for k in ('client_id','run_id','owner','evaluation_at'))
+        or data.get('source_db_sha256')!=request['client_snapshot']['payload']['source_sha256']
+        or data.get('confirmed_target_digest')!=digest(request['confirmed_target'])
+        or scope.get('family_owner')!=request['owner']
+        or scope.get('source_db_sha256')!=data['source_db_sha256']
+        or str(scope.get('target_version'))!=str(request['confirmed_target']['target_version'])
+        or scope.get('profile')!=profile or any(k in data for k in ('work6_result','asset_framework','native_result'))):
+        raise PermissionError('FAMILY_C7_SCOPE_SOURCE_MEMBER_RUN_OR_APPROVAL_MISMATCH')
+    originals=data.get('raw_sources') or []
+    hashes={}
+    for item in originals:
+        if sha256(Path(item['local_path']).read_bytes()).hexdigest()!=item['sha256']:
+            raise PermissionError('FAMILY_C7_ORIGINAL_SOURCE_BYTES_CHANGED')
+        if item['source_id'] in hashes:raise PermissionError('FAMILY_C7_ORIGINAL_SOURCE_DUPLICATED')
+        hashes[item['source_id']]=item['sha256']
+    if not hashes:raise PermissionError('FAMILY_C7_ORIGINAL_SOURCE_FILES_REQUIRED')
+    for ref in data['source_references']:
+        if hashes.get(ref['source_id'])!=ref['source_fingerprint']:
+            raise PermissionError('FAMILY_C7_ORIGINAL_SOURCE_REFERENCE_UNBOUND')
+    return data
+
+
+def bind_family_approval(request,analysis,scope):
+    """Compare immutable source amounts/weights to the original W2 projection."""
+    approved=scope['approved_long_term_target'];projection=analysis['native_target_source']
+    evidence=request['confirmed_target']['payload']['confirmation_evidence']
+    if (evidence.get('action')!='READ_EXISTING_APPROVAL' or approved['confirmed_at']!=evidence.get('confirmed_at')
+        or approved['confirmed_by']!=evidence.get('confirmed_by')):
+        raise PermissionError('FAMILY_C7_EXISTING_APPROVAL_PROOF_MISMATCH')
+    denom=projection['denominator']
+    if (approved['denominator']['currency']!=denom['currency']
+        or Decimal(str(approved['denominator']['amount']))!=Decimal(str(denom['amount']))):
+        raise PermissionError('FAMILY_C7_APPROVED_INVESTMENT_POOL_CHANGED')
+    actual={r['instrument_id']:r for r in approved['positions']};expected=projection['targets']
+    if set(actual)!=set(expected):raise PermissionError('FAMILY_C7_APPROVED_INSTRUMENT_COVERAGE_MISMATCH')
+    for row in request['confirmed_target']['payload']['draft']['target_lines']:
+        iid=projection['source_to_native'][row['instrument_id']];target=actual[iid];money=expected[iid]['target_amount']
+        if (Decimal(str(target['weight']['value']))!=Decimal(str(row['weight']['value']))
+            or target['portfolio_amount']['currency']!=money['currency']
+            or Decimal(str(target['portfolio_amount']['amount']))!=Decimal(str(money['amount']))):
+            raise PermissionError('FAMILY_C7_APPROVED_WEIGHT_OR_MONEY_CHANGED')
+    return deepcopy(approved)
 
 
 def reference_currencies(request, analysis):
@@ -72,6 +132,12 @@ def reference(sid, kind, owner, value, at, *, quality='OK', freshness='UNKNOWN')
 
 def extend(root, request, analysis, prepared, context, sources):
     out = deepcopy(sources)
+    family_source=family_scope_source(request,context)
+    if family_source is not None and family_source.get('missing'):
+        out['source_validation_issues'].append({'source_section':'trusted_context.family_c7_scope_source',
+            'code':family_source['missing'],'field_path':'family_c7_scope_source',
+            'engineering_scope':'NEW_FAMILY_PROFILE__NO_LEGACY_CONFIRM_FALLBACK'})
+        return out
     current = current_allocation(request, analysis, prepared, context)
     out['component_results']['current_allocation'] = current
     portfolio = None
@@ -91,8 +157,13 @@ def extend(root, request, analysis, prepared, context, sources):
     target = request['confirmed_target']; projection = analysis['native_target_source']
     base = Decimal(projection['denominator']['amount'])
     comparison_ready = portfolio is not None and portfolio['denominator']['state'] == 'KNOWN'
-    if comparison_ready:
+    if comparison_ready and family_source is None:
         base = Decimal(portfolio['denominator']['value'])
+    if family_source is not None and (not comparison_ready or portfolio.get('cash_assumptions')):
+        out['source_validation_issues'].append({'source_section':'current_allocation',
+            'code':'FAMILY_C7_CURRENT_NAV_NOT_SOURCE_QUALIFIED','field_path':'portfolio_current_comparison',
+            'reason':'Complete Current NAV requires source cash; zero-cash diagnostic assumptions cannot qualify the new scope.'})
+        return out
     comparison_quality = 'FALLBACK_USED' if comparison_ready else 'OK'
     target_ref = 'SRC_APPROVED_LONG_TERM'; current_ref = 'SRC_CURRENT_SCOPE'; v70_ref = 'SRC_V70'
     tactical = next(r['current_analysis']['v70_tactical_budget'] for r in analysis['analysis_result']['positions']
@@ -197,6 +268,13 @@ def extend(root, request, analysis, prepared, context, sources):
                       quality=raw['payload']['data_quality'], freshness=freshness)],
         'issues': [], 'traceability': []}
     canonical['identity']['portfolio_id'] = 'GLOBAL-PORTFOLIO:' + request['client_id']
+    if family_source is not None:
+        references={r['source_id']:r for r in canonical['source_references']}
+        for row in family_source['source_references']:
+            if row['source_id'] in references and references[row['source_id']]!=row:
+                raise PermissionError('FAMILY_C7_SOURCE_REFERENCE_COLLISION')
+            references[row['source_id']]=deepcopy(row)
+        canonical['source_references']=list(references.values())
     if comparison_ready and portfolio.get('fx_observation'):
         fx = portfolio['fx_observation']
         canonical['capital_context']['fx_metadata'] = {'value_state': 'KNOWN', 'as_of': fx['as_of'],
@@ -210,7 +288,7 @@ def extend(root, request, analysis, prepared, context, sources):
             'confirmed_at': None, 'confirmed_by': None, 'source_reference_ids': []},
         'radar_scores': [], 'source_references': [], 'source_reference_ids': [target_ref, current_ref, v70_ref]}
     evidence = target['payload']['confirmation_evidence']
-    if (comparison_ready and evidence.get('action') == 'READ_EXISTING_APPROVAL'
+    if (family_source is None and comparison_ready and evidence.get('action') == 'READ_EXISTING_APPROVAL'
             and evidence.get('confirmed_at') and evidence.get('confirmed_by')):
         # Transport the already-bound approval of these exact long-term
         # weights. No new tactical weights, timestamp or signing event exists.
@@ -219,9 +297,15 @@ def extend(root, request, analysis, prepared, context, sources):
             'source_reference_ids': [target_ref]}
     work6_source = {'schema_version': 'Family.W5.Work6Source.v1', 'canonical_input': canonical,
         'adjustment_request': adjustment, 'benchmark_source': deepcopy(descriptor), 'evaluated_at': at}
+    if family_source is not None:
+        scope=family_source['family_scope'];approved=bind_family_approval(request,analysis,scope)
+        if approved['allocation_id']!=out['native_bundle']['stock_request']['work3_handoff']['final_target']['allocation_id']:
+            raise PermissionError('FAMILY_C7_ORIGINAL_APPROVAL_ID_MISMATCH')
+        canonical['allocations']['final_target']={'value_state':'KNOWN','snapshot':approved,'reason':None}
+        work6_source.update(schema_version='Family.W5.Work6Source.v2',family_scope=deepcopy(scope))
     work6 = run_work6_engine(root, work6_source)
     final = work6['result']['final_target']
-    if final['value_state'] == 'KNOWN':
+    if family_source is None and final['value_state'] == 'KNOWN':
         approved_weights = {r['instrument_id']: Decimal(str(r['weight']['value'])) for r in lines}
         transported = {r['instrument_id']: Decimal(str(r['weight']['value'])) for r in final['snapshot']['positions']}
         if (set(approved_weights) != set(transported)
@@ -242,6 +326,10 @@ def extend(root, request, analysis, prepared, context, sources):
             'tactical_target_approved': False, 'not_authorization_for_tactical_execution': True,
             'holding_policy_state': 'NO_NEW_PREFERENCE_DECISIONS_INFERRED__W1_POLICY_BINDING_STILL_REQUIRED',
             'original_approved_money_projection': deepcopy(projection['denominator'])}}
+    if family_source is not None:
+        source.update(schema_version='Family.W5.C7Source.v2',family_scope=deepcopy(family_source['family_scope']))
+        source['comparison_context'].update(mode='SOURCE_BOUND_LONG_TERM_AND_CURRENT_NAV_SEPARATE',
+            source_basis='ORIGINAL_MEMBER_PRODUCERS__VERSIONED_FAMILY_PROFILE',cash_assumptions=[])
     computed = run_c7_engine(root, source)
     from deployment_progress_review import build as build_progress_review
     source['continuation_review'] = build_progress_review(root, request, analysis,

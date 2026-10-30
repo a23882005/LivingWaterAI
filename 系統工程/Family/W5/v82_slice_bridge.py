@@ -144,13 +144,20 @@ def commit_local_plan(source,calculation,*,request_digest):
         'source_hash':digest({'request_digest':request_digest,'amount':str(plan.execution_amount),'intent_id':iid}),
         'as_of':at,'available_at':at,'broker_submission_performed':False,
         'planning_pool_id':source['shared_allocation_request']['pool_id'],
-        'funding_bucket_id':next(r['bucket_id'] for r in source['shared_allocation_request']['slices'] if r['asset_id']==source['identity']['asset_id'])}
+        'funding_bucket_id':next(r['bucket_id'] for r in source['shared_allocation_request']['slices']
+            if r['asset_id']==source['identity']['asset_id'] and r['owner']==source['identity']['owner'])}
     updated=update_intent(cycle,event_id='LOCAL_PLAN:'+request_digest,intent_id=iid,state='PLANNED',
         filled_amount='0',remaining_amount=str(plan.execution_amount),receipt=receipt,evaluation_at=at,
         speed_result=calculation['approved_v10_analysis']['speed'],permission=True,
         trend_allowed=calculation['approved_v10_analysis']['trend_timing']['truth'],
         session_id=source['session']['session_id'],session_open=source['session']['open_for_planning'])
     def validate_shared(others,pending):
+        family_binding=calculation.get('family_ceiling_binding')
+        if family_binding is not None:
+            from family_ceiling_bridge import validate_ledger_commit
+            validate_ledger_commit(source,family_binding,others,pending,current,
+                new_amount=plan.execution_amount)
+            return
         from funding_guard import check_aggregate
         from decimal import Decimal
         group=source['shared_allocation_request'];pool=group['pool_id'];owner=source['identity']['owner'];by_bucket={}
@@ -204,4 +211,5 @@ def finalize(request,result):
         raise PermissionError('V82_LOCAL_PLAN_CANONICAL_AMOUNT_MISMATCH')
     return commit_local_plan(source,{'execution':SimpleNamespace(execution_amount=Decimal(amount)),
         'evidence':request['native_bundle']['stock_evidence'],
+        **({'family_ceiling_binding':local['family_ceiling_binding']} if local.get('family_ceiling_binding') else {}),
         'approved_v10_analysis':local['approved_v10_analysis']},request_digest=digest(request))

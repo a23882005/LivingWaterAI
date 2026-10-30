@@ -1,20 +1,20 @@
 {
   "region": "taiwan",
-  "generated_utc": "2026-10-29T07:33:05.629537+00:00",
+  "generated_utc": "2026-10-30T07:32:05.123963+00:00",
   "universe_source": "config/ib_taiwan_symbols.txt",
   "data_source": "Yahoo Finance via yfinance",
   "items": {
     "0050.TW": {
       "status": "OK",
-      "latest_observation": "2026-10-29",
-      "rows": 4361,
-      "last_verified_utc": "2026-10-29T07:33:05.629537+00:00"
+      "latest_observation": "2026-10-30",
+      "rows": 4362,
+      "last_verified_utc": "2026-10-30T07:32:05.123963+00:00"
     },
     "2330.TW": {
       "status": "OK",
-      "latest_observation": "2026-10-29",
-      "rows": 6667,
-      "last_verified_utc": "2026-10-29T07:33:05.629537+00:00"
+      "latest_observation": "2026-10-30",
+      "rows": 6668,
+      "last_verified_utc": "2026-10-30T07:32:05.123963+00:00"
     },
     "00679B.TW": {
       "status": "MISSING",

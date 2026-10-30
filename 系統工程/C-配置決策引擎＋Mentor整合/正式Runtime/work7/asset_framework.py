@@ -189,6 +189,8 @@ def _current_allocation_snapshot(work6_result: Mapping[str, Any]) -> Optional[Ma
     actual Current Allocation snapshot instead of trusting duplicated numeric fields.
     """
     engine = work6_result.get("final_target_engine_result") or {}
+    if work6_result.get('contract_version')=='C-W6-FAMILY-LT-v1.0.0' and not engine:
+        engine=(work6_result.get('family_scope_evidence') or {}).get('current_engine_result') or {}
     slot = (engine.get("allocations") or {}).get("current_allocation") if isinstance(engine, Mapping) else None
     if not isinstance(slot, Mapping) or slot.get("value_state") != "KNOWN":
         return None
@@ -811,7 +813,8 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
                                     work7_output_schema_path: str | Path,
                                     funding_context: Mapping[str, Any],
                                     funding_context_schema_path: str | Path,
-                                    evaluated_at: str) -> Dict[str, Any]:
+                                    evaluated_at: str,
+                                    family_scope: Optional[Mapping[str, Any]]=None) -> Dict[str, Any]:
     """Integrate a confirmed Work6 target with the same-run V70 asset framework.
 
     The function is deterministic for the same inputs and ``evaluated_at``.  It deep-copies
@@ -822,6 +825,13 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
     w6_schema = _load_json(work6_output_schema_path)
     w7_schema = _load_json(work7_output_schema_path)
     funding_schema = _load_json(funding_context_schema_path)
+    family_capacity=None
+    if family_scope is not None:
+        from work7 import family_long_term as family
+        family_capacity=family.capacity(family_scope,canonical_input,evaluated_at)
+        family.validate_confirmed_book(family_scope,canonical_input,evaluated_at)
+        w6_schema=_load_json(Path(__file__).resolve().parents[1]/'contracts_c7/84_Family_Existing_LongTerm_Work6_Result.schema.json')
+        w7_schema=_load_json(Path(__file__).resolve().parents[1]/'contracts_c7/85_Family_LongTerm_Work7_Result.schema.json')
     if _absence_contract().is_extended(funding_context):w7_schema=_absence_contract().extend_schema(w7_schema)
 
     ci = deepcopy(dict(canonical_input))
@@ -836,6 +846,18 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
     if w6.get("identity") != ci.get("identity"):
         issues.append(_issue("C_W7_IDENTITY_MISMATCH", "BLOCKING", "work6_result.identity",
                              "Work6 identity must exactly match the Canonical Input identity.", blocking=True))
+    if family_scope is not None:
+        evidence=w6.get('family_scope_evidence') or {}
+        if (evidence.get('input_scope_digest')!=family.digest(family_scope)
+            or evidence.get('approved_long_term_target')!=family_scope['approved_long_term_target']
+            or evidence.get('approved_target_digest')!=family_scope['approved_target_digest']
+            or evidence.get('new_confirmation_created') is not False
+            or evidence.get('effective_view_digest')!=family.digest(w6.get('final_target',{}).get('snapshot'))):
+            issues.append(_issue('C_W7_LT_WORK6_SOURCE_BINDING_MISMATCH','BLOCKING','work6_result.family_scope_evidence',
+                'Existing approval, effective view and typed scope must replay exactly.',blocking=True))
+        if family_capacity['value_state']!='KNOWN':
+            issues.append(_issue('C_W7_LT_CAPACITY_INPUT_UNRESOLVED','BLOCKING','family_scope.occupancy_and_capacity',
+                'Required cap/funding inputs remain unknown; no positive capacity is fabricated.',blocking=True))
     source_ids = _source_ids(ci)
     unresolved = set((ci.get("v70_asset_framework") or {}).get("source_reference_ids", [])) - source_ids
     if unresolved:
@@ -894,11 +916,15 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
     hard_block = any(x.get("blocking") for x in issues)
 
     if not hard_block and not pre_route_v70:
-        residual, integrated, residual_issues, residual_reroute = _build_residual_allocation(w6, v70_weights)
+        if family_scope is not None:
+            residual, integrated, residual_issues, residual_reroute = family.integrate(w6,family_scope,v70_weights)
+        else:
+            residual, integrated, residual_issues, residual_reroute = _build_residual_allocation(w6, v70_weights)
         issues += residual_issues
     else:
         residual_reroute = pre_route_v70
         residual = {"method": "LOCKED_FIRST_THEN_PROPORTIONAL_RESIDUAL_WITHIN_V70_BUCKET", "buckets": []}
+        if family_scope is not None:residual['method']='PRESERVE_LONG_TERM_NO_V70_RESIDUAL_SCALING'
         integrated = {"value_state": "NONE", "stock_weight": None, "bond_weight": None,
                       "v70_original_dry_powder_weight": None, "total_weight": None,
                       "instrument_targets": [], "work6_final_target_preserved": True,
@@ -982,7 +1008,7 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
 
     out = {
         "contract_name": "LivingWaterAI.C.Work7.AssetFrameworkIntegrationResult",
-        "contract_version": WORK7_VERSION,
+        "contract_version": family.VERSION if family_scope is not None else WORK7_VERSION,
         "identity": deepcopy(ci.get("identity", {})),
         "work7_snapshot_id": "PENDING",
         "parent_work6_snapshot_id": w6.get("work6_snapshot_id"),
@@ -1033,6 +1059,23 @@ def run_asset_framework_integration(canonical_input: Mapping[str, Any], *,
                                              status=status, route=route,
                                              integrated_asset_framework=integrated,
                                              funding_context_snapshot=funding_snapshot)
+
+    if family_scope is not None:
+        out['family_scope_evidence']={'profile':family.PROFILE,'approval_contract_sha256':family.APPROVAL_SHA256,
+            'input_scope':deepcopy(family_scope),'canonical_input':deepcopy(ci),
+            'input_scope_digest':family.digest(family_scope),'source_db_sha256':family_scope['source_db_sha256'],
+            'target_version':family_scope['target_version'],'family_owner':deepcopy(family_scope['family_owner']),
+            'account_owners':deepcopy(family_scope['account_owners']),
+            'approved_long_term_target':deepcopy(family_scope['approved_long_term_target']),
+            'approved_target_digest':family_scope['approved_target_digest'],
+            'project_target_money_base':deepcopy(family_scope['approved_long_term_target']['denominator']),
+            'current_weight_and_drift_base':deepcopy(family_scope['current_nav']),
+            'same_run_v70_total_ceiling':deepcopy(family_scope['total_stock_ceiling']),
+            'occupancy_and_capacity':deepcopy(family_capacity),'new_confirmation_created':False,
+            'tactical_target_approved':False,'production_released':False}
+        # Include the versioned scope/capacity in this profile's snapshot id.
+        # The legacy snapshot algorithm and all legacy golden files stay exact.
+        out['work7_snapshot_id']='C-W7-'+family.digest({k:v for k,v in out.items() if k!='work7_snapshot_id'})[:32]
 
     schema_errors = _schema_issues(out, w7_schema, "work7_output", "C_W7_OUTPUT_SCHEMA_INVALID")
     if schema_errors:

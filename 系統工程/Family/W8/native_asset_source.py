@@ -36,7 +36,9 @@ EXAMPLES={'VT':0,'VWRA':0,'VOO':1,'SPY':1,'QQQ':2,'VGT':2,'0050':3,
 
 
 def native_error_path(error):
-    if getattr(error,'issues',None):return error.issues[0].path
+    if getattr(error,'issues',None):
+        issue=error.issues[0]
+        return issue.get('field_path') if isinstance(issue,dict) else issue.path
     schema=re.search(r'schema rejection at ([^:]+):',str(error))
     if schema:return schema.group(1)
     money=re.search(r'c7\.contexts\[(\d+)\]\.([a-z_]+)',str(error))

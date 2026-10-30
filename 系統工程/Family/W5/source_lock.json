@@ -299,9 +299,9 @@
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "e12075640d5f67db3c9614d4ec6aa16ede04853b",
-      "sha256": "cb6d992ce236388b20850da6a36145fad6cbe1ae84e7f350713b5c8ccd45e387",
-      "size": 25140,
+      "git_blob_sha": "0ca6e765f95aa97fe7c91f9fb235d820c07d870f",
+      "sha256": "a8d25478873ddcaaee567738874b340347c8e046b98c6ec59278c871c6cd5555",
+      "size": 25879,
       "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
       "upstream": {
         "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
@@ -311,7 +311,14 @@
         "size": 24590,
         "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
       },
-      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
+      "family_revision": "PM_20261030_FAMILY_LT_PROFILE_V1_READONLY",
+      "family_profile_extension": {
+        "approval_contract_sha256": "112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0",
+        "scope": "FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1",
+        "legacy_schema_and_guard_preserved": true,
+        "pm_gate_released": false
+      },
+      "commit_scope": "UPSTREAM_ANCHOR_ONLY__FAMILY_EXTENSION_LOCKED_BY_SHA256"
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",

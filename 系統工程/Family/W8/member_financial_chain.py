@@ -115,7 +115,15 @@ def complete_report(report,request,config,root):
         row['call_trace']+=financial['call_trace']
         row['missing_inputs']=[m for m in row['missing_inputs'] if m['field']!='work3/C7/funding/execution_constraints']
         if not financial['formal_deployment_ready']:
-            for issue in financial['issue_codes'] or [{'code':financial['drive_persistence_status'],'field_path':'daily_slice_ledger_receipt'}]:
+            issues=deepcopy(financial['issue_codes'])
+            native=financial['native_result'].get('native_result') or {}
+            if native.get('c7_family_pm_gate'):
+                issues.append({'code':'C7_PM_CONTRACT_SCHEMA_GATE_PENDING','field_path':'native_result.c7_family_pm_gate',
+                    'kind':'PM_INDEPENDENT_ACCEPTANCE_REQUIRED'})
+            if financial['drive_persistence_status']=='PENDING_DRIVE_BACKUP_UPDATE_READBACK':
+                issues.append({'code':financial['drive_persistence_status'],'field_path':'daily_slice_ledger_receipt'})
+            if not issues:issues=[{'code':'ORIGINAL_RUNTIME_READINESS_NOT_RELEASED','field_path':'native_result.formal_deployment_ready'}]
+            for issue in issues:
                 row['missing_inputs'].append({'field':issue.get('field_path'),'producer':'ORIGINAL_FAMILY_FINANCIAL_CHAIN',
                     'reason':issue.get('code'),'kind':'NATIVE_CONTRACT_OR_PERSISTENCE_REQUIREMENT',
                     'affects':['canonical deployment readiness'],'original_issue':issue})
@@ -123,15 +131,22 @@ def complete_report(report,request,config,root):
             row['proposed_amount']=financial['canonical_amount']
         row['result_digest']=digest({k:v for k,v in row.items() if k!='result_digest'})
     financial=[r.get('financial_chain') or {} for r in out['positions']]
-    all_complete=bool(financial) and all(f.get('formal_deployment_ready') and f.get('mentor') is not None for f in financial)
+    all_native_complete=bool(financial) and all(f.get('full_native_pipeline_complete') for f in financial)
+    all_mentor=bool(financial) and all(f.get('mentor') is not None for f in financial)
+    all_complete=all_native_complete and all_mentor and all(f.get('formal_deployment_ready') for f in financial)
     # Native shared cash is conserved in the single member ledger; positive
     # plans stay pending until original-ID remote readback has been verified.
-    out['full_native_pipeline_complete']=all_complete
-    out['full_native_mentor_reached']=all_complete
+    out['full_native_pipeline_complete']=all_native_complete
+    out['full_native_mentor_reached']=all_mentor
+    out['formal_deployment_ready']=all_complete
     out['summary']['full_financial_native_completed']=sum(bool(f.get('full_native_pipeline_complete')) for f in financial)
     out['summary']['formal_financial_ready']=sum(bool(f.get('formal_deployment_ready')) for f in financial)
     if all_complete:
         out['status']='FINANCIAL_PIPELINE_COMPLETE'
+        out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
+        out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}
+    elif all_native_complete and all_mentor:
+        out['status']='FINANCIAL_ANALYSIS_COMPLETE_PENDING_ORIGINAL_GATES'
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
         out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}
     out['report_digest']=digest({k:v for k,v in out.items() if k!='report_digest'})

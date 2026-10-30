@@ -68,7 +68,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     for name in ('base_currency','total_new_investment_amount','contexts','bank_cash_scope'):
         if digest(funding_snapshot[name])!=digest(c7[name]):
             raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
-    stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
+    stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'],c7_computation=c7_computation)
     if stock.get('execution') is None:
         return {'status':'DATA_UNAVAILABLE','unified_result':None,'trade_action':'NO_TRADE',
                 'issue_codes':['NATIVE_TECHNICAL_DEPLOYMENT_UNRESOLVED'],'call_trace':stock['call_trace']}
@@ -145,13 +145,16 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         'target_unit_projection':target_projection,
         'bond_runtime_readiness':deepcopy(bond['runtime_ready']),
         'read_only_native_wait_review':native_wait_review,
-        'formal_deployment_ready':bond['runtime_ready']['runtime_ready'] is True,
+        'formal_deployment_ready':bond['runtime_ready']['runtime_ready'] is True and framework.get('contract_version')!='C-W7-FAMILY-LT-v1.0.0',
+        **({'c7_family_pm_gate':deepcopy(framework['pm_gate']),'c7_family_capacity':deepcopy(framework['family_scope_evidence']['occupancy_and_capacity'])}
+            if framework.get('contract_version')=='C-W7-FAMILY-LT-v1.0.0' else {}),
         'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         **({'stock_local_plan':{'execution_amount':str(stock['execution'].execution_amount)
             if stock['execution'].execution_amount is not None else None,
             'approved_v10_analysis':deepcopy(stock['approved_v10_analysis']),
             'daily_slice':deepcopy(stock['daily_slice']),
+            **({'family_ceiling_binding':deepcopy(stock['family_ceiling_binding'])} if stock.get('family_ceiling_binding') else {}),
             'shared_slice_allocation':deepcopy(stock['shared_slice_allocation'])}}
             if stock.get('approved_v10_analysis') else {}),
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,

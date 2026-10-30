@@ -27,6 +27,9 @@ class MemberV82Tests(TestCase):
         self.temp = TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.folder = Path(self.temp.name); self.client = 'fam_'+'a'*32
         self.at = '2026-10-29T23:00:00Z'
+        clock = patch('member_v82_analysis.datetime', wraps=datetime)
+        fixed = clock.start(); self.addCleanup(clock.stop)
+        fixed.now.return_value = datetime.fromisoformat(self.at.replace('Z', '+00:00'))
         def instrument(key, ticker, kind):
             return {'client_id':self.client, 'instrument_key':key, 'ticker':ticker,
                     'instrument_type':kind, 'identity_state':'KNOWN', 'quote_currency':'USD'}

@@ -2297,5 +2297,25 @@
     "evidence_sha256": "eaa226f48d673792953390b738f829c04369f6899391d673f634ab23f607f50d",
     "execution_owner": "Original Codex workers; PM governs, coordinates and independently accepts",
     "next_owner": "PM consolidates existing originals and prepares precise integration work order; no original Codex session ACK claimed"
+  },
+  "pm_finance_report_contract_20261031_v1": {
+    "status": "FORMAL_INTERFACE_CONTRACT_AND_WORK_ORDER_READY",
+    "producer_commit": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
+    "consumer_commit": "4319556a67f83f1cf3fc754446a2c401335db3e1",
+    "contract_path": "系統工程/Family/W8/契約/Family_金融報告交接與Mentor接收相容_中PM工單_v1.0_20261031.md",
+    "phase1": "READY_FOR_ORIGINAL_PR60_CODEX__MENTOR_RECEIVER_COMPATIBILITY_ONLY",
+    "phase2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK",
+    "allowed_additional_file": "系統工程/Family/W6/runtime/report_receiver.py",
+    "preserve": "PR59 original producer semantics; PR60 accepted reports/layout/source-review; original account/financial gates",
+    "private_requirement_groups": 36,
+    "original_disposition_rows_mapped": 179,
+    "remaining_original_not_provided_fields": 404,
+    "private_package_name": "Family_PM_金融報告介面與四戶原件_施工包_v1.0_20261031.zip",
+    "private_package_location": "Google Drive root/TEMP",
+    "package_sha256": "b9737c09bea8854e7ca58447ceb4bffcde22528fcd62bcc8787bf7cd31328412",
+    "worker_ack": "PENDING_ORIGINAL_SESSION_REPLY",
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "PM_next": "Consolidate originals; coordinate baseline/dependencies; independently accept receiver fix and later qualified financial/report integration"
   }
 }

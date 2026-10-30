@@ -37,7 +37,7 @@
     },
     {
       "path": "../../Family/W5/target_units.py",
-      "sha256": "73ad572e687b37abb143974b2e0fc1e42a7bf5b625a85b59d4dc28f827baca64"
+      "sha256": "bfec50780007fd07c53b9b51d8e0d68f33623609f138d71b2115d64c6812ea5f"
     },
     {
       "path": "../../Family/W5/target_source_bridge.py",
@@ -61,7 +61,7 @@
     },
     {
       "path": "../../Family/W8/deployment_c7_sources.py",
-      "sha256": "3740b64fcd155b396ea70ab09bba2a916d0716ff1bc5dfe6742ef95390a9f5ab"
+      "sha256": "e5484e3efff21cad2d65f323ec23b75479ed79af730c949c0190ee20444ce6e5"
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",

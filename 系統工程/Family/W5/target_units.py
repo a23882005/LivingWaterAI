@@ -8,6 +8,21 @@ from decimal import Decimal
 from family_input import digest
 
 
+def same_canonical_money(canonical,exact):
+    """Compare an original JSON-number view to an exact source amount.
+
+    Only the identical binary-float serialization is accepted as a second
+    representation. This adds no money tolerance, FX rate or rounding policy.
+    Native Gap continues to consume the exact approved source projection.
+    """
+    if isinstance(canonical,bool) or isinstance(exact,bool) or canonical is None or exact is None:return False
+    try:
+        actual=Decimal(str(canonical));expected=Decimal(str(exact))
+        return actual.is_finite() and expected.is_finite() and (actual==expected
+            or isinstance(canonical,float) and canonical==float(expected))
+    except (ValueError,ArithmeticError):return False
+
+
 def project_target_units(calculation, c7_computation):
     def fail(reason):raise ValueError('TARGET_UNIT_'+reason)
     def number(value):
@@ -44,19 +59,23 @@ def project_target_units(calculation, c7_computation):
     if abs(money/nav-rate)>Decimal('1e-12'):fail('AMOUNT_WEIGHT_MISMATCH')
     if not family or not target['protected']:
         if abs(number(target['integrated_weight'])-rate)>Decimal('1e-12'):fail('C7_WEIGHT_MISMATCH')
-    if number(calculation['position_gap'].project_target_position_amount)!=money:fail('NATIVE_AMOUNT_MISMATCH')
+    native_money=number(calculation['position_gap'].project_target_position_amount)
+    if not (same_canonical_money(amount['amount'],native_money) if family else native_money==money):fail('NATIVE_AMOUNT_MISMATCH')
     current=source['work6_result']['final_target_engine_result']['allocations']['current_allocation']
     if current['value_state']!='KNOWN':fail('CURRENT_UNKNOWN')
     current_row=single(current['snapshot']['positions'],asset)
     current_amount=current_row['portfolio_amount']
     if current_amount['value_state']!='KNOWN':fail('CURRENT_UNKNOWN')
     if current_amount['currency']!=binding['currency']:fail('FX_REQUIRED')
-    if number(current_amount['amount'])!=number(calculation['position_gap'].confirmed_amount):fail('CURRENT_AMOUNT_MISMATCH')
+    native_current=number(calculation['position_gap'].confirmed_amount)
+    if not (same_canonical_money(current_amount['amount'],native_current) if family else number(current_amount['amount'])==native_current):fail('CURRENT_AMOUNT_MISMATCH')
     return {'asset_id':asset,'allocation_id':snapshot['allocation_id'],
-            'native_target_amount':str(money),'currency':binding['currency'],
-            'native_confirmed_amount':str(number(current_amount['amount'])),
+            'native_target_amount':str(native_money if family else money),'currency':binding['currency'],
+            'native_confirmed_amount':str(native_current if family else number(current_amount['amount'])),
             'canonical_target_weight':target['integrated_weight'],'canonical_unit':'portfolio_weight',
             'denominator':deepcopy(denom),'source_target':deepcopy(row),
             **({'approved_long_term_weight':str(rate),'money_base_role':'ORIGINAL_APPROVED_INVESTMENT_POOL',
-                'effective_weight_base':deepcopy(proof['current_weight_and_drift_base'])} if family else {}),
+                'effective_weight_base':deepcopy(proof['current_weight_and_drift_base']),
+                'canonical_serialized_target_money':deepcopy(amount),
+                'native_exact_source_amount_preserved':True} if family else {}),
             'c7_snapshot_id':result['work7_snapshot_id'],'source_digest':c7_computation['source_digest']}

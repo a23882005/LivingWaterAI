@@ -12,6 +12,15 @@ from family_ceiling_bridge import allocate,CeilingBindingError
 from stock_engine import run_stock_engine
 
 
+def test_canonical_float_view_does_not_change_native_exact_gap_money():
+    from target_units import same_canonical_money
+    exact=Decimal('837000')/Decimal('32.452')
+    assert same_canonical_money(float(exact),exact)
+    assert not same_canonical_money(float(exact)+.01,exact)
+    assert not same_canonical_money(str(float(exact)),exact)  # No approximate string source.
+    assert not same_canonical_money(True,1) and not same_canonical_money(float('nan'),exact)
+
+
 def test_sqlite_planning_projection_does_not_apply_one_release_twice():
     from family_ceiling_bridge import planning_exposures
     m,ci,scope,at=family_case()

@@ -69,3 +69,22 @@ def test_native_path_reports_structured_c7_failure_without_losing_the_field():
     from native_asset_source import native_error_path
     class Error(ValueError):issues=[{'field_path':'family_scope.exposure_coverage','code':'SYNTHETIC_MISSING_SOURCE'}]
     assert native_error_path(Error())=='family_scope.exposure_coverage'
+
+
+def test_repeating_fx_money_keeps_exact_source_and_accepts_only_its_json_number_view():
+    from decimal import Decimal
+    pool=Decimal('837000')/Decimal('32.452');money=Decimal('669600')/Decimal('32.452')
+    evidence={'action':'READ_EXISTING_APPROVAL','confirmed_at':'2026-01-01T00:00:00Z','confirmed_by':'SYNTHETIC_OWNER'}
+    request={'confirmed_target':{'payload':{'confirmation_evidence':evidence,'draft':{'target_lines':[
+        {'instrument_id':'SYNTHETIC_ASSET','weight':{'value':'.8'}}]}}}}
+    projection={'denominator':{'amount':str(pool),'currency':'USD'},'source_to_native':{'SYNTHETIC_ASSET':'SYNTHETIC_ASSET'},
+        'targets':{'SYNTHETIC_ASSET':{'target_amount':{'amount':str(money),'currency':'USD'}}}}
+    approved={'denominator':{'amount':float(pool),'currency':'USD'},'confirmed_at':evidence['confirmed_at'],
+        'confirmed_by':evidence['confirmed_by'],'positions':[{'instrument_id':'SYNTHETIC_ASSET','weight':{'value':'.8'},
+        'portfolio_amount':{'amount':float(money),'currency':'USD'}}]}
+    before=deepcopy(projection)
+    assert bind_family_approval(request,{'native_target_source':projection},{'approved_long_term_target':approved})==approved
+    assert projection==before
+    approved['positions'][0]['portfolio_amount']['amount']+=.01
+    with pytest.raises(PermissionError,match='WEIGHT_OR_MONEY_CHANGED'):
+        bind_family_approval(request,{'native_target_source':projection},{'approved_long_term_target':approved})

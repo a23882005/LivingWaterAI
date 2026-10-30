@@ -82,8 +82,9 @@ def bind_family_approval(request,analysis,scope):
         or approved['confirmed_by']!=evidence.get('confirmed_by')):
         raise PermissionError('FAMILY_C7_EXISTING_APPROVAL_PROOF_MISMATCH')
     denom=projection['denominator']
+    from target_units import same_canonical_money
     if (approved['denominator']['currency']!=denom['currency']
-        or Decimal(str(approved['denominator']['amount']))!=Decimal(str(denom['amount']))):
+        or not same_canonical_money(approved['denominator']['amount'],denom['amount'])):
         raise PermissionError('FAMILY_C7_APPROVED_INVESTMENT_POOL_CHANGED')
     actual={r['instrument_id']:r for r in approved['positions']};expected=projection['targets']
     if set(actual)!=set(expected):raise PermissionError('FAMILY_C7_APPROVED_INSTRUMENT_COVERAGE_MISMATCH')
@@ -91,7 +92,7 @@ def bind_family_approval(request,analysis,scope):
         iid=projection['source_to_native'][row['instrument_id']];target=actual[iid];money=expected[iid]['target_amount']
         if (Decimal(str(target['weight']['value']))!=Decimal(str(row['weight']['value']))
             or target['portfolio_amount']['currency']!=money['currency']
-            or Decimal(str(target['portfolio_amount']['amount']))!=Decimal(str(money['amount']))):
+            or not same_canonical_money(target['portfolio_amount']['amount'],money['amount'])):
             raise PermissionError('FAMILY_C7_APPROVED_WEIGHT_OR_MONEY_CHANGED')
     return deepcopy(approved)
 

@@ -2317,5 +2317,33 @@
     "production": "HOLD",
     "trade_authorization": "NONE",
     "PM_next": "Consolidate originals; coordinate baseline/dependencies; independently accept receiver fix and later qualified financial/report integration"
+  },
+  "pm_original_fact_audit_20261031": {
+    "status": "COMPLETED_READ_ONLY_AUDIT__QUALIFICATION_IMPLEMENTATION_PENDING",
+    "fresh_official_DBs": 4,
+    "DB_SHA_unchanged": 4,
+    "DB_integrity_FK": "4_OF_4_PASS",
+    "fresh_Sources_unchanged": 4,
+    "approved_project_originals_reread": 2,
+    "confirmed_reader": "W8/confirmed_asset_facts.py:read_latest_confirmed_asset_facts",
+    "engineering_candidates": [
+      "Arthur confirmed investable amount and basis vs settlement/total pool",
+      "Lilian confirmed real holding values supersede hypothetical classification",
+      "Joseph existing broker/currency evidence and new IB partial readbacks"
+    ],
+    "IB_source_owner": "Joseph_ONLY_OWNER_DECLARED",
+    "IB_quality": "PARTIAL__MISSING_PROVIDER_ASOF__VALUATION_DIFFERENCE__REPLACED_ORDER_SUCCESSOR_UNRESOLVED",
+    "IB_order_retry": "show_completed_true_internal_error_then_one_reduced_false_retry_success",
+    "private_files": [
+      "Family_PM_四戶正式原件核對結果_20261031.txt",
+      "Family_PM_四戶正式原件核對證據_20261031.json"
+    ],
+    "private_location": "Google Drive root/TEMP",
+    "private_fresh_reread": "2_OF_2_BYTES_SHA_PASS",
+    "public_record": "系統工程/Family/W8/查核紀錄/PM_四戶正式原件唯讀核對_20261031.md",
+    "official_DB_writes": 0,
+    "broker_actions": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

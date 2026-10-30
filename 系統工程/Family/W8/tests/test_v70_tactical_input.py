@@ -61,4 +61,15 @@ class V70ComponentTest(unittest.TestCase):
         self.assertIsNone(calculate(ROOT,self.request,self.policy)['current_stock_bond_reference'])
         self.assertEqual(calculate(ROOT,self.request,self.policy)['allocation']['lifeStageCode'],'UNKNOWN')
 
+    def test_saved_cutoff_reexecutes_original_calculation_with_identical_source_bytes(self):
+        request={**self.request,'evaluation_at':'2026-10-30T17:14:15Z'}
+        first=calculate(ROOT,request,self.policy);second=calculate(ROOT,request,self.policy)
+        self.assertEqual(first,second)
+        self.assertEqual(first['snapshot']['calculatedAt'],'2026-10-30T17:14:15.000Z')
+        self.assertEqual(sum(Decimal(v) for v in first['amounts'].values()),Decimal('1000000'))
+
+    def test_naive_evaluation_clock_cannot_bind_a_formal_source(self):
+        with self.assertRaisesRegex(ValueError,'V70_EVALUATION_AT_TIMEZONE_REQUIRED'):
+            calculate(ROOT,{**self.request,'evaluation_at':'2026-10-30T17:14:15'},self.policy)
+
 if __name__=='__main__':unittest.main()

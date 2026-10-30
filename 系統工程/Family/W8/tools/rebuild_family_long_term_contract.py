@@ -74,7 +74,8 @@ files=['work7/family_long_term.py','work7/asset_framework.py','C8C9_RUNTIME/C8C9
  '../../Family/W5/target_units.py','../../Family/W5/target_source_bridge.py','../../Family/W5/stock_engine.py','../../Family/W5/native_pipeline.py',
  '../../Family/W5/v82_slice_bridge.py','../../Family/W5/family_runner.py','../../Family/W8/deployment_c7_sources.py',
  '../../Family/W8/member_financial_chain.py','../../Family/W8/member_funding_summary.py','../../Family/W8/native_asset_source.py','../../Family/W8/member_financial_producer.py','../../Family/W8/family_c7_source_assembly.py','../../Family/W8/same_run_market_cache.py',
- '../../Family/W8/approved_v04_technical.py','../../Family/W5/technical_source_bridge.py','../../Family/W8/tools/rebuild_family_long_term_contract.py']
+ '../../Family/W8/approved_v04_technical.py','../../Family/W5/technical_source_bridge.py','../../Family/W8/tools/rebuild_family_long_term_contract.py',
+ '../../Family/W8/v70_tactical_input.py','../../Family/W8/v70_component_runtime.cjs']
 files += [p for p in ['work6/family_long_term_read.py','contracts_c7/84_Family_Existing_LongTerm_Work6_Result.schema.json','contracts_c7/85_Family_LongTerm_Work7_Result.schema.json'] if (BASE/p).exists()]
 manifest={'profile':'FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1','approval_sha256':'112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0',
  'status':'APPROVED_FOR_IMPLEMENTATION__PM_GATE_NOT_RELEASED','files':[{'path':p,'sha256':sha256((BASE/p).read_bytes()).hexdigest()} for p in files]}

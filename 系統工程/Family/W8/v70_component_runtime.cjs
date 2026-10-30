@@ -7,7 +7,14 @@ if(!feed.verification?.ready)throw Error('V70_SOURCE_NOT_READY');
 const keep=new Set(['macroConfig','C_VALUATION_IDS','C_VALUATION_ALPHA','lifeStageLabels']);const selected=[];
 for(const s of sources){let ast;try{ast=parse(s,{ecmaVersion:'latest'})}catch{continue}for(const n of ast.body){if(n.type==='FunctionDeclaration')selected.push(s.slice(n.start,n.end));if(n.type==='VariableDeclaration'&&n.declarations.some(d=>keep.has(d.id.name)))selected.push(s.slice(n.start,n.end));if(n.type==='ExpressionStatement'&&n.expression.type==='AssignmentExpression'&&s.slice(n.expression.left.start,n.expression.left.end)==='window.v703StressModel')selected.push(s.slice(n.start,n.end));}}
 const nodes=new Map();function node(id){if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',style:{},classList:{toggle(){},add(){},remove(){}},get innerText(){return this.textContent},set innerText(v){this.textContent=v}});return nodes.get(id)}
-const ctx={console,document:{getElementById:id=>id.startsWith('input-')?null:node(id),querySelector:()=>null},window:null};ctx.window=ctx;vm.createContext(ctx);vm.runInContext(selected.join('\n'),ctx);
+const ctx={console,document:{getElementById:id=>id.startsWith('input-')?null:node(id),querySelector:()=>null},window:null};ctx.window=ctx;
+// A saved request reuses its evaluation clock. Original calcTotal emits
+// calculatedAt; wall time would change source hashes on an identical replay.
+if(input.evaluation_at!=null){
+ const cutoff=Date.parse(input.evaluation_at);if(!Number.isFinite(cutoff))throw Error('INVALID_EVALUATION_AT');
+ ctx.Date=class EvaluationDate extends Date{constructor(...args){super(...(args.length?args:[cutoff]));}static now(){return cutoff;}};
+}
+vm.createContext(ctx);vm.runInContext(selected.join('\n'),ctx);
 vm.runInContext('globalThis.config=macroConfig',ctx);
 for(const c of ctx.config){const r=feed.indicators[c.id]||feed.derived?.[c.id];if(!r||!Number.isFinite(Number(r.value)))throw Error('Missing '+c.id);node('in_'+c.id).value=String(r.value);node('sc_'+c.id).textContent=String(ctx.v703RiskForConfig(c,Number(r.value)));}
 if(![input.stock_percent,input.bond_percent].every(n=>Number.isFinite(n)&&n>=0&&n<=100)||input.stock_percent+input.bond_percent!==100)throw Error('APPROVED_STRATEGIC_BASE_REQUIRED');

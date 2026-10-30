@@ -1,6 +1,7 @@
 """Reuse original V70 numerical components with an explicit approved base."""
 from copy import deepcopy
 from decimal import Decimal
+from datetime import datetime
 from pathlib import Path
 import hashlib,json,subprocess,sys
 
@@ -31,6 +32,10 @@ def calculate(root,request,policy,fx_observation=None,*,feed_source=None):
     hashes=[hashlib.sha256(p.read_bytes()).hexdigest() for p in (html,feed)]
     args={'repo_root':str(root),'stock_percent':stock,'bond_percent':bond,
         'life_stage_code':policy.get('life_stage_code'),'html_sha256':hashes[0],'feed_sha256':hashes[1]}
+    if request.get('evaluation_at') is not None:
+        at=datetime.fromisoformat(request['evaluation_at'].replace('Z','+00:00'))
+        if at.utcoffset() is None:raise ValueError('V70_EVALUATION_AT_TIMEZONE_REQUIRED')
+        args['evaluation_at']=request['evaluation_at']
     if feed_source is not None:args['feed_path']=str(feed)
     run=subprocess.run(['node',str(Path(__file__).with_name('v70_component_runtime.cjs'))],input=json.dumps(args),capture_output=True,text=True,timeout=15)
     if run.returncode:raise RuntimeError('V70_COMPONENT_EXECUTION_FAILED:'+run.stderr[-350:])

@@ -521,7 +521,7 @@ def assemble_original_producers(producer,request,context,prepared,trial):
         approved_account_scope=deepcopy(context.get('approved_document_account_scope')))
     if options.get('portfolio_reconciliation_source') is None:
         db_locator={'local_path':str(producer.db_path),'sha256':request['client_snapshot']['payload']['source_sha256'],
-            'as_of':request['client_snapshot'].get('as_of',request['evaluation_at']),'available_at':request['evaluation_at']}
+            'as_of':request['client_snapshot'].get('as_of'),'available_at':request['client_snapshot'].get('available_at')}
         for position in prepared.payload['positions']:
             source=position.get('source_position') or {};iid=position['instrument_key']
             locator={**db_locator,'table':'portfolio_position','instrument_key':iid,
@@ -534,11 +534,13 @@ def assemble_original_producers(producer,request,context,prepared,trial):
             aid=account['account_key'];rows=[r for r in cash_rows if r['account_key']==aid]
             locator={**db_locator,'table':'cash_balance_snapshot','account_key':aid,'original_rows':deepcopy(rows)}
             for name,column in [('settled_cash','normalized_settled_minor'),('reserved_cash','reserved_minor'),('unsettled_cash','pending_payable_minor')]:
-                original=next((r[column] for r in sorted(rows,key=lambda r:(r['as_of_utc'],r['version']),reverse=True)
+                row=next((r for r in sorted(rows,key=lambda r:(r['as_of_utc'],r['version']),reverse=True)
                     if r.get(column) is not None),None)
+                original=row[column] if row is not None else None
                 assembler.field('funding_buckets.'+aid+'.'+name,original,
                     state=ADAPTER if original is not None else MISSING,
-                    code='C7_ACCOUNT_ORIGINAL_'+name.upper()+'_QUALIFICATION_REQUIRED',sources=[locator],
+                    code='C7_ACCOUNT_ORIGINAL_'+name.upper()+'_QUALIFICATION_REQUIRED',
+                    sources=[dict(locator,as_of=row.get('as_of_utc') if row else None)],
                     producer='ORIGINAL_W1_CASH_ROWS__MINOR_UNITS_NOT_EXECUTABLE_CASH')
             assembler.field('funding_buckets.'+aid+'.available_and_authorization',None,
                 code='C7_ACCOUNT_AVAILABLE_CASH_AND_INCREMENTAL_AUTHORIZATION_REQUIRED',sources=[locator])

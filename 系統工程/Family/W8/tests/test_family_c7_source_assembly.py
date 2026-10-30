@@ -167,6 +167,30 @@ def test_duplicate_position_identity_is_not_silently_overwritten(tmp_path):
         assemble(ROOT,req,ctx,artifact_directory=tmp_path/'private',tactical=t,identities=ids,portfolio_facts_source=desc())
 
 
+def test_partial_original_observation_times_are_preserved_and_never_stamped_with_run_time(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    from family_c7_source_assembly import assemble_original_producers
+    import native_asset_source,v70_tactical_input
+    m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path);owner=req['owner']
+    old='2026-10-20T01:02:03Z'
+    req['client_snapshot']['payload']['tables']['cash_balance_snapshot']=[{'account_key':owner['account'],
+        'as_of_utc':old,'version':1,'normalized_settled_minor':5000,'reserved_minor':1000,'pending_payable_minor':0}]
+    producer=SimpleNamespace(root=ROOT,db_path=tmp_path/'original.db',class_source={},product_sources={},
+        verified_macro_feed_source=None,v70_strategic_policy={},fx_observation=None,order_confirmation=None,
+        family_c7_assembly_inputs={'schema_version':'Family.W8.C7AssemblyInputs.v1',
+            'artifact_directory':str(tmp_path/'private'),'portfolio_reconciliation_source':None})
+    prepared=SimpleNamespace(payload={'positions':[{'instrument_key':'QQQ','quantity':'60',
+        'quantity_state':'KNOWN','source_position':{}}]})
+    monkeypatch.setattr(native_asset_source,'classification',lambda symbol,*args:deepcopy(ids[symbol]))
+    monkeypatch.setattr(v70_tactical_input,'calculate',lambda *args,**kwargs:deepcopy(t))
+    out=assemble_original_producers(producer,req,ctx,prepared,{})
+    inventory={r['field_path']:r for r in out['field_inventory']}
+    q=inventory['family_scope.current_nav.positions.QQQ.quantity']['source_locators'][0]
+    cash=inventory['family_scope.funding_buckets.'+owner['account']+'.settled_cash']['source_locators'][0]
+    assert q['as_of'] is None and q['available_at'] is None and q['observation_time_state']=='NOT_PROVIDED'
+    assert cash['as_of']==old and cash['binding_checked_at']==req['evaluation_at']
+
+
 @pytest.mark.parametrize('change',['cash_net','nav','order_quantity','fill_not_applied','cap_currency'])
 def test_business_reconciliation_errors_are_not_hidden_by_complete_flags(tmp_path,change):
     m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path)

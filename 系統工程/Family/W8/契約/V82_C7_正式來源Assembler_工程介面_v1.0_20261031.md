@@ -37,4 +37,6 @@
 
 全來源結構可組裝時寫 `Family.W8.C7FamilyScopeSource.v1`：schema83、原件references/hash、完整Current snapshot；狀態為 `SOURCE_ASSEMBLED__ORIGINAL_C7_VALIDATION_PENDING`。原reader再次讀回並驗原件SHA，交原Work6／C7、原Gap／切片／MIN／帳本／Work9。來源組裝本身不核准金融決策。新scope最高仍READY_FOR_PM_GATE，a78/a79及Work8 release沿原Gate。
 
+原V70數值函式的執行時鐘綁定request.evaluation_at，使其calculatedAt與同cutoff的原件hash可精確重播；HTML、feed、allocation base與原算式不變。這是計算時鐘，不能取代任何原始觀測的as_of／available_at；執行的實際牆鐘時間另存在run_receipt。
+
 真實cycle只在合格Gap、permission、session及book成立後初始化。原SQLite交易、G0/B0、pending不提前釋放、Drive單序列writer／寫前重查／備份／原ID／重新下載讀回均沿用；沒有Drive分散式CAS，也沒有下單、取消、換匯或購買資料。

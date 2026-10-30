@@ -1,0 +1,48 @@
+{
+  "scope": "ISOLATED_SYNTHETIC_NATIVE_COMPONENT_PROBE",
+  "head": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "mature_150000_B0": "37500.00",
+  "immature_150000_B0": "22500.00",
+  "before_pending": {
+    "slice_cycle_id": "V82-SLICE-09562373200aa4642211af1cca144929e9d3065b1403b8bf4ebf723eaf6776ad",
+    "G0": "100",
+    "B0": "25.00",
+    "B_current": "25.00",
+    "cycle_spent": "0",
+    "cycle_committed": "25",
+    "cycle_room": "0.00",
+    "fixed_initial_gap_used": true,
+    "cash_reservation_subtracted": false,
+    "profile_version": "V82_APPROVED_IMPLEMENTATION_1.0"
+  },
+  "pending_unchanged_room": {
+    "slice_cycle_id": "V82-SLICE-09562373200aa4642211af1cca144929e9d3065b1403b8bf4ebf723eaf6776ad",
+    "G0": "100",
+    "B0": "25.00",
+    "B_current": "25.00",
+    "cycle_spent": "0",
+    "cycle_committed": "25",
+    "cycle_room": "0.00",
+    "fixed_initial_gap_used": true,
+    "cash_reservation_subtracted": false,
+    "profile_version": "V82_APPROVED_IMPLEMENTATION_1.0"
+  },
+  "pending_zero_remaining_without_release": {
+    "accepted": true,
+    "room": {
+      "slice_cycle_id": "V82-SLICE-09562373200aa4642211af1cca144929e9d3065b1403b8bf4ebf723eaf6776ad",
+      "G0": "100",
+      "B0": "25.00",
+      "B_current": "25.00",
+      "cycle_spent": "0",
+      "cycle_committed": "0",
+      "cycle_room": "25.00",
+      "fixed_initial_gap_used": true,
+      "cash_reservation_subtracted": false,
+      "profile_version": "V82_APPROVED_IMPLEMENTATION_1.0"
+    },
+    "persisted": true
+  },
+  "expected": "Cancellation/replacement pending without confirmed release must retain prior unfilled commitment, adjusting only verified fills; malformed shrink must be rejected or preserve that commitment.",
+  "real_orders_or_private_db_changed": false
+}

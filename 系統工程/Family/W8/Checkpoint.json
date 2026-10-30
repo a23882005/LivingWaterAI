@@ -974,8 +974,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原Codex：四戶V82測試／修錯；中PM：協調、驗收及治理",
-  "next_action": "原Codex完成四戶逐檔V82真實來源測試與必要隔離邊界／修錯回歸，逐戶回交；中PM獨立驗收。",
+  "next_owner": "原報告Codex：PR60剩餘三項；原V82 Codex：PR59四戶V82重跑；中PM：協調、獨立驗收及治理",
+  "next_action": "報告Codex依PR60最新續工契約完成瀏覽器重跑、四戶真人資料整線及Drive正式保存讀回；V82 Codex完成原四戶測試契約；各線回交同一最終版本逐戶證據後由中PM獨立驗收。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1827,11 +1827,34 @@
     "governance": "Three original private Drive records backed up and updated; exact private source links retained there.",
     "remote_commit": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
     "draft_pr": "https://github.com/a23882005/LivingWaterAI/pull/60",
-    "remote_content_verified": 16
+    "remote_content_verified": 16,
+    "execution_owner": "原報告／HTML Codex",
+    "PM_owner": "Family中PM：契約、協調、治理、獨立驗收及Gate",
+    "continuation_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6514477704"
   },
   "owner_PM_engineering_authority_20261030": {
     "decision": "Owner approved this exact 16-file public report code/text QA export and Draft PR; same-scope routine engineering submissions, tests and governance are middle-PM responsibility and may proceed without repeated permission.",
     "public_report_scope": "16 approved code/synthetic-tests/documentation/text-QA files only",
     "record": "Original private Drive PM governance"
+  },
+  "owner_PM_governance_Codex_construction_20261030": {
+    "decision": "Codex負責施工、除錯、環境修復、整線與補測；中PM盡量不親自施工，負責契約、範圍、依賴與版本協調、治理、獨立驗收及Gate。",
+    "supersedes": "中PM接續瀏覽器重跑、真人資料整線及Drive正式保存讀回，以及中PM預設親自施工的安排。",
+    "report_execution_owner": "原報告／HTML Codex，沿PR60",
+    "report_remaining": [
+      "瀏覽器7項重跑及回歸",
+      "四戶真人資料producer至完整報告整線",
+      "四戶Drive正式保存、重新下載校驗、manifest及Menu12讀回"
+    ],
+    "members": [
+      "Joseph",
+      "MOU",
+      "Arthur",
+      "Lilian"
+    ],
+    "continuation_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6514477704",
+    "dispatch_status": "CONTRACT_POSTED__ORIGINAL_CODEX_SESSION_START_NOT_OBSERVED",
+    "acceptance": "中PM收到同一最終版本逐戶證據後獨立驗收；尚未整線PASS。",
+    "v82_execution_owner": "原V82 Codex，PR59四戶V82重跑維持原契約"
   }
 }

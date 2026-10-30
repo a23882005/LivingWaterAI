@@ -12,6 +12,20 @@ from family_ceiling_bridge import allocate,CeilingBindingError
 from stock_engine import run_stock_engine
 
 
+def test_sqlite_planning_projection_does_not_apply_one_release_twice():
+    from family_ceiling_bridge import planning_exposures
+    m,ci,scope,at=family_case()
+    buy=next(r for r in scope['exposures'] if r['kind']=='ACTIVE_BUY_RESERVATION')
+    release={**deepcopy(buy),'event_id':'SYNTHETIC_RELEASE_ACK_ONE','kind':'RELEASE','amount':'5',
+        'economic_effect_ids':['SYNTHETIC_ONE_CANCEL_EFFECT'],'release_confirmed':True,
+        'releases_event_id':buy['event_id'],'release_state':'CANCELLED'}
+    scope['exposures'] += [release,{**deepcopy(release),'event_id':'SYNTHETIC_RELEASE_ACK_TWO'}]
+    cap=m.capacity(scope,ci,at)
+    result=planning_exposures(scope,cap)
+    assert next(r for r in result if r['event_id']==buy['event_id'])['amount']=='5'
+    assert cap['confirmed_release_deducted']=='5'
+
+
 def allocation_binding():
     m,ci,scope,at=family_case()
     return m,{'scope':scope,'canonical_input':ci,'input_scope_digest':m.digest(scope),

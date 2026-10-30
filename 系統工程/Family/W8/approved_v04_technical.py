@@ -50,6 +50,16 @@ def val(value):
 
 
 def produce(rows,*,profile,is_etf=None,close_only=False):
+    from same_run_market_cache import active_cache
+    cache=active_cache()
+    if cache is not None:
+        return cache.memo('W8.approved_v04_technical.produce',{'rows':rows,'profile':profile,'is_etf':is_etf,'close_only':close_only},
+            lambda:_produce_original(rows,profile=profile,is_etf=is_etf,close_only=close_only),
+            repo_root=Path(__file__).resolve().parents[3])
+    return _produce_original(rows,profile=profile,is_etf=is_etf,close_only=close_only)
+
+
+def _produce_original(rows,*,profile,is_etf=None,close_only=False):
     with localcontext() as ctx:
         ctx.prec=50;ctx.rounding=ROUND_HALF_EVEN
         result=_produce(rows,profile=profile,is_etf=is_etf,close_only=close_only)

@@ -98,17 +98,36 @@ def calculate(root,descriptor,request,symbol,*,runner_factory=None,delivery=None
 def complete_report(report,request,config,root):
     """Called after immutable component-source replay, once per requested run."""
     descriptors=config.get('financial_sources') or {}
-    if not descriptors:return deepcopy(report)
+    producers=config.get('financial_producer_sources') or {}
+    if not descriptors and not producers:return deepcopy(report)
     symbols={r['symbol'] for r in report['positions']}
-    if set(descriptors)-symbols:raise PermissionError('MEMBER_FINANCIAL_ASSET_OUTSIDE_APPROVED_UNIVERSE')
+    if (set(descriptors)|set(producers))-symbols:raise PermissionError('MEMBER_FINANCIAL_ASSET_OUTSIDE_APPROVED_UNIVERSE')
+    if set(descriptors)&set(producers):raise PermissionError('MEMBER_FINANCIAL_DUPLICATE_PRODUCER_PATH')
     out=deepcopy(report);out['component_report_digest']=report['report_digest']
+    from same_run_market_cache import SameRunMarketCache
+    observation_cache=SameRunMarketCache()
     for row in out['positions']:
         descriptor=descriptors.get(row['symbol'])
+        if row['symbol'] in producers:
+            from member_financial_producer import produce
+            attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],observation_cache=observation_cache)
+            row['financial_source_attempt']=attempt;row['call_trace']+=attempt['call_trace']
+            row['missing_inputs']=[m for m in row['missing_inputs'] if m['field']!='work3/C7/funding/execution_constraints']
+            if descriptor is None:
+                for issue in attempt['issues']:
+                    if not isinstance(issue,dict):continue
+                    row['missing_inputs'].append({'field':issue.get('field_path'),'producer':'ORIGINAL_ASSET_SOURCE_PRODUCER',
+                        'reason':issue.get('code'),'kind':issue.get('kind','ORIGINAL_SOURCE_CONTRACT_FAILURE'),
+                        'affects':['financial source assembly'],'original_issue':issue})
+                row['result_digest']=digest({k:v for k,v in row.items() if k!='result_digest'})
         if descriptor is None:continue
         readback=(config.get('ledger_delivery_sources') or {}).get(row['symbol'])
         delivery={'member_db_path':config['member_db_path'],'member_drive_binding':config['member_drive_binding'],
             'descriptor':readback} if readback is not None else None
         financial=calculate(root,descriptor,request,row['symbol'],delivery=delivery)
+        if row.get('financial_source_attempt') is not None:
+            row['financial_source_attempt']['qualified_financial_pack']=financial['full_native_pipeline_complete']
+            row['financial_source_attempt']['native_validation_status']=financial['status']
         row['financial_chain']=financial
         row['full_native_pipeline_complete']=financial['full_native_pipeline_complete']
         row['full_native_mentor_reached']=financial['mentor'] is not None
@@ -131,21 +150,43 @@ def complete_report(report,request,config,root):
             row['proposed_amount']=financial['canonical_amount']
         row['result_digest']=digest({k:v for k,v in row.items() if k!='result_digest'})
     financial=[r.get('financial_chain') or {} for r in out['positions']]
+    from member_funding_summary import reconcile as reconcile_member_funding
+    funding=reconcile_member_funding(request,out['positions'])
+    out['member_funding_summary']=funding
+    if funding['issues']:
+        for row in out['positions']:
+            f=row.get('financial_chain')
+            if f is None:continue
+            f['per_asset_formal_deployment_ready']=f['formal_deployment_ready']
+            f['formal_deployment_ready']=False
+            f['member_funding_reconciliation_status']=funding['status']
+            row['missing_inputs'].append({'field':'member_funding_summary','producer':'ORIGINAL_NATIVE_FUNDING_RECONCILIATION',
+                'reason':'MEMBER_SHARED_FUNDING_NOT_CONSERVED','kind':'MEMBER_SHARED_FUNDING_REQUIREMENT',
+                'affects':['canonical deployment readiness']})
     all_native_complete=bool(financial) and all(f.get('full_native_pipeline_complete') for f in financial)
     all_mentor=bool(financial) and all(f.get('mentor') is not None for f in financial)
-    all_complete=all_native_complete and all_mentor and all(f.get('formal_deployment_ready') for f in financial)
+    all_complete=all_native_complete and all_mentor and funding['conserved'] and all(f.get('formal_deployment_ready') for f in financial)
     # Native shared cash is conserved in the single member ledger; positive
     # plans stay pending until original-ID remote readback has been verified.
-    out['full_native_pipeline_complete']=all_native_complete
+    out['full_native_pipeline_complete']=all_native_complete and funding['conserved']
     out['full_native_mentor_reached']=all_mentor
     out['formal_deployment_ready']=all_complete
     out['summary']['full_financial_native_completed']=sum(bool(f.get('full_native_pipeline_complete')) for f in financial)
     out['summary']['formal_financial_ready']=sum(bool(f.get('formal_deployment_ready')) for f in financial)
+    out['summary']['original_financial_producer_attempts']=sum('financial_source_attempt' in r for r in out['positions'])
+    out['summary']['original_asset_producer_calls']=sum('W8.AssetSourceProducer' in r.get('financial_source_attempt',{}).get('call_trace',[])
+        for r in out['positions'])
+    out['summary']['original_financial_packs_created']=sum(bool(r.get('financial_source_attempt',{}).get('created_pack_descriptor')) for r in out['positions'])
     if all_complete:
         out['status']='FINANCIAL_PIPELINE_COMPLETE'
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
         out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}
-    elif all_native_complete and all_mentor:
+    elif funding['issues']:
+        out['status']='FINANCIAL_FUNDING_RECONCILIATION_BLOCKED'
+        for row in out['positions']:
+            row['proposed_amount']=None
+            row['result_digest']=digest({k:v for k,v in row.items() if k!='result_digest'})
+    elif all_native_complete and all_mentor and funding['conserved']:
         out['status']='FINANCIAL_ANALYSIS_COMPLETE_PENDING_ORIGINAL_GATES'
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
         out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}

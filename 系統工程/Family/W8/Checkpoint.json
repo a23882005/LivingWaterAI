@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-10-30T13:09:00.591Z",
+  "updated_at": "2026-10-30T16:18:49.856Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -958,6 +958,15 @@
       "repair": "W8 official read using existing B06 and W5; secure identity/client/SHA; 02/04 handlers, AVGO natural-language 04 routing, fail-closed missing official source",
       "test_status": "CI code compilation and existing regressions PASS",
       "end_to_end_status": "PENDING_RUNTIME_BINDING"
+    },
+    {
+      "id": "REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW",
+      "status": "OPEN_ASSIGNED_ORIGINAL_REPORT_CODEX",
+      "PR": 60,
+      "fixed_review_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+      "review_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+      "affected_pages": 12,
+      "source_lines": 32
     }
   ],
   "outstanding": [
@@ -974,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原V82 Codex：依C7正式B方案施工及四戶金融整線；原報告Codex：PR60；中PM：版本/依賴治理與獨立驗收/Gate",
-  "next_action": "原V82 Codex納入main 27e48e7正式C7契約及最新治理，實作新scope與四戶同輪financial_sources，補根事實後驗真實Gap/cycle/資金/MIN/lot/Work9-Mentor及Drive帳本讀回。中PM獨立驗收；C7 A/B方案選擇已完成。",
+  "next_owner": "原報告Codex：PR60來源長字串排版補修與重交；原V82 Codex：PR59 C7新scope/金融整線；中PM：契約/版本協調與獨立驗收",
+  "next_action": "PR60先獨立修復來源reference水平溢位，加入browser/PDF邊界斷言，重渲四戶並以新檔名保存、20份讀回及查閱回交；保留已通過SOURCE_REVIEW資料/保存成果。完整金融及七組章節依原producer待PM鎖PR59回交版本整合。PR59依正式C7 B契約續工，PM獨立複驗各線。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -1982,5 +1991,78 @@
     "semantics": "Preserve approved long-term Project Target and money base. Consume same-run V70 total ceiling; subtract canonical occupied exposure once, then cap by authorized incremental funding; preserve protected and old-scope guards.",
     "runtime_status": "NEW_SCOPE_IMPLEMENTATION_AND_PM_ACCEPTANCE_PENDING",
     "gate_status": "CONSTRUCTION_AUTHORIZED__NO_PRODUCTION_OR_TRADING_RELEASE"
+  },
+  "report_html_PM_review_20261031": {
+    "fixed_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+    "verdict": "DATA_SOURCE_AND_PERSISTENCE_PASS__SOURCE_REFERENCE_WRAP_REPAIR_REQUIRED",
+    "PR60_review": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+    "checks": {
+      "remote_code_blobs": 19,
+      "independent_contract_tests": 43,
+      "independent_subtests": 46,
+      "member_source_digest_reproductions": 4,
+      "private_package_payloads": 176,
+      "pages": [
+        18,
+        21,
+        15,
+        15
+      ],
+      "pages_total": 69,
+      "chapters": 14,
+      "toc_targets": 13,
+      "fresh_remote_files_and_manifests": 20,
+      "fresh_private_metadata_checks": 20,
+      "publication_verifiers": 4,
+      "lookup_verifiers": 4,
+      "CI_success": 1
+    },
+    "scope": "SOURCE_REVIEW with archived d8dea45 member analysis; full finance and seven source envelopes pending",
+    "browser": {
+      "contractor_recorded_tests": 8,
+      "independent_rerender": "NOT_RUN_CHROMIUM_DOWNLOAD_SITE_UNAVAILABLE",
+      "independent_PDF_static_and_visual_review": "COMPLETED_WITH_NAMED_HORIZONTAL_DEFECT"
+    },
+    "defect": {
+      "id": "REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW",
+      "source_lines": 32,
+      "affected_physical_pages": 12,
+      "page_edge_overflows": 2,
+      "page_map": {
+        "Joseph": [
+          11,
+          12,
+          13,
+          14
+        ],
+        "MOU": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "Arthur": [
+          11
+        ],
+        "Lilian": [
+          11
+        ]
+      },
+      "source": "Family/W8/w6_member_render.py:_section_items"
+    },
+    "private_PM_package": {
+      "location": "Google Drive root/TEMP",
+      "name": "Family_Report_HTML_PR60_中PM驗收與補修契約_20261031.zip",
+      "bytes": 1014386,
+      "sha256": "c86b99265cdd15f3e766eee7269fc548a9d856b37539aee51509e04a10b4aa2c",
+      "remote_sha_crc_manifest_pass": true
+    },
+    "next_execution_owner": "原報告Codex：來源文字換行/水平邊界回歸/四戶重渲與新20檔保存讀回",
+    "PM_owner": "Family中PM：派工、金融版本與章節來源協調、治理與獨立複驗",
+    "full_financial_and_end_user_login": "PENDING_SEPARATE_ACCEPTANCE",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

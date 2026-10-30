@@ -192,13 +192,22 @@ def capacity(source,canonical,evaluated_at):
         value=number(item['amount'],path+'.amount')*rate;key=digest(item['owner'])
         by_account[key]=by_account.get(key,Decimal(0))+value
     positive=sum((number(r['amount'],'exposure.amount')*conversion(data,canonical,evaluated_at,r['owner']) for r in components.values() if r['kind']!='RELEASE'),Decimal(0))
-    released=Decimal(0);release_by_target={}
+    released=Decimal(0);release_by_target={};release_effects={}
     for item in releases:
         event=item['event_id'];target=components.get(item.get('releases_event_id'))
         if item.get('release_confirmed') is not True:
             ignored.append({'event_id':event,'reason':'RELEASE_NOT_CONFIRMED__COMMITMENT_RETAINED'});continue
         if event in data['exposure_coverage']['confirmed_effects_already_applied']:
             ignored.append({'event_id':event,'reason':'ALREADY_REFLECTED_IN_CONFIRMED_EXPOSURE'});continue
+        effects=frozenset(item['economic_effect_ids'])
+        signature=(digest(item['owner']),item['asset_id'],item.get('intent_id'),item.get('releases_event_id'),
+            item.get('release_state'),number(item['amount'],'release.amount'),item['currency'])
+        overlaps=[release_effects[e] for e in effects if e in release_effects]
+        if overlaps:
+            if all(previous==(effects,signature) for previous in overlaps) and len(overlaps)==len(effects):
+                ignored.append({'event_id':event,'reason':'DUPLICATE_CONFIRMED_RELEASE_ECONOMIC_EFFECT'});continue
+            fail('C_W7_LT_CONFLICTING_RELEASE_ECONOMIC_EFFECT','exposures.'+event)
+        if effects.intersection(covered):fail('C_W7_LT_RELEASE_OVERLAPS_POSITIVE_ECONOMIC_EFFECT','exposures.'+event)
         if (target is None or target['kind']=='RELEASE' or item['owner']!=target['owner']
             or item.get('intent_id')!=target.get('intent_id') or item.get('asset_id')!=target.get('asset_id')
             or item.get('release_state') not in ('CANCELLED','EXPIRED','REJECTED','LOCAL_RELEASED','CONFIRMED_POSITION_REDUCTION')):
@@ -207,6 +216,7 @@ def capacity(source,canonical,evaluated_at):
         release_by_target[target_id]=release_by_target.get(target_id,Decimal(0))+value
         if release_by_target[target_id]>number(target['amount'],'released_exposure.amount'):
             fail('C_W7_LT_RELEASE_EXCEEDS_RECORDED_EXPOSURE','exposures.'+event)
+        for effect in effects:release_effects[effect]=(effects,signature)
         normalized=value*conversion(data,canonical,evaluated_at,item['owner'])
         released+=normalized;by_account[digest(item['owner'])]-=normalized
     occupied=positive-released
@@ -224,6 +234,16 @@ def capacity(source,canonical,evaluated_at):
             fail('C_W7_LT_FUNDING_ACCOUNT_SCOPE_OR_DUPLICATION',path)
         funding_accounts.add(key)
         if bucket['value_state']!='KNOWN' or bucket['settled'] is not True:
+            # Explicit zero authorization proves a zero contribution without
+            # converting missing brokerage cash or settlement into known zero.
+            if bucket['authorized_incremental_amount'] is not None and number(bucket['authorized_incremental_amount'],path+'.authorized_incremental_amount')==0:
+                receipt(bucket['receipt'],canonical,evaluated_at,path+'.receipt')
+                cash_audit.append({'bucket_id':bucket['bucket_id'],'state':'UNKNOWN_CASH_KNOWN_ZERO_AUTHORIZATION',
+                    'cash_basis':bucket['cash_basis'],'net_available':None,'authorized':'0','available_authorized':'0',
+                    'native_net_available':None,'native_authorized':'0','native_available_authorized':'0',
+                    'currency':bucket['currency'],'budget_currency':currency,'cash_or_settlement_unknown_retained':True,
+                    'reserved_deducted_here':False})
+                continue
             funding_unknown.append(bucket['bucket_id']);cash_audit.append({'bucket_id':bucket['bucket_id'],'state':'UNKNOWN'});continue
         receipt(bucket['receipt'],canonical,evaluated_at,path+'.receipt')
         rate=conversion(data,canonical,evaluated_at,bucket['owner'])
@@ -249,7 +269,7 @@ def capacity(source,canonical,evaluated_at):
             'reserved_deducted_here':bucket['cash_basis']=='GROSS_SETTLED_CASH'})
     funding_unknown+=['ACCOUNT:'+key for key in sorted(owners-funding_accounts)]
     known_funding=None if funding_unknown else funding
-    amount=Decimal(0) if room==0 else None if room is None or known_funding is None else min(room,known_funding)
+    amount=Decimal(0) if room==0 or known_funding==0 else None if room is None or known_funding is None else min(room,known_funding)
     gross_result={'ceiling':None if unknown_caps else str(ceiling),'ceiling_upper_bound':str(ceiling),
         'ceiling_value_state':'UNKNOWN' if unknown_caps else 'KNOWN',
         'occupied':str(occupied),'confirmed_release_deducted':str(released),

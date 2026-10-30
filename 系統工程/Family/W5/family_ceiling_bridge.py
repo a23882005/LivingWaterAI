@@ -48,15 +48,7 @@ def bind(repo_path,computation,request,evidence):
             fail('WORK3_SETTLED_CASH_OR_AUTHORIZATION_SOURCE_MISMATCH')
     amount=capacity['incremental_capacity']
     if amount is None:fail('INCREMENTAL_CAPACITY_UNKNOWN')
-    events={r['event_id']:r for r in scope['exposures']};released={}
-    for row in events.values():
-        if (row['kind']=='RELEASE' and row.get('release_confirmed') is True
-            and row['event_id'] not in scope['exposure_coverage']['confirmed_effects_already_applied']):
-            target=row['releases_event_id'];released[target]=released.get(target,Decimal(0))+Decimal(str(row['amount']))
-    planning=[]
-    for row in events.values():
-        if row['kind']=='ACTIVE_BUY_RESERVATION':
-            planning.append({**deepcopy(row),'amount':str(Decimal(str(row['amount']))-released.get(row['event_id'],Decimal(0)))})
+    planning=planning_exposures(scope,capacity)
     return {'profile':module.PROFILE,'input_scope_digest':proof['input_scope_digest'],
         'scope':deepcopy(scope),'canonical_input':deepcopy(proof['canonical_input']),
         'evaluation_at':result['created_at'],'amount':Decimal(amount)/rate,'currency':w3['currency'],
@@ -66,6 +58,23 @@ def bind(repo_path,computation,request,evidence):
         'account_owners':deepcopy(scope['account_owners']),
         'planning_exposure_sources':planning,
         'pm_gate_released':False}
+
+
+def planning_exposures(scope,capacity):
+    """Carry the original capacity producer's release deduplication to SQLite."""
+    events={r['event_id']:r for r in scope['exposures']};released={}
+    ignored_releases={r['event_id'] for r in capacity['ignored_duplicate_or_release_events']
+        if r['reason']!='IDENTICAL_EVENT_ALREADY_COUNTED'}
+    for row in events.values():
+        if (row['kind']=='RELEASE' and row.get('release_confirmed') is True
+            and row['event_id'] not in ignored_releases
+            and row['event_id'] not in scope['exposure_coverage']['confirmed_effects_already_applied']):
+            target=row['releases_event_id'];released[target]=released.get(target,Decimal(0))+Decimal(str(row['amount']))
+    planning=[]
+    for row in events.values():
+        if row['kind']=='ACTIVE_BUY_RESERVATION':
+            planning.append({**deepcopy(row),'amount':str(Decimal(str(row['amount']))-released.get(row['event_id'],Decimal(0)))})
+    return planning
 
 
 def allocate(repo_path,binding,group,*,asset_id,daily_cap):

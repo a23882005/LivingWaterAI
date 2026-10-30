@@ -118,6 +118,15 @@ def mapped_numeric_signals(current, previous):
 
 
 def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
+    module=sys.modules.get('same_run_market_cache')
+    cache=module.active_cache() if module is not None else None
+    if cache is not None:
+        return cache.memo('W5.build_partial_technical',{'history':history,'metadata':metadata,'evaluated_at':evaluated_at},
+            lambda:_build_partial_technical_original(history,metadata=metadata,evaluated_at=evaluated_at,repo_path=repo_path),repo_root=repo_path)
+    return _build_partial_technical_original(history,metadata=metadata,evaluated_at=evaluated_at,repo_path=repo_path)
+
+
+def _build_partial_technical_original(history,*,metadata,evaluated_at,repo_path):
     """Return partial facts and original aggregation, never deployment permission.
 
     metadata is supplied by the trusted source adapter, not inferred from ticker.

@@ -98,6 +98,13 @@ class FinancialSourceTests(TestCase):
             'issue_codes':[],'call_trace':['SYNTHETIC_TEST_ONLY'],'canonical_v82_output':{'synthetic':True},
             'canonical_amount':{'amount':'0','currency':'USD'},'drive_persistence_status':'NOT_REQUIRED_NO_POSITIVE_PLAN',
             'native_result':{'native_result':{'c7_family_pm_gate':{'required':True,'work8_released':False}}}}
+        from test_member_funding_summary import financial_row
+        source=financial_row('SYNTHETIC_ASSET','0','0')['financial_chain']
+        source['owner']['client_id']=self.parent['client_id']
+        source['native_result']['native_result']['client_id']=self.parent['client_id']
+        source['native_result']['native_result']['funding_aggregate']['owner']['client_id']=self.parent['client_id']
+        financial.update(owner=source['owner'],run_id=source['run_id'])
+        financial['native_result']['native_result'].update(source['native_result']['native_result'])
         with patch('member_financial_chain.calculate',return_value=financial):
             out=complete_report(report,self.parent,{'financial_sources':{'SYNTHETIC_ASSET':{}}},ROOT)
         self.assertTrue(out['full_native_pipeline_complete']);self.assertTrue(out['full_native_mentor_reached'])

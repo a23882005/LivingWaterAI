@@ -51,6 +51,29 @@ def family_scope_source(request,context):
     return data
 
 
+def member_scope_preflight(request,context):
+    """Fail only Member deployment assembly before repeating its analysis.
+
+    The Member producer has already run its independent stock components. A
+    missing container says the source assembly is unfinished; it does not say
+    that every fact inside it is externally unavailable.
+    """
+    source=family_scope_source(request,context)
+    if source is None or not source.get('missing'):return None
+    return {'source_section':'trusted_context.family_c7_scope_source',
+        'code':source['missing'],'field_path':'family_c7_scope_source',
+        'kind':'SOURCE_ASSEMBLY_REQUIRED',
+        'required_contract_fields':[
+            'family_scope.approved_long_term_target','family_scope.approval_receipt',
+            'family_scope.current_nav','family_scope.total_stock_ceiling',
+            'family_scope.portfolio_caps','family_scope.protection_coverage',
+            'family_scope.preference_locks','family_scope.exposure_coverage',
+            'family_scope.exposures','family_scope.funding_buckets'],
+        'contract_schema':'83_Family_LongTerm_V70Ceiling_Input.schema.json',
+        'external_fact_completeness_not_inferred':True,
+        'engineering_scope':'NEW_FAMILY_PROFILE__NO_LEGACY_CONFIRM_FALLBACK'}
+
+
 def bind_family_approval(request,analysis,scope):
     """Compare immutable source amounts/weights to the original W2 projection."""
     approved=scope['approved_long_term_target'];projection=analysis['native_target_source']

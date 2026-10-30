@@ -317,11 +317,13 @@ class AssetSourceProducer:
     def __init__(self, *, repo_root, request_seed, context_seed, cash_policy,
                  classification_source, source_commit, focus_symbol='VT',db_path=None,product_source=None,
                  flow='HOLDINGS_ANALYSIS', analyze_all=True,alternative_source_dir=None,issuer_facts_source=None,
-                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None,core_sources=None):
+                 product_sources=None,issuer_facts_sources=None,new_investment_policy=None,account_presence_policy=None,v70_strategic_policy=None,fx_observation=None,order_confirmation=None,loop2_target_projection_policy=None,official_target_base_source=None,bond_market_supplement_source=None,v75_macro_source_manifest=None,verified_macro_feed_source=None,broker_snapshot_source=None,qualified_equity_source_manifest=None,core_sources=None,run_binding=None,observation_cache=None):
         self.root=Path(repo_root);self.req=deepcopy(request_seed);self.ctx=deepcopy(context_seed)
         self.broker_snapshot_source=deepcopy(broker_snapshot_source)
         self.qualified_equity_source_manifest=deepcopy(qualified_equity_source_manifest)
         self.core_sources=deepcopy(core_sources or {})
+        self.run_binding=deepcopy(run_binding)
+        self.observation_cache=observation_cache
         self.policy=deepcopy(cash_policy);self.class_source=deepcopy(classification_source)
         self.source_commit=source_commit;self.symbol=focus_symbol
         self.db_path=db_path
@@ -376,14 +378,30 @@ class AssetSourceProducer:
         if self.verified_macro_feed_source is not None:
             ctx['verified_macro_feed_source']=deepcopy(self.verified_macro_feed_source)
         when=datetime.now(timezone.utc).isoformat();run='family-04-'+uuid.uuid4().hex
+        if self.run_binding is not None:
+            binding=self.run_binding
+            from member_market_source import time
+            if (binding.get('client_id')!=snapshot['client_id'] or binding.get('source_db_sha256')!=snapshot['source_sha256']
+                or binding.get('owner')!=req['owner'] or not binding.get('run_id')
+                or time(binding['evaluation_at'])>time(when)):
+                raise PermissionError('MEMBER_FINANCIAL_PRODUCER_RUN_BINDING_MISMATCH')
+            when=binding['evaluation_at'];run=binding['run_id']
         req.update(run_id=run,request_id=run+'-request',evaluation_at=when)
         req['client_snapshot']['as_of']=when
         # Refresh the actual W3 feed independently; no old result is re-labelled.
         from market_bridge import read_macro_snapshot
         read_options={'source':self.verified_macro_feed_source} if self.verified_macro_feed_source is not None else {}
-        macro=read_macro_snapshot(self.root,source_commit=self.source_commit,capture_bound=True,**read_options)
+        if self.run_binding is not None:
+            macro=deepcopy(self.run_binding['macro_snapshot'])
+            from v10_source_observations import checked_payload
+            checked_payload(macro,when)
+            path=Path(macro['source_path'])
+            if not path.is_absolute():path=self.root/path
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=macro['source_sha256']:
+                raise PermissionError('MEMBER_FINANCIAL_PRODUCER_MACRO_BYTES_CHANGED')
+        else:macro=read_macro_snapshot(self.root,source_commit=self.source_commit,capture_bound=True,**read_options)
         req['macro_snapshot']=macro
-        req['evaluation_at']=datetime.now(timezone.utc).isoformat()
+        req['evaluation_at']=when if self.run_binding is not None else datetime.now(timezone.utc).isoformat()
         when=req['evaluation_at']  # One post-capture evaluation clock for all native observations.
         if macro.get('capture_receipt'):ctx['macro_capture_digest']=digest(macro['capture_receipt'])
         req['expected_versions']['market']=ctx['expected_versions']['market']=macro['digest']
@@ -418,11 +436,21 @@ class AssetSourceProducer:
         found=[r for r in prepared.payload['positions'] if r['source_instrument'].get('ticker')==self.symbol]
         if len(found)!=1:raise ValueError('FOCUS_ASSET_SOURCE_MISSING_OR_AMBIGUOUS')
         held=found[0];asset_class=classification(self.symbol,self.class_source,self.product_sources.get(self.symbol))
-        if self.flow=='DEPLOYMENT' and asset_class['primary_class']!=FORMAL_CLASSES[0]:
-            raise ValueError('CLASS_SPECIFIC_NATIVE_PRODUCER_REQUIRED')
         trial=cash_trial(snapshot,req['owner'],self.policy,db_path=self.db_path,run_id=run,broker_view=broker_view)
         if self.flow=='DEPLOYMENT' and trial['issues']:
             raise ValueError(trial['issues'][0]['code']+':'+trial['issues'][0]['field_path'])
+        if self.flow=='DEPLOYMENT' and self.run_binding is not None:
+            from deployment_c7_sources import member_scope_preflight
+            missing=member_scope_preflight(req,ctx)
+            if missing is not None:
+                return {'request':req,'trusted_context':ctx,'source_production':{
+                    'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':[missing],
+                    'call_trace':['W8.AssetSourceProducer:original_member_bootstrap',
+                        'W5.prepare_input','W8.deployment_c7_sources.member_scope_preflight'],
+                    'independent_member_stock_components_already_computed':True,
+                    'no_financial_engine_or_ledger_claimed':True},
+                    'source_metadata':{'client_id':req['client_id'],'run_id':run,
+                        'source_db_sha256':snapshot['source_sha256']}}
         spec=importlib.util.spec_from_file_location('asset_source_market',HERE/'on_demand_market_observations.py')
         market=importlib.util.module_from_spec(spec);spec.loader.exec_module(market)
         holdings=project_official_holdings(snapshot,evaluation_at=when)
@@ -431,7 +459,7 @@ class AssetSourceProducer:
             holdings=broker_holdings(holdings,prepared.payload['positions'],broker_view)
         from bond_advisory import policy as bond_advisory_policy,candidates as bond_candidates
         advisory_candidates=bond_candidates(self.root) if bond_advisory_policy(req,ctx) else None
-        observations=market.build_member_market_observations(snapshot,[],macro,repo_root=self.root,
+        market_arguments=dict(snapshot=snapshot,targets=[],macro=macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings,
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
             approved_rule_profile=self.approved_rule_profile,
@@ -442,6 +470,12 @@ class AssetSourceProducer:
             bond_advisory_candidates=advisory_candidates,
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
+        cache=self.observation_cache if self.run_binding is not None else None
+        if cache is not None:
+            from same_run_market_cache import SameRunMarketCache
+            if not isinstance(cache,SameRunMarketCache):raise TypeError('MEMBER_MARKET_CACHE_INTERNAL_INSTANCE_REQUIRED')
+            observations=cache.build(market.build_member_market_observations,market_arguments)
+        else:observations=market.build_member_market_observations(**market_arguments)
         from v75_market_supplement import read as read_bond_supplement,apply as apply_bond_supplement
         supplement=read_bond_supplement(self.bond_market_supplement_source,when)
         from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
@@ -487,6 +521,8 @@ class AssetSourceProducer:
             return {'request':req,'trusted_context':ctx,'source_production':stitched,
                 'source_metadata':{'client_id':req['client_id'],'run_id':run,
                     'source_db_sha256':snapshot['source_sha256']}}
+        if asset_class['primary_class']!=FORMAL_CLASSES[0]:
+            raise ValueError('CLASS_SPECIFIC_NATIVE_PRODUCER_REQUIRED')
         observed=next((r for r in observations['assets'] if r['symbol']==self.symbol),None)
         report={'schema_version':'Family.W8.NativeSourceProduction.v1','client_id':req['client_id'],
             'run_id':run,'owner':deepcopy(req['owner']),'source_db_sha256':snapshot['source_sha256'],

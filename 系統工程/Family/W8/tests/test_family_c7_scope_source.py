@@ -19,6 +19,15 @@ def test_new_scope_missing_facts_never_falls_back_to_legacy_confirm(monkeypatch)
     assert out['source_validation_issues'][0]['code']=='FAMILY_C7_ORIGINAL_SCOPE_FACTS_REQUIRED'
 
 
+def test_member_deployment_preflight_names_assembly_without_asserting_all_facts_missing():
+    from deployment_c7_sources import member_scope_preflight
+    assert member_scope_preflight({}, {}) is None  # Legacy entry remains unchanged.
+    issue=member_scope_preflight({}, {'family_c7_profile':FAMILY_PROFILE})
+    assert issue['kind']=='SOURCE_ASSEMBLY_REQUIRED'
+    assert issue['external_fact_completeness_not_inferred'] is True
+    assert 'family_scope.exposure_coverage' in issue['required_contract_fields']
+
+
 def test_source_bytes_owner_run_db_approval_and_originals_are_bound(tmp_path):
     raw=tmp_path/'SYNTHETIC_ORIGINAL.json';raw.write_text('{"synthetic":true}')
     hashed=sha256(raw.read_bytes()).hexdigest();at='2026-10-30T00:00:00Z'

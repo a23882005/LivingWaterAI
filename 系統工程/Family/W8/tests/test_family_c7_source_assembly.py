@@ -167,14 +167,19 @@ def test_duplicate_position_identity_is_not_silently_overwritten(tmp_path):
         assemble(ROOT,req,ctx,artifact_directory=tmp_path/'private',tactical=t,identities=ids,portfolio_facts_source=desc())
 
 
-def test_partial_original_observation_times_are_preserved_and_never_stamped_with_run_time(tmp_path,monkeypatch):
+@pytest.mark.parametrize('new_snapshot',[False,True])
+def test_partial_original_observation_times_are_preserved_and_never_stamped_with_run_time(tmp_path,monkeypatch,new_snapshot):
     from types import SimpleNamespace
     from family_c7_source_assembly import assemble_original_producers
     import native_asset_source,v70_tactical_input
     m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path);owner=req['owner']
-    old='2026-10-20T01:02:03Z'
+    old='2026-09-20T01:02:03Z'
     req['client_snapshot']['payload']['tables']['cash_balance_snapshot']=[{'account_key':owner['account'],
         'as_of_utc':old,'version':1,'normalized_settled_minor':5000,'reserved_minor':1000,'pending_payable_minor':0}]
+    if new_snapshot:
+        req['client_snapshot']['payload']['tables']['cash_balance_snapshot'].append({'account_key':owner['account'],
+            'as_of_utc':'2026-09-21T01:02:03Z','version':1,'normalized_settled_minor':None,
+            'reserved_minor':None,'pending_payable_minor':100})
     producer=SimpleNamespace(root=ROOT,db_path=tmp_path/'original.db',class_source={},product_sources={},
         verified_macro_feed_source=None,v70_strategic_policy={},fx_observation=None,order_confirmation=None,
         family_c7_assembly_inputs={'schema_version':'Family.W8.C7AssemblyInputs.v1',
@@ -188,7 +193,14 @@ def test_partial_original_observation_times_are_preserved_and_never_stamped_with
     q=inventory['family_scope.current_nav.positions.QQQ.quantity']['source_locators'][0]
     cash=inventory['family_scope.funding_buckets.'+owner['account']+'.settled_cash']['source_locators'][0]
     assert q['as_of'] is None and q['available_at'] is None and q['observation_time_state']=='NOT_PROVIDED'
-    assert cash['as_of']==old and cash['binding_checked_at']==req['evaluation_at']
+    assert cash['as_of']==('2026-09-21T01:02:03Z' if new_snapshot else old)
+    assert cash['binding_checked_at']==req['evaluation_at']
+    assert cash['normalized_amount']==(None if new_snapshot else '50')
+    prefix='family_scope.funding_buckets.'+owner['account']
+    assert inventory[prefix+'.unsettled_cash']['value_state']=='UNKNOWN'
+    payable=inventory[prefix+'.pending_payable']['source_locators'][0]
+    assert payable['normalized_amount']==('1' if new_snapshot else '0')
+    assert out['scope_candidate']['funding_buckets'] is None
 
 
 @pytest.mark.parametrize('change',['cash_net','nav','order_quantity','fill_not_applied','cap_currency'])

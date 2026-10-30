@@ -27,6 +27,10 @@
 
 帳戶原始reported/gross cash未完成payable、netting、nonoverlap或結算查核時，不能填成合格available cash。原broker settled觀測也不自動等於可用現金。數量與金額以原十進位字串保留；日期與原始SHA不改成此次執行時間。
 
+既有W1原件由 `w1_portfolio_observations.normalize` 產生內部 `Family.W8.W1PortfolioObservationReview.v1`，保留在 `original_observations.w1_portfolio_review`。逐帳戶列正式身份缺欄，具備完整明確候選時重用原W5 `bind_owner` 驗證，不用帳戶名稱推定券商／幣別／資金域，不傳分析用的臨時category scope充當金融身份證明。這是部分來源查核，不能直接當完整 `PortfolioReconciliationFacts.v1`。
+
+現金每account/currency只選cutoff前同一最新as_of/version的完整原row；同版異值拒收，不逐欄回填較早非空值。W1 INTEGER分幣按原 `official_mutations.minor_units` 的100倍尺度精確轉成原幣十進位字串，附原minor欄位和值、幣別、row digest及原時間。不同幣別分列，未明確選定時不產生單一account現金值；`pending_payable_minor`只列應付款，不列為unsettled cash。reported／settled／receivable／payable／reserved原觀測各自保留，available與本人增額授權未知仍null，未自動推導或升格為可執行資金。持倉歷史逐account/instrument選最新觀測，不加總不同日期數量；缺完整涵蓋證據仍UNKNOWN。
+
 相同instrument在兩個帳戶、同一報價單位的持倉，Current按instrument彙總一次，confirmed exposures仍逐帳戶分列；不同單位不能偷偷合併。position_id不能重複。CANCEL_PENDING／REPLACE_PENDING須附券商最後已確認的`last_acknowledged_commitment`（原總數量、承諾價、來源與時間），目前占額必須與之相符；尚未確認的縮量、降價不能降低占額。原觀測時間缺失時，inventory明列null／NOT_PROVIDED，另列本輪binding_checked_at，不能以本輪時間冒充原件時間。
 
 ## 輸出與依賴

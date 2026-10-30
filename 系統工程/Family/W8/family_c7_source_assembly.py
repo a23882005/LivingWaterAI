@@ -206,6 +206,8 @@ class SourceAssembler:
     def portfolio(self,facts,descriptor,scope):
         snapshot=self.request['client_snapshot']['payload'];tables=snapshot['tables']
         if facts is None:
+            from w1_portfolio_observations import normalize
+            review=normalize(self.request)
             counts={k:len(tables.get(k,[])) for k in ('portfolio_account','account_broker_link','account_ownership',
                 'funding_account_domain_link','cash_balance_snapshot','holding_policy_proposal','holding_policy_confirmation')}
             locator={'source_db_sha256':snapshot['source_sha256'],'table_row_counts':counts}
@@ -224,7 +226,13 @@ class SourceAssembler:
             self.observations={'cash_balance_snapshot':deepcopy(tables.get('cash_balance_snapshot',[])),
                 'portfolio_positions':deepcopy(tables.get('portfolio_position',[])),
                 'holding_policies':deepcopy(tables.get('holding_policy_proposal',[])),
-                'account_bindings':deepcopy(tables.get('account_broker_link',[]))}
+                'account_bindings':deepcopy(tables.get('account_broker_link',[])),
+                'w1_portfolio_review':review}
+            self.inventory['account_owners']['qualification_review']={
+                'producer':'W8.w1_portfolio_observations.normalize -> W5.family_boundary.bind_owner',
+                'qualified_account_count':review['qualified_account_count'],
+                'accounts':[{'account_key':r['account_key'],'missing_original_fields':r['missing_binding_fields']}
+                    for r in review['accounts']]}
             return None
         proof=self.reference('reconciliation',descriptor,facts['as_of'],facts['available_at'],original=facts)
         sid=proof['source_reference_id'];accounts=facts['accounts'];owners=[deepcopy(r['owner']) for r in accounts]
@@ -529,19 +537,26 @@ def assemble_original_producers(producer,request,context,prepared,trial):
                 'as_of':source.get('as_of_utc') or source.get('observed_at_utc') or db_locator['as_of']}
             assembler.field('current_nav.positions.'+iid+'.quantity',position.get('quantity') if position.get('quantity_state')=='KNOWN' else None,
                 code='C7_CURRENT_POSITION_QUANTITY_REQUIRED',sources=[locator],producer='W5.prepare_input:accepted_original_position')
-        cash_rows=request['client_snapshot']['payload']['tables'].get('cash_balance_snapshot',[])
-        for account in request['client_snapshot']['payload']['tables'].get('portfolio_account',[]):
-            aid=account['account_key'];rows=[r for r in cash_rows if r['account_key']==aid]
-            locator={**db_locator,'table':'cash_balance_snapshot','account_key':aid,'original_rows':deepcopy(rows)}
-            for name,column in [('settled_cash','normalized_settled_minor'),('reserved_cash','reserved_minor'),('unsettled_cash','pending_payable_minor')]:
-                row=next((r for r in sorted(rows,key=lambda r:(r['as_of_utc'],r['version']),reverse=True)
-                    if r.get(column) is not None),None)
-                original=row[column] if row is not None else None
+        review=out['original_observations']['w1_portfolio_review']
+        from w1_portfolio_observations import MINOR_COLUMNS
+        for account in review['accounts']:
+            aid=account['account_key'];observations=account['cash_observations']
+            selected=observations[0] if len(observations)==1 else None
+            row=selected['original_row'] if selected is not None else None
+            locator={**db_locator,'table':'cash_balance_snapshot','account_key':aid,
+                'selected_snapshot':deepcopy(selected),'snapshot_currency_ambiguous':len(observations)>1}
+            for name,column in {**MINOR_COLUMNS,'unsettled_cash':None}.items():
+                original=selected['amounts'].get(name) if selected is not None else None
                 assembler.field('funding_buckets.'+aid+'.'+name,original,
                     state=ADAPTER if original is not None else MISSING,
                     code='C7_ACCOUNT_ORIGINAL_'+name.upper()+'_QUALIFICATION_REQUIRED',
-                    sources=[dict(locator,as_of=row.get('as_of_utc') if row else None)],
-                    producer='ORIGINAL_W1_CASH_ROWS__MINOR_UNITS_NOT_EXECUTABLE_CASH')
+                    sources=[dict(locator,as_of=row.get('as_of_utc') if row else None,
+                        available_at=selected['available_at'] if selected is not None else None,
+                        currency=selected['currency'] if selected is not None else None,
+                        unit='currency_major',original_minor_column=column,
+                        original_minor_value=row.get(column) if row is not None and column else None,
+                        normalized_amount=original)],
+                    producer='ORIGINAL_W1_COHERENT_CASH_SNAPSHOT__OBSERVATION_NOT_EXECUTABLE_CASH')
             assembler.field('funding_buckets.'+aid+'.available_and_authorization',None,
                 code='C7_ACCOUNT_AVAILABLE_CASH_AND_INCREMENTAL_AUTHORIZATION_REQUIRED',sources=[locator])
         order=prepared.payload.get('broker_snapshot_source')

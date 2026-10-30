@@ -81,7 +81,11 @@
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
-      "sha256": "e635862f4ea5782bec5a2922210604b6b38dd649ace6d80316bb8bd9e9edc964"
+      "sha256": "3119ac73df4c673f605fa9a62987021a9fbbe82eb2e23bcb6928817157c24afd"
+    },
+    {
+      "path": "../../Family/W8/w1_portfolio_observations.py",
+      "sha256": "ec0a64f1c3fe4a3d5da71ad55b4e8f89392692708c200422714147755d011eae"
     },
     {
       "path": "../../Family/W8/same_run_market_cache.py",
@@ -97,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/tools/rebuild_family_long_term_contract.py",
-      "sha256": "7f7b5b3acbf7dc8dfc8901216d18e31c540cfdf7389da55f39a5979d9b0c728c"
+      "sha256": "49195d0683888edebc6ae92d1236322ba1392f6850b7e9f2be41b9f57fb5ac65"
     },
     {
       "path": "../../Family/W8/v70_tactical_input.py",

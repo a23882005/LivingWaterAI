@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "7966a5d38650644c056df591a84261b84f1b8cbde045d44995ed570211bd983c"
+    "sha256": "8a97f0194eca87db6f1a5b51abc1acf7151fb638721650a17013a1c6c68e0bae"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -427,7 +427,7 @@
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
-    "sha256": "7f7b5b3acbf7dc8dfc8901216d18e31c540cfdf7389da55f39a5979d9b0c728c"
+    "sha256": "49195d0683888edebc6ae92d1236322ba1392f6850b7e9f2be41b9f57fb5ac65"
   },
   {
     "path": "系統工程/Family/W8/same_run_market_cache.py",
@@ -447,7 +447,7 @@
   },
   {
     "path": "系統工程/Family/W8/family_c7_source_assembly.py",
-    "sha256": "e635862f4ea5782bec5a2922210604b6b38dd649ace6d80316bb8bd9e9edc964"
+    "sha256": "3119ac73df4c673f605fa9a62987021a9fbbe82eb2e23bcb6928817157c24afd"
   },
   {
     "path": "系統工程/Family/W8/v70_tactical_input.py",
@@ -456,5 +456,9 @@
   {
     "path": "系統工程/Family/W8/v70_component_runtime.cjs",
     "sha256": "7aeea5f4df9512f62cd5ce89d6279e4935fd16772e95e2952b7fec4347fc5b7b"
+  },
+  {
+    "path": "系統工程/Family/W8/w1_portfolio_observations.py",
+    "sha256": "ec0a64f1c3fe4a3d5da71ad55b4e8f89392692708c200422714147755d011eae"
   }
 ]

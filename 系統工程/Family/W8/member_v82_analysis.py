@@ -162,6 +162,16 @@ def build_report(request, config, repo_root):
     if request.get('confirmed_target') != target:
         raise PermissionError('MEMBER_V82_TARGET_SOURCE_REPLAY_MISMATCH')
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
+    ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
+        'resource_initialized':False,'financial_cycle_initialized':False}
+    if config.get('member_db_path'):
+        from on_demand_drive_io import Binding,inspect
+        from v82_ledger_drive import resolve_resource
+        binding=Binding(**config['member_drive_binding'])
+        if binding.client_id!=client or inspect(config['member_db_path'],binding)['sha256']!=snapshot['source_sha256']:
+            raise PermissionError('MEMBER_LEDGER_SNAPSHOT_BINDING_MISMATCH')
+        ledger_resource=resolve_resource(config['member_db_path'],binding,
+            config.get('ledger_source'),evaluation_at=request['evaluation_at'])
     profile = load_profile(Path(__file__).with_name('owner_approved_v10.json'))
     rows = []
     for asset in coverage['assets']:
@@ -251,9 +261,15 @@ def build_report(request, config, repo_root):
         else:
             row['missing_inputs'].append(missing('market.history', 'exact listing market provider',
                 market_error or 'EXACT_SYMBOL_COMPLETED_HISTORY_UNAVAILABLE', ['technical/Core/Mode/Stage/M']))
+        row['planning_ledger_resource']={k:v for k,v in ledger_resource.items()
+            if k in ('status','cycle_count','resource_initialized','financial_cycle_initialized',
+                'sha256','reference','requires_serialized_writer','distributed_remote_cas_provided')}
         row['missing_inputs'] += [
             missing('cycle_snapshot', 'persistent V82 cycle ledger source',
-                'NO_MEMBER_ASSET_EXCHANGE_BOUND_CYCLE_SNAPSHOT_SUPPLIED', ['remaining daily room']),
+                'QUALIFIED_GAP_AND_OWNER_SESSION_REQUIRED_FOR_CYCLE_INITIALIZATION'
+                if ledger_resource['status']=='VERIFIED_REGISTERED_DRIVE_RESOURCE' else ledger_resource['status'],
+                ['remaining daily room'],kind='UPSTREAM_QUALIFICATION_REQUIRED'
+                if ledger_resource['status']=='VERIFIED_REGISTERED_DRIVE_RESOURCE' else 'LEDGER_TRANSPORT_INPUT_REQUIRED'),
             missing('work3/C7/funding/execution_constraints', 'original Work3/C7/Work4 producers',
                 'FULL_SAME_RUN_FINANCIAL_BUNDLE_NOT_BOUND', ['final amount/caps/MIN/lot/shared cash'],
                 kind='UPSTREAM_INTEGRATION_NOT_COMPLETED'),
@@ -278,6 +294,7 @@ def build_report(request, config, repo_root):
             'source_blocked': sum(r['execution_status']=='SOURCE_BLOCKED' for r in rows),
             'data_complete': sum(r['data_complete'] for r in rows)},
         'canonical_result': None, 'full_native_pipeline_complete': False,
+        'planning_ledger_resource':{k:v for k,v in ledger_resource.items() if k!='cycles'},
         'full_native_mentor_reached': False, 'mentor': None, 'cash_overlay_applied': False,
         'database_written': False, 'trade_authorization': 'NONE', 'trade_action': 'NO_TRADE',
         'call_trace': ['Family.Menu04', 'W8.OnDemandAnalysisProvider',

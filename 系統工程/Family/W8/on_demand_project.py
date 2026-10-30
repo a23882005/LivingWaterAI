@@ -128,6 +128,11 @@ def build_project_menu(*, family_login, project_name, login_account,
         config=dict(member_v82_source_config)
         if config.get('client_id')!=client_id or config.get('source_db_sha256')!=verified_drive_sha256:
             raise PermissionError('MEMBER_V82_CONFIG_CLIENT_OR_DB_MISMATCH')
+        if config.get('member_db_path') is not None and Path(config['member_db_path']).resolve()!=Path(downloaded_db_path).resolve():
+            raise PermissionError('MEMBER_V82_DB_OVERRIDE_REJECTED')
+        config['member_db_path']=str(Path(downloaded_db_path).resolve())
+        config['member_drive_binding']={'account':login_account,'client_id':client_id,
+            'file_id':official_drive_file_id,'family_alias':family_alias}
         member=_load(ROOT/'member_v82_analysis.py','family_w8_member_v82_source')
         trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
     if native_source_config is not None:

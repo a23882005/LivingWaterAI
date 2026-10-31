@@ -89,6 +89,31 @@ class ProducerTests(unittest.TestCase):
             self.assertEqual(str(r.value[2].raw_close),"12.1")
             self.assertEqual(str(r.value[2].split_ratio),"10.0")
 
+    def test_ib_snapshot_supports_split_effective_date_override_after_suspension(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "ib.json"
+            obj = {
+                "contract":"V82_QP_IB_SNAPSHOT_v1",
+                "price_basis":"SPLIT_BACK_ADJUSTED_CLOSE",
+                "cash_dividend_basis":"OLD_SHARE_GROSS",
+                "time":["2025-06-10T01:00:00Z","2025-06-18T01:00:00Z"],
+                "close":[47.1625,47.57],
+                "corp_actions":[
+                    {"type":"Splits","date":"20250611","value":"4.0"},
+                ],
+            }
+            p.write_text(json.dumps(obj), encoding="utf-8")
+            spec = self._spec(p,"2025-06-10","2025-06-18")
+            spec["event_count_verified"]=1
+            spec["corporate_action_effective_date_overrides"]={"Splits|2025-06-11":"2025-06-18"}
+            r = reconstruct_ib_snapshot(p,spec)
+            self.assertEqual(r.status,OK)
+            self.assertEqual(str(r.value[0].raw_close),"188.65000")
+            self.assertEqual(str(r.value[1].raw_close),"47.57")
+            self.assertEqual(str(r.value[1].split_ratio),"4.0")
+            self.assertEqual(r.evidence["corporate_action_effective_date_overrides"],
+                             {"Splits|2025-06-11":"2025-06-18"})
+
     def test_source_blob_mismatch_blocks(self):
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "x.csv"

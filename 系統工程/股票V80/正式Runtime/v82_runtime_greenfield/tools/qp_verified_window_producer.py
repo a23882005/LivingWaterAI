@@ -194,12 +194,16 @@ def reconstruct_ib_snapshot(snapshot_path: str | Path, spec: dict[str, Any]) -> 
     if len(times) != len(closes) or not times:
         return Result(UNKNOWN, reason="IB_BAR_ARRAY_LENGTH_MISMATCH")
     events_by_date: dict[str, dict[str, Decimal]] = {}
+    effective_date_overrides = {
+        str(k): str(v) for k, v in (spec.get("corporate_action_effective_date_overrides") or {}).items()
+    }
     for e in obj.get("corp_actions") or []:
         dt = str(e.get("date") or "")
         if len(dt) == 8 and dt.isdigit():
             dt = f"{dt[:4]}-{dt[4:6]}-{dt[6:]}"
-        slot = events_by_date.setdefault(dt, {"div": D("0"), "split": D("1")})
         typ = e.get("type")
+        dt = effective_date_overrides.get(f"{typ}|{dt}", dt)
+        slot = events_by_date.setdefault(dt, {"div": D("0"), "split": D("1")})
         try:
             val = D(e.get("value"))
         except Exception as exc:
@@ -280,6 +284,7 @@ def reconstruct_ib_snapshot(snapshot_path: str | Path, spec: dict[str, Any]) -> 
         "max_event_value_relative_error": spec.get("max_event_value_relative_error"),
         "verification_source": spec.get("verification_source"),
         "source_type": "IB_SNAPSHOT_JSON",
+        "corporate_action_effective_date_overrides": effective_date_overrides,
     })
 
 

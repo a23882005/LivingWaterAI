@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-10-30T03:37:20.352024Z",
+  "asOf": "2026-10-31T03:35:41.146196Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -24,30 +24,30 @@
   },
   "indicators": {
     "m07": {
-      "value": 16.91,
-      "dataDate": "2026-10-28",
+      "value": 17.2,
+      "dataDate": "2026-10-29",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-30T01:54:19.402961+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:03.182763+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:19.402961+00:00",
-              "observation_date": "2026-10-28"
+              "verified_at": "2026-10-31T01:53:03.182763+00:00",
+              "observation_date": "2026-10-29"
             }
           ]
         }
       }
     },
     "m01": {
-      "value": 0.37,
-      "dataDate": "2026-10-29",
+      "value": 0.38,
+      "dataDate": "2026-10-30",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
@@ -57,8 +57,8 @@
       "sourceEvidence": null
     },
     "m08": {
-      "value": 2.63,
-      "dataDate": "2026-10-29",
+      "value": 2.6,
+      "dataDate": "2026-10-30",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
@@ -68,22 +68,22 @@
       "sourceEvidence": null
     },
     "m02": {
-      "value": 3.14,
-      "dataDate": "2026-10-28",
+      "value": 3.26,
+      "dataDate": "2026-10-29",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-30T01:54:55.591002+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:41.124315+00:00",
       "sourceEvidence": {
         "series": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:55.591002+00:00",
-              "observation_date": "2026-10-28"
+              "verified_at": "2026-10-31T01:53:41.124315+00:00",
+              "observation_date": "2026-10-29"
             }
           ]
         }
@@ -108,14 +108,14 @@
       "method": "FRED CPILFESL 同一數列 YoY",
       "status": "OK",
       "detail": "比較基期 2025-09-01",
-      "lastVerifiedAt": "2026-10-30T01:54:56.957700+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:42.504282+00:00",
       "sourceEvidence": {
         "series": {
           "CPILFESL": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:56.957700+00:00",
+              "verified_at": "2026-10-31T01:53:42.504282+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -123,8 +123,8 @@
       }
     },
     "m09": {
-      "value": 101.746002,
-      "dataDate": "2026-10-29",
+      "value": 101.963997,
+      "dataDate": "2026-10-30",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
@@ -134,8 +134,8 @@
       "sourceEvidence": null
     },
     "m10": {
-      "value": 104.389999,
-      "dataDate": "2026-10-29",
+      "value": 102.949997,
+      "dataDate": "2026-10-30",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
@@ -145,8 +145,8 @@
       "sourceEvidence": null
     },
     "m12": {
-      "value": 93.538498,
-      "dataDate": "2026-10-29",
+      "value": 100.197601,
+      "dataDate": "2026-10-30",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
@@ -156,8 +156,8 @@
       "sourceEvidence": null
     },
     "m13": {
-      "value": 2.47,
-      "dataDate": "2026-10-29",
+      "value": 2.46,
+      "dataDate": "2026-10-30",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
@@ -167,13 +167,13 @@
       "sourceEvidence": null
     },
     "m17": {
-      "value": 0.13,
-      "dataDate": "2026-10-29",
+      "value": 0.1,
+      "dataDate": "2026-10-30",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
-      "detail": "5Y breakeven change from 2026-09-29",
+      "detail": "5Y breakeven change from 2026-09-30",
       "lastVerifiedAt": null,
       "sourceEvidence": null
     },
@@ -185,22 +185,22 @@
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
       "detail": "開始=2026-07-29, 結束=2026-10-28, 單位十億美元; Fed Δ=7.445000, TGA Δ=45.190000, RRP Δ=-2.400000; 淨流動性 Δ=-35.345000",
-      "lastVerifiedAt": "2026-10-30T01:54:58.196270+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:43.943613+00:00",
       "sourceEvidence": {
         "series": {
           "RRPONTSYD": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:55:00.480103+00:00",
-              "observation_date": "2026-10-29"
+              "verified_at": "2026-10-31T01:53:45.960942+00:00",
+              "observation_date": "2026-10-30"
             }
           ],
           "WALCL": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:58.196270+00:00",
+              "verified_at": "2026-10-31T01:53:43.943613+00:00",
               "observation_date": "2026-10-28"
             }
           ],
@@ -208,7 +208,7 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:59.218206+00:00",
+              "verified_at": "2026-10-31T01:53:44.957092+00:00",
               "observation_date": "2026-10-28"
             }
           ]
@@ -256,14 +256,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-10-30T01:55:05.049485+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:51.454869+00:00",
       "sourceEvidence": {
         "series": {
           "UNRATE": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:55:05.049485+00:00",
+              "verified_at": "2026-10-31T01:53:51.454869+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -278,14 +278,14 @@
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
-      "lastVerifiedAt": "2026-10-30T01:55:06.093370+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:52.393849+00:00",
       "sourceEvidence": {
         "series": {
           "PAYEMS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:55:06.093370+00:00",
+              "verified_at": "2026-10-31T01:53:52.393849+00:00",
               "observation_date": "2026-09-01"
             }
           ]
@@ -293,30 +293,30 @@
       }
     },
     "s03": {
-      "value": 16.91,
-      "dataDate": "2026-10-28",
+      "value": 17.2,
+      "dataDate": "2026-10-29",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",
-      "lastVerifiedAt": "2026-10-30T01:54:19.402961+00:00",
+      "lastVerifiedAt": "2026-10-31T01:53:03.182763+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-10-30T01:54:19.402961+00:00",
-              "observation_date": "2026-10-28"
+              "verified_at": "2026-10-31T01:53:03.182763+00:00",
+              "observation_date": "2026-10-29"
             }
           ]
         }
       }
     },
     "s04": {
-      "value": 34.6,
-      "dataDate": "2026-10-29",
+      "value": 26.238655,
+      "dataDate": "2026-10-30",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
       "method": "CNN 非官方可讀 JSON（可能變動）",
@@ -857,7 +857,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-30T01:55:02.075108+00:00"
+      "retrieved_at": "2026-10-31T01:53:48.229139+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -868,7 +868,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-30T01:55:03.047673+00:00"
+      "retrieved_at": "2026-10-31T01:53:49.195219+00:00"
     },
     {
       "observation_date": "2026-09-01",
@@ -879,7 +879,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-10-30T01:55:03.868007+00:00"
+      "retrieved_at": "2026-10-31T01:53:50.184539+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -1003,13 +1003,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-10-30T11:37:20+08:00",
+  "dataUpdatedAt": "2026-10-31T11:35:41+08:00",
   "sourceSnapshot": {
-    "macro18": "c334e9db7874874696c971a6e3dd442629eed8b6",
+    "macro18": "3067b8f9e12bd6830a505386ff83560569ddbde5",
     "macro8": "619a60f2eeb093ed5d8f69578729cfc15a019857",
     "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-10-30T09:55:06.445705+08:00",
+    "macro18GeneratedAt": "2026-10-31T09:53:52.670396+08:00",
     "macro8GeneratedAt": "2026-10-30T10:04:27+08:00"
   }
 }

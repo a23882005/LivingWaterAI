@@ -17,6 +17,31 @@ def native_number(value,field):
         require(False,'NATIVE_NUMBER_INVALID',field)
 
 
+def quantity_time(request,position,context):
+    """Separate original observation time from the accepted-snapshot boundary.
+
+    Owner acceptance is already authenticated before native dispatch. It can
+    establish a current analysis baseline without dating an undated screenshot
+    or sealed row. It is not historical point-in-time observation evidence.
+    """
+    proof=context.get('holdings_completeness',{})
+    if position is None:return proof['as_of'],'ACCOUNT_COMPLETENESS_BOUNDARY'
+    if position.get('as_of_utc') is not None:return position['as_of_utc'],'SOURCE_OBSERVATION'
+    snapshot=request['client_snapshot']['payload']
+    require(position.get('source_kind') in ('SEALED_W6','OWNER_SCREENSHOT_SOURCE')
+        and proof.get('schema_version')=='Family.W8.OfficialHoldingsAcceptance.v1'
+        and proof.get('state')=='COMPLETE'
+        and proof.get('client_id')==request['client_id']
+        and proof.get('account_key')==request['owner']['account']
+        and proof.get('source_db_sha256')==snapshot['source_sha256']
+        and proof.get('snapshot_digest')==snapshot['payload_digest']
+        and proof.get('owner_decision',{}).get('action')=='ACCEPT_EXISTING_OFFICIAL_HOLDINGS',
+        'POSITION_OBSERVATION_TIME_REQUIRED','valuation.quantity.as_of','W1','DATA_UNAVAILABLE')
+    require(timestamp(proof.get('as_of'),'holdings.accepted_at')<=timestamp(request['evaluation_at'],'evaluation_at'),
+        'FUTURE_HOLDINGS_ACCEPTANCE','holdings.accepted_at')
+    return proof['as_of'],'OWNER_ACCEPTANCE_BOUNDARY__NOT_ORIGINAL_OBSERVATION'
+
+
 def bind_position_values(request,prepared,context):
     source=context.get('valuation_source')
     require(isinstance(source,dict),'VALUATION_INPUT_REQUIRED','trusted_context.valuation_source',status='DATA_UNAVAILABLE')
@@ -30,12 +55,19 @@ def bind_position_values(request,prepared,context):
     for asset,row in sources.items():
         price=source['prices'][asset]
         require(price.get('unit')=='CURRENCY_PER_SHARE','VALUATION_PRICE_UNIT_REQUIRED','prices.'+asset+'.unit')
-        instrument=one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
-                        if r['instrument_key']==row['instrument_key']],'valuation.instrument')
+        positions=[p for p in prepared.payload['positions'] if p['instrument_key']==row['instrument_key']]
+        if row.get('approved_target_only'):
+            instrument=row['source_instrument']  # Already authenticated by bind_bond_sources.
+        else:
+            instrument=(one(positions,'valuation.positions')['source_instrument'] if positions else
+                one([r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument']
+                     if r['instrument_key']==row['instrument_key']],'valuation.instrument'))
         require(price.get('currency')==instrument['quote_currency'],'VALUATION_QUOTE_CURRENCY_MISMATCH','prices.'+asset)
         position=row['source_position']
+        quantity_at,quantity_basis=quantity_time(request,position,context)
         qty={'state':'KNOWN','value':row['confirmed_quantity'],'instrument_key':row['instrument_key'],
-            'as_of':position['as_of_utc'] if position else context['holdings_completeness']['as_of'],
+            'as_of':quantity_at,'as_of_basis':quantity_basis,
+            'original_observation_at':position.get('as_of_utc') if position else None,
             'source_reference':request['client_snapshot']['digest']+':'+row['instrument_key']}
         # Quantity must exist by the quote's valuation instant; preserve old quote dates.
         require(timestamp(qty['as_of'],'quantity.as_of')<=timestamp(price['as_of'],'price.as_of')
@@ -46,12 +78,21 @@ def bind_position_values(request,prepared,context):
         require(valued['state']=='KNOWN','POSITION_VALUATION_UNAVAILABLE','valuation.'+asset,status='DATA_UNAVAILABLE')
         result[asset]=valued
     quote=source['prices'][stock['asset_id']];facts=bundle['stock_evidence']
-    require(amount(quote['value'])==amount(facts['valuation_price']) and quote['as_of']==facts['as_of'],
+    observation_at=quote.get('price_observation_as_of',quote['as_of'])
+    if observation_at!=quote['as_of']:
+        require(quote.get('valuation_basis')=='CURRENT_QUANTITY_AT_KNOWN_REFERENCE_PRICE'
+            and timestamp(observation_at,'price.observation')<=timestamp(quote['as_of'],'price.valuation')
+            and bool(quote.get('price_source_digest')),
+            'STOCK_VALUATION_REFERENCE_CLOCK_REQUIRED','stock_evidence.valuation_price')
+    require(amount(quote['value'])==amount(facts['valuation_price']) and observation_at==facts['as_of'],
             'STOCK_VALUATION_SOURCE_MISMATCH','stock_evidence.valuation_price')
     holdings=bundle['bond_request']['v75_source_context']['existing_bond_holdings']
     for asset in bonds:
         if asset=='SGOV':continue  # Existing bond bucket is logical money, not all physical SGOV.
-        holding=one([r for r in holdings if r['asset_id']==asset],'bond.valuation')
+        found=[r for r in holdings if r['asset_id']==asset]
+        if not found and amount(bonds[asset]['confirmed_quantity'])==0 and amount(result[asset]['value'])==0:
+            continue  # Complete W1 source proves an approved target is not held.
+        holding=one(found,'bond.valuation')
         require(native_number(holding['amount']['amount'],'bond.amount')==amount(result[asset]['value']),
                 'BOND_VALUATION_MISMATCH','existing_bond_holdings.'+asset)
     require('SGOV' in bonds,'SGOV_PHYSICAL_SOURCE_REQUIRED','bond_instruments',status='DATA_UNAVAILABLE')

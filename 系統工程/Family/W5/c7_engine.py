@@ -12,7 +12,7 @@ C_ROOT = Path('系統工程/C-配置決策引擎＋Mentor整合/正式Runtime')
 _LOCK = RLock()
 
 
-def run_c7_engine(repo_path, source):
+def load_original_configuration_module(repo_path, module_name):
     root = Path(repo_path).resolve()
     verify(root)
     base = root / C_ROOT
@@ -26,18 +26,43 @@ def run_c7_engine(repo_path, source):
                     raise ValueError('C7_MODULE_ORIGIN_CONFLICT:' + name)
         sys.path.insert(0, str(base))
         try:
-            module = importlib.import_module('work7.asset_framework')
+            module = importlib.import_module(module_name)
         finally:
             sys.path.remove(str(base))
+    return module
+
+
+def run_c7_engine(repo_path, source):
+    root = Path(repo_path).resolve()
+    base = root / C_ROOT
+    module = load_original_configuration_module(root, 'work7.asset_framework')
     schemas = base / 'contracts_c7'
     data = deepcopy(source)
+    family_scope=data.get('family_scope')
+    if family_scope is not None:
+        require(data.get('schema_version')=='Family.W5.C7Source.v2',
+            'C7_VERSIONED_FAMILY_SCOPE_REQUIRED','c7_source.schema_version')
+        from work7.family_long_term import validate_scope
+        validate_scope(family_scope,data['canonical_input'],data['evaluated_at'])
+    elif data.get('schema_version')=='Family.W5.C7Source.v2':
+        require(False,'C7_FAMILY_SCOPE_SOURCE_REQUIRED','c7_source.family_scope')
+    if data.get('work6_source') is not None:
+        from configuration_source import run_work6_engine
+        replay = run_work6_engine(root, data['work6_source'])
+        require(data['work6_source']['canonical_input'] == data['canonical_input']
+                and data['work6_source']['evaluated_at'] == data['evaluated_at']
+                and data['work6_source'].get('family_scope')==family_scope,
+                'C7_WORK6_SOURCE_IDENTITY_MISMATCH', 'c7_source.work6_source')
+        require(replay['result'] == data['work6_result'],
+                'C7_WORK6_REPLAY_MISMATCH', 'c7_source.work6_result')
     result = module.run_asset_framework_integration(
         data['canonical_input'], work6_result=data['work6_result'],
         funding_context=data['funding_context'], evaluated_at=data['evaluated_at'],
         canonical_input_schema_path=schemas/'05_C_Canonical_Input.schema.json',
         work6_output_schema_path=schemas/'57_C_Work6_Mentor_Adjustment_Result.schema.json',
         work7_output_schema_path=schemas/'68_C_Work7_V70_Asset_Framework_Result.schema.json',
-        funding_context_schema_path=schemas/'80_C_Work7_Funding_Context.schema.json')
+        funding_context_schema_path=schemas/'80_C_Work7_Funding_Context.schema.json',
+        **({'family_scope':family_scope} if family_scope is not None else {}))
     return {'source_digest':digest(source), 'original_source':deepcopy(source), 'result':result,
             'call_trace':['C.Work7.run_asset_framework_integration'],
             'production':'HOLD', 'trade_action':'NO_TRADE'}
@@ -50,7 +75,7 @@ def bind_c7_source(repo_path, request, context):
         return None
     require(isinstance(source, dict), 'C7_SOURCE_REQUIRED', 'trusted_context.c7_source', status='DATA_UNAVAILABLE')
     require(request.get('c7_source_digest') == digest(source), 'C7_SOURCE_DIGEST_MISMATCH', 'c7_source_digest')
-    require(source.get('schema_version') == 'Family.W5.C7Source.v1' and
+    require(source.get('schema_version') in ('Family.W5.C7Source.v1','Family.W5.C7Source.v2') and
             all(source.get(k) for k in ('producer','version','source_reference')),
             'C7_SOURCE_PROVENANCE_REQUIRED', 'c7_source')
     require(source.get('family_owner') == request['owner'], 'C7_SOURCE_OWNER_MISMATCH', 'c7_source.family_owner')
@@ -58,9 +83,70 @@ def bind_c7_source(repo_path, request, context):
     require(identity['client_id'] == request['client_id'] and identity['run_id'] == request['run_id'],
             'C7_SOURCE_IDENTITY_MISMATCH', 'canonical_input.identity')
     require(source['evaluated_at'] == request['evaluation_at'], 'C7_EVALUATION_MISMATCH', 'c7_source.evaluated_at')
+    if source.get('schema_version')=='Family.W5.C7Source.v2':
+        scope=source.get('family_scope') or {}
+        require(scope.get('family_owner')==request['owner']
+            and scope.get('source_db_sha256')==request['client_snapshot']['payload']['source_sha256']
+            and str(scope.get('target_version'))==str(request['confirmed_target']['target_version']),
+            'C7_FAMILY_DB_TARGET_OR_OWNER_MISMATCH','c7_source.family_scope')
+    if context['native_binding']['data_provenance'] == 'SOURCE_BACKED':
+        require(isinstance(source.get('work6_source'), dict), 'C7_WORK6_SOURCE_REQUIRED',
+                'c7_source.work6_source', status='DATA_UNAVAILABLE')
     computed = run_c7_engine(repo_path, source)
     result = computed['result']
-    require(result['status'] == 'READY_FOR_PM_GATE', 'C7_FRAMEWORK_NOT_READY', 'c7.status', status='DATA_UNAVAILABLE')
+    if result['status'] != 'READY_FOR_PM_GATE':
+        from family_boundary import BoundaryError
+        error = BoundaryError('C7_FRAMEWORK_NOT_READY', 'c7.status', status='DATA_UNAVAILABLE')
+        error.issue.update(native_status=result['status'], native_issues=deepcopy(result['issues']),
+                           work6_status=source['work6_result']['loop_status'])
+        work6 = source['work6_result']
+        engine = work6.get('final_target_engine_result') or {}
+        error.issue['configuration_review'] = {
+            'schema_version': 'Family.W5.ConfigurationReview.v1',
+            'client_id': request['client_id'], 'run_id': request['run_id'],
+            'owner': deepcopy(request['owner']),
+            'source_db_sha256': request.get('client_snapshot', {}).get('payload', {}).get('source_sha256'),
+            'scope': 'ORIGINAL_C_WORK6_AND_C7_REVIEW__NOT_UNIFIED_WORK9_MENTOR',
+            'evaluation_at': source['evaluated_at'], 'c7_status': result['status'],
+            'work6_status': work6['loop_status'], 'work6_snapshot_id': work6['work6_snapshot_id'],
+            'c7_snapshot_id': result['work7_snapshot_id'],
+            'current_allocation': deepcopy(engine.get('allocations', {}).get('current_allocation')),
+            'drift_snapshot': deepcopy(work6['drift_snapshot']),
+            'configuration_engine_eligibility': deepcopy(engine.get('formal_output_eligibility')),
+            'configuration_engine_issues': deepcopy(engine.get('issues', [])),
+            'original_work6_mentor_contract': deepcopy(work6['mentor_result_contract']),
+            'comparison_context': deepcopy(source.get('comparison_context')),
+            'original_c7_issues': deepcopy(result['issues']),
+            'full_native_pipeline_complete': False, 'full_native_mentor_reached': False,
+            'trade_action': 'NO_TRADE'}
+        progress = source.get('continuation_review')
+        if progress is not None:
+            require(progress.get('schema_version') == 'Family.W8.DeploymentProgressReview.v1'
+                and all(progress.get(k) == request.get(k) for k in ('client_id','run_id','owner','evaluation_at'))
+                and progress.get('source_db_sha256') == request['client_snapshot']['payload']['source_sha256']
+                and progress.get('full_native_pipeline_complete') is False
+                and progress.get('full_native_mentor_reached') is False
+                and progress.get('trade_action') == 'NO_TRADE'
+                and progress.get('digest') == digest({k:v for k,v in progress.items() if k != 'digest'}),
+                'C7_CONTINUATION_REVIEW_BINDING_MISMATCH', 'c7_source.continuation_review')
+            error.issue['configuration_review']['deployment_progress'] = deepcopy(progress)
+            mentor=progress.get('mentor_review')
+            if mentor is not None:
+                require(mentor.get('schema_version')=='Family.W5.ContinuationMentor.v1'
+                    and all(mentor.get(k)==request.get(k) for k in ('client_id','run_id','owner','evaluation_at'))
+                    and mentor.get('source_db_sha256')==request['client_snapshot']['payload']['source_sha256']
+                    and mentor.get('digest')==digest({k:v for k,v in mentor.items() if k!='digest'})
+                    and mentor.get('source_bindings',{}).get('work6_result_digest')==digest(work6)
+                    and mentor.get('source_bindings',{}).get('c7_result_digest')==digest(result)
+                    and mentor.get('source_bindings',{}).get('analysis_report_digest')==progress.get('analysis_report_digest')
+                    and mentor.get('full_native_mentor_reached') is False
+                    and mentor.get('full_native_pipeline_complete') is False
+                    and mentor.get('formal_deployment_ready') is False and mentor.get('canonical_result') is None
+                    and mentor.get('broker_execution_allowed') is False and mentor.get('financial_mutation_allowed') is False
+                    and mentor.get('trade_action')=='NO_TRADE',
+                    'C7_CONTINUATION_MENTOR_BINDING_MISMATCH','c7_source.continuation_review.mentor_review')
+                error.issue['configuration_review']['mentor_review']=deepcopy(mentor)
+        raise error
     require(digest(result) == digest(request['native_bundle']['asset_framework']),
             'C7_COMPUTED_FRAMEWORK_MISMATCH', 'native_bundle.asset_framework')
     return computed

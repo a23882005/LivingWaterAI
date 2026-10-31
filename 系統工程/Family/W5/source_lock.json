@@ -4,11 +4,18 @@
   "files": [
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "1406fec46b401670e6ecf4d0c259b8430505b3de",
-      "sha256": "aeaf8d5e8a33919ef43ebda7d25355325ed0d2c26d3c32f5047cad1b61abc370",
-      "size": 12477,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py"
+      "sha256": "d364aed54f0e5316eda7d1b9ac54591b7b3051b662d441c7a96d5ed40087ffb1",
+      "git_blob_sha": "d934061dece6746237b86c0367d854d2b430fa6c",
+      "size": 13007,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_AND_MENU04_RECOMMENDATION_OUTPUT",
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "1406fec46b401670e6ecf4d0c259b8430505b3de",
+        "sha256": "aeaf8d5e8a33919ef43ebda7d25355325ed0d2c26d3c32f5047cad1b61abc370",
+        "size": 12477,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/validation.py"
+      }
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py",
@@ -20,11 +27,24 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "708edf57461a78563828abd1932d904ea0cfe3dd",
-      "sha256": "81e2b13ab208152c47a36338b265c819d79a63810a8378202e50783354d647dd",
-      "size": 12456,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py"
+      "sha256": "82eb080acd23b5dd2def5ef9e6a1882600c0b7f24c71f52dd6d042427fab19ec",
+      "git_blob_sha": "6341e06250d0180d5a9f46d0f8e9334f1ed57ca6",
+      "size": 13588,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      },
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "708edf57461a78563828abd1932d904ea0cfe3dd",
+        "sha256": "81e2b13ab208152c47a36338b265c819d79a63810a8378202e50783354d647dd",
+        "size": 12456,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py"
+      },
+      "prior_upstream": null
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/canonical_output.py",
@@ -212,51 +232,108 @@
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "0506c26c540adce824f7d5eac599bcb7d76db143",
-      "sha256": "a06f4e5c0aed446bd3a8b8d85b61b2b4cd8ad25cb57d094fd73c1180cedc403b",
-      "size": 31530,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py"
+      "sha256": "22dde2a3f261c3a27c3843dbe7fd6241920130aa934ce31946f5e7be8f85d641",
+      "git_blob_sha": "8cbd355284e8223e89794e4469f258566c3caa5a",
+      "size": 32319,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_AND_MENU04_RECOMMENDATION_OUTPUT",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "0506c26c540adce824f7d5eac599bcb7d76db143",
+        "sha256": "a06f4e5c0aed446bd3a8b8d85b61b2b4cd8ad25cb57d094fd73c1180cedc403b",
+        "size": 31530,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work4_V82_Integration_Adapter.py"
+      }
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "a7e64f8ab84150e385ed4315f1e860ca6a3e0793",
-      "sha256": "b5b3bb2dd405cac3b3ec5448840cdd9812ea5f2c69a028828259a54753b5a01b",
-      "size": 36165,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py"
+      "git_blob_sha": "b8dffea7d54218e94e698dfa32b7603b653fe24f",
+      "sha256": "a206e602d405afa6dff28edbcd58b0bbcde93b720c79fc28c1b6a8eb8a003eb6",
+      "size": 36947,
+      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "a7e64f8ab84150e385ed4315f1e860ca6a3e0793",
+        "sha256": "b5b3bb2dd405cac3b3ec5448840cdd9812ea5f2c69a028828259a54753b5a01b",
+        "size": 36165,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work5_V75_Integration_Adapter.py"
+      },
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Guard.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "17964ed7bc9b77de3873bf35182a50f755bf7d45",
-      "sha256": "aaac8f85ad1e265e44204ce99e104cad48551ae83bc9ce49ed362a4f32e162c4",
-      "size": 22793,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Guard.py"
+      "git_blob_sha": "67e5ac94c61fb6002447c304dc6b1491c2eae59a",
+      "sha256": "c6b6dff484385bcd4333b884b65d5da04ff761809ad96f34d22fabc48bb5154c",
+      "size": 23579,
+      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Guard.py",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Guard.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "17964ed7bc9b77de3873bf35182a50f755bf7d45",
+        "sha256": "aaac8f85ad1e265e44204ce99e104cad48551ae83bc9ce49ed362a4f32e162c4",
+        "size": 22793,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work6_Funding_Account_Isolation_Guard.py"
+      },
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Integration.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "58cd13c12f85e2922fc723880cb17469b9ea6723",
-      "sha256": "beb4a84a51172667362da920b528c920eb873e9766c21f3bc983ae4f06959984",
-      "size": 20922,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Integration.py"
+      "git_blob_sha": "b24558dabe09344daaf19d5473ac4826215712fb",
+      "sha256": "d3ea79464997774ceaea30cc5d2efdb5be954bfb642ced397135562e0fb8c047",
+      "size": 21472,
+      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Integration.py",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Integration.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "58cd13c12f85e2922fc723880cb17469b9ea6723",
+        "sha256": "beb4a84a51172667362da920b528c920eb873e9766c21f3bc983ae4f06959984",
+        "size": 20922,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work7_SGOV_Runtime_Role_Integration.py"
+      },
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "dba6989a22d3a9ec5345cb07aedc4fc18432d469",
-      "sha256": "2d5102593a06a2c4eff0a58aa0355b3e8a0630d7f4ccd464f74777e3027073b8",
-      "size": 24590,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
+      "git_blob_sha": "0ca6e765f95aa97fe7c91f9fb235d820c07d870f",
+      "sha256": "a8d25478873ddcaaee567738874b340347c8e046b98c6ec59278c871c6cd5555",
+      "size": 25879,
+      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "dba6989a22d3a9ec5345cb07aedc4fc18432d469",
+        "sha256": "2d5102593a06a2c4eff0a58aa0355b3e8a0630d7f4ccd464f74777e3027073b8",
+        "size": 24590,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py"
+      },
+      "family_revision": "PM_20261030_FAMILY_LT_PROFILE_V1_READONLY",
+      "family_profile_extension": {
+        "approval_contract_sha256": "112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0",
+        "scope": "FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1",
+        "legacy_schema_and_guard_preserved": true,
+        "pm_gate_released": false
+      },
+      "commit_scope": "UPSTREAM_ANCHOR_ONLY__FAMILY_EXTENSION_LOCKED_BY_SHA256"
     },
     {
       "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",
-      "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "c1b87e985e90085d1ce0372ec13be838d35dc763",
-      "sha256": "33ab5e187f626f497cda449683a230809d29edd4f7c681ee2079a1800cda58bd",
-      "size": 35768,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py"
+      "sha256": "cae639465a6791a1272487146e1967904b27c8aba2f86b6bbe61c4031cd58f32",
+      "git_blob_sha": "26666769aa568dc2eda6ee6c5042b83829efd880",
+      "size": 40302,
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS",
+      "upstream": {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",
+        "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
+        "git_blob_sha": "c1b87e985e90085d1ce0372ec13be838d35dc763",
+        "sha256": "33ab5e187f626f497cda449683a230809d29edd4f7c681ee2079a1800cda58bd",
+        "size": 35768,
+        "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py"
+      }
     },
     {
       "path": "系統工程/總經V70/P70-5.py",
@@ -329,6 +406,101 @@
       "sha256": "3d89dae1e9f3ca4ec19e361e40e6fb554414c4770d6963aa9fa92afdbfd19bc8",
       "size": 48827,
       "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/C-%E9%85%8D%E7%BD%AE%E6%B1%BA%E7%AD%96%E5%BC%95%E6%93%8E%EF%BC%8BMentor%E6%95%B4%E5%90%88/%E6%AD%A3%E5%BC%8FRuntime/C8C9_RUNTIME/C8C9_Work5_V75_Adapter_Input.schema_RECHECK1_2026-09-27_0207.json"
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py",
+      "sha256": "a6b65bc9f9310bbfd3ee678cea9cbb8746b7e5d1d8ffaec26cb65f74ebdae14a",
+      "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS",
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py",
+        "sha256": "923266625af939c7740be49e71df818bec0cb7e432b005912e5cc340b8516d9a",
+        "family_revision": "OWNER_CONFIRMED_ABSENT_DOMAIN_CONTRACT_V1.1__NO_ACCOUNT_INVENTED"
+      },
+      "git_blob_sha": "acaabb45289be2aa800f004c6590534acce5752c",
+      "size": 4378
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_profiles.py",
+      "sha256": "b8e5759f03475d022b6642e7efea6dd14744de8c3d9fe7c82b78ff4ffeb876a5",
+      "git_blob_sha": "7a3e33f85cb064b178ab5c3d79302b26cd1e4f21",
+      "size": 14288,
+      "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "New approved native producer; prior frozen functions unchanged; not production cutover approval"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py",
+      "sha256": "b443a06905f7620132ad48f74e9d88743eb6361b2f0039a9379c5492222fe889",
+      "git_blob_sha": "852ce6974bf56773730d3f6f77885c3a27d7d6a5",
+      "size": 16572,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      },
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/own_history.py",
+        "sha256": "02774a6161565b63c3f39c3351df395c3da31b69b6f43d835b8a24500ec0316d",
+        "git_blob_sha": "af079043e172044d06cf10ad99cea3bb34a4a198",
+        "size": 15536,
+        "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7"
+      },
+      "prior_upstream": null
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py",
+      "sha256": "943fbb566014317a63041992e36de5bfd6cff3dfb4509899d8e5c733a882dd85",
+      "git_blob_sha": "ef5f021b20be617e2e2c4012d3a69ce5cada82f5",
+      "size": 8066,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+      "sha256": "d090359deffa7a0e578a0005775a7f4e2ec306d63874c5d6e33a44a43ae70574",
+      "git_blob_sha": "aadb4d0715358648bee02d4a8e64c4e1f04e14a2",
+      "size": 18404,
+      "family_revision": "OWNER_20261030_PM6511847368_PENDING_RELEASE",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "CMR-SLICE-01 / MR42: conserve live filled+remaining commitment in event and SQLite paths; terminal release requires confirmation. No Stage/rate/G0/B0/cycle identity change.",
+        "pm_review_url": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6511847368"
+      },
+      "implementation_version": "V82_DAILY_SLICE_LEDGER_1.0.1",
+      "upstream": {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+        "sha256": "0c22bc7ff5232fdfd10587d8c3b9ddef05c8400f736698d413d344bd0b1dfe26",
+        "git_blob_sha": "e8573bcc12e69d8d04338dbba7aede674d2a34fb",
+        "size": 17525,
+        "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+        "authorization": {
+          "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+          "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+          "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+        },
+        "commit": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56"
+      }
+    },
+    {
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/slice_allocation.py",
+      "sha256": "a2b7d7a3f00882407b714d885ce203a85833c3c53ded5a89b533575821d23b11",
+      "git_blob_sha": "3932103116ebcb906a74ec1f4be4ad24c4fb73c0",
+      "size": 6390,
+      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "authorization": {
+        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
+        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
+        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+      }
     }
   ]
 }

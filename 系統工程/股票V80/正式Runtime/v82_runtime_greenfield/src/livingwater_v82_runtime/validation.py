@@ -13,6 +13,8 @@ from typing import Any, Mapping
 from .enums import CashBasis, FundingDomain
 from .models import BoundEquityBudgetView
 from .schema_runtime import compile_schema
+from . import funding_absence
+from jsonschema import Draft202012Validator
 
 INPUT_CONTRACT_NAME = "LivingWaterAI.V82.RuntimeInput"
 INPUT_CONTRACT_VERSION = "V82-INPUT-v1.0.1-W2-RECHECK2"
@@ -125,7 +127,7 @@ def validate_and_bind_funding(runtime_input: Mapping[str, Any]) -> ValidatedFund
     v70 = _mapping(_required(root, "upstream_v70_snapshot", "$"), "$.upstream_v70_snapshot")
     v70_run = _nonempty_string(_required(v70, "run_id", "$.upstream_v70_snapshot"), "$.upstream_v70_snapshot.run_id")
     c7 = _mapping(_required(root, "c7_funding_context", "$"), "$.c7_funding_context")
-    if _required(c7, "contract_name", "$.c7_funding_context") != C7_CONTRACT_NAME or _required(c7, "contract_version", "$.c7_funding_context") != C7_CONTRACT_VERSION:
+    if _required(c7, "contract_name", "$.c7_funding_context") != C7_CONTRACT_NAME or _required(c7, "contract_version", "$.c7_funding_context") not in (C7_CONTRACT_VERSION,funding_absence.VERSION):
         raise _issue("V82E_FUNDING_CONTEXT_CONTRACT_MISMATCH", "$.c7_funding_context", "C7 funding contract identity mismatch")
     c7_run = _nonempty_string(_required(c7, "run_id", "$.c7_funding_context"), "$.c7_funding_context.run_id")
     if len({run_id, v70_run, c7_run}) != 1:
@@ -151,6 +153,11 @@ def validate_and_bind_funding(runtime_input: Mapping[str, Any]) -> ValidatedFund
     for i, raw_ctx in enumerate(contexts):
         path = f"$.c7_funding_context.contexts[{i}]"
         ctx = _mapping(raw_ctx, path)
+        try:absent=funding_absence.validate_absent(ctx,c7['contract_version'])
+        except ValueError as exc:raise _issue('V82E_ABSENT_CONTEXT_INVALID',path,str(exc))
+        if absent:
+            domains.append(ctx['domain'])
+            continue
         ctx_id = _identity(ctx, path)
         domains.append(ctx_id[0])
         if ctx_id in seen_ids:
@@ -193,7 +200,10 @@ def validate_and_bind_funding(runtime_input: Mapping[str, Any]) -> ValidatedFund
         raise _issue("V82E_REQUIRED_FIELD_MISSING", "$.c7_funding_context.contexts[].source_reference_ids", "source_reference_ids must be non-empty unique strings")
     # Full W2 JSON-Schema shape validation is performed after funding-specific
     # diagnostics so B02 can preserve its more specific canonical error codes.
-    schema_errors = sorted(compile_schema("runtime_input").iter_errors(root), key=lambda e: list(e.absolute_path))
+    validator=compile_schema("runtime_input")
+    if c7['contract_version']==funding_absence.VERSION:
+        validator=Draft202012Validator(funding_absence.extend_schema(validator.schema))
+    schema_errors = sorted(validator.iter_errors(root), key=lambda e: list(e.absolute_path))
     if schema_errors:
         err = schema_errors[0]
         path = "$" + "".join(f"[{x}]" if isinstance(x, int) else f".{x}" for x in err.absolute_path)
@@ -202,7 +212,7 @@ def validate_and_bind_funding(runtime_input: Mapping[str, Any]) -> ValidatedFund
 
     bound = BoundEquityBudgetView(
         domain=FundingDomain(requested[0]), broker=requested[1], account=requested[2], amount=amount,
-        currency=currency, cash_basis=CashBasis.AVAILABLE, source_contract=f"{C7_CONTRACT_NAME}/{C7_CONTRACT_VERSION}",
+        currency=currency, cash_basis=CashBasis.AVAILABLE, source_contract=f"{C7_CONTRACT_NAME}/{c7['contract_version']}",
         source_reference_ids=tuple(refs),
     )
-    return ValidatedFundingBinding(bound, C7_CONTRACT_NAME, C7_CONTRACT_VERSION, run_id)
+    return ValidatedFundingBinding(bound, C7_CONTRACT_NAME, c7["contract_version"], run_id)

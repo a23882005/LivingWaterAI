@@ -1,0 +1,12 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "PPH",
+  "fund_name": "VanEck Pharmaceutical ETF",
+  "source_url": "https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph/overview/",
+  "verified_on": "2026-10-28",
+  "source_scope": "ISSUER_PRODUCT_IDENTITY_ONLY__NOT_VALUATION_OR_CURRENT_SAFETY",
+  "industry_focus": "pharmaceutical industry",
+  "evidence_kind": "OFFICIAL_ISSUER_PRODUCT_PAGE",
+  "is_stock_etf": true,
+  "is_single_industry": true
+}

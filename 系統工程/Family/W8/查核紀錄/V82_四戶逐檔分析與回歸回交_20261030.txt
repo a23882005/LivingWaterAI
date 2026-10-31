@@ -1,0 +1,88 @@
+V82 四戶逐檔分析與回歸回交｜原 Codex 施工線
+日期：2026-10-30 UTC
+交辦：PR59 issuecomment-6512785203（2026-10-30 01:37:39Z 更新）
+範圍：Joseph、MOU、Arthur、Lilian 的 V82 持倉及核准目標；債券另列。
+共同 README／Checkpoint 仍由中PM維護，本紀錄不宣告中PM已驗收。
+
+1. 結果及分母
+
+Joseph 11／11、MOU 16／16、Arthur 2／2、Lilian 3／3，共32檔經本人
+正式DB隔離副本 → 原FamilyMenu.select('04') → OnDemandAnalysisProvider →
+原技術／Core／approved_decision／slice_cap函式執行。持倉涵蓋台灣與美國帳戶，
+目標尚無持倉列的標的同樣納入。分母不含現金及原V75適用清單中的債券。
+每戶最新確認版本及精確來源／run／逐檔欄位見私人包，未改本人核准權重。
+
+這32檔是逐檔分析元件與輸出邊界核對，資料齊備的正式全流程PASS為0。
+四戶結果保留ANALYSIS_PARTIAL，canonical_result及最終建議金額均為null；
+未建立假的空訂單帳本、cycle、現金0或可執行額度。執行核對PASS與有資料／
+上游缺項的檔數是兩個維度，不得把兩者相加或宣稱32檔全功能驗收通過。
+
+2. 本輪修補
+
+approved_v04_technical.py：前一日ETF Up快照原先直接留下NOT_APPLICABLE，
+進Trend時daily_slice.trend_timing的PredicateTruth轉換會例外。改用原已核准
+predicate_votes；EPS槽仍保留ETF_NOT_ISSUER／NOT_APPLICABLE，非投票值FALSE
+僅交給聚合。Lilian實際來源重現；隔離測試覆蓋ETF Trend及前日快照。
+
+official_target_input.py：分離最新確認權重讀取與金額base讀取，完整保留現金
+在100%分母內；不因現金無ticker而漏掉Lilian的目標，也不把可用現金當base。
+原完整金額入口仍要求經驗證的正式投資池來源，不放寬原金融契約。
+
+member_v82_analysis.py：本人全帳戶／持倉＋目標的來源編排，逐帳戶只取最新
+ledger，保留sealed來源衝突及不同帳戶事實，避免把歷史列相加；沒有持倉列
+維持數量UNKNOWN。核准目標不回退舊版，不重配、正規化權重或覆蓋SGOV角色。
+使用既有分類及各主類的正式估值瀑布，未知類別不套用全球ETF估值替代。
+
+member_market_source.py：讀回雜湊綁定的原始行情及有版本的交易日曆；排除取得
+時未收盤資料，保留null／OHLC異常；完整OHLC只算連續有效區間。原生Close
+獨立函式另算可用的長區間，輸出與完整OHLC票數分開，不修high／close。
+來源的OHLC觀測不冒充raw unadjusted wealth或歷史PIT證明。
+
+formal_mode_analysis.py：Gap明列confirmed_position_quantity；目標尚無持倉
+數量時不以0代入。native_asset_source.py共用原Core呼叫，補正式VOO／0050
+章節路由；不因章節路由存在就補造產品Grade／安全通過。
+
+on_demand_project.py、on_demand_analysis.py、official_family_entry.py：只在
+operator綁定本人DB SHA的來源設定下使用上述分析；沿原Menu04呼叫並重讀來源、
+重算驗證report，禁止同時掛兩個producer及跨戶／改報告／假canonical。
+既有完整native_bundle／FamilyRunner金融入口及其C7限制保留。
+
+3. 已完成的測試與未成立的資料條件
+
+本輪隔離測試涵蓋最新持倉去歷史重複、跨帳戶、只有目標、現金分母、債券
+分流、最新確認版本不回退、同ticker不同listing、雜湊與跨戶隔離、未收盤
+排除、OHLC異常保留、Close獨立計算、單檔資料缺項不抹除其他分析及篡改拒收。
+完整W5／W8與原核准V82／pending占額測試由本PR CI重跑；精確結果見CI及
+私人包JUnit。原daily_slice.py及source_lock未修改，52b1326占額修補保留。
+
+逐檔實際輸入／輸出包含：技術票數、Hard Gate／Down、完整Right、四模式、
+qP／qV、Stage、M1～M8、各倍率、Gap缺欄、slice原生結果及金額未執行原因。
+另以獨立三值門檻、成熟度門檻、MA20及類別瀑布核對實際來源輸出。
+37500／22500、合法歷史選階、MIN／lot、pending／部分成交／確認釋放／SQLite
+與共享資金邊界沿既有隔離測試驗證，不能當作四戶實際資金均已可執行。
+
+仍須區分：
+- 外部資料／資格：自身同口徑估值歷史及PIT；raw價格、公司行動、listing／
+  share class資格；同輪事件安全／信用／結構證據；完整訂單與成交對帳；部分
+  標的最新完成日行情、產品Grade／唯一主框架來源。私人逐檔表列實際值與原因。
+- 上游／工程：新的四戶分析沒有完整同輪Work3/C7/Work4金融bundle；個別
+  valuation_class及資金／execution constraints尚需接妥原契約。這些項目列為
+  PRODUCER_NOT_CONNECTED或UPSTREAM_INTEGRATION_NOT_COMPLETED，不歸咎客服。
+- cycle不可用：缺正式Gap及同owner／asset／exchange的持續帳本，不能憑空
+  初始化G0/B0。permission關閉時原slice_cap可回0，但其未知帳本仍原樣保留；
+  這不是完整可下單金額，也未把現金缺值歸0。
+
+4. C7與後續驗收
+
+已在同一DB來源下重播保存的Joseph／MOU既有金融輸入，明確標為既有as-of
+重播，非本輪新行情的同輪完整金融bundle。仍為FINAL_TARGET_CONFIRMED後
+RETURN_TO_V70；原work7/asset_framework.py:679比較asset_framework.STOCK、
+BOND、V70_ORIGINAL_DRY_POWDER與同輪V70桶，超過WEIGHT_TOLERANCE要求返回，
+W5以C7_FRAMEWORK_NOT_READY回交。具體值與原生issues保存在私人C7_REPLAY。
+未改權重、未繞過正式返回規則；Arthur／Lilian沒有冒用兩戶金融來源。
+
+中PM請以最終鎖定commit、私人包四戶PER_ASSET.csv／VALIDATION.json及
+request/context/result/call_trace逐戶獨立驗收。完整金融金額、cap/MIN/lot的
+本人實跑與統一Mentor仍須上述原契約來源／接線成立，不宣稱已完成。
+V75待DOT、報告HTML、四戶其他選單項目均維持各自原工序；未交易、購買、
+修改正式DB或啟用服務。

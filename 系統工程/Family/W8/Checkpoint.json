@@ -2346,4 +2346,71 @@
     "production": "HOLD",
     "trade_authorization": "NONE"
   }
+,
+  "program_atlas_archive_20261031": {
+    "label": "使用者要求之文件位置登錄（非中PM驗收裁定）",
+    "status": "DOCUMENTATION_LOCATION_REGISTRATION_NOT_PM_ACCEPTANCE",
+    "registered_at": "2026-10-31",
+    "source_commit": "5163116bcdedaabbc3cf09ae091ca96968a26fdd",
+    "main_comparison_commit": "591cf6256dc8942d68cf4441529b4b08391624b5",
+    "repository_directory": "系統工程/全系統程式盤點與V82流程對照/",
+    "counts": {
+      "source_files": 531,
+      "html_supplement": 11,
+      "main_source_files": 363,
+      "source_mirror_verified": 542
+    },
+    "atlas": {
+      "pages": 174,
+      "description": "逐檔具體用途、Input、Output、來源函式行號、PDF頁次及Drive檔案位置；靜態來源查核，非動態驗收",
+      "pdf": {
+        "drive_id": "1Ytl33SXeekIqJTrhYFRyxrzOeL6Zzk-X",
+        "sha256": "bda4f0249ffed4410208b30cf5d27a812045eda84faf3f57cbccba98f89b9cd9",
+        "size": 3933699
+      },
+      "docx": {
+        "drive_id": "15eyFOGQpuGINVctnCNRGI3UUT7rxJ42e",
+        "sha256": "6395f570b16697833ef31aae2bad6d49a8be30edfa65395ddfa564ba11e4f704",
+        "size": 1270763
+      },
+      "zip": {
+        "drive_id": "1ijn5og0CWTBqKD8RRTBAfy8aH4wEcXMB",
+        "sha256": "48a2482abe3006e8fe147bba492a9406d09d67908dcdb06d7c88fea84ac3c834",
+        "size": 3469339
+      },
+      "drive_readback": "三件沿原ID替換並重新下載，bytes與凍結本機文件一致；私人權限未擴大"
+    },
+    "source_mirror": {
+      "folder_id": "10-z_W1IwuofPQohtsWRGVzKQGQTbINW2",
+      "verification": "542/542逐檔Git blob SHA及Drive raw下載大小、MD5、Git blob SHA一致"
+    },
+    "governance": "僅文件位置及來源對照登錄；不冒稱中PM驗收。既有Owner、中PM單一治理writer、工作分工、current_work、status、Gate、Production HOLD／交易NONE及歷史記錄完全保留；未改程式、未執行金融鏈或測試、未部署或合併PR。"
+  }
+,
+  "program_atlas_compact_layout_20261031": {
+    "label": "使用者要求之頁底留白縮減（非中PM驗收裁定）",
+    "status": "LAYOUT_ONLY_DOCUMENTATION_REVISION",
+    "registered_at": "2026-10-31",
+    "source_commit": "5163116bcdedaabbc3cf09ae091ca96968a26fdd",
+    "previous_pages": 174,
+    "current_pages": 114,
+    "changes": "保留大字、全部531原始碼及11HTML語意、DriveID/URL與source hash；連續排版減少頁底留白，更新PDF起訖頁次。章節同頁銜接，頁次範圍可重疊。",
+    "pdf": {
+      "drive_id": "1Ytl33SXeekIqJTrhYFRyxrzOeL6Zzk-X",
+      "sha256": "d1262f14197483e940b398bc4281ec446a13b9c4dfb6ebd0f0cd84ea1e4a375b",
+      "size": 3876062
+    },
+    "docx": {
+      "drive_id": "15eyFOGQpuGINVctnCNRGI3UUT7rxJ42e",
+      "sha256": "f3fe4361c5f207b0e710a45afc9a64cb2b5d312017616cac027989060bea6587",
+      "size": 1272911
+    },
+    "zip": {
+      "drive_id": "1ijn5og0CWTBqKD8RRTBAfy8aH4wEcXMB",
+      "sha256": "ac4710a131f528cf9eda30e9b1e576a28f688062ef3dc583dbe6334d6f774b84",
+      "size": 3440726
+    },
+    "verification": "三檔same-ID替換並fresh下載bytes完全一致；531/11/76筆CSV非頁次欄逐欄相同；原始碼及鏡像不重傳。",
+    "governance": "前述174頁登錄保留為歷史；目前閱讀版以本114頁修訂為準。不更改Owner、中PM權責、Gate或既有驗收狀態；不修改程式、測試或workflow。"
+  }
 }

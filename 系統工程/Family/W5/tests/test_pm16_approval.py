@@ -23,7 +23,9 @@ def test_approved_null_keeps_native_money_policy_and_c7_separate():
         assert row['family_policy_context']['policy']==fact['policy']
         assert row['c7_client_action']==fact['c7_drift']['client_facing_action']
         assert json.loads(json.dumps(row))['client_action'] is None
-    assert out['trade_action']=='NO_TRADE' and out['execution_advice_allowed'] is False
+    assert out['trade_action']=='NO_TRADE'
+    assert out['recommendations_allowed'] is True and out['broker_execution_allowed'] is False
+    assert all(row['recommendation']['broker_submission_allowed'] is False for row in out['items'])
     assert (req,u,facts)==before
 
 

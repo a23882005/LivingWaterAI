@@ -285,15 +285,26 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/adjustment_loop.py",
-    "sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "sha256": "421693a245290e65c85f5bdd83864720f711af69a0908f9570f0a0df974e2005",
     "sha": "4b7bfc90f3a16578c65e11a8d3389d139c4fe209",
-    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c",
+    "upstream_sha256": "e28b1ec655281c85056aaf04d87b9de5178c6f08f4bf5374ff3950940bd07c70",
+    "family_revision": "EXTRACT_EXISTING_COMPLETE_TARGET_WEIGHT_LOOKUP__UNCHANGED_DRIFT_MATH"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
-    "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+    "sha256": "ec73be70d83b907ca6b2c0ff32d8e7980fed0ecff8b1bcb0a896db3a76cdb621",
     "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
-    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c",
+    "upstream": {
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/asset_framework.py",
+      "sha256": "99298c9ca3bc729fb6aa543fe9abf9d5aa590e39505851e9fb8529ac6c981bdf",
+      "sha": "fb021bcfb650d5138de06a5c9fa576db437864ca",
+      "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
+    },
+    "git_blob_sha": "aebacc30df7ca47906cd52f543ff65e6a260a854",
+    "size": 57930,
+    "family_revision": "OWNER_20261028_CONFIRMED_ABSENT_ACCOUNT_CONSUMERS"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/__init__.py",
@@ -329,5 +340,145 @@
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/xlsx_minimal_reader.py",
     "sha256": "fd5fbcf1bb9867bf498cea0deea945cef4dd791f08da5cc25c4336de50eaf5fa",
     "reason": "Direct import by C work2.benchmark_reader; baseline 32c9322c"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work7/family_long_term.py",
+    "sha256": "0e459212539375b6655f60237f18f1418612d18a42e36f2be0e99c093de9f8e0"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/83_Family_LongTerm_V70Ceiling_Input.schema.json",
+    "sha256": "1855dcb89768ba07728bb234012b45fffbddbe5210853f3ecd00f7f5b3a04196"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
+    "sha256": "cb3961829b27a23be6ec7fd5501231db485a3f021ff57e152e8652776fcee77d"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
+    "sha256": "59429faa6381f104e467a5713f431cce22e5ff06cf10e1c95fc42b61f7ee6926"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/84_Family_Existing_LongTerm_Work6_Result.schema.json",
+    "sha256": "05e7878826d3ad134581bc754e60569092da97fc7d484b46e1aaa8bf74cc18b6"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/85_Family_LongTerm_Work7_Result.schema.json",
+    "sha256": "b44988a16e03a4b64cc2a54755179b96bf78a174f6509ddf87634df643855acf"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work8_Protected_Holding_Client_Action_Protection.py",
+    "sha256": "a8d25478873ddcaaee567738874b340347c8e046b98c6ec59278c871c6cd5555"
+  },
+  {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/69_C_Work7_V70_資產框架整合_LockedResidual_RadarSnapshot.md",
+    "sha256": "a2ee7abda757e0ead51b8025bbc6cf3d4bcb59db358dcb9cc6065583c8c21d7a"
+  },
+  {
+    "path": "系統工程/Family/W5/family_ceiling_bridge.py",
+    "sha256": "6d67f10f3f3c0a1169a14e12873c1fa9862e227825504050617d6a10740893aa"
+  },
+  {
+    "path": "系統工程/Family/W5/c7_engine.py",
+    "sha256": "d5e0e1983291391880f7d78d8e5a86abf4c662e04c5c32aadad1c3ae03b5614f"
+  },
+  {
+    "path": "系統工程/Family/W5/configuration_source.py",
+    "sha256": "46bdacc043c88386381cef1480dc838560045dcdb53218aab94987f3a52934c2"
+  },
+  {
+    "path": "系統工程/Family/W5/target_units.py",
+    "sha256": "bfec50780007fd07c53b9b51d8e0d68f33623609f138d71b2115d64c6812ea5f"
+  },
+  {
+    "path": "系統工程/Family/W5/target_source_bridge.py",
+    "sha256": "913394881a7f0213bce90095b3e7b538c064503fb2ddcf790daef5065da29695"
+  },
+  {
+    "path": "系統工程/Family/W5/stock_engine.py",
+    "sha256": "4a4842fb68d259c4acbd52a1a1e81a8ddd7b334f1ccb15278019546e385590cc"
+  },
+  {
+    "path": "系統工程/Family/W5/native_pipeline.py",
+    "sha256": "68c632a45c9e09057f1c9c1882c63070494da2f324d087505dcecfdcfafac030"
+  },
+  {
+    "path": "系統工程/Family/W5/v82_slice_bridge.py",
+    "sha256": "b6e091c693cb9a6597481424cbfc474746fc4acb94c9090fd4ace7fccd2915be"
+  },
+  {
+    "path": "系統工程/Family/W8/deployment_c7_sources.py",
+    "sha256": "29ae6e119ded6a0048bc3a0095537dfcf312ddbead31f4c41ecfedd822c1ac0f"
+  },
+  {
+    "path": "系統工程/Family/W5/family_runner.py",
+    "sha256": "4f45d81ed850ab784cf565fd7b5c178260d7356937e0b23cc742786772a904e6"
+  },
+  {
+    "path": "系統工程/Family/W8/member_financial_chain.py",
+    "sha256": "a6fe16980a48913af0b34ee0e8e282b1da66612b6ef151d5d180aa7f450c9393"
+  },
+  {
+    "path": "系統工程/Family/W8/native_asset_source.py",
+    "sha256": "cbeed6b9f8b20904df07941701a726af8dc0c1141050a5306f1e91df997fdda2"
+  },
+  {
+    "path": "系統工程/Family/W8/member_financial_producer.py",
+    "sha256": "ff7b8ee1a2d1fe69a9ed63fef4129a11f6e28e678dcab110794bbd4669346220"
+  },
+  {
+    "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
+    "sha256": "044c6ea09043d15b079968d69d14124b56fbb39e31f3c004d99ec3326802c8fd"
+  },
+  {
+    "path": "系統工程/Family/W8/same_run_market_cache.py",
+    "sha256": "614e3d13c3e4ea93ce08179800b0381feeeeacadc03d06d4f3bb6bd04aa5a1ab"
+  },
+  {
+    "path": "系統工程/Family/W8/approved_v04_technical.py",
+    "sha256": "c03799d07342c139833cb75e8caaade0d44bc3b200314233e55ad31599e93559"
+  },
+  {
+    "path": "系統工程/Family/W5/technical_source_bridge.py",
+    "sha256": "3535a79e7825fe6d0bc48801e833c38260a9b6dcad6edd6ce23e5cef296bfccf"
+  },
+  {
+    "path": "系統工程/Family/W8/member_funding_summary.py",
+    "sha256": "d617b5f5f087d77a05b067375141ffd5994f3ed5fffe4c7c94e9534e6f239f35"
+  },
+  {
+    "path": "系統工程/Family/W8/family_c7_source_assembly.py",
+    "sha256": "2b7635cde6e45a5c4925c739d42a77bf45e28435cba388434a343e490f749daf"
+  },
+  {
+    "path": "系統工程/Family/W8/v70_tactical_input.py",
+    "sha256": "d44b324115a01e038b81819e2c5e09c09200723b2ece01449f3b25aac3f5674a"
+  },
+  {
+    "path": "系統工程/Family/W8/v70_component_runtime.cjs",
+    "sha256": "7aeea5f4df9512f62cd5ce89d6279e4935fd16772e95e2952b7fec4347fc5b7b"
+  },
+  {
+    "path": "系統工程/Family/W8/w1_portfolio_observations.py",
+    "sha256": "ec0a64f1c3fe4a3d5da71ad55b4e8f89392692708c200422714147755d011eae"
+  },
+  {
+    "path": "系統工程/Family/W8/c7_source_qualification.py",
+    "sha256": "36d95c700768662d26a15eeea8f64f23d448e3ca5492ca06aff6b2b9bea3608e"
+  },
+  {
+    "path": "系統工程/Family/W5/mentor_bridge.py",
+    "sha256": "404f6c62a21e34c6ea3048af0966085ea1936e43322e976a27f6006221b092a4"
+  },
+  {
+    "path": "系統工程/Family/W5/mentor_scope.py",
+    "sha256": "13f83818e849200d29a2c7d481d145bbfd8e54d01b1f76afb42b935ad79847e0"
+  },
+  {
+    "path": "系統工程/Family/W5/mentor_advice_scope.schema.json",
+    "sha256": "bfd993ad253ba8baff1326adaa941878e59921a128c714d15dde5b3944e1bb89"
+  },
+  {
+    "path": "系統工程/Family/W8/契約/FAMILY_MENTOR_SCOPE_CONSUMER_Producer介面_v1.0_20261031.md",
+    "sha256": "85f57fc8cde09100709e89fe024aa548e01ee684a49ea515c412d8677dbb5729"
   }
 ]

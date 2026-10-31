@@ -5,3 +5,4 @@ yfinance>=0.2.55,<1
 selenium>=4.22,<5
 webdriver-manager>=4.0,<5
 pandas>=2.1,<3
+exchange_calendars>=4.13.2,<5

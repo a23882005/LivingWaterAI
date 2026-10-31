@@ -20,6 +20,25 @@ class PipelineError(ValueError):
     pass
 
 
+def _native_wait_review(bond):
+    """Original formal HARD_WAIT is readable while original cutover stays blocked.
+
+    This admits only the exact two native HARD_WAIT cutover blockers. Missing
+    predicates, version/identity errors and ineligible output stay fail-closed.
+    Work9 owns normalization of this unchanged source envelope to WAIT.
+    """
+    ready=bond.get('runtime_ready') or {}
+    output=ready.get('output') or {}
+    canonical=bond.get('canonical') or {}
+    return (ready.get('runtime_ready') is False and ready.get('cutover_state')=='BLOCKED'
+        and ready.get('evaluation_state')=='COMPLETE' and ready.get('final_classification')=='HARD_WAIT'
+        and ready.get('gate_state')=='HARD_WAIT' and output.get('formal_output_eligible') is True
+        and output.get('evaluation_state')=='COMPLETE'
+        and set(ready.get('blocking_reason_codes',[]))=={
+            'WORK6_UPSTREAM_GATE_NOT_PASS','WORK6_BLOCKING_CLASSIFICATION:HARD_WAIT'}
+        and canonical.get('canonical_v75_output')==output)
+
+
 def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=None, *, c7_source=None):
     data=apply_stock_policy(bundle,stock_source)
     stock_req,bond_req=data['stock_request'],data['bond_request']
@@ -49,7 +68,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     for name in ('base_currency','total_new_investment_amount','contexts','bank_cash_scope'):
         if digest(funding_snapshot[name])!=digest(c7[name]):
             raise PipelineError('FRAMEWORK_FUNDING_MISMATCH:'+name)
-    stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'])
+    stock=run_stock_engine(repo_path,stock_req,data['stock_evidence'],data['producer_contract'],c7_computation=c7_computation)
     if stock.get('execution') is None:
         return {'status':'DATA_UNAVAILABLE','unified_result':None,'trade_action':'NO_TRADE',
                 'issue_codes':['NATIVE_TECHNICAL_DEPLOYMENT_UNRESOLVED'],'call_trace':stock['call_trace']}
@@ -60,7 +79,8 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         target_projection=project_target_units(stock,c7_computation)
     bond=run_bond_engine(repo_path,bond_req,data['bond_evidence'],
                          None if family_sources is None else family_sources['bond'])
-    if (bond.get('canonical') is None or not bond.get('runtime_ready',{}).get('runtime_ready')
+    native_wait_review=_native_wait_review(bond)
+    if (bond.get('canonical') is None or (not bond.get('runtime_ready',{}).get('runtime_ready') and not native_wait_review)
             or not bond['runtime_ready']['output'].get('formal_output_eligible')):
         return {'status':bond['status'],'stock_result':stock_output,'bond_result':bond,
                 'unified_result':None,'trade_action':'NO_TRADE','input_digest':digest(data)}
@@ -76,11 +96,13 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     owner=({'client_id':client,**w3['owner'],'currency':w3['currency']} if family_sources is None
            else family_sources['funding']['family_owner'])
     claims=[{'claim_id':'V82:'+stock_output['asset_id'],'owner':owner,'run_id':run_id,
-             'asset_class':'EQUITY','amount':stock['execution'].execution_amount}]
+             'asset_class':'EQUITY','amount':stock['execution'].execution_amount,
+             'source_engine':'V82','asset_id':stock_output['asset_id']}]
     for d in bond['runtime_ready']['output']['per_asset_decisions']:
         if d['deploy_amount'] is None:raise PipelineError('BOND_DEPLOYMENT_UNKNOWN')
         claims.append({'claim_id':'V75:'+d['asset_id'],'owner':owner,'run_id':run_id,
-                       'asset_class':'BOND','amount':d['deploy_amount']['amount']})
+                       'asset_class':'BOND','amount':d['deploy_amount']['amount'],
+                       'source_engine':'V75','asset_id':d['asset_id']})
     funding_reconciliation=None
     if family_sources is not None:
         f=family_sources['funding']
@@ -118,10 +140,23 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     unified=work9.build_unified_deployment(unified_request)
     trace.append('C8C9.Work9.build_unified_deployment')
     return {'status':'NATIVE_PIPELINE_COMPLETE','input_digest':digest(bundle),'effective_input_digest':digest(data),
+        **({'predicate_amendments':deepcopy(bond['predicate_amendments'])} if bond.get('predicate_amendments') else {}),
         'stock_source':deepcopy(stock_source),'family_sources':deepcopy(family_sources),
         'target_unit_projection':target_projection,
+        'bond_runtime_readiness':deepcopy(bond['runtime_ready']),
+        'read_only_native_wait_review':native_wait_review,
+        'formal_deployment_ready':bond['runtime_ready']['runtime_ready'] is True and framework.get('contract_version')!='C-W7-FAMILY-LT-v1.0.0',
+        **({'c7_family_pm_gate':deepcopy(framework['pm_gate']),'c7_family_capacity':deepcopy(framework['family_scope_evidence']['occupancy_and_capacity'])}
+            if framework.get('contract_version')=='C-W7-FAMILY-LT-v1.0.0' else {}),
         'funding_reconciliation':funding_reconciliation,'family_protection':family_protection,'client_id':client,'run_id':run_id,
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
+        **({'stock_local_plan':{'execution_amount':str(stock['execution'].execution_amount)
+            if stock['execution'].execution_amount is not None else None,
+            'approved_v10_analysis':deepcopy(stock['approved_v10_analysis']),
+            'daily_slice':deepcopy(stock['daily_slice']),
+            **({'family_ceiling_binding':deepcopy(stock['family_ceiling_binding'])} if stock.get('family_ceiling_binding') else {}),
+            'shared_slice_allocation':deepcopy(stock['shared_slice_allocation'])}}
+            if stock.get('approved_v10_analysis') else {}),
         'sgov_reconciliation':physical,'protected_holding':protected,'unified_result':unified,
         'mentor_return':deepcopy(unified['mentor_return']),'work9_request':unified_request,'call_trace':trace,
         'production':'HOLD','trade_action':'NO_TRADE'}

@@ -1,0 +1,56 @@
+V82核准補齊工程｜Codex回交Family中PM
+日期：2026/10/30（台灣時間）；PR59 Draft，未合併／未上線。
+
+本輪結果
+程式與兩戶實跑版本48e896128a94eaa2132f9d210fbbcb94d9ec8ed1。沿27d41bd既有成果，第一段f6ddf599，合併保留中PM38ff92c、7fb0630查核；未重做V75既有資料查核，V75邏輯衝突施工仍暫停待DOT。最後文件／Checkpoint提交只記錄本輪證據，不改金融程式。
+收尾另保留並合併main的1a9990d查核修訂及946a2a4行情快取更新；金融程式blob與48e8961相同。兩戶實跑來源封存於48e8961，不用後來更新的快取改寫先前證據；可依Git歷史還原原資料版本。更新後資料另跑W8完整回歸621項通過（W8_MERGED_HEAD.xml），結果另存，未混成新的PIT或重新下載的私人來源。
+
+已完成的施工
+1. 原生own_history實作合法自身qP/qV：listing/share class/幣別/provider/method、月／季已完成期、current排除、PIT與revision、90% coverage／連缺／至少2年／10→5→可比制度期；原close+簡單split+gross現金wealth，252日高與peak63日sigma。缺真正合格來源時保持具名UNKNOWN。
+2. approved_profiles實作B2～B7、嚴格邊界、較高UNKNOWN／nesting、range適用性／明確N/A、具名Stage限制及typed expression。完整Right包含off_low、R去重、基本面、信用、非Down、估值及真正相依T+1；Trend8／9與Up/Down衝突依原契約。
+3. W8正式分析與W5原生部署共用approved_decision；R_ok只保留技術子條件。current_judgment不另用技術R選階；補充來源每次hash／owner／DB SHA／時間重驗，並重播原生分析。股票Thesis與ETF結構分開。
+4. daily_slice消費M1～M8去重、成熟度三值、Base10/20%、Left15/25%、Right25%、Trend20%、信用／總經／適用估值乘數及Trend新增時機。保留Mode/Stage/Target，時機或新增許可關閉只限制新增。
+5. 每日SQLite planning cycle以owner/session/exchange/asset/profile分區，固定G0/B0，spent/live committed、取消待確認、確認取消、跨session GTC、CAS與冪等。首個cycle與本地PLANNED intent只在原Family保全及Work9/Mentor成功後同transaction保存；超額在發布前拒絕。沒有券商送單或現金reservation。
+6. 日切片與費用／共享資金cap送原build_buy_execution_plan MIN；同現金桶按比例後再限制V70剩餘額度，FX具來源、legal lot向下且不重新分配餘額。SGOV防守角色、已授權可動用規劃池與結算現金分欄。
+7. 原deployment.py改動僅具名V82_EXECUTION_DECIMAL_1.0.1：避免40位小數cap被Decimal先四捨五入跨過lot邊界；原MIN、門檻、49/13欄不變。來源鎖保留上游版本與本次正式授權，並非單改hash繞過凍結。
+
+實際改檔與函式／測試對照
+見Family/W8/V82_IMPLEMENTATION_GUIDE.md。原生新增approved_profiles、own_history、approved_decision、daily_slice、slice_allocation；既有deployment精度修正。Family/W5修改stock_engine、family_technical_bridge、native_pipeline、family_runner並新增v82_slice_bridge。Family/W8接approved_v04_technical、v82_approved_context、formal_mode_analysis、holdings_analysis、current_analysis_delivery、deployment_evidence_sources及recommendation_report；新增具名測試與CI。原生擴充版本V82_APPROVED_IMPLEMENTATION_1.0，package 0.9.0僅保留封存版本意義，歷史W12證據不自動驗收本輪。
+
+實際驗證
+PYTHONDONTWRITEBYTECODE=1；原W5 requirements.lock、jsdom26.1.0、exchange_calendars4.13.2；W5_W2_ROOT指原vendor/w2。
+python 系統工程/Family/W5/verify_dependencies.py：121份來源／相依hash通過。
+python -m pytest 系統工程/Family/W5/tests -q --junitxml=W5_FULL.xml：445通過。
+python -m pytest 系統工程/Family/W8/tests -q --junitxml=W8_FULL.xml：621通過。
+原生W6/W7/W8/W9/W10五組原有相容性gate在隔離副本實跑：59+43+50+44+30＝226項通過；沒有把封存W11/W12舊成績移作本輪完整gate。
+48e8961的GitHub CI六組均success，含新增完整W5/W8合成回歸run40972894709；其他run40972894203、40972894357、40972894136、40972894196、40972894339。CI是工程合成驗證，不是私人DB真人UAT。
+
+同組合成輸入／輸出
+ProjectTarget1,000,000、Stage4/45%、Target450,000、Confirmed250,000＋ActiveBuy50,000＝Projected300,000，Gap150,000。
+真正同源合成原價／公司行動／日曆／月估值producer得qP80、qV31.666…，非外部直接塞百分位。
+價格100、lot1、明示費用；M成熟／乘數1時slice37,500，未成熟22,500。現金100,000及200,000時不帶slice的原元件分別100,000及150,000；加slice均37,500。只有現金20,000則20,000。
+現金20,000＋已授權可動用SGOV80,000，規劃池100,000、結算額20,000，原MIN仍20,000；未自動出售SGOV。cap19,999.999…／價格100只准199股、19,900。
+原FamilyRunner合成正向穿過原C7、Work9、統一Mentor及持久帳本；同request／新worker重跑新增占額0。同池超額計畫發布0次、無新intent。G0=100、B0=25、fill10後room15；CANCEL_PENDING不釋放，確認取消僅釋放未成交部分。
+原始fixture、輸入輸出、digest、call trace及JUnit在私人回交包，非市場資料、下單或績效證據。
+
+Joseph／MOU真正第04項
+以固定正式DB、既有已驗證來源及原FamilyMenu.select(04)重跑；程式48e8961，當時工作目錄乾淨。未修改正式DB；既有來源日期保留，非重新取得資料或PIT新證明。
+Joseph：持倉分析10/10返回，10部分、0整檔阻塞；9個V82路由消費同源核准新契約。Work6 FINAL_TARGET_CONFIRMED，drift21列；完整部署DATA_UNAVAILABLE，C7 RETURN_TO_V70。
+MOU：持倉分析16/16返回，16部分、0整檔阻塞；15個V82路由消費同源核准新契約。Work6 FINAL_TARGET_CONFIRMED，drift19列；完整部署DATA_UNAVAILABLE，C7 RETURN_TO_V70；核准長期SGOV20%未改。
+兩戶各初始化一個明示新的本地planning容器；0cycle、0intent。這不代表全部券商訂單／成交已知。真實來源未達首次合法計畫，帳本沒有占額。持倉範圍的原Work9／Mentor已有交付，完整統一部署canonical及Mentor仍為None，未混稱通過。
+
+C7精確原因及位置
+原work7/asset_framework.py:_build_residual_allocation，第676～681行比較：abs(confirmed bucket total - same-run V70 bucket)>WEIGHT_TOLERANCE，輸出C_W7_V70_FINAL_TARGET_BUCKET_MISMATCH；第909～923行路由RETURN_TO_V70且不發替代目標。欄位為asset_framework.STOCK、BOND、V70_ORIGINAL_DRY_POWDER。
+來源對應work6_result.final_target.snapshot.positions[*].weight.value與canonical_input.v70_asset_framework.{stock_tactical_weight,bond_tactical_weight,v70_original_dry_powder_weight}.value。兩戶各三個bucket觸發；逐欄真實值、來源、原生message、hash、bucket comparison及完整來源包留在私人LIVE_ACCEPTANCE_SUMMARY.json，未把私人帳戶金額寫入Git。
+此為正式契約／長期核准與當輪戰術承接的衝突，不是SPSB缺資料，也不是V82新producer未接。要沿原Loop1／V70→Work6的既有調整／確認程序處理；本輪不自行重批、不覆寫長期配置、不偽造C7 READY。
+
+剩餘具體缺口
+資料／操作端：V82真實自身估值PIT／方法歷史、原價wealth的公司行動與日曆覆蓋、部分Thesis／ETF結構／事件T+1適用來源，以及必要執行價格／tick／lot／費用／共享cap／session來源尚未滿足。原生producer已存在；逐檔qP/qV reason、Right子條件、M與Stage audit見私人摘要，不用「缺證據」總稱代替。
+帳本工程／操作端接入：已完成本地SQLite持久化、CAS、共同資金guard與Family發布前接線。正式Drive帳本的每次最新讀回、原ID同步、跨環境串接及真實券商事件receipt仍未以真人部署驗收；本地測試及空容器不當作已正式同步。缺此來源時不自動建空帳或重置B0。
+正式規則：上述C7長期／當輪桶值衝突，以及既有V75配置／predicate限制，仍需既有Owner/PM程序與DOT後續指示，並非允許改門檻。
+三類外部資料獨立：20完整交易日SIP NBBO、五年完整週頻YTM/SEC yield、SPSB其餘九次配息成分。80筆維持稀疏、異常IB原值與既有SGOV資料保留。State Street已結案無法供應；IB正式客服仍待答覆，不購買、不要求貼密鑰。
+Family後續工程：中PM7fb0630所列W6 drift canonical／符號呈現、Joseph外部核准目標→W6 DB-only、雷達／章節來源綁定與report.html分頁DOM等仍須續辦；本輪沒有宣稱完成這些獨立工項。
+
+保存與驗收
+最新W5/W8 Checkpoint登記程式完成範圍、測試與私人實跑；Google Drive原工程管理／檔案管理先備份、原ID更新並讀回。V82_Codex_Completion_20261030.zip放Drive根目錄TEMP，保留前包，含code delta、原件、manifest、回歸／同輸入／兩戶來源與結果及安全還原工具。實際ID、SHA及下載／還原讀回收據另存，避免自引用校驗。
+待Family中PM獨立驗收；Production HOLD、NO_TRADE。只提供建議，不下單、不購買，不展開Arthur／Lilian，不宣稱兩戶全功能通過。

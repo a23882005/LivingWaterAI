@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '系統工程/Family/W8/**'
+      - '系統工程/Family/W5/**'
       - '系統工程/Family/W7/family_menu.py'
       - '.github/workflows/family-w8-post-trade-regression.yml'
   push:
@@ -129,50 +130,102 @@ jobs:
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_market_observations.py' -v
 
       - name: Run sealed official holdings source mapping
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_official_holdings_projection.py' -v
       - name: Run first-asset source and cash-only trial guards
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_native_asset_source.py' -v
       - name: Validate cash-only simulation overlays
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_loop2_cash_scenario.py' -v
       - name: Validate formal v1.0 technical source production
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_v04*.py' -v
       - name: Validate v1.0 V70 source observations
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_v10_source_observations.py' -v
       - name: Validate ETF structural source production
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_etf_structure_source.py' -v
       - name: Validate original mode selection and source target amounts
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_formal_mode_analysis.py' -v
       - name: Run holding analysis independent of new-money deployment
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_holdings_analysis.py' -v
       - name: Validate readable recommendation report rendering
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_recommendation_report.py' -v
       - name: Validate original V70 component recalculation and amount binding
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_v70_tactical_input.py' -v
       - name: Validate confirmed contributions and no-external-money scenario
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_new_investment_scenario.py' -v
       - name: Validate advice amounts and original Work9 Mentor presentation
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_recommendation_output.py' -v
       - name: Validate completed-bar alternative history receipts
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         run: python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_import_observed_history.py' -v
       - name: Run existing approved target input and original Family boundary
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
         env:
           PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests
         run: |
           python -m unittest discover -s '系統工程/Family/W8/tests' -p 'test_approved_target_input.py' -v
           python -m pytest '系統工程/Family/W5/tests/test_family_boundary.py' '系統工程/Family/W5/tests/test_family_runner.py' '系統工程/Family/W5/tests/test_c7_engine.py' -q
           python -m pytest '系統工程/Family/W5/tests/test_family_technical.py' '系統工程/Family/W5/tests/test_technical_source_bridge.py' -q
+      - name: Prepare qualified bond calendar
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+        run: python -m pip install exchange_calendars==4.13.2
+      - name: Validate source-bound broker, SGOV and V75 contracts
+        env:
+          PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests:系統工程/Family/W8:系統工程/Family/W8/tests
+          W5_W2_ROOT: 系統工程/Family/W5/vendor/w2
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+        run: >-
+          python -m pytest -q
+          '系統工程/Family/W5/tests/test_broker_snapshot_source.py'
+          '系統工程/Family/W5/tests/test_tactical_budget.py'
+          '系統工程/Family/W5/tests/test_funding_guard.py'
+          '系統工程/Family/W5/tests/test_analysis_source_mappings.py'
+          '系統工程/Family/W5/tests/test_pred007_amendment.py'
+          '系統工程/Family/W8/tests/test_sgov_role_source.py'
+          '系統工程/Family/W8/tests/test_native_bond_source.py'
+          '系統工程/Family/W8/tests/test_v75_macro_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_remaining_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_market_contract.py'
+          '系統工程/Family/W8/tests/test_formal_v75_parameters.py'
+          '系統工程/Family/W8/tests/test_v75_etf_quality_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_official_release_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_sofr_horizon_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_technical_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_handoff_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_ready_data_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_additional_delta_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_plugin_data_inputs.py'
+          '系統工程/Family/W8/tests/test_v75_ib_qa_inputs.py'
+          '系統工程/Family/W8/tests/test_official_reply_inputs.py'
+          '系統工程/Family/W8/tests/test_c7_currency_bindings.py'
+          '系統工程/Family/W8/tests/test_continuation_review.py'
+          '系統工程/Family/W8/tests/test_native_source_freshness.py'
+          '系統工程/Family/W8/tests/test_account_funding_check.py'
+          '系統工程/Family/W8/tests/test_deployment_component_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_context_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_evidence_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_readiness.py'
+          '系統工程/Family/W8/tests/test_pred007_inputs.py'
+          '系統工程/Family/W8/tests/test_qualified_equity_inputs.py'
 
+      - name: Validate source-bound Current Allocation and Work6 C7 review
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+        env:
+          PYTHONPATH: 系統工程/Family/W5:系統工程/Family/W5/tests:系統工程/Family/W8:系統工程/Family/W8/tests
+          W5_W2_ROOT: 系統工程/Family/W5/vendor/w2
+        run: >-
+          python -m pytest -q
+          '系統工程/Family/W8/tests/test_current_allocation_source.py'
+          '系統工程/Family/W8/tests/test_portfolio_current_source.py'
+          '系統工程/Family/W8/tests/test_deployment_c7_sources.py'
+          '系統工程/Family/W8/tests/test_deployment_progress_review.py'

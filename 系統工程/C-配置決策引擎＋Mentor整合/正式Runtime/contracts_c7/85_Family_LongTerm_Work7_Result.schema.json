@@ -1,0 +1,1307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:livingwater:c7:family-long-term-work7-result:v1",
+  "title": "LivingWaterAI C Work7 Asset Framework Integration Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_name",
+    "contract_version",
+    "identity",
+    "work7_snapshot_id",
+    "parent_work6_snapshot_id",
+    "status",
+    "route",
+    "v70_framework_snapshot",
+    "funding_context_snapshot",
+    "work6_final_target_reference",
+    "protected_locked_weights",
+    "residual_allocation",
+    "integrated_asset_framework",
+    "drift_snapshot",
+    "radar_snapshot",
+    "snapshot_lineage",
+    "hard_checks",
+    "report_contract",
+    "pm_gate",
+    "source_reference_ids",
+    "issues",
+    "created_at",
+    "family_scope_evidence"
+  ],
+  "properties": {
+    "contract_name": {
+      "const": "LivingWaterAI.C.Work7.AssetFrameworkIntegrationResult"
+    },
+    "contract_version": {
+      "const": "C-W7-FAMILY-LT-v1.0.0"
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity"
+    },
+    "work7_snapshot_id": {
+      "type": "string",
+      "pattern": "^C-W7-[0-9a-f]{32}$"
+    },
+    "parent_work6_snapshot_id": {
+      "type": "string",
+      "pattern": "^C-W6-[0-9a-f]{32}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "BLOCKED",
+        "RETURN_TO_V70",
+        "READY_FOR_PM_GATE"
+      ]
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "reason_codes"
+      ],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "BLOCKED",
+            "RETURN_TO_V70",
+            "PM_CONTRACT_SCHEMA_GATE"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "v70_framework_snapshot": {
+      "$ref": "#/$defs/V70Framework"
+    },
+    "work6_final_target_reference": {
+      "$ref": "#/$defs/FinalTargetReference"
+    },
+    "protected_locked_weights": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProtectedLock"
+      }
+    },
+    "residual_allocation": {
+      "$ref": "#/$defs/ResidualAllocation"
+    },
+    "integrated_asset_framework": {
+      "$ref": "#/$defs/IntegratedFramework"
+    },
+    "drift_snapshot": {
+      "$ref": "#/$defs/DriftSnapshot"
+    },
+    "radar_snapshot": {
+      "$ref": "#/$defs/RadarSnapshot"
+    },
+    "snapshot_lineage": {
+      "$ref": "#/$defs/SnapshotLineage"
+    },
+    "hard_checks": {
+      "$ref": "#/$defs/HardChecks"
+    },
+    "report_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "renderer_must_not_recompute_final_target",
+        "renderer_must_use_work6_drift_snapshot",
+        "renderer_must_use_work6_radar_snapshot",
+        "risk_warning_is_not_sell_instruction",
+        "funding_context_must_remain_account_isolated",
+        "funding_domain_engine_must_not_be_reimplemented_in_c7"
+      ],
+      "properties": {
+        "renderer_must_not_recompute_final_target": {
+          "const": true
+        },
+        "renderer_must_use_work6_drift_snapshot": {
+          "const": true
+        },
+        "renderer_must_use_work6_radar_snapshot": {
+          "const": true
+        },
+        "risk_warning_is_not_sell_instruction": {
+          "const": true
+        },
+        "funding_context_must_remain_account_isolated": {
+          "const": true
+        },
+        "funding_domain_engine_must_not_be_reimplemented_in_c7": {
+          "const": true
+        }
+      }
+    },
+    "pm_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "status",
+        "a78_a79_released",
+        "work8_released",
+        "required_hard_checks"
+      ],
+      "properties": {
+        "required": {
+          "const": true
+        },
+        "status": {
+          "const": "PENDING_ABC_PM_CONTRACT_SCHEMA_GATE"
+        },
+        "work8_released": {
+          "const": false
+        },
+        "required_hard_checks": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "prefixItems": [
+            {
+              "const": "Protected Existing Holding Contract"
+            },
+            {
+              "const": "Portfolio Drift Snapshot Contract"
+            },
+            {
+              "const": "Radar Axis Label/Order Contract"
+            },
+            {
+              "const": "Funding Context Schema/Validation"
+            },
+            {
+              "const": "Account Isolation"
+            },
+            {
+              "const": "No Cross-Account Funding/Executable Budget Isolation"
+            }
+          ],
+          "items": false
+        },
+        "a78_a79_released": {
+          "const": false
+        }
+      }
+    },
+    "source_reference_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Issue"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "funding_context_snapshot": {
+      "$ref": "#/$defs/FundingContextSnapshot"
+    },
+    "family_scope_evidence": {
+      "type": "object",
+      "required": [
+        "profile",
+        "approval_contract_sha256",
+        "input_scope",
+        "canonical_input",
+        "input_scope_digest",
+        "source_db_sha256",
+        "target_version",
+        "family_owner",
+        "approved_long_term_target",
+        "project_target_money_base",
+        "current_weight_and_drift_base",
+        "same_run_v70_total_ceiling",
+        "occupancy_and_capacity",
+        "new_confirmation_created",
+        "production_released"
+      ],
+      "properties": {
+        "profile": {
+          "const": "FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1"
+        },
+        "approval_contract_sha256": {
+          "const": "112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0"
+        },
+        "new_confirmation_created": {
+          "const": false
+        },
+        "tactical_target_approved": {
+          "const": false
+        },
+        "production_released": {
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "client_id",
+        "portfolio_id",
+        "request_id"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "client_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "portfolio_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "NullableNumber": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "V70Framework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_contract",
+        "run_id",
+        "upstream_v70_snapshot_id",
+        "snapshot_as_of",
+        "strategic_stock_weight",
+        "strategic_bond_weight",
+        "tactical_tilt_t",
+        "stock_tactical_weight",
+        "bond_tactical_weight",
+        "v70_original_dry_powder_weight",
+        "data_quality",
+        "freshness",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "owner_contract": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "upstream_v70_snapshot_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "snapshot_as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "strategic_stock_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "strategic_bond_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "tactical_tilt_t": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "stock_tactical_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "bond_tactical_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "v70_original_dry_powder_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "data_quality": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "freshness": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "FinalTargetReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id",
+        "confirmed_at",
+        "confirmed_by",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "allocation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confirmed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "confirmed_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ProtectedLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "ticker",
+        "bucket",
+        "current_weight",
+        "final_target_weight",
+        "drift",
+        "protected",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "instrument_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ticker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bucket": {
+          "type": "string",
+          "enum": [
+            "STOCK",
+            "BOND",
+            "V70_ORIGINAL_DRY_POWDER",
+            "UNKNOWN"
+          ]
+        },
+        "current_weight": {
+          "type": "number"
+        },
+        "final_target_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "drift": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "protected": {
+          "const": true
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ResidualItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "ticker",
+        "asset_type",
+        "bucket",
+        "protected",
+        "work6_final_target_weight",
+        "integrated_weight",
+        "allocation_rule",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "instrument_id": {
+          "type": "string"
+        },
+        "ticker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "asset_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bucket": {
+          "type": "string",
+          "enum": [
+            "STOCK",
+            "BOND",
+            "V70_ORIGINAL_DRY_POWDER"
+          ]
+        },
+        "protected": {
+          "type": "boolean"
+        },
+        "work6_final_target_weight": {
+          "type": "number"
+        },
+        "integrated_weight": {
+          "type": "number"
+        },
+        "allocation_rule": {
+          "const": "PRESERVE_EXISTING_LONG_TERM_EFFECTIVE_VIEW"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "ResidualBucket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bucket",
+        "target_weight",
+        "work6_final_target_bucket_weight",
+        "locked_weight",
+        "residual_budget",
+        "unlocked_reference_weight",
+        "allocated_residual_weight",
+        "items"
+      ],
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "enum": [
+            "STOCK",
+            "BOND",
+            "V70_ORIGINAL_DRY_POWDER"
+          ]
+        },
+        "target_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "work6_final_target_bucket_weight": {
+          "type": "number"
+        },
+        "locked_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "residual_budget": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "unlocked_reference_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "allocated_residual_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResidualItem"
+          }
+        }
+      }
+    },
+    "ResidualAllocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "PRESERVE_LONG_TERM_NO_V70_RESIDUAL_SCALING"
+        },
+        "buckets": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "method",
+        "buckets"
+      ]
+    },
+    "IntegratedFramework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "stock_weight",
+        "bond_weight",
+        "v70_original_dry_powder_weight",
+        "total_weight",
+        "instrument_targets",
+        "work6_final_target_preserved",
+        "reason"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE"
+          ]
+        },
+        "stock_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "bond_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "v70_original_dry_powder_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "total_weight": {
+          "$ref": "#/$defs/NullableNumber"
+        },
+        "instrument_targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResidualItem"
+          }
+        },
+        "work6_final_target_preserved": {
+          "const": true
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "WeightValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "value"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "UNKNOWN"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "DriftItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "ticker",
+        "current_weight",
+        "final_target_weight",
+        "drift",
+        "protected",
+        "client_facing_action"
+      ],
+      "properties": {
+        "instrument_id": {
+          "type": "string"
+        },
+        "ticker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "current_weight": {
+          "$ref": "#/$defs/WeightValue"
+        },
+        "final_target_weight": {
+          "$ref": "#/$defs/WeightValue"
+        },
+        "drift": {
+          "$ref": "#/$defs/WeightValue"
+        },
+        "protected": {
+          "type": "boolean"
+        },
+        "client_facing_action": {
+          "type": "string"
+        }
+      }
+    },
+    "DriftSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "as_of",
+        "denominator",
+        "items",
+        "renderer_must_not_recompute_final_target",
+        "reason"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE"
+          ]
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "denominator": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DriftItem"
+          }
+        },
+        "renderer_must_not_recompute_final_target": {
+          "const": true
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "RadarAxisRoot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axis_id",
+        "label_zh",
+        "order"
+      ],
+      "properties": {
+        "axis_id": {
+          "type": "string"
+        },
+        "label_zh": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        }
+      }
+    },
+    "RadarScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "value",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "UNKNOWN"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "RadarAxisView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axis_id",
+        "label_zh",
+        "order",
+        "score"
+      ],
+      "properties": {
+        "axis_id": {
+          "type": "string"
+        },
+        "label_zh": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "score": {
+          "$ref": "#/$defs/RadarScore"
+        }
+      }
+    },
+    "RadarView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view_id",
+        "axes",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "view_id": {
+          "type": "string"
+        },
+        "axes": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/RadarAxisView"
+          }
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "RadarSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "axes",
+        "views",
+        "display_requirements"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string"
+        },
+        "axes": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/RadarAxisRoot"
+          }
+        },
+        "views": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/RadarView"
+          }
+        },
+        "display_requirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "same_six_axes_for_all_four_views",
+            "same_axis_order_for_all_four_views",
+            "six_chinese_labels_directly_visible",
+            "missing_overlapped_or_unreadable_label_is_formal_report_qa_fail"
+          ],
+          "properties": {
+            "same_six_axes_for_all_four_views": {
+              "const": true
+            },
+            "same_axis_order_for_all_four_views": {
+              "const": true
+            },
+            "six_chinese_labels_directly_visible": {
+              "const": true
+            },
+            "missing_overlapped_or_unreadable_label_is_formal_report_qa_fail": {
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "SnapshotLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "canonical_request_id",
+        "work6_snapshot_id",
+        "v70_snapshot_id",
+        "lineage_status"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string"
+        },
+        "canonical_request_id": {
+          "type": "string"
+        },
+        "work6_snapshot_id": {
+          "type": "string"
+        },
+        "v70_snapshot_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lineage_status": {
+          "type": "string",
+          "enum": [
+            "SAME_RUN",
+            "MISMATCH"
+          ]
+        }
+      }
+    },
+    "HardChecks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protected_existing_holding_contract",
+        "portfolio_drift_snapshot_contract",
+        "radar_axis_label_order_contract",
+        "same_run_snapshot_lineage",
+        "portfolio_math_100_percent",
+        "v70_owner_boundary",
+        "funding_context_schema_validation",
+        "account_isolation",
+        "no_cross_account_funding_executable_budget_isolation"
+      ],
+      "properties": {
+        "protected_existing_holding_contract": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "portfolio_drift_snapshot_contract": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "radar_axis_label_order_contract": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "same_run_snapshot_lineage": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "portfolio_math_100_percent": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "v70_owner_boundary": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "funding_context_schema_validation": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "account_isolation": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "no_cross_account_funding_executable_budget_isolation": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      }
+    },
+    "Issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "field_path",
+        "message",
+        "blocking",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR",
+            "BLOCKING"
+          ]
+        },
+        "field_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "FundingExecutableLeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "cash_basis",
+        "source_domain",
+        "source_broker",
+        "source_account"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cash_basis": {
+          "const": "AVAILABLE"
+        },
+        "source_domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "source_broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_account": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "FundingAccountContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "broker",
+        "account",
+        "bucket_new_investment_amount",
+        "brokerage_cash_state",
+        "executable_budget",
+        "source_reference_ids"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "enum": [
+            "TW_LOCAL_BROKER",
+            "TW_SUB_BROKERAGE",
+            "US_BROKER"
+          ]
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bucket_new_investment_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "brokerage_cash_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total",
+            "available",
+            "unsettled",
+            "reserved"
+          ],
+          "properties": {
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "available": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unsettled": {
+              "type": "number",
+              "minimum": 0
+            },
+            "reserved": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "executable_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "equity",
+            "bond"
+          ],
+          "properties": {
+            "equity": {
+              "$ref": "#/$defs/FundingExecutableLeg"
+            },
+            "bond": {
+              "$ref": "#/$defs/FundingExecutableLeg"
+            }
+          }
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "FundingContextSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_state",
+        "boundary_contract",
+        "bank_cash_scope",
+        "base_currency",
+        "total_new_investment_amount",
+        "contexts",
+        "source_reference_ids",
+        "reason"
+      ],
+      "properties": {
+        "value_state": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "NONE"
+          ]
+        },
+        "boundary_contract": {
+          "const": "UPSTREAM_FUNDING_CONTEXT_VALIDATE_AND_ROUTE_ONLY_NO_SECOND_FUNDING_DOMAIN_ENGINE"
+        },
+        "bank_cash_scope": {
+          "const": "OUT_OF_SCOPE"
+        },
+        "base_currency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "total_new_investment_amount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FundingAccountContext"
+          },
+          "maxItems": 3
+        },
+        "source_reference_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "KNOWN"
+              }
+            },
+            "required": [
+              "value_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "base_currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              },
+              "total_new_investment_amount": {
+                "type": "number",
+                "minimum": 0
+              },
+              "contexts": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/$defs/FundingAccountContext"
+                }
+              },
+              "reason": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "contexts": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -6,7 +6,8 @@ without inventing Price-Map→Stage mappings or a second funding engine.
 """
 from __future__ import annotations
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation, ROUND_FLOOR
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR, localcontext
+from functools import wraps
 from typing import Any, Mapping, Sequence
 from .enums import (ACTIVE_ORDER_STATES, CANONICAL_DEPLOYMENT_TARGET_RATE_PCT,
     NormalDeploymentMode, OrderLifecycleState, PredicateTruth)
@@ -18,6 +19,28 @@ NOT_APPLICABLE="NOT_APPLICABLE"
 
 STAGE_RATE_PCT={f"STAGE_{i+1}": Decimal(str(v)) for i,v in enumerate(CANONICAL_DEPLOYMENT_TARGET_RATE_PCT)}
 LEFT_STAGES=frozenset({f"STAGE_{i}" for i in range(2,8)})
+EXECUTION_DECIMAL_VERSION='V82_EXECUTION_DECIMAL_1.0.1'
+
+
+def _execution_precision(fn):
+    """Keep source-cap precision before legal lot flooring (CMR9.1).
+
+    A 40-digit proportional cap must not round up to the next lot under a
+    caller's default 28-digit context. This changes no cap or target formula.
+    """
+    @wraps(fn)
+    def exact(*args,**kwargs):
+        values=[kwargs.get('order_working_price'),kwargs.get('minimum_lot'),kwargs.get('normalized_order_price'),
+            *kwargs.get('required_known_caps',())]
+        gap=kwargs.get('gap');budget=kwargs.get('bound_equity_budget')
+        if gap is not None:values.extend((gap.positive_deployment_gap,gap.project_target_position_amount))
+        if budget is not None:values.append(budget.amount)
+        numbers=[v for v in (_d(x) for x in values) if v is not None]
+        digits=max((len(v.as_tuple().digits) for v in numbers),default=28)
+        with localcontext() as ctx:
+            ctx.prec=max(80,2*digits+32);ctx.rounding=ROUND_FLOOR
+            return fn(*args,**kwargs)
+    return exact
 
 def _d(v: Any) -> Decimal | None:
     if isinstance(v,bool): return None
@@ -136,6 +159,7 @@ def calculate_position_gap(*, project_target_position_amount:Any, target_rate:An
     projected_rate=(projected/target if target>0 else None)
     return PositionGap(target,target_amount,confirmed,active_buy,active_sell,projected,gap,max(gap,Decimal("0")),actual,projected_rate)
 
+@_execution_precision
 def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
     bound_equity_budget:BoundEquityBudgetView, order_working_price:Any,
     minimum_lot:Any, required_known_caps:Sequence[Any]=(),

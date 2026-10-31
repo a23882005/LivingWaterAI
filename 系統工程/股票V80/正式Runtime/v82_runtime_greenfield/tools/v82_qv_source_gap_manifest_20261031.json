@@ -1,0 +1,178 @@
+{
+  "contract": "V82_QV_SOURCE_GAP_MANIFEST_v1",
+  "rule_version": "V82-v1.21.0 + Three-Layer-v1.0",
+  "as_of": "2026-10-31",
+  "policy": {
+    "qv_direction": "LOWER_IS_CHEAPER",
+    "history_min_span_years": 2,
+    "history_min_coverage": 0.9,
+    "max_consecutive_missing_periods": 2,
+    "pit_required": true,
+    "same_metric_method_required": true,
+    "metric_switch_to_force_percentile_forbidden": true,
+    "numeric_qv_when_history_invalid_forbidden": true
+  },
+  "items": {
+    "0050": {
+      "formal_class": "TAIWAN_LARGE_CAP_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","PB","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "NATO": {
+      "formal_class": "DEFENSE_MILITARY_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","EV_EBITDA","FCF_YIELD","EV_SALES"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "VALU": {
+      "formal_class": "GLOBAL_EQUITY_ETF",
+      "class_status": "PRODUCT_IDENTITY_SUPPORTS_FORMAL_CLASS",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "product_identity": "Vanguard FTSE Global All-Cap UCITS ETF USD Acc, LSE USD ticker VALU",
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "UNDER_TWO_YEARS_LISTING_HISTORY",
+      "qv_status": "UNKNOWN",
+      "reason": "HISTORY_SPAN_UNDER_TWO_YEARS"
+    },
+    "VWRA": {
+      "formal_class": "GLOBAL_EQUITY_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "VT": {
+      "formal_class": "GLOBAL_EQUITY_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "PPH": {
+      "formal_class": "PHARMA_HEALTHCARE_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","EV_EBITDA","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "QQQ": {
+      "formal_class": "TECH_AI_HIGH_GROWTH_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","EV_EBITDA","EV_SALES","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "SOXX": {
+      "formal_class": "SEMICONDUCTOR_ETF",
+      "class_status": "FORMAL_NAMED_ROUTE",
+      "primary_metric": "FORWARD_PE",
+      "metric_sequence": ["FORWARD_PE","EV_EBITDA","EV_SALES","PS","FCF_YIELD"],
+      "current_metric_status": "SOURCE_NOT_LOCKED",
+      "historical_pit_status": "MISSING_VALIDATED_SERIES",
+      "qv_status": "UNKNOWN",
+      "reason": "NO_VALID_HISTORICAL_VALUATION_SERIES"
+    },
+    "IUCS": {
+      "formal_class": "SECTOR_THEME_ETF",
+      "class_status": "OFFICIAL_PRODUCT_IDENTITY_VERIFIED",
+      "sector_or_theme": "CONSUMER_STAPLES",
+      "primary_metric": "UNKNOWN_PENDING_SUBTYPE_REGISTRY",
+      "metric_sequence": [],
+      "product_identity": "iShares S&P 500 Consumer Staples Sector UCITS ETF, USD Acc",
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "VALUATION_SUBTYPE_REGISTRY_REQUIRED"
+    },
+    "VDC": {
+      "formal_class": "SECTOR_THEME_ETF",
+      "class_status": "OFFICIAL_PRODUCT_IDENTITY_VERIFIED",
+      "sector_or_theme": "CONSUMER_STAPLES",
+      "primary_metric": "UNKNOWN_PENDING_SUBTYPE_REGISTRY",
+      "metric_sequence": [],
+      "product_identity": "Vanguard Consumer Staples ETF",
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "VALUATION_SUBTYPE_REGISTRY_REQUIRED"
+    },
+    "GOOGL": {
+      "formal_class": "UNKNOWN_PENDING_PROFILE_OWNER",
+      "class_status": "ROUTE_EVIDENCE_REQUIRED",
+      "primary_metric": "UNKNOWN",
+      "metric_sequence": [],
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "FORMAL_PROFILE_ROUTE_REQUIRED"
+    },
+    "MSFT": {
+      "formal_class": "UNKNOWN_PENDING_PROFILE_OWNER",
+      "class_status": "ROUTE_EVIDENCE_REQUIRED",
+      "primary_metric": "UNKNOWN",
+      "metric_sequence": [],
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "FORMAL_PROFILE_ROUTE_REQUIRED"
+    },
+    "NVDA": {
+      "formal_class": "UNKNOWN_PENDING_PROFILE_OWNER",
+      "class_status": "ROUTE_EVIDENCE_REQUIRED",
+      "primary_metric": "UNKNOWN",
+      "metric_sequence": [],
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "FORMAL_PROFILE_ROUTE_REQUIRED"
+    },
+    "AVGO": {
+      "formal_class": "UNKNOWN_PENDING_PROFILE_OWNER",
+      "class_status": "ROUTE_EVIDENCE_REQUIRED",
+      "primary_metric": "UNKNOWN",
+      "metric_sequence": [],
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "FORMAL_PROFILE_ROUTE_REQUIRED"
+    },
+    "ZTS": {
+      "formal_class": "UNKNOWN_PENDING_PROFILE_OWNER",
+      "class_status": "ROUTE_EVIDENCE_REQUIRED",
+      "primary_metric": "UNKNOWN",
+      "metric_sequence": [],
+      "current_metric_status": "ROUTE_NOT_FINAL",
+      "historical_pit_status": "NOT_EVALUABLE_BEFORE_ROUTE_FINAL",
+      "qv_status": "UNKNOWN",
+      "reason": "FORMAL_PROFILE_ROUTE_REQUIRED"
+    }
+  },
+  "formal_rule_source": "系統工程/股票V80/文件歸檔/V82_v1.0_正式實作/V82_Three_Layer_Quant_Rules_Formal_Implementation_v1.0.docx",
+  "identity_evidence": {
+    "VALU": "https://www.vanguard.co.uk/professional/product/etf/equity/E161/ftse-global-all-cap-ucits-etf-usd-acc",
+    "IUCS": "https://www.ishares.com/uk/professional/en/literature/fact-sheet/iucs-ishares-s-p-500-consumer-staples-sector-ucits-etf-fund-fact-sheet-en-gb.pdf",
+    "VDC": "https://investor.vanguard.com/investment-products/etfs/profile/vdc"
+  }
+}

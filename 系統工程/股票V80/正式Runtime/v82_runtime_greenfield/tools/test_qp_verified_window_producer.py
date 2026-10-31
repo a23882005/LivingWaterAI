@@ -7,7 +7,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from qp_verified_window_producer import (
-    OK, UNKNOWN, git_blob_sha, reconstruct_raw_rows, build_wealth,
+    OK, UNKNOWN, git_blob_sha, reconstruct_raw_rows, reconstruct_ib_snapshot, build_wealth,
     calculate_qp, produce_one,
 )
 
@@ -63,6 +63,31 @@ class ProducerTests(unittest.TestCase):
             self.assertEqual(str(r.value[0].raw_dividend_old_share), "0.040")
             self.assertEqual(str(r.value[1].raw_close), "12")
             self.assertEqual(str(r.value[1].split_ratio), "10")
+
+    def test_ib_snapshot_reconstructs_split_back_adjusted_close_with_old_share_cash(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "ib.json"
+            obj = {
+                "contract":"V82_QP_IB_SNAPSHOT_v1",
+                "price_basis":"SPLIT_BACK_ADJUSTED_CLOSE",
+                "cash_dividend_basis":"OLD_SHARE_GROSS",
+                "time":["2024-06-06T13:30:00Z","2024-06-07T13:30:00Z","2024-06-10T13:30:00Z"],
+                "close":[11.6,12.0,12.1],
+                "corp_actions":[
+                    {"type":"CashDividends","date":"20240607","value":"4.0","currency":"USD"},
+                    {"type":"Splits","date":"20240610","value":"10.0"},
+                ],
+            }
+            p.write_text(json.dumps(obj), encoding="utf-8")
+            spec = self._spec(p,"2024-06-06","2024-06-10")
+            spec["event_count_verified"]=2
+            r = reconstruct_ib_snapshot(p,spec)
+            self.assertEqual(r.status,OK)
+            self.assertEqual(r.value[0].raw_close, r.value[0].raw_close.__class__("116"))
+            self.assertEqual(r.value[1].raw_close, r.value[1].raw_close.__class__("120"))
+            self.assertEqual(str(r.value[1].raw_dividend_old_share),"4.0")
+            self.assertEqual(str(r.value[2].raw_close),"12.1")
+            self.assertEqual(str(r.value[2].split_ratio),"10.0")
 
     def test_source_blob_mismatch_blocks(self):
         with tempfile.TemporaryDirectory() as td:

@@ -2358,4 +2358,31 @@
     },
     "governance": "僅文件位置及來源對照登錄；不冒稱中PM驗收。既有Owner、中PM單一治理writer、工作分工、current_work、status、Gate、Production HOLD／交易NONE及歷史記錄完全保留；未改程式、未執行金融鏈或測試、未部署或合併PR。"
   }
+,
+  "program_atlas_compact_layout_20261031": {
+    "label": "使用者要求之頁底留白縮減（非中PM驗收裁定）",
+    "status": "LAYOUT_ONLY_DOCUMENTATION_REVISION",
+    "registered_at": "2026-10-31",
+    "source_commit": "5163116bcdedaabbc3cf09ae091ca96968a26fdd",
+    "previous_pages": 174,
+    "current_pages": 114,
+    "changes": "保留大字、全部531原始碼及11HTML語意、DriveID/URL與source hash；連續排版減少頁底留白，更新PDF起訖頁次。章節同頁銜接，頁次範圍可重疊。",
+    "pdf": {
+      "drive_id": "1Ytl33SXeekIqJTrhYFRyxrzOeL6Zzk-X",
+      "sha256": "d1262f14197483e940b398bc4281ec446a13b9c4dfb6ebd0f0cd84ea1e4a375b",
+      "size": 3876062
+    },
+    "docx": {
+      "drive_id": "15eyFOGQpuGINVctnCNRGI3UUT7rxJ42e",
+      "sha256": "f3fe4361c5f207b0e710a45afc9a64cb2b5d312017616cac027989060bea6587",
+      "size": 1272911
+    },
+    "zip": {
+      "drive_id": "1ijn5og0CWTBqKD8RRTBAfy8aH4wEcXMB",
+      "sha256": "ac4710a131f528cf9eda30e9b1e576a28f688062ef3dc583dbe6334d6f774b84",
+      "size": 3440726
+    },
+    "verification": "三檔same-ID替換並fresh下載bytes完全一致；531/11/76筆CSV非頁次欄逐欄相同；原始碼及鏡像不重傳。",
+    "governance": "前述174頁登錄保留為歷史；目前閱讀版以本114頁修訂為準。不更改Owner、中PM權責、Gate或既有驗收狀態；不修改程式、測試或workflow。"
+  }
 }

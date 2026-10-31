@@ -4,7 +4,7 @@
 
 本目錄依使用者要求提供工程文件的唯一公開導航。正式閱讀原件保存於 Google Drive「系統工程」，原始程式來源仍是 GitHub；本圖冊是來源位置及函式對照，不取代正式規格、施工契約或中PM Gate。
 
-- [174頁大字版 PDF（含逐檔用途、Input／Output）](https://drive.google.com/file/d/1Ytl33SXeekIqJTrhYFRyxrzOeL6Zzk-X/view)
+- [114頁大字緊湊版 PDF（含逐檔用途、Input／Output）](https://drive.google.com/file/d/1Ytl33SXeekIqJTrhYFRyxrzOeL6Zzk-X/view)
 - [Word 可編輯原件](https://drive.google.com/file/d/15eyFOGQpuGINVctnCNRGI3UUT7rxJ42e/view)
 - [完整交付包](https://drive.google.com/file/d/1ijn5og0CWTBqKD8RRTBAfy8aH4wEcXMB/view)
 - [固定來源版本的程式鏡像目錄](https://drive.google.com/drive/folders/10-z_W1IwuofPQohtsWRGVzKQGQTbINW2)
@@ -22,15 +22,15 @@
 | 5 | 閱讀說明與目錄分布 |
 | 6–10 | 原流程與放大參照 |
 | 11–19 | V82 18項流程位置對照 |
-| 20–169 | 全部531檔原始碼用途、Input／Output |
-| 20–90 | 功能及共用模組235檔 |
-| 91–110 | 作業工具與驗證腳本71檔 |
-| 111–167 | 測試220檔 |
-| 168–169 | 備份與封存5檔 |
-| 170–173 | HTML補充11檔 |
-| 174 | 版本證據與清冊核對 |
+| 20–111 | 全部531檔原始碼用途、Input／Output |
+| 20–62 | 功能及共用模組235檔 |
+| 62–75 | 作業工具與驗證腳本71檔 |
+| 75–110 | 測試220檔 |
+| 111 | 備份與封存5檔 |
+| 111–114 | HTML補充11檔 |
+| 114 | 版本證據與清冊核對 |
 
-V82流程1–2見第11頁、3–4見第12頁、5–6見第13頁、7–8見第14頁、9–10見第15頁、11–12見第16頁、13–14見第17頁、15–16見第18頁、17–18見第19頁。每個程式的完整路徑與頁次可由CSV查找。
+V82流程1–2見第11頁、3–4見第12頁、5–6見第13頁、7–8見第14頁、9–10見第15頁、11–12見第16頁、13–14見第17頁、15–16見第18頁、17–18見第19頁。每個程式的完整路徑與起訖頁次可由CSV查找。緊湊版保留大字與全部內容，以連續排版減少頁底留白；章節可在同頁銜接，因此頁次範圍可能重疊。
 
 ## 可檢索清單
 

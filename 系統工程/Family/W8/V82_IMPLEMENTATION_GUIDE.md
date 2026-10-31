@@ -59,3 +59,13 @@ planning_ledger_source帶owner/local_path/source_reference/planning_write_author
 驗收項 `V82-CYCLE-PENDING-RELEASE`：`daily_slice.update_intent` 與 `CycleLedgerStore.save` 共用意圖狀態／占額守恆校驗。LIVE意圖的 `filled_amount + remaining_amount` 不得因未確認縮額而下降，包括CANCEL_PENDING、REPLACE_PENDING及改標其他LIVE狀態；單獨release_confirmed旗標不能使pending變成已確認釋放。核實部分成交可把committed轉成spent，確認終止後才釋放未成交額；直接SQLite存檔同樣拒絕缺確認的終止狀態及未核實縮額。
 
 修補版本 `V82_DAILY_SLICE_LEDGER_1.0.1`；cycle schema、profile、id、G0/B0、模式率、Stage及原MIN不變，既有cycle不重開。`test_v10_pending_commitment.py`補35個反例與正向／持久化案例；含既有日切片測試共51項。中PM原始probe未改，複製至私人目錄分別跑修補前／後，避免覆寫其歷史查核結果。完整回歸與最新提交見Checkpoint的新 `cycle_pending_release_20261030` 紀錄。此次不重跑真人兩戶、不動正式DB或券商；Drive同步、真實來源、C7與獨立報告／HTML線保持各自追蹤。
+
+
+<!-- USER_PROGRAM_ATLAS_LOCATION_REGISTRATION_20261031 -->
+## 2026/10/31｜使用者要求之文件位置登錄（非中PM驗收裁定）
+
+依使用者要求新增[全系統程式盤點與 V82 流程對照索引](https://github.com/a23882005/LivingWaterAI/blob/family/w8-complete-04-joseph-mou/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E5%85%A8%E7%B3%BB%E7%B5%B1%E7%A8%8B%E5%BC%8F%E7%9B%A4%E9%BB%9E%E8%88%87V82%E6%B5%81%E7%A8%8B%E5%B0%8D%E7%85%A7/README.md)，保存於 `系統工程/全系統程式盤點與V82流程對照/`；閱讀版、頁次導航及完整程式位置見該入口。
+
+程式盤點固定於 PR59 `5163116bcdedaabbc3cf09ae091ca96968a26fdd`：531 個原始碼檔（Python 525、PHP 4、CJS 2；含測試、工具及5個備份），不是531個獨立功能。main `591cf6256dc8942d68cf4441529b4b08391624b5` 對照為363個，兩分支不相加。11個HTML另列、不混入531。
+
+此登錄僅為文件位置／來源對照交接，不代表中PM獨立驗收、PR合併、正式部署或金融Gate通過；原Owner、權限、規則、Checkpoint與驗收裁定完整保留，Production HOLD／交易NONE不變。舊文件中的數量、版本及交接包校驗值仍是各自歷史截點，不以本次盤點覆蓋。

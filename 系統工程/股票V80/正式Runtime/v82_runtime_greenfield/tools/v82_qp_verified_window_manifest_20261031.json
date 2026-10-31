@@ -3,11 +3,13 @@
   "rule_version": "V82-v1.21.0 + Three-Layer-v1.0",
   "source_main_commit": "591cf6256dc8942d68cf4441529b4b08391624b5",
   "as_of": "2026-10-31",
-  "scope_note": "Only symbols with exact Yahoo/IB bar-date alignment and verified corporate actions in the stated window are promoted here. This manifest does not authorize qV, Price Map, Stage, account target, or trading.",
+  "scope_note": "Only symbols with independently verified market-session coverage and corporate actions in the stated window are promoted here. This manifest does not authorize qV, Price Map, Stage, account target, or trading.",
   "calendar_evidence": [
     "NYSE official holidays/trading-hours calendar",
     "Nasdaq official U.S. market holiday schedule",
-    "Exact independent Yahoo-vs-IB session-date alignment for each included symbol"
+    "Exact independent Yahoo-vs-IB session-date alignment for each included symbol",
+    "TWSE official 0050 split schedule: last pre-split trade 2025-06-10, suspension 2025-06-11..17, first post-split listing/trade 2025-06-18",
+    "TWSE/Taiwan public closure evidence: 2026-10-23 typhoon closure is non-trading and any zero-volume vendor row is a placeholder, not an expected bar"
   ],
   "items": {
     "VT": {
@@ -71,7 +73,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 11,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 208813719 NASDAQ + GitHub yfinance cache + official U.S. exchange calendar",
       "expected_qp": "97.727273",
       "expected_qp_tolerance": "0.000001",
@@ -88,7 +90,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 20,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 272093 NASDAQ + GitHub yfinance cache + official U.S. exchange calendar",
       "expected_qp": "22.727273",
       "expected_qp_tolerance": "0.000001",
@@ -105,7 +107,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 21,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 4815747 NASDAQ + GitHub yfinance cache + official U.S. exchange calendar",
       "expected_qp": "77.272727",
       "expected_qp_tolerance": "0.000001",
@@ -140,7 +142,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 20,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 27638069 ARCA snapshot + Massive dividends exact-match + exact VDC-vs-VT U.S. session-date alignment + official U.S. exchange calendar",
       "expected_qp": "18.181818",
       "expected_qp_tolerance": "0.000001",
@@ -158,7 +160,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 21,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 313130367 NASDAQ snapshot + Massive dividends/split exact-match + exact AVGO-vs-QQQ U.S. session-date alignment + official U.S. exchange calendar",
       "expected_qp": "100.000000",
       "expected_qp_tolerance": "0.000001",
@@ -176,7 +178,7 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 20,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 121665622 NYSE snapshot + Massive dividends exact-match + exact ZTS-vs-VT U.S. session-date alignment + official U.S. exchange calendar",
       "expected_qp": "97.727273",
       "expected_qp_tolerance": "0.000001",
@@ -194,16 +196,36 @@
       "calendar_verified": true,
       "timestamp_evidence_verified": true,
       "event_count_verified": 0,
-      "max_event_value_relative_error": 0.0,
+      "max_event_value_relative_error": 0,
       "verification_source": "IBKR conid 375855577 LSEETF snapshot with include_corporate_actions=true + GitHub yfinance zero-event cross-check + LSE business-day evidence; IB includes Yahoo-missing 2025-10-24",
       "expected_qp": "81.818182",
       "expected_qp_tolerance": "0.000001",
       "expected_row_count": 1262,
       "event_value_relative_error_tolerance": 0.005
+    },
+    "0050": {
+      "source_type": "IB_SNAPSHOT_JSON",
+      "source_path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/evidence/qp_20261031/0050_ib_5y.json",
+      "source_blob_sha": "5a31182ad2a06a2e6269e9cf742904d21168718c",
+      "verified_window_start": "2023-04-25",
+      "verified_window_end": "2026-10-30",
+      "bar_date_alignment_verified": true,
+      "event_coverage_verified": true,
+      "calendar_verified": true,
+      "timestamp_evidence_verified": true,
+      "event_count_verified": 8,
+      "max_event_value_relative_error": 0,
+      "verification_source": "IBKR conid 165197063 TWSE snapshot + TWSE official 4:1 split/suspension/resumption schedule + TWSE/Yuanta dividend records + 2026-10-23 typhoon closure validation",
+      "corporate_action_effective_date_overrides": {
+        "Splits|2025-06-11": "2025-06-18"
+      },
+      "expected_qp": "76.923077",
+      "expected_qp_tolerance": "0.000001",
+      "expected_row_count": 855,
+      "event_value_relative_error_tolerance": 0.005
     }
   },
   "excluded_or_partial": {
-    "0050": "Corporate-action/dividend basis still has ~0.77% wealth consistency discrepancy and Yahoo split event omission.",
     "VALL/VALU": "USD listing has insufficient history (<2y).",
     "NATO": "Target listing is LSE/USD; existing NATO.CN cache is not the same listing.",
     "IUCS": "Correct LSE/USD listing identified; historical source not yet in current cache."

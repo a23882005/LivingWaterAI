@@ -17,7 +17,11 @@
       "formal_class": "TAIWAN_LARGE_CAP_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","PB","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "PB",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -27,7 +31,12 @@
       "formal_class": "DEFENSE_MILITARY_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","EV_EBITDA","FCF_YIELD","EV_SALES"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "EV_EBITDA",
+        "FCF_YIELD",
+        "EV_SALES"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -37,7 +46,13 @@
       "formal_class": "GLOBAL_EQUITY_ETF",
       "class_status": "PRODUCT_IDENTITY_SUPPORTS_FORMAL_CLASS",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "TRAILING_PE",
+        "CAPE",
+        "PB",
+        "FCF_YIELD"
+      ],
       "product_identity": "Vanguard FTSE Global All-Cap UCITS ETF USD Acc, LSE USD ticker VALU",
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "UNDER_TWO_YEARS_LISTING_HISTORY",
@@ -48,7 +63,13 @@
       "formal_class": "GLOBAL_EQUITY_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "TRAILING_PE",
+        "CAPE",
+        "PB",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -58,7 +79,13 @@
       "formal_class": "GLOBAL_EQUITY_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","TRAILING_PE","CAPE","PB","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "TRAILING_PE",
+        "CAPE",
+        "PB",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -68,7 +95,11 @@
       "formal_class": "PHARMA_HEALTHCARE_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","EV_EBITDA","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "EV_EBITDA",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -78,7 +109,12 @@
       "formal_class": "TECH_AI_HIGH_GROWTH_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","EV_EBITDA","EV_SALES","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "EV_EBITDA",
+        "EV_SALES",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",
@@ -88,7 +124,13 @@
       "formal_class": "SEMICONDUCTOR_ETF",
       "class_status": "FORMAL_NAMED_ROUTE",
       "primary_metric": "FORWARD_PE",
-      "metric_sequence": ["FORWARD_PE","EV_EBITDA","EV_SALES","PS","FCF_YIELD"],
+      "metric_sequence": [
+        "FORWARD_PE",
+        "EV_EBITDA",
+        "EV_SALES",
+        "PS",
+        "FCF_YIELD"
+      ],
       "current_metric_status": "SOURCE_NOT_LOCKED",
       "historical_pit_status": "MISSING_VALIDATED_SERIES",
       "qv_status": "UNKNOWN",

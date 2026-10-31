@@ -160,6 +160,129 @@ def reconstruct_raw_rows(csv_path: str | Path, spec: dict[str, Any]) -> Result:
     })
 
 
+def reconstruct_ib_snapshot(snapshot_path: str | Path, spec: dict[str, Any]) -> Result:
+    path = Path(snapshot_path)
+    if not path.is_file():
+        return Result(UNKNOWN, reason="SOURCE_SNAPSHOT_NOT_FOUND")
+    raw_bytes = path.read_bytes()
+    actual_sha = git_blob_sha(raw_bytes)
+    expected_sha = spec.get("source_blob_sha")
+    if expected_sha and actual_sha != expected_sha:
+        return Result(UNKNOWN, reason="SOURCE_BLOB_SHA_MISMATCH",
+                      evidence={"expected": expected_sha, "actual": actual_sha})
+    gate_reasons = {
+        "bar_date_alignment_verified": "BAR_DATE_ALIGNMENT_NOT_VERIFIED",
+        "event_coverage_verified": "EVENT_COVERAGE_NOT_VERIFIED",
+        "calendar_verified": "CALENDAR_NOT_VERIFIED",
+        "timestamp_evidence_verified": "TIMESTAMP_EVIDENCE_NOT_VERIFIED",
+    }
+    for gate, reason in gate_reasons.items():
+        if spec.get(gate) is not True:
+            return Result(UNKNOWN, reason=reason)
+    try:
+        obj = json.loads(raw_bytes.decode("utf-8"))
+    except Exception as exc:
+        return Result(UNKNOWN, reason="SNAPSHOT_JSON_PARSE_ERROR", evidence={"error": str(exc)})
+    if obj.get("contract") != "V82_QP_IB_SNAPSHOT_v1":
+        return Result(UNKNOWN, reason="IB_SNAPSHOT_CONTRACT_MISMATCH")
+    if obj.get("price_basis") != "SPLIT_BACK_ADJUSTED_CLOSE":
+        return Result(UNKNOWN, reason="IB_PRICE_BASIS_UNVERIFIED")
+    if obj.get("cash_dividend_basis") != "OLD_SHARE_GROSS":
+        return Result(UNKNOWN, reason="IB_CASH_BASIS_UNVERIFIED")
+    times = obj.get("time") or []
+    closes = obj.get("close") or []
+    if len(times) != len(closes) or not times:
+        return Result(UNKNOWN, reason="IB_BAR_ARRAY_LENGTH_MISMATCH")
+    events_by_date: dict[str, dict[str, Decimal]] = {}
+    for e in obj.get("corp_actions") or []:
+        dt = str(e.get("date") or "")
+        if len(dt) == 8 and dt.isdigit():
+            dt = f"{dt[:4]}-{dt[4:6]}-{dt[6:]}"
+        slot = events_by_date.setdefault(dt, {"div": D("0"), "split": D("1")})
+        typ = e.get("type")
+        try:
+            val = D(e.get("value"))
+        except Exception as exc:
+            return Result(UNKNOWN, reason="IB_EVENT_NUMERIC_PARSE_ERROR", evidence={"date": dt, "error": str(exc)})
+        if typ == "CashDividends":
+            if val < 0:
+                return Result(UNKNOWN, reason="INVALID_CASH_DIVIDEND", evidence={"date": dt})
+            slot["div"] += val
+        elif typ == "Splits":
+            if val <= 0:
+                return Result(UNKNOWN, reason="INVALID_SPLIT_RATIO", evidence={"date": dt})
+            slot["split"] *= val
+        else:
+            return Result(UNKNOWN, reason="UNSUPPORTED_CORPORATE_ACTION", evidence={"date": dt, "type": typ})
+
+    start = spec["verified_window_start"]
+    end = spec["verified_window_end"]
+    parsed: list[dict[str, Any]] = []
+    for t, c in zip(times, closes):
+        dt = str(t)[:10]
+        if not (start <= dt <= end):
+            continue
+        try:
+            close = D(c)
+        except Exception as exc:
+            return Result(UNKNOWN, reason="IB_CLOSE_NUMERIC_PARSE_ERROR", evidence={"date": dt, "error": str(exc)})
+        if close <= 0:
+            return Result(UNKNOWN, reason="INVALID_PRICE_VALUE", evidence={"date": dt})
+        event = events_by_date.get(dt, {"div": D("0"), "split": D("1")})
+        if event["div"] != 0 and event["split"] != 1:
+            return Result(UNKNOWN, reason="SAME_DAY_SPLIT_AND_CASH_RIGHTS_ORDER_UNKNOWN", evidence={"date": dt})
+        parsed.append({"date": dt, "close": close, "div": event["div"], "split": event["split"]})
+    if not parsed:
+        return Result(UNKNOWN, reason="NO_ROWS_IN_VERIFIED_WINDOW")
+    expected_rows = spec.get("expected_row_count")
+    if expected_rows is not None and len(parsed) != int(expected_rows):
+        return Result(UNKNOWN, reason="ROW_COUNT_MISMATCH",
+                      evidence={"expected": int(expected_rows), "actual": len(parsed)})
+    dates = [r["date"] for r in parsed]
+    if dates != sorted(set(dates)):
+        return Result(UNKNOWN, reason="DUPLICATE_OR_NONMONOTONIC_SESSIONS")
+    if dates[0] != start or dates[-1] != end:
+        return Result(UNKNOWN, reason="VERIFIED_WINDOW_BOUNDARY_MISMATCH",
+                      evidence={"first": dates[0], "last": dates[-1], "expected_first": start, "expected_last": end})
+    bar_dates = set(dates)
+    orphan_events = sorted(d for d in events_by_date if start <= d <= end and d not in bar_dates)
+    if orphan_events:
+        return Result(UNKNOWN, reason="CORPORATE_ACTION_WITHOUT_BAR", evidence={"dates": orphan_events})
+
+    # IB chart Close is split-back-adjusted, while the corporate-action cash values
+    # observed in this contract are old-share gross cash. Rebuild only the price basis;
+    # do not multiply the cash dividend by future splits a second time.
+    future_factor = D("1")
+    rebuilt_rev: list[Row] = []
+    for r in reversed(parsed):
+        raw_close = r["close"] * future_factor
+        raw_div = r["div"]
+        rebuilt_rev.append(Row(r["date"], r["close"], r["div"], r["split"], raw_close, raw_div))
+        if r["split"] != 1:
+            future_factor *= r["split"]
+    rebuilt = list(reversed(rebuilt_rev))
+    event_count = sum(1 for r in rebuilt if r.cached_dividend != 0 or r.split_ratio != 1)
+    expected_event_count = spec.get("event_count_verified")
+    if expected_event_count is not None and event_count != int(expected_event_count):
+        return Result(UNKNOWN, reason="EVENT_COUNT_MISMATCH",
+                      evidence={"expected": int(expected_event_count), "actual": event_count})
+    max_err = D(spec.get("max_event_value_relative_error", 0))
+    tolerance = D(spec.get("event_value_relative_error_tolerance", "0.005"))
+    if max_err > tolerance:
+        return Result(UNKNOWN, reason="EVENT_VALUE_VERIFICATION_TOLERANCE_EXCEEDED",
+                      evidence={"max_relative_error": str(max_err), "tolerance": str(tolerance)})
+    return Result(OK, rebuilt, evidence={
+        "rows": len(rebuilt),
+        "first_date": rebuilt[0].date,
+        "last_date": rebuilt[-1].date,
+        "source_blob_sha": actual_sha,
+        "event_count_verified": spec.get("event_count_verified"),
+        "max_event_value_relative_error": spec.get("max_event_value_relative_error"),
+        "verification_source": spec.get("verification_source"),
+        "source_type": "IB_SNAPSHOT_JSON",
+    })
+
+
 def build_wealth(rows: list[Row]) -> Result:
     if len(rows) < 2:
         return Result(UNKNOWN, reason="INSUFFICIENT_DAILY_CLOSES")
@@ -260,7 +383,13 @@ def calculate_qp(rows: list[Row], wealth_result: Result) -> Result:
 
 def produce_one(repo_root: str | Path, spec: dict[str, Any]) -> Result:
     source = Path(repo_root) / spec["source_path"]
-    raw = reconstruct_raw_rows(source, spec)
+    source_type = spec.get("source_type", "YFINANCE_CSV")
+    if source_type == "YFINANCE_CSV":
+        raw = reconstruct_raw_rows(source, spec)
+    elif source_type == "IB_SNAPSHOT_JSON":
+        raw = reconstruct_ib_snapshot(source, spec)
+    else:
+        return Result(UNKNOWN, reason="UNSUPPORTED_SOURCE_TYPE", evidence={"source_type": source_type})
     if raw.status != OK:
         return raw
     wealth = build_wealth(raw.value)

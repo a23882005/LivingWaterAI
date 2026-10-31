@@ -14,12 +14,12 @@ MANIFEST = HERE / "v82_qp_verified_window_manifest_20261031.json"
 
 
 class RealManifestReplayTests(unittest.TestCase):
-    def test_six_verified_symbols_replay_exactly(self):
+    def test_all_manifest_symbols_replay_exactly(self):
         out = produce_manifest(REPO_ROOT, MANIFEST)
-        self.assertEqual(set(out["items"]), {"VT", "QQQ", "SOXX", "GOOGL", "MSFT", "NVDA"})
+        expected = json.loads(MANIFEST.read_text(encoding="utf-8"))["items"]
+        self.assertEqual(set(out["items"]), set(expected))
         bad = {k:v for k,v in out["items"].items() if v["status"] != OK}
         self.assertEqual(bad, {}, bad)
-        expected = json.loads(MANIFEST.read_text(encoding="utf-8"))["items"]
         for symbol, result in out["items"].items():
             self.assertAlmostEqual(float(result["value"]["qP"]), float(expected[symbol]["expected_qp"]), places=6)
             self.assertGreaterEqual(result["value"]["reference_points"], 24)

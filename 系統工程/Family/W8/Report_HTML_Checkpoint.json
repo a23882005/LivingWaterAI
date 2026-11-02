@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
-  "date": "2026-10-31",
-  "status": "MENTOR_SCOPE_COMPATIBILITY_PHASE_1_TESTED__PM_REVIEW_PENDING",
+  "date": "2026-11-03",
+  "status": "PASS_PHASE1_MENTOR_SCOPE_COMPATIBILITY",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -50,23 +50,21 @@
   },
   "evidence": "report_html_evidence/README.md",
   "remaining_dependencies": [
-    "Middle PM independent acceptance of this phase-1 compatibility repair",
-    "Phase 2: qualified same-run real financial sources and PM producer/schema/source digest lock",
+    "Phase 2: qualified same-run real financial sources and middle PM producer/schema/source digest lock plus a new construction contract",
     "Actual Project login UAT not run; Android/iOS devices deferred by Owner"
   ],
-  "next_responsible_owner": "Family middle PM: independently verify phase-1 compatibility; lock qualified real financial producer/schema/sources for phase 2",
-  "independent_acceptance": "LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED__NEW_SCOPE_FIX_PENDING",
+  "next_responsible_owner": "Family middle PM: supply qualified real financial sources, freeze producer/schema/source digests and issue the phase-2 contract; report Codex preserves the accepted phase-1 result pending that handoff",
+  "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED",
   "resume": [
-    "Checkout this draft PR head and read Report_HTML_Contract_20261030.md",
-    "Verify latest main/PR59 and allowed-file overlaps before editing",
-    "Run test_report_canonical_adapter.py on the synthetic fixture",
-    "Provide the exact approved W6 archive and run test_report_rendered_html.py",
-    "Coordinate only the pinned real upstream data with the middle PM; do not modify PR59-owned programs or private DBs"
+    "Read the PM phase-1 PASS ruling and PR60 issuecomment-6589908544",
+    "Preserve accepted consumer 9bd61094 and its evidence; status-only commits do not change the accepted financial interface",
+    "Wait for middle PM qualified real sources, explicit version lock and phase-2 construction contract",
+    "Shared README/Checkpoint remain PM-owned; production HOLD and trade authorization NONE remain"
   ],
   "artifact_location": "Private Drive household report folders / private TEMP evidence entry",
   "artifact_upload_status": "FOUR_PRIVATE_REPORTS_AND_MANIFESTS_FRESH_READBACK_VERIFIED",
   "github_publication": {
-    "status": "BASE_4319556_PUBLISHED__CURRENT_SCOPE_FIX_SHA_AND_CI_IN_COMPLETION_RECEIPT",
+    "status": "PHASE_1_PUBLISHED_AT_9bd61094__OWNER_EXPORT_APPROVAL_RESOLVED__PM_ACCEPTED",
     "repository": "a23882005/LivingWaterAI",
     "visibility": "public",
     "branch": "family/report-canonical-html-20261030",
@@ -86,7 +84,8 @@
       "next": "HISTORICAL__RESOLVED_BY_OWNER_AUTHORIZATION_AND_PUBLICATION_AT_81e741da"
     },
     "continuation_scope": "Source, synthetic tests and deidentified text QA only; private output remains in private Drive",
-    "continuation_start_commit": "4319556a67f83f1cf3fc754446a2c401335db3e1"
+    "continuation_start_commit": "4319556a67f83f1cf3fc754446a2c401335db3e1",
+    "accepted_phase_1_commit": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59"
   },
   "original_isolated_status": "ISOLATED_IMPLEMENTATION_AND_QA_COMPLETE__GITHUB_EXPORT_APPROVAL_REQUIRED",
   "continuation_start_commit": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
@@ -189,7 +188,7 @@
     "contract_version": "1.0",
     "consumer_base": "4319556a67f83f1cf3fc754446a2c401335db3e1",
     "producer_commit": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
-    "status": "PHASE_1_IMPLEMENTED_AND_TESTED__PM_REVIEW_PENDING",
+    "status": "PASS_PHASE1_MENTOR_SCOPE_COMPATIBILITY",
     "evidence": "report_html_evidence/mentor_scope_compatibility/",
     "raw_mentor_lineage": "report_source_lineage.mentor",
     "new_action_fields": {
@@ -201,6 +200,35 @@
     "new_real_reports": 0,
     "private_DB_writes": 0,
     "broker_actions": 0,
-    "phase_2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK"
+    "phase_2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK",
+    "middle_PM_acceptance": "PASS",
+    "accepted_consumer_commit": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+    "accepted_consumer_tree": "b960b8ea3f443612fc736a4ba444f32aecc5e15f",
+    "PM_ruling": {
+      "file_name": "PM_PR60_第一階段獨立驗收裁定_20261103.md",
+      "location": "Google Drive根目錄／TEMP",
+      "sha256": "9a59f50ded5587b54ea6a506a6b3fcb7c665286de85a7eaf300a36f6010f5d37",
+      "PR_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6589908544",
+      "date_Taiwan": "2026-11-03",
+      "PM_independent_tests": {
+        "passed": 59,
+        "subtests_passed": 112,
+        "exit_code": 0,
+        "duration_seconds": 3.86
+      },
+      "sealed_full_suite_reviewed": {
+        "main_cases": 272,
+        "subtests": 134,
+        "Chromium_cases": 13
+      },
+      "PM_Chromium_rerun": "NOT_RUN__SEALED_BROWSER_EVIDENCE_CHECKED",
+      "accepted_head_CI": {
+        "run_id": 41523893632,
+        "head_sha": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "scope": "FIXED_VERSION_PHASE_1_RECEIVER_COMPATIBILITY_ONLY"
+    }
   }
 }

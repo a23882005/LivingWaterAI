@@ -68,6 +68,7 @@ jobs:
       - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
+          python -m py_compile scripts/refresh_v703_predeploy.py
           test -s data/18_macro_verification.json
           test -s data/8_macro_supplement_verified.json
           test -s data/v703_official_monthly_release_calendar.json

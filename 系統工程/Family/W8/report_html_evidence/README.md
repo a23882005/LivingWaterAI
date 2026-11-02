@@ -1,3 +1,9 @@
+# 金融→報告相容修補 v1.0（第一階段）
+
+固定PR59 `d250d3c` → PR60驗收基準 `4319556a`。相容修補與原始JUnit／來源blob／可重現命令見 [mentor_scope_compatibility/README.md](mentor_scope_compatibility/README.md)。272項＋134子案例、13項Chromium通過；原四戶77頁／76卡／20檔已由中PM正式分段PASS，本輪保留。
+
+新True建議路徑只在明確禁止券商執行、HOLD／NO_TRADE及所有原資格通過時接收，原True/True/False完整保存lineage。新真人完整金融報告仍等待合格來源與中PM另鎖版本；本輪待獨立複驗。以下保留前輪原施工紀錄及當時的待驗收狀態，現行裁定以上方及本線Checkpoint為準。
+
 # 四戶最新正式 DB 報告：SOURCE_REVIEW（2026-10-31）
 
 中 PM 已正式驗收 1fe71862 的來源換行與保存，排版缺陷 CLOSED；本輪沿該 renderer 產製最新 DB 報告，沒有改動已驗收版型／來源樣式。

@@ -43,6 +43,9 @@ class RenderedHTMLTests(unittest.TestCase):
         cls.long_rendered=F.R.render_current_w6(cls.long_current,archive)
         cls.db_current=F.current(F.db_review_case())
         cls.db_rendered=F.R.render_current_w6(cls.db_current,archive)
+        cls.pinned_case=F.pinned_native_case()
+        cls.pinned_current=F.current(cls.pinned_case)
+        cls.pinned_rendered=F.R.render_current_w6(cls.pinned_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:
@@ -74,6 +77,53 @@ class RenderedHTMLTests(unittest.TestCase):
             db_folder=target/'db_review';db_folder.mkdir(exist_ok=True)
             for name,raw in cls.db_rendered['artifacts'].items():(db_folder/name).write_bytes(raw)
             (db_folder/'current.synthetic.json').write_text(json.dumps(cls.db_current,ensure_ascii=False,indent=2),encoding='utf-8')
+            pinned_folder=target/'pinned_pr59';pinned_folder.mkdir(exist_ok=True)
+            for name,raw in cls.pinned_rendered['artifacts'].items():(pinned_folder/name).write_bytes(raw)
+            (pinned_folder/'current.synthetic.json').write_text(json.dumps(cls.pinned_current,ensure_ascii=False,indent=2),encoding='utf-8')
+            (pinned_folder/'original_mentor.synthetic.json').write_text(json.dumps(cls.pinned_case['result']['mentor'],ensure_ascii=False,indent=2),encoding='utf-8')
+
+    def test_pinned_pr59_advice_text_renders_verbatim_without_broker_permission(self):
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600}).new_page()
+        page.set_content(self.pinned_rendered['artifacts']['report.html'].decode())
+        body=page.locator('body').inner_text()
+        mentor=self.pinned_case['result']['mentor']
+        for row in mentor['items']:
+            self.assertIn(row['recommendation_explanation'],body)
+        self.assertIn('70.00 USD',body)
+        self.assertEqual(page.locator('#toc a').count(),13)
+        self.assertEqual(len(set(page.locator('[data-chapter]').evaluate_all('ns=>ns.map(n=>n.dataset.chapter)'))),14)
+        lineage=self.pinned_current['report_source_lineage']
+        self.assertEqual(lineage['mentor'],mentor)
+        self.assertIs(lineage['mentor']['execution_advice_allowed'],True)
+        self.assertIs(lineage['action']['execution_advice_allowed'],False)
+        self.assertIs(lineage['action']['broker_execution_allowed'],False)
+        for row in self.source_reference_geometry(page):
+            self.assertEqual(row['font_size'],'18px')
+            self.assertLessEqual(row['scroll_width'],row['client_width']+1)
+            for rect in row['lines']:
+                self.assertGreaterEqual(rect['left'],row['card_left']-1)
+                self.assertLessEqual(rect['right'],row['card_right']+1)
+        self.receipt['checks']['pinned_pr59_original_advice_text_and_readonly_scope']='PASS_SYNTHETIC_ONLY'
+
+    def test_pinned_advice_pdf_html_zip_and_all_saved_pages_are_consistent(self):
+        import fitz
+        from PIL import Image,ImageChops
+        rendered=self.pinned_rendered
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600},device_scale_factor=1).new_page()
+        page.set_content(rendered['artifacts']['report.html'].decode());page.evaluate('document.fonts.ready')
+        pdf=fitz.open(stream=rendered['artifacts']['report.pdf'],filetype='pdf');self.addCleanup(pdf.close)
+        self.assertEqual(len(pdf),rendered['page_count'])
+        self.assertIn('70.00USD',''.join(''.join(p.get_text() for p in pdf).split()))
+        with zipfile.ZipFile(io.BytesIO(rendered['artifacts']['report.zip'])) as z:
+            for name in ('report.html','report.pdf','index.html'):
+                self.assertEqual(z.read(name),rendered['artifacts'][name])
+            for index in range(rendered['page_count']):
+                raw=page.locator('.page').nth(index).screenshot(animations='disabled')
+                expected=z.read(f'pages/CR-IMG-{index+1:03d}.png')
+                self.assertIsNone(ImageChops.difference(Image.open(io.BytesIO(raw)).convert('RGB'),
+                    Image.open(io.BytesIO(expected)).convert('RGB')).getbbox())
+        self.receipt['pinned_pr59_page_count']=rendered['page_count']
+        self.receipt['checks']['pinned_pr59_pdf_text_zip_bytes_all_png_pixels']='PASS_SYNTHETIC_ONLY'
 
     def test_native_member_review_renders_unknown_nav_and_source_dated_holdings(self):
         page=self.context(java_script_enabled=False).new_page()

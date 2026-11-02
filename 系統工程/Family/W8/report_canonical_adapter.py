@@ -495,6 +495,8 @@ def prepare_report_sources(source, market, engine):
     out = {"scope": binding["scope"], "sections": sections, "radar": None, "canonical": None,
            "lineage": {"binding_sha256": binding["digest"], "sections": receipts, "action": action,
                        "request_sha256": digest(request), "result_sha256": digest(result)}}
+    if result is not None and result.get("status") == "OK":
+        out["lineage"]["mentor"] = deepcopy(result["mentor"])
     target_ctx = binding.get("target_context")
     if target_ctx is not None:
         require(target_ctx.get("run_id") == engine["run_id"] and target_ctx.get("evaluation_at") == engine["evaluation_at"],

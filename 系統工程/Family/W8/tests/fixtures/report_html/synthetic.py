@@ -4,9 +4,15 @@ Values intentionally cover a protected stock, current-only and target-only
 instruments, positive/negative/zero drift and zero new deployment (WAIT).
 """
 from copy import deepcopy
+from contextlib import contextmanager
+from functools import lru_cache
+from hashlib import sha1, sha256
 import importlib.util
+import json
 from pathlib import Path
 import sys
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 W8 = Path(__file__).resolve().parents[3]
 
@@ -168,6 +174,123 @@ def refresh(c, *, scope="CANONICAL_CALCULATION", result=True, c7=True):
 def current(c=None):
     c = c or case()
     return D.build_w6_current_data(c["source"], c["market"], c["engine"])
+
+
+PINNED_PRODUCER = "d250d3c506da3f7bec1dd7f3b5c89639a69765f7"
+PINNED_SNAPSHOT_SHA256 = "5417dd4530889a904e7a8e0b9e3616b3b55f4760b64e413c52d5373c141ee833"
+
+
+@contextmanager
+def pinned_producer():
+    """Load exact public PR59 sources in isolation, never replacing report W5.
+
+    Three differing upstream files are embedded as immutable source snapshots;
+    fifteen unchanged dependencies are checked against their upstream hashes.
+    Only the temporary import of Mentor sees the pinned runtime_loader module.
+    No sys.path edits, source rewriting, financial-module mocks or downloads.
+    """
+    raw = (W8 / "report_html_evidence/mentor_scope_compatibility/upstream_snapshot.json").read_bytes()
+    if sha256(raw).hexdigest() != PINNED_SNAPSHOT_SHA256:
+        raise ValueError("PINNED_UPSTREAM_SNAPSHOT_INTEGRITY")
+    snapshot = json.loads(raw)
+    if snapshot["producer_commit"] != PINNED_PRODUCER:
+        raise ValueError("PINNED_UPSTREAM_COMMIT")
+    with TemporaryDirectory(prefix="report-pinned-pr59-") as directory:
+        root = Path(directory)
+        for row in snapshot["files"]:
+            rel = Path(row["path"])
+            if rel.is_absolute() or ".." in rel.parts:
+                raise ValueError("PINNED_UPSTREAM_PATH")
+            data = (row["content_utf8"].encode() if "content_utf8" in row
+                    else (W8.parents[2] / rel).read_bytes())
+            blob = sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+            if (len(data) != row["bytes"] or sha256(data).hexdigest() != row["sha256"]
+                    or blob != row["git_blob_sha"]):
+                raise ValueError("PINNED_UPSTREAM_SOURCE_INTEGRITY:" + row["path"])
+            dest = root / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(data)
+        def module(name, path):
+            spec = importlib.util.spec_from_file_location(name, path)
+            out = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(out)
+            return out
+        w5 = root / "系統工程/Family/W5"
+        loader = module("report_pinned_pr59_loader", w5 / "runtime_loader.py")
+        with patch.dict(sys.modules, {"runtime_loader": loader}):
+            mentor = module("report_pinned_pr59_mentor", w5 / "mentor_bridge.py")
+        native = loader.load_c_module(root, 9)
+        request = json.loads((w5 / "tests/fixtures/work9_mentor_request.json").read_text())
+        yield root, native, mentor, request
+
+
+def native_work9_case(c, native, mentor_module, root, raw_request):
+    """Bind the synthetic report to original Work9/Mentor outputs unchanged."""
+    raw_before = deepcopy(raw_request)
+    unified = native.build_unified_deployment(raw_request)
+    original_owner = unified["owner"]
+    account, run = original_owner["account"], unified["run_id"]
+    owner = {"client_id": CLIENT, **original_owner, "currency": unified["currency"]}
+    snapshot = c["snapshot"]
+    snapshot["tables"]["portfolio_account"][0]["account_key"] = account
+    for row in snapshot["tables"]["portfolio_position"]:
+        row["account_key"] = account
+    snapshot["payload_digest"] = A.digest(snapshot["tables"])
+    c["source"] = S.build_report_source(snapshot, account="AR", expected_client_id=CLIENT)
+    c["request"].update(run_id=run, owner=deepcopy(owner))
+    c["request"]["client_snapshot"] = {"payload": snapshot, "digest": A.digest(snapshot)}
+    c["request"]["native_bundle"]["stock_request"]["work3_handoff"]["owner"] = deepcopy(original_owner)
+    c["market"]["run_id"] = c["engine"]["run_id"] = run
+    for row in c["market"]["position_values_twd"]:
+        row["account_key"] = account
+    c["target_context"].update(run_id=run, snapshot_payload_sha256=snapshot["payload_digest"])
+    original = c["c7"]["original_source"]
+    original["family_owner"] = deepcopy(owner)
+    for identity in (original["canonical_input"]["identity"], original["work6_result"]["identity"],
+                     c["c7"]["result"]["identity"]):
+        identity["run_id"] = run
+    allocation_id = unified["source_bindings"]["final_target_allocation_id"]
+    original["work6_result"]["final_target"]["snapshot"]["allocation_id"] = allocation_id
+    target = c["request"]["confirmed_target"]
+    target["payload"]["draft"]["allocation_id"] = allocation_id
+    target["payload"]["draft"]["draft_hash"] = A.digest(
+        {k: v for k, v in target["payload"]["draft"].items() if k != "draft_hash"})
+    target["target_hash"] = target["payload"]["target_hash"] = target["payload"]["draft"]["draft_hash"]
+    c["target_context"]["expected_target_hash"] = target["target_hash"]
+    for envelope in c["sections"].values():
+        envelope["run_id"] = run
+    context = {"client_id": CLIENT, "run_id": run, "owner": original_owner, "currency": unified["currency"],
+               "analysis_permission": "ANALYZE_ONLY", "trade_authorization": "NONE",
+               "runtime_mode": "REAL_DETERMINISTIC", "data_provenance": "SYNTHETIC",
+               "expected_result_digest": native._digest(unified)}
+    before = deepcopy((raw_request, unified, context))
+    mentor = mentor_module.explain_native(root, raw_request, unified, trusted_context=context)
+    c["result"].update(run_id=run, owner=deepcopy(owner), mentor=mentor, data_provenance="SYNTHETIC")
+    c["result"]["native_result"]["unified_result"] = unified
+    c["upstream_originals"] = {"request_before": raw_before, "request": raw_request,
+                               "before": before, "after": (raw_request, unified, context)}
+    refresh(c)
+    return c
+
+
+@lru_cache(maxsize=1)
+def _pinned_native_case():
+    with pinned_producer() as (root, native, mentor, request):
+        c = native_work9_case(case(), native, mentor, root, request)
+    # Engineering-only chapter producer: quotes original Mentor text verbatim.
+    # This is not a qualified envelope or a report for any real household.
+    c["sections"]["actions"].update(source_id="SYNTHETIC_PINNED_PR59_MENTOR_ACTION_TEXT",
+        rules_sha="308c254d60f8ffd42c7ea559cbf948ece1b0fe77ee0f753bd64d0fcdd6dd3907",
+        payload=[{"heading": "合成原生建議 " + row["item_id"],
+                  "body": row["recommendation_explanation"],
+                  "source_reference": "SYNTHETIC_PR59:" + PINNED_PRODUCER}
+                 for row in c["result"]["mentor"]["items"]])
+    refresh(c)
+    return c
+
+
+def pinned_native_case():
+    return deepcopy(_pinned_native_case())
 
 
 def db_review_case():

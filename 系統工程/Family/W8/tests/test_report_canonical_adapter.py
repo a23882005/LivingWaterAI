@@ -228,6 +228,118 @@ class CanonicalReportTests(unittest.TestCase):
         self.assertEqual(out["drift"][0]["client_facing_action"], "HOLD_PROTECTED")
         self.assertEqual(len(F.R._build_blocks(out)), 14)
 
+    def test_pinned_pr59_native_advice_is_lossless_and_never_grants_broker_execution(self):
+        c = F.pinned_native_case()
+        before = deepcopy(c)
+        out = F.current(c)
+        lineage = out["report_source_lineage"]
+        mentor = c["result"]["mentor"]
+        unified = c["result"]["native_result"]["unified_result"]
+        self.assertIs(mentor["execution_advice_allowed"], True)
+        self.assertIs(mentor["recommendations_allowed"], True)
+        self.assertIs(mentor["broker_execution_allowed"], False)
+        self.assertEqual(lineage["mentor"], mentor)
+        self.assertEqual(lineage["action"]["items"], unified["canonical_deployment_result"]["items"])
+        self.assertEqual(lineage["action"]["canonical_digest"], mentor["canonical_deployment_result_sha256"])
+        self.assertIs(lineage["action"]["source_execution_advice_allowed"], True)
+        self.assertIs(lineage["action"]["execution_advice_allowed"], False)
+        self.assertIs(lineage["action"]["broker_execution_allowed"], False)
+        self.assertEqual(out["canonical_final_target_id"], unified["source_bindings"]["final_target_allocation_id"])
+        for row, original in zip(mentor["items"], lineage["action"]["items"]):
+            self.assertEqual(row["source_facts"], original)
+            self.assertEqual(row["recommendation"]["action"], original["canonical_action"])
+            self.assertEqual(row["recommendation"]["amount"], original["deployment_amount"])
+            self.assertEqual(row["recommendation"]["ratio"], original["deployment_ratio"])
+            self.assertEqual(original["account_owner"], mentor["owner"])
+            self.assertIs(row["recommendation"]["broker_submission_allowed"], False)
+        self.assertEqual(lineage["action"]["source_run_id"], unified["run_id"])
+        self.assertEqual(lineage["result_sha256"], F.A.digest(c["result"]))
+        self.assertEqual(lineage["sections"], c["sections"])
+        self.assertEqual(c["upstream_originals"]["request_before"], c["upstream_originals"]["request"])
+        self.assertEqual(c["upstream_originals"]["before"], c["upstream_originals"]["after"])
+        self.assertEqual(c, before)
+
+    def test_pinned_true_path_rejects_incomplete_or_unsafe_permissions(self):
+        missing = object()
+        attacks = [("broker_execution_allowed", v) for v in (True, missing, None, "False", 0)]
+        attacks += [("recommendations_allowed", v) for v in (False, missing, None, "True", 1)]
+        attacks += [("execution_advice_allowed", v) for v in (missing, None, "True", "False", 1, 0)]
+        attacks += [("contract_name", v) for v in (missing, "UNKNOWN")]
+        attacks += [("production", v) for v in (missing, "READY")]
+        attacks += [("trade_action", v) for v in (missing, "BUY")]
+        for key, value in attacks:
+            with self.subTest(flag=key, value="MISSING" if value is missing else value):
+                c = F.pinned_native_case()
+                if value is missing:
+                    c["result"]["mentor"].pop(key, None)
+                else:
+                    c["result"]["mentor"][key] = value
+                F.refresh(c)
+                before = deepcopy(c)
+                with self.assertRaisesRegex(ValueError, "MENTOR_.*SCOPE"):
+                    F.current(c)
+                self.assertEqual(c, before)
+
+    def test_pinned_true_path_keeps_identity_source_and_canonical_guards(self):
+        for attack in ("client", "run", "request_digest", "owner", "currency", "canonical",
+                       "canonical_digest", "source_result_digest", "work9_summary", "result_time",
+                       "future_section", "section_digest", "c7_owner", "c7_run", "c7_digest",
+                       "snapshot_digest", "trade_authorization"):
+            with self.subTest(attack=attack):
+                c = F.pinned_native_case()
+                mentor = c["result"]["mentor"]
+                if attack == "client": mentor["client_id"] = "WRONG"
+                elif attack == "run": mentor["run_id"] = "WRONG"
+                elif attack == "owner": mentor["owner"]["account"] = "WRONG"
+                elif attack == "currency": mentor["currency"] = "EUR"
+                elif attack == "canonical": mentor["canonical_deployment_result"]["items"][0]["canonical_action"] = "BUY"
+                elif attack == "canonical_digest": mentor["canonical_deployment_result_sha256"] = "0" * 64
+                elif attack == "source_result_digest": mentor["source_result_digest"] = "0" * 64
+                elif attack == "work9_summary": c["result"]["native_result"]["unified_result"]["mentor_return"]["item_ids"] = []
+                elif attack == "result_time": c["result"]["evaluation_at"] = "2026-10-31T00:00:00Z"
+                elif attack == "future_section": c["sections"]["actions"]["as_of"] = "2099-01-01T00:00:00Z"
+                elif attack == "c7_owner": c["c7"]["original_source"]["family_owner"]["account"] = "WRONG"
+                elif attack == "c7_run": c["c7"]["original_source"]["work6_result"]["identity"]["run_id"] = "WRONG"
+                elif attack == "snapshot_digest": c["request"]["client_snapshot"]["digest"] = "0" * 64
+                elif attack == "trade_authorization": c["request"]["trade_authorization"] = "AUTHORIZED"
+                F.refresh(c)
+                binding = c["engine"]["report_sources"]
+                if attack == "request_digest": binding["result"]["input_digest"] = "0" * 64
+                elif attack == "section_digest": binding["sections"]["actions"]["payload_sha256"] = "0" * 64
+                elif attack == "c7_digest": binding["c7"]["source_digest"] = "0" * 64
+                binding["digest"] = F.A.digest({k: v for k, v in binding.items() if k != "digest"})
+                before = deepcopy(c)
+                with self.assertRaises(ValueError):
+                    F.current(c)
+                self.assertEqual(c, before)
+
+    def test_pinned_consumer_has_no_db_or_network_transport(self):
+        from unittest.mock import patch
+        c = F.pinned_native_case()
+        with patch("sqlite3.connect", side_effect=AssertionError("DB access forbidden")), \
+                patch("urllib.request.urlopen", side_effect=AssertionError("HTTP forbidden")), \
+                patch("socket.create_connection", side_effect=AssertionError("Network forbidden")):
+            out = F.current(c)
+            self.assertEqual(len(F.R._build_blocks(out)), 14)
+        self.assertIs(out["report_source_lineage"]["action"]["broker_execution_allowed"], False)
+
+    def test_pinned_true_source_review_still_requires_c_for_canonical_scope(self):
+        c = F.pinned_native_case()
+        c["sections"] = {}
+        c["result"]["native_result"]["family_sources"] = {}
+        c["market"].update(verified=False, valuation_state="UNKNOWN", market_as_of=F.AT,
+                           market_as_of_basis="SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION")
+        F.refresh(c, scope="SOURCE_REVIEW", c7=False)
+        out = F.current(c)
+        self.assertEqual(out["report_scope"], "SOURCE_REVIEW")
+        self.assertIsNone(out["current_total_twd"])
+        self.assertIsNone(out["approved_radar"])
+        self.assertNotIn("canonical_lineage", out)
+        self.assertEqual(out["report_source_lineage"]["mentor"], c["result"]["mentor"])
+        F.refresh(c, scope="CANONICAL_CALCULATION", c7=False)
+        with self.assertRaisesRegex(ValueError, "W6_CANONICAL_C_SOURCE_REQUIRED"):
+            F.current(c)
+
     def test_source_review_without_c_does_not_claim_canonical_result(self):
         c = self.c; c["sections"] = {}; F.refresh(c, scope="SOURCE_REVIEW", result=False, c7=False)
         out = F.current(c)

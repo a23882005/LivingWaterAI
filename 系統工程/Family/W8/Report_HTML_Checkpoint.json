@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
   "date": "2026-10-31",
-  "status": "LATEST_DB_FOUR_SOURCE_REVIEW_REPORTS_ARCHIVED__PM_ACCEPTANCE_PENDING",
+  "status": "MENTOR_SCOPE_COMPATIBILITY_PHASE_1_TESTED__PM_REVIEW_PENDING",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -29,21 +29,12 @@
     "tests/test_on_demand_w6.py"
   ],
   "validation": {
-    "pytest_passed": 261,
-    "subtests_passed": 68,
+    "pytest_passed": 272,
+    "subtests_passed": 134,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "canonical_contract_tests": 38,
-    "real_browser_tests": 11,
-    "physical_pages": 16,
-    "chapters": 14,
-    "all_static_pages_equal_zip_png": true,
-    "mock_staging_readbacks_manifest": "PASS_MOCK_ONLY",
-    "direct_file_open": "NOT_VERIFIED__MANAGED_CHROMIUM_FILE_URL_POLICY",
-    "git_diff_check": "PASS",
-    "compile": "PASS",
-    "original_work9_mentor_shape_test": "PASS_PUBLIC_SYNTHETIC_GOLDEN"
+    "real_chromium_tests": 13
   },
   "approved_zip_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
   "preserved": {
@@ -59,13 +50,12 @@
   },
   "evidence": "report_html_evidence/README.md",
   "remaining_dependencies": [
-    "Same-run complete C Work6/7 and Work9/Mentor are absent from the four current native partial results; original upstream owners and PM coordinate, report UNKNOWN preserved",
-    "Seven prose groups still lack official source envelopes; valuation quotes existing native partial analysis only",
-    "Android/iOS device UAT remains deferred; managed file:// policy is preserved",
-    "Middle PM independently accepts the final source-review report and verifies remaining formal financial integration"
+    "Middle PM independent acceptance of this phase-1 compatibility repair",
+    "Phase 2: qualified same-run real financial sources and PM producer/schema/source digest lock",
+    "Actual Project login UAT not run; Android/iOS devices deferred by Owner"
   ],
-  "next_responsible_owner": "Family middle PM: independently accept latest-DB reports; freeze PR59 financial source versions before later integration",
-  "independent_acceptance": "LAYOUT_AT_1fe71862_PM_PASS_CLOSED__LATEST_DB_REPORTS_PENDING",
+  "next_responsible_owner": "Family middle PM: independently verify phase-1 compatibility; lock qualified real financial producer/schema/sources for phase 2",
+  "independent_acceptance": "LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED__NEW_SCOPE_FIX_PENDING",
   "resume": [
     "Checkout this draft PR head and read Report_HTML_Contract_20261030.md",
     "Verify latest main/PR59 and allowed-file overlaps before editing",
@@ -76,7 +66,7 @@
   "artifact_location": "Private Drive household report folders / private TEMP evidence entry",
   "artifact_upload_status": "FOUR_PRIVATE_REPORTS_AND_MANIFESTS_FRESH_READBACK_VERIFIED",
   "github_publication": {
-    "status": "PR60_PUBLISHED_AT_81e741da__LAYOUT_REPAIR_ON_SAME_19_FILE_SCOPE",
+    "status": "BASE_4319556_PUBLISHED__CURRENT_SCOPE_FIX_SHA_AND_CI_IN_COMPLETION_RECEIPT",
     "repository": "a23882005/LivingWaterAI",
     "visibility": "public",
     "branch": "family/report-canonical-html-20261030",
@@ -95,7 +85,8 @@
       ],
       "next": "HISTORICAL__RESOLVED_BY_OWNER_AUTHORIZATION_AND_PUBLICATION_AT_81e741da"
     },
-    "continuation_scope": "Source, synthetic tests and deidentified text QA only; private output remains in private Drive"
+    "continuation_scope": "Source, synthetic tests and deidentified text QA only; private output remains in private Drive",
+    "continuation_start_commit": "4319556a67f83f1cf3fc754446a2c401335db3e1"
   },
   "original_isolated_status": "ISOLATED_IMPLEMENTATION_AND_QA_COMPLETE__GITHUB_EXPORT_APPROVAL_REQUIRED",
   "continuation_start_commit": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
@@ -172,8 +163,44 @@
     "current_NAV_target_amounts_drift_radars": "UNKNOWN",
     "financial_research": "PARTIAL_DB_QUOTES_AND_SCOPE_NOTES__FORMAL_RESEARCH_PENDING",
     "Owner_output": "Four direct PDF links plus HTML/ZIP in private delivery entry",
-    "middle_PM_acceptance": "PENDING",
+    "middle_PM_acceptance": "PASS_AT_4319556__PR60_6535506724",
     "full_financial_or_end_user_login_UAT": "NOT_ASSERTED",
-    "assignment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6531912321"
+    "assignment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6531912321",
+    "PM_ruling": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6535506724"
+  },
+  "previous_latest_db_validation": {
+    "pytest_passed": 261,
+    "subtests_passed": 68,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "canonical_contract_tests": 38,
+    "real_browser_tests": 11,
+    "physical_pages": 16,
+    "chapters": 14,
+    "all_static_pages_equal_zip_png": true,
+    "mock_staging_readbacks_manifest": "PASS_MOCK_ONLY",
+    "direct_file_open": "NOT_VERIFIED__MANAGED_CHROMIUM_FILE_URL_POLICY",
+    "git_diff_check": "PASS",
+    "compile": "PASS",
+    "original_work9_mentor_shape_test": "PASS_PUBLIC_SYNTHETIC_GOLDEN"
+  },
+  "scope_compatibility": {
+    "contract_version": "1.0",
+    "consumer_base": "4319556a67f83f1cf3fc754446a2c401335db3e1",
+    "producer_commit": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
+    "status": "PHASE_1_IMPLEMENTED_AND_TESTED__PM_REVIEW_PENDING",
+    "evidence": "report_html_evidence/mentor_scope_compatibility/",
+    "raw_mentor_lineage": "report_source_lineage.mentor",
+    "new_action_fields": {
+      "source_execution_advice_allowed": "exact source boolean",
+      "broker_execution_allowed": false
+    },
+    "legacy_output_execution_advice_allowed": false,
+    "prior_reports_preserved": true,
+    "new_real_reports": 0,
+    "private_DB_writes": 0,
+    "broker_actions": 0,
+    "phase_2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK"
   }
 }

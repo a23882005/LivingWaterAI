@@ -154,3 +154,27 @@ Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫
 唯一產生程式變更 w6_current_data.py；w6_member_render.py 與 1fe71862 byte-for-byte 相同。新增三項 adapter 與一項 browser 回歸；完整261項＋68子案例、11項Chromium，0 failures/errors/skips。四戶23／23／15／16共77頁，76張來源卡與全部逐頁PNG／PDF／HTML／ZIP／reader QA通過。
 
 新20件原件依本人Sources原folder、新台灣時間檔名保存，舊報告歷史保留；全部全新下載核對bytes／SHA／private parent／run／DB／current及工程Menu12查閱。四份正式DB再新下載與本輪起始完全相同。Owner回交四份直接PDF、各戶HTML／ZIP，私人完成入口與完整回交ZIP使用實際台灣時間命名並存Drive根目錄／TEMP，含新20檔索引、來源版本／日期／缺項、測試、逐頁視覺及保存收據。中PM獨立驗收本輪報告，金融源組裝PR59沿原線待其另鎖版本；共用README／Checkpoint由中PM維護。
+
+
+## 2026-10-31 金融→報告欄位相容修補（第一階段）
+
+依中PM工單 `Family_PM_金融報告介面與四戶原件_施工包_v1.0_20261031.zip` 的00→01施工。正式01契約全文保存於 `report_html_evidence/mentor_scope_compatibility/01_金融與報告介面契約及施工單_v1.0.md`。鎖定producer PR59 `d250d3c506da3f7bec1dd7f3b5c89639a69765f7`、consumer PR60 `4319556a67f83f1cf3fc754446a2c401335db3e1`。中PM已在issuecomment-6535506724正式接收四戶77頁、76來源卡、20保存檔；先前排版PASS／CLOSED保留。
+
+`W6/runtime/report_receiver.receive_action` 原先只接受 `mentor.execution_advice_allowed is False`。本輪先以固定PR59原生Work9→`explain_native`重現 `MENTOR_EXECUTION_SCOPE`，再依原生「可呈現建議、禁止券商交易」語意接收：
+
+| 輸入 | 接收條件 |
+| --- | --- |
+| 舊版明確boolean False | 原合法路徑保留，缺少新版欄位不拒收 |
+| 新版明確boolean True | `contract_name=Family.W5.mentor.v1`、`recommendations_allowed is True`、`broker_execution_allowed is False`、`production=HOLD`、`trade_action=NO_TRADE`全部明確具備 |
+| 任何明示券商權限True或非法型別 | 拒收；布林字串、數字0/1、null不以truthy轉型 |
+| 失敗result | 原守門保留，canonical_result與mentor皆不得有建議，回傳items=[] |
+
+本人／request／run／owner／currency／input digest／Work9／Mentor／canonical digest／C7／來源時點／章節／scope／NAV與保護守門保持。報告不重算金額、比例或動作。原 `receive_action` 回傳欄位 `execution_advice_allowed=False` 保留其既有報告接收邊界語意，未改為上游旗標或授予執行權；新增 `source_execution_advice_allowed` 逐值保存上游原旗標，新增 `broker_execution_allowed=False` 明示交易限制。失敗回傳無source advice欄位、券商權限亦False。`report_canonical_adapter` 於已通過驗證的OK result，把完整原 `engine.report_sources.result.mentor` deepcopy至 `report_source_lineage.mentor`，包含原True/True/False旗標及所有原文；原action items與digest仍逐值承接。沒有改寫原金融receipt。
+
+合成測試以18份逐檔Git blob/SHA256的上游依賴鎖定；只有與報告分支不同的三份原始公開來源嵌入 `upstream_snapshot.json`，十五份相同依賴以hash驗證後在臨時獨立root載入。Mentor只在載入期間使用該root的原runtime_loader；沒有散拷W5至報告分支、沒有改sys.path或重寫金融程式。測試專用actions envelope逐字引用原Mentor建議說明，標示SYNTHETIC，不是任何真人的合格金融來源。
+
+完整272項＋134子案例、13項Chromium通過，0 failures/errors/skips。包含真正固定Work9→Mentor→receiver／adapter正向、舊False、權限與綁定攻擊、失敗無建議、SOURCE_REVIEW／DB-only／canonical資格及既有來源換行。合成16頁建議文字、HTML／PDF／ZIP同源、逐頁PNG像素通過；核准renderer全檔不變。本機封存四戶current全物件及原20保存檔／manifest再次比對不變，本輪新真人報告0、金融引擎真人執行0、DB寫入0、券商動作0。
+
+精確改檔、原始來源blob/hash、命令／JUnit／render QA見 `report_html_evidence/mentor_scope_compatibility/`；原始JUnit及合成PDF／完整HTML／reader／ZIP／圖片、既有四戶不變證明與Git還原包留私人Drive根目錄／TEMP的新回交包及入口。既有W8 CI與本輪本機13項browser／新接收測試分列，CI實際run/head及覆蓋見完成收據，不以未選入CI的案例宣稱遠端執行。本輪相容修補仍待中PM獨立複驗。
+
+第二階段維持 `WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK`：待中PM另鎖真人同輪來源／producer／schema／digest，再逐章接入、重產四戶正式報告。本次無需重產原20份，也不修改W5、正式DB、核准配置、共享README／Checkpoint或交易限制。PR60維持Draft／未合併，Production HOLD／交易NONE；真人Project登入及Android/iOS UAT沿既定範圍。

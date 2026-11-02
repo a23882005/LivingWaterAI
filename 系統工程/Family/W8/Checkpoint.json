@@ -2437,5 +2437,23 @@
     "production": "HOLD",
     "trade": "NONE",
     "preserves": "Existing W6/W7 and PR59/PR60 segmented PASS; four-household SOURCE_REVIEW 77 pages/76 source cards/20 files; source layout CLOSED"
+  },
+  "pm_report_phase2_dispatch_20261103": {
+    "work_order": "FAMILY-REPORT-PHASE2-20261103-r1",
+    "status": "RELEASED_FOR_REPORT_WIRING_AND_REAL_SOURCE_INTAKE__ACK_PENDING",
+    "consumer_start": "4dc4f1cba0035afe2cf8a37f51a146494dfb05fd",
+    "accepted_business_consumer": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+    "new_producer_observed_not_yet_accepted": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+    "private_contract": "Family_PR60_第二階段_完整施工單_20261103.md",
+    "contract_sha256": "3c4aa0597c6119415b5b521716ee8d8f93f65d716a199c7eadcf195473b59d4d",
+    "private_source_package": "Family_PR60_第二階段_施工與四戶實際來源_20261103.zip",
+    "package_bytes": 57998,
+    "package_sha256": "9915e72263e1bd57ce48f1cad26e56b76ffd72a96083089b13117790b890160a",
+    "actual_source_readbacks": 4,
+    "native_financial_results_in_package": 0,
+    "scope": "Eight-section report wiring and validation now; PM-owned qualified same-run financial source lock before complete real financial outputs. Preserve approved renderer and phase-one PASS.",
+    "dispatch": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6590518188",
+    "production": "HOLD",
+    "trade": "NONE"
   }
 }

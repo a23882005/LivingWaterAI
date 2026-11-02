@@ -10,6 +10,7 @@ on:
     paths:
       - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/refresh_v703_predeploy.py'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
       - 'scripts/monthly_research/build_bank_macro_monthly.py'

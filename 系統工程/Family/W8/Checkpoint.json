@@ -2455,5 +2455,33 @@
     "dispatch": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6590518188",
     "production": "HOLD",
     "trade": "NONE"
+  },
+  "pm_report_actual_source_intake_20261103": {
+    "status": "PASS_SOURCE_REVIEW_INTAKE_ONLY",
+    "producer": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+    "consumer": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+    "consumer_status_head": "4dc4f1cba0035afe2cf8a37f51a146494dfb05fd",
+    "households_passed": 4,
+    "securities": 41,
+    "equity_analysis_rows": 32,
+    "bonds": 9,
+    "cash_accounts": 6,
+    "identity_tamper_rejection_cases_passed": 8,
+    "synthetic_latest_native_seam": "PASS_ORIGINAL_WORK9_MENTOR_REPORT_LINEAGE_VALUES",
+    "approved_target_display_rows": [
+      11,
+      17,
+      3,
+      5
+    ],
+    "package": "Family_PR60_四戶實算接收通過_完整輸入_20261103.zip",
+    "package_bytes": 4029047,
+    "package_sha256": "59139c0e180dbd84a33f0e727c90f7e83a14e936baedc7d109bdd2410c3410e5",
+    "dispatch": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6590764200",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "worker_ack": "PENDING",
+    "production": "HOLD",
+    "trade": "NONE"
   }
 }

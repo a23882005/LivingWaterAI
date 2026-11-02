@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-11-02T18:27:19.031183Z",
+  "asOf": "2026-11-02T18:33:23.193613Z",
   "verification": {
     "ready": true,
     "valid": 26,
@@ -97,7 +97,7 @@
       "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
-      "lastVerifiedAt": "2026-11-03T02:27:13+08:00",
+      "lastVerifiedAt": "2026-11-03T02:33:11+08:00",
       "sourceEvidence": null
     },
     "m05": {
@@ -332,7 +332,7 @@
       "unit": "%",
       "method": "Federal Reserve官方政策頁目前目標區間3.75%–4.00%之算術中點；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=49ec72dd66b2c3de29dc23347441460147e50b4e16fa1d5c01969e4a5809b956，稽核檔data/audit/fed_target_evidence_20261102T182713Z.html.gz",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=7352a70cc9adce2e3914ca32df8bb7d069d024d0f22e72edbe8cfc7b60f83110，稽核檔data/audit/fed_target_evidence_20261102T183311Z.html.gz",
       "policySchema": "fed-target-evidence-v1",
       "effectiveDate": "2026-09-17",
       "lowerBound": {
@@ -343,13 +343,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "lastVerifiedAt": "2026-11-03T02:27:13+08:00",
+      "lastVerifiedAt": "2026-11-03T02:33:11+08:00",
       "sourceEvidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-03T02:27:13+08:00",
+        "checked_at": "2026-11-03T02:33:11+08:00",
         "result": "CURRENT_CONFIRMED",
         "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
-        "response_sha256": "49ec72dd66b2c3de29dc23347441460147e50b4e16fa1d5c01969e4a5809b956",
+        "response_sha256": "7352a70cc9adce2e3914ca32df8bb7d069d024d0f22e72edbe8cfc7b60f83110",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -368,7 +368,7 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC目標區間",
           "status": "FOUND",
-          "checked_at": "2026-11-03T02:27:13+08:00",
+          "checked_at": "2026-11-03T02:33:11+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
@@ -408,7 +408,7 @@
           "notes": "ALFRED DFEDTARU顯示2026-10-28上限4.00%，與官方及FRED一致。"
         }
       ],
-      "retrievalTime": "2026-11-03T02:27:13+08:00",
+      "retrievalTime": "2026-11-03T02:33:11+08:00",
       "publicationDate": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; corroborated by 2026-10-29 FRED and 2026-10-28 ALFRED"
     },
@@ -587,13 +587,13 @@
       "vintage": "CBO February 2026 potential GDP vintage + BEA/FRED 2026Q3 advance real GDP released 2026-10-29"
     },
     "s05": {
-      "value": 41.08,
-      "dataDate": "2026-10-28",
-      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "value": 46.78,
+      "dataDate": "2026-11-02",
+      "source": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "unit": "%",
-      "method": "Macroaxis直接值；TradingView定義作交叉核對",
+      "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "Macroaxis頁直接標示NYSE MMFI（全市場站上各自50日均線比例）41.08%，更新日2026-10-28；TradingView交叉確認NYSE全市場50日均線定義，未以S&P 500或Nasdaq替代。",
+      "detail": "INDEX/MMFI 日期2026-11-02收盤46.78%，採EOD收盤非盤中LAST；來源SHA256=27fc1e56d445dd25a1e4906367de2bff8046d6ed8d47c5cedd3c2984c91fb299",
       "candidateChecks": [
         {
           "site": "Macroaxis",
@@ -619,14 +619,14 @@
         },
         {
           "site": "EODData",
-          "url": "https://www.eoddata.com/stockquote/NYSE/MMFI.htm",
+          "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE/MMFI",
-          "status": "BLOCKED",
-          "checked_at": "2026-10-30T10:04:27+08:00",
-          "value": null,
+          "status": "FOUND",
+          "checked_at": "2026-11-03T02:33:11+08:00",
+          "value": 46.78,
           "unit": "%",
-          "observation_date": null,
-          "notes": "指定頁無法由讀取器存取，本輪未取得值。"
+          "observation_date": "2026-11-02",
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=27fc1e56d445dd25a1e4906367de2bff8046d6ed8d47c5cedd3c2984c91fb299"
         },
         {
           "site": "TradingView",
@@ -640,8 +640,8 @@
           "notes": "頁面確認MMFI為NYSE全市場站上各自50日均線比例，但未回傳可讀當期數值。"
         }
       ],
-      "retrievalTime": "2026-10-30T10:04:27+08:00",
-      "publicationDate": "2026-10-28",
+      "retrievalTime": "2026-11-03T02:33:11+08:00",
+      "publicationDate": "2026-11-02",
       "vintage": "Macroaxis page updated 2026-10-28; checked 2026-10-30"
     },
     "m03_qqq": {
@@ -691,20 +691,20 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-03T02:27:13+08:00",
+          "checked_at": "2026-11-03T02:33:11+08:00",
           "value": 20.49,
           "unit": "倍 Forward",
           "observation_date": "2026-11-02",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "lastVerifiedAt": "2026-11-03T02:27:13+08:00",
+      "lastVerifiedAt": "2026-11-03T02:33:11+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
         "value": 20.49,
         "source_url": "https://stockanalysis.com/etf/qqq/"
       },
-      "retrievalTime": "2026-11-03T02:27:13+08:00",
+      "retrievalTime": "2026-11-03T02:33:11+08:00",
       "publicationDate": "2026-11-02",
       "vintage": "StockAnalysis page checked 2026-10-30; market/page date 2026-10-29"
     },
@@ -755,20 +755,20 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-03T02:27:13+08:00",
+          "checked_at": "2026-11-03T02:33:11+08:00",
           "value": 19.15,
           "unit": "倍 Forward",
           "observation_date": "2026-11-02",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "lastVerifiedAt": "2026-11-03T02:27:13+08:00",
+      "lastVerifiedAt": "2026-11-03T02:33:11+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
         "value": 19.15,
         "source_url": "https://stockanalysis.com/etf/spy/"
       },
-      "retrievalTime": "2026-11-03T02:27:13+08:00",
+      "retrievalTime": "2026-11-03T02:33:11+08:00",
       "publicationDate": "2026-11-02",
       "vintage": "State Street fund characteristics as of 2026-10-28; checked 2026-10-30"
     },
@@ -819,20 +819,20 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-03T02:27:13+08:00",
+          "checked_at": "2026-11-03T02:33:11+08:00",
           "value": 15.61,
           "unit": "倍 Forward",
           "observation_date": "2026-11-02",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "lastVerifiedAt": "2026-11-03T02:27:13+08:00",
+      "lastVerifiedAt": "2026-11-03T02:33:11+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
         "value": 15.61,
         "source_url": "https://stockanalysis.com/etf/vt/"
       },
-      "retrievalTime": "2026-11-03T02:27:13+08:00",
+      "retrievalTime": "2026-11-03T02:33:11+08:00",
       "publicationDate": "2026-11-02",
       "vintage": "StockAnalysis page checked 2026-10-30; market/page date 2026-10-29"
     },
@@ -1003,13 +1003,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-11-03T02:27:19+08:00",
+  "dataUpdatedAt": "2026-11-03T02:33:23+08:00",
   "sourceSnapshot": {
-    "macro18": "6d9ee2486929ee7d2c79b747d0109471ceb86122",
-    "macro8": "aea6099cec6acbf84b2cd9b62f1084691dfdc015",
-    "officialReleaseCalendar": "1d8ae2afdf249d89e02c08c347c03716a07bc594",
+    "macro18": "40385cb7c7ce91acb62b950efb16759929e93268",
+    "macro8": "2389bc330d9d1a29cfe3056b07dde44838f5742e",
+    "officialReleaseCalendar": "9d9ffc52a82ed9ac7046e464390e121273a773dd",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
     "macro18GeneratedAt": "2026-11-03T02:26:34.850062+08:00",
-    "macro8GeneratedAt": "2026-11-03T02:27:13+08:00"
+    "macro8GeneratedAt": "2026-11-03T02:33:11+08:00"
   }
 }

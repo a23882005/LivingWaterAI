@@ -42,6 +42,34 @@ def revise_candidate(row,site,stamp,value,date,note):
     raise ValueError('candidate site missing '+site)
 
 
+
+def parse_mmfi_eod(raw, today):
+    """Use dated INDEX/MMFI end-of-day Close, never a delayed intraday Last."""
+    page=clean(raw)
+    if not re.search(r'INDEX\s*,\s*MMFI\s*:\s*Percent of Stocks Above 50-Day Average',page,re.I):
+        raise ValueError('EOD source is not exact INDEX/MMFI 50-day breadth')
+    if 'RECENT END OF DAY PRICES' not in page:
+        raise ValueError('EOD latest daily table missing')
+    rows=page.split('RECENT END OF DAY PRICES',1)[1].split('SYMBOL HISTORY',1)[0]
+    rows=rows[:1300]
+    found=re.search(
+        r'\b(\d{1,2}\s+[A-Za-z]{3}\s+\d{2})\s+'
+        r'(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+'
+        r'(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+\d+\b',
+        rows)
+    if not found:
+        raise ValueError('EOD dated table has no complete OHLC close')
+    observed=dt.datetime.strptime(found.group(1),'%d %b %y').date()
+    if observed>today:
+        raise ValueError('EOD quote has future date')
+    value=float(found.group(5))
+    if not 0<=value<=100:
+        raise ValueError('EOD MMFI close must be percent in 0..100')
+    if not (float(found.group(4))<=value<=float(found.group(3))):
+        raise ValueError('EOD close outside daily high/low')
+    return value,observed.isoformat()
+
+
 def main():
     session=requests.Session()
     session.headers.update({'User-Agent':'Mozilla/5.0 (compatible; LivingWaterAI-V703/1.0)',
@@ -130,7 +158,31 @@ def main():
         revise_candidate(row,'Macroaxis',now,value,observed,'頁面明示NYSE市場50日廣度')
         print('MMFI_PASS',value,observed,flush=True)
     except (requests.RequestException,ValueError) as exc:
-        print('MMFI_RETAIN_ORIGINAL_DATED_VALUE',str(exc)[:100],flush=True)
+        # Exact INDEX/MMFI EOD table is an authorized same-symbol fallback;
+        # all-US or S&P500 breadth would be a different population.
+        print('MMFI_MACROAXIS_UNAVAILABLE',str(exc)[:100],flush=True)
+        try:
+            url='https://www.eoddata.com/stockquote/INDEX/MMFI.htm'
+            raw=fetch(session,url)
+            value,observed=parse_mmfi_eod(raw,dt.datetime.now(TPE).date())
+            original=a['items']['s05']
+            prior_date=dt.date.fromisoformat(original['observation_date'])
+            if dt.date.fromisoformat(observed)<prior_date:
+                raise ValueError('EOD observation predates last verified MMFI')
+            raw_sha=hashlib.sha256(raw).hexdigest()
+            row=a['items']['s05']
+            row.update(value=value,observation_date=observed,status='USABLE',
+                source_url=url,method='EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤',
+                retrieval_time=now,publication_date=observed,
+                detail=f'INDEX/MMFI 日期{observed}收盤{value}%，採EOD收盤非盤中LAST；來源SHA256={raw_sha}')
+            revise_candidate(row,'EODData',now,value,observed,
+                'INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256='+raw_sha)
+            for candidate in row['candidate_checks']:
+                if candidate['site']=='EODData':
+                    candidate['url']=url
+            print('MMFI_EOD_FALLBACK_PASS',value,observed,raw_sha,flush=True)
+        except (requests.RequestException,ValueError) as second:
+            print('MMFI_RETAIN_ORIGINAL_DATED_VALUE',str(second)[:150],flush=True)
 
     # Update direct, explicitly Forward (not TTM) multiples where accessible.
     for ticker in ('qqq','spy','vt'):

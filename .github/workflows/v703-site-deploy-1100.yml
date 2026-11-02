@@ -16,6 +16,7 @@ on:
       - 'scripts/monthly_research/build_bank_macro_monthly.py'
       - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/**'
+      - 'tests/test_v703_monthly_release.py'
       - 'tests/test_macro_safety_monthly.py'
       - 'tests/test_bank_macro_monthly.py'
       - 'tests/test_v703_research_charts.py'

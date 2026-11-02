@@ -8,6 +8,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -43,27 +44,38 @@ def revise_candidate(row,site,stamp,value,date,note):
 
 
 
-def parse_mmfi_eod(raw, today):
-    """Use dated INDEX/MMFI end-of-day Close, never a delayed intraday Last."""
+def parse_mmfi_eod(raw, today, market_now=None):
+    """Pick the last completed NYSE daily close; ignore current US intraday rows."""
     page=clean(raw)
     if not re.search(r'INDEX\s*,\s*MMFI\s*:\s*Percent of Stocks Above 50-Day Average',page,re.I):
         raise ValueError('EOD source is not exact INDEX/MMFI 50-day breadth')
     if 'RECENT END OF DAY PRICES' not in page:
         raise ValueError('EOD latest daily table missing')
-    rows=page.split('RECENT END OF DAY PRICES',1)[1].split('SYMBOL HISTORY',1)[0]
-    rows=rows[:1300]
-    found=re.search(
-        r'\b(\d{1,2}\s+[A-Za-z]{3}\s+\d{2})\s+'
+    rows=page.split('RECENT END OF DAY PRICES',1)[1].split('SYMBOL HISTORY',1)[0][:1300]
+    dated=list(re.finditer(r'\b\d{1,2}\s+[A-Za-z]{3}\s+\d{2}\b',rows))
+    if not dated:
+        raise ValueError('EOD dated table has no observation dates')
+    market_now=market_now or dt.datetime.now(ZoneInfo('America/New_York'))
+    if market_now.tzinfo is None:
+        raise ValueError('market clock must be timezone aware')
+    local=market_now.astimezone(ZoneInfo('America/New_York'))
+    first_date=dt.datetime.strptime(dated[0].group(0),'%d %b %y').date()
+    # EODData can populate "daily" rows during an active NY session.
+    # Keep the last *completed* session: require 17:00 ET for same-day close.
+    is_intraday=first_date==local.date() and local.time()<dt.time(17,0)
+    chosen=1 if is_intraday else 0
+    if chosen>=len(dated):
+        raise ValueError('EOD latest NY session still open and last closed row missing')
+    fragment=rows[dated[chosen].start():(dated[chosen+1].start() if chosen+1<len(dated) else len(rows))]
+    found=re.match(
+        r'\s*(\d{1,2}\s+[A-Za-z]{3}\s+\d{2})\s+'
         r'(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+'
         r'(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+\d+\b',
-        rows)
+        fragment)
     if not found:
-        raise ValueError('EOD dated table has no complete OHLC close')
-    first_date=re.search(r'\b\d{1,2}\s+[A-Za-z]{3}\s+\d{2}\b',rows)
-    if not first_date or first_date.group(0)!=found.group(1):
-        raise ValueError('EOD latest row lacks complete OHLC; decline older fallback')
+        raise ValueError('EOD latest closed row lacks complete OHLC close')
     observed=dt.datetime.strptime(found.group(1),'%d %b %y').date()
-    if observed>today:
+    if observed>today or observed>local.date():
         raise ValueError('EOD quote has future date')
     value=float(found.group(5))
     if not 0<=value<=100:
@@ -71,6 +83,7 @@ def parse_mmfi_eod(raw, today):
     if not (float(found.group(4))<=value<=float(found.group(3))):
         raise ValueError('EOD close outside daily high/low')
     return value,observed.isoformat()
+
 
 
 def main():
@@ -167,10 +180,14 @@ def main():
         try:
             url='https://www.eoddata.com/stockquote/INDEX/MMFI.htm'
             raw=fetch(session,url)
-            value,observed=parse_mmfi_eod(raw,dt.datetime.now(TPE).date())
+            ny_now=dt.datetime.now(ZoneInfo('America/New_York'))
+            value,observed=parse_mmfi_eod(raw,dt.datetime.now(TPE).date(),ny_now)
             original=a['items']['s05']
             prior_date=dt.date.fromisoformat(original['observation_date'])
-            if dt.date.fromisoformat(observed)<prior_date:
+            # Correct any prematurely marked current-day close written before NY 17:00.
+            provisional=(prior_date==ny_now.date() and ny_now.time()<dt.time(17,0)
+                         and original.get('source_url','').startswith('https://www.eoddata.com/'))
+            if dt.date.fromisoformat(observed)<prior_date and not provisional:
                 raise ValueError('EOD observation predates last verified MMFI')
             raw_sha=hashlib.sha256(raw).hexdigest()
             row=a['items']['s05']

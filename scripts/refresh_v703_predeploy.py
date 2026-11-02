@@ -59,6 +59,9 @@ def parse_mmfi_eod(raw, today):
         rows)
     if not found:
         raise ValueError('EOD dated table has no complete OHLC close')
+    first_date=re.search(r'\b\d{1,2}\s+[A-Za-z]{3}\s+\d{2}\b',rows)
+    if not first_date or first_date.group(0)!=found.group(1):
+        raise ValueError('EOD latest row lacks complete OHLC; decline older fallback')
     observed=dt.datetime.strptime(found.group(1),'%d %b %y').date()
     if observed>today:
         raise ValueError('EOD quote has future date')

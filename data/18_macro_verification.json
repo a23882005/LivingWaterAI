@@ -142,15 +142,15 @@
     "m04": {
       "id": "m04",
       "label": "ISM 製造業 PMI",
-      "value": 54.5,
+      "value": 55.5,
       "unit": "",
-      "observation_date": "2026-09-01",
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
-      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
+      "observation_date": "2026-10-01",
+      "source_url": "https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html",
+      "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
-      "detail": "統計月份2026-09；8月54.6",
+      "detail": "2026-10官方製造業PMI 55.5；前月54.5",
       "error": "",
-      "attempted_at": "2026-11-02T01:59:35.476471+00:00",
+      "attempted_at": "2026-11-03T02:23:36+08:00",
       "attempt_result": "SUCCESS",
       "source_attempts": {
         "ISM_m04": [
@@ -165,12 +165,18 @@
             "result": "OK",
             "verified_at": "2026-11-02T01:59:36.624550+00:00",
             "observation_date": "2026-09-01"
+          },
+          {
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-11-03T02:23:36+08:00",
+            "observation_date": "2026-10-01"
           }
         ]
       },
       "retrieval_error": "",
       "cache_used": false,
-      "last_verified_at": null,
+      "last_verified_at": "2026-11-03T02:23:36+08:00",
       "source_evidence": null
     },
     "m05": {

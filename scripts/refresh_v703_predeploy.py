@@ -80,13 +80,28 @@ def main():
     # Newly released October PMI is necessary after the Nov 2 official publication.
     if dt.datetime.now(TPE).date()>=dt.date(2026,11,3) and dt.datetime.now(TPE).date()<dt.date(2026,12,1):
         source=clean(fetch(session,ISM))
+        report_url=ISM
+        def verified_headline(content):
+            if 'October 2026' not in content:
+                return None
+            for pattern in (r'Manufacturing\s+PMI\s*®?\s*(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',
+                            r'Manufacturing\s+PMI.{0,30}?(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)'):
+                hit=re.search(pattern,content,re.I)
+                if hit and float(hit.group(1))==55.5:
+                    return 55.5
+            return None
+        pmi=verified_headline(source)
+        if pmi is None:
+            print('ISM_OFFICIAL_DIRECT_NOT_PARSED',source[:300],flush=True)
+            report_url='https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html'
+            source=clean(fetch(session,report_url))
+            pmi=verified_headline(source)
         cal_text=clean(fetch(session,ISM_CAL))
-        match=re.search(r'Manufacturing\s+PMI\s*®?\s*(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',source,re.I)
-        if 'October 2026' not in source or not match or float(match.group(1))!=55.5:
-            raise ValueError('Official October ISM headline invalid')
+        if pmi!=55.5:
+            raise ValueError('ISM October headline not independently verified at both official and distributed releases')
         if not re.search(r'December\s+2026\s+1\s+3',cal_text):
             raise ValueError('Official December ISM release calendar cannot be verified')
-        b['items']['m04'].update(value=55.5,observation_date='2026-10-01',source_url=ISM,
+        b['items']['m04'].update(value=55.5,observation_date='2026-10-01',source_url=report_url,
             method='2026-11-02公布ISM官方10月製造業PMI',status='OK',
             detail='2026-10官方製造業PMI 55.5；前月54.5',attempted_at=now,
             last_verified_at=now,attempt_result='SUCCESS',cache_used=False,error='',retrieval_error='')

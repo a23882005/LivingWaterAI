@@ -146,7 +146,7 @@ def main():
             if not 0<value<200: raise ValueError('out of bound')
             item.update(value=value,observation_date=date,source_url=url,status='OK',
                 publication_date=date,retrieval_time=now,
-                method='StockAnalysis明示Forward PE（非TTM）',detail=f'{ticker.upper()} Forward PE {value}，頁面資料日{date}')
+                method='StockAnalysis明示Forward PE，採未來預估口徑',detail=f'{ticker.upper()} Forward PE {value}，頁面資料日{date}')
             revise_candidate(item,'StockAnalysis',now,value,date,'真實網頁明示Forward PE；TTM未採用')
             print('FORWARD_PASS',ticker,value,date,flush=True)
         except (requests.RequestException,ValueError) as exc:

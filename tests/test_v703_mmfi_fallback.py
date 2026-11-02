@@ -15,7 +15,7 @@ def page(symbol="INDEX, MMFI: Percent of Stocks Above 50-Day Average",
       <div>LAST: 40.90</div>
       <h3>RECENT END OF DAY PRICES</h3>
       <table><tr><th>Date</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>
-      <tr><td>{recent.replace(' ', '</td><td>', 1) if False else recent}</td></tr>
+      <tr><td>{recent}</td></tr>
       <tr><td>30 Oct 26</td><td>44.11</td><td>44.24</td><td>40.05</td><td>41.56</td><td>0</td></tr>
       </table><h3>SYMBOL HISTORY</h3>""".encode('utf8')
 

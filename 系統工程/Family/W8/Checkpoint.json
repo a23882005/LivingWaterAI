@@ -2410,5 +2410,32 @@
     "pr59_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589698005",
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_pr60_phase1_acceptance_20261103": {
+    "status": "PASS_PHASE1_MENTOR_SCOPE_COMPATIBILITY",
+    "producer": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
+    "consumer": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+    "tree": "b960b8ea3f443612fc736a4ba444f32aecc5e15f",
+    "independent_tests": {
+      "passed": 59,
+      "subtests": 112,
+      "exit_code": 0
+    },
+    "archived_tests": {
+      "passed": 272,
+      "subtests": 134,
+      "chromium": 13,
+      "pm_reran_chromium": false
+    },
+    "remote_19_files_exact": true,
+    "ci_run": 41523893632,
+    "ci_status": "success",
+    "decision_file": "PM_PR60_第一階段獨立驗收裁定_20261103.md",
+    "decision_sha256": "9a59f50ded5587b54ea6a506a6b3fcb7c665286de85a7eaf300a36f6010f5d37",
+    "pr60_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6589908544",
+    "phase2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK",
+    "production": "HOLD",
+    "trade": "NONE",
+    "preserves": "Existing W6/W7 and PR59/PR60 segmented PASS; four-household SOURCE_REVIEW 77 pages/76 source cards/20 files; source layout CLOSED"
   }
 }

@@ -229,3 +229,10 @@ SHA-256 來自指揮官本次八份實際附件原始位元組；若 Google Driv
 FAMILY-V82-UNIFIED-20261103-r2 is the sole current dispatch entry (private Drive root/TEMP: Family_V82_CODEX_完整統一施工交辦書_20261103_r2.md; 37113 bytes; SHA256 92c9f4ec88cdb4595b6f591c94412e48ccb9ec10c1cf04750b21afc7e2c7578a).
 
 Continue new four-household full-asset data work, approved-profile financial integration and isolated candidate comparison directly from existing PR59 results. Preserve prior PASS and checkpoint results; include old evidence in final handback. This replaces the previous A old-package-first → B → C waiting sequence. Old-package handback/PM acceptance is not a prerequisite for new construction. Dispatch: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589698005 . Worker ACK pending. Formal new-strategy adoption remains subject to Owner decision and PM acceptance; PR60 report work remains separately owned. Production HOLD / trading NONE.
+
+
+### 2026/11/03 PR60 phase-1 independent acceptance
+
+PASS_PHASE1_MENTOR_SCOPE_COMPATIBILITY at consumer 9bd61094 / producer d250d3c / tree b960b8ea3f443612fc736a4ba444f32aecc5e15f. PM rerun: 59 passed + 112 subtests; archived full evidence 272 + 134 including 13 Chromium separately verified (Chromium not rerun by PM). All 19 remote files match approved source bytes; CI41523893632 success. Decision: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6589908544. Private verdict filename and digest are in Checkpoint; private financial data remains in Drive.
+
+Phase 1 completed. Original V82 Codex continues the unified four-household data/financial and isolated-candidate work. PM owns new producer/schema/source lock and phase-2 handoff to report Codex. Preserve accepted 77-page/20-file SOURCE_REVIEW output and prior PASS/CLOSED. PR60 Draft/unmerged; Production HOLD / trading NONE.

@@ -222,3 +222,10 @@ SHA-256 來自指揮官本次八份實際附件原始位元組；若 Google Driv
 - 私人完整通知：Drive root/TEMP `Family_V82_5163116_checkpoint_and_resume_LOCK_20261103.md`；7319 bytes；SHA256 `ebfc70d45b2f70c79f211694bbf3bac45c53b476c932fd1c49d0b7434a4a7b25`。
 
 狀態：RELEASED_FOR_SCOPED_EXECUTION__ACK_PENDING；尚待原施工會話ACK。W8 IN_PROGRESS、Production HOLD/交易NONE及既有W6/W7/PR59/60裁定保留。本筆為去私人化治理，不包含本人原件/ID或業務程式修改。
+
+
+### 2026/11/03 Owner latest execution correction / unified V82 work order r2
+
+FAMILY-V82-UNIFIED-20261103-r2 is the sole current dispatch entry (private Drive root/TEMP: Family_V82_CODEX_完整統一施工交辦書_20261103_r2.md; 37113 bytes; SHA256 92c9f4ec88cdb4595b6f591c94412e48ccb9ec10c1cf04750b21afc7e2c7578a).
+
+Continue new four-household full-asset data work, approved-profile financial integration and isolated candidate comparison directly from existing PR59 results. Preserve prior PASS and checkpoint results; include old evidence in final handback. This replaces the previous A old-package-first → B → C waiting sequence. Old-package handback/PM acceptance is not a prerequisite for new construction. Dispatch: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589698005 . Worker ACK pending. Formal new-strategy adoption remains subject to Owner decision and PM acceptance; PR60 report work remains separately owned. Production HOLD / trading NONE.

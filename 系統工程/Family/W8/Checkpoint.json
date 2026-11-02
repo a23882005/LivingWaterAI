@@ -2398,5 +2398,17 @@
     "ack": "Original session ACK and resumed execution not yet observed",
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_unified_dispatch_20261103_r2": {
+    "work_order": "FAMILY-V82-UNIFIED-20261103-r2",
+    "private_drive_file_name": "Family_V82_CODEX_完整統一施工交辦書_20261103_r2.md",
+    "bytes": 37113,
+    "sha256": "92c9f4ec88cdb4595b6f591c94412e48ccb9ec10c1cf04750b21afc7e2c7578a",
+    "supersedes": "pm_scope_lock_20261103_r1 execution sequence and PR59 comment 6589545525; retains approved rules, source facts and historical PASS",
+    "execution": "Directly continue four-household full-asset source qualification, approved-profile financial integration, and isolated nine-stage comparison. Include old checkpoint evidence in final handback; old handback or PM old-checkpoint acceptance is not a prerequisite.",
+    "ack_status": "REGISTERED_ACK_PENDING",
+    "pr59_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589698005",
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

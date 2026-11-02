@@ -44,6 +44,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      # MMFI fallback selects the last completed NY session, not an intraday EODData row.
       - name: Recheck real Fed evidence and refresh dated V70 inputs
         run: |
           python -m pip install --disable-pip-version-check -q requests

@@ -2317,6 +2317,99 @@
     "production": "HOLD",
     "trade_authorization": "NONE",
     "PM_next": "Consolidate originals; coordinate baseline/dependencies; independently accept receiver fix and later qualified financial/report integration"
+  },
+  "pm_original_fact_audit_20261031": {
+    "status": "COMPLETED_READ_ONLY_AUDIT__QUALIFICATION_IMPLEMENTATION_PENDING",
+    "fresh_official_DBs": 4,
+    "DB_SHA_unchanged": 4,
+    "DB_integrity_FK": "4_OF_4_PASS",
+    "fresh_Sources_unchanged": 4,
+    "approved_project_originals_reread": 2,
+    "confirmed_reader": "W8/confirmed_asset_facts.py:read_latest_confirmed_asset_facts",
+    "engineering_candidates": [
+      "Arthur confirmed investable amount and basis vs settlement/total pool",
+      "Lilian confirmed real holding values supersede hypothetical classification",
+      "Joseph existing broker/currency evidence and new IB partial readbacks"
+    ],
+    "IB_source_owner": "Joseph_ONLY_OWNER_DECLARED",
+    "IB_quality": "PARTIAL__MISSING_PROVIDER_ASOF__VALUATION_DIFFERENCE__REPLACED_ORDER_SUCCESSOR_UNRESOLVED",
+    "IB_order_retry": "show_completed_true_internal_error_then_one_reduced_false_retry_success",
+    "private_files": [
+      "Family_PM_四戶正式原件核對結果_20261031.txt",
+      "Family_PM_四戶正式原件核對證據_20261031.json"
+    ],
+    "private_location": "Google Drive root/TEMP",
+    "private_fresh_reread": "2_OF_2_BYTES_SHA_PASS",
+    "public_record": "系統工程/Family/W8/查核紀錄/PM_四戶正式原件唯讀核對_20261031.md",
+    "official_DB_writes": 0,
+    "broker_actions": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
+  },
+  "pm_scope_lock_20261103_r1": {
+    "status": "SCOPED_EXECUTION_RELEASED__ACK_PENDING",
+    "owner_decision": "All four households: current effective holdings union approved targets across every account; include bonds/SGOV/cash/orders/fills/commitments. VT is only a first example.",
+    "baseline_commit": "5163116bcdedaabbc3cf09ae091ca96968a26fdd",
+    "observed_pr59_head": "ccaed4355af3d7b6520eefad8c6a45b0df2509d6",
+    "baseline_relation": {
+      "ahead_by": 2,
+      "behind_by": 0,
+      "changed_files": 16,
+      "changed_scope": "documentation/index/checkpoint only; preserve latest head"
+    },
+    "worker_reported_tests": {
+      "W5": 556,
+      "W8": 777,
+      "targeted": 88,
+      "archived_assets": 32,
+      "full_financial_PASS": 0,
+      "real_cycles": 0,
+      "original_Drive_acceptance_package": "AWAITING_FORMAL_HANDOFF"
+    },
+    "independent_PM_CI_readback": {
+      "commit": "5163116bcdedaabbc3cf09ae091ca96968a26fdd",
+      "success_runs": [
+        41145098207,
+        41145098263,
+        41145098168,
+        41145098143,
+        41145098160,
+        41145098192
+      ],
+      "scope": "six PR-triggered workflows; does not replace original 88-case logs or new-profile validation"
+    },
+    "dispatch_comments": [
+      "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589450132",
+      "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589545525"
+    ],
+    "contract": "Private Google Drive root/TEMP/Family_V82_5163116_checkpoint_and_resume_LOCK_20261103.md",
+    "contract_sha256": "ebfc70d45b2f70c79f211694bbf3bac45c53b476c932fd1c49d0b7434a4a7b25",
+    "sequence": [
+      "A archive and return original baseline evidence",
+      "B complete four-household source qualification/current analysis and financial integration using approved legacy strategy",
+      "C isolated baseline/partial-view/confirmed-lifetime/plateau profiles and attribution comparisons"
+    ],
+    "construction_owner": "Original V82 Codex / PR59",
+    "PM_owner": "Scope, originals, version coordination, independent acceptance, gates, shared governance",
+    "report_owner": "Original report Codex / PR60 after qualified producer/schema/digest lock; existing receiver fix independently reverified first",
+    "strategy_status": "New confirmation-lifetime/plateau proposals REVIEW_PENDING; isolated implementation allowed, production defaults unchanged",
+    "preserved": "existing d250/ac1 and W6/W7/PR60 scoped PASS/CLOSED, current profile/rates/49+13/account allocations",
+    "source_readback": "Four Sources read; DB metadata checked; actual latest DB contents and dynamic universe must be refreshed by worker",
+    "ack": "Original session ACK and resumed execution not yet observed",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
+  },
+  "pm_unified_dispatch_20261103_r2": {
+    "work_order": "FAMILY-V82-UNIFIED-20261103-r2",
+    "private_drive_file_name": "Family_V82_CODEX_完整統一施工交辦書_20261103_r2.md",
+    "bytes": 37113,
+    "sha256": "92c9f4ec88cdb4595b6f591c94412e48ccb9ec10c1cf04750b21afc7e2c7578a",
+    "supersedes": "pm_scope_lock_20261103_r1 execution sequence and PR59 comment 6589545525; retains approved rules, source facts and historical PASS",
+    "execution": "Directly continue four-household full-asset source qualification, approved-profile financial integration, and isolated nine-stage comparison. Include old checkpoint evidence in final handback; old handback or PM old-checkpoint acceptance is not a prerequisite.",
+    "ack_status": "REGISTERED_ACK_PENDING",
+    "pr59_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6589698005",
+    "production": "HOLD",
+    "trading": "NONE"
   }
 ,
   "program_atlas_archive_20261031": {

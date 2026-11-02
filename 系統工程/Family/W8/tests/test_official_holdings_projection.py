@@ -71,6 +71,72 @@ class ProjectionTest(unittest.TestCase):
             'as_of_utc': '2026-10-26T00:00:00Z', 'version_no': 2})
         self.assertEqual(self.build()['analysis_security_positions'][0]['quantity'], '2.3000')
 
+    def confirmed_value(self, *, run='VALUE', at='2026-10-25T00:00:00Z', kind='USER_PROVIDED'):
+        self.tables['portfolio_snapshot_run'].append({'client_id':self.client,
+            'run_id':run,'run_state':'SEALED','source_kind':kind,'as_of_utc':at,'version_no':1})
+        for i, (key, value) in enumerate([('asset_label','VT'),('quantity',None),
+                ('reported_market_value_twd','900'),('valuation_date',None)], 1):
+            self.tables['portfolio_snapshot_item'].append({'client_id':self.client,'run_id':run,
+                'item_no':i,'domain_code':'USER_CONFIRMED_REAL_HOLDING_VALUE','entity_key':'VT',
+                'field_key':key,'value_state':'KNOWN' if value is not None else 'UNKNOWN',
+                'value_text':value,'currency_code':'TWD' if key=='reported_market_value_twd' else None,
+                'source_observed_at_utc':None})
+
+    def test_confirmed_value_preserves_real_holding_without_inventing_quantity(self):
+        self.confirmed_value();before=deepcopy(self.tables);out=self.build()
+        row=out['analysis_security_positions'][0]
+        self.assertEqual(row['symbol'],'VT')
+        self.assertIsNone(row['quantity']);self.assertEqual(row['quantity_state'],'UNKNOWN')
+        self.assertIsNone(row['currency']);self.assertIsNone(row['account_key'])
+        self.assertFalse(row['reported_value_is_current_nav'])
+        self.assertEqual(row['source_fields']['reported_market_value_twd'][0]['value_text'],'900')
+        self.assertEqual(out['ledger_only_positions'],[])
+        self.assertEqual(before,self.tables)
+
+    def test_hypothetical_and_future_value_cannot_erase_effective_holdings(self):
+        self.confirmed_value(kind='USER_HYPOTHETICAL')
+        self.confirmed_value(run='FUTURE',at='2026-10-28T00:00:00Z')
+        self.assertEqual(self.build()['analysis_security_positions'],[])
+        self.assertEqual(self.build()['ledger_only_positions'][0]['quantity'],'1.00')
+
+    def test_newer_value_run_selected_by_effective_time(self):
+        self.confirmed_value(run='NEW');self.confirmed_value(run='OLD',at='2026-10-24T00:00:00Z')
+        self.assertEqual(self.build()['analysis_security_positions'][0]['source_run_id'],'NEW')
+
+    def test_value_and_independent_broker_source_do_not_silently_add(self):
+        self.run_source();self.confirmed_value()
+        out=self.build();self.assertEqual(out['source_layer_conflicts'],['VT'])
+        self.assertEqual(len(out['analysis_security_positions']),2)
+
+    def test_conflicting_confirmed_value_label_is_rejected(self):
+        self.confirmed_value();self.tables['portfolio_snapshot_item'][0]['value_text']='QQQ'
+        with self.assertRaisesRegex(ValueError,'IDENTITY_CONFLICT'):self.build()
+
+    def test_duplicate_quantity_and_equal_time_value_runs_are_rejected(self):
+        self.confirmed_value()
+        self.tables['portfolio_snapshot_item'].append(deepcopy(self.tables['portfolio_snapshot_item'][1]))
+        with self.assertRaisesRegex(ValueError,'QUANTITY_AMBIGUOUS'):self.build()
+        self.tables['portfolio_snapshot_item'].pop();self.confirmed_value(run='TIE')
+        with self.assertRaisesRegex(ValueError,'RUN_AMBIGUOUS'):self.build()
+
+    def test_unmapped_intake_cannot_erase_another_account_with_same_ticker(self):
+        self.run_source()
+        self.tables['portfolio_position'].append({**self.tables['portfolio_position'][0],
+            'account_key':'SECOND_ACCOUNT','quantity_decimal':'7'})
+        out=self.build()
+        self.assertEqual({r['account_key'] for r in out['ledger_only_positions']},
+            {'IB','SECOND_ACCOUNT'})
+        self.assertEqual(out['unresolved_account_representations'],['VT'])
+        self.assertEqual(out['source_layer_conflicts'],['VT'])
+
+    def test_backdated_future_receipt_cannot_change_saved_cutoff(self):
+        self.run_source()
+        self.tables['portfolio_snapshot_run'][0]['created_at_utc']='2026-10-28T00:00:00Z'
+        self.assertEqual(self.build()['analysis_security_positions'],[])
+        self.tables['portfolio_snapshot_run'][0]['created_at_utc']='2026-10-20T00:00:00Z'
+        self.tables['portfolio_snapshot_item'][0]['recorded_at_utc']='2026-10-28T00:00:00Z'
+        self.assertEqual(self.build()['analysis_security_positions'],[])
+
     def test_ambiguous_runs_and_cross_family_rows_are_rejected(self):
         self.run_source();self.run_source(run='TIE')
         with self.assertRaisesRegex(ValueError, 'RUN_AMBIGUOUS'):self.build()

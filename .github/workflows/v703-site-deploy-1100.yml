@@ -10,11 +10,14 @@ on:
     paths:
       - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/refresh_v703_predeploy.py'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
       - 'scripts/monthly_research/build_bank_macro_monthly.py'
       - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/**'
+      - 'tests/test_v703_monthly_release.py'
+      - 'tests/test_v703_mmfi_fallback.py'
       - 'tests/test_macro_safety_monthly.py'
       - 'tests/test_bank_macro_monthly.py'
       - 'tests/test_v703_research_charts.py'
@@ -41,13 +44,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      # MMFI fallback selects the last completed NY session, not an intraday EODData row.
+      - name: Recheck real Fed evidence and refresh dated V70 inputs
+        run: |
+          python -m pip install --disable-pip-version-check -q requests
+          mkdir -p build/site
+          if ! python scripts/refresh_v703_predeploy.py > build/site/predeploy.log 2>&1; then
+            cat build/site/predeploy.log
+            python -c 'import json,pathlib; p=pathlib.Path("build/site/predeploy.log"); e=p.read_text(encoding="utf-8"); pathlib.Path("build/site/QA.json").write_text(json.dumps({"ready":False,"valid":False,"problems":[e[-3000:]],"failureStage":"V70_PREDEPLOY_SOURCE_REFRESH"},ensure_ascii=False,indent=2),encoding="utf-8")'
+            exit 1
+          fi
+          cat build/site/predeploy.log
+          python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/18_macro_verification.json data/8_macro_supplement_verified.json data/v703_official_monthly_release_calendar.json
+          git add -f data/audit/fed_target_evidence_*.html.gz
+          if ! git diff --cached --quiet; then
+            git commit -m "data(v703): refresh real Fed evidence and dated macro inputs"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+          fi
       - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |
           python -m py_compile scripts/build_daily_v703_site.py
+          python -m py_compile scripts/refresh_v703_predeploy.py
           test -s data/18_macro_verification.json
           test -s data/8_macro_supplement_verified.json
           test -s data/v703_official_monthly_release_calendar.json
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+          python -m unittest discover -s tests -p 'test_v703_mmfi_fallback.py' -v
           python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
           python -m unittest discover -s tests -p 'test_v703_publication.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_daily_capture.py' -v

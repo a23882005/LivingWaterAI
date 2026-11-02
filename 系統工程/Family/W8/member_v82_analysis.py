@@ -309,6 +309,9 @@ def build_report(request, config, repo_root):
         'call_trace': ['Family.Menu04', 'W8.OnDemandAnalysisProvider',
             'W5.project_official_holdings', 'W8.official_target_input.read_confirmed_weights',
             'W8.member_v82_analysis.universe', 'ORIGINAL_V82_COMPONENT_CHAIN']}
+    from all_asset_coverage import build as build_all_asset_coverage
+    report['all_asset_coverage'] = build_all_asset_coverage(request,config,coverage,repo_root,
+        ledger_resource=ledger_resource)
     report['report_digest'] = digest(report)
     return report
 

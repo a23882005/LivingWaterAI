@@ -1,12 +1,12 @@
 {
   "schema": "V70.3/monthly-official-release-calendar-v1",
-  "checked_at_utc": "2026-10-18T08:00:00Z",
+  "checked_at_utc": "2026-11-02T18:38:35+00:00",
   "explanation": "Official next data publication, not observation month age. Never use a past date to certify freshness. Fail closed when record's observation month mismatches.",
   "items": {
     "m04": {
-      "observation_month": "2026-09",
-      "publication_date": "2026-10-01",
-      "next_release_at_utc": "2026-11-02T15:00:00Z",
+      "observation_month": "2026-10",
+      "publication_date": "2026-11-02",
+      "next_release_at_utc": "2026-12-01T15:00:00Z",
       "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
     },
     "m05": {

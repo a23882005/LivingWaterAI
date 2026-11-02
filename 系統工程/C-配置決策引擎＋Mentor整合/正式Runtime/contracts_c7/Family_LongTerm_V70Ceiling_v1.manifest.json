@@ -96,6 +96,22 @@
       "sha256": "614e3d13c3e4ea93ce08179800b0381feeeeacadc03d06d4f3bb6bd04aa5a1ab"
     },
     {
+      "path": "../../Family/W5/official_holdings_source.py",
+      "sha256": "67abdc5f165a19c25404bb4f359038f81581dd5c54ee64c8a93a366ecf37c106"
+    },
+    {
+      "path": "../../Family/W8/member_v82_analysis.py",
+      "sha256": "8ee92fe62dc462d04296ccbffc5bacbea5be59a27c211393fd54b2b12a667f41"
+    },
+    {
+      "path": "../../Family/W8/member_market_source.py",
+      "sha256": "34756cfd50090cde67720bc1d83f92352064fb2e57d0f23f8364ac1df6030d50"
+    },
+    {
+      "path": "../../Family/W8/all_asset_coverage.py",
+      "sha256": "f42fdb20ef62bc513cbd5031057f43eacbddf3d1455656cc4a58b23c6f70ba72"
+    },
+    {
       "path": "../../Family/W5/mentor_bridge.py",
       "sha256": "404f6c62a21e34c6ea3048af0966085ea1936e43322e976a27f6006221b092a4"
     },
@@ -121,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/tools/rebuild_family_long_term_contract.py",
-      "sha256": "044c6ea09043d15b079968d69d14124b56fbb39e31f3c004d99ec3326802c8fd"
+      "sha256": "9f3acea0d371e844b9c6c3c59f043e893d53a3abf4d03ed847c8a8f85fb059c7"
     },
     {
       "path": "../../Family/W8/v70_tactical_input.py",

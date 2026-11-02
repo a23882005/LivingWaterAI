@@ -27,7 +27,9 @@ def read_json(source):
     return json.loads(raw, parse_float=Decimal)
 
 
-def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
+def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, observation_route='V82'):
+    if observation_route not in ('V82', 'V75'):
+        raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
     if source is None:
         return None
     if (source.get('provider') != 'YAHOO_CHART' or source.get('symbol') != symbol
@@ -116,6 +118,24 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
     used = [rows[day] for day in expected_dates[last_gap + 1:] if day in rows]
     if not used:
         raise ValueError('MEMBER_MARKET_NO_CONTIGUOUS_VALID_SUFFIX')
+    if observation_route == 'V75':
+        # Share exactly the same immutable intake and completed-session checks.
+        # V75 receives its own named predicates, never V82 votes or stages.
+        return {'symbol':symbol,'completed_rows':deepcopy_rows(used),
+            'observed_date':used[-1]['Date'],'observed_close':used[-1]['_source_decimal']['Close'],
+            'latest_expected_completed_session':evaluation_completed[-1]['session_id'],
+            'completed_session_close_at':by_date[used[-1]['Date']]['close_at'],
+            'source_sha256':source['sha256'],'source_path':source['local_path'],
+            'source_reference':source['source_reference'],'provider_verified_at':source['retrieved_at'],
+            'source_descriptor_digest':digest(source),
+            'market_identity':{'exchange':source['exchange'],'currency':source['currency'],
+                'provider_symbol':source['provider_symbol'],'provider_type':meta['instrumentType']},
+            'history_quality':{'excluded_uncompleted_rows':excluded,'invalid_source_rows':invalid,
+                'discarded_before_last_gap':len(valid_dates)-len(used),
+                'price_basis':'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED',
+                'corporate_action_pit_coverage':'UNVERIFIED','formal_deployment_eligible':False},
+            'calendar_scope':calendar.get('scope','IDENTIFIED_EXCHANGE_CALENDAR_SOURCE'),
+            'call_trace':['W8.member_market_source:original_completed_session_intake']}
     from on_demand_market_observations import evaluate_observed_history
     observed = evaluate_observed_history(used, repo_root=repo_root, evaluation_at=evaluation_at,
         macro=None, asset_id=symbol, approved_rule_profile=profile, is_etf=is_etf)
@@ -151,3 +171,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf):
             'corporate_action_pit_coverage': 'UNVERIFIED', 'formal_deployment_eligible': False},
         source_descriptor_digest=digest(source))
     return observed
+
+
+def deepcopy_rows(rows):
+    # Return original Decimal spellings rather than round-tripping the float
+    # rendering used by the older observation boundary.
+    return [{'Date':r['Date'],**r['_source_decimal']} for r in rows]

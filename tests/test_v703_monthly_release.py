@@ -18,10 +18,28 @@ MONTHLY_SIX = ("m04", "m05", "m15", "m18", "m19", "m20")
 
 class OfficialMonthlyReleaseTests(unittest.TestCase):
     def setUp(self):
+        # Frozen 2026-10-18 historical case: current production inputs are allowed
+        # to move forward without retroactively altering this regression scenario.
         self.observed = json.loads(CORE.read_text(encoding="utf-8"))["items"]
+        self.observed["m04"] = dict(
+            self.observed["m04"], value=54.5, observation_date="2026-09-01",
+            source_url="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+            method="Frozen September 2026 ISM headline regression fixture")
         self.now = dt.datetime(2026, 10, 18, 8, 15, tzinfo=dt.timezone.utc)
         self.today = self.now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
-        self.calendar = builder._official_release_calendar(CALENDAR, self.today)
+        self.calendar_data = json.loads(CALENDAR.read_text(encoding="utf-8"))
+        self.calendar_data["checked_at_utc"] = "2026-10-18T08:00:00Z"
+        self.calendar_data["items"]["m04"] = {
+            "observation_month": "2026-09",
+            "publication_date": "2026-10-01",
+            "next_release_at_utc": "2026-11-02T15:00:00Z",
+            "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+        }
+        self.fixture_directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.fixture_directory.cleanup)
+        fixture_path = pathlib.Path(self.fixture_directory.name) / "calendar.json"
+        fixture_path.write_text(json.dumps(self.calendar_data), encoding="utf-8")
+        self.calendar = builder._official_release_calendar(fixture_path, self.today)
 
     def test_official_latest_september_observations_pass_after_day_46(self):
         self.assertEqual(set(self.calendar), set(MONTHLY_SIX))
@@ -50,7 +68,7 @@ class OfficialMonthlyReleaseTests(unittest.TestCase):
         self.assertTrue(builder._validate("m04", self.observed["m04"], self.today, {}, self.now))
 
     def test_calendar_rejects_untrusted_source_and_future_verification(self):
-        data=json.loads(CALENDAR.read_text(encoding="utf-8"))
+        data=json.loads(json.dumps(self.calendar_data))
         data["items"]["m04"]["calendar_source_url"]="https://phishing.invalid/ism"
         with tempfile.TemporaryDirectory() as directory:
             p=pathlib.Path(directory)/"calendar.json"

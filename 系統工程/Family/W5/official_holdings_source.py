@@ -76,7 +76,8 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
     ledger = []
     by_key = {r['instrument_key']: r for r in tables.get('portfolio_instrument', [])}
     for row in tables.get('portfolio_position', []):
-        if at and _time(row['as_of_utc']) > at:
+        if at and (_time(row['as_of_utc']) > at or any(_time(row[k]) > at
+                for k in ('recorded_at_utc','created_at_utc') if row.get(k))):
             continue
         instrument = by_key.get(row['instrument_key'], {})
         ledger.append({'symbol': instrument.get('ticker'),
@@ -87,22 +88,27 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
             'source_row': deepcopy(row)})
     runs = [r for r in tables.get('portfolio_snapshot_run', [])
         if r.get('run_state') == 'SEALED' and r.get('source_kind') != 'USER_HYPOTHETICAL'
-        and (not at or _time(r['as_of_utc']) <= at)]
-    items = tables.get('portfolio_snapshot_item', [])
+        and (not at or (_time(r['as_of_utc']) <= at and all(_time(r[k]) <= at
+            for k in ('recorded_at_utc','created_at_utc') if r.get(k))))]
+    items = [r for r in tables.get('portfolio_snapshot_item', []) if not at or
+        all(_time(r[k]) <= at for k in ('recorded_at_utc','created_at_utc') if r.get(k))]
     # Select the latest run *with the relevant holding source*. An unrelated
     # newer sealed profile/cash run must not erase the accepted holdings.
     layers = []
     for run in runs:
         current = [r for r in items if r['run_id'] == run['run_id']]
-        for kind in ('W6', 'SCREENSHOT'):
+        for kind in ('W6', 'SCREENSHOT', 'CONFIRMED_VALUE'):
             relevant = [r for r in current if
                 (kind == 'W6' and r['field_key'] == 'accepted_W6_broker_holdings_json') or
                 (kind == 'SCREENSHOT' and r.get('domain_code') == 'OWNER_SCREENSHOT_SOURCE'
-                    and r['field_key'] == 'quantity')]
+                    and r['field_key'] == 'quantity') or
+                (kind == 'CONFIRMED_VALUE' and
+                    r.get('domain_code') == 'USER_CONFIRMED_REAL_HOLDING_VALUE'
+                    and r['field_key'] == 'asset_label' and r['value_state'] == 'KNOWN')]
             if relevant:
                 layers.append((kind, run, current, relevant))
     chosen = []
-    for kind in ('W6', 'SCREENSHOT'):
+    for kind in ('W6', 'SCREENSHOT', 'CONFIRMED_VALUE'):
         candidates = [x for x in layers if x[0] == kind]
         if not candidates:
             continue
@@ -119,6 +125,16 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
                 if item['value_state'] != 'KNOWN':
                     raise ValueError('W6_HOLDINGS_SOURCE_UNKNOWN')
                 rows = json.loads(item['value_text'])
+            elif kind == 'CONFIRMED_VALUE':
+                if item.get('value_text') != item['entity_key']:
+                    raise ValueError('CONFIRMED_HOLDING_VALUE_IDENTITY_CONFLICT')
+                quantity_facts = [r for r in current if r.get('domain_code') == item['domain_code']
+                    and r['entity_key'] == item['entity_key'] and r['field_key'] == 'quantity']
+                if len(quantity_facts) > 1:
+                    raise ValueError('CONFIRMED_HOLDING_VALUE_QUANTITY_AMBIGUOUS')
+                quantity = quantity_facts[0] if quantity_facts else {}
+                rows = [{'symbol': item['entity_key'], 'quantity': quantity.get('value_text')
+                    if quantity.get('value_state') == 'KNOWN' else None}]
             else:
                 rows = [{'symbol': item['entity_key'],
                     'quantity': item.get('value_text') if item['value_state'] == 'KNOWN' else None}]
@@ -130,13 +146,15 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
                     raise ValueError('HOLDINGS_INSTRUMENT_AMBIGUOUS')
                 instrument = deepcopy(matches[0]) if matches else None
                 source_fields = {}
-                if kind == 'SCREENSHOT':
+                if kind in ('SCREENSHOT', 'CONFIRMED_VALUE'):
                     for fact in current:
-                        if (fact.get('domain_code') == 'OWNER_SCREENSHOT_SOURCE' and
+                        if (fact.get('domain_code') == item.get('domain_code') and
                                 fact.get('entity_key') == symbol):
                             source_fields.setdefault(fact['field_key'], []).append(deepcopy(fact))
+                # A reported holding value in TWD does not establish the
+                # security's quotation currency or an FX conversion.
                 currencies = {fact['currency_code'] for facts in source_fields.values()
-                    for fact in facts if fact.get('currency_code')}
+                    for fact in facts if fact.get('currency_code')} if kind != 'CONFIRMED_VALUE' else set()
                 if len(currencies) > 1:
                     raise ValueError('HOLDINGS_SOURCE_CURRENCY_CONFLICT')
                 source_currency = next(iter(currencies), None)
@@ -147,13 +165,17 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
                     row['currency'] = source_currency
                 row.update(quantity=_quantity(row.get('quantity')),
                     quantity_state='KNOWN' if row.get('quantity') is not None else 'UNKNOWN',
-                    source_kind='SEALED_W6' if kind == 'W6' else 'OWNER_SCREENSHOT_SOURCE',
+                    source_kind={'W6': 'SEALED_W6', 'SCREENSHOT': 'OWNER_SCREENSHOT_SOURCE',
+                        'CONFIRMED_VALUE': 'USER_CONFIRMED_REAL_HOLDING_VALUE'}[kind],
                     source_row=deepcopy(item), source_run_id=run['run_id'],
                     observed_at=item.get('source_observed_at_utc'),
                     received_at=run['as_of_utc'], instrument=instrument,
                     source_fields=source_fields,
                     instrument_key=instrument['instrument_key'] if instrument else None,
                     account_key=None, account_mapping_state='UNKNOWN')
+                if kind == 'CONFIRMED_VALUE':
+                    row.update(reported_value_is_current_nav=False,
+                        valuation_date_state='UNKNOWN', value_does_not_infer_quantity=True)
                 if at and row['observed_at'] and _time(row['observed_at']) > at:
                     raise ValueError('HOLDINGS_OBSERVATION_IN_FUTURE')
                 # Cash is not a security position or physical SGOV.
@@ -186,7 +208,15 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
     selected_symbols = {r['symbol'] for r in positions}
     # Ledger-only positions stay visible, e.g. MOU's Taiwan holding not shown in
     # the US screenshots. They remain separate account-scoped original facts.
-    ledger_only = [r for r in ledger if r['symbol'] not in selected_symbols]
+    # An intake with an unknown account cannot erase another account holding
+    # the same ticker. Retain its account-scoped rows and disclose the unresolved
+    # representation instead of guessing which account the intake replaces.
+    unresolved_accounts = {symbol for symbol in selected_symbols if
+        len({r['account_key'] for r in ledger if r['symbol'] == symbol}) > 1
+        and any(p['symbol'] == symbol and p.get('account_key') is None for p in positions)}
+    ledger_only = [r for r in ledger if r['symbol'] not in selected_symbols
+        or r['symbol'] in unresolved_accounts]
+    overlap = sorted(set(overlap) | unresolved_accounts)
     registered = set(registry)
     return {'schema_version': 'Family.W8.OfficialHoldingsProjection.v1',
         'client_id': client, 'source_db_sha256': snapshot['source_sha256'],
@@ -197,6 +227,7 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
         'cash_sources': cash, 'owner_corrections': corrections,
         'source_symbols_missing_from_instrument_registry': sorted(selected_symbols - registered),
         'source_layer_conflicts': overlap, 'source_layers_preserved': True,
+        'unresolved_account_representations': sorted(unresolved_accounts),
         'cash_settlement_asserted': False, 'database_written': False,
         'trade_authorization': 'NONE'}
 

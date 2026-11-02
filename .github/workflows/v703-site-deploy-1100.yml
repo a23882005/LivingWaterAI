@@ -17,6 +17,7 @@ on:
       - 'experiments/macro-safety-monthly-research/bank_forecast_register_research.csv'
       - 'experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/**'
       - 'tests/test_v703_monthly_release.py'
+      - 'tests/test_v703_mmfi_fallback.py'
       - 'tests/test_macro_safety_monthly.py'
       - 'tests/test_bank_macro_monthly.py'
       - 'tests/test_v703_research_charts.py'
@@ -71,6 +72,7 @@ jobs:
           test -s data/8_macro_supplement_verified.json
           test -s data/v703_official_monthly_release_calendar.json
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+          python -m unittest discover -s tests -p 'test_v703_mmfi_fallback.py' -v
           python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
           python -m unittest discover -s tests -p 'test_v703_publication.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_daily_capture.py' -v

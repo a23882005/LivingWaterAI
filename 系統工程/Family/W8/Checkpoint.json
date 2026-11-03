@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-03T20:58:00Z",
+  "updated_at": "2026-11-03T23:08:00Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原V82 Codex／PR59最小修正qP換錨診斷+續正式金融主鏈；中PM獨立驗收及治理；PR60保持結案",
-  "next_action": "中PM qP最終定案：正式252/峰63/√252及九階保留，四方案比較取消；原V82 Codex只補前次錨已驗來源、OLD_HIGH_EXPIRED/NEW_HIGH與UNKNOWN診斷，不改qP/Stage/買額，之後原合格PIT/qV/C7B/資金ledger按契約續工；PR59不合併/HOLD/NONE。",
+  "next_owner": "新對話Family中PM／全案總PM接手工程管理+獨立QA；原V82 Codex／PR59繼續已核准qP診斷與正式金融主鏈；原PR60報表線維持結案",
+  "next_action": "新對話先依Drive/TEMP三份交接ZIP1→ZIP2→ZIP3及Live四治理/W8 Checkpoint Fresh Read；核PR59是否已有新head/回交，立即獨立驗增量；中PM同步查已有金融原件和授權資金/SGOV等，PR59續已批准qP換錨診斷+qP/qV/PIT/C7B/ledger；後續四戶56格→Gate D→Project交付→Trial→Gate E，保留PASS/HOLD/NONE。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -2991,5 +2991,51 @@
     "handoff_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6615932676",
     "worker_handoff_status": "ISSUED_TO_ORIGINAL_V82_CODEX_PR59__NEW_CODE_PENDING",
     "PM_new_code_independent_QA": "PENDING"
+  },
+  "pm_handoff_3zip_20261104": {
+    "status": "ZIP1_ZIP2_ZIP3_UPLOADED_REMOTE_READBACK_CRC_MANIFEST_SHA_PASS__NEXT_CHAT_READY",
+    "pm_role": "Family middle PM = full Family total PM to Gate E",
+    "root_folder": "Google Drive root/TEMP",
+    "folder_id_for_private_PM": "see official root file manager (not in public docs)",
+    "archives": [
+      {
+        "filename": "Family_中PM_交接_ZIP1_總PM責任與治理_20261104.zip",
+        "bytes": 11255,
+        "sha256": "8eaa94d0e6b1f1dd6f8f6b4621fe0c68adc235aec4117046bd516257811148c6",
+        "payload_files": 5
+      },
+      {
+        "filename": "Family_中PM_交接_ZIP2_已完成成果與正式來源_20261104.zip",
+        "bytes": 11820,
+        "sha256": "a4e1f31257da943165b92c5ea9a7bd0b9ed6406c27ad87a7beb3ab1dfbbe4f54",
+        "payload_files": 6
+      },
+      {
+        "filename": "Family_中PM_交接_ZIP3_剩餘工序與驗收契約_20261104.zip",
+        "bytes": 17977,
+        "sha256": "76c33dede2a7551920ffa774a3ed6218b54d0c30501d248da8a4ec431fa96499",
+        "payload_files": 9
+      }
+    ],
+    "total_payloads": 20,
+    "manifest_files": 3,
+    "download_reverified": true,
+    "backup_before_write": true,
+    "root_drive_file_manager_updated": true,
+    "master_wbs_scope_unchanged": true,
+    "current_W8": "IN_PROGRESS",
+    "upstream_W7": "PASS_CLOSED",
+    "PR59": "a87971f1b7f5f06aab258a3c993659c4d4601ff5_DRAFT",
+    "PR60": "a37851b446c9a7901b1b0827e16dadd41f4f3b27_DRAFT_SCOPE_CLOSED",
+    "PR61": "2a60d319fd081b3d475b11ee6b628986271d212e_DRAFT_READ_ONLY",
+    "latest_owner_qp_decision": "252_H_peak63_sigma_sqrt252_monthly_midrank_retained; four_alternatives_cancelled; anchor_reason_only",
+    "qP_implementation": "ORIGINAL_V82_CODEX_PENDING",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "owner_of_next_chat": "Family middle PM as total PM",
+    "next_action": "Fresh Read current governance, PR59 head and any new Codex handoff; PM source facts audit and independent QA; continue W8→Gate D→four Projects→Trial→Gate E",
+    "keep_all_prior_PASS": true
   }
 }

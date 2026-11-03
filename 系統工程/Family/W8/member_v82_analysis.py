@@ -237,6 +237,10 @@ def build_report(request, config, repo_root):
             'valuation_observations': [], 'issuer_facts': read_issuer_facts(
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
+        history_sources=config.get('public_history_sources',{}).get(symbol)
+        if history_sources is not None:
+            from historical_source_qualification import bind
+            row['history_source_qualification']=bind(history_sources,request,symbol)
         if asset.get('analysis_instrument_binding'):
             row['missing_inputs'].append(missing('target.listing_identity',
                 'original holding instrument and target registry rows',

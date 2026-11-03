@@ -13,7 +13,7 @@ import re
 from family_input import digest
 
 
-def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None):
+def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None):
     raw=Path(descriptor['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_PRODUCER_SOURCE_BYTES_CHANGED')
     data=json.loads(raw)
@@ -30,10 +30,19 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         'source_descriptor_digest':digest(descriptor),'qualified_financial_pack':False,
         'call_trace':['W8.member_financial_producer'],'trade_action':'NO_TRADE'}
     cfg=deepcopy(data.get('configuration'))
+    public_binding=None
+    if public_history_sources is not None:
+        from historical_source_qualification import bind
+        observed=bind(public_history_sources,request,symbol)
+        public_binding={'client_id':request['client_id'],'run_id':request['run_id'],
+            'source_db_sha256':data['source_db_sha256'],'asset_id':symbol,
+            'source_descriptors':deepcopy(public_history_sources),'digest':observed['digest']}
+        attempt['public_history_source_binding']=deepcopy(public_binding)
     def root_inventory(seed_context=None):
         from family_c7_source_assembly import assemble
         context=deepcopy(seed_context or {})
         if reconciliation_source is not None:context['member_reconciliation_source']=deepcopy(reconciliation_source)
+        if public_binding is not None:context['public_history_source_binding']=deepcopy(public_binding)
         return assemble(root,request,context,artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
     if reconciliation_source is not None:
         from member_reconciliation_source import read
@@ -86,6 +95,8 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         'portfolio_reconciliation_source':deepcopy(data.get('portfolio_reconciliation_source'))}
     if reconciliation_source is not None:
         cfg['family_c7_assembly_inputs']['member_reconciliation_source']=deepcopy(reconciliation_source)
+    if public_binding is not None:
+        cfg['family_c7_assembly_inputs']['public_history_source_binding']=deepcopy(public_binding)
     if producer_factory is None:
         from native_asset_source import AssetSourceProducer
         producer_factory=AssetSourceProducer

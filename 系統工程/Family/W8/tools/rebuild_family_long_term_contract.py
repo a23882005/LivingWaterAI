@@ -79,6 +79,7 @@ files=['work7/family_long_term.py','work7/asset_framework.py','C8C9_RUNTIME/C8C9
  '../../Family/W8/owner_target_decision_source.py','../../Family/W8/nasdaq_daily_source.py','../../Family/W8/member_position_valuation.py',
  '../../Family/W8/tpex_actual_sessions.py',
  '../../Family/W8/member_reconciliation_source.py',
+ '../../Family/W8/sec_publication_source.py','../../Family/W8/historical_source_qualification.py',
  '../../Family/W5/mentor_bridge.py','../../Family/W5/mentor_scope.py','../../Family/W5/mentor_advice_scope.schema.json',
  '../../Family/W8/契約/FAMILY_MENTOR_SCOPE_CONSUMER_Producer介面_v1.0_20261031.md',
  '../../Family/W8/approved_v04_technical.py','../../Family/W5/technical_source_bridge.py','../../Family/W8/tools/rebuild_family_long_term_contract.py',

@@ -125,7 +125,11 @@ def complete_report(report,request,config,root):
         if row['symbol'] in producers:
             from member_financial_producer import produce
             attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],
-                observation_cache=observation_cache,reconciliation_source=reconciliation_source)
+                observation_cache=observation_cache,reconciliation_source=reconciliation_source,
+                public_history_sources=config.get('public_history_sources',{}).get(row['symbol']))
+            if row.get('history_source_qualification') is not None:
+                if attempt.get('public_history_source_binding',{}).get('digest')!=row['history_source_qualification']['digest']:
+                    raise PermissionError('MEMBER_FINANCIAL_PUBLIC_HISTORY_SOURCE_REPLAY_MISMATCH')
             row['financial_source_attempt']=attempt;row['call_trace']+=attempt['call_trace']
             row['missing_inputs']=[m for m in row['missing_inputs'] if m['field']!='work3/C7/funding/execution_constraints']
             if descriptor is None:

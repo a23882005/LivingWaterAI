@@ -473,6 +473,16 @@ class SourceAssembler:
         scope['total_stock_ceiling']=self.tactical(tactical,scope)
         facts=read_facts(portfolio_facts_source,req)
         current=self.portfolio(facts,portfolio_facts_source,scope)
+        history_binding=self.context.get('public_history_source_binding')
+        if history_binding is not None:
+            if (history_binding.get('client_id')!=req['client_id'] or history_binding.get('run_id')!=req['run_id']
+                or history_binding.get('source_db_sha256')!=scope['source_db_sha256']):
+                raise PermissionError('C7_PUBLIC_HISTORY_MEMBER_RUN_OR_DB_MISMATCH')
+            from historical_source_qualification import bind
+            observed=bind(history_binding['source_descriptors'],req,history_binding['asset_id'])
+            if observed['digest']!=history_binding['digest']:
+                raise PermissionError('C7_PUBLIC_HISTORY_ORIGINAL_REPLAY_MISMATCH')
+            self.observations['public_history_source_qualification']=observed
         source=self.context.get('member_reconciliation_source')
         if source is not None:
             from member_reconciliation_source import read
@@ -555,6 +565,10 @@ def assemble_original_producers(producer,request,context,prepared,trial):
     ctx=deepcopy(context);ctx['family_c7_reporting_fx']=deepcopy(producer.fx_observation)
     if options.get('member_reconciliation_source') is not None:
         ctx['member_reconciliation_source']=deepcopy(options['member_reconciliation_source'])
+    if options.get('public_history_source_binding') is not None:
+        if options['public_history_source_binding'].get('asset_id')!=producer.symbol:
+            raise PermissionError('C7_PUBLIC_HISTORY_FOCUS_ASSET_MISMATCH')
+        ctx['public_history_source_binding']=deepcopy(options['public_history_source_binding'])
     assembler=SourceAssembler(producer.root,request,ctx,options['artifact_directory'])
     out=assembler.build(tactical=tactical,identities=identities,portfolio_facts_source=options.get('portfolio_reconciliation_source'))
     out['original_observations'].update(selected_account_cash_trial={

@@ -69,3 +69,14 @@ def test_supplementary_source_hash_owner_and_time_are_checked_each_read(tmp_path
     with pytest.raises(PermissionError,match='NOT_AVAILABLE'):read_source(source,request,'QQQ')
     request,row,source,*_=case(tmp_path,owner={'account':'OTHER'})
     with pytest.raises(PermissionError,match='IDENTITY_MISMATCH'):read_source(source,request,'QQQ')
+
+
+def test_observed_as_filed_eps_does_not_supply_valuation_history_or_clear_original_safety(tmp_path):
+    request,row,source,*_=case(tmp_path)
+    before,decision=build(ROOT,row,request,fundamental=True,price_conditions={'value':True},left_safety=True,source_descriptor=source)
+    row['history_source_qualification']={'digest':'a'*64,'sources':{'sec_filings':{
+        'as_reported_eps_facts':[{'value':'1.25','unit':'USD_PER_SHARE'}],
+        'untrusted_direct_qP':'100','untrusted_direct_qV':'0'}}}
+    after,again=build(ROOT,row,request,fundamental=True,price_conditions={'value':True},left_safety=True,source_descriptor=source)
+    assert again==decision and after['price_history']==after['valuation_history']==None
+    assert after['source_binding']['history_source_qualification_digest']=='a'*64

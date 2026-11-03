@@ -65,7 +65,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
-      "sha256": "14dee7f3f248ed9861623407e52ccd06c88e190a90080be7ceafee0dd9597e4a"
+      "sha256": "3f1510b3f0674bbdde81653c12784e8e30388638885b7e5816e65cbcb668c8ad"
     },
     {
       "path": "../../Family/W8/member_funding_summary.py",
@@ -77,11 +77,11 @@
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "b7058720bf32bc1e684c762e9dfe27e4c362555ff4367a23c60235e4472a1057"
+      "sha256": "ef4e4edc82952df650aba0eea88a9c13a8922099b15b3b34fcdffaa944525ea3"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
-      "sha256": "357df540a3c261c601959f1b5bd42cf181029b7e9311982686b74e999637f700"
+      "sha256": "d4acfeb3478737a5a1b3a6d4e0cf82c03dea90cb34d9310b326e5941308a5001"
     },
     {
       "path": "../../Family/W8/w1_portfolio_observations.py",
@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "2342247493fefb3025732bc3639d8fecb58cc1b2076a54d526ed812600804d53"
+      "sha256": "f9f03a107b6adc51f508b32001d5da18aaf48b67b78c11aa50ee571242162e71"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -136,6 +136,14 @@
       "sha256": "050a43eac5e976c5b41aa12ebf872b15f8965f4dae1b625b71a2ce9988f80bf0"
     },
     {
+      "path": "../../Family/W8/sec_publication_source.py",
+      "sha256": "bcab54e7871e18d93807a6c2cfdda28821202d62657b7e2f7ea995e8bfb0572f"
+    },
+    {
+      "path": "../../Family/W8/historical_source_qualification.py",
+      "sha256": "49ccc6e4af0517f31f961dc55e1e729edc2d74e34566f5907df2312766a51268"
+    },
+    {
       "path": "../../Family/W5/mentor_bridge.py",
       "sha256": "404f6c62a21e34c6ea3048af0966085ea1936e43322e976a27f6006221b092a4"
     },
@@ -161,7 +169,7 @@
     },
     {
       "path": "../../Family/W8/tools/rebuild_family_long_term_contract.py",
-      "sha256": "43c7320507487256b250e02f765ad1a9feb3547b7d5eb0da00b3d9d05cbd9762"
+      "sha256": "05578b0d50a31953757777bc56d2467572a36bbaa8a6eeae3d7c1b4986fe1f82"
     },
     {
       "path": "../../Family/W8/v70_tactical_input.py",

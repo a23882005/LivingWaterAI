@@ -117,3 +117,17 @@ def test_same_run_uses_current_pinned_original_base_instead_of_stale_bootstrap_c
         reconciliation_source={'local_path':'SYNTHETIC_REPLAYED_SOURCE','sha256':'e'*64})
     assert pack is None and not out['qualified_financial_pack']
     assert out['same_run_source_binding']['source_digest']=='d'*64
+
+
+def test_public_history_source_reaches_original_c7_options_without_becoming_a_financial_pack(tmp_path,monkeypatch):
+    import historical_source_qualification
+    r,d,desc=case(tmp_path);sources={'sec_filings':{'local_path':'SYNTHETIC_ORIGINAL','sha256':'b'*64}}
+    monkeypatch.setattr(historical_source_qualification,'bind',lambda *args:{'digest':'c'*64})
+    def factory(**cfg):
+        b=cfg['family_c7_assembly_inputs']['public_history_source_binding']
+        assert b['client_id']==r['client_id'] and b['run_id']==r['run_id'] and b['asset_id']=='SYNTHETIC_ASSET'
+        assert b['source_descriptors']==sources and b['digest']=='c'*64
+        return lambda *args:{'request':deepcopy(cfg['request_seed']),'source_production':{
+            'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':[{'code':'ORIGINAL_FINANCIAL_FACTS_STILL_REQUIRED'}]}}
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=factory,public_history_sources=sources)
+    assert out['public_history_source_binding']['digest']=='c'*64 and pack is None and not out['qualified_financial_pack']

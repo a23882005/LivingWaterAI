@@ -94,6 +94,10 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
         'source_binding':{'analysis_core_digest':digest(row['core_observation']),
             'technical_digest':digest(approved),'source_reference':extra.get('source_reference'),
             'supplementary_facts_supplied':bool(extra)}}
+    if row.get('history_source_qualification') is not None:
+        context['source_binding']['history_source_qualification_digest']=row['history_source_qualification']['digest']
+        # Source observations cannot fill valuation_history/price_history or
+        # safety predicates. Those remain the original qualified input routes.
     return context,evaluate(context,core)
 
 

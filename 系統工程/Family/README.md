@@ -285,3 +285,10 @@ PM accepted the filtered-interior-bar correction and TPEx annual-plan source int
 The restored base865 and delta228 private paths,137 inherited sources and10 remote worker files are verified with0 overwrites. Six official annual documents reproduce1229 planned sessions. Actual ad-hoc closure/history qualification and coherent CPAI final-bar sourcing remain scoped follow-on work. Frozen four-member source/digest and saved replay evidence is verified; the extra relocated full Menu04 replay attempt is not counted because canonical-runtime binding blocked it. Prior dd36143 cold-replay PASS remains.
 
 Original V82 Codex now consumes the already-dispatched owner-source recovery and continues TPEx actual-session / CPAI final-day sources under the existing contract. Formal financial PASS/cycles remain0; Production HOLD/trading NONE; Draft PR retained. Acceptance/continuation: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6593250716 . Private verdict/evidence filenames and hashes are in Checkpoint.
+
+
+### 2026/11/03 approved report correction published
+
+After explicit Owner approval of the reviewed15-file/286561-byte batch, PM used the original GitHub tools to publish remote61ce0851f9f47c7a856bdf7462abb9633110ea51 onPR60. Its tree7d430d28 exactly matches reviewed local782e8a1; all15 remote files read back byte-for-byte, and same-head CI41577308922 completed/success under the existing workflow. The earlier approval block is resolved. The same approved publication does not require repeated confirmation.
+
+The privately accepted16-page/5-file member correction and prior reports remain preserved; private DB/report/images remain private. Original report Codex completes scoped documentation PASS writeback and receipts, preserving the published program and reports. PR60 stays Draft/unmerged, Production HOLD/trading NONE. Publication notice: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6595348307 . Private receipt filename/hash and exact approval/publication state are recorded in Checkpoint.

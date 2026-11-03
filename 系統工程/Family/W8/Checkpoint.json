@@ -2763,5 +2763,38 @@
     "production": "HOLD",
     "trade_authorization": "NONE",
     "PR59": "DRAFT_UNMERGED"
+  },
+  "pm_pr60_782e8a1_publication_20261103": {
+    "status": "OWNER_APPROVED_PUBLICATION_REMOTE_READBACK_CI_PASS",
+    "reviewed_local_commit": "782e8a19b3cc63a38c5077eb26514e9e36d37c09",
+    "published_commit": "61ce0851f9f47c7a856bdf7462abb9633110ea51",
+    "same_reviewed_tree": "7d430d281f7317e50dd210feb2370ef2b4567e9d",
+    "previous_remote": "661c8acef3c544bee0d5c144258f5d843e79463b",
+    "file_count": 15,
+    "bytes": 286561,
+    "owner_explicit_approval": true,
+    "approval_scope": "PUBLIC_CODE_AND_EXISTING_GOVERNANCE_DRIVE_REFERENCES_METADATA__PRIVATE_DB_REPORTS_IMAGES_REMAIN_PRIVATE",
+    "repeat_same_approval": "NOT_REQUIRED",
+    "previous_auto_review_rejection": "RESOLVED_BY_EXPLICIT_OWNER_APPROVAL",
+    "publication_route": "ORIGINAL_CREATE_TREE_COMMIT_UPDATE_REF",
+    "ref_update": "EXPECTED_SHA_FORCE_FALSE",
+    "remote_full_content_readback": 15,
+    "CI": {
+      "id": 41577308922,
+      "head": "61ce0851f9f47c7a856bdf7462abb9633110ea51",
+      "status": "completed",
+      "conclusion": "success",
+      "coverage": "EXISTING_WORKFLOW_ONLY__SEALED_291_162_17_AND_PM_8_13_SEPARATE"
+    },
+    "PM_private_acceptance": "PASS_LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY",
+    "reports": "NEW_LILIAN16_PAGES_5_FILES_AND_PRIOR_RESULTS_PRESERVED",
+    "private_publication_receipt_filename": "Family_PR60_Lilian修正版_核准公開發布收據_20261103.json",
+    "private_publication_receipt_sha256": "fdf7c53bf2b6f278623620638e3e572f62f9e31e95f9c7cadb201491690b0417",
+    "notice": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6595348307",
+    "next_owner": "ORIGINAL_REPORT_CODEX",
+    "next_action": "DOCS_ONLY_PASS_WRITEBACK__NO_REPORT_OR_CODE_REWORK",
+    "PR60": "DRAFT_UNMERGED",
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

@@ -276,3 +276,12 @@ The original financial Codex receives the new source package to rebuild changed-
 PM verified docs-only661c8ace: exactly two report-line files match the private receipt in bytes/SHA/blob, same-ID entry freshly matches, CI41556916762 completed/success at that head. Prior phase2 PASS and137-page/20-file plus77-page evidence remain. Documentation writeback is complete.
 
 The existing same-ID report work order now includes this receipt acceptance and one immediate next step: execute the scoped member-source/latest-owner-decision display correction and return five updated member artifacts. The other three reports remain. The current MD supersedes the source ZIP's embedded dispatch snapshot for this acknowledgement/next-step text; implementation scope is unchanged. Dispatch: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746 . Exact private filenames/digests are in Checkpoint. Production HOLD/trading NONE.
+
+
+### 2026/11/03 PR59 80e635e scoped independent acceptance
+
+PM accepted the filtered-interior-bar correction and TPEx annual-plan source integration at80e635e. Original defect closes asCLOSED_PASS. Independent W5 556 / W8 892 main cases plus60 W8 subcases pass;84 candidate cases are a subset. The original counterexample now returns MA5=None, all161 dependency hashes pass, six same-head PR CI runs succeed, and the official artifact digest matches the archived raw ZIP/JUnit.
+
+The restored base865 and delta228 private paths,137 inherited sources and10 remote worker files are verified with0 overwrites. Six official annual documents reproduce1229 planned sessions. Actual ad-hoc closure/history qualification and coherent CPAI final-bar sourcing remain scoped follow-on work. Frozen four-member source/digest and saved replay evidence is verified; the extra relocated full Menu04 replay attempt is not counted because canonical-runtime binding blocked it. Prior dd36143 cold-replay PASS remains.
+
+Original V82 Codex now consumes the already-dispatched owner-source recovery and continues TPEx actual-session / CPAI final-day sources under the existing contract. Formal financial PASS/cycles remain0; Production HOLD/trading NONE; Draft PR retained. Acceptance/continuation: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6593250716 . Private verdict/evidence filenames and hashes are in Checkpoint.

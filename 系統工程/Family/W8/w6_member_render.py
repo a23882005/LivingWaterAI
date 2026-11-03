@@ -187,8 +187,22 @@ def _build_blocks(data):
         else:
             parts[3].append(_card("持倉資料狀態", "UNKNOWN；缺少已記錄持倉不表示持倉為零。"))
         parts[4]=[_card("目前比例與統計", "UNKNOWN；市值分母尚未核實，不以舊值、零或推算比例填入。")]
-    parts[5]=['<div class="piegrid"><div>'+_pie(target)+'</div><div>'+_table(
-        ["編號","代碼／標的","目標比例","目標金額（新台幣）"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(target)])+'</div></div>']
+    decision=data.get("target_decision")
+    if decision:
+        projection=decision["PM_projection"]
+        excluded="、".join(projection["excluded"])
+        included="／".join(projection["included_weight_pending"])
+        summary="排除 "+excluded+"、加入 "+included+"，比例待定。這是已確認的目標標的選擇。"
+        parts[2][1]=_card("最新本人目標決定",summary+"其餘原比例未調整；完整百分比配置尚未定案。")
+        parts[5]=[_card("已確認標的，完整比例待定",summary+
+            "原完整配置表的部分標的選擇已被本次決定取代，舊版僅作歷史來源；未推定新增比例或合計比例。"),
+            _table(["標的","最新選擇狀態","原核准比例／待定"], [
+                [_instrument_label(r),"已選定、比例待定" if r["權重"] is None else "原標的及比例未調整",
+                 "待定" if r["權重"] is None else _format_pct(r["權重"])] for r in target]),
+            _card("本人決定來源", "確認資料更新日："+decision["available_at"]+"；"+decision["source_reference"])]
+    else:
+        parts[5]=['<div class="piegrid"><div>'+_pie(target)+'</div><div>'+_table(
+            ["編號","代碼／標的","目標比例","目標金額（新台幣）"],[[i+1,_instrument_label(row),_format_pct(row["權重"]),_format_money(row["市值TWD"])] for i,row in enumerate(target)])+'</div></div>']
     for i in range(0,len(drift),9):
         dual=[]
         for row in drift[i:i+9]:
@@ -208,6 +222,8 @@ def _build_blocks(data):
         parts[5]=[_card("目標配置資料狀態", "UNKNOWN；尚待核准目標來源，不以零比例表示缺值。")]
     if not drift:
         parts[6]=[_card("漂移資料狀態", "UNKNOWN；尚待正式目標及漂移來源，不以零差額表示缺值。")]
+    if decision:
+        parts[6]=[_card("漂移資料狀態", "UNKNOWN；最新目標標的已確認，完整比例仍待定，且目前市值尚未核實。")]
     for number,name in CONTENTS.items():
         envelope=data.get("report_source_lineage",{}).get("sections",{}).get(name)
         parts[number]=_section_items(sections[name],envelope=envelope)

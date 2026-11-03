@@ -5,10 +5,14 @@ Never converts historical prices or provisional values into live NAV or executab
 funding. This is an input to approved W6 rendering, not a new 30-page renderer.
 """
 from collections import defaultdict
+from copy import deepcopy
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import json
 import importlib.util
+import re
+import sqlite3
 from pathlib import Path
 
 
@@ -186,8 +190,100 @@ def _report_ticker(instrument):
     return ticker
 
 
+def _decision_time(value):
+    try:
+        moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (AttributeError, TypeError, ValueError):
+        raise ValueError("W6_OWNER_DECISION_TIME") from None
+    if moment.tzinfo is None:
+        raise ValueError("W6_OWNER_DECISION_TIME")
+    return moment
+
+
+def _read_owner_decision(snapshot, evidence, expected_digest, db_path, evaluation_at, targets):
+    """Match the exact DB row and a pinned PM projection; never parse prose as approval.
+
+    expected_digest is trusted operator configuration from the verified handoff,
+    like the external-target validator, not a menu user's arbitrary text.
+    """
+    if (not isinstance(evidence, dict) or expected_digest != _digest(evidence)
+            or evidence.get("schema") != "Family.PM.OwnerDecisionEvidence.v1"
+            or evidence.get("client_id") != snapshot["client_id"]
+            or evidence.get("source_db_sha256") != snapshot["source_sha256"]
+            or evidence.get("original_table") != "personal_profile_attribute"
+            or evidence.get("trade_authorization") != "NONE"
+            or snapshot["payload_digest"] != _digest(snapshot["tables"])):
+        raise ValueError("W6_OWNER_DECISION_BINDING")
+    path = Path(db_path).resolve(strict=True)
+    before = sha256(path.read_bytes()).hexdigest()
+    if before != snapshot["source_sha256"]:
+        raise ValueError("W6_OWNER_DECISION_DB_SHA")
+    conn = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA query_only=ON")
+        rows = [dict(r) for r in conn.execute(
+            "SELECT * FROM personal_profile_attribute WHERE client_id=? AND field_key=?",
+            (snapshot["client_id"], "funding_goal"))]
+    finally:
+        conn.close()
+        if sha256(path.read_bytes()).hexdigest() != before:
+            raise ValueError("W6_OWNER_DECISION_DB_CHANGED")
+    if len(rows) != 1 or rows[0] != evidence.get("original_row"):
+        raise ValueError("W6_OWNER_DECISION_ORIGINAL_ROW")
+    row = rows[0]
+    if (row.get("value_state") != "KNOWN" or row.get("source_kind") != "OWNER_VERIFIED"
+            or not isinstance(row.get("value_text"), str) or not row["value_text"].strip()
+            or not row.get("source_reference")):
+        raise ValueError("W6_OWNER_DECISION_NOT_VERIFIED")
+    updated = _decision_time(row.get("updated_at_utc"))
+    if not (_decision_time(row.get("recorded_at_utc")) <= updated <= _decision_time(evaluation_at)):
+        raise ValueError("W6_OWNER_DECISION_FUTURE")
+    projection = evidence.get("PM_projection")
+    keys = {"excluded", "included_weight_pending", "weights_not_authorized",
+            "salary_contributions_amount_and_time", "existing_other_weights", "old_complete_target_version"}
+    if (not isinstance(projection, dict) or set(projection) != keys
+            or projection.get("existing_other_weights") != "UNCHANGED"
+            or projection.get("salary_contributions_amount_and_time") != "NOT_PROVIDED"
+            or not isinstance(projection.get("weights_not_authorized"), list)
+            or not all(isinstance(x, str) for x in projection["weights_not_authorized"])
+            or not isinstance(projection.get("old_complete_target_version"), str)):
+        raise ValueError("W6_OWNER_DECISION_PROJECTION")
+    for key in ("excluded", "included_weight_pending"):
+        items = projection[key]
+        if (not isinstance(items, list) or not items
+                or any(not isinstance(x, str) or not re.fullmatch(r"[A-Z0-9][A-Z0-9._-]*", x) for x in items)
+                or len(set(items)) != len(items)):
+            raise ValueError("W6_OWNER_DECISION_SELECTION")
+    excluded, added = set(projection["excluded"]), set(projection["included_weight_pending"])
+    if len(targets) != 1 or excluded & added:
+        raise ValueError("W6_OWNER_DECISION_HISTORICAL_TARGET")
+    prior = targets[0]
+    tickers = {x["ticker"] for x in prior["allocations"]}
+    if (not excluded <= tickers or added & tickers
+            or updated <= _decision_time(prior.get("confirmed_at_utc"))):
+        raise ValueError("W6_OWNER_DECISION_HISTORICAL_TARGET")
+    lines = [{**deepcopy(x), "selection_state":"EXISTING_WEIGHT_UNCHANGED"}
+             for x in prior["allocations"] if x["ticker"] not in excluded]
+    lines.extend({"ticker":x, "label":x, "weight_units":None, "weight_fraction":None,
+                  "selection_state":"CONFIRMED_INSTRUMENT_WEIGHT_PENDING"}
+                 for x in projection["included_weight_pending"])
+    decision = {"schema_version":"Family.W8.OwnerTargetDecision.v1", "client_id":snapshot["client_id"],
+        "source_db_sha256":before, "snapshot_payload_sha256":snapshot["payload_digest"],
+        "value_state":"KNOWN", "state":"CONFIRMED_SELECTION_WEIGHTS_PENDING",
+        "available_at":row["updated_at_utc"], "verified_cutoff":evaluation_at,
+        "source_reference":row["source_reference"], "original_row":deepcopy(row),
+        "original_row_sha256":_digest(row), "evidence_sha256":expected_digest,
+        "PM_projection":deepcopy(projection), "historical_targets":deepcopy(targets),
+        "selection_lines":lines, "trade_authorization":"NONE"}
+    decision["digest"] = _digest(decision)
+    return decision
+
+
 def build_report_source(snapshot, *, account, expected_client_id,
-                        approved_target=None, target_context=None, approved_target_validator=None):
+                        approved_target=None, target_context=None, approved_target_validator=None,
+                        owner_decision=None, expected_owner_decision_digest=None,
+                        profile_db_path=None, evaluation_at=None):
     if not isinstance(snapshot,dict) or snapshot.get("schema_version")!="Family.W5.W1Snapshot.v1":
         raise ValueError("VERIFIED_W5_SNAPSHOT_REQUIRED")
     if snapshot.get("client_id")!=expected_client_id or not isinstance(expected_client_id,str):
@@ -262,5 +358,19 @@ def build_report_source(snapshot, *, account, expected_client_id,
             source,approved_target,target_context,validator=approved_target_validator)
         source["external_target_receipt"]=receipt
         source["reporting_flags"]["confirmed_target_available"]=bool(source["current_confirmed_target_details"])
+    if any(x is not None for x in (owner_decision, expected_owner_decision_digest, profile_db_path, evaluation_at)):
+        if (any(x is None for x in (owner_decision, expected_owner_decision_digest, profile_db_path, evaluation_at))
+                or approved_target is not None or target_context is not None):
+            raise ValueError("W6_OWNER_DECISION_TRUSTED_CONTEXT_REQUIRED")
+        decision = _read_owner_decision(snapshot, owner_decision, expected_owner_decision_digest,
+                                        profile_db_path, evaluation_at, target_details)
+        source["owner_target_decision"] = decision
+        source["known_profile_original_rows"] = [deepcopy(decision["original_row"])]
+        source["historical_confirmed_target_details"] = deepcopy(target_details)
+        source["current_confirmed_target_details"] = []
+        source["source_account_labels"] = {r["account_key"]:r.get("account_label") or r["account_key"]
+                                            for r in tables.get("portfolio_account", [])}
+        source["reporting_flags"].update(confirmed_target_available=False,
+            latest_owner_selection_confirmed=True, complete_target_weights_pending=True)
     source["digest"]=_digest(source)
     return source

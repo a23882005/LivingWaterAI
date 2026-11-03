@@ -191,3 +191,14 @@ Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫
 完整281項＋149子案例、15項實際Chromium通過，0 failures/errors/skips。四戶以同一程式接收PM凍結輸入，新的SOURCE_REVIEW報告42／44／25／26共137頁、274張來源卡；來源全文／PDF字框／每頁PNG／ZIP同源及離線窄畫面reader通過。工程接線與保存不代表完整金融PASS；完整金融PASS目前0，中PM獨立驗收待辦。各戶新20件使用原Sources固定folder與新台灣時間檔名，實際上傳與全新bytes/SHA/private-parent/lookup收據另存私人入口。
 
 精確mapping、版本鎖、JUnit、測試命令與合成產物hash在report_html_evidence/phase2_financial_sections/。真人原件/current/來源映射、報告20件連結、逐頁圖及保存收據只在Google Drive根目錄／TEMP／Family_PR60_第二階段八章接線_中PM驗收入口_20261103.txt列明。原77頁不覆寫；PR60維持Draft/unmerged，Production HOLD。受管file://政策、真人登入與實機UAT限制沿原規則分列。
+
+
+## 2026-11-03 本人決定與待定權重修正
+
+依FAMILY-REPORT-OWNER-DECISION-20261103-r1及PR60 issuecomment-6592917746，從661c8ace接續。原第二階段八章、相容、來源保存與歷史PASS保留。本次以report-specific唯讀profile補充既有W5 snapshot，W5白名單不改。formal_report_source的owner_decision／expected_owner_decision_digest／profile_db_path／evaluation_at為可信operator設定，須由驗過manifest的PM原件提供；不是公開選單或自由文字審批入口。驗原SQLite前後完整SHA、本人KNOWN/OWNER_VERIFIED funding_goal原列、原updated_at及完整PM投影digest；不以文字關鍵詞猜核准比例。
+
+本人新決定取代舊表部分標的時，原完整表轉入historical_confirmed_target_details，最新選擇另列，新增權重保持null、其餘原比例逐值保持；不做正規化或補差額。adapter再驗本人/DB/snapshot/digest/可得時點與每一selection line，拒絕改列、錯戶、未來資料、未授權權重及舊result套新DB。沒有合格新DB金融結果時，沿SOURCE_REVIEW原件與決定修正版產製，歷史分析另存查閱；不改上游run/hash來過驗。
+
+本單明確批准w6_member_render._build_blocks中parts[2]目標摘要、parts[5]及相依漂移提示的必要分支：待定權重用標的/狀態/已知比例表，省略完整比例圓餅。相同輸入而沒有新決定時，原所有章節blocks逐值一致；CSS、配色、字型、章序、來源換行、reader與其他renderer AST皆保持。本人股數及來源日沿新正式來源，帳戶顯示標籤與原account key分開保留。現金來源鍵不加總成已結算資金，未知NAV/FX/金額/漂移/雷達維持原資格。
+
+291主案例＋162子案例、17實際Chromium通過，零failure/error/skip。公開只存合成案例、去識別JUnit及程式hash；真人來源、數值、畫面、報告及五件新下載SHA均在私人回交。其餘報告原件保留，完整金融PASS0／真實cycle0，Production HOLD／交易NONE，PR60 Draft/unmerged。完整金融來源及下輪介面由PM與原金融producer鎖定；本輪未擴改NoHost/登入/選單、W5、receiver或共享治理。

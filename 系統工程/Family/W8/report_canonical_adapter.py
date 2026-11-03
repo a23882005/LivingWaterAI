@@ -454,6 +454,73 @@ def _radar(snapshot, reference):
             "canonical_snapshot": deepcopy(snapshot), "allow_unknown": True}
 
 
+def _owner_decision(source, evaluated, scope):
+    decision = source.get("owner_target_decision")
+    if decision is None:
+        return None
+    require(isinstance(decision, dict)
+            and decision.get("schema_version") == "Family.W8.OwnerTargetDecision.v1"
+            and decision.get("digest") == digest({k:v for k,v in decision.items() if k!="digest"})
+            and decision.get("client_id") == source["client_id"]
+            and decision.get("source_db_sha256") == source["source_db_sha256"]
+            and decision.get("snapshot_payload_sha256") == source["snapshot_payload_sha256"],
+            "W6_OWNER_DECISION_BINDING")
+    require(scope == "SOURCE_REVIEW" and decision.get("trade_authorization") == "NONE"
+            and decision.get("state") == "CONFIRMED_SELECTION_WEIGHTS_PENDING"
+            and source.get("current_confirmed_target_details") == [], "W6_OWNER_DECISION_SCOPE")
+    row = decision.get("original_row", {})
+    require(row.get("client_id") == source["client_id"] and row.get("field_key") == "funding_goal"
+            and row.get("value_state") == "KNOWN" and row.get("source_kind") == "OWNER_VERIFIED"
+            and decision.get("original_row_sha256") == digest(row)
+            and source.get("known_profile_original_rows") == [row], "W6_OWNER_DECISION_ORIGINAL_ROW")
+    require(decision.get("available_at") == row.get("updated_at_utc")
+            and _time(row.get("recorded_at_utc")) <= _time(decision["available_at"])
+            <= _time(decision.get("verified_cutoff")) <= _time(evaluated), "W6_OWNER_DECISION_FUTURE")
+    projection = decision.get("PM_projection", {})
+    expected_keys = {"excluded", "included_weight_pending", "weights_not_authorized",
+        "salary_contributions_amount_and_time", "existing_other_weights", "old_complete_target_version"}
+    require(isinstance(projection, dict) and set(projection) == expected_keys
+            and projection.get("existing_other_weights") == "UNCHANGED"
+            and projection.get("salary_contributions_amount_and_time") == "NOT_PROVIDED",
+            "W6_OWNER_DECISION_PROJECTION")
+    require(decision.get("evidence_sha256") == digest({"schema":"Family.PM.OwnerDecisionEvidence.v1",
+        "client_id":source["client_id"], "source_db_sha256":source["source_db_sha256"],
+        "original_table":"personal_profile_attribute", "original_row":row,
+        "PM_projection":projection, "trade_authorization":"NONE"}), "W6_OWNER_DECISION_EVIDENCE_DIGEST")
+    history = source.get("historical_confirmed_target_details")
+    require(isinstance(history,list) and len(history)==1 and decision.get("historical_targets")==history,
+            "W6_OWNER_DECISION_HISTORICAL_TARGET")
+    for key in ("excluded", "included_weight_pending"):
+        items = projection[key]
+        require(isinstance(items,list) and bool(items)
+                and all(isinstance(x,str) and re.fullmatch(r"[A-Z0-9][A-Z0-9._-]*",x) for x in items)
+                and len(set(items))==len(items), "W6_OWNER_DECISION_SELECTION")
+    excluded, added = set(projection["excluded"]), set(projection["included_weight_pending"])
+    prior = history[0]
+    tickers = {x["ticker"] for x in prior["allocations"]}
+    require(excluded<=tickers and not (excluded&added or added&tickers)
+            and _time(prior["confirmed_at_utc"]) < _time(decision["available_at"]),
+            "W6_OWNER_DECISION_HISTORICAL_TARGET")
+    expected = [{**deepcopy(x), "selection_state":"EXISTING_WEIGHT_UNCHANGED"}
+                for x in prior["allocations"] if x["ticker"] not in excluded]
+    expected.extend({"ticker":x,"label":x,"weight_units":None,"weight_fraction":None,
+                     "selection_state":"CONFIRMED_INSTRUMENT_WEIGHT_PENDING"}
+                    for x in projection["included_weight_pending"])
+    require(decision.get("selection_lines")==expected, "W6_OWNER_DECISION_UNAUTHORIZED_WEIGHT")
+    return deepcopy(decision)
+
+
+def _with_owner_decision(prepared, decision, source, binding):
+    if decision is not None:
+        require(binding.get("target_context") is None and binding.get("approved_target_transfer") is None
+                and binding.get("c7") is None, "W6_OWNER_DECISION_STALE_COMPLETE_TARGET")
+        prepared["owner_target_decision"] = decision
+        prepared["targets"] = []
+        prepared["lineage"]["owner_target_decision"] = deepcopy(decision)
+        prepared["lineage"]["source_positions_original"] = deepcopy(source["actual_position_records"])
+    return prepared
+
+
 def prepare_report_sources(source, market, engine):
     binding = engine.get("report_sources")
     if binding is None:
@@ -467,9 +534,10 @@ def prepare_report_sources(source, market, engine):
                           ("snapshot_payload_sha256", source.get("snapshot_payload_sha256"))):
         require(expected is not None and binding.get(key) == expected, "W6_REPORT_SOURCE_BINDING")
     require(binding.get("scope") in ("SOURCE_REVIEW", "CANONICAL_CALCULATION"), "W6_REPORT_SCOPE")
+    decision = _owner_decision(source, engine.get("evaluation_at"), binding["scope"])
     request = binding.get("request")
     if isinstance(request, dict) and request.get("schema_version") == "Family.W8.MemberV82Request.v1":
-        return _member_sources(source, market, engine, binding)
+        return _with_owner_decision(_member_sources(source, market, engine, binding), decision, source, binding)
     require(isinstance(request, dict) and request.get("schema_version") == "Family.W5.request.v1"
             and request.get("client_id") == source["client_id"] and request.get("run_id") == engine["run_id"]
             and request.get("evaluation_at") == engine["evaluation_at"]
@@ -528,7 +596,8 @@ def prepare_report_sources(source, market, engine):
         out["targets"], out["lineage"]["approved_target"] = resolve_targets(source, request.get("confirmed_target"), target_ctx)
     if c7 is None:
         require(binding["scope"] == "SOURCE_REVIEW", "W6_CANONICAL_C_SOURCE_REQUIRED")
-        return out
+        return _with_owner_decision(out, decision, source, binding)
+    require(decision is None, "W6_OWNER_DECISION_STALE_COMPLETE_TARGET")
     original = c7.get("original_source", {})
     w6 = original.get("work6_result", {})
     framework = c7.get("result", {})

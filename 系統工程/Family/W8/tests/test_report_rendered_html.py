@@ -51,6 +51,9 @@ class RenderedHTMLTests(unittest.TestCase):
             cls.financial_case['result'],source_id='SYNTHETIC_ALL_ASSET_PRODUCER',rules_sha='e'*64)
         cls.financial_current=F.D.build_w6_current_data(cls.financial_case['source'],**financial_inputs)
         cls.financial_rendered=F.R.render_current_w6(cls.financial_current,archive)
+        cls.owner_case=F.owner_decision_case(cls.folder/'synthetic-owner.sqlite')
+        cls.owner_current=F.current(cls.owner_case)
+        cls.owner_rendered=F.R.render_current_w6(cls.owner_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:
@@ -89,6 +92,47 @@ class RenderedHTMLTests(unittest.TestCase):
             financial_folder=target/'phase2_all_asset';financial_folder.mkdir(exist_ok=True)
             for name,raw in cls.financial_rendered['artifacts'].items():(financial_folder/name).write_bytes(raw)
             (financial_folder/'current.synthetic.json').write_text(json.dumps(cls.financial_current,ensure_ascii=False,indent=2),encoding='utf-8')
+            owner_folder=target/'owner_selection';owner_folder.mkdir(exist_ok=True)
+            for name,raw in cls.owner_rendered['artifacts'].items():(owner_folder/name).write_bytes(raw)
+            (owner_folder/'current.synthetic.json').write_text(json.dumps(cls.owner_current,ensure_ascii=False,indent=2),encoding='utf-8')
+
+    def test_owner_selection_is_current_and_pending_weights_have_no_pie(self):
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600}).new_page()
+        page.set_content(self.owner_rendered['artifacts']['report.html'].decode())
+        chapter=page.locator('[data-chapter="5"]')
+        text=' '.join(chapter.all_inner_texts())
+        self.assertIn('排除 NEW、加入 SYN_A／SYN_B，比例待定',text)
+        self.assertIn('已確認的目標標的選擇',text)
+        self.assertIn('舊版僅作歷史來源',text)
+        self.assertEqual(chapter.locator('svg').count(),0)
+        self.assertEqual(chapter.locator('tr').count(),5)
+        self.assertNotIn('Final Target v7',page.locator('[data-chapter="2"]').inner_text())
+        self.assertEqual(page.locator('#toc a').count(),13)
+        self.assertEqual(len(set(page.locator('[data-chapter]').evaluate_all('ns=>ns.map(n=>n.dataset.chapter)'))),14)
+        self.assertIsNone(self.owner_current['target_version'])
+        self.receipt['checks']['owner_confirmed_selection_pending_weights_no_pie']='PASS_SYNTHETIC'
+
+    def test_owner_selection_pdf_zip_and_all_saved_pages_match(self):
+        import fitz
+        from PIL import Image,ImageChops
+        r=self.owner_rendered
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600},device_scale_factor=1).new_page()
+        page.set_content(r['artifacts']['report.html'].decode());page.evaluate('document.fonts.ready')
+        pdf=fitz.open(stream=r['artifacts']['report.pdf'],filetype='pdf');self.addCleanup(pdf.close)
+        self.assertEqual(len(pdf),r['page_count'])
+        self.assertIn('SYN_A',''.join(p.get_text() for p in pdf))
+        for p in pdf:
+            for word in p.get_text('words'):
+                self.assertGreaterEqual(word[0],-1);self.assertLessEqual(word[2],p.rect.width+1)
+        with zipfile.ZipFile(io.BytesIO(r['artifacts']['report.zip'])) as z:
+            for name in ('report.html','report.pdf','index.html'):self.assertEqual(z.read(name),r['artifacts'][name])
+            for index in range(r['page_count']):
+                raw=page.locator('.page').nth(index).screenshot()
+                expected=z.read(f'pages/CR-IMG-{index+1:03d}.png')
+                self.assertIsNone(ImageChops.difference(Image.open(io.BytesIO(raw)).convert('RGB'),
+                    Image.open(io.BytesIO(expected)).convert('RGB')).getbbox())
+        self.receipt['owner_selection_page_count']=r['page_count']
+        self.receipt['checks']['owner_selection_pdf_zip_png_consistency']='PASS_SYNTHETIC'
 
     def test_partial_all_asset_eight_chapters_keep_known_facts_and_unknown_money(self):
         page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600}).new_page()

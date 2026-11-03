@@ -303,6 +303,53 @@ def db_review_case():
     return c
 
 
+def owner_decision_case(db_path, *, row_changes=None):
+    """Synthetic read-only profile seam; no real owner, ticker or quantity."""
+    import sqlite3
+    from hashlib import sha256
+    base=member_case();snapshot=deepcopy(base['request']['client_snapshot']['payload'])
+    snapshot['tables']['portfolio_account'][0]['account_label']='合成券商／合成帳戶'
+    row={'client_id':CLIENT,'field_key':'funding_goal','value_state':'KNOWN',
+         'value_text':'SYNTHETIC owner selection; approval projection is separately pinned.',
+         'value_integer':None,'value_real':None,'value_boolean':None,'value_date':None,
+         'source_kind':'OWNER_VERIFIED','source_reference':'SYNTHETIC_OWNER_DECISION',
+         'recorded_at_utc':'2026-10-01T00:00:00Z','updated_at_utc':'2026-10-15T00:00:00Z'}
+    row.update(row_changes or {})
+    with sqlite3.connect(db_path) as conn:
+        conn.execute('CREATE TABLE personal_profile_attribute ('+','.join(k+' TEXT' for k in row)+')')
+        conn.execute('INSERT INTO personal_profile_attribute VALUES ('+','.join('?' for _ in row)+')',list(row.values()))
+    snapshot['source_sha256']=sha256(Path(db_path).read_bytes()).hexdigest()
+    snapshot['payload_digest']=A.digest(snapshot['tables'])
+    evidence={'schema':'Family.PM.OwnerDecisionEvidence.v1','client_id':CLIENT,
+        'source_db_sha256':snapshot['source_sha256'],'original_table':'personal_profile_attribute',
+        'original_row':row,'PM_projection':{'excluded':['NEW'],'included_weight_pending':['SYN_A','SYN_B'],
+            'weights_not_authorized':['SYN_A=7%','SYN_B=7%'],
+            'salary_contributions_amount_and_time':'NOT_PROVIDED','existing_other_weights':'UNCHANGED',
+            'old_complete_target_version':'SYNTHETIC MAIN v7 historical'},'trade_authorization':'NONE'}
+    legacy=S.build_report_source(snapshot,account='AR',expected_client_id=CLIENT)
+    source=S.build_report_source(snapshot,account='AR',expected_client_id=CLIENT,
+        owner_decision=evidence,expected_owner_decision_digest=A.digest(evidence),
+        profile_db_path=db_path,evaluation_at=AT)
+    request={'schema_version':'Family.W5.request.v1','client_id':CLIENT,'run_id':'synthetic-owner-selection',
+        'evaluation_at':AT,'trade_authorization':'NONE','owner':{'client_id':CLIENT,'account':'SYNTH_ACCOUNT'},
+        'client_snapshot':{'payload':snapshot,'digest':A.digest(snapshot)}}
+    c={'source':source,'snapshot':snapshot,'request':request,'sections':{},'target_context':None,
+       'result':None,'c7':None,'legacy_source':legacy,'owner_evidence':evidence,'profile_path':str(db_path)}
+    common={'client_id':CLIENT,'source_db_sha256':snapshot['source_sha256'],
+            'run_id':request['run_id'],'data_provenance':'SOURCE_BACKED'}
+    c['market']={**common,'verified':False,'valuation_state':'UNKNOWN','market_as_of':AT,
+        'market_as_of_basis':'SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION'}
+    c['engine']={**common,'status':'DATA_UNAVAILABLE','evaluation_at':AT,'trade_authorization':'NONE'}
+    owner_decision_refresh(c)
+    return c
+
+
+def owner_decision_refresh(c):
+    c['source']['digest']=A.digest({k:v for k,v in c['source'].items() if k!='digest'})
+    c['engine']['report_sources']=A.make_report_sources(c['source'],c['request'],None,
+        sections=c['sections'],scope='SOURCE_REVIEW')
+
+
 def long_reference_case():
     """Long unbroken URL/path/hash and Chinese punctuation, all invented."""
     c=case()

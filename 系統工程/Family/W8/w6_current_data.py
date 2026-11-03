@@ -67,6 +67,9 @@ def build_w6_current_data(source, market, engine):
     unknown_nav=(source_review and market.get("valuation_state")=="UNKNOWN"
                  and market.get("verified") is False
                  and market.get("market_as_of_basis")=="SOURCE_REVIEW_TIME_NOT_MARKET_VALUATION")
+    decision=(prepared or {}).get("owner_target_decision")
+    if decision is not None and not unknown_nav:
+        raise ValueError("W6_OWNER_DECISION_SOURCE_REVIEW_UNKNOWN_NAV_REQUIRED")
     client=source["client_id"]
     same=(market.get("client_id")==engine.get("client_id")==client
           and market.get("source_db_sha256")==engine.get("source_db_sha256")==source["source_db_sha256"]
@@ -114,6 +117,12 @@ def build_w6_current_data(source, market, engine):
                 raise ValueError("W6_TARGET_WEIGHT_INVALID")
             rows.append({"代碼":row["ticker"],"顯示名稱":row.get("label") or row["ticker"],
                          "權重":str(Decimal(units)/Decimal(1000000)),"市值TWD":None})
+        if decision is not None:
+            # A known instrument choice does not authorize any new percentage.
+            rows=[{"代碼":r["ticker"],"顯示名稱":r.get("label") or r["ticker"],
+                   "權重":None if r["weight_units"] is None else str(Decimal(r["weight_units"])/Decimal(1000000)),
+                   "市值TWD":None,"selection_state":r["selection_state"]}
+                  for r in decision["selection_lines"]]
         if len({x["代碼"] for x in rows})!=len(rows):
             raise ValueError("W6_DUPLICATE_TARGET_SYMBOL")
         out={"schema_version":"Family.W8.W6CurrentData.v1",
@@ -131,6 +140,17 @@ def build_w6_current_data(source, market, engine):
              "report_scope":"SOURCE_REVIEW","data_provenance":"SOURCE_BACKED",
              "report_content_state":"SOURCE_REVIEW_READY__VALUATION_AND_FINANCIAL_PIPELINE_UNKNOWN",
              "trade_authorization":"NONE"}
+        if decision is not None:
+            out["target_decision"]=deepcopy(decision)
+            out["target_key"]=decision["historical_targets"][0]["target_key"]
+            out["target_version"]=None  # No current complete percentage revision.
+            out["report_content_state"]="SOURCE_REVIEW_READY__OWNER_SELECTION_WEIGHTS_PENDING"
+            labels=source.get("source_account_labels",{})
+            for row in out["source_position_records"]:
+                key=row["account_key"]
+                if labels.get(key) and labels[key]!=key:
+                    row["source_account_key"]=key
+                    row["account_key"]=labels[key]+"（"+key+"）"  # display only; raw IDs remain in lineage
         if "section_projection" in prepared["lineage"]:
             out["asset_coverage_summary"]=deepcopy(prepared.get("coverage_summary"))
             out["financial_section_status"]={k:{"value_state":v["value_state"],

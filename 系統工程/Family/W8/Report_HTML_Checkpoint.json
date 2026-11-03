@@ -374,6 +374,13 @@
       "status": "OWNER_APPROVED__PUBLISHED_AND_REMOTE_READBACK_VERIFIED",
       "frozen_business_files": 15,
       "frozen_business_bytes": 286561,
+      "publication_receipt": {
+        "file_name": "Family_PR60_Lilian修正版_核准公開發布收據_20261103.json",
+        "location": "Google Drive根目錄／TEMP",
+        "bytes": 4296,
+        "sha256": "fdf7c53bf2b6f278623620638e3e572f62f9e31e95f9c7cadb201491690b0417",
+        "status": "OWNER_APPROVED__PUBLICATION_AND_REMOTE_READBACK_AND_CI_PASS"
+      },
       "previous_automatic_rejection": "HISTORICAL__RESOLVED_BY_OWNER_APPROVAL_AND_PUBLICATION_AT_61ce0851",
       "private_DB_reports_images": "REMAIN_PRIVATE"
     },

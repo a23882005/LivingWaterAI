@@ -2,6 +2,8 @@
 
 中 PM 已獨立驗收 **PASS_LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY**，接受業務版本 `61ce0851f9f47c7a856bdf7462abb9633110ea51`／tree `7d430d281f7317e50dd210feb2370ef2b4567e9d`，與施工封存 `782e8a19b3cc63a38c5077eb26514e9e36d37c09` 同 tree。正式裁定：Google Drive 根目錄／TEMP／`PM_PR60_782e8a1_Lilian修正版_獨立驗收裁定_20261103.md`，6524 bytes，SHA256 `1f1ee5e1041aeabc1dfa6c1f067f4c6a1bd728651336aa0a9db984a7dec1a27e`；[中 PM 發布完成與本線回寫交辦](https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6595348307)。裁定封存時的公開待授權已由 Owner 核准及 `61ce0851` 發布完成更新。
 
+核准公開發布收據：Google Drive 根目錄／TEMP／`Family_PR60_Lilian修正版_核准公開發布收據_20261103.json`，4296 bytes，SHA256 `fdf7c53bf2b6f278623620638e3e572f62f9e31e95f9c7cadb201491690b0417`。收據確認指揮官已核准固定 15 檔／286561 bytes 公開、`61ce0851` 發布及逐檔讀回一致、同版本 CI 通過；這批程式不再重複發布。
+
 工單 `FAMILY-REPORT-OWNER-DECISION-20261103-r1`，依 [中 PM 公開施工留言](https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746)，base `661c8ace`。本次只回寫 `Report_HTML_Checkpoint.json` 與本 README，並更新原私人入口／回寫收據；業務程式及原報告保持。Lilian 16 頁／22 張來源卡／5 件私人正式保存檔已通過，舊 26 頁分析、其他三戶、原 137 頁／20 件與 77 頁／20 件、第一與第二階段及歷史 PASS 保留。
 
 W5 snapshot 未納入 profile 時，報表來源可用可信 operator 設定補充同一正式 DB 的原列。`formal_report_source.build_report_source` 新增 `owner_decision`、`expected_owner_decision_digest`、`profile_db_path`、`evaluation_at`，四項須完整具備。先驗已核實 PM 原件的完整 digest，再以 SQLite `mode=ro`／`query_only` 讀本人 `funding_goal` 的 KNOWN／OWNER_VERIFIED 原列，逐值相等並核前後 DB SHA、snapshot SHA 及可得時間。原文與 PM 結構投影各自保存，不把自由文字解析成比例核准。公開選單參數沒有增加。

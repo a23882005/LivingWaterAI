@@ -62,6 +62,21 @@ def test_latest_value_holding_counts_without_unknown_quantity_becoming_zero(case
     assert not out['database_written']
 
 
+def test_official_annual_plan_does_not_remove_actual_session_attestation_gap(case):
+    from tpex_calendar_source import SCOPE
+    from hashlib import sha256
+    import json
+    req,coverage=request(case);source=case.market('SGOV')
+    path=Path(source['calendar_source']['local_path']);calendar=json.loads(path.read_bytes())
+    calendar['scope']=SCOPE;calendar['actual_session_coverage_verified']=False
+    path.write_text(json.dumps(calendar));source['calendar_source']['sha256']=sha256(path.read_bytes()).hexdigest()
+    case.config['market_sources']={'SGOV':source}
+    out=C.build(req,case.config,coverage,case.config['repo_root']);bond=out['bonds'][0]
+    assert bond['market']['observed_close'] is not None
+    assert any(r['reason']==SCOPE for r in bond['missing_inputs'])
+    assert not bond['full_financial_complete']
+
+
 def test_missing_one_bond_history_does_not_erase_other_outputs(case):
     req,coverage=request(case);case.config['market_sources']={'SGOV':case.market('SGOV')}
     out=C.build(req,case.config,coverage,case.config['repo_root'])

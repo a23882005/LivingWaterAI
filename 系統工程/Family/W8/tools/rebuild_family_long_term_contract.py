@@ -75,7 +75,7 @@ files=['work7/family_long_term.py','work7/asset_framework.py','C8C9_RUNTIME/C8C9
  '../../Family/W5/v82_slice_bridge.py','../../Family/W5/family_runner.py','../../Family/W8/deployment_c7_sources.py',
  '../../Family/W8/member_financial_chain.py','../../Family/W8/member_funding_summary.py','../../Family/W8/native_asset_source.py','../../Family/W8/member_financial_producer.py','../../Family/W8/family_c7_source_assembly.py','../../Family/W8/w1_portfolio_observations.py','../../Family/W8/c7_source_qualification.py','../../Family/W8/same_run_market_cache.py',
  '../../Family/W5/official_holdings_source.py','../../Family/W8/member_v82_analysis.py',
- '../../Family/W8/member_market_source.py','../../Family/W8/all_asset_coverage.py',
+ '../../Family/W8/member_market_source.py','../../Family/W8/all_asset_coverage.py','../../Family/W8/tpex_calendar_source.py',
  '../../Family/W5/mentor_bridge.py','../../Family/W5/mentor_scope.py','../../Family/W5/mentor_advice_scope.schema.json',
  '../../Family/W8/契約/FAMILY_MENTOR_SCOPE_CONSUMER_Producer介面_v1.0_20261031.md',
  '../../Family/W8/approved_v04_technical.py','../../Family/W5/technical_source_bridge.py','../../Family/W8/tools/rebuild_family_long_term_contract.py',

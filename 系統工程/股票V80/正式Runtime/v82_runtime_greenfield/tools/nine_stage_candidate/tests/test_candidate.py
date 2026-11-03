@@ -327,3 +327,82 @@ def test_compact_daily_keeps_decisions_and_latest_full_lineage():
     for a,b in zip(full,compact):
         assert all(a[k]==b[k] for k in ('Date','M','R','right','eligibility','stage','normal_mode','financial_result'))
     assert full[-1]==compact[-1]
+
+
+def availability_case():
+    # Synthetic QA exercises the SOURCE_BACKED availability branch. None of
+    # these prices, quantiles or calendar dates is customer market evidence.
+    days=('05','06','07','08','09','12','13','14')
+    bars=[dict(Date='2026-01-'+d,Open='100',High='101',Low='99',Close='100',Volume='1000',
+        session_close_at='2026-01-'+d+'T21:00:00Z',available_at='2026-01-'+d+'T22:00:00Z') for d in days]
+    inp=[dict(depth='0.1',qp='80',qv='30',valuation_legal=True,fundamental=True,
+        up=False,a_normal=True) for _ in bars]
+    source={**SOURCE,'data_provenance':'SOURCE_BACKED','decision_cutoff':'2026-01-14T23:00:00Z'}
+    return bars,inp,source
+
+
+@pytest.mark.parametrize('profile',E.PROFILES)
+@pytest.mark.parametrize('excluded,interior',[
+    ((3,),True),((2,3),True),((6,7),False),((0,1),False)])
+def test_filtered_availability_preserves_real_segment_boundaries(profile,excluded,interior):
+    bars,inp,source=availability_case()
+    for index in excluded:bars[index]['available_at']='2026-01-16T00:00:00Z'
+    original=deepcopy(bars)
+    out=E.replay(bars,inp,source=source,profile=profile,enabled=True)
+    accepted=[b for i,b in enumerate(bars) if i not in excluded]
+    bound_inputs=[x for i,x in enumerate(inp) if i not in excluded]
+    assert [r['Date'] for r in out]==[r['Date'] for r in accepted]
+    assert bars==original
+    if not interior:
+        assert out==E.replay(accepted,bound_inputs,source=source,profile=profile,enabled=True)
+        assert out[-1]['primitive_values']['MA5']==D(100)
+        assert not any(r['right']['reason']=='INVALIDATED_SEGMENT_BOUNDARY' for r in out)
+        return
+    first_post=max(excluded)+1
+    suffix=E.replay(bars[first_post:],inp[first_post:],source=source,profile=profile,enabled=True)
+    assert out[-1]['primitive_values']['MA5'] is None
+    for actual,reference in zip(out[-len(suffix):],suffix):
+        assert actual['primitive_values']==reference['primitive_values']
+        assert actual['M']==reference['M'] and actual['R']==reference['R']
+        assert actual['low_reference']==reference['low_reference']
+    assert out[-len(suffix)]['right']['reason']=='INVALIDATED_SEGMENT_BOUNDARY'
+
+
+@pytest.mark.parametrize('profile',E.PROFILES)
+def test_incomplete_interior_session_also_restarts_windows(profile):
+    bars,inp,source=availability_case()
+    bars[3]['session_close_at']='2026-01-15T21:00:00Z'
+    out=E.replay(bars,inp,source=source,profile=profile,enabled=True)
+    assert out[-1]['primitive_values']['MA5'] is None
+    assert out[3]['right']['reason']=='INVALIDATED_SEGMENT_BOUNDARY'
+
+
+@pytest.mark.parametrize('profile',E.PROFILES)
+def test_filtered_gap_invalidates_live_episode_and_causal_pivot_r10_history(profile):
+    bars=rows();inp=inputs(bars)
+    # A strict trough (rather than the equal adjacent lows of rows()) must
+    # establish a live baseline episode before testing its invalidation.
+    for b in bars:
+        close=D(b['Close'])
+        b.update(Open=b['Close'],High=str(close+D('.3')),Low=str(close-D('.3')))
+    from datetime import date,timedelta
+    day=date(2024,1,2)
+    for b in bars:
+        while day.weekday()>4:day+=timedelta(days=1)
+        b.update(Date=day.isoformat(),session_close_at=day.isoformat()+'T21:00:00Z',
+            available_at=day.isoformat()+'T22:00:00Z')
+        day+=timedelta(days=1)
+    source={**SOURCE,'data_provenance':'SOURCE_BACKED','decision_cutoff':'2026-01-14T23:00:00Z'}
+    original=E.replay(bars,inp,source=source,profile=profile,enabled=True)
+    live=next(i for i,r in enumerate(original[:-3]) if r['right']['episode'] is not None)
+    gap=live+1;bars[gap]['available_at']='2026-01-16T00:00:00Z'
+    out=E.replay(bars,inp,source=source,profile=profile,enabled=True)
+    post=out[gap:];fresh=E.replay(bars[gap+1:],inp[gap+1:],source=source,profile=profile,enabled=True)
+    assert post[0]['right']['reason']=='INVALIDATED_SEGMENT_BOUNDARY'
+    assert post[0]['right']['episode'] is None
+    for i,(actual,reference) in enumerate(zip(post,fresh)):
+        assert actual['M']==reference['M'] and actual['R']==reference['R']
+        assert actual['low_reference']==reference['low_reference']
+        if i<34:assert actual['R'][9] is None
+        episode=actual['right']['episode']
+        if episode is not None:assert episode['b']>=gap

@@ -70,7 +70,7 @@ def _rows(rows, inputs, source):
         raise ValueError('EXPLICIT_MARKET_IDENTITY_REQUIRED')
     if source.get('data_provenance') not in ('SOURCE_BACKED', 'SYNTHETIC'):
         raise ValueError('DATA_PROVENANCE_REQUIRED')
-    accepted = []; bound_inputs = []; previous = None
+    accepted = []; bound_inputs = []; previous = None; excluded_after_accepted = False
     for row, inp in zip(rows, inputs):
         if not isinstance(row.get('Date'), str) or previous is not None and row['Date'] <= previous:
             raise ValueError('DATES_NOT_STRICTLY_INCREASING')
@@ -82,8 +82,12 @@ def _rows(rows, inputs, source):
             if not cutoff or not available or not close:
                 raise ValueError('COMPLETED_SESSION_AND_AVAILABILITY_REQUIRED')
             if max(_stamp(available), _stamp(close)) > _stamp(cutoff):
+                excluded_after_accepted = bool(accepted)
                 continue
         clean = deepcopy(row)
+        if excluded_after_accepted:
+            clean['segment_break'] = True
+            excluded_after_accepted = False
         for key in ('Open', 'High', 'Low', 'Close', 'Volume'):
             value = number(row.get(key), minimum=0)
             if key != 'Volume' and value is not None and value <= 0:

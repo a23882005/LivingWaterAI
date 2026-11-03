@@ -2637,7 +2637,12 @@
       "scope": "OWNER_DECISION_SOURCE_AND_SCOPED_TARGET_PRESENTATION_ONLY__NO_FINANCIAL_RECALCULATION",
       "renderer_exception": "ONLY_TARGET_SUMMARY_TARGET_CHAPTER_AND_DEPENDENT_DRIFT_STATE_BRANCH__APPROVED_STYLE_UNCHANGED",
       "next": "FIX_MEMBER_SPECIFIC_SOURCE_REVIEW_AND_RETURN_FIVE_NEW_ARTIFACTS",
-      "ACK": "PENDING"
+      "ACK": "PENDING",
+      "current_work_order": {
+        "bytes": 6819,
+        "sha256": "b38fc816f822389bcdad9c4664f45021a7e0c2a95834f5419fb5d5fe626079f7",
+        "scope": "UNCHANGED__DOCS_WRITEBACK_RECEIPT_AND_IMMEDIATE_NEXT_STEP_CONSOLIDATED"
+      }
     },
     "previous_phase2_PASS": "PRESERVED_EIGHT_CHAPTER_COMPATIBILITY_AND_SAVE_SCOPE__TARGET_DECISION_PROJECTION_FIX_PENDING",
     "PR60_docs_writeback_observed": {
@@ -2649,5 +2654,43 @@
     "production": "HOLD",
     "trading": "NONE",
     "physical_UAT": "DEFERRED"
+  },
+  "pm_report_phase2_docs_writeback_acceptance_20261103": {
+    "status": "PASS_DOCS_WRITEBACK_RECEIVED",
+    "docs_commit": "661c8acef3c544bee0d5c144258f5d843e79463b",
+    "docs_tree": "ecfa6d160a47dd7be76ae78e9ee070601166a284",
+    "changed_files": 2,
+    "remote_bytes_sha_blob": "PASS_BOTH_FILES",
+    "ci": {
+      "id": 41556916762,
+      "head": "661c8acef3c544bee0d5c144258f5d843e79463b",
+      "status": "completed",
+      "conclusion": "success",
+      "conditional_steps_not_selected": 14
+    },
+    "private_receipt": {
+      "filename": "Family_PR60_第二階段驗收PASS_回寫讀回收據_20261103_090153_TW.json",
+      "bytes": 17842,
+      "sha256": "7d199baa249094333f37aa37e3d075fc5419a4c97f6f11432d98c9e17b4fc5a2",
+      "fresh_download": "PASS"
+    },
+    "entry_readback": {
+      "bytes": 12476,
+      "sha256": "316117697f334123d6a3ff40195594272825444b8030cb4996957db2ce5468c1",
+      "same_id": true
+    },
+    "previous_PASS": "PRESERVED",
+    "next_report_step": "EXECUTE_EXISTING_LILIAN_SOURCE_AND_OWNER_DECISION_DISPLAY_CORRECTION__FIVE_MEMBER_ARTIFACTS_ONLY",
+    "current_work_order": {
+      "filename": "Family_PR60_Lilian最新決定與持股補回_修正單_20261103.md",
+      "bytes": 6819,
+      "sha256": "b38fc816f822389bcdad9c4664f45021a7e0c2a95834f5419fb5d5fe626079f7",
+      "same_id_update": true,
+      "dispatch": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746"
+    },
+    "full_financial_amounts": "PM_SUPPLIES_QUALIFIED_RESULT_SEPARATELY__DOES_NOT_BLOCK_CURRENT_SOURCE_REVIEW_FIX",
+    "no_new_reports_this_ack": true,
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

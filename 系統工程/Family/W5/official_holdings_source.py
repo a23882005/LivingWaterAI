@@ -54,6 +54,48 @@ def holding_quote_currency(row):
         'scope':'ACCEPTED_PER_SHARE_PRICE_UNIT__NO_FX_OR_VENUE_ASSERTION','registry_written':False}
 
 
+def _confirmed_quantity_positions(runs, items, ledger, by_key):
+    """Bind explicit owner corrections to their original account/instrument row."""
+    candidates={}
+    for run in runs:
+        current=[r for r in items if r['run_id']==run['run_id'] and r.get('domain_code')=='HOLDING']
+        symbols={r['entity_key'] for r in current if r['field_key']=='record_basis'
+            and r['value_state']=='KNOWN' and r.get('value_text')=='OWNER_CONFIRMED_QUANTITY_CORRECTION'}
+        for symbol in symbols:
+            fields={}
+            for fact in current:
+                if fact['entity_key']==symbol:fields.setdefault(fact['field_key'],[]).append(deepcopy(fact))
+            def known(key):
+                rows=fields.get(key,[])
+                if len(rows)!=1 or rows[0]['value_state']!='KNOWN':
+                    raise ValueError('OWNER_QUANTITY_CORRECTION_FIELD_AMBIGUOUS')
+                return rows[0]
+            quantity=known('quantity');broker=known('broker')
+            if not broker.get('value_text'):raise ValueError('OWNER_QUANTITY_CORRECTION_BROKER_REQUIRED')
+            value=_quantity(quantity.get('value_text'))
+            if value is None:raise ValueError('OWNER_QUANTITY_CORRECTION_QUANTITY_REQUIRED')
+            observed=quantity.get('source_observed_at_utc') or run['as_of_utc']
+            exact=[r for r in ledger if r['symbol']==symbol and r['quantity'] is not None
+                and Decimal(r['quantity'])==Decimal(value) and r['observed_at']==observed
+                and r['source_row'].get('position_source_reference')==quantity.get('source_reference')]
+            if len(exact)!=1:raise ValueError('OWNER_QUANTITY_CORRECTION_POSITION_BINDING_REQUIRED')
+            original=exact[0];instrument=by_key[original['instrument_key']]
+            if instrument.get('ticker')!=symbol:raise ValueError('OWNER_QUANTITY_CORRECTION_INSTRUMENT_CONFLICT')
+            row={'symbol':symbol,'quantity':value,'account_key':original['account_key'],
+                'instrument_key':original['instrument_key'],'instrument':deepcopy(instrument),
+                'currency':instrument.get('quote_currency'),'broker_label':broker['value_text'],
+                'source_kind':'OWNER_CONFIRMED_QUANTITY','source_run_id':run['run_id'],
+                'source_row':deepcopy(quantity),'source_fields':fields,
+                'source_position_row':deepcopy(original['source_row']),
+                'observed_at':observed,'received_at':run['as_of_utc'],
+                'quantity_is_known':True,'settlement_asserted':False}
+            key=(original['account_key'],original['instrument_key']);order=(_time(observed),run.get('version_no',0))
+            previous=candidates.get(key)
+            if previous is None or order>previous[0]:candidates[key]=(order,row)
+            elif order==previous[0] and row!=previous[1]:raise ValueError('OWNER_QUANTITY_CORRECTION_AMBIGUOUS')
+    return [deepcopy(value[1]) for key,value in sorted(candidates.items())]
+
+
 def project_official_holdings(snapshot, *, evaluation_at=None):
     """Resolve source quantities; never sum representations of the same holding.
 
@@ -118,7 +160,9 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
         if len(latest) != 1:
             raise ValueError('HOLDINGS_SOURCE_RUN_AMBIGUOUS')
         chosen.extend(latest)
-    positions, cash, corrections = [], [], []
+    positions=_confirmed_quantity_positions(runs,items,ledger,by_key)
+    owner_positions=deepcopy(positions);historical_values=[]
+    cash, corrections = [], []
     for kind, run, current, relevant in chosen:
         for item in relevant:
             if kind == 'W6':
@@ -141,6 +185,14 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
             for original in rows:
                 row = deepcopy(original)
                 symbol = row['symbol']
+                newer=[p for p in owner_positions if p['symbol']==symbol
+                    and _time(p['observed_at'])>_time(run['as_of_utc'])]
+                if kind=='CONFIRMED_VALUE' and newer:
+                    historical_values.append({'symbol':symbol,'source_run':deepcopy(run),
+                        'source_row':deepcopy(item),'source_fields':[deepcopy(f) for f in current
+                            if f.get('domain_code')==item.get('domain_code') and f['entity_key']==symbol],
+                        'scope':'HISTORICAL_REPORTED_VALUE__LATER_EXPLICIT_QUANTITY_CORRECTION'})
+                    continue
                 matches = registry.get(symbol, [])
                 if len(matches) > 1:
                     raise ValueError('HOLDINGS_INSTRUMENT_AMBIGUOUS')
@@ -214,8 +266,12 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
     unresolved_accounts = {symbol for symbol in selected_symbols if
         len({r['account_key'] for r in ledger if r['symbol'] == symbol}) > 1
         and any(p['symbol'] == symbol and p.get('account_key') is None for p in positions)}
+    replaced={(p.get('account_key'),p.get('instrument_key')) for p in positions
+        if p.get('account_key') is not None and p.get('instrument_key') is not None}
     ledger_only = [r for r in ledger if r['symbol'] not in selected_symbols
-        or r['symbol'] in unresolved_accounts]
+        or r['symbol'] in unresolved_accounts or (
+            not any(p['symbol']==r['symbol'] and p.get('account_key') is None for p in positions)
+            and (r['account_key'],r['instrument_key']) not in replaced)]
     overlap = sorted(set(overlap) | unresolved_accounts)
     registered = set(registry)
     return {'schema_version': 'Family.W8.OfficialHoldingsProjection.v1',
@@ -229,7 +285,9 @@ def project_official_holdings(snapshot, *, evaluation_at=None):
         'source_layer_conflicts': overlap, 'source_layers_preserved': True,
         'unresolved_account_representations': sorted(unresolved_accounts),
         'cash_settlement_asserted': False, 'database_written': False,
-        'trade_authorization': 'NONE'}
+        'trade_authorization': 'NONE',
+        **({'historical_reported_holding_values':historical_values,
+            'explicit_owner_quantity_corrections':owner_positions} if owner_positions else {})}
 
 
 def build_official_position_view(snapshot, account, evaluation_at, acceptance, account_scope):

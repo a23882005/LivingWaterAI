@@ -271,3 +271,26 @@ One isolated candidate correction is required: _rows drops an unavailable interi
 PM independently accepted the eight-chapter SOURCE_REVIEW connection at 81a1bdf (tree76ff298d): 16 remote files match, four frozen inputs reproduce exactly with 2310 original fields preserved, 266 main tests and 149 subcases independently pass. Sealed worker evidence separately covers 281 main / 149 subcases including 15 Chromium cases. Same-head CI41552900597 success covers its existing workflow only.
 
 Four new reports total137 pages (42/44/25/26), with274 source cards and20 formally saved files freshly downloaded and verified for bytes/SHA/private member parent. PM checked actual PDF/HTML source text and bounds; all137 ZIP PNGs decode. Approved mother/renderer, old77 pages/20 files and phase1 PASS remain. Original report Codex completes scoped documentation writeback; PM supplies qualified financial sources and amounts for the next content update. Full financial PASS and real cycles remain0; Production HOLD/trading NONE; PR60 Draft/unmerged. Formal acceptance and instructions: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592485664 . Private verdict/evidence filenames and hashes are in Checkpoint.
+
+
+### 2026/11/03 four-member source recovery and scoped continuation
+
+PM freshly retrieved all four official DBs and recovered one member's previously staged, owner-confirmed source rows into the same canonical Drive ID. Backup, fresh source check, append-only132-row recovery, preservation of all old rows/37 unrelated tables, schema/triggers, full remote bytes/SHA and original W5/report-source reads passed. Private evidence includes the corrected original holdings/account facts, newer owner decision and broker readback qualifications; no investment amounts or private DB hashes are published here.
+
+The original financial Codex receives the new source package to rebuild changed-member native request/result bindings and continue four-member financial work: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6592917468 . Separately, the original report Codex receives a precise correction for a newer owner target decision omitted by the existing snapshot/source projection; renderer permission is limited to target-summary/target-chapter/dependent-drift conditional display, preserving approved styling and other members: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746 . Existing eight-chapter/compatibility/save PASS remain; this target-decision correction is tracked separately. Full financial PASS/cycles remain0, Production HOLD/trading NONE.
+
+
+### 2026/11/03 report phase2 documentation handback received
+
+PM verified docs-only661c8ace: exactly two report-line files match the private receipt in bytes/SHA/blob, same-ID entry freshly matches, CI41556916762 completed/success at that head. Prior phase2 PASS and137-page/20-file plus77-page evidence remain. Documentation writeback is complete.
+
+The existing same-ID report work order now includes this receipt acceptance and one immediate next step: execute the scoped member-source/latest-owner-decision display correction and return five updated member artifacts. The other three reports remain. The current MD supersedes the source ZIP's embedded dispatch snapshot for this acknowledgement/next-step text; implementation scope is unchanged. Dispatch: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746 . Exact private filenames/digests are in Checkpoint. Production HOLD/trading NONE.
+
+
+### 2026/11/03 PR59 80e635e scoped independent acceptance
+
+PM accepted the filtered-interior-bar correction and TPEx annual-plan source integration at80e635e. Original defect closes asCLOSED_PASS. Independent W5 556 / W8 892 main cases plus60 W8 subcases pass;84 candidate cases are a subset. The original counterexample now returns MA5=None, all161 dependency hashes pass, six same-head PR CI runs succeed, and the official artifact digest matches the archived raw ZIP/JUnit.
+
+The restored base865 and delta228 private paths,137 inherited sources and10 remote worker files are verified with0 overwrites. Six official annual documents reproduce1229 planned sessions. Actual ad-hoc closure/history qualification and coherent CPAI final-bar sourcing remain scoped follow-on work. Frozen four-member source/digest and saved replay evidence is verified; the extra relocated full Menu04 replay attempt is not counted because canonical-runtime binding blocked it. Prior dd36143 cold-replay PASS remains.
+
+Original V82 Codex now consumes the already-dispatched owner-source recovery and continues TPEx actual-session / CPAI final-day sources under the existing contract. Formal financial PASS/cycles remain0; Production HOLD/trading NONE; Draft PR retained. Acceptance/continuation: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6593250716 . Private verdict/evidence filenames and hashes are in Checkpoint.

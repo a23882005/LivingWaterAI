@@ -26,6 +26,12 @@ def missing(field, producer, reason, affects, *, kind='EXTERNAL_SOURCE_OR_APPROV
 
 
 def target_source(snapshot, config, evaluation_at):
+    from owner_target_decision_source import project
+    historical=_historical_target_source(snapshot,config,evaluation_at)
+    return project(snapshot,config,evaluation_at,historical)
+
+
+def _historical_target_source(snapshot, config, evaluation_at):
     approved = read_confirmed_weights(snapshot, evaluation_at=evaluation_at)
     if approved is not None:
         if config.get('official_target_base_source') is not None:
@@ -90,9 +96,12 @@ def universe(snapshot, target, evaluation_at, repo_root):
         entry = by_symbol.setdefault(fact['symbol'], {'symbol': fact['symbol'], 'holdings': [], 'targets': []})
         entry['holdings'].append(deepcopy(fact))
     for line in target['payload']['draft']['target_lines']:
-        if line['weight']['value_state'] != 'KNOWN':
+        pending=(target.get('complete_allocation') is False
+            and line.get('selection_state')=='CONFIRMED_INSTRUMENT_WEIGHT_PENDING'
+            and line.get('ticker') in (target.get('owner_selection_decision') or {}).get('included_weight_pending',[]))
+        if line['weight']['value_state'] != 'KNOWN' and not pending:
             raise ValueError('MEMBER_APPROVED_WEIGHT_UNRESOLVED')
-        if Decimal(str(line['weight']['value'])) == 0 and line.get('ticker') not in by_symbol:
+        if not pending and Decimal(str(line['weight']['value'])) == 0 and line.get('ticker') not in by_symbol:
             continue
         key = line.get('ticker') or line['instrument_id']
         entry = by_symbol.setdefault(key, {'symbol': line.get('ticker'), 'holdings': [], 'targets': []})
@@ -109,12 +118,22 @@ def universe(snapshot, target, evaluation_at, repo_root):
         raise PermissionError('MEMBER_BOND_APPLICABILITY_SOURCE_MISMATCH')
     from v75_runtime.work3 import US_LISTED_ASSETS, TW_LISTED_ASSETS
     registered = [r for r in snapshot['tables']['portfolio_instrument'] if r.get('ticker')]
-    if len({r['ticker'] for r in registered}) != len(registered):
-        raise ValueError('MEMBER_INSTRUMENT_LISTING_AMBIGUOUS')
-    registry = {r['ticker']: r for r in registered}
+    registry={}
+    for row in registered:registry.setdefault(row['ticker'],[]).append(row)
     assets = []; excluded = []
     for key, entry in sorted(by_symbol.items()):
-        symbol = entry['symbol']; instrument = registry.get(symbol)
+        symbol = entry['symbol']; candidates=registry.get(symbol,[])
+        instrument=candidates[0] if len(candidates)==1 else None
+        if len(candidates)>1:
+            keys={p.get('instrument_key') for p in entry['holdings'] if p.get('source_kind')=='OWNER_CONFIRMED_QUANTITY'}
+            anchored=[r for r in candidates if r['instrument_key'] in keys]
+            if len(anchored)!=1:raise ValueError('MEMBER_INSTRUMENT_LISTING_AMBIGUOUS')
+            instrument=anchored[0]
+            if any(any(r.get(k) is not None and instrument.get(k) is not None and r[k]!=instrument[k]
+                    for k in ('instrument_type','quote_currency','exchange_code','isin')) for r in candidates):
+                raise ValueError('MEMBER_INSTRUMENT_LISTING_AMBIGUOUS')
+            entry.update(instrument_identity_candidates=deepcopy(candidates),
+                analysis_instrument_binding='EXPLICIT_OWNER_POSITION_KEY__TARGET_ALIAS_NOT_ATTESTED')
         if instrument is None:
             instrument = next((t.get('source_instrument_row') for t in entry['targets']
                                if t.get('source_instrument_row')), None)
@@ -218,6 +237,11 @@ def build_report(request, config, repo_root):
             'valuation_observations': [], 'issuer_facts': read_issuer_facts(
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
+        if asset.get('analysis_instrument_binding'):
+            row['missing_inputs'].append(missing('target.listing_identity',
+                'original holding instrument and target registry rows',
+                asset['analysis_instrument_binding'],['formal target-to-holding financial join'],
+                kind='SOURCE_IDENTITY_QUALIFICATION_REQUIRED'))
         if market:
             from v82_core_source import read as read_core_source
             core_source=read_core_source(config.get('core_sources',{}).get(symbol),request,symbol)
@@ -312,6 +336,10 @@ def build_report(request, config, repo_root):
     from all_asset_coverage import build as build_all_asset_coverage
     report['all_asset_coverage'] = build_all_asset_coverage(request,config,coverage,repo_root,
         ledger_resource=ledger_resource)
+    if config.get('position_valuation_inputs') is not None:
+        from member_position_valuation import produce
+        report['source_position_valuations']=produce(request,report['all_asset_coverage'],rows,
+            config['position_valuation_inputs'])
     report['report_digest'] = digest(report)
     return report
 

@@ -68,7 +68,8 @@ def build(request, config, coverage, repo_root, *, ledger_resource=None):
             row['market']['rows'] = len(market['completed_rows'])
             row['call_trace'] += market['call_trace']
             if any(tag in market.get('calendar_scope','') for tag in ('PROXY','NOT_ATTESTED')):
-                row['missing_inputs'].append({'field':'calendar.authoritative_venue_schedule',
+                row['missing_inputs'].append({'field':'calendar.historical_availability' if
+                    market.get('calendar_completed_window_verified') else 'calendar.authoritative_venue_schedule',
                     'reason':market['calendar_scope'],'responsibility':'MARKET_SOURCE_ADAPTER',
                     'affects':['formal_deployment_qualification']})
             if parameters:

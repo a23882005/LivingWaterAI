@@ -133,6 +133,11 @@ class SourceAssembler:
 
     def approved(self,identities):
         req=self.request;target=req['confirmed_target'];draft=target['payload']['draft']
+        if target.get('complete_allocation') is False:
+            return self.field('approved_long_term_target',None,state=ADAPTER,
+                code='C7_CURRENT_OWNER_TARGET_WEIGHTS_NOT_SPECIFIED',
+                sources=[{'original_owner_selection':deepcopy(target.get('owner_selection_decision')),
+                    'historical_target_digest':target.get('historical_target_digest')}])
         evidence=target['payload'].get('confirmation_evidence',{});projection=self.context.get('native_target_source')
         if projection is None and self.currency:
             from native_target_source import produce

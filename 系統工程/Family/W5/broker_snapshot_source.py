@@ -90,7 +90,9 @@ def read(request,source):
         'source_reference':'IBKR.get_account_orders:working_only','issues':[]}
     if manifest.get('orders'):
         item=manifest['orders']
-        if item.get('arguments')!={'show_completed':False}:
+        mixed=(item.get('arguments')=={'show_completed':True}
+            and item.get('source_mode')=='MIXED_HISTORY_OBSERVATIONS_ONLY')
+        if item.get('arguments')!={'show_completed':False} and not mixed:
             raise PermissionError('BROKER_WORKING_ORDER_SCOPE_REQUIRED')
         try:
             raw_orders=response(item,'get_account_orders').get('orders')
@@ -120,16 +122,32 @@ def read(request,source):
                     'state':state,'order_qty':total,'confirmed_filled_qty':filled,
                     'remaining_qty':remaining,'provider_status':status,'order_time':raw['order_time'],
                     'limit_price':number(raw['limit_price'])})
-            order_source.update(status='BROKER_WORKING_EXPOSURE_VERIFIED',active_orders=parsed,
-                complete_for_open_order_exposure=True,lifecycle_fully_resolved=not caveat,
-                exposure_scope='CONSERVATIVE_REPLACEMENT_EXPOSURE' if caveat else 'BROKER_WORKING_ORDER_SNAPSHOT')
+            order_source.update(status='BROKER_ORDER_OBSERVATIONS_ONLY' if mixed else 'BROKER_WORKING_EXPOSURE_VERIFIED',active_orders=parsed,
+                complete_for_open_order_exposure=not mixed,lifecycle_fully_resolved=not mixed and not caveat,
+                exposure_scope='MIXED_COMPLETED_QUERY__SUCCESSORS_AND_RELEASES_NOT_RECONCILED' if mixed else
+                    'CONSERVATIVE_REPLACEMENT_EXPOSURE' if caveat else 'BROKER_WORKING_ORDER_SNAPSHOT')
+            if mixed:order_source['original_query']={'show_completed':True}
         except (ValueError,KeyError) as error:
             order_source['issues'].append(str(error))
+    quality={}
+    if manifest.get('report_reconciliation_quality') is True:
+        raw_values=[r.get('market_value') for r in positions]
+        complete=all(v is not None for v in raw_values)
+        value=sum((Decimal(number(v)) for v in raw_values),Decimal(0)) if complete else None
+        summary=cash.get('account_summary_observations') or {}
+        gross=summary.get('gross_position_value')
+        quality={'provider_snapshot_as_of':None,'retrieval_time_is_not_provider_snapshot_time':True,
+            'position_market_value_sum':str(value) if value is not None else None,
+            'broker_gross_position_value':number(gross) if gross is not None else None,
+            'difference':str(value-Decimal(number(gross))) if value is not None and gross is not None else None,
+            'qualifies_complete_portfolio_NAV':False,'available_funds_are_not_available_cash':True,
+            'buying_power_is_not_funding_authorization':True,'trade_history_completeness_attested':False}
     return {'schema_version':'Family.W5.ReadonlyBrokerView.v1','client_id':request['client_id'],
         'run_id':request['run_id'],'owner':deepcopy(owner),'source_db_sha256':manifest['source_db_sha256'],
         'source_descriptor_digest':digest(source),'captured_at':manifest['captured_at'],
         'positions':rows,'cash':cash,'order_source':order_source,
-        'owner_authorization':authorization,'database_written':False,'trade_action':'NO_TRADE'}
+        'owner_authorization':authorization,'database_written':False,'trade_action':'NO_TRADE',
+        **({'reconciliation_quality':quality} if quality else {})}
 
 
 def project_positions(original,view):

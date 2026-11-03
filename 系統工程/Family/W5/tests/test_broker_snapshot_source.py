@@ -65,6 +65,36 @@ def test_replaced_in_working_list_keeps_remaining_exposure_and_original_label(tm
     assert orders['active_orders'][0]['remaining_qty']=='1'
 
 
+def test_mixed_completed_query_is_partial_and_does_not_release_replaced_exposure(tmp_path):
+    req,_,_,_,manifest,save=broker_case(tmp_path)
+    manifest['orders'].update(arguments={'show_completed':True},source_mode='MIXED_HISTORY_OBSERVATIONS_ONLY')
+    source=save('manifest.json',manifest);view=read(req,source);orders=view['order_source']
+    assert orders['original_query']=={'show_completed':True}
+    assert orders['active_orders'][0]['state']=='REPLACE_PENDING'
+    assert not orders['complete_for_open_order_exposure'] and not orders['lifecycle_fully_resolved']
+    assert view['cash']['available'] is None
+
+
+def test_completed_query_requires_explicit_partial_source_mode(tmp_path):
+    req,_,_,_,manifest,save=broker_case(tmp_path)
+    manifest['orders']['arguments']={'show_completed':True};source=save('manifest.json',manifest)
+    with pytest.raises(PermissionError,match='WORKING_ORDER_SCOPE'):read(req,source)
+
+
+def test_incoherent_broker_values_do_not_become_nav_or_available_cash(tmp_path):
+    req,_,_,_,manifest,save=broker_case(tmp_path);manifest['report_reconciliation_quality']=True
+    pos=json.loads(Path(manifest['positions']['local_path']).read_text())
+    pos['value']['structuredContent']['positions'][0]['market_value']=301
+    manifest['positions']=save('positions.json',pos,'get_account_positions')
+    summary=json.loads(Path(manifest['summary']['local_path']).read_text())
+    summary['value']['structuredContent']['gross_position_value']=300
+    manifest['summary']=save('summary.json',summary,'get_account_summary')
+    view=read(req,save('manifest.json',manifest))
+    assert view['reconciliation_quality']['difference']=='1'
+    assert not view['reconciliation_quality']['qualifies_complete_portfolio_NAV']
+    assert view['cash']['available'] is None and not view['cash']['margin_funds_used_as_cash']
+
+
 @pytest.mark.parametrize('field',['client_id','owner','source_db_sha256'])
 def test_other_member_or_db_is_rejected(tmp_path,field):
     req,ctx,_,source,_,_=broker_case(tmp_path)

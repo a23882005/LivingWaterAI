@@ -32,13 +32,19 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
     if source is None:
         return None
-    if (source.get('provider') != 'YAHOO_CHART' or source.get('symbol') != symbol
+    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL') or source.get('symbol') != symbol
             or not source.get('source_reference') or time(source['retrieved_at']) > time(evaluation_at)):
         raise PermissionError('MEMBER_MARKET_SOURCE_IDENTITY_OR_TIME')
-    chart = read_json(source)['chart']
-    if chart.get('error') or len(chart.get('result') or []) != 1:
-        raise ValueError('MEMBER_MARKET_PROVIDER_ERROR')
-    raw = chart['result'][0]; meta = raw['meta']
+    completion=None
+    if source['provider']=='NASDAQ_HISTORICAL':
+        from nasdaq_daily_source import load
+        meta,quotes,stamps,completion=load(source,evaluation_at)
+    else:
+        chart = read_json(source)['chart']
+        if chart.get('error') or len(chart.get('result') or []) != 1:
+            raise ValueError('MEMBER_MARKET_PROVIDER_ERROR')
+        raw = chart['result'][0]; meta = raw['meta']
+        quotes = raw['indicators']['quote'][0]; stamps = raw['timestamp']
     expected = {'symbol': source['provider_symbol'], 'currency': source['currency'],
                 'exchangeTimezoneName': source['timezone'], 'exchangeName': source['provider_exchange']}
     if any(meta.get(k) != v for k, v in expected.items()):
@@ -57,13 +63,18 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         raise ValueError('MEMBER_MARKET_CALENDAR_ORDER')
     # A bar must have completed before both acquisition and evaluation. A
     # current-session quote must not become a final close when replayed later.
-    cutoff = min(time(evaluation_at), time(source['retrieved_at']))
+    acquisition=(source['historical_retrieved_at'] if source['provider']=='NASDAQ_HISTORICAL' else source['retrieved_at'])
+    cutoff = min(time(evaluation_at), time(acquisition))
     completed = [r for r in sessions if time(r['close_at']) <= cutoff]
     evaluation_completed = [r for r in sessions if time(r['close_at']) <= time(evaluation_at)]
     if not completed:
         raise ValueError('MEMBER_MARKET_NO_COMPLETED_SESSIONS')
+    window=calendar.get('actual_session_window')
+    calendar_evidence=({'calendar_actual_session_window':window,
+        'calendar_completed_window_verified':bool(window.get('verified') and evaluation_completed
+            and evaluation_completed[-1]['session_id']<=window['through']),
+        'calendar_historical_pit_verified':calendar.get('historical_pit_verified') is True} if window else {})
     by_date = {r['session_id']: r for r in completed}
-    quotes = raw['indicators']['quote'][0]; stamps = raw['timestamp']
     if stamps != sorted(set(stamps)):
         raise ValueError('MEMBER_MARKET_SOURCE_TIMESTAMP_ORDER')
     if any(len(quotes[k]) != len(stamps) for k in ('open', 'high', 'low', 'close', 'volume')):
@@ -81,7 +92,7 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         if date not in by_date:
             excluded.append({'date': date, 'reason': 'SESSION_NOT_COMPLETED_AT_ACQUISITION_OR_NOT_IN_CALENDAR'})
             continue
-        if date==acquired_day and (quote_at is None or quote_at<time(by_date[date]['close_at']) or quote_at>cutoff):
+        if source['provider']=='YAHOO_CHART' and date==acquired_day and (quote_at is None or quote_at<time(by_date[date]['close_at']) or quote_at>cutoff):
             # A delayed current quote can still inhabit today's daily bar
             # after the exchange closes. Calendar completion alone does not
             # attest that the provider has published the final daily close.
@@ -135,6 +146,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
                 'price_basis':'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED',
                 'corporate_action_pit_coverage':'UNVERIFIED','formal_deployment_eligible':False},
             'calendar_scope':calendar.get('scope','IDENTIFIED_EXCHANGE_CALENDAR_SOURCE'),
+            **({'provider_completion_evidence':completion} if completion else {}),
+            **calendar_evidence,
             'call_trace':['W8.member_market_source:original_completed_session_intake']}
     from on_demand_market_observations import evaluate_observed_history
     observed = evaluate_observed_history(used, repo_root=repo_root, evaluation_at=evaluation_at,
@@ -169,7 +182,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
             'scope': 'CONTIGUOUS_PROVIDER_OHLC_OBSERVATIONS__NOT_PIT_WEALTH',
             'price_basis': 'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED',
             'corporate_action_pit_coverage': 'UNVERIFIED', 'formal_deployment_eligible': False},
-        source_descriptor_digest=digest(source))
+        source_descriptor_digest=digest(source),
+        **calendar_evidence,
+        **({'provider_completion_evidence':completion} if completion else {}))
     return observed
 
 

@@ -532,5 +532,9 @@
   {
     "path": "系統工程/Family/W8/massive_daily_source.py",
     "sha256": "808ef6fdf8456c70932b92bd3a0fc9f5910dd92192e1245a98302aea6326171d"
+  },
+  {
+    "path": "系統工程/Family/W8/qp_anchor_diagnostic.py",
+    "sha256": "9d400106e2c28adecffa219c9372e801b9406abf254dc8ec1927c77f7d80f527"
   }
 ]

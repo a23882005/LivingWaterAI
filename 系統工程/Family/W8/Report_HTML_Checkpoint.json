@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
   "date": "2026-11-03",
-  "status": "PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW_READY__PM_ACCEPTANCE_PENDING",
+  "status": "PASS_PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -50,17 +50,18 @@
   },
   "evidence": "report_html_evidence/README.md",
   "remaining_dependencies": [
-    "Middle PM independently accepts new SOURCE_REVIEW chapters/reports; complete financial PASS remains 0",
-    "Middle PM supplies qualified same-run C/Work6-7/Work9/Mentor, verified NAV/FX/cash/orders, original V75 inputs and formal scenario/education/research sources",
+    "Middle PM supplies and qualifies complete same-run financial originals/amounts and freezes the next producer/run/schema/digest before issuing a new report work order",
+    "Complete financial PASS=0; real financial cycle=0; accepted SOURCE_REVIEW reports remain valid",
     "Actual Project login UAT not run; Android/iOS devices deferred by Owner"
   ],
-  "next_responsible_owner": "Family middle PM: independently inspect new four-household reports and supply complete financial dependencies; report Codex preserves the mother and accepted history",
-  "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED",
+  "next_responsible_owner": "Family middle PM: complete qualified four-household financial sources/amounts and version lock, then issue the next report work order; report Codex preserves accepted code and reports",
+  "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED__PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW_PM_PASS_AT_81a1bdf",
   "resume": [
-    "Read phase2_financial_sections/README.md and the private TEMP acceptance entry",
-    "Preserve PM phase1 PASS at 9bd61094, prior 77 pages/20 files and layout PASS/CLOSED",
-    "Use frozen PM original SOURCE_REVIEW inputs; never recalculate financial strategy or promote partial results to complete scope",
-    "Shared README/Checkpoint remain PM-owned; Draft/unmerged, production HOLD and trade authorization NONE remain"
+    "Read the phase2 PM PASS ruling and PR60 issuecomment-6592485664",
+    "Preserve accepted consumer 81a1bdf/tree76ff298, four 137-page reports/20 files, old 77-page reports/20 files and all historical PASS rulings",
+    "This change is docs-only; do not regenerate reports or change financial strategy/renderer",
+    "Wait for middle PM qualified complete financial source, amount definition and version lock before the next report update",
+    "Shared README/W8 Checkpoint remain PM-owned; Draft/unmerged, Production HOLD and trade authorization NONE remain"
   ],
   "artifact_location": "Private Drive household report folders / private TEMP evidence entry",
   "artifact_upload_status": "FOUR_PRIVATE_REPORTS_AND_MANIFESTS_FRESH_READBACK_VERIFIED",
@@ -201,7 +202,7 @@
     "new_real_reports": 0,
     "private_DB_writes": 0,
     "broker_actions": 0,
-    "phase_2": "EIGHT_CHAPTER_SOURCE_REVIEW_READY__COMPLETE_FINANCIAL_INPUTS_PENDING",
+    "phase_2": "PASS_EIGHT_CHAPTER_SOURCE_REVIEW__QUALIFIED_COMPLETE_FINANCIAL_INPUTS_PENDING",
     "middle_PM_acceptance": "PASS",
     "accepted_consumer_commit": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
     "accepted_consumer_tree": "b960b8ea3f443612fc736a4ba444f32aecc5e15f",
@@ -257,15 +258,53 @@
     ],
     "source_cards": 274,
     "full_financial_PASS": 0,
-    "middle_PM_acceptance": "PENDING",
+    "middle_PM_acceptance": "PASS",
     "source_originals_modified": false,
     "financial_engine_runs": 0,
     "DB_writes": 0,
     "broker_actions": 0,
     "prior_77_pages_and_20_files": "PRESERVED_PM_PASS",
-    "new_20_files": "SEE_PRIVATE_FRESH_READBACK_RECEIPT",
+    "new_20_files": "PM_FRESH_DOWNLOAD_BYTES_SHA_PRIVATE_PARENT_AND_SOURCE_BINDINGS_PASS",
     "private_entry": "Google Drive根目錄／TEMP／Family_PR60_第二階段八章接線_中PM驗收入口_20261103.txt",
     "trading": "NONE",
-    "production": "HOLD"
+    "production": "HOLD",
+    "status": "PASS_PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW",
+    "accepted_consumer_commit": "81a1bdf28aacc7555b7e0091b567ebb2a9058a90",
+    "accepted_consumer_tree": "76ff298d13d0784b63a5a09da8885522f3524204",
+    "PM_ruling": {
+      "file_name": "PM_PR60_第二階段八章接線_獨立驗收裁定_20261103.md",
+      "location": "Google Drive根目錄／TEMP",
+      "sha256": "b24e5c2d078933d5116ae2a82dc6e9f9238b65de01102b45c4c37161a9a9b639",
+      "PR_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592485664",
+      "date_Taiwan": "2026-11-03"
+    },
+    "PM_independent_tests": {
+      "passed": 266,
+      "subtests_passed": 149,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "W8/W6 runtime non-browser tests",
+      "Chromium_reexecuted": 0
+    },
+    "sealed_worker_validation_reviewed": {
+      "main_cases": 281,
+      "subtests_passed": 149,
+      "actual_Chromium_cases": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "PM_browser_check": "SEALED_EVIDENCE_REVIEW_ONLY__NOT_REEXECUTED"
+    },
+    "accepted_business_CI": {
+      "run_id": 41552900597,
+      "head": "81a1bdf28aacc7555b7e0091b567ebb2a9058a90",
+      "conclusion": "success",
+      "conditional_steps_not_selected": 14,
+      "local_full_suite_is_separate": true
+    },
+    "real_financial_cycle": 0,
+    "next": "WAIT_FOR_PM_QUALIFIED_FINANCIAL_SOURCES_AMOUNTS_AND_NEXT_VERSION_LOCKED_WORK_ORDER",
+    "this_writeback": "DOCS_ONLY__NO_NEW_REPORTS_OR_BUSINESS_CHANGES"
   }
 }

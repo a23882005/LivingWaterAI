@@ -2982,6 +2982,14 @@
     "production": "HOLD",
     "trade": "NONE",
     "implementation_status": "NOT_YET_IMPLEMENTED",
-    "independent_QA": "PENDING_REHANDOFF"
+    "independent_QA": "PENDING_REHANDOFF",
+    "handoff_zip_filename": "Family_V82_qP換錨原因_最終定案與Codex施工契約_20261104.zip",
+    "handoff_zip_bytes": 10545,
+    "handoff_zip_sha256": "ff19ffc115c48826e8de594a731a19065c774b99dd93b60f8c5662c12f6d86ae",
+    "handoff_zip_private_directory": "Google Drive root/TEMP",
+    "handoff_zip_test": "CRC plus manifest 3/3 plus download readback PASS",
+    "handoff_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6615932676",
+    "worker_handoff_status": "ISSUED_TO_ORIGINAL_V82_CODEX_PR59__NEW_CODE_PENDING",
+    "PM_new_code_independent_QA": "PENDING"
   }
 }

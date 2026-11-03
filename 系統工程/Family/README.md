@@ -1,4 +1,4 @@
-最後修改日期時間：2026/11/04 04:04（台灣時間）
+最後修改日期時間：2026/11/04 04:59（台灣時間）
 ## 2026/10/31｜金融／報告交接工單 v1.0 已備妥
 
 中PM已固定PR59 `d250d3c` producer與PR60 `4319556` consumer的介面基準，確認「建議呈現／券商不執行」語意。第一階段交原報表Codex限修Mentor接收相容性，新增明確准改W6/runtime/report_receiver.py；既有金融producer與77頁報告成果保留。完整真人金融章節待合格來源及中PM另鎖交接版本後進入第二階段。
@@ -310,3 +310,8 @@ The privately accepted16-page/5-file member correction and prior reports remain 
 ## 2026-11-04｜中PM PR59 a87971f 原始日價及部分持倉驗收
 PR59固定head`a87971f1b7f5f06aab258a3c993659c4d4601ff5`，自已驗`172d5eb`經`c423c77`兩筆續工。中PM獨立裁定`PASS_SCOPED_17_ASSET_RAW_UNADJUSTED_HISTORY_AND_21_PARTIAL_DATED_POSITION_VALUES`，前版所有PASS保留。兩私人ZIP新下載SHA/CRC/manifest及隔離還原Git1153檔、來源1455位置全PASS、零覆寫；原繼承1035份path/bytes/SHA完全保留。17美股原始日價8148筆（16×500＋DRAM148，資料完成日2026-11-02）來源SHA/date/price獨立核對，21筆原股數×對應原raw close日期化部位金額皆獨立重算正確；已保留24同戶來源身分綁定，21筆只是可計部分資產。還原正式程式新來源36＋原PV2 37＝73測試通過；同head GitHub六CI成功，原JUnit W5 559、W8 1080全過；四戶42證券Menu04原封存各雙遍一致，PM本次未宣稱四戶全新cold-start。正式qP/qV/PIT、完整財富/公司行動與C7B/schema83尚待資料資格，financial PASS0、cycle0、Production HOLD、交易 NONE，PR59仍Draft。PR60報表既有PASS結案。
 **下一施工者：原V82 Codex／PR59**沿合法本身歷史/股息分拆/歷史PIT/同Primary估值及既有金融主鏈續工；**中PM**集中確認已存本人帳戶/結算/訂單/SGOV/投資池來源並獨立驗收；**原報表Codex PR60**已結案，待金融合格另發工單。正式 [PR59中PM裁定與下一施工契約](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6614032017)；[公開去識別化驗收紀錄](W8/查核紀錄/PM_PR59_a87971f_RAW_8148_PARTIAL_VALUES_21_ACCEPTANCE_20261104.md)。私人來源與本人資料只保留Drive權限管控。
+
+## 2026-11-04｜中PM qP正式最終決策（取代四方案研究）
+指揮官要求先定案再寫程式。本輪中PM**已正式選定保留** V82核准之252交易session最高H、峰值時63筆log return sample σ(ddof=1)、√252、自身歷史月末Z midrank qP與75/90/97.5選階；九階、M/R/Up、估值、Hard Gate、資金與交易規則全部不變。高點126、峰63＋0.75×峰252 floor、當前63、504日與Z絕對門檻本輪**全部不採用**，先前四profile實驗工單停用。
+唯一實作：高點新高／舊峰退出252視窗被動降錨／同高取最新／其他變化及previous_anchor缺失時UNKNOWN的診斷附屬輸出，並辨別舊峰過期且W未反彈的情況；保留原qP/Z/Stage/Target/Gap/Permission/49+13全部數值欄位，沒有新增買進門檻。由**原 V82 Codex／PR59**最小修改與測試、沿既有金融來源/qV/C7B主線繼續；**中PM**獨立QA及四本治理；**PR60報表Codex**結案，PR61只讀參考。
+**唯一最新施工契約：** [PR59 中 PM qP 最終決策與最小工單](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6615181307)。[舊四方案研究留言](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6614876112) 已註明 SUPERSEDED；僅留來源背景。原所有既有PASS與 W8 IN_PROGRESS、完整金融PASS0/真實cycle0、Production HOLD/交易NONE維持，診斷程式仍待原Codex回交實作與中PM獨立驗收。

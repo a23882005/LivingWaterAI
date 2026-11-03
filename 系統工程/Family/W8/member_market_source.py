@@ -32,12 +32,15 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
     if source is None:
         return None
-    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL') or source.get('symbol') != symbol
+    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY') or source.get('symbol') != symbol
             or not source.get('source_reference') or time(source['retrieved_at']) > time(evaluation_at)):
         raise PermissionError('MEMBER_MARKET_SOURCE_IDENTITY_OR_TIME')
     completion=None
     if source['provider']=='NASDAQ_HISTORICAL':
         from nasdaq_daily_source import load
+        meta,quotes,stamps,completion=load(source,evaluation_at)
+    elif source['provider']=='MASSIVE_RAW_DAILY':
+        from massive_daily_source import load
         meta,quotes,stamps,completion=load(source,evaluation_at)
     else:
         chart = read_json(source)['chart']
@@ -143,7 +146,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
                 'provider_symbol':source['provider_symbol'],'provider_type':meta['instrumentType']},
             'history_quality':{'excluded_uncompleted_rows':excluded,'invalid_source_rows':invalid,
                 'discarded_before_last_gap':len(valid_dates)-len(used),
-                'price_basis':'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED',
+                'price_basis':('RAW_UNADJUSTED_PROVIDER_OHLC__NOT_PIT_WEALTH' if
+                    (completion or {}).get('raw_unadjusted_request_verified') is True else
+                    'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED'),
                 'corporate_action_pit_coverage':'UNVERIFIED','formal_deployment_eligible':False},
             'calendar_scope':calendar.get('scope','IDENTIFIED_EXCHANGE_CALENDAR_SOURCE'),
             **({'provider_completion_evidence':completion} if completion else {}),
@@ -180,7 +185,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         history_quality={'excluded_uncompleted_rows': excluded, 'invalid_source_rows': invalid,
             'discarded_before_last_gap': len(valid_dates)-len(used),
             'scope': 'CONTIGUOUS_PROVIDER_OHLC_OBSERVATIONS__NOT_PIT_WEALTH',
-            'price_basis': 'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED',
+            'price_basis': ('RAW_UNADJUSTED_PROVIDER_OHLC__NOT_PIT_WEALTH' if
+                (completion or {}).get('raw_unadjusted_request_verified') is True else
+                'PROVIDER_OHLC__RAW_UNADJUSTED_NOT_ATTESTED'),
             'corporate_action_pit_coverage': 'UNVERIFIED', 'formal_deployment_eligible': False},
         source_descriptor_digest=digest(source),
         **calendar_evidence,

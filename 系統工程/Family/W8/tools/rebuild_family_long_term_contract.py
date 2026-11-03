@@ -76,7 +76,7 @@ files=['work7/family_long_term.py','work7/asset_framework.py','C8C9_RUNTIME/C8C9
  '../../Family/W8/member_financial_chain.py','../../Family/W8/member_funding_summary.py','../../Family/W8/native_asset_source.py','../../Family/W8/member_financial_producer.py','../../Family/W8/family_c7_source_assembly.py','../../Family/W8/w1_portfolio_observations.py','../../Family/W8/c7_source_qualification.py','../../Family/W8/same_run_market_cache.py',
  '../../Family/W5/official_holdings_source.py','../../Family/W8/member_v82_analysis.py',
  '../../Family/W8/member_market_source.py','../../Family/W8/all_asset_coverage.py','../../Family/W8/tpex_calendar_source.py',
- '../../Family/W8/owner_target_decision_source.py','../../Family/W8/nasdaq_daily_source.py','../../Family/W8/member_position_valuation.py',
+ '../../Family/W8/owner_target_decision_source.py','../../Family/W8/nasdaq_daily_source.py','../../Family/W8/massive_daily_source.py','../../Family/W8/member_position_valuation.py',
  '../../Family/W8/tpex_actual_sessions.py',
  '../../Family/W8/member_reconciliation_source.py',
  '../../Family/W8/sec_publication_source.py','../../Family/W8/historical_source_qualification.py',

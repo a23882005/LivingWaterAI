@@ -2530,5 +2530,63 @@
     "production": "HOLD",
     "trade": "NONE",
     "prior_pass_preserved": true
+  },
+  "pm_pr60_phase2_independent_acceptance_20261103": {
+    "status": "PASS_PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW",
+    "consumer_commit": "81a1bdf28aacc7555b7e0091b567ebb2a9058a90",
+    "consumer_tree": "76ff298d13d0784b63a5a09da8885522f3524204",
+    "producer_commit": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+    "remote_files_verified": 16,
+    "pm_independent_tests": {
+      "main": 266,
+      "subtests": 149,
+      "failures": 0,
+      "skips": 0,
+      "browser_rerun": false
+    },
+    "sealed_worker_tests": {
+      "main": 281,
+      "subtests": 149,
+      "chromium_main": 15,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "github_ci": {
+      "run_id": 41552900597,
+      "status": "completed",
+      "conclusion": "success",
+      "coverage": "EXISTING_WORKFLOW_ONLY__14_CONDITIONAL_STEPS_NOT_SELECTED"
+    },
+    "four_household_intake": "EXACT_REPRODUCTION__2310_ORIGINAL_FIELDS_PRESERVED",
+    "new_report_pages": [
+      42,
+      44,
+      25,
+      26
+    ],
+    "new_total_pages": 137,
+    "source_cards": 274,
+    "saved_files": 20,
+    "pm_fresh_downloads": "PASS_BYTES_SHA_PRIVATE_PARENT__20_OF_20",
+    "pdf_html_sources": "PASS_FULL_TEXT_274_AND_PDF_BOUNDS_137_PAGES",
+    "zip_pngs": "PASS_CRC_INNER_ORIGINALS_AND_137_DECODED",
+    "pdf_visual_sample_pages": 12,
+    "scope": "SOURCE_REVIEW",
+    "complete_financial_PASS": 0,
+    "real_cycles": 0,
+    "previous_pass": "PRESERVED_PHASE1_AND_77_PAGES_20_FILES",
+    "private_verdict_filename": "PM_PR60_第二階段八章接線_獨立驗收裁定_20261103.md",
+    "private_verdict_bytes": 7051,
+    "private_verdict_sha256": "b24e5c2d078933d5116ae2a82dc6e9f9238b65de01102b45c4c37161a9a9b639",
+    "private_evidence_filename": "PM_PR60_phase2_acceptance_evidence_20261103.json",
+    "private_evidence_sha256": "450d404646edfa23fb815b951a28a1781d039b60293be089e83c60bf649cb9f5",
+    "acceptance_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592485664",
+    "next_report_codex": "DOCS_ONLY_PASS_WRITEBACK_TO_OWN_REPORT_CHECKPOINT_AND_README_AND_SAME_ID_DRIVE_ENTRY",
+    "next_PM": "QUALIFY_SAME_RUN_FINANCIAL_SOURCES_AND_AMOUNTS_THEN_DISPATCH_REPORT_UPDATE",
+    "production": "HOLD",
+    "trading": "NONE",
+    "PR60": "DRAFT_UNMERGED",
+    "physical_UAT": "DEFERRED_BY_OWNER"
   }
 }

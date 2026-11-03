@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
   "date": "2026-11-03",
-  "status": "OWNER_TARGET_DECISION_CORRECTION_READY__PM_ACCEPTANCE_PENDING",
+  "status": "PASS_LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -55,10 +55,12 @@
     "Actual Project login UAT not run; Android/iOS devices deferred by Owner"
   ],
   "next_responsible_owner": "Family middle PM: complete qualified four-household financial sources/amounts and version lock, then issue the next report work order; report Codex preserves accepted code and reports",
-  "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED__PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW_PM_PASS_AT_81a1bdf",
+  "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED__PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW_PM_PASS_AT_81a1bdf__LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY_PM_PASS_AT_61ce0851",
   "resume": [
-    "Read the phase2 PM PASS ruling and PR60 issuecomment-6592485664",
-    "Preserve accepted consumer 81a1bdf/tree76ff298, four 137-page reports/20 files, old 77-page reports/20 files and all historical PASS rulings",
+    "Read the Lilian PM PASS ruling and PR60 issuecomment-6595348307; the historical publication hold was resolved by Owner approval and publication at 61ce0851",
+    "Preserve accepted business 61ce0851/tree7d430d28 (same tree as sealed local 782e8a1), Lilian 16 pages/22 source cards/5 private files and the previous 26-page report",
+    "Preserve phase2 consumer 81a1bdf/tree76ff298, four 137-page reports/20 files, old 77-page reports/20 files, other households and all historical PASS rulings",
+    "Keep PM independent 8 main cases/13 subtests separate from sealed worker 291 main cases/162 subtests/17 Chromium cases; PM did not rerun the full suite or Chromium",
     "This change is docs-only; do not regenerate reports or change financial strategy/renderer",
     "Wait for middle PM qualified complete financial source, amount definition and version lock before the next report update",
     "Shared README/W8 Checkpoint remain PM-owned; Draft/unmerged, Production HOLD and trade authorization NONE remain"
@@ -311,7 +313,7 @@
     "work_order": "FAMILY-REPORT-OWNER-DECISION-20261103-r1",
     "base_remote_commit": "661c8acef3c544bee0d5c144258f5d843e79463b",
     "base_tree": "ecfa6d160a47dd7be76ae78e9ee070601166a284",
-    "status": "PENDING_MIDDLE_PM_ACCEPTANCE",
+    "status": "PASS_LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY",
     "evidence": "report_html_evidence/owner_target_decision/",
     "scope": "SOURCE_REVIEW",
     "trusted_profile": "KNOWN_OWNER_VERIFIED_ROW_READ_FROM_SAME_DB_WITH_PINNED_PM_PROJECTION",
@@ -320,6 +322,7 @@
     "report_only_for_affected_member": true,
     "other_reports": "CURRENT_AND_ALL_ORIGINAL_RENDERER_BLOCKS_EXACT__NO_REGENERATION",
     "accepted_phase2_and_prior_reports": "PRESERVED",
+    "tests_scope": "SEALED_WORKER_FULL_SUITE__REVIEWED_BY_PM_NOT_REEXECUTED",
     "tests": {
       "main_cases": 291,
       "subtests": 162,
@@ -334,6 +337,56 @@
     "real_financial_cycle": 0,
     "production": "HOLD",
     "trade_authorization": "NONE",
-    "private_handoff": "Exact files and original folder links delivered privately to Owner/PM"
+    "private_handoff": "Exact files and original folder links delivered privately to Owner/PM",
+    "middle_PM_acceptance": "PASS_LILIAN_SOURCE_DECISION_PRIVATE_DELIVERY",
+    "accepted_consumer_commit": "61ce0851f9f47c7a856bdf7462abb9633110ea51",
+    "accepted_consumer_tree": "7d430d281f7317e50dd210feb2370ef2b4567e9d",
+    "sealed_worker_commit": "782e8a19b3cc63a38c5077eb26514e9e36d37c09",
+    "sealed_worker_tree_equals_accepted_remote_tree": true,
+    "PM_ruling": {
+      "file_name": "PM_PR60_782e8a1_Lilian修正版_獨立驗收裁定_20261103.md",
+      "location": "Google Drive根目錄／TEMP",
+      "sha256": "1f1ee5e1041aeabc1dfa6c1f067f4c6a1bd728651336aa0a9db984a7dec1a27e",
+      "PR_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6595348307",
+      "date_Taiwan": "2026-11-03",
+      "original_publication_hold": "HISTORICAL__SUPERSEDED_BY_OWNER_APPROVAL_AND_PUBLICATION_AT_61ce0851"
+    },
+    "PM_independent_tests": {
+      "passed": 8,
+      "subtests_passed": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "OWNER_DECISION_SOURCE_BINDING_AND_DISPLAY",
+      "full_worker_suite_reexecuted": false,
+      "Chromium_reexecuted": 0
+    },
+    "private_delivery": {
+      "status": "PM_FRESH_DOWNLOAD_BYTES_SHA_PRIVATE_PARENT_AND_SOURCE_BINDINGS_PASS",
+      "physical_pages": 16,
+      "source_cards": 22,
+      "formal_files": 5,
+      "previous_26_page_report": "PRESERVED",
+      "other_households_and_137_77_page_reports": "PRESERVED_PM_PASS",
+      "reports_regenerated_for_this_writeback": 0
+    },
+    "github_publication": {
+      "status": "OWNER_APPROVED__PUBLISHED_AND_REMOTE_READBACK_VERIFIED",
+      "frozen_business_files": 15,
+      "frozen_business_bytes": 286561,
+      "previous_automatic_rejection": "HISTORICAL__RESOLVED_BY_OWNER_APPROVAL_AND_PUBLICATION_AT_61ce0851",
+      "private_DB_reports_images": "REMAIN_PRIVATE"
+    },
+    "accepted_business_CI": {
+      "run_id": 41577308922,
+      "head": "61ce0851f9f47c7a856bdf7462abb9633110ea51",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/a23882005/LivingWaterAI/actions/runs/41577308922",
+      "coverage": "EXISTING_WORKFLOW__SEALED_WORKER_AND_PM_TESTS_RECORDED_SEPARATELY",
+      "is_this_docs_writeback_CI": false
+    },
+    "next": "WAIT_FOR_PM_QUALIFIED_FINANCIAL_SOURCES_AMOUNTS_AND_NEXT_VERSION_LOCKED_WORK_ORDER",
+    "this_writeback": "DOCS_ONLY__TWO_REPORT_LINE_FILES__NO_NEW_REPORTS_OR_BUSINESS_CHANGES__ACTUAL_NEW_HEAD_CI_IN_PRIVATE_RECEIPT"
   }
 }

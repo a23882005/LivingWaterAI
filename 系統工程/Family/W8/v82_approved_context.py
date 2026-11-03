@@ -23,6 +23,63 @@ def read_source(descriptor,request,symbol):
         raise PermissionError('V82_APPROVED_SOURCE_IDENTITY_MISMATCH')
     if not data.get('source_reference') or timestamp(data['available_at'],'available_at')>timestamp(request['evaluation_at'],'evaluation_at'):
         raise PermissionError('V82_APPROVED_SOURCE_NOT_AVAILABLE_AT_CUTOFF')
+    # A caller cannot paste the projection produced below into a source file.
+    if 'verified_market_identity' in data:
+        raise PermissionError('V82_MARKET_IDENTITY_DERIVED_PROJECTION_NOT_AN_INPUT')
+    evidence=data.get('market_identity_source')
+    if evidence is not None:
+        import csv,io,re
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        bound={k:request[k] for k in ('client_id','run_id','evaluation_at')}
+        bound.update(asset_id=symbol,source_db_sha256=expected['source_db_sha256'])
+        if (any(data.get(k)!=v or evidence.get(k)!=v for k,v in bound.items())
+            or evidence.get('schema_version')!='Family.W8.PV2MarketIdentitySource.v1'
+            or evidence.get('provider')!='MASSIVE'):
+            raise PermissionError('V82_MARKET_IDENTITY_MEMBER_RUN_DB_OR_CUTOFF_MISMATCH')
+        at=timestamp(request['evaluation_at'],'evaluation_at')
+        started=timestamp(evidence['started_at'],'started_at')
+        retrieved=timestamp(evidence['retrieved_at'],'retrieved_at')
+        # This route is an observed US reference snapshot for this query date,
+        # not historical dissemination proof for prices or financial fields.
+        day=datetime.fromisoformat(request['evaluation_at'].replace('Z','+00:00')).astimezone(ZoneInfo('America/New_York')).date().isoformat()
+        endpoint='/v3/reference/tickers/'+symbol
+        if (evidence.get('endpoint')!=endpoint or evidence.get('query')!={'date':day}
+            or evidence.get('source_reference')!='https://api.massive.com'+endpoint+'?date='+day
+            or not started<=retrieved<=timestamp(data['available_at'],'available_at')<=at):
+            raise PermissionError('V82_MARKET_IDENTITY_SOURCE_SCOPE_OR_TIME_MISMATCH')
+        source=evidence['source'];original=Path(source['local_path']).read_bytes()
+        if sha256(original).hexdigest()!=source['sha256']:
+            raise PermissionError('V82_MARKET_IDENTITY_ORIGINAL_BYTES_CHANGED')
+        table=csv.DictReader(io.StringIO(original.decode('utf-8-sig')))
+        if len(table.fieldnames or [])!=len(set(table.fieldnames or [])):
+            raise PermissionError('V82_MARKET_IDENTITY_ORIGINAL_COLUMNS_AMBIGUOUS')
+        records=list(table)
+        if len(records)!=1:
+            raise PermissionError('V82_MARKET_IDENTITY_SINGLE_ORIGINAL_RECORD_REQUIRED')
+        record=records[0]
+        if (None in record or any(v is None for v in record.values())
+            or record.get('ticker')!=symbol or record.get('market')!='stocks'
+            or record.get('locale')!='us' or record.get('active')!='true'
+            or not record.get('type')
+            or not re.fullmatch(r'[A-Z0-9]{4}',record.get('primary_exchange',''))
+            or not re.fullmatch(r'BBG[A-Z0-9]{9}',record.get('share_class_figi',''))
+            or not re.fullmatch(r'[a-z]{3}',record.get('currency_name',''))):
+            raise PermissionError('V82_MARKET_IDENTITY_ORIGINAL_SECURITY_NOT_QUALIFIED')
+        observed={'listing':record['primary_exchange'],'share_class':record['share_class_figi'],
+            'currency':record['currency_name'].upper()}
+        supplied=data.get('market_identity') or {}
+        if (any(supplied.get(k)!=observed[k] for k in ('listing','share_class'))
+            or supplied.get('currency',observed['currency'])!=observed['currency']):
+            raise PermissionError('V82_MARKET_IDENTITY_ORIGINAL_PROJECTION_MISMATCH')
+        proof={'schema_version':'Family.W8.VerifiedPV2MarketIdentity.v1',**bound,
+            'market_identity':deepcopy(observed),'provider':'MASSIVE','endpoint':endpoint,
+            'query':deepcopy(evidence['query']),'source_reference':evidence['source_reference'],
+            'started_at':evidence['started_at'],'retrieved_at':evidence['retrieved_at'],
+            'source':deepcopy(source),'availability_basis':'OBSERVED_REFERENCE_CAPTURE_ONLY',
+            'historical_financial_PIT_attested':False}
+        proof['digest']=digest(proof)
+        data['verified_market_identity']={**observed,'currency_source':proof}
     return data
 
 
@@ -45,6 +102,8 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
     # Listing/share-class are indispensable to own-history identity. A ticker
     # or an account's currency alone does not prove either field.
     market_identity={'listing':observed.get('listing'),'share_class':observed.get('share_class')}
+    if extra.get('verified_market_identity') is not None:
+        market_identity=deepcopy(extra['verified_market_identity'])
     supplied_fundamental=extra.get('fundamentals_viable')
     if identity.get('asset_type')=='INDIVIDUAL_STOCK':fundamental=supplied_fundamental
     macro=extra.get('macro_pressure_inputs') or {}

@@ -453,14 +453,15 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py",
-      "sha256": "943fbb566014317a63041992e36de5bfd6cff3dfb4509899d8e5c733a882dd85",
-      "git_blob_sha": "ef5f021b20be617e2e2c4012d3a69ce5cada82f5",
-      "size": 8066,
-      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "sha256": "1724f13882d30d41943eff5e3d936699a3136e54045de9dd2b9b71464cac06da",
+      "git_blob_sha": "cfa8197402a5014725ba9ba23b76117db9741719",
+      "size": 12278,
+      "family_revision": "PM_20261104_6610364592_PV2_MARKET_IDENTITY_CURRENCY",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
-        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+        "scope": "PV2 qP/qV market identity currency check only; preserve single-account guard and all Stage/rate/funding/trading rules.",
+        "pm_contract": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6610364592"
       }
     },
     {

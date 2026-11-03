@@ -32,8 +32,62 @@ def evaluate(context, core):
         source=context.get(key)
         if source is None:continue
         source=deepcopy(source)
-        if (source.get('identity',{}).get('asset_id')!=asset
-                or source.get('identity',{}).get('currency')!=identity['owner']['currency']
+        currency=identity['owner']['currency'];currency_issue=None
+        if (identity['owner'].get('scope')=='ALL_MEMBER_ACCOUNTS'
+            and all(identity['owner'].get(k) is None for k in ('account','broker','currency','funding_domain'))):
+            # Market currency never becomes an account/funding currency. Replay
+            # the pinned reference bytes rather than trusting a currency flag.
+            import csv,io,re,json
+            from datetime import datetime
+            from hashlib import sha256
+            from pathlib import Path
+            from zoneinfo import ZoneInfo
+            market=context.get('market_identity') or {};proof=deepcopy(market.get('currency_source') or {})
+            try:
+                claimed=proof.pop('digest',None)
+                fingerprint=sha256(json.dumps(proof,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+                expected={'client_id':identity['client_id'],'run_id':identity['run_id'],'evaluation_at':at,
+                    'asset_id':asset,'source_db_sha256':snapshot}
+                if (claimed!=fingerprint or proof.get('schema_version')!='Family.W8.VerifiedPV2MarketIdentity.v1'
+                    or any(proof.get(k)!=v for k,v in expected.items())
+                    or identity['owner'].get('client_id')!=identity['client_id']
+                    or proof.get('provider')!='MASSIVE'
+                    or proof.get('availability_basis')!='OBSERVED_REFERENCE_CAPTURE_ONLY'
+                    or proof.get('historical_financial_PIT_attested') is not False):
+                    raise ValueError('PV2_MARKET_IDENTITY_SOURCE_UNVERIFIED')
+                def instant(value):
+                    value=datetime.fromisoformat(value.replace('Z','+00:00'))
+                    if value.utcoffset() is None:raise ValueError('PV2_MARKET_IDENTITY_TIMEZONE_REQUIRED')
+                    return value
+                day=instant(at).astimezone(ZoneInfo('America/New_York')).date().isoformat()
+                endpoint='/v3/reference/tickers/'+asset
+                if (proof.get('endpoint')!=endpoint or proof.get('query')!={'date':day}
+                    or proof.get('source_reference')!='https://api.massive.com'+endpoint+'?date='+day
+                    or not instant(proof['started_at'])<=instant(proof['retrieved_at'])<=instant(at)):
+                    raise ValueError('PV2_MARKET_IDENTITY_SOURCE_SCOPE_OR_TIME_MISMATCH')
+                original=Path(proof['source']['local_path']).read_bytes()
+                if sha256(original).hexdigest()!=proof['source']['sha256']:
+                    raise ValueError('PV2_MARKET_IDENTITY_ORIGINAL_BYTES_CHANGED')
+                table=csv.DictReader(io.StringIO(original.decode('utf-8-sig')));records=list(table)
+                if len(records)!=1 or len(table.fieldnames or [])!=len(set(table.fieldnames or [])):
+                    raise ValueError('PV2_MARKET_IDENTITY_ORIGINAL_RECORD_AMBIGUOUS')
+                row=records[0]
+                if (None in row or any(v is None for v in row.values()) or row.get('ticker')!=asset
+                    or row.get('market')!='stocks' or row.get('locale')!='us' or row.get('active')!='true'
+                    or not row.get('type') or not re.fullmatch(r'[A-Z0-9]{4}',row.get('primary_exchange',''))
+                    or not re.fullmatch(r'BBG[A-Z0-9]{9}',row.get('share_class_figi',''))
+                    or not re.fullmatch(r'[a-z]{3}',row.get('currency_name',''))):
+                    raise ValueError('PV2_MARKET_IDENTITY_ORIGINAL_SECURITY_NOT_QUALIFIED')
+                observed={'listing':row['primary_exchange'],'share_class':row['share_class_figi'],'currency':row['currency_name'].upper()}
+                if proof.get('market_identity')!=observed or any(market.get(k)!=v for k,v in observed.items()):
+                    raise ValueError('PV2_MARKET_IDENTITY_ORIGINAL_PROJECTION_MISMATCH')
+                currency=observed['currency']
+            except (KeyError,ValueError,TypeError,OSError) as error:
+                currency_issue=str(error)
+        if currency_issue is not None:
+            result=unknown('PV2_MARKET_IDENTITY_SOURCE_UNVERIFIED',depth=None,source_issue=currency_issue)
+        elif (source.get('identity',{}).get('asset_id')!=asset
+                or source.get('identity',{}).get('currency')!=currency
                 or any(source.get('identity',{}).get(k)!=context.get('market_identity',{}).get(k) for k in ('listing','share_class'))):
             result=unknown('PV2_SOURCE_INSTRUMENT_IDENTITY_CONFLICT',depth=None)
         elif key=='valuation_history' and (source['identity'].get('metric_name')!=selected

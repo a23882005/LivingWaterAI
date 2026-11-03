@@ -2588,5 +2588,66 @@
     "trading": "NONE",
     "PR60": "DRAFT_UNMERGED",
     "physical_UAT": "DEFERRED_BY_OWNER"
+  },
+  "pm_four_household_source_recovery_20261103": {
+    "status": "PARTIAL_SOURCE_COMPLETION_PERSISTED_AND_DISPATCHED",
+    "four_official_DB_fresh_read": "PASS",
+    "one_household_canonical_recovery": {
+      "same_id": true,
+      "backup_and_fresh_raw_readback": "PASS",
+      "append_only_rows": 132,
+      "changed_source_tables": 10,
+      "unchanged_other_tables": 37,
+      "original_rows_preserved": true,
+      "schema_triggers_unchanged": true,
+      "original_W5_reader_and_report_source": "PASS",
+      "new_full_financial_gate": false
+    },
+    "broker_readback": {
+      "scope": "JOSEPH_ONLY_PARTIAL_SOURCE",
+      "working_and_today_completed_orders": "RECEIVED_WITH_UNRESOLVED_REPLACED_LIFECYCLE",
+      "balance_limited_retry": "SUCCESS",
+      "trades30": "INTERNAL_ERROR",
+      "trades7": "SUCCESS_EMPTY_WITH_SCOPE_PRESERVED",
+      "valuation_reconciliation": "DIFFERENCE_RECORDED_NOT_PROMOTED_TO_FULL_FINANCIAL"
+    },
+    "private_source_package": {
+      "filename": "Family_四戶金融來源補齊_實際輸入_20261103.zip",
+      "bytes": 84168,
+      "sha256": "e8b8da20480d53f895452df981d848d41b108a0e572bb86813d97dd3c13d1b55",
+      "payloads": 28,
+      "download_manifest": "PASS"
+    },
+    "financial_dispatch": {
+      "owner": "ORIGINAL_V82_CODEX",
+      "filename": "Family_四戶金融來源補齊_交原V82Codex_20261103.md",
+      "bytes": 5305,
+      "sha256": "2ae15334440deff10aeb05f9873bde8f0e756d57f2a41c5d8c8cda03afb222a3",
+      "comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6592917468",
+      "next": "REBUILD_CHANGED_MEMBER_NATIVE_REQUEST_RESULT_BINDINGS_AND_CONTINUE_FOUR_MEMBER_FINANCIAL_CHAIN",
+      "ACK": "PENDING"
+    },
+    "report_dispatch": {
+      "owner": "ORIGINAL_REPORT_CODEX",
+      "filename": "Family_PR60_Lilian最新決定與持股補回_修正單_20261103.md",
+      "bytes": 5011,
+      "sha256": "1031b713f2baa5e2792ab24e72c763b1283594d1c7fd24fbe8166c34e453b036",
+      "comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746",
+      "defect": "NEWER_OWNER_TARGET_DECISION_NOT_PROJECTED_BY_EXISTING_SNAPSHOT_SOURCE",
+      "scope": "OWNER_DECISION_SOURCE_AND_SCOPED_TARGET_PRESENTATION_ONLY__NO_FINANCIAL_RECALCULATION",
+      "renderer_exception": "ONLY_TARGET_SUMMARY_TARGET_CHAPTER_AND_DEPENDENT_DRIFT_STATE_BRANCH__APPROVED_STYLE_UNCHANGED",
+      "next": "FIX_MEMBER_SPECIFIC_SOURCE_REVIEW_AND_RETURN_FIVE_NEW_ARTIFACTS",
+      "ACK": "PENDING"
+    },
+    "previous_phase2_PASS": "PRESERVED_EIGHT_CHAPTER_COMPATIBILITY_AND_SAVE_SCOPE__TARGET_DECISION_PROJECTION_FIX_PENDING",
+    "PR60_docs_writeback_observed": {
+      "head": "661c8acef3c544bee0d5c144258f5d843e79463b",
+      "diff": "TWO_OWN_DOCUMENTS_ONLY"
+    },
+    "complete_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "physical_UAT": "DEFERRED"
   }
 }

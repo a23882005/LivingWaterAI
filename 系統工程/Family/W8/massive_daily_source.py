@@ -36,6 +36,8 @@ def _bytes(source):
 def load(source,evaluation_at):
     from member_market_source import read_json,time
     symbol=source['provider_symbol'];zone=ZoneInfo('America/New_York')
+    if source['symbol']!=symbol:
+        raise PermissionError('MEMBER_MARKET_MASSIVE_ASSET_ALIAS_NOT_VERIFIED')
     acquisition=read_json(source['acquisition_source'])
     expected='/v2/aggs/ticker/'+symbol+'/range/1/day/'+source['requested_start']+'/'+source['requested_end']
     if (acquisition.get('schema_version')!='Family.W8.MassiveDailyAcquisition.v1'

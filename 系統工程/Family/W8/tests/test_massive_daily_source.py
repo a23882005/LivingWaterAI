@@ -84,6 +84,13 @@ def test_no_cross_product_or_provider_substitution(tmp_path):
     with pytest.raises(PermissionError,match='IDENTITY_OR_TIME'):read(source)
 
 
+def test_project_asset_cannot_be_replaced_by_an_unverified_provider_alias(tmp_path):
+    source=fixture(tmp_path);source['symbol']='OTHER'
+    with pytest.raises(PermissionError,match='ASSET_ALIAS_NOT_VERIFIED'):
+        read_market(source,symbol='OTHER',evaluation_at='2026-11-03T00:00:00Z',
+            repo_root=HERE.parents[2],profile=None,is_etf=True,observation_route='V75')
+
+
 def test_raw_bytes_and_the_original_response_must_both_replay(tmp_path):
     source=fixture(tmp_path);path=Path(source['local_path'])
     path.write_text(path.read_text().replace('100,101','100,102'))

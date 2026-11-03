@@ -2796,5 +2796,27 @@
     "PR60": "DRAFT_UNMERGED",
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_total_handoff_r2_20261103": {
+    "edition": "20261103_r2",
+    "role": "全專案總PM",
+    "handoff_location": "私人Google Drive根目錄/TEMP；正式入口原ID更新；私人包不上公開repo",
+    "pr59": {
+      "head": "471e4b127c82213b785a8f3dc2d49fbf3c64a075",
+      "status": "RETURNED_PENDING_PM_INDEPENDENT_ACCEPTANCE",
+      "accepted_prior": "80e635e"
+    },
+    "pr60": {
+      "head": "d78ea448b9ac757e086aec14365412f09b4071ce",
+      "status": "PASS_DOCS_WRITEBACK_RECEIVED",
+      "accepted_business": "61ce0851",
+      "scope": "two docs only; full text bytes/SHA, parent/diff and same-head CI verified",
+      "ci": 41580184079
+    },
+    "complete_financial_PASS": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "next": "PM independently accept PR59 latest owner-recovery return, resolve minimal facts and lock financial producer; original Codex lines remain separate"
   }
 }

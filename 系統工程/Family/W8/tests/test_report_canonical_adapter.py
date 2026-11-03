@@ -473,7 +473,9 @@ class MemberSourceReviewTests(unittest.TestCase):
         self.assertTrue(all(r["市值TWD"] is None for r in current["target"]))
         self.assertEqual(current["source_position_records"],c["source"]["actual_position_records"])
         self.assertEqual(current["report_source_lineage"]["member_analysis"],c["result"])
-        self.assertEqual(len(current["verified_sections"]["valuation"]),3)
+        for symbol in ("KEEP","BOTH","NEW"):
+            self.assertTrue(any(symbol in row["heading"] for row in current["verified_sections"]["valuation"]))
+        self.assertEqual(set(current["verified_sections"]),set(F.A.SECTION_NAMES))
         self.assertIn("UNKNOWN",current["verified_sections"]["bond"][0]["body"])
 
     def test_rehashed_foreign_identity_owner_snapshot_or_target_is_rejected(self):

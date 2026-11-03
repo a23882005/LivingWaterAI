@@ -1,7 +1,7 @@
 {
   "schema_version": "Family.W8.ReportHTMLCheckpoint.v1",
   "date": "2026-11-03",
-  "status": "PASS_PHASE1_MENTOR_SCOPE_COMPATIBILITY",
+  "status": "PHASE2_EIGHT_CHAPTER_SOURCE_REVIEW_READY__PM_ACCEPTANCE_PENDING",
   "branch": "family/report-canonical-html-20261030",
   "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
   "initial_main": "2eaa56eceb0b5b6f7f1a338ea7f677f3a2d89136",
@@ -29,12 +29,12 @@
     "tests/test_on_demand_w6.py"
   ],
   "validation": {
-    "pytest_passed": 272,
-    "subtests_passed": 134,
+    "pytest_passed": 281,
+    "subtests_passed": 149,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "real_chromium_tests": 13
+    "real_chromium_tests": 15
   },
   "approved_zip_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
   "preserved": {
@@ -50,16 +50,17 @@
   },
   "evidence": "report_html_evidence/README.md",
   "remaining_dependencies": [
-    "Phase 2: qualified same-run real financial sources and middle PM producer/schema/source digest lock plus a new construction contract",
+    "Middle PM independently accepts new SOURCE_REVIEW chapters/reports; complete financial PASS remains 0",
+    "Middle PM supplies qualified same-run C/Work6-7/Work9/Mentor, verified NAV/FX/cash/orders, original V75 inputs and formal scenario/education/research sources",
     "Actual Project login UAT not run; Android/iOS devices deferred by Owner"
   ],
-  "next_responsible_owner": "Family middle PM: supply qualified real financial sources, freeze producer/schema/source digests and issue the phase-2 contract; report Codex preserves the accepted phase-1 result pending that handoff",
+  "next_responsible_owner": "Family middle PM: independently inspect new four-household reports and supply complete financial dependencies; report Codex preserves the mother and accepted history",
   "independent_acceptance": "PHASE1_MENTOR_SCOPE_PM_PASS_AT_9bd61094__LATEST_DB_4319556_PM_PASS__LAYOUT_1fe71862_PASS_CLOSED",
   "resume": [
-    "Read the PM phase-1 PASS ruling and PR60 issuecomment-6589908544",
-    "Preserve accepted consumer 9bd61094 and its evidence; status-only commits do not change the accepted financial interface",
-    "Wait for middle PM qualified real sources, explicit version lock and phase-2 construction contract",
-    "Shared README/Checkpoint remain PM-owned; production HOLD and trade authorization NONE remain"
+    "Read phase2_financial_sections/README.md and the private TEMP acceptance entry",
+    "Preserve PM phase1 PASS at 9bd61094, prior 77 pages/20 files and layout PASS/CLOSED",
+    "Use frozen PM original SOURCE_REVIEW inputs; never recalculate financial strategy or promote partial results to complete scope",
+    "Shared README/Checkpoint remain PM-owned; Draft/unmerged, production HOLD and trade authorization NONE remain"
   ],
   "artifact_location": "Private Drive household report folders / private TEMP evidence entry",
   "artifact_upload_status": "FOUR_PRIVATE_REPORTS_AND_MANIFESTS_FRESH_READBACK_VERIFIED",
@@ -200,7 +201,7 @@
     "new_real_reports": 0,
     "private_DB_writes": 0,
     "broker_actions": 0,
-    "phase_2": "WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK",
+    "phase_2": "EIGHT_CHAPTER_SOURCE_REVIEW_READY__COMPLETE_FINANCIAL_INPUTS_PENDING",
     "middle_PM_acceptance": "PASS",
     "accepted_consumer_commit": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
     "accepted_consumer_tree": "b960b8ea3f443612fc736a4ba444f32aecc5e15f",
@@ -230,5 +231,41 @@
       },
       "scope": "FIXED_VERSION_PHASE_1_RECEIVER_COMPATIBILITY_ONLY"
     }
+  },
+  "previous_phase1_validation": {
+    "pytest_passed": 272,
+    "subtests_passed": 134,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "real_chromium_tests": 13
+  },
+  "phase2_financial_sections": {
+    "work_order": "FAMILY-REPORT-PHASE2-20261103-r1",
+    "base_commit": "4dc4f1cba0035afe2cf8a37f51a146494dfb05fd",
+    "producer_commit": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+    "local_branch": "family/report-eight-sections-20261103",
+    "evidence": "report_html_evidence/phase2_financial_sections/",
+    "source_review_intake": "4_OF_4_PASS__8_NEGATIVE_REJECTIONS",
+    "scope": "SOURCE_REVIEW",
+    "eight_chapters": "PARTIAL_ORIGINAL_FACTS_AND_NAMED_GAPS",
+    "physical_pages": [
+      42,
+      44,
+      25,
+      26
+    ],
+    "source_cards": 274,
+    "full_financial_PASS": 0,
+    "middle_PM_acceptance": "PENDING",
+    "source_originals_modified": false,
+    "financial_engine_runs": 0,
+    "DB_writes": 0,
+    "broker_actions": 0,
+    "prior_77_pages_and_20_files": "PRESERVED_PM_PASS",
+    "new_20_files": "SEE_PRIVATE_FRESH_READBACK_RECEIPT",
+    "private_entry": "Google Drive根目錄／TEMP／Family_PR60_第二階段八章接線_中PM驗收入口_20261103.txt",
+    "trading": "NONE",
+    "production": "HOLD"
   }
 }

@@ -131,6 +131,11 @@ def build_w6_current_data(source, market, engine):
              "report_scope":"SOURCE_REVIEW","data_provenance":"SOURCE_BACKED",
              "report_content_state":"SOURCE_REVIEW_READY__VALUATION_AND_FINANCIAL_PIPELINE_UNKNOWN",
              "trade_authorization":"NONE"}
+        if "section_projection" in prepared["lineage"]:
+            out["asset_coverage_summary"]=deepcopy(prepared.get("coverage_summary"))
+            out["financial_section_status"]={k:{"value_state":v["value_state"],
+                "source_id":v.get("source_id"),"display_rows":len(prepared["sections"][k])}
+                for k,v in prepared["lineage"]["sections"].items()}
         out["digest"]=_sha(out)
         return out
     positions=source.get("actual_position_records",[])

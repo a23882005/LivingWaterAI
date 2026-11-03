@@ -178,3 +178,16 @@ Menu12 沿既有認證後的固定本人資料夾查詢，再由 executor 呼叫
 精確改檔、原始來源blob/hash、命令／JUnit／render QA見 `report_html_evidence/mentor_scope_compatibility/`；原始JUnit及合成PDF／完整HTML／reader／ZIP／圖片、既有四戶不變證明與Git還原包留私人Drive根目錄／TEMP的新回交包及入口。既有W8 CI與本輪本機13項browser／新接收測試分列，CI實際run/head及覆蓋見完成收據，不以未選入CI的案例宣稱遠端執行。本輪相容修補仍待中PM獨立複驗。
 
 第二階段維持 `WAITING_FOR_QUALIFIED_FINANCIAL_SOURCE_AND_PM_VERSION_LOCK`：待中PM另鎖真人同輪來源／producer／schema／digest，再逐章接入、重產四戶正式報告。本次無需重產原20份，也不修改W5、正式DB、核准配置、共享README／Checkpoint或交易限制。PR60維持Draft／未合併，Production HOLD／交易NONE；真人Project登入及Android/iOS UAT沿既定範圍。
+
+
+## 2026-11-03 第二階段：八章可用原結果接線
+
+依工單 FAMILY-REPORT-PHASE2-20261103-r1 及 PR60 issuecomment-6590518188／6590764200，起點4dc4f1c，producer鎖dd36143。第一階段9bd61094中PM PASS、排版PASS/CLOSED與已驗收77頁／20件保留。本輪將PM四戶原件的可用分析接進既有八章，不為每批資料重寫金融策略。
+
+新增report_financial_sections為純顯示轉換器；驗證本人、DB、cutoff、coverage與債券digest、股票/V75/現金路由及分母，逐欄保存原JSON pointer／present／型別／值與result SHA。原result、input_sections與正式核准物件不變。既有顯式合法章節envelope優先，缺章才用PARTIAL display fallback；可用值與逐輸出缺項同時呈現，不清空已知分析。第1～6章、母版、renderer、配色、來源18px及完整URL換行保持。
+
+八鍵沿bond/market/radar/valuation/actions/risks/education/institutions。V75不套股票九階；現金按帳戶幣別與觀察日分列，buying power不作可用現金；底二TRUE與正式已選階段分開；原價格、當期估值與歷史qV/qP分開，原資格不升格。Work9/Mentor金額未齊仍UNKNOWN，cap標明非金額。缺C不造雷達，缺NAV不造目前權重／目標金額／漂移；原核准比例保留。交易NONE，沒有改W5、W6 receiver、金融規則、DB/ledger或共享治理。
+
+完整281項＋149子案例、15項實際Chromium通過，0 failures/errors/skips。四戶以同一程式接收PM凍結輸入，新的SOURCE_REVIEW報告42／44／25／26共137頁、274張來源卡；來源全文／PDF字框／每頁PNG／ZIP同源及離線窄畫面reader通過。工程接線與保存不代表完整金融PASS；完整金融PASS目前0，中PM獨立驗收待辦。各戶新20件使用原Sources固定folder與新台灣時間檔名，實際上傳與全新bytes/SHA/private-parent/lookup收據另存私人入口。
+
+精確mapping、版本鎖、JUnit、測試命令與合成產物hash在report_html_evidence/phase2_financial_sections/。真人原件/current/來源映射、報告20件連結、逐頁圖及保存收據只在Google Drive根目錄／TEMP／Family_PR60_第二階段八章接線_中PM驗收入口_20261103.txt列明。原77頁不覆寫；PR60維持Draft/unmerged，Production HOLD。受管file://政策、真人登入與實機UAT限制沿原規則分列。

@@ -46,6 +46,11 @@ class RenderedHTMLTests(unittest.TestCase):
         cls.pinned_case=F.pinned_native_case()
         cls.pinned_current=F.current(cls.pinned_case)
         cls.pinned_rendered=F.R.render_current_w6(cls.pinned_current,archive)
+        cls.financial_case=F.member_financial_case()
+        financial_inputs=F.A.make_member_review_inputs(cls.financial_case['source'],cls.financial_case['request'],
+            cls.financial_case['result'],source_id='SYNTHETIC_ALL_ASSET_PRODUCER',rules_sha='e'*64)
+        cls.financial_current=F.D.build_w6_current_data(cls.financial_case['source'],**financial_inputs)
+        cls.financial_rendered=F.R.render_current_w6(cls.financial_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:
@@ -81,6 +86,53 @@ class RenderedHTMLTests(unittest.TestCase):
             for name,raw in cls.pinned_rendered['artifacts'].items():(pinned_folder/name).write_bytes(raw)
             (pinned_folder/'current.synthetic.json').write_text(json.dumps(cls.pinned_current,ensure_ascii=False,indent=2),encoding='utf-8')
             (pinned_folder/'original_mentor.synthetic.json').write_text(json.dumps(cls.pinned_case['result']['mentor'],ensure_ascii=False,indent=2),encoding='utf-8')
+            financial_folder=target/'phase2_all_asset';financial_folder.mkdir(exist_ok=True)
+            for name,raw in cls.financial_rendered['artifacts'].items():(financial_folder/name).write_bytes(raw)
+            (financial_folder/'current.synthetic.json').write_text(json.dumps(cls.financial_current,ensure_ascii=False,indent=2),encoding='utf-8')
+
+    def test_partial_all_asset_eight_chapters_keep_known_facts_and_unknown_money(self):
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600}).new_page()
+        page.set_content(self.financial_rendered['artifacts']['report.html'].decode())
+        text=page.locator('body').inner_text()
+        for value in ('12.345678901','17.890123','101.234567','3.210987','SYN_SGOV','SYNTH_CASH'):
+            self.assertIn(value,text)
+        self.assertEqual(page.locator('#toc a').count(),13)
+        self.assertEqual(len(set(page.locator('[data-chapter]').evaluate_all('ns=>ns.map(n=>n.dataset.chapter)'))),14)
+        self.assertIsNone(self.financial_current['current_total_twd'])
+        self.assertIsNone(self.financial_current['approved_radar'])
+        self.assertIn('原正式階段：UNKNOWN',text)
+        self.assertIn('底二條件原值：TRUE',text)
+        self.assertIn('未提供正式雷達來源',text)
+        for row in self.source_reference_geometry(page):
+            self.assertEqual(row['font_size'],'18px')
+            self.assertLessEqual(row['scroll_width'],row['client_width']+1)
+            for rect in row['lines']:
+                self.assertGreaterEqual(rect['left'],row['card_left']-1)
+                self.assertLessEqual(rect['right'],row['card_right']+1)
+        self.receipt['checks']['phase2_partial_eight_chapters_all_asset_and_original_values']='PASS_SYNTHETIC'
+
+    def test_phase2_all_asset_pdf_zip_and_all_saved_png_pages_match(self):
+        import fitz
+        from PIL import Image,ImageChops
+        rendered=self.financial_rendered
+        page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600},device_scale_factor=1).new_page()
+        page.set_content(rendered['artifacts']['report.html'].decode());page.evaluate('document.fonts.ready')
+        pdf=fitz.open(stream=rendered['artifacts']['report.pdf'],filetype='pdf');self.addCleanup(pdf.close)
+        self.assertEqual(len(pdf),rendered['page_count'])
+        self.assertIn('17.890123',''.join(p.get_text() for p in pdf))
+        for p in pdf:
+            for word in p.get_text('words'):
+                self.assertGreaterEqual(word[0],-1);self.assertLessEqual(word[2],p.rect.width+1)
+        with zipfile.ZipFile(io.BytesIO(rendered['artifacts']['report.zip'])) as z:
+            for name in ('report.html','report.pdf','index.html'):
+                self.assertEqual(z.read(name),rendered['artifacts'][name])
+            for index in range(rendered['page_count']):
+                raw=page.locator('.page').nth(index).screenshot(animations='disabled')
+                expected=z.read(f'pages/CR-IMG-{index+1:03d}.png')
+                self.assertIsNone(ImageChops.difference(Image.open(io.BytesIO(raw)).convert('RGB'),
+                    Image.open(io.BytesIO(expected)).convert('RGB')).getbbox())
+        self.receipt['phase2_all_asset_page_count']=rendered['page_count']
+        self.receipt['checks']['phase2_all_asset_pdf_zip_and_png_consistency']='PASS_SYNTHETIC'
 
     def test_pinned_pr59_advice_text_renders_verbatim_without_broker_permission(self):
         page=self.context(java_script_enabled=False,viewport={'width':1135,'height':1600}).new_page()

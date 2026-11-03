@@ -365,3 +365,77 @@ def member_refresh(c):
     universe=r["universe"]
     universe["universe_digest"]=A.digest({k:v for k,v in universe.items() if k!="universe_digest"})
     r["report_digest"]=A.digest({k:v for k,v in r.items() if k not in ("report_digest","source_sha256")})
+
+
+def member_financial_case():
+    """Invented partial full-asset output; no household values or identities."""
+    c = member_case()
+    snapshot = c["request"]["client_snapshot"]["payload"]
+    snapshot["tables"]["portfolio_account"].append({"client_id": CLIENT, "account_key": "SYNTH_CASH"})
+    snapshot["payload_digest"] = A.digest(snapshot["tables"])
+    c["source"] = S.build_report_source(snapshot, account="AR", expected_client_id=CLIENT)
+    result = c["result"]
+    extra = deepcopy(result["positions"][0]);extra.update(symbol="SELL",instrument_id="SELL")
+    result["positions"].append(extra)
+    result["universe"].update(expected_count=4, assets=[{"symbol": r["symbol"]} for r in result["positions"]])
+    result["summary"]["tested"] = 4
+    macro = {"observed": {key: {"value": value, "unit": "SYN_UNIT", "as_of": "2026-10-29",
+        "direction": "UNKNOWN", "speed": "UNKNOWN", "freshness": "UNKNOWN"}
+        for key, value in (("hy_oas", "321.123"), ("vix", "18.456"), ("move", "87.654"))},
+        "credit": {"C1": "TRUE", "C2": "FALSE", "C3": "UNKNOWN", "risk_level": "UNKNOWN"},
+        "full_safety_contract_complete": False, "remaining_inputs": ["SYNTHETIC_CREDIT_DIRECTION_HISTORY"]}
+    for index, row in enumerate(result["positions"]):
+        row.update(coverage_basis="HOLDING_ONLY" if row["symbol"] == "SELL" else "HOLDING_AND_TARGET",
+            data_complete=False, market={"observed_date": "2026-10-29", "observed_close": "12.345678901",
+            "formal_deployment_eligible": False, "provider_verified_at": ASOF,
+            "source_reference": "https://synthetic.invalid/market/" + row["symbol"],
+            "numeric": {"ma20": "11.234", "ma50": "10.123", "kd_k_9_3": "20.456",
+                        "kd_d_9_3_3": "22.345", "rsi14": "43.210"}},
+            macro_observations=deepcopy(macro), daily_slice={"maturity": {"state": "IMMATURE"},
+                "status": "UNKNOWN_AMOUNTS_RETAINED"},
+            core_observation={"result": {"permission": {"hard_gate": "UNKNOWN"},
+                "technical": {"runaway_down": "UNKNOWN"}, "structural_risk": {"risk_grade": "NONE"}}},
+            valuation_observations=[{"metric_name": "FORWARD_PE", "current": "17.890123",
+                "unit": "multiple", "source_row": {"dataDate": "2026-10-29"},
+                "valuation_level": "UNKNOWN", "classification_scope": "SOURCE_OBSERVATION_ONLY",
+                "source_reference": "https://synthetic.invalid/issuer/" + row["symbol"]}])
+        row["formal_conclusion"].update(market_predicates={"right": "TRUE", "runaway_up": "UNKNOWN", "left": "UNKNOWN"},
+            selected_mode="UNKNOWN", formal_stage="UNKNOWN", canonical_target_rate=None,
+            stage_required_unknown_fields=["SYNTHETIC_APPROVED_CASH_SCOPE"],
+            approved_v10_analysis={"qP": {"value": None, "status": "UNKNOWN", "depth": None},
+                "qV": {"value": None, "status": "UNKNOWN"}, "left_stage_profile": {"eligible": {"2": "TRUE"}}},
+            buy_permission={"value": False, "reason_codes": ["SYNTHETIC_MISSING_CASH"]},
+            deployment_gap={"status": "NOT_RUN_REQUIRED_INPUTS_UNRESOLVED", "missing_fields": ["SYNTHETIC_VERIFIED_CASH"]},
+            event_coverage={"status": "NOT_VERIFIED"}, order_source={"status": "UNKNOWN"})
+    c["request"]["macro_snapshot"] = {"payload": {"indicators": {"SYN_RATE": {"value": "3.210987",
+        "unit": "%", "dataDate": "2026-10-29", "status": "OK", "detail": "SYNTHETIC_ONLY",
+        "source": "https://synthetic.invalid/macro"}}}}
+    bonds = []
+    for symbol, basis in (("SYN_BOND", "TARGET_ONLY"), ("SYN_SGOV", "HOLDING_ONLY")):
+        bond = {"symbol": symbol, "route": "V75", "coverage_basis": basis, "full_financial_complete": False,
+            "trade_action": "NO_TRADE", "market": {"observed_date": "2026-10-29", "observed_close": "101.234567",
+                "source_reference": "https://synthetic.invalid/bond/" + symbol},
+            "original_pred009": {"aggregate_state": "TECHNICAL_NEUTRAL", "assessment_status": "VALID",
+                "as_of": ASOF, "input_freshness_state": "FRESH"},
+            "missing_inputs": [{"field": "original_v75_financial_handoff", "reason": "SYNTHETIC_BUDGET_REQUIRED",
+                                "affects": ["canonical amount", "Work9"]}]}
+        if symbol == "SYN_SGOV":
+            bond["sgov_roles"] = {"sgov_role_proposal": [], "sgov_role_confirmation": []}
+        bond["result_digest"] = A.digest(bond);bonds.append(bond)
+    expected = sorted([r["symbol"] for r in result["positions"]] + [b["symbol"] for b in bonds])
+    coverage = {"schema_version": "Family.W8.AllAssetCoverage.v1", "client_id": CLIENT,
+        "source_db_sha256": c["source"]["source_db_sha256"], "evaluation_at": AT,
+        "expected": expected, "observed": expected, "missing": [], "excluded": [],
+        "denominators": {"securities": 6, "equity": 4, "bonds": 2, "cash_accounts": 2,
+                         "orders_and_commitments": "COMPLETENESS_UNKNOWN__NOT_ASSUMED_EMPTY"},
+        "equity_symbols": [r["symbol"] for r in result["positions"]], "bonds": bonds,
+        "cash_accounts": [{"account_key": key, "owner_candidate": {"client_id": CLIENT, "currency": "TWD"},
+            "available_cash": None, "missing_binding_fields": ["funding_domain"],
+            "missing_inputs": ["verified_settlement"], "cash_observations": []}
+            for key in ("SYNTH_ACCOUNT", "SYNTH_CASH")],
+        "coverage_complete": True, "financial_completeness_asserted": False,
+        "database_written": False, "trade_action": "NO_TRADE"}
+    coverage["coverage_digest"] = A.digest(coverage)
+    result["all_asset_coverage"] = coverage
+    member_refresh(c)
+    return c

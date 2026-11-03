@@ -283,6 +283,7 @@ def _member_analysis(source, request, result, producer, *, targets=None):
                 ("client_id", source["client_id"]), ("run_id", request["run_id"]),
                 ("owner", owner), ("source_db_sha256", source["source_db_sha256"]),
                 ("request_digest", result["request_digest"]))), "W6_MEMBER_CONCLUSION_BINDING")
+    _runtime("report_financial_sections", "W8").validate_coverage(result, source, request)
     return deepcopy(result)
 
 
@@ -365,9 +366,30 @@ def _member_sources(source, market, engine, binding):
             matches=[x for x in targets if x.get("target_key")==prior["target_key"]]
             require(len(matches)==1 and _same_target(prior,matches[0]),"W6_DB_EXTERNAL_TARGET_CONFLICT")
     original = _member_analysis(source, request, result, binding.get("member_producer"),targets=targets)
-    sections, receipts = _sections(binding.get("sections", {}), source, request["run_id"], _time(request["evaluation_at"]))
+    incoming = binding.get("sections", {})
+    # Validate supplied envelopes even when a legacy display fallback will be
+    # regenerated. A bad hash/client/time is never hidden by a fallback.
+    _sections(incoming, source, request["run_id"], _time(request["evaluation_at"]))
+    display = _runtime("report_financial_sections", "W8").member_sections(
+        source, request, original, binding["member_producer"])
+    active = display["envelopes"]
+    generated = set(active)
+    for name, envelope in incoming.items():
+        legacy_display = (name == "valuation"
+            and envelope.get("scope") == "PARTIAL_MEMBER_V82_ANALYSIS"
+            and envelope.get("source_id") == binding["member_producer"]["source_id"]
+            and envelope.get("upstream_rules_sha") == binding["member_producer"]["rules_sha"])
+        if not legacy_display:
+            active[name] = deepcopy(envelope)
+            generated.discard(name)
+    sections, receipts = _sections(active, source, request["run_id"], _time(request["evaluation_at"]))
+    display["projection"]["generated_sections"] = sorted(generated)
+    display["projection"]["quoted_fields"] = {k: v for k, v in display["projection"]["quoted_fields"].items()
+                                               if k in generated}
     output={"scope": "SOURCE_REVIEW", "sections": sections, "radar": None, "canonical": None,
+            "coverage_summary": display["coverage_summary"],
             "lineage": {"binding_sha256": binding["digest"], "sections": receipts,
+                        "input_sections": deepcopy(incoming), "section_projection": display["projection"],
                         "member_analysis": original, "member_producer": deepcopy(binding["member_producer"]),
                         "request_sha256": digest(request), "result_sha256": digest(result),
                         "valuation_state": "UNKNOWN", "missing": ["VERIFIED_PORTFOLIO_NAV_AND_FX",
@@ -386,13 +408,15 @@ def _sections(envelopes, source, run_id, evaluated):
         receipts[name] = raw
         if raw.get("as_of"):
             require(_time(raw["as_of"]) <= evaluated, "W6_FUTURE_SECTION")
+        if raw.get("available_at") is not None:
+            require(_time(raw["available_at"]) <= evaluated, "W6_FUTURE_SECTION_AVAILABILITY")
         payload = raw.get("payload")
         if payload is not None:
             require(isinstance(payload, list) and all(isinstance(x, dict) and x.get("heading")
                     and x.get("body") and x.get("source_reference") for x in payload), "W6_SECTION_PAYLOAD")
         normalized[name] = deepcopy(payload or [])
         if raw["value_state"] != "KNOWN" or not payload:
-            normalized[name].append({"heading": "資料狀態：" + raw["value_state"],
+            normalized[name].insert(0, {"heading": "資料狀態：" + raw["value_state"],
                                      "body": "資料尚待提供或核對；缺值保留 UNKNOWN，不代表零或安全。",
                                      "source_reference": raw.get("source_id") or "SOURCE_NOT_PROVIDED"})
     return normalized, receipts

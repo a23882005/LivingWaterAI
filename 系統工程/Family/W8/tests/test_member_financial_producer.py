@@ -94,3 +94,26 @@ def test_complete_original_inputs_are_saved_for_the_existing_native_assembler(tm
     saved=json.loads(Path(pack['local_path']).read_text())
     assert saved['pack']['native_sources'] and not out['qualified_financial_pack']
     assert saved['pack'].get('native_result') is None
+
+
+def test_same_run_uses_current_pinned_original_base_instead_of_stale_bootstrap_copy(tmp_path,monkeypatch):
+    import member_reconciliation_source
+    r,d,desc=case(tmp_path)
+    old={'local_path':'SYNTHETIC_OLD_ORIGINAL','sha256':'b'*64}
+    current={'local_path':'SYNTHETIC_CURRENT_ORIGINAL','sha256':'c'*64}
+    d['configuration']['official_target_base_source']=old
+    monkeypatch.setattr(member_reconciliation_source,'read',lambda *args:{
+        'digest':'d'*64,'client_id':r['client_id'],'run_id':r['run_id'],'source_db_sha256':'a'*64,
+        'target_version':2,'original_target_sources':{'official_target_base_source':current}})
+    def factory(**cfg):
+        assert cfg['official_target_base_source']==current
+        assert cfg['family_c7_assembly_inputs']['member_reconciliation_source']['sha256']=='e'*64
+        def run(*args):
+            child=deepcopy(cfg['request_seed'])
+            return {'request':child,'source_production':{'status':'SOURCE_STAGE_INCOMPLETE',
+                'source_validation_issues':[{'code':'ORIGINAL_COMPLETE_FACTS_STILL_REQUIRED'}]}}
+        return run
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=factory,
+        reconciliation_source={'local_path':'SYNTHETIC_REPLAYED_SOURCE','sha256':'e'*64})
+    assert pack is None and not out['qualified_financial_pack']
+    assert out['same_run_source_binding']['source_digest']=='d'*64

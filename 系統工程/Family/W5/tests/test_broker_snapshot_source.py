@@ -70,6 +70,7 @@ def test_mixed_completed_query_is_partial_and_does_not_release_replaced_exposure
     manifest['orders'].update(arguments={'show_completed':True},source_mode='MIXED_HISTORY_OBSERVATIONS_ONLY')
     source=save('manifest.json',manifest);view=read(req,source);orders=view['order_source']
     assert orders['original_query']=={'show_completed':True}
+    assert orders['source_reference']=='IBKR.get_account_orders:show_completed=true'
     assert orders['active_orders'][0]['state']=='REPLACE_PENDING'
     assert not orders['complete_for_open_order_exposure'] and not orders['lifecycle_fully_resolved']
     assert view['cash']['available'] is None

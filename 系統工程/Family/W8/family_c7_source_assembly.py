@@ -473,6 +473,26 @@ class SourceAssembler:
         scope['total_stock_ceiling']=self.tactical(tactical,scope)
         facts=read_facts(portfolio_facts_source,req)
         current=self.portfolio(facts,portfolio_facts_source,scope)
+        source=self.context.get('member_reconciliation_source')
+        if source is not None:
+            from member_reconciliation_source import read
+            normalized=read(self.root,source,req)
+            self.observations['same_run_financial_sources']={'source_descriptor':deepcopy(source),
+                'source_digest':normalized['digest'],'original_observations':normalized,
+                'used_as_complete_reconciliation_facts':False}
+            # Feed known quantities to the original source inventory even when
+            # a missing owner/funding root prevents AssetSourceProducer startup.
+            # A dated price/value is still an observation, never complete NAV.
+            for index,row in enumerate(normalized['position_values']['positions']):
+                fact=row['quantity_source'];iid=fact.get('instrument_key') or row['symbol']+'#'+str(index)
+                account=row.get('account_key') or 'ACCOUNT_UNRESOLVED'
+                locator={'source':deepcopy(source),'source_digest':normalized['digest'],
+                    'original_quantity_source':deepcopy(fact),'source_db_sha256':normalized['source_db_sha256'],
+                    'as_of':fact.get('observed_at'),'available_at':fact.get('received_at')}
+                self.field('current_nav.positions.'+account+'.'+iid+'.quantity',row['quantity'],
+                    state=DIRECT if row['quantity'] is not None else MISSING,
+                    code='C7_CURRENT_POSITION_QUANTITY_REQUIRED',sources=[locator],
+                    producer='W5.project_official_holdings:replayed_same_run_original_quantity',blocking=False)
         for key in ('approval_receipt','account_owners','current_nav','protection_coverage','preference_locks','portfolio_caps','exposure_coverage','exposures','funding_buckets'):
             if key not in self.inventory:self.field(key,scope.get(key),state=ADAPTER,code='C7_ORIGINAL_DEPENDENCY_NOT_QUALIFIED')
         out={'schema_version':'Family.W8.C7SourceAssembly.v1','client_id':req['client_id'],'run_id':req['run_id'],
@@ -533,6 +553,8 @@ def assemble_original_producers(producer,request,context,prepared,trial):
     arguments={'feed_source':producer.verified_macro_feed_source} if producer.verified_macro_feed_source is not None else {}
     tactical=calculate(producer.root,request,producer.v70_strategic_policy,producer.fx_observation,**arguments)
     ctx=deepcopy(context);ctx['family_c7_reporting_fx']=deepcopy(producer.fx_observation)
+    if options.get('member_reconciliation_source') is not None:
+        ctx['member_reconciliation_source']=deepcopy(options['member_reconciliation_source'])
     assembler=SourceAssembler(producer.root,request,ctx,options['artifact_directory'])
     out=assembler.build(tactical=tactical,identities=identities,portfolio_facts_source=options.get('portfolio_reconciliation_source'))
     out['original_observations'].update(selected_account_cash_trial={

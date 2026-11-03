@@ -104,13 +104,28 @@ def complete_report(report,request,config,root):
     if (set(descriptors)|set(producers))-symbols:raise PermissionError('MEMBER_FINANCIAL_ASSET_OUTSIDE_APPROVED_UNIVERSE')
     if set(descriptors)&set(producers):raise PermissionError('MEMBER_FINANCIAL_DUPLICATE_PRODUCER_PATH')
     out=deepcopy(report);out['component_report_digest']=report['report_digest']
+    reconciliation_source=None
+    if config.get('financial_reconciliation_artifact_directory') is not None:
+        from member_reconciliation_source import persist,binding
+        reconciliation,reconciliation_source=persist(root,request,config,
+            config['financial_reconciliation_artifact_directory'])
+        if (reconciliation['position_values']!=report.get('source_position_valuations')
+            or reconciliation['securities']!=report['all_asset_coverage']['expected']
+            or reconciliation['coverage_digest']!=report['all_asset_coverage']['coverage_digest']):
+            raise PermissionError('MEMBER_RECONCILIATION_ANALYSIS_SOURCE_VALUES_OR_COVERAGE_MISMATCH')
+        out['same_run_financial_sources']={'source_descriptor':reconciliation_source,
+            'binding_digest':digest(binding(request)),
+            'source_digest':reconciliation['digest'],'securities':reconciliation['securities'],
+            'account_keys':reconciliation['account_keys'],'reconciliation_attested':False,
+            'financial_cycle_initialized':False,'trade_action':'NO_TRADE'}
     from same_run_market_cache import SameRunMarketCache
     observation_cache=SameRunMarketCache()
     for row in out['positions']:
         descriptor=descriptors.get(row['symbol'])
         if row['symbol'] in producers:
             from member_financial_producer import produce
-            attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],observation_cache=observation_cache)
+            attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],
+                observation_cache=observation_cache,reconciliation_source=reconciliation_source)
             row['financial_source_attempt']=attempt;row['call_trace']+=attempt['call_trace']
             row['missing_inputs']=[m for m in row['missing_inputs'] if m['field']!='work3/C7/funding/execution_constraints']
             if descriptor is None:

@@ -13,7 +13,7 @@ import re
 from family_input import digest
 
 
-def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None):
+def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None):
     raw=Path(descriptor['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_PRODUCER_SOURCE_BYTES_CHANGED')
     data=json.loads(raw)
@@ -32,7 +32,21 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     cfg=deepcopy(data.get('configuration'))
     def root_inventory(seed_context=None):
         from family_c7_source_assembly import assemble
-        return assemble(root,request,seed_context or {},artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
+        context=deepcopy(seed_context or {})
+        if reconciliation_source is not None:context['member_reconciliation_source']=deepcopy(reconciliation_source)
+        return assemble(root,request,context,artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
+    if reconciliation_source is not None:
+        from member_reconciliation_source import read
+        normalized=read(root,reconciliation_source,request)
+        attempt['same_run_source_binding']={'source_descriptor':deepcopy(reconciliation_source),
+            'source_digest':normalized['digest'],'client_id':normalized['client_id'],
+            'run_id':normalized['run_id'],'source_db_sha256':normalized['source_db_sha256'],
+            'target_version':normalized['target_version'],'reconciliation_attested':False}
+        # Reuse the exact current original base descriptor. An older bootstrap
+        # may quote the same amount from an earlier revision of the member's
+        # source file; it must not become a second same-run approval lineage.
+        if cfg is not None and normalized.get('original_target_sources',{}).get('official_target_base_source') is not None:
+            cfg['official_target_base_source']=deepcopy(normalized['original_target_sources']['official_target_base_source'])
     if cfg is None:
         gaps=deepcopy(data.get('missing_source_facts') or [])
         if not gaps:raise PermissionError('MEMBER_PRODUCER_EXACT_ROOT_GAPS_REQUIRED')
@@ -70,6 +84,8 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     cfg['family_c7_assembly_inputs']={'schema_version':'Family.W8.C7AssemblyInputs.v1',
         'artifact_directory':str(Path(data['artifact_directory'])/'c7_sources'),
         'portfolio_reconciliation_source':deepcopy(data.get('portfolio_reconciliation_source'))}
+    if reconciliation_source is not None:
+        cfg['family_c7_assembly_inputs']['member_reconciliation_source']=deepcopy(reconciliation_source)
     if producer_factory is None:
         from native_asset_source import AssetSourceProducer
         producer_factory=AssetSourceProducer

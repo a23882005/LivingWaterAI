@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "38a4cd7378a4299f5d4a2d55c7796446ea054c8dbae00d8a46dc96e44b4e743e"
+    "sha256": "99f49b9973199eb49ed2520210dd1273149624140085a6f09ad1632d11c7e0fd"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -415,7 +415,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_chain.py",
-    "sha256": "a6fe16980a48913af0b34ee0e8e282b1da66612b6ef151d5d180aa7f450c9393"
+    "sha256": "14dee7f3f248ed9861623407e52ccd06c88e190a90080be7ceafee0dd9597e4a"
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
@@ -423,11 +423,11 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_producer.py",
-    "sha256": "ff7b8ee1a2d1fe69a9ed63fef4129a11f6e28e678dcab110794bbd4669346220"
+    "sha256": "b7058720bf32bc1e684c762e9dfe27e4c362555ff4367a23c60235e4472a1057"
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
-    "sha256": "607aef8ec7ff18447122b74f0ca64ae38819de2c4abec4ade615a20bcf7d4343"
+    "sha256": "43c7320507487256b250e02f765ad1a9feb3547b7d5eb0da00b3d9d05cbd9762"
   },
   {
     "path": "系統工程/Family/W8/same_run_market_cache.py",
@@ -447,7 +447,7 @@
   },
   {
     "path": "系統工程/Family/W8/family_c7_source_assembly.py",
-    "sha256": "4f9af297ca4ff61314845bfd38e37b5e78360594bada4197bd063512ca3d0033"
+    "sha256": "357df540a3c261c601959f1b5bd42cf181029b7e9311982686b74e999637f700"
   },
   {
     "path": "系統工程/Family/W8/v70_tactical_input.py",
@@ -516,5 +516,9 @@
   {
     "path": "系統工程/Family/W8/tpex_actual_sessions.py",
     "sha256": "bccdcbf081b359ee2f5607cce0491aa529717434e4cbcaa846212c103a7fdc23"
+  },
+  {
+    "path": "系統工程/Family/W8/member_reconciliation_source.py",
+    "sha256": "050a43eac5e976c5b41aa12ebf872b15f8965f4dae1b625b71a2ce9988f80bf0"
   }
 ]

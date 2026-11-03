@@ -94,6 +94,7 @@ def read(request,source):
             and item.get('source_mode')=='MIXED_HISTORY_OBSERVATIONS_ONLY')
         if item.get('arguments')!={'show_completed':False} and not mixed:
             raise PermissionError('BROKER_WORKING_ORDER_SCOPE_REQUIRED')
+        order_source['source_reference']='IBKR.get_account_orders:show_completed=true' if mixed else 'IBKR.get_account_orders:working_only'
         try:
             raw_orders=response(item,'get_account_orders').get('orders')
             if not isinstance(raw_orders,list):raise ValueError('BROKER_ORDER_LIST_REQUIRED')

@@ -1,4 +1,4 @@
-最後修改日期時間：2026/11/04 07:11（台灣時間）
+最後修改日期時間：2026/11/04 07:21（台灣時間）
 ## 2026/10/31｜金融／報告交接工單 v1.0 已備妥
 
 中PM已固定PR59 `d250d3c` producer與PR60 `4319556` consumer的介面基準，確認「建議呈現／券商不執行」語意。第一階段交原報表Codex限修Mentor接收相容性，新增明確准改W6/runtime/report_receiver.py；既有金融producer與77頁報告成果保留。完整真人金融章節待合格來源及中PM另鎖交接版本後進入第二階段。
@@ -317,4 +317,6 @@ PR59固定head`a87971f1b7f5f06aab258a3c993659c4d4601ff5`，自已驗`172d5eb`經
 **唯一最新施工契約：** [PR59 中 PM qP 最終決策與最小工單](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6615181307)。[舊四方案研究留言](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6614876112) 已註明 SUPERSEDED；僅留來源背景。原所有既有PASS與 W8 IN_PROGRESS、完整金融PASS0/真實cycle0、Production HOLD/交易NONE維持，診斷程式仍待原Codex回交實作與中PM獨立驗收。
 
 ## 2026-11-04｜Family中PM三ZIP交接
-已於Google Drive根/TEMP交付並重下載逐SHA/CRC/Manifest核對三包：`Family_中PM_交接_ZIP1_總PM責任與治理_20261104.zip`（11255 bytes，SHA `8eaa94d0e6b1f1dd6f8f6b4621fe0c68adc235aec4117046bd516257811148c6`）、`Family_中PM_交接_ZIP2_已完成成果與正式來源_20261104.zip`（11820 bytes，SHA `a4e1f31257da943165b92c5ea9a7bd0b9ed6406c27ad87a7beb3ab1dfbbe4f54`）、`Family_中PM_交接_ZIP3_剩餘工序與驗收契約_20261104.zip`（17977 bytes，SHA `76c33dede2a7551920ffa774a3ed6218b54d0c30501d248da8a4ec431fa96499`）。共20正文/索引＋3 manifest。承接者Family中PM全案總PM責任至Gate E，先Fresh Read正式Root/Family治理及live W8 Checkpoint，維持W7 PASS/CLOSED、W8 IN_PROGRESS、原PR59 a87971f的scoped PASS、PR60報表分段結案、正式qP峰63不變及四方案研究取消、Production HOLD/交易NONE。當前由原V82 Codex續已核准qP換錨診斷與合法金融主鏈，接任中PM自行查真缺的原件並接回交作獨立QA；後續四戶56格→Gate D→四Project→Trial→Gate E。三包私有Drive ID與持倉、DB原件留在私人正式治理，不公開。
+已於Google Drive根/TEMP交付並重下載逐SHA/CRC/Manifest核對三包：`Family_中PM_交接_ZIP1_總PM責任與治理_20261104.zip`（11426 bytes，SHA `ee6501c6da7b9c46eb62636dca6fe21a210d9641933be5d3e22274396c5b3c19`）、`Family_中PM_交接_ZIP2_已完成成果與正式來源_20261104.zip`（14362 bytes，SHA `d55ce4ff49622a7f0634124704107c75570c5b406770e6fb2304846229514e79`）、`Family_中PM_交接_ZIP3_剩餘工序與驗收契約_20261104.zip`（19552 bytes，SHA `35674c949362ca4d962a9080f724adfa8ea7d36016b19c5bfa15dac5b065ee04`）。共22正文/索引＋3 manifest。承接者Family中PM全案總PM責任至Gate E，先Fresh Read正式Root/Family治理及live W8 Checkpoint，維持W7 PASS/CLOSED、W8 IN_PROGRESS、原PR59 a87971f是最後中PM已驗收scoped PASS；新PR59 fdf244f已提交唯讀qP換錨診斷與測試/依賴鎖三檔、同head六CI成功，**仍待中PM獨立QA**、PR60報表分段結案、正式qP峰63不變及四方案研究取消、Production HOLD/交易NONE。當前由原V82 Codex續已核准qP換錨診斷與合法金融主鏈，接任中PM自行查真缺的原件並接回交作獨立QA；後續四戶56格→Gate D→四Project→Trial→Gate E。三包私有Drive ID與持倉、DB原件留在私人正式治理，不公開。
+
+**H2最新版校驗備註（2026/11/04）**：三包已於原受權Drive/TEMP File IDs原位更新，新增PR59 fdf244f施工/六CI成功與**PM獨立QA待辦**之精確區分，H1大小/SHA只留治理歷史。新對話先驗fdf244f，確認後才簽新Scoped PASS；既有數據a87971f驗收保留。\n

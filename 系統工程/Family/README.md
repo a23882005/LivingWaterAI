@@ -1,4 +1,4 @@
-最後修改日期時間：2026/11/04 02:09（台灣時間）
+最後修改日期時間：2026/11/04 04:04（台灣時間）
 ## 2026/10/31｜金融／報告交接工單 v1.0 已備妥
 
 中PM已固定PR59 `d250d3c` producer與PR60 `4319556` consumer的介面基準，確認「建議呈現／券商不執行」語意。第一階段交原報表Codex限修Mentor接收相容性，新增明確准改W6/runtime/report_receiver.py；既有金融producer與77頁報告成果保留。完整真人金融章節待合格來源及中PM另鎖交接版本後進入第二階段。
@@ -306,3 +306,7 @@ The privately accepted16-page/5-file member correction and prior reports remain 
 ## 2026-11-04｜中PM PR59 172d5eb PV2幣別最小介面驗收PASS
 最新PR59 head`172d5ebe7af9372ad2b669bf30692f2cab202ce7`，parent `67be3c0`；正式裁定`PASS_SCOPED_PV2_ALL_ACCOUNTS_MARKET_IDENTITY_CURRENCY_INTERFACE`。承接原全部分段PASS，PV2全戶以可信標的市場幣別核對原生qP/qV，單戶安全守門保留。中PM從私人Drive/TEMP新下載兩包、SHA/manifest/CRC及隔離還原1151個Git檔、1035個來源mapping全PASS；新PV2測試37/37、相依回歸20/20親跑；同head六組CI全success，JUnit W5 559/W8 1044零failure。四戶42證券之Menu04封存兩遍一致，中PM以原生模組另實際重讀、核算24筆本人市場身分皆與封存同結果。真實qP/qV/PIT與完整金融仍需合法歷史資料，financial PASS0、cycle0、Production HOLD、交易NONE；PR59 Draft未合併。PR60報表Codex成果維持結案。
 **下一施工者：原V82 Codex／PR59**沿合法自身raw價、完整公司行動、日曆、PIT及可比估值完成qP/qV，再續C7B/schema83與資金帳本主鏈；中PM集中本人資料原件、驗收與四本治理；報表Codex暫不派工。詳 [PR59正式裁定與工序](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6611687862) 和 [去識別化PM驗收](W8/查核紀錄/PM_PR59_172d5eb_PV2_SCOPED_ACCEPTANCE_20261104.md)。私人原件僅保留權限管控Drive。
+
+## 2026-11-04｜中PM PR59 a87971f 原始日價及部分持倉驗收
+PR59固定head`a87971f1b7f5f06aab258a3c993659c4d4601ff5`，自已驗`172d5eb`經`c423c77`兩筆續工。中PM獨立裁定`PASS_SCOPED_17_ASSET_RAW_UNADJUSTED_HISTORY_AND_21_PARTIAL_DATED_POSITION_VALUES`，前版所有PASS保留。兩私人ZIP新下載SHA/CRC/manifest及隔離還原Git1153檔、來源1455位置全PASS、零覆寫；原繼承1035份path/bytes/SHA完全保留。17美股原始日價8148筆（16×500＋DRAM148，資料完成日2026-11-02）來源SHA/date/price獨立核對，21筆原股數×對應原raw close日期化部位金額皆獨立重算正確；已保留24同戶來源身分綁定，21筆只是可計部分資產。還原正式程式新來源36＋原PV2 37＝73測試通過；同head GitHub六CI成功，原JUnit W5 559、W8 1080全過；四戶42證券Menu04原封存各雙遍一致，PM本次未宣稱四戶全新cold-start。正式qP/qV/PIT、完整財富/公司行動與C7B/schema83尚待資料資格，financial PASS0、cycle0、Production HOLD、交易 NONE，PR59仍Draft。PR60報表既有PASS結案。
+**下一施工者：原V82 Codex／PR59**沿合法本身歷史/股息分拆/歷史PIT/同Primary估值及既有金融主鏈續工；**中PM**集中確認已存本人帳戶/結算/訂單/SGOV/投資池來源並獨立驗收；**原報表Codex PR60**已結案，待金融合格另發工單。正式 [PR59中PM裁定與下一施工契約](https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6614032017)；[公開去識別化驗收紀錄](W8/查核紀錄/PM_PR59_a87971f_RAW_8148_PARTIAL_VALUES_21_ACCEPTANCE_20261104.md)。私人來源與本人資料只保留Drive權限管控。

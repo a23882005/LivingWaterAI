@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-03T17:10:00Z",
+  "updated_at": "2026-11-03T18:09:00Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原V82 Codex／PR59：67be3c0後續合法金融來源＋C7B/schema83＋PV2最小接口；中PM：原件／獨立驗收／治理；原報表Codex／PR60：已結案，待PM另發新工單",
-  "next_action": "原V82 Codex沿中PMPR59施工契約續合法raw/history/PIT/qP/qV與PV2全帳戶市場幣別最小接口，再接C7B/schema83、金融資金與ledger；中PM核個人資金原件。PR60已結案保留全部PASS，四戶56選單/Gate D/E仍按原工序。Production HOLD、交易NONE。",
+  "next_owner": "原V82 Codex／PR59續合格自身歷史qP/qV/PIT及C7B金融鏈；中PM本人核缺少的金融原件與獨立驗收／治理；報表Codex／PR60現已結案",
+  "next_action": "PR59 172d5eb PV2全帳戶交易幣別界面已中PM scope PASS。原V82 Codex下一段只續合法自有raw/公司行動/PIT/同Primary歷史→C7B/schema83/qP qV→Work6/C7→資金安全/daily slice/shared MIN→ledger；中PM核本人原件及每次Gate。四戶56項與Gate D/E沿原MasterWBS。Production HOLD、交易NONE",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -2850,5 +2850,48 @@
     "next_contract": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6610364592",
     "PM_document": "系統工程/Family/W8/查核紀錄/PM_PR59_67be3c0_SCOPED_ACCEPTANCE_20261104.md",
     "PR60": "PASS_PRESERVED__DOCS_CLOSED"
+  },
+  "pm_pr59_172d5eb_independent_acceptance_20261104": {
+    "head": "172d5ebe7af9372ad2b669bf30692f2cab202ce7",
+    "parent": "67be3c0663365975a70b24b317c3de0329c71708",
+    "tree": "432f88a8b017906ce46a3c6e58c9661617158137",
+    "verdict": "PASS_SCOPED_PV2_ALL_ACCOUNTS_MARKET_IDENTITY_CURRENCY_INTERFACE",
+    "scope": "ALL_MEMBER_ACCOUNTS market identity currency verification in qP/qV only",
+    "modified_files": 4,
+    "independent_restore": {
+      "code_files": 1151,
+      "input_locations": 1035,
+      "overwrites": 0
+    },
+    "new_PV2_tests_pass": 37,
+    "previous_context_history_tests_pass": 20,
+    "six_CI_pass": true,
+    "W5_Junit_pass": 559,
+    "W8_Junit_pass": 1044,
+    "four_member_sealed_Menu04_double_replays": "42_securities_equal",
+    "native_market_identity_independent_reexecuted": {
+      "Joseph": 6,
+      "MOU": 14,
+      "Arthur": 1,
+      "Lilian": 3,
+      "total": 24
+    },
+    "prior_pass_preserved": [
+      "67be3c0",
+      "9a3350d",
+      "471e4b1_r2",
+      "80e635e",
+      "dd36143",
+      "PR60"
+    ],
+    "actual_real_qP_qV": "UNKNOWN",
+    "complete_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "PR59": "DRAFT_UNMERGED",
+    "PR60": "PASS_DOCS_CLOSED",
+    "PM_public_record": "系統工程/Family/W8/查核紀錄/PM_PR59_172d5eb_PV2_SCOPED_ACCEPTANCE_20261104.md",
+    "next_contract": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6611687862"
   }
 }

@@ -248,3 +248,10 @@ FAMILY-REPORT-PHASE2-20261103-r1 released to original report Codex. PM prepared 
 PM independently verified fixed dd36143 partial real outputs into accepted 9bd61094 report receiver: four households passed, 41 security records (32 equity analysis rows / 9 bonds) and six cash accounts retained in source lineage. External approved-target intake validated; display rows 11/17/3/5. Eight identity/tamper rejection checks passed; latest original Work9/Mentor to report synthetic seam passed with unchanged values/flags. Scope PASS_SOURCE_REVIEW_INTAKE_ONLY; full financial PASS remains zero.
 
 Verified real input package name/digest and fixed versions are recorded in Checkpoint. Report Codex receives ready source/request/result/report_inputs/current/coverage for its existing phase-2 wiring work: https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6590764200 . ACK pending. Preserve renderer, prior accepted reports and all prior PASS. Production HOLD / trading NONE.
+
+
+### 2026/11/03 PR59 dd36143 independent acceptance
+
+PM completed source/coverage and regression acceptance at dd36143: W5 556 and W8 845 distinct cases independently passed after documented environment-dependency rechecks; six PR CI runs success; 871 payloads verified; 865 paths restored without overwrites; four original-cutoff real-data Menu04 replays exactly matched. Forty-one securities / six cash accounts preserved with validated bindings/digests. Prior accepted results remain.
+
+One isolated candidate correction is required: _rows drops an unavailable interior bar without restarting indicator/event windows. A synthetic counterexample and minimal patch are in the private PM handback; patch copy fixes the counterexample and passes 54 candidate regression cases. Original V82 Codex applies it and continues authorized financial-source work. Dispatch: https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6591698576 . Exact filenames/digests and scope are in Checkpoint. Full financial PASS and real cycles remain zero; no formal strategy switch, release or trade permission change.

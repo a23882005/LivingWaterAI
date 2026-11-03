@@ -2483,5 +2483,52 @@
     "worker_ack": "PENDING",
     "production": "HOLD",
     "trade": "NONE"
+  },
+  "pm_pr59_dd36143_independent_acceptance_20261103": {
+    "commit": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+    "tree": "5c21d7813d81661359f0a74a78c7d4ff5b702c42",
+    "status": "SOURCE_AND_REGRESSION_PASS__CANDIDATE_ONE_SCOPED_FIX_REQUIRED",
+    "independent_unique_cases": {
+      "W5": 556,
+      "W8": 845,
+      "W8_subtests": 60
+    },
+    "delta_tests_subset": {
+      "cases": 81,
+      "subtests": 5
+    },
+    "ci_pr_runs": [
+      41539312964,
+      41539313045,
+      41539313184,
+      41539312946,
+      41539313037,
+      41539313137
+    ],
+    "restored_private_paths": 865,
+    "restore_overwrites": 0,
+    "exact_replay_households": 4,
+    "securities": 41,
+    "cash_accounts": 6,
+    "required_fix": {
+      "code": "CANDIDATE_FILTERED_INTERIOR_GAP",
+      "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/nine_stage_candidate/engine.py",
+      "function": "_rows",
+      "observed": "An excluded unavailable interior session joins pre-gap and post-gap indicator/event windows",
+      "expected": "Next accepted bar begins a new segment; terminal excluded future rows do not alter completed prefix",
+      "proposed_patch_regression_passed": 54,
+      "formal_branch_modified_by_PM": false
+    },
+    "decision_file": "PM_PR59_dd36143_獨立驗收與精確修正單_20261103.md",
+    "decision_sha256": "726a18dabfababadfc883618f98b5d86db9ed71a2a2c388218008893c967aa2c",
+    "evidence_file": "PM_PR59_dd36143_獨立驗收證據與修補建議_20261103.zip",
+    "evidence_sha256": "1bb02c399804d43abeb9d20c613df1345c4e9cc38a1f79183927a3ca2082eb45",
+    "dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6591698576",
+    "next_owner": "Original V82 Codex: isolated minimal fix and financial source continuation; PM: originals/source coordination and independent acceptance",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "prior_pass_preserved": true
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-04T01:38:00Z",
+  "updated_at": "2026-11-04T04:04:00Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3108,5 +3108,51 @@
     "production": "HOLD",
     "trade": "NONE",
     "family_db_written": false
+  },
+  "pm_pr59_0b53f7e_scoped_acceptance_20261104": {
+    "owner": "Family中PM／全案總PM",
+    "acceptance_time_taipei": "2026/11/04 12:04",
+    "decision": "PASS_SCOPED",
+    "fixed_head": "0b53f7e656e85928a1dcffd1dcf15deb2deca15e",
+    "parent_scoped_PASS": "fdf244f6e129a6e751287e6bbc8d8039dd4d7959",
+    "change_scope": "SAME_RUN_ORIGINAL_MONEY_AND_ACCOUNT_QUALIFICATION + QP_252_SESSION_DIAGNOSTIC",
+    "changed_files": 13,
+    "qa": {
+      "remote_git_CI": "6/6 SUCCESS",
+      "git_ci_junit": "W5 559/559, W8 1160/1160, fail/error/skip=0",
+      "pm_pytest": "71/71 + 42/42 PASS",
+      "source_replay": "4/4 DB snapshot, 4/4 financial_facts, 33/33 C7 qualifications",
+      "qp_replay": "12/12 Golden + 12/12 business/49+13",
+      "immutable_double_replay": "42 securities, 33 stock rows, 4/4 first vs second byte identical",
+      "restored": {
+        "code_files": 1157,
+        "source_map": 3783,
+        "git_commits": 1449,
+        "overwrites": 0
+      },
+      "official_remote_source_recheck": "4/4 member DB + 4/4 member ledger; SHA same, SQLite integrity ok, FK 0"
+    },
+    "delivery": {
+      "private_pm_qa": "Google Drive root/TEMP/Family_PM_PR59_0b53f7e_中PM獨立驗收_PASS_SCOPED_20261104.md",
+      "pm_qa_sha256": "b84f113ef582b64f574795172214e3aa7dc9816507974036385f45b13bffebf6",
+      "code_zip_sha256": "3aca3b9c2fc91dd4615a30ab5e5a3d27a97df7f195e74a69275507d239ce0d71",
+      "sources_zip_sha256": "e5bc8c1ecd93e522575b53fb5cf936fdc7730aae9c90775d10073ee43d61a954",
+      "github_review": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6622239170"
+    },
+    "preserved": "All prior PASS; V82/three-layer rules and qP numerical output unchanged; PR60 current scoped CLOSE",
+    "limitations": [
+      "Recorded identity engineering replay, not live family login cold start",
+      "Full qualified qP/qV/PIT and company actions pending",
+      "Same-cutoff cross-broker NAV and identity/settled/reserved/pending proof pending",
+      "SGOV BOND/DRY physical units/settlement pending"
+    ],
+    "original_v82_codex_next": "Continue PR59: qualified PIT/own-history qP/qV -> C7B/schema83 -> all-account NAV, settled/authorized cash, orders/confirmed releases, SGOV -> slice/ledger -> Work9/Mentor",
+    "middle_pm_next": "Verify next Codex delta and current official financial originals; own full W8 4x14 matrix, Gate D, Trial, Gate E",
+    "w8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "pr59": "DRAFT_UNMERGED"
   }
 }

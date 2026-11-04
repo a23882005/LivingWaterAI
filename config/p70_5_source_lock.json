@@ -1,0 +1,1156 @@
+{
+  "schema": "LivingWaterAI/p70-5-source-lock-v1",
+  "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+  "files": {
+    ".github/workflows/email-action-results.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3887,
+      "sha256": "067720610eda6ae1e43c47e0d667dea0f232d40e4f1b6db9a0876c93db64a9d5",
+      "git_blob_sha1": "d036e5bf4acfd3f6110b54b9ff2e25b7e550c16d",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/hlw-realtime-rstar-check.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3592,
+      "sha256": "64e10589446e8d7829c1bea0c2c9c7120a446afbf45b4c97bec2592a8c374865",
+      "git_blob_sha1": "0670fde2c1e8adeb8208391fdf97787d5b7f49af",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/hostinger-connectivity-smoke.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3288,
+      "sha256": "aa3213ecce3be245af5b81c89f736f844e77b4b8d248a6c86a692f74b3d9e0b6",
+      "git_blob_sha1": "1b2a3a16e8c4c9d8a45460ea85dbec02e681d1a5",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/ib-global-history-0700.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1295,
+      "sha256": "af64b28afce6cbabe3e1250fc2cb983ff3b830e830fd76cdf9ee8a1df2766785",
+      "git_blob_sha1": "3ae834cfddea6fd87d589c460b8f4025c0ce53ea",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/ib-taiwan-history-1430.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1312,
+      "sha256": "c06207d06fa056214b4a4e8ac3051f0fc1fe9a7e11a626b6fba6da9c16ae45d6",
+      "git_blob_sha1": "2cf7adacbdf6bc373110e1f45263c8a1c3de59b2",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/macro18-preflight.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 9345,
+      "sha256": "047ce382f88dcceb91ec293ce8e4681d400c4e6122a837a4a2a19deb0e3dd59e",
+      "git_blob_sha1": "a7bd778b1823346365e077017cbaaa103c0527d2",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/qa-macro18.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1325,
+      "sha256": "d1d7e932b3db0e29dbe367c584487b82a15694b09b78b1467b20f16d6caa15ab",
+      "git_blob_sha1": "c1ca71e71efd58d5e4508eb8b0ff16cdd4994b91",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/qa-macro19.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1454,
+      "sha256": "e4555a2f7954da47b5a4dbcb0cfde21247edbafa827306c617375c03fc443af9",
+      "git_blob_sha1": "48e85c5634375ba933dda939572d36870699df6b",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/update-v70.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 10294,
+      "sha256": "fe1d4244635d1181f2c4d0136d6c86cb07683ce461266587a2e95858c087f144",
+      "git_blob_sha1": "bd77dc5b20aa64095f7c26d3d1d65f2d2b4c3466",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/v703-frontend-regression.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 7152,
+      "sha256": "eef9e4ecca25fbee30c69ea3f343cbf6fef7720b6215bca946df9cc082826600",
+      "git_blob_sha1": "25288b536d9022af4bd099722b77e3fe1bbbe83f",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    ".github/workflows/v703-site-deploy-1100.yml": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 19997,
+      "sha256": "6061529e3b09f5f71c3048d16736c2fa185ac62aa6db0d12889ee8bbc543162a",
+      "git_blob_sha1": "af186b0bf59cf1c57edc0c85e805f80ae28e2535",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "V70_macro_latest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 5366,
+      "sha256": "e1d9a64a81277c096e75587c1fa403b3b6657be3d0b6352f993207ab4f21dd8a",
+      "git_blob_sha1": "c8f0772cc4ed2b7f8fa2be2522fceffd307737b6",
+      "producer": "scripts/build_v703_feed.py / legacy workflow",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "V70.3/macro-feed-v1",
+      "data_date": "2026-10-20T10:52:02.884789+08:00"
+    },
+    "data/18_macro_verification.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 11448,
+      "sha256": "a45a05009ad9bcb95f69feb2c6ec2a445531a12f6a39c7ac8f58a29232e27dad",
+      "git_blob_sha1": "0312949c3c4e158a7835cbe29e386a293843ce18",
+      "producer": "系統工程/總經V70/總經爬蟲18項.py",
+      "use_class": "OFFICIAL_SCORING",
+      "schema": "V70.3/18-macro-collector-v1",
+      "data_date": "2026-10-20T09:35:13.000156+08:00"
+    },
+    "data/22_macro_verification.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 10782,
+      "sha256": "e93be74c049b7e23474d24221ca2c31a59e09d105781e9740e5891f09d0613bd",
+      "git_blob_sha1": "f9d4ffb09c7b23ba1f43a7da95eb7bfca0cd9d20",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/22-macro-collector-v1",
+      "data_date": "2026-10-14T20:29:11.818338+08:00"
+    },
+    "data/24_macro_verification.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 11532,
+      "sha256": "4282573c7b390ec60491f84dffdd6a724a6d54ccd0452d6a5534ada7906372d4",
+      "git_blob_sha1": "7c7837120d02172c941a559b4dcb39e334bd03b6",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.2/24-macro-research-v1",
+      "data_date": "2026-10-20T10:52:02.884789+08:00"
+    },
+    "data/5_macro_verified.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 9468,
+      "sha256": "743d1260b55bc604442edd49a2bbfe128c203932e3aa23b4a1414fe575ecd7aa",
+      "git_blob_sha1": "e6b66694f8c2c33664bfd2e47337806d8e8f9ef5",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/10h-five-supplement-forward-v2",
+      "data_date": "2026-10-17T10:07:13+08:00"
+    },
+    "data/8_macro_supplement_verified.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 21910,
+      "sha256": "a9614345ebf12279a60abea014c995f47e968568bd17396d349113fd73a3359f",
+      "git_blob_sha1": "6e9285c27981a404d6313d40aeea27fbf95513f8",
+      "producer": "10:00 ChatGPT總經Task",
+      "use_class": "OFFICIAL_SCORING",
+      "schema": "V70.3/10h-eight-supplement-v3",
+      "data_date": "2026-10-20 10:04:47"
+    },
+    "data/V70-3-27_8_macro_supplement_verified.template.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 18658,
+      "sha256": "83b0aaee234cb475faa28dac15a2adff9701a2ded3389065ea5ed51cb3d57f13",
+      "git_blob_sha1": "dc59e5bcb097ff9c1e95fbf273cacb7f6ad64f2d",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/10h-eight-supplement-v3",
+      "data_date": "UNKNOWN"
+    },
+    "data/V70_macro_latest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 5366,
+      "sha256": "e1d9a64a81277c096e75587c1fa403b3b6657be3d0b6352f993207ab4f21dd8a",
+      "git_blob_sha1": "c8f0772cc4ed2b7f8fa2be2522fceffd307737b6",
+      "producer": "scripts/build_v703_feed.py / legacy workflow",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "V70.3/macro-feed-v1",
+      "data_date": "2026-10-20T10:52:02.884789+08:00"
+    },
+    "data/backups/chatgpt_macro_snapshot_pre_20261013.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1880,
+      "sha256": "b6f8991c292b6b70de220b26bac72427b058fd3a9472c5a8717d7cdd4684fbf5",
+      "git_blob_sha1": "4f99d76ad932eeb638112c73de2d6bf7d815b366",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "UNDECLARED",
+      "data_date": "UNKNOWN"
+    },
+    "data/chatgpt_macro_snapshot.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1880,
+      "sha256": "b6f8991c292b6b70de220b26bac72427b058fd3a9472c5a8717d7cdd4684fbf5",
+      "git_blob_sha1": "4f99d76ad932eeb638112c73de2d6bf7d815b366",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "UNDECLARED",
+      "data_date": "UNKNOWN"
+    },
+    "data/d009_actions_proof.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 484,
+      "sha256": "2a3e19ce474b818ca7de9c881edd0fdf8282deb6de3def0ce7bc32f0e597f462",
+      "git_blob_sha1": "14e105d52bd1f3f3dbd5f873c4adcf0e16c2675b",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "D009-actions-proof-v1",
+      "data_date": "UNKNOWN"
+    },
+    "data/lei_cross_vintage_candidate_unverified.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 871,
+      "sha256": "b726ae770177821821a2156087e7187da7f337228ec98ae81dc10648b531c8b1",
+      "git_blob_sha1": "85a82eec566335a46aa4d52c62316ab91c84a15e",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/lei-candidate-v1",
+      "data_date": "UNKNOWN"
+    },
+    "data/macro_safety_daily.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 709259,
+      "sha256": "28fe5de5760c2727c032681b99f097bffd82e221ef74869692e8584c53e09b50",
+      "git_blob_sha1": "474d7a891ab843b6a6dfd451e327ded7cd6aa296",
+      "producer": "scripts/capture_v703_daily_snapshot.py",
+      "use_class": "OFFICIAL_SCORING",
+      "schema": "CSV:daily_record_id|observation_date|run_timestamp_utc|feed_asof_utc|v70_version|source_commit|feed_sha256|health_score|score_status|neutral_imputed_items|raw_indicator_values_json|indicator_provenance_json|source_snapshot_json",
+      "data_date": "2026-10-20"
+    },
+    "data/macro_safety_monthly.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 499,
+      "sha256": "c94cb446bd43a01fdea2424eb6d2d6a6285cb2754d56882b2aa6d120c3f0ab60",
+      "git_blob_sha1": "800f21fd775056a3837fe0cba0d4cdf9890c53ad",
+      "producer": "scripts/monthly_research/macro_safety_monthly.py",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:snapshot_month|snapshot_date|source_daily_observation_date|health_score|previous_snapshot_date|previous_health_score|elapsed_months|delta_points|slope_points_per_month|sp500_start_date|sp500_start_close|sp500_forward_end_date|sp500_forward_end_close|sp500_forward_3m_return_pct|return_status|score_status|neutral_imputed_items|run_timestamp_utc|source_commit",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/QQQ.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 679324,
+      "sha256": "0238fc4d20bd180a52b2601690433f131d1939720da72a8b0865a09605c7735e",
+      "git_blob_sha1": "733530e28525c9e83665026874ba8c0fb485dce9",
+      "producer": "UNKNOWN; record root manifest as legacy; no fallback",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|MA50_Close|Above_MA50_Individual|Adjusted_Price_Drawdown",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/SPY.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 682134,
+      "sha256": "3e51524711f00eadacdfa9b8e380eef12668a84cf961380e56f82950ee254e3e",
+      "git_blob_sha1": "efd1a0281bf1dba22af42b36bc4f99c6cb0d2437",
+      "producer": "UNKNOWN; record root manifest as legacy; no fallback",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|MA50_Close|Above_MA50_Individual|Adjusted_Price_Drawdown",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/VOO.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 647274,
+      "sha256": "cade6ba071d32e3892b8e32ab5df281379ef671c0ef6ef65bae6bebe7954ac1c",
+      "git_blob_sha1": "c61ff1f4058a9178ad77e26cba3772f6cce387bc",
+      "producer": "UNKNOWN; record root manifest as legacy; no fallback",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|MA50_Close|Above_MA50_Individual|Adjusted_Price_Drawdown",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/VT.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 673270,
+      "sha256": "a036c931d25c83559bcfbd0cc4c759bc0188e195139c9e2c46a61b03c5e7b37a",
+      "git_blob_sha1": "17ee9dce872dffce69bda9dd29fc996365882d3a",
+      "producer": "UNKNOWN; record root manifest as legacy; no fallback",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|MA50_Close|Above_MA50_Individual|Adjusted_Price_Drawdown",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/DRAM.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 16931,
+      "sha256": "932940268eb63e31c64823fd272871bdd71d9e082ed77e2e63302b7c3fcd479f",
+      "git_blob_sha1": "87be16cf4d3e0437fab92db42cb01eb66005f176",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/GOOG.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 674932,
+      "sha256": "846a69df9590919728e0b289c0b51b23ef742db52c7ccf5ff130e8c3e839cb74",
+      "git_blob_sha1": "4195ac6563abfcc73382282459ac3a314343c2eb",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/GOOGL.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 673529,
+      "sha256": "f56d2b2433db44968edeaf894d6a8fc87bce1dead7255fe407861ae57d8e2503",
+      "git_blob_sha1": "6ff24709fd9d0404aed11c3242a1fc71c9a953e4",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/IBKR.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 562279,
+      "sha256": "1251379f8affea8c442d67176aae7ddc9a33d75a7bf40b607c4f999ff270941c",
+      "git_blob_sha1": "1ea70bef409bd8f5e51a79bc4c57c70f47f1af71",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/IEF.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 738027,
+      "sha256": "c82d73f486f69341303555246dd9c328c3f57faa8db43b334be48c8b2a1b31ec",
+      "git_blob_sha1": "7d10987913f76e97c3b21ea2f629f2110764186b",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/MSFT.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 784451,
+      "sha256": "527eb5545d5e0665a65f2e73d9daa0692ed9c3afb77ba880f00187a190fa383c",
+      "git_blob_sha1": "37ff7dc7d4d27bb663184e7e067bdcf76431a756",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/NATO.CN.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 146838,
+      "sha256": "8a5c10c81ed002d2f0ccbb463c632b1c73a94ebf6b40a07e4262d56c29fdfc73",
+      "git_blob_sha1": "a2a30f5ecec0b87178d2bc7c404edd1b3d8fd56e",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/NVDA.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 832602,
+      "sha256": "dea6aba1011479110ed5b5413ea1c5a392aa19b8db88baaca89ac3f0aa8e9d2e",
+      "git_blob_sha1": "a2eb85261511b172044f8d30598da1916d946ccc",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/PPH.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 780069,
+      "sha256": "d82fd867b81d569b18669dd0bd23821f4996afeb9c648c902af1727a1ed7103a",
+      "git_blob_sha1": "250addd7b1521bf91b204a14a0aebf287789d9ce",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/QQQ.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 802743,
+      "sha256": "3e3f80822ee5a57a8f0401428e8fadeb7f398dfd7c01005f6f82805c88cfe2e1",
+      "git_blob_sha1": "7ab46d5d884b14ba4da184fd0d717edc884f2eae",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/SGOV.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 199433,
+      "sha256": "439215f7463f7d29de03afe0278a957501011387e5f6fc064bffac0891818820",
+      "git_blob_sha1": "066e7137a521d77cb1a6cb379819ce7208de85c4",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/SMH.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 808355,
+      "sha256": "f66f0f45ca1a3f1cceb30db741b748c2853119666fda1b2da0aa55a33cad0730",
+      "git_blob_sha1": "5c63c3a8f995f64be4eee35bca8eb649c3048ee9",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/SOXX.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 781248,
+      "sha256": "085124a762b92afb4b9f98b9977fff540b50c59dd68eb3e97a2f1dc1f8a9b384",
+      "git_blob_sha1": "3432783650fa5b9da6928f2e6d4f7484b5ac981e",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/SPLB.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 541529,
+      "sha256": "f524b34a4b31b6317a0cf419998c198ab794af583cf192806e7db775067229e4",
+      "git_blob_sha1": "9418ced473b57e3e2548cabf97a379e60e2ef885",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/SPSB.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 516255,
+      "sha256": "b6f7bf013e470de8c8fdf64627679d2645753473ae49db3f61a9aab650d89508",
+      "git_blob_sha1": "88898cda9f1a6ed74eae784c198ac6d9628e5ed4",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/TLT.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 743392,
+      "sha256": "ce6b163fa77c01523e9899e977ec9e7296a6c3df053c276bfe812ae2de9976c2",
+      "git_blob_sha1": "c91fd1321fe2942a053b17ff30e41cdec624f961",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/VALL.L.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 5149,
+      "sha256": "2b38dfdf2174677fafc55ded2288d41cfc4c4ef39e9aa14e3a97f05551c66c53",
+      "git_blob_sha1": "00d9a56f23f9fa0712cb928c36a58ebb15077411",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-16"
+    },
+    "data/market_history/global/VOO.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 492148,
+      "sha256": "02200151a8f7e27b838673f2132d8f968f5846289227468a0f7c2db5ac89c75e",
+      "git_blob_sha1": "2aa41f85f414acccbbf9bd249333617bd3a5b18e",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/VT.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 555141,
+      "sha256": "817eddd6a618fdb7d2befb512cbf35bf2ed9d2acfd303ae5248b2e853429d3e0",
+      "git_blob_sha1": "cfdaf89d8757ffc85e83fefd472daf3086f5a088",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/VWRA.L.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 217287,
+      "sha256": "d2c6369b54a1809a28c5408cb272ce4e55a9a56037d01b5684ef50c805ec09af",
+      "git_blob_sha1": "3f4bccad60627909670e9e08e6bcb0592690eb0f",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-16"
+    },
+    "data/market_history/global/ZTS.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 404960,
+      "sha256": "af1ef4210de85fe6cf9319fee9210ce31eb3dfb777058adcd0e5f5449505ee64",
+      "git_blob_sha1": "250ec5b1ac5252bb6613074dc8c1f05599ea10d8",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/global/manifest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3700,
+      "sha256": "a102dcbf43f11fcebe34dabad0650fe14b801d23e861c47ab98a56c296d65bfb",
+      "git_blob_sha1": "8ef335b179bf5f67f5f2d5ba5ac72cb505aecd43",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "UNDECLARED",
+      "data_date": "2026-10-19T23:19:51.061852+00:00"
+    },
+    "data/market_history/manifest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1156,
+      "sha256": "e4808480ae4acb6d275a21a4e3bca85ca80373ba22393bea7a3ab56ed67fcc62",
+      "git_blob_sha1": "51c60e9ab72afeb4a5bbfc094cc7a7fc4b4a8a69",
+      "producer": "UNKNOWN; record root manifest as legacy; no fallback",
+      "use_class": "LEGACY_NONCANONICAL",
+      "schema": "UNDECLARED",
+      "data_date": "2026-10-20T02:52:03.779957+00:00"
+    },
+    "data/market_history/taiwan/0050.TW.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 503951,
+      "sha256": "917e32afbd22cf945810eb2f9914f88222206812f4cd8cac7b78bb968c72fa30",
+      "git_blob_sha1": "8f05c867b1be1523c13f0bae0bee533f46851da9",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits|Capital Gains",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/taiwan/2330.TW.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 633880,
+      "sha256": "8f0fa32608bd49fda8d064396ce1640ecaeb7e3e1345752295513a8a7455a168",
+      "git_blob_sha1": "15addba9584fae8e0b964a7f1f3b4620b65a7470",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "CSV:Date|Open|High|Low|Close|Adj Close|Volume|Dividends|Stock Splits",
+      "data_date": "2026-10-19"
+    },
+    "data/market_history/taiwan/manifest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1071,
+      "sha256": "bb1665df113dcf80e22d12974c35e1ef1ca68837a4ce18742b4c48f814006aa9",
+      "git_blob_sha1": "775b8fa0e1dedde34db6ba4b8beb00c5ea597528",
+      "producer": "scripts/ib_market_history_update.py",
+      "use_class": "MARKET_CONTEXT",
+      "schema": "UNDECLARED",
+      "data_date": "2026-10-19T07:21:22.168192+00:00"
+    },
+    "data/sp500_public_display_license.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 473,
+      "sha256": "04f8f9d29cb813e1c7474eded5ae5798cf5b98931ae4dfc028cadbf8e0fb87ee",
+      "git_blob_sha1": "307c6138f33c5d61fbf4c021bbbc2b9fa2c0e065",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/SP500-public-display-license-v1",
+      "data_date": "2026-10-19"
+    },
+    "data/v703_official_monthly_release_calendar.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1788,
+      "sha256": "b9a32f9fc41efe12ff76c6fdf73b6dbfe0cceb6c3b7ac0a2a38e72275efb33b3",
+      "git_blob_sha1": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
+      "producer": "official release calendar file",
+      "use_class": "OFFICIAL_SCORING",
+      "schema": "V70.3/monthly-official-release-calendar-v1",
+      "data_date": "UNKNOWN"
+    },
+    "data/verified_overrides.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1085,
+      "sha256": "67326b1ff02975a9647828dc20b7e0fa8683aee38ebb3126c2880b8b4708bf5d",
+      "git_blob_sha1": "fee611a9b963ce6a230d93890a1438b98881e061",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "UNDECLARED",
+      "data_date": "UNKNOWN"
+    },
+    "data/wallstreet5_forecasts.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3699,
+      "sha256": "23aac22a0f4e7ec2d36c915e22a999668e349f0dcfd926a7aebe8eea5de82017",
+      "git_blob_sha1": "df5ab4b3384826fcf0200476aa6627f883cf867e",
+      "producer": "10:00 ChatGPT總經Task",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "V70.3/wallstreet-five-forecast-v1",
+      "data_date": "2026-10-17"
+    },
+    "experiments/macro-safety-monthly-research/bank_forecast_register_research.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 19708,
+      "sha256": "9eb135b851ac5d63ed036d5ffef8302109f75d1581eb876c2b825ec8831774ae",
+      "git_blob_sha1": "840329fa7f223e038f5350dcdee86274644e69dc",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:forecast_id|institution|forecast_target_index|forecast_value|forecast_target_date|evidence_date|publication_date|forecast_horizon_days|institution_department|source_url|source_note|verification_status|source_artifact_sha256|source_sheet|source_row|retrieved_at_utc",
+      "data_date": "2026-10-06"
+    },
+    "experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1903,
+      "sha256": "9b9467f032d7bc83fbb6d249e5ec0ba0d781c186e72714b01ac79f093733d3a9",
+      "git_blob_sha1": "0a2f050e643f874cba0026de104b263167d19fda",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:snapshot_month|snapshot_date|institution|forecast_id|forecast_target_index|forecast_target_date|forecast_value|forecast_evidence_date|forecast_publication_date|forecast_horizon_days|forecast_implied_return_pct|sp500_snapshot_date|sp500_snapshot_close|forecast_status|source_url|macro_health_score|macro_score_status|previous_macro_snapshot_date|previous_macro_health_score|macro_slope_points_per_month|macro_sp500_forward_3m_return_pct|macro_return_status",
+      "data_date": "2026-10-19"
+    },
+    "experiments/macro-safety-monthly-research/bank_quarterly_comparison_research.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 33251,
+      "sha256": "b77f212fb22823584d1514576e6e345b2f86d1ca713dcfb55bb86d369143113c",
+      "git_blob_sha1": "77b77c43248766fbf125cd8b9d324e7a1ced22e2",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:observation_date|actual_trading_date|sp500_start_close|sp500_forward_end_date|sp500_forward_end_close|sp500_close|institution|forecast_id|forecast_evidence_date|forecast_target_date|forecast_value|forecast_horizon_days|forecast_implied_return_pct|sp500_forward_3m_return_pct|return_status|verification_status|source_url",
+      "data_date": "2026-10-16"
+    },
+    "experiments/macro-safety-monthly-research/charts/MacroSafety_candidate_quarterly_slope_vs_SP500_3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 413521,
+      "sha256": "908b1d33bf17cacdfa177cdaa18b8d088808159b830f2f14cb12c4f82101a09d",
+      "git_blob_sha1": "cc02d027506acb7c9ab4502491c4cbd15c2e907f",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/seven_line_overview_candidate_quarterly.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 764791,
+      "sha256": "7444c7c38fd228c02d1efb54b8df12346fbea2a21a497b1949894279b0bbb499",
+      "git_blob_sha1": "b350df73f6420a90a7c9921f644101ef75f6cc53",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/五大機構與SP500後3M_季度研究總覽.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 131216,
+      "sha256": "0fbb54ad4fcc225ce501e55de1c86a5f4b9a6ca47b148c4605824b62ee295367",
+      "git_blob_sha1": "de84cc10c539b19b345e585dd1e7a5daea6ae3aa",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/摩根士丹利_年底目標_vs_SP500後3M_季度研究.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 179047,
+      "sha256": "2b73999dbef9ec7afbbf1727c00d058e008456bd3ac23e3a461f64f40618e7e1",
+      "git_blob_sha1": "03534beb84887a640d5fcae3b7f53efa6cd3e925",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/摩根大通_年底目標_vs_SP500後3M_季度研究.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 169565,
+      "sha256": "d0acfe561119823e1e5539d13062e19a6cf76ee1aeec7190501acd3fb7560478",
+      "git_blob_sha1": "79b014593b210f270b88e96faaf49e2722d42604",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/瑞銀_年底目標_vs_SP500後3M_季度研究.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 169941,
+      "sha256": "deaf6e25adc59f21c2b311be7297945cd1fdb6970c5493206ef2d35479274382",
+      "git_blob_sha1": "db5c0358a929f16534aa3a100f6c4e793d83a535",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/美國銀行_年底目標_vs_SP500後3M_季度研究.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 171395,
+      "sha256": "82885542735dd6c0af95400b617df3c3be18fb35ac36c35fd03e5e83527fa334",
+      "git_blob_sha1": "15cbafb85b0bbd76ae95504368967768cc5d760e",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/charts/高盛_年底目標_vs_SP500後3M_季度研究.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 168839,
+      "sha256": "7660779fd6d8ef0a2fd80db88c1aa0d4c0e8c1149bd70df9d43780e5eea02c49",
+      "git_blob_sha1": "7c404fbad81298e79009ef68ea5c26f0f44de52a",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/Macro-SaFe_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 307740,
+      "sha256": "1b4052f86c0a5dad2f8fa7f59540f16e5eca8db2d927dc0d14ebfd09a9e592e8",
+      "git_blob_sha1": "4974df4678e1e07cbd81d5c623662d638c2a1bb7",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/Macro-SaFe_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 317356,
+      "sha256": "3b4dd959959f630fb74be77624cdc32d56ae4f2d816e0deae09606fb232be1b5",
+      "git_blob_sha1": "fc91bb5302650220a883123cd657d05d7a25f9a8",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/十二圖與共識統計_逐季資料.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 6354,
+      "sha256": "c19c32c23b8e01674daa7a86a4c17badd5ba0f86b5efe7d65659bd7b7014d3de",
+      "git_blob_sha1": "6df123a1b62c0919843b771c741e48db736e2958",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:季度觀察交易日|三個月目標日|後三個月取價交易日|SP500後3個月價格報酬_pct|報酬成熟狀態|高盛_原始隱含報酬_pct|高盛_季度微分_百分點每季|摩根大通_原始隱含報酬_pct|摩根大通_季度微分_百分點每季|摩根士丹利_原始隱含報酬_pct|摩根士丹利_季度微分_百分點每季|美國銀行_原始隱含報酬_pct|美國銀行_季度微分_百分點每季|瑞銀_原始隱含報酬_pct|瑞銀_季度微分_百分點每季|Macro-SaFe原始體質分_0至100|Macro-SaFe季度微分_分數點每季|Macro-SaFe原始狀態_50為中性線|Macro-SaFe微分方向|五家機構原始偏多數|五家機構原始偏空數|五家機構原始持平數|五家機構原始缺值數|五家機構微分上修數|五家機構微分下修數|五家機構微分持平數|五家機構微分不可計算數",
+      "data_date": "2026-10-01"
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/季度偏多偏空共識統計.csv": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3116,
+      "sha256": "8f61c29732d0e060af38b2bbfc12bba714892bd9c51d0ecdefc9702c3cfe3bf3",
+      "git_blob_sha1": "db04420e45a170dc85d1851dafa57d7677227d66",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "RESEARCH_ONLY",
+      "schema": "CSV:季度觀察交易日|SP500後3個月價格報酬_pct|報酬成熟狀態|五家機構原始偏多數|五家機構原始偏空數|五家機構原始持平數|五家機構原始缺值數|五家機構微分上修數|五家機構微分下修數|五家機構微分持平數|五家機構微分不可計算數|Macro-SaFe原始體質分_0至100|Macro-SaFe原始狀態_50為中性線|Macro-SaFe季度微分_分數點每季|Macro-SaFe微分方向",
+      "data_date": "2026-10-01"
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/摩根士丹利_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 321712,
+      "sha256": "7dcf69d966f205dd19e9fd9fd46cde1b4c97003ba6dff77e35a41ea1d64d2f2f",
+      "git_blob_sha1": "baa8765a8f3b05c77d3e436f5eccbc0226525dbf",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/摩根士丹利_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 322770,
+      "sha256": "73f02b3cfc7615ea394a15e222bdab6a608be3b02595fcaef15929a566423dad",
+      "git_blob_sha1": "5f206a5fbb35cf5ffb9993d63493c84616bb60da",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/摩根大通_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 272082,
+      "sha256": "1370a8dfee2512c3d9db7a9b7a93f4e911ba46a89faf4e722370ed40f0392fd6",
+      "git_blob_sha1": "e0f57597c7ad2ca2b686076685c0f1fb6dfe3f91",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/摩根大通_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 276690,
+      "sha256": "42b50652d015a840a24f04dd2ee3800fd9d5eaa2e8818e474ed8c8c170bd7236",
+      "git_blob_sha1": "d907e714c726a496134fc1299aac8cd58d72d075",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/瑞銀_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 288093,
+      "sha256": "6e4e96d2e01b22a474bdaa5af18f06b0c6ca430cbcaa8c841184c3c78e93685b",
+      "git_blob_sha1": "92a4bbc5070bc82d5befe9561f57eff4b9235ca7",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/瑞銀_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 281351,
+      "sha256": "48493fc659eecd09646ed2d92300171bc16a043e5973ab6ab16557e1dd64a832",
+      "git_blob_sha1": "bb23ed0a0a6339dbe6b2fa1b41302729d42c7408",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/總覽_左原始值右季度微分_含共識統計.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 1359018,
+      "sha256": "8cc9b1339184b6ba1d9387bac58e487a5de9ab273e2df4ceb1892eebee6bb2b1",
+      "git_blob_sha1": "edf5bacb84c1df7b10ae893cca735fa6c9067ef0",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/美國銀行_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 316247,
+      "sha256": "91d02c367ca26ecbc292f9be4ed92d328dfff06ea91f49a78bb207f88d6f1520",
+      "git_blob_sha1": "82856a2ee09ddb8cc31a1d7e7abb65024e687d03",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/美國銀行_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 319765,
+      "sha256": "54e145a73ef26a106484f27c7a73a39c81f812fc9af7851b87eb0a12d3357975",
+      "git_blob_sha1": "677e2956e86e994b407dd281df584afca8d042d4",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/高盛_原始值_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 310318,
+      "sha256": "4e2f9c3223c85514fd847acf5582d8df67c6b8d9b539c7d6f2ab4ff759289862",
+      "git_blob_sha1": "15bbfb2b229311a07aa95ce24441f6191f00a3fb",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/高盛_季度微分_SP500後3M.png": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 308915,
+      "sha256": "387f00f29a6d396cd1472258b921931d29382b1f552446c4763df63682787b43",
+      "git_blob_sha1": "3689e1b67710a4506b9a22b77b39724006029db1",
+      "producer": "scripts/monthly_research; quarterly assets are archived inputs",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "requirements.txt": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 137,
+      "sha256": "53207d0d93ab5c34846b66f17e9099e077280e0394f71e59f41ab96d265ded04",
+      "git_blob_sha1": "d3ceb96557a3ba463710471ebca548fbf2daa543",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/build_daily_v703_site.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 33348,
+      "sha256": "a416edab39ec709c01d6475c968963c9274a2555d5118ea80a3bff51fd9a1617",
+      "git_blob_sha1": "a3e2aa17a70d538d293d730b81895603b4db3410",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/build_v703_feed.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 2094,
+      "sha256": "5cec27ee0df7ebfdfa21f064c73b80f28585641476d58fa2b96a4db97ff1fb33",
+      "git_blob_sha1": "75fe68beafe3ba4d97d44be758ff0f173976fbd5",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/capture_v703_daily_snapshot.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 10081,
+      "sha256": "b9030a54b8d6f7264cce3388d310a9c57b5635c2ac85b6c1a08b7a97bde2ce3e",
+      "git_blob_sha1": "3391cbc20cc006ea1859b08a5ee21a691741d6fa",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/chatgpt_fallback.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3583,
+      "sha256": "5f97968cbcb3f0cddf2fa57c8663f1a266dc10cbe550677c3efa81e3e7e5a943",
+      "git_blob_sha1": "af5de9f3142454dee07180b19fa97efe7e32df83",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/ib_market_history_update.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 4795,
+      "sha256": "084822f0f4c3b0e739fb64d6bf9538e58c9b864da91a1579a05f631822408fea",
+      "git_blob_sha1": "fb0cc727974985c7547701e83a52039cb60252ad",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/macro18_alert.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 2927,
+      "sha256": "55145977c565e1a8ca6c65904101d50f325e0b49bda02667b9cf52ecfd1738ac",
+      "git_blob_sha1": "594ef8c6ae973d367761f9f7ba4a4896f2a74006",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/macro18_state.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 7961,
+      "sha256": "7c5bf6b08d084020c0f952204dbf4418937bb08276b810c5f4514abe7305c783",
+      "git_blob_sha1": "1a3817ec4f8a98182e11a16ae5ef27c55cf13186",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/monthly_research/README.md": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 12257,
+      "sha256": "d6a4b860ef7b5012c82b2109325561786caacf2f5225ce8f08798793fe532f31",
+      "git_blob_sha1": "24cdfeebdfcd1215beadd9e1cb3f6cda3d1dfebe",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/monthly_research/bank_forecast_research.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 16912,
+      "sha256": "2321a3cf0a9e7aeeee332c3d8eb0bdce4f9bda18d47a25018c9e571030fea97f",
+      "git_blob_sha1": "dec419ea2a44ff205ef39100890d5eb449a825c8",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/monthly_research/build_bank_macro_monthly.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 8133,
+      "sha256": "a2f93b3a82d1924164d23dfbef6dde2e6e8265346cb78ff4219058815f1233f5",
+      "git_blob_sha1": "c7cb9b47d2709df647461ded18f857da4a6a68cd",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/monthly_research/macro_safety_monthly.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 17114,
+      "sha256": "fc186894ca3537de65bb623b0d1b38e4af5f47e7c790c200dca200a4b8f3f1c9",
+      "git_blob_sha1": "e03faa6bbfc47b786b08fd0ef0d0cb13742d314a",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/probe_extra8.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 12592,
+      "sha256": "19ac58ac18c99170ef4bf7e8d0bcf237d03e3724bede7244a1c737ded71e5cca",
+      "git_blob_sha1": "d1c24630e8c0ac0909ad1592620df6632ec95211",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/probe_m06_fedwatch_free.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 4535,
+      "sha256": "e2a529f2c2a97cbe108e346b3dc61b27081b4820ddb5e9ccc5df569a2f42a59a",
+      "git_blob_sha1": "8a599a431582c32a209e91969451e03cb4168855",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/send_action_gmail_report.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 10447,
+      "sha256": "6db5e95514871b18f95ff41f2a2b4153ceb740400183609d268bbaf55b73f0ab",
+      "git_blob_sha1": "78ec2493ae089b286a3194808b0373a9e63be85d",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "scripts/update_hlw_rstar.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 7169,
+      "sha256": "c17ea35955a58802d2194f9cd9228eeb49c4837d32072aacf87c4789776009c9",
+      "git_blob_sha1": "2d4743564b723ec40737d28ca64fc46b1a4b8674",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "tests/test_bank_forecast_research.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 3274,
+      "sha256": "805b104b7a9af94097dc0039d7c17b71cc83045c743e7f5439179c1f8840032d",
+      "git_blob_sha1": "684c2abf2320b51c45d4134e7f204bebb3161ed4",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "tests/test_bank_macro_monthly.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 4163,
+      "sha256": "48c3562460b447c63adc5d78306893fdf128e6a59f1d24eefc830e36e37337cd",
+      "git_blob_sha1": "29aab43a9516cf1cc23636405d0d06369e6ad083",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "tests/test_macro_safety_monthly.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 9109,
+      "sha256": "0b40339f2bacba07bf03488011407fd1328bd9839ddb7745d9d0af8bc0f4376d",
+      "git_blob_sha1": "11545a7b109b5e4d23014f2193614972e2fa5165",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "tests/test_v703_outlook_ui.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 5900,
+      "sha256": "0dd3bdd9689713b79b63286ae26d36a939dfa7426502b86dbc289c60783207fc",
+      "git_blob_sha1": "6bbae76958ab658531128cc4fc787aa8ab3a96ed",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "tests/test_v703_research_charts.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 5127,
+      "sha256": "0ac20619aa2acaeee42ad490ccce369d0969dc7452d78265f056e15836b4b3cc",
+      "git_blob_sha1": "d53baa335a961b78d901dae62c311d148a29a8bb",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/V70-3-27.html": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 338233,
+      "sha256": "58f19c8ff3482d724e87527ae91e75811a7354fa028aa88d5fe3aad2c9b07232",
+      "git_blob_sha1": "2bd3f49fff160852ef6df6040094c5537a74a18f",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/V70_macro_latest.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 38270,
+      "sha256": "71c8cfad106927fdde6c16ca1b24c40fc57d625e59732b662fb079f4c598b83f",
+      "git_blob_sha1": "ca92c88643750ea73389d05c10421793b01669de",
+      "producer": "scripts/build_daily_v703_site.py",
+      "use_class": "OFFICIAL_SCORING",
+      "schema": "V70.3/family-macro-feed-v3",
+      "data_date": "2026-10-20T03:23:03.720004Z"
+    },
+    "系統工程/總經V70/macro_source_config.json": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 4289,
+      "sha256": "bacd11c360ae1c59f13b341693151a1e8825df98178f7866e377f75ac628a38a",
+      "git_blob_sha1": "de146db3b91357e2feb9b2189c8c8a7553c8755f",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "LivingWaterAI-D009-source-config-v1",
+      "data_date": "UNKNOWN"
+    },
+    "系統工程/總經V70/每天總經及html更新程序.md": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 2047,
+      "sha256": "7fc08864892aa8b0aa80adbfefa2087a5a6d44b04246fb6d43ff9a7756d0be64",
+      "git_blob_sha1": "0ec24fabddc64eb0a6175bf952458a9ac13e8f9f",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/總經18項爬蟲.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 49406,
+      "sha256": "143a48a80416529e1f5880903c6f1286b9cc38c5ecd7da352d8487ac1385127c",
+      "git_blob_sha1": "fb0151a8dfcae7c29279f7e8a172143c8c8484c0",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/總經19項爬蟲.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 51079,
+      "sha256": "240fdc43c0974a46285c76f13b96d237b0a07f89c5ecfbd1427a1f63df5e86de",
+      "git_blob_sha1": "33926df6e8b3404da0b834905c3f9ff5659129cf",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/總經爬蟲18項.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 63488,
+      "sha256": "31532760dfd2b29bbb48a2d248406a76b6a6dcf8706f5de6648538d8aeec309f",
+      "git_blob_sha1": "68ee18af0379d08765cdc49499d61f2a21aa99b6",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/總經爬蟲程式16項.py": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 56372,
+      "sha256": "9cd058791fb1c7e6d6e9f153cafeef2da65cd1ea4cdd71aaddd1b1eb89616b1f",
+      "git_blob_sha1": "33007eb0ab1e510a1e2600052184e4dd8a46ac70",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    },
+    "系統工程/總經V70/跨專案正式通知_V70-3-27.md": {
+      "source_commit": "00fc36bc20736c4083b890ed3503324e88afee16",
+      "size": 9647,
+      "sha256": "c7453fa830a89266e8e44c2d0d13338422590b41d3b0b4d51fb081e188c77fb7",
+      "git_blob_sha1": "a9bde4d351fbb3c09e900a018f7c91dcfe70221a",
+      "producer": "SOURCE_CODE_OR_GOVERNANCE",
+      "use_class": "DISPLAY_ONLY",
+      "schema": "",
+      "data_date": ""
+    }
+  }
+}

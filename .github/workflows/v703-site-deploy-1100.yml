@@ -1,5 +1,6 @@
+# 2026/11/04 Hostinger SSH/SCP 65002 偶發逾時：網站與收據各最多 3 次上傳，20/40 秒退避；僅在成功後繼續線上讀回，全部失敗仍通報。
 # 2026/10/22 W7-A13：啟用 fed-target-evidence-v1、發布前政策重驗、線上完整讀回及真實來源歸檔驗收。
-# 最後修改日期時間：2026/10/20 08:20（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：部署十二張季度研究圖、總覽與完整數值表
+# 最後修改日期時間：2026/11/04 11:52（台灣時間）｜檔案名稱：v703-site-deploy-1100.yml｜版本：Hostinger 65002 連線逾時有限重試；保留既有 QA 與線上驗證
 # 2026/10/20 V70 正式版通知：季度共識表已凍結首兩欄；本次部署 main 最新資料快照，須通過 25/28/26/22 品質閘門與線上讀回。
 name: LivingWaterAI 11h Verified V70.3 Site Deploy
 on:
@@ -176,7 +177,9 @@ jobs:
             public_html|*/public_html|*/public_html/) ;;
             *) echo "::error::Site directory must end in public_html"; exit 1 ;;
           esac
-      - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH
+      - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH (1/3)
+        id: site_upload_1
+        continue-on-error: true
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -189,6 +192,62 @@ jobs:
           overwrite: true
           timeout: 90s
           command_timeout: 90s
+
+      - name: Wait 20s before site_upload retry 2
+        if: steps.site_upload_1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH (2/3)
+        id: site_upload_2
+        if: steps.site_upload_1.outcome == 'failure'
+        continue-on-error: true
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+
+      - name: Wait 40s before site_upload retry 3
+        if: steps.site_upload_2.outcome == 'failure' && steps.site_upload_1.outcome == 'failure'
+        run: sleep 40
+
+      - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH (3/3)
+        id: site_upload_3
+        if: steps.site_upload_1.outcome == 'failure' && steps.site_upload_2.outcome == 'failure'
+        continue-on-error: true
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+
+      - name: Require successful site upload after limited retries
+        env:
+          TRY_1: ${{ steps.site_upload_1.outcome }}
+          TRY_2: ${{ steps.site_upload_2.outcome }}
+          TRY_3: ${{ steps.site_upload_3.outcome }}
+        run: |
+          if [[ "$TRY_1" == "success" || "$TRY_2" == "success" || "$TRY_3" == "success" ]]; then
+            echo "SITE_UPLOAD_PASS"
+          else
+            echo "::error::SITE_UPLOAD_FAILED: Hostinger SSH/SCP port 65002 timed out after 3 attempts; preserve QA artifact and stop before live verification"
+            exit 1
+          fi
+
       - name: Verify Hostinger homepage and live JSON
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
@@ -270,7 +329,9 @@ jobs:
           Path('build/site/v703_deployment_receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
           print('LIVE_RECEIPT_PREPARED',receipt['asOf'],receipt['githubRunId'])
           PY
-      - name: Upload verified receipt after successful online readback
+      - name: Upload verified receipt after successful online readback (1/3)
+        id: receipt_upload_1
+        continue-on-error: true
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -283,6 +344,62 @@ jobs:
           overwrite: true
           timeout: 90s
           command_timeout: 90s
+
+      - name: Wait 20s before receipt_upload retry 2
+        if: steps.receipt_upload_1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Upload verified receipt after successful online readback (2/3)
+        id: receipt_upload_2
+        if: steps.receipt_upload_1.outcome == 'failure'
+        continue-on-error: true
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/v703_deployment_receipt.json
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+
+      - name: Wait 40s before receipt_upload retry 3
+        if: steps.receipt_upload_2.outcome == 'failure' && steps.receipt_upload_1.outcome == 'failure'
+        run: sleep 40
+
+      - name: Upload verified receipt after successful online readback (3/3)
+        id: receipt_upload_3
+        if: steps.receipt_upload_1.outcome == 'failure' && steps.receipt_upload_2.outcome == 'failure'
+        continue-on-error: true
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/site/v703_deployment_receipt.json
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 2
+          overwrite: true
+          timeout: 90s
+          command_timeout: 90s
+
+      - name: Require successful receipt upload after limited retries
+        env:
+          TRY_1: ${{ steps.receipt_upload_1.outcome }}
+          TRY_2: ${{ steps.receipt_upload_2.outcome }}
+          TRY_3: ${{ steps.receipt_upload_3.outcome }}
+        run: |
+          if [[ "$TRY_1" == "success" || "$TRY_2" == "success" || "$TRY_3" == "success" ]]; then
+            echo "RECEIPT_UPLOAD_PASS"
+          else
+            echo "::error::RECEIPT_UPLOAD_FAILED: Hostinger SSH/SCP port 65002 timed out after 3 attempts; preserve QA artifact and stop before live verification"
+            exit 1
+          fi
+
       - name: Verify live deployment receipt matches the verified feed
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}

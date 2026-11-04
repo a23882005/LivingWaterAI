@@ -81,7 +81,7 @@
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
-      "sha256": "e2b91462233904a8781f096ececb580e44631a5f7468febeacd9e7a86b83c99b"
+      "sha256": "704c3f1dfa17d1232f18f6b2f3103362cb7b14d38a8c53dd526f801c5411a169"
     },
     {
       "path": "../../Family/W8/w1_portfolio_observations.py",
@@ -210,6 +210,10 @@
     {
       "path": "../../Family/W8/v82_approved_context.py",
       "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59"
+    },
+    {
+      "path": "../../Family/W8/replacement_order_source.py",
+      "sha256": "208ea4ebb18271fa634c5529df85227b01d9f5c825e5dbb716637780efd87428"
     }
   ]
 }

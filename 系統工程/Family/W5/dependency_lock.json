@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "e97e10fe840a7ca3480d1ddc481390323c22dbc9e89804961335e91e3c142bbf"
+    "sha256": "63a7ecd0c27181254df5f79b333c1ef27d94a4dc40932a5598c55f2664c99f28"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -447,7 +447,7 @@
   },
   {
     "path": "系統工程/Family/W8/family_c7_source_assembly.py",
-    "sha256": "e2b91462233904a8781f096ececb580e44631a5f7468febeacd9e7a86b83c99b"
+    "sha256": "704c3f1dfa17d1232f18f6b2f3103362cb7b14d38a8c53dd526f801c5411a169"
   },
   {
     "path": "系統工程/Family/W8/v70_tactical_input.py",
@@ -555,5 +555,10 @@
     "path": "系統工程/Family/W8/v82_approved_context.py",
     "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59",
     "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
+  },
+  {
+    "path": "系統工程/Family/W8/replacement_order_source.py",
+    "sha256": "208ea4ebb18271fa634c5529df85227b01d9f5c825e5dbb716637780efd87428",
+    "reason": "PR59 來源所有者已確認的替換委託接線；不推定現金釋放"
   }
 ]

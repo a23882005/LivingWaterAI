@@ -382,15 +382,25 @@ class SourceAssembler:
                     raise ValueError('C7_ASSEMBLY_FILL_POSITION_RECONCILIATION_REQUIRED')
                 key=fill['applied_to_position_id'];filled_by_position[key]=filled_by_position.get(key,Decimal(0))+number(fill['quantity'])
                 if filled_by_position[key]>target['quantity']:raise ValueError('C7_ASSEMBLY_FILLS_EXCEED_CURRENT_POSITION')
-            for order in facts.get('orders',[]):
+            from replacement_order_source import reconcile as reconcile_replacements,terminal_acknowledgment
+            effective_orders,replacement_replay=reconcile_replacements(facts,self.request)
+            terminal_acknowledgments=[]
+            for order in effective_orders:
                 owner=next((o for o in owners if o['account']==order['account']),None)
                 if owner is None:raise PermissionError('C7_ASSEMBLY_ORDER_OWNER_MISMATCH')
                 total=number(order['order_quantity']);filled=number(order['filled_quantity']);remaining=number(order['remaining_quantity'])
-                if total-filled!=remaining:raise ValueError('C7_ASSEMBLY_ORDER_QUANTITY_RECONCILIATION_REQUIRED')
+                if filled>total:raise ValueError('C7_ASSEMBLY_ORDER_QUANTITY_RECONCILIATION_REQUIRED')
+                terminal=order['state'] in ('FILLED','CANCELLED','REJECTED','EXPIRED')
+                if not terminal and total-filled!=remaining:raise ValueError('C7_ASSEMBLY_ORDER_QUANTITY_RECONCILIATION_REQUIRED')
                 if order['side']=='SELL':continue  # A working sell is never a release.
                 if order['side']!='BUY':raise ValueError('C7_ASSEMBLY_ORDER_SIDE_REQUIRED')
-                if order['state'] in ('FILLED','CANCELLED','REJECTED','EXPIRED'):
+                if terminal:
                     if remaining!=0:raise ValueError('C7_ASSEMBLY_TERMINAL_ORDER_REMAINING_CONFLICT')
+                    if order['state']=='FILLED' and filled!=total:raise ValueError('C7_ASSEMBLY_ORDER_QUANTITY_RECONCILIATION_REQUIRED')
+                    if filled<total:
+                        chain=next((r['events'] for r in (replacement_replay or {}).get('chains',[])
+                            if r['active_or_terminal_successor_event_id']==order['event_id']),None)
+                        terminal_acknowledgments.append(terminal_acknowledgment(order,owner,facts,chain))
                     continue
                 if order['state'] not in ('PLANNED','SUBMITTED','OPEN','PARTIAL_FILL','CANCEL_PENDING','REPLACE_PENDING'):
                     raise ValueError('C7_ASSEMBLY_ORDER_LIFECYCLE_REQUIRED')
@@ -453,6 +463,14 @@ class SourceAssembler:
         scope['preference_locks']=self.field('preference_locks',locks if protected and current is not None else None,
             code='C7_CONFIRMED_HOLDING_DIRECTIVES_REQUIRED',sources=[self.raw[-1]])
         self.observations={'account_nav_reconciliation':nav_refs,'original_coverage':deepcopy(coverage)}
+        if terminal_acknowledgments:
+            self.observations['terminal_order_acknowledgments']=terminal_acknowledgments
+        if replacement_replay is not None:
+            for source in replacement_replay['confirmation_sources']:
+                confirmation=source['confirmation']
+                self.reference('replacement_'+digest(confirmation['confirmation_id']),source['descriptor'],
+                    confirmation['confirmed_at'],confirmation['available_at'],original=confirmation)
+            self.observations['order_replacement_replay']=replacement_replay
         return current
 
     def build(self,*,tactical=None,identities=None,portfolio_facts_source=None):

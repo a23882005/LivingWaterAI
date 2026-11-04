@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-04T00:22:00Z",
+  "updated_at": "2026-11-04T01:38:00Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3086,5 +3086,27 @@
     "production": "HOLD",
     "trading": "NONE",
     "next": "Original V82 Codex continues existing financial main chain; PM independently QA next delta and W8 56-cell integration; report Codex current scoped phase CLOSED"
+  },
+  "pm_family_financial_source_audit_20261104": {
+    "date_taipei": "2026-11-04 09:35",
+    "scope": "Four-household Family W8 PM source freshness and exact producer input mapping",
+    "status": "SOURCE_LOCATION_AND_QUALIFICATION_AUDIT_COMPLETE__FINANCIAL_CHAIN_PENDING",
+    "formal_db_readonly": "4/4 original Drive IDs + Project_Sources (MOU/Joseph/Lilian 1.16.4; Arthur 1.16.5), integrity 4/4 OK, FK 0/4",
+    "daily_ledger_readonly": "4/4 original Drive IDs + identity binding, integrity 4/4 OK, cycles 0/4, intents 0/4",
+    "target_source": "MOU final 17 items; Arthur final 3 items; Lilian late OWNER-approved exclusion/addition supersedes historical VEA with PPH/VDC weights unknown; Joseph latest approved project source not yet canonical final_target in own DB",
+    "cash_scope": "Reported vs settled and independent accounts not yet fully reconciled; no null-to-zero; source audit not an actionable budget",
+    "ibkr_read_only": "Joseph-matched 10-position account snapshot, BASE/USD same-currency duplicate not counted twice, replacement orders require successor evidence; provider batch as_of absent",
+    "source_package_gap": "20261103 supplementary input ZIP referenced in previous PM document not found in Drive TEMP by exact name; original DBs and Project_Sources newly retrieved as authoritative substitute",
+    "private_drive_report_id": "1cuB5o5V5bs8tLp0s3LYB_wE6cI-1qKjM",
+    "private_report_name": "Family_PM_四戶金融原件FreshRead_交V82Codex_20261104.md",
+    "public_pr_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6620173922",
+    "next_owner": "Original V82 Codex PR59: PIT/qP/qV -> C7B/schema83 -> cash/SGOV/pending/slice -> ledger -> Work9/Mentor; middle PM independently QA",
+    "prior_scoped_pass_preserved": true,
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "w8": "IN_PROGRESS",
+    "production": "HOLD",
+    "trade": "NONE",
+    "family_db_written": false
   }
 }

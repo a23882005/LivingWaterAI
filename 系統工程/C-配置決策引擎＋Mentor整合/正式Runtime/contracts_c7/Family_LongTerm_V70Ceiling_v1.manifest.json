@@ -65,7 +65,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
-      "sha256": "3f1510b3f0674bbdde81653c12784e8e30388638885b7e5816e65cbcb668c8ad"
+      "sha256": "4d265228ed3f79b3054e0dd5dd29ac4d5de8f3eac23bd0ef05baa2d381d0028b"
     },
     {
       "path": "../../Family/W8/member_funding_summary.py",
@@ -81,7 +81,7 @@
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
-      "sha256": "d4acfeb3478737a5a1b3a6d4e0cf82c03dea90cb34d9310b326e5941308a5001"
+      "sha256": "e2b91462233904a8781f096ececb580e44631a5f7468febeacd9e7a86b83c99b"
     },
     {
       "path": "../../Family/W8/w1_portfolio_observations.py",
@@ -89,7 +89,7 @@
     },
     {
       "path": "../../Family/W8/c7_source_qualification.py",
-      "sha256": "36d95c700768662d26a15eeea8f64f23d448e3ca5492ca06aff6b2b9bea3608e"
+      "sha256": "710484b30d1d17128a2e6de7d0c9817e4eb83d1d9693e70b6efa9e91266b20bc"
     },
     {
       "path": "../../Family/W8/same_run_market_cache.py",
@@ -137,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/member_reconciliation_source.py",
-      "sha256": "050a43eac5e976c5b41aa12ebf872b15f8965f4dae1b625b71a2ce9988f80bf0"
+      "sha256": "bc54e928ec55c34b563fd3393a9bb1a75c375cab64e25b202597951b44900351"
     },
     {
       "path": "../../Family/W8/sec_publication_source.py",
@@ -173,7 +173,7 @@
     },
     {
       "path": "../../Family/W8/tools/rebuild_family_long_term_contract.py",
-      "sha256": "58d26b5e21a8a4270e4c6bc227e3036f6ca844bb296eda317fc50f3560c5f6d1"
+      "sha256": "c08ed1276970cfd0f680c55866caa2745cf87694a9d013e81dd3ab1b1a122413"
     },
     {
       "path": "../../Family/W8/v70_tactical_input.py",
@@ -194,6 +194,10 @@
     {
       "path": "contracts_c7/85_Family_LongTerm_Work7_Result.schema.json",
       "sha256": "b44988a16e03a4b64cc2a54755179b96bf78a174f6509ddf87634df643855acf"
+    },
+    {
+      "path": "../../Family/W8/member_financial_facts.py",
+      "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
     }
   ]
 }

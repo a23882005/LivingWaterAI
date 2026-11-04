@@ -490,6 +490,21 @@ class SourceAssembler:
             self.observations['same_run_financial_sources']={'source_descriptor':deepcopy(source),
                 'source_digest':normalized['digest'],'original_observations':normalized,
                 'used_as_complete_reconciliation_facts':False}
+            facts=normalized.get('financial_facts')
+            if facts is not None:
+                for item in facts['reported_money']['facts']:
+                    locator={'source':deepcopy(source),'source_digest':normalized['digest'],
+                        'original_money_fact':deepcopy(item),'as_of':item['as_of'],
+                        'available_at':item['available_at']}
+                    self.field('financial_observations.'+item['fact_kind']+'.'+item['fact_digest']+'.amount',
+                        item['amount'],sources=[locator],producer='W8.member_financial_facts',blocking=False)
+                broker=facts.get('broker_observations')
+                if broker is not None:
+                    self.field('exposure_coverage.original_order_snapshot',None,state=ADAPTER,
+                        code='BROKER_OWNER_CUTOFF_AND_REPLACEMENT_LIFECYCLE_REQUIRED',
+                        sources=[{'source':deepcopy(broker['source_descriptor']),
+                            'original_order_observations':deepcopy(broker['orders']),
+                            'source_digest':facts['digest']}],blocking=False)
             # Feed known quantities to the original source inventory even when
             # a missing owner/funding root prevents AssetSourceProducer startup.
             # A dated price/value is still an observation, never complete NAV.

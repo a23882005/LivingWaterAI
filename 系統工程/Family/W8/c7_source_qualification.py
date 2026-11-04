@@ -78,12 +78,22 @@ def annotate(assembly,request):
             key=prefix+suffix;owner_requirements.append(key)
             check(key,ready,fields,existing=bool(records),locators=refs(table,records),account=aid)
         cash=rows('cash_balance_snapshot',aid)
-        ready=scope.get('funding_buckets') is not None
+        buckets=[b for b in (scope.get('funding_buckets') or [])
+            if b.get('owner',{}).get('account')==aid
+            and b.get('owner',{}).get('client_id')==request['client_id']
+            and b.get('currency')==b.get('owner',{}).get('currency')
+            and (not account.get('account_currency') or b.get('currency')==account['account_currency'])]
+        bucket=buckets[0] if len(buckets)==1 else {}
+        cash_ready=(bucket.get('value_state')=='KNOWN' and bucket.get('settled') is True
+            and bucket.get('cash_amount') is not None and bucket.get('reserved_amount') is not None
+            and bucket.get('cash_basis') in ('NET_AVAILABLE','GROSS_SETTLED_CASH'))
+        auth_ready=bucket.get('authorized_incremental_amount') is not None
         for suffix,fields in [('cash_eligibility',['same-cutoff total/settled/unsettled/reserved/available cash',
                 'cash basis','payable/netting/nonoverlap evidence']),
             ('incremental_authorization',['allowed incremental amount/currency','original confirmation reference/time'])]:
             key=prefix+suffix;funding_requirements.append(key)
-            check(key,ready,fields,existing=bool(cash) if suffix=='cash_eligibility' else False,
+            ready=cash_ready if suffix=='cash_eligibility' else auth_ready
+            check(key,ready,fields,existing=bool(cash) or bool(bucket) if suffix=='cash_eligibility' else bool(bucket),
                 locators=refs('cash_balance_snapshot',cash),account=aid)
     draft=request['confirmed_target']['payload']['draft'];base=draft.get('denominator') or {}
     approval=request['confirmed_target']['payload'].get('confirmation_evidence') or request['confirmed_target'].get('original_confirmation')
@@ -128,10 +138,13 @@ def annotate(assembly,request):
         'portfolio_caps':['caps'],
     }
     for field in assembly['field_inventory']:
-        root=field['field_path'].removeprefix('family_scope.').split('.')[0]
+        path=field['field_path'].removeprefix('family_scope.')
+        root=path.split('.')[0]
         # A known independent leaf does not become unknown because another
         # portfolio field is missing. Derived digests are never Owner JSON tasks.
         available=field['classification']=='EXISTING_BOUND_SOURCE' and field['value_state']=='KNOWN'
+        if path=='funding_buckets':
+            available=available and all(checks[key]['state']==AVAILABLE for key in dependencies[root])
         ids=[] if available else dependencies.get(root,[])
         unresolved=[key for key in ids if checks[key]['state']!=AVAILABLE]
         state=AVAILABLE if available else WAITING if unresolved else ENGINEERING

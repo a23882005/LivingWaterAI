@@ -118,6 +118,7 @@ def complete_report(report,request,config,root):
             'source_digest':reconciliation['digest'],'securities':reconciliation['securities'],
             'account_keys':reconciliation['account_keys'],'reconciliation_attested':False,
             'financial_cycle_initialized':False,'trade_action':'NO_TRADE'}
+        out['same_run_financial_facts']=deepcopy(reconciliation.get('financial_facts'))
     from same_run_market_cache import SameRunMarketCache
     observation_cache=SameRunMarketCache()
     for row in out['positions']:

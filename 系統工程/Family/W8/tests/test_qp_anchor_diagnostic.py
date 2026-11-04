@@ -134,6 +134,11 @@ def test_pm_golden_and_native_value_invariance(tmp_path, case, reason, status, w
         assert result['previous']['source_digest'] != result['current']['source_digest']
     if case == 'A12':
         assert result['current']['anchor_session'] == c['bars'][-1]['session_id']
+    if result['current'] is not None:
+        ids = result['current']['window_session_ids']
+        assert len(ids) == len(set(ids)) == 252
+        assert ids == [s['session_id'] for s in c['calendar']['sessions'][-252:]]
+        assert result['current']['window_session_ids_digest'] == digest(ids)
     save(tmp_path / 'verified_result.json', dict(case=case, expected_reason=reason,
          expected_status=status, diagnostic=result, native_before=native_before,
          native_after=price_percentile(**c), native_exact_equal=True, source_files_unchanged=True))

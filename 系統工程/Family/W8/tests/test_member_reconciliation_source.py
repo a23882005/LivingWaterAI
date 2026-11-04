@@ -126,3 +126,27 @@ def test_c7_root_inventory_consumes_known_original_quantity_without_inventing_na
     assert not result['original_observations']['same_run_financial_sources']['used_as_complete_reconciliation_facts']
     quantity=next(r for r in result['field_inventory'] if r['field_path'].endswith('ORIGINAL_ACCOUNT.ORIGINAL_KEY.quantity'))
     assert quantity['classification']=='EXISTING_BOUND_SOURCE' and quantity['source_locators'][0]['as_of']=='2026-09-20T00:00:00Z'
+
+
+@pytest.mark.parametrize('qualified_originals',[False,True])
+def test_reported_money_and_unbound_broker_observations_preserve_original_c7_contract(tmp_path,monkeypatch,qualified_originals):
+    from test_family_c7_source_assembly import original_case
+    from family_c7_source_assembly import assemble
+    _,_,req,ctx,tactical,identities,facts,desc=original_case(tmp_path)
+    normalized={'digest':'b'*64,'source_db_sha256':req['client_snapshot']['payload']['source_sha256'],
+        'position_values':{'positions':[]},'financial_facts':{'digest':'c'*64,'reported_money':{'facts':[
+            {'fact_kind':'OWNER_INVESTMENT_INTENT','fact_digest':'d'*64,'amount':'50',
+             'as_of':req['evaluation_at'],'available_at':req['evaluation_at'],'settlement_qualified':False}]},
+            'broker_observations':{'source_descriptor':{'local_path':str(tmp_path/'candidate.json'),'sha256':'e'*64},
+                'orders':[{'order_status':'REPLACED'}]}}}
+    monkeypatch.setattr(source,'read',lambda *args:deepcopy(normalized))
+    ctx['member_reconciliation_source']={'local_path':str(tmp_path/'same_run.json'),'sha256':'f'*64}
+    out=assemble(ROOT,req,ctx,artifact_directory=tmp_path/'private',tactical=tactical,identities=identities,
+        portfolio_facts_source=desc() if qualified_originals else None)
+    money=next(r for r in out['field_inventory'] if 'financial_observations.OWNER_INVESTMENT_INTENT' in r['field_path'])
+    assert money['source_locators'][0]['original_money_fact']['amount']=='50'
+    pending=next(r for r in out['field_inventory'] if r['field_path'].endswith('original_order_snapshot'))
+    assert pending['value_state']=='UNKNOWN'
+    assert ('source_descriptor' in out)==qualified_originals
+    if not qualified_originals:
+        assert out['scope_candidate']['current_nav'] is None and out['scope_candidate']['funding_buckets'] is None

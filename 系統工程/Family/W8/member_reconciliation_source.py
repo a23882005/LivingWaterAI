@@ -17,7 +17,8 @@ SCHEMA='Family.W8.MemberReconciliationSource.v1'
 INPUTS=('client_id','source_db_sha256','classification_source','product_sources',
     'v75_parameter_source','market_sources','current_broker_sources',
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
-    'official_target_base_source','document_target','owner_target_decision_source')
+    'official_target_base_source','document_target','owner_target_decision_source',
+    'broker_observation_source')
 
 
 def binding(request):
@@ -137,6 +138,8 @@ def normalize(root,request,config):
         complete_exposure_book=False,reconciliation_attested=False,financial_cycle_initialized_by_adapter=False,
         scope='REPLAYED_ORIGINAL_OBSERVATIONS__COMPLETE_FACTS_CONTRACT_STILL_REQUIRED',
         trade_authorization='NONE',trade_action='NO_TRADE')
+    from member_financial_facts import produce as financial_facts
+    out['financial_facts']=financial_facts(request,out,config.get('broker_observation_source'))
     out['digest']=digest(out)
     return out
 

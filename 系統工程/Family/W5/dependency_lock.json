@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "21d62b045936ea67c56323a9d9874f8d4f845b3a7fd610bea0f9678cac8f56b9"
+    "sha256": "2174adb42af241b849e5966250031cff79c7b0f8aa10c5449c2762b045224aa4"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -415,7 +415,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_chain.py",
-    "sha256": "3f1510b3f0674bbdde81653c12784e8e30388638885b7e5816e65cbcb668c8ad"
+    "sha256": "4d265228ed3f79b3054e0dd5dd29ac4d5de8f3eac23bd0ef05baa2d381d0028b"
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
@@ -427,7 +427,7 @@
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
-    "sha256": "58d26b5e21a8a4270e4c6bc227e3036f6ca844bb296eda317fc50f3560c5f6d1"
+    "sha256": "c08ed1276970cfd0f680c55866caa2745cf87694a9d013e81dd3ab1b1a122413"
   },
   {
     "path": "系統工程/Family/W8/same_run_market_cache.py",
@@ -447,7 +447,7 @@
   },
   {
     "path": "系統工程/Family/W8/family_c7_source_assembly.py",
-    "sha256": "d4acfeb3478737a5a1b3a6d4e0cf82c03dea90cb34d9310b326e5941308a5001"
+    "sha256": "e2b91462233904a8781f096ececb580e44631a5f7468febeacd9e7a86b83c99b"
   },
   {
     "path": "系統工程/Family/W8/v70_tactical_input.py",
@@ -463,7 +463,7 @@
   },
   {
     "path": "系統工程/Family/W8/c7_source_qualification.py",
-    "sha256": "36d95c700768662d26a15eeea8f64f23d448e3ca5492ca06aff6b2b9bea3608e"
+    "sha256": "710484b30d1d17128a2e6de7d0c9817e4eb83d1d9693e70b6efa9e91266b20bc"
   },
   {
     "path": "系統工程/Family/W5/mentor_bridge.py",
@@ -519,7 +519,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_reconciliation_source.py",
-    "sha256": "050a43eac5e976c5b41aa12ebf872b15f8965f4dae1b625b71a2ce9988f80bf0"
+    "sha256": "bc54e928ec55c34b563fd3393a9bb1a75c375cab64e25b202597951b44900351"
   },
   {
     "path": "系統工程/Family/W8/sec_publication_source.py",
@@ -535,6 +535,10 @@
   },
   {
     "path": "系統工程/Family/W8/qp_anchor_diagnostic.py",
-    "sha256": "9d400106e2c28adecffa219c9372e801b9406abf254dc8ec1927c77f7d80f527"
+    "sha256": "b195af89cb96136eeab40806f5e65d4a9b06747e2b7ce62852ed42bd41274b4e"
+  },
+  {
+    "path": "系統工程/Family/W8/member_financial_facts.py",
+    "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
   }
 ]

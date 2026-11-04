@@ -41,6 +41,31 @@ def test_complete_raw_facts_have_no_new_original_gate_and_empty_confirmed_lists_
     assert out['source_qualification']['financial_pass_claimed'] is False
 
 
+@pytest.mark.parametrize('cash,authorization',[(False,False),(True,False),(False,True),(True,True)])
+def test_cash_and_authorization_qualify_independently_per_account(tmp_path,cash,authorization):
+    m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path)
+    account=f['accounts'][0]
+    if not cash:account['cash']['settlement_evidence_state']='UNKNOWN'
+    if not authorization:account['authorization_evidence_state']='UNKNOWN'
+    out=assemble(ROOT,req,ctx,artifact_directory=tmp_path/'private',tactical=t,identities=ids,portfolio_facts_source=desc())
+    facts={r['requirement_id']:r for r in out['source_qualification']['original_fact_checks']}
+    prefix='account:'+req['owner']['account']+':'
+    assert (facts[prefix+'cash_eligibility']['state']==AVAILABLE)==cash
+    assert (facts[prefix+'incremental_authorization']['state']==AVAILABLE)==authorization
+    field=next(r for r in out['field_inventory'] if r['field_path']=='family_scope.funding_buckets')
+    assert (field['dependency_resolution']['state']==AVAILABLE)==(cash and authorization)
+
+
+def test_one_qualified_cash_bucket_cannot_qualify_another_account(tmp_path):
+    m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path)
+    out=assemble(ROOT,req,ctx,artifact_directory=tmp_path/'private',tactical=t,identities=ids,portfolio_facts_source=desc())
+    req['client_snapshot']['payload']['tables']['portfolio_account'].append({'account_key':'OTHER_ACCOUNT'})
+    annotate(out,req)
+    facts={r['requirement_id']:r for r in out['source_qualification']['original_fact_checks']}
+    assert facts['account:OTHER_ACCOUNT:cash_eligibility']['state']!=AVAILABLE
+    assert facts['account:OTHER_ACCOUNT:incremental_authorization']['state']!=AVAILABLE
+
+
 def test_existing_cash_and_ownership_fragments_are_not_called_absent(tmp_path):
     req,ctx,t,ids,out=partial(tmp_path);account=req['owner']['account'];tables=req['client_snapshot']['payload']['tables']
     tables['cash_balance_snapshot']=[{'account_key':account,'as_of_utc':req['evaluation_at'],

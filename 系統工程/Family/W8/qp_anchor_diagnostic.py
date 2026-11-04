@@ -91,6 +91,8 @@ def _read(descriptor):
                    decision_at=source['decision_at'], saved_at=artifact['saved_at'],
                    window_start_session=window[0]['session_id'],
                    window_end_session=window[-1]['session_id'],
+                   window_session_ids=[r['session_id'] for r in window],
+                   window_session_ids_digest=digest([r['session_id'] for r in window]),
                    snapshot_digest=artifact['snapshot_digest'],
                    source_digest=artifact['input_digest'], file_sha256=descriptor['sha256'],
                    run_id=artifact['run_id'], source_reference=artifact['source_reference'])

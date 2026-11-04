@@ -113,12 +113,15 @@ def read_market(descriptor,symbol,evaluation_at):
 def bind(sources,request,symbol):
     result={}
     if not isinstance(sources,dict) or not sources:raise ValueError('HISTORY_INTAKE_NAMED_SOURCE_REQUIRED')
-    if set(sources)-{'sec_filings','market_acquisition'}:raise ValueError('HISTORY_INTAKE_UNKNOWN_SOURCE_ROUTE')
+    if set(sources)-{'sec_filings','market_acquisition','twse_own_history'}:raise ValueError('HISTORY_INTAKE_UNKNOWN_SOURCE_ROUTE')
     if sources.get('sec_filings') is not None:
         from sec_publication_source import read
         result['sec_filings']=read(sources['sec_filings'],symbol,request['evaluation_at'])
     if sources.get('market_acquisition') is not None:
         result['market_acquisition']=read_market(sources['market_acquisition'],symbol,request['evaluation_at'])
+    if sources.get('twse_own_history') is not None:
+        from twse_own_history_source import read
+        result['twse_own_history']=read(sources['twse_own_history'],symbol,request['evaluation_at'])
     out=dict(schema_version='Family.W8.AssetHistorySourceQualification.v1',client_id=request['client_id'],
         run_id=request['run_id'],asset_id=symbol,evaluation_at=request['evaluation_at'],
         source_db_sha256=request['client_snapshot']['payload']['source_sha256'],sources=result,

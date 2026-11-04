@@ -145,7 +145,7 @@
     },
     {
       "path": "../../Family/W8/historical_source_qualification.py",
-      "sha256": "49ccc6e4af0517f31f961dc55e1e729edc2d74e34566f5907df2312766a51268"
+      "sha256": "3bcd35f80d3b9b7151141a1e3f4711a0f398e2735ef1bdcfecbd37bfa6175af3"
     },
     {
       "path": "../../Family/W5/mentor_bridge.py",
@@ -198,6 +198,18 @@
     {
       "path": "../../Family/W8/member_financial_facts.py",
       "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
+    },
+    {
+      "path": "../../Family/W8/twse_own_history_source.py",
+      "sha256": "1c990d23c5d37decc1ee07465c18fe67d2aa543151adbe8f956a7fc2cd6f1211"
+    },
+    {
+      "path": "../../Family/W8/native_history_source.py",
+      "sha256": "7372ecc068d2382c90b7cfbb71c8ae484fcc33c6e96cde3ffb1e30cc3ee0ba1d"
+    },
+    {
+      "path": "../../Family/W8/v82_approved_context.py",
+      "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59"
     }
   ]
 }

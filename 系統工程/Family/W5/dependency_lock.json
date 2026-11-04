@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "2174adb42af241b849e5966250031cff79c7b0f8aa10c5449c2762b045224aa4"
+    "sha256": "e97e10fe840a7ca3480d1ddc481390323c22dbc9e89804961335e91e3c142bbf"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -527,7 +527,7 @@
   },
   {
     "path": "系統工程/Family/W8/historical_source_qualification.py",
-    "sha256": "49ccc6e4af0517f31f961dc55e1e729edc2d74e34566f5907df2312766a51268"
+    "sha256": "3bcd35f80d3b9b7151141a1e3f4711a0f398e2735ef1bdcfecbd37bfa6175af3"
   },
   {
     "path": "系統工程/Family/W8/massive_daily_source.py",
@@ -540,5 +540,20 @@
   {
     "path": "系統工程/Family/W8/member_financial_facts.py",
     "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
+  },
+  {
+    "path": "系統工程/Family/W8/twse_own_history_source.py",
+    "sha256": "1c990d23c5d37decc1ee07465c18fe67d2aa543151adbe8f956a7fc2cd6f1211",
+    "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
+  },
+  {
+    "path": "系統工程/Family/W8/native_history_source.py",
+    "sha256": "7372ecc068d2382c90b7cfbb71c8ae484fcc33c6e96cde3ffb1e30cc3ee0ba1d",
+    "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
+  },
+  {
+    "path": "系統工程/Family/W8/v82_approved_context.py",
+    "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59",
+    "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
   }
 ]

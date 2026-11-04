@@ -24,7 +24,7 @@ def read_source(descriptor,request,symbol):
     if not data.get('source_reference') or timestamp(data['available_at'],'available_at')>timestamp(request['evaluation_at'],'evaluation_at'):
         raise PermissionError('V82_APPROVED_SOURCE_NOT_AVAILABLE_AT_CUTOFF')
     # A caller cannot paste the projection produced below into a source file.
-    if 'verified_market_identity' in data:
+    if 'verified_market_identity' in data or 'native_history_source_readback' in data:
         raise PermissionError('V82_MARKET_IDENTITY_DERIVED_PROJECTION_NOT_AN_INPUT')
     evidence=data.get('market_identity_source')
     if evidence is not None:
@@ -80,6 +80,13 @@ def read_source(descriptor,request,symbol):
             'historical_financial_PIT_attested':False}
         proof['digest']=digest(proof)
         data['verified_market_identity']={**observed,'currency_source':proof}
+    if data.get('native_history_source') is not None:
+        if any(data.get(k) is not None for k in ('price_history','valuation_history')):
+            raise PermissionError('V82_HISTORY_INLINE_AND_PINNED_ROUTES_CONFLICT')
+        from native_history_source import read
+        histories,receipt=read(data['native_history_source'],request,symbol)
+        data.update(histories)
+        data['native_history_source_readback']=receipt
     return data
 
 
@@ -157,6 +164,8 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
         context['source_binding']['history_source_qualification_digest']=row['history_source_qualification']['digest']
         # Source observations cannot fill valuation_history/price_history or
         # safety predicates. Those remain the original qualified input routes.
+    if extra.get('native_history_source_readback') is not None:
+        context['source_binding']['native_history_source_readback']=deepcopy(extra['native_history_source_readback'])
     return context,evaluate(context,core)
 
 

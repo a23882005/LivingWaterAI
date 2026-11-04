@@ -14,7 +14,7 @@
       "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=2e03c97cafd12ff0592d347927a1c57d62e05e5a9f793ebfab48f1ff679e828d，稽核檔data/audit/fed_target_evidence_20261104T020625Z.html.gz",
       "retrieval_time": "2026-11-04T10:06:25+08:00",
       "publication_date": "2026-09-16",
-      "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; corroborated by FRED/ALFRED through 2026-11-02",
+      "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; corroborated by FRED/ALFRED through 2026-11-03",
       "policy_schema": "fed-target-evidence-v1",
       "effective_date": "2026-09-17",
       "lower_bound": {
@@ -73,7 +73,7 @@
           "metric_or_horizon": "目標區間上限",
           "status": "FOUND",
           "checked_at": "2026-11-04T10:04:17+08:00",
-          "value": 4.0,
+          "value": 4,
           "unit": "%",
           "observation_date": "2026-11-03",
           "notes": "FRED CSV本輪直接查核最新日值4.00%，與Fed官方上限一致。"
@@ -84,7 +84,7 @@
           "metric_or_horizon": "目標區間上限歷史vintage",
           "status": "FOUND",
           "checked_at": "2026-11-04T10:04:17+08:00",
-          "value": 4.0,
+          "value": 4,
           "unit": "%",
           "observation_date": "2026-11-03",
           "notes": "ALFRED頁面本輪HTTP 200；現行上限4.00%，與官方及FRED一致。"
@@ -279,7 +279,7 @@
       "detail": "INDEX/MMFI 日期2026-11-03收盤43.74%，採EOD收盤非盤中LAST；來源SHA256=2048e28c77e0a15fa14e37dfbd9b0a71829cc31664843b85e646d6a01cbca3ef",
       "retrieval_time": "2026-11-04T10:06:25+08:00",
       "publication_date": "2026-11-03",
-      "vintage": "EODData INDEX/MMFI retrieved 2026-11-03; observation 2026-11-02",
+      "vintage": "EODData INDEX/MMFI retrieved 2026-11-04; observation 2026-11-03",
       "candidate_checks": [
         {
           "site": "Macroaxis",
@@ -530,12 +530,12 @@
     }
   },
   "notes": [
-    "2026-10-30本輪依正式契約逐項重查四站；Forward/FY1嚴格排除TTM。",
+    "2026-11-04本輪依正式契約逐項重查四站；Forward/FY1嚴格排除TTM。",
     "m06由builder依m06_rate、m06_inf、m06_rstar、m06_output_gap衍生，不在此檔手填。",
-    "Fed現行政策正規化原始證據：data/audit/fed_target_evidence_20261030T100427+0800.txt；SHA256=b98885ef9d58fdf29ab3297dde7d73748baf75acb478c317890afa9743f703e2。",
-    "r-star保留真實季度觀測日及vintage；工具不能解析官方XLSX時未刷新觀測日。",
+    "Fed現行政策原始證據：data/audit/fed_target_evidence_20261104T020625Z.html.gz；SHA256=2e03c97cafd12ff0592d347927a1c57d62e05e5a9f793ebfab48f1ff679e828d。",
+    "r-star保留真實季度觀測日及vintage；本輪已直接下載並解析官方real-time與current XLSX。",
     "output gap採CBO 2026-02 vintage的2026Q3 GDPPOT 24,200.4446936與BEA/FRED 2026Q3 GDPC1 24,611.077一致口徑計算；未使用年度平均或模板值。",
-    "本輪配對核心為2026-10-30T09:55:06.445705+08:00，09:00核心18項及s03重複傳輸欄已讀回，19筆status均為OK。"
+    "本輪配對核心為2026-11-04T09:56:39.118404+08:00，09:00核心18項及s03重複傳輸欄已讀回，19筆status均為OK。"
   ],
   "refresh_method": "Official Fed full raw HTTP reverified; other values retain dated observations unless independently refreshed"
 }

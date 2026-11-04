@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-04T07:46:33Z",
+  "updated_at": "2026-11-04T08:54:47Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3298,5 +3298,71 @@
     "trade": "NONE",
     "next_action": "Await original Codex next financial chain delta under posted PR59 contract; PM handles qualified financial originals and independent QA; 4x14 integration then Gate D/Trial/Gate E",
     "historical_handover_fields": "H3 and H2 snapshots are retained as historical records, not live work state"
+  },
+  "pm_full_source_call_chain_readonly_audit_20261104": {
+    "time_taiwan": "2026/11/04 16:52",
+    "owner": "Family中PM／全案總PM",
+    "purpose": "Owner-requested complete core-call-chain read and source understanding; read-only",
+    "pinned_pr59_head": "37665b388d2f6981aa0c511143fd965df780d809",
+    "observed_live_pr59_head": "37665b388d2f6981aa0c511143fd965df780d809",
+    "reviewed_mother_rules": [
+      "Mentor.md v3.21.0",
+      "V70_2.html formal root",
+      "Family V70-3-27.html actual on-demand consumer",
+      "V82.md v1.21.0 + approved three-layer v1.0",
+      "債券V75.md v2.7.0"
+    ],
+    "reviewed_program_chain": [
+      "Family/W7/family_menu.py",
+      "Family/W8/on_demand_project.py",
+      "Family/W8/official_family_entry.py",
+      "Family/W8/on_demand_current_sources.py",
+      "Family/W8/v70_original_runtime.cjs",
+      "Family/W8/member_v82_analysis.py",
+      "Family/W5/family_runner.py",
+      "Family/W5/native_pipeline.py",
+      "V82 formally approved runtime/own_history+approved_decision+daily_slice+deployment+canonical_output",
+      "債券V75正式Runtime/work3..work6/predicates",
+      "C8C9 direct Work6/Work7/Work8/Work9",
+      "Family/W5/mentor_bridge.py",
+      "Family/W8/formal_report_source.py+w6_current_data.py+on_demand_w6.py+w6_member_render.py+on_demand_report_delivery.py",
+      "Family/W6/runtime/report_archive.py"
+    ],
+    "pr60_read_only_head": "a37851b446c9a7901b1b0827e16dadd41f4f3b27",
+    "pr60_read_only_consumer": [
+      "report_canonical_adapter.py",
+      "report_financial_sections.py",
+      "w6_current_data.py",
+      "w6_member_render.py",
+      "formal_report_source.py",
+      "on_demand_report_delivery.py",
+      "Report_HTML_Checkpoint.json"
+    ],
+    "read_only_official_database_count": 10,
+    "official_db_integrity": "6 Family DB + 4 CycleLedger; all SQLite quick_check ok; FK errors 0",
+    "work12_archived_reference_db_count": 2,
+    "work12_reference_integrity": "both quick_check ok, FK errors 0; 11 instruments/330 metric/55 released in canonical DB",
+    "w6_approved_zip_entries": 224,
+    "w6_approved_zip_crc": "PASS",
+    "findings": [
+      "Mentor V70_2 formal vs Family V70-3-27 actual differs for extreme market allocation; do not silently replace sources or treat candidate as actionable",
+      "PR60 SOURCE_REVIEW can show UNKNOWN without fabricated NAV, distinct from fully qualified financial output",
+      "PR59/PR60 Draft branches remain distinct",
+      "No DB update or direct order; previous PASS retained"
+    ],
+    "private_audit": "Google Drive root/TEMP/Family_中PM_Mentor至V70_V82_V75_DB_W6完整讀碼與理解紀錄_20261104.md",
+    "private_audit_sha256": "5ac5792e226f7f4d09e45bce85b236e9f1229699b1f893cc41b5c5f6e0a27a77",
+    "family_drive_governance": [
+      "Root 檔案管理.md",
+      "Family家人版_施工管理.md",
+      "家人版_檔案管理.md"
+    ],
+    "w7": "PASS_CLOSED",
+    "w8": "IN_PROGRESS",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "next_owner": "Original V82 Codex PR59 next qualified sources and finance pipeline; middle PM independent next-delta QA + four-household 56-menu E2E/Gate D/Trial/Gate E"
   }
 }

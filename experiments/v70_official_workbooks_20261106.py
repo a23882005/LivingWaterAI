@@ -4,6 +4,7 @@ import datetime as dt
 import hashlib
 import io
 import json
+import re
 import urllib.request
 from pathlib import Path
 import openpyxl
@@ -37,6 +38,54 @@ for name,url in targets:
      if len(summary["matching_rows"])<12:summary["matching_rows"].append([ix]+cells)
    row["sheets"].append(summary)
   row["status"]="XLSX_STRUCTURAL_PASS_NUMERIC_PENDING"
+
+  # Read exact documented table codes; do not confuse these with ISM PMI.
+  if name=="m04_census_new_orders":
+   ws=wb["m3-outp-nop"]
+   observations=[]
+   for values in ws.iter_rows(values_only=True):
+    if str(values[0]).strip()!="AMTMNO":continue
+    try:year=int(values[1])
+    except (ValueError,TypeError):continue
+    for month,val in enumerate(values[2:14],start=1):
+     if isinstance(val,(int,float)) and val>0 and 1900<=year<=2030:
+      observations.append((dt.date(year,month,1),float(val)))
+   if observations:
+    d,v=max(observations)
+    row.update(status="OFFICIAL_NUMERIC_PASS",series="AMTMNO",unit="millions of USD, seasonally adjusted",
+      latest_observation=d.isoformat(),value=v,sample_count=len(observations),
+      recent_observations=[{"date":x.isoformat(),"value":y} for x,y in sorted(observations)[-4:]],
+      note="US Census total manufacturing new orders, NOT ISM manufacturing PMI")
+  if name=="m15_bea_services":
+   ws=wb["T20806-M"]
+   header=next(ws.iter_rows(min_row=8,max_row=8,values_only=True))
+   row["service_header_tail"]=[str(x) for x in header[-18:]]
+   row["service_metadata"]=[str(x[0]) for x in ws.iter_rows(min_row=1,max_row=5,values_only=True)]
+   observations=[]
+   for values in ws.iter_rows(min_row=9,max_row=min(ws.max_row,100),values_only=True):
+    if str(values[1]).strip().lower()!="services" or str(values[2]).strip()!="DSERRX":
+     continue
+    for i in range(3,min(len(values),len(header))):
+     val=values[i]
+     if not isinstance(val,(int,float)) or val<=0:continue
+     stamp=str(header[i]).strip()
+     m=re.search(r"(20\d\d)[-]?M?(0?[1-9]|1[012])$",stamp,re.I) if stamp else None
+     if not m:
+      m=re.search(r"^(20\d\d)[-/](0?[1-9]|1[012])$",stamp)
+     if m:
+      d=dt.date(int(m.group(1)),int(m.group(2)),1)
+      observations.append((d,float(val)))
+    break
+   if observations:
+    observations.sort()
+    d,v=observations[-1]
+    prior=observations[-2][1] if len(observations)>=2 else None
+    row.update(status="OFFICIAL_NUMERIC_PASS",series="DSERRX",unit="millions of chained 2017 USD, SAAR",
+      latest_observation=d.isoformat(),value=v,sample_count=len(observations),
+      monthly_change_pct=round((v/prior-1)*100,6) if prior else None,
+      recent_observations=[{"date":x.isoformat(),"value":y} for x,y in observations[-4:]],
+      note="BEA Table 2.8.6 real PCE services, NOT ISM services PMI")
+
  except Exception as e:
   row.update(status="ERROR",error=type(e).__name__+": "+str(e)[:330])
  results.append(row)

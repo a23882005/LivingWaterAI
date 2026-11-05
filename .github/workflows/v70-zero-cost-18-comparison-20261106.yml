@@ -1,0 +1,57 @@
+name: V70 Research Zero-Subscription Verification 20261106
+on:
+  push:
+    branches:
+      - test/v70-zero-cost-source-verification-20261106
+    paths:
+      - experiments/v70_zero_cost_candidates_20261106.py
+      - .github/workflows/v70-zero-cost-18-comparison-20261106.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v70-zero-cost-source-verification-20261106
+  cancel-in-progress: false
+jobs:
+  original-free-15-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare old isolated official source test
+        run: python -m pip install --disable-pip-version-check -q xlrd==2.0.2
+      - name: Fetch actual previously verified 15 official/free sources again
+        run: python -u experiments/v70_free_sources_probe_20261106.py
+      - name: Save real numeric and timestamp evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-zero-cost-official-15-original
+          path: build/v70_free_source_probe/
+          if-no-files-found: warn
+          retention-days: 14
+  isolated-new-candidates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare standalone EIA XLS parser
+        run: python -m pip install --disable-pip-version-check -q xlrd==2.0.2
+      - name: Python syntax check
+        run: python -m py_compile experiments/v70_zero_cost_candidates_20261106.py
+      - name: Probe 7 actual zero-subscription public candidates (no deploy)
+        run: python -u experiments/v70_zero_cost_candidates_20261106.py
+      - name: Save each numeric/date/source result and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-zero-cost-public-7-candidates
+          path: build/v70_zero_cost_candidate_20261106/
+          if-no-files-found: warn
+          retention-days: 14

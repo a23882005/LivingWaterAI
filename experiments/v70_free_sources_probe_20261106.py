@@ -31,6 +31,22 @@ TARGETS = [
      "https://www.eia.gov/dnav/pet/hist_xls/RWTCd.xls", "eia_xls", 30),
     ("BLS_UNEMPLOYMENT", "BLS LNS14000000 unemployment rate, seasonally adjusted",
      "https://api.bls.gov/publicAPI/v2/timeseries/data/LNS14000000?startyear=2025&endyear=2026", "bls", 90),
+    ("DFII10", "10Y TIPS real yield/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10", "fred", 21),
+    ("T5YIE", "5Y breakeven inflation/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE", "fred", 21),
+    ("WALCL", "Federal Reserve total assets/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL", "fred", 28),
+    ("WDTGAL", "Treasury General Account/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL", "fred", 28),
+    ("RRPONTSYD", "Fed overnight reverse repo/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD", "fred", 21),
+    ("CPILFESL", "Core CPI level/BLS via FRED",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL", "fred", 90),
+    ("PAYEMS", "Total nonfarm payroll employment/BLS via FRED",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=PAYEMS", "fred", 90),
+    ("SAHMREALTIME", "Sahm real-time recession signal/FRED download",
+     "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SAHMREALTIME", "fred", 90),
 ]
 
 def parse_date(s):

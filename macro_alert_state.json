@@ -1,6 +1,6 @@
 {
   "schema": "D009-alert-state-v1",
-  "updated_at": "2026-11-05",
+  "updated_at": "2026-11-06",
   "indicators": {
     "m07": {
       "consecutive_failures": 0,
@@ -23,14 +23,14 @@
       "status": "OK"
     },
     "m04": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-06",
+      "status": "STALE"
     },
     "m05": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-06",
+      "status": "STALE"
     },
     "m09": {
       "consecutive_failures": 0,
@@ -73,19 +73,19 @@
       "status": "OK"
     },
     "m18": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-06",
+      "status": "STALE"
     },
     "m19": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-06",
+      "status": "STALE"
     },
     "m20": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-06",
+      "status": "STALE"
     },
     "s04": {
       "consecutive_failures": 0,

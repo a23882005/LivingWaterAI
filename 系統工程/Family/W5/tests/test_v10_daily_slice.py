@@ -174,3 +174,74 @@ def test_reconciliation_receipt_cannot_cross_owner_or_arrive_after_cutoff():
     with pytest.raises(ValueError,match='OWNER_ASSET'):event(c,receipt=r)
     r['owner']=OWNER;r['available_at']='2026-10-31T00:00:00Z'
     with pytest.raises(ValueError,match='NOT_AVAILABLE'):event(c,receipt=r)
+
+
+def amended_source_slots(count):
+    sys.path.insert(0,str(ROOT/'系統工程/Family/W8/tests'))
+    from test_m1_m8_amendment import selected_maturity
+    return selected_maturity(count)[0]
+
+
+@pytest.mark.parametrize('mode,immature,mature',[
+    ('Base Deployment','0.1','0.2'),('Left Overweight','0.15','0.25'),
+    ('Right Confirmation','0.25','0.25'),('Trend Deployment','0.2','0.2')])
+def test_G6_actual_amended_M_sources_preserve_mode_rates_and_unknown_semantics(mode,immature,mature):
+    two,three,unknown=[amended_source_slots(k) for k in ('8','9','unknown')]
+    assert maturity(two)['state']=='IMMATURE' and maturity(two)['true_count']==2
+    assert maturity(three)['state']=='MATURE' and maturity(three)['true_count']==3
+    assert maturity(unknown)['state']=='UNKNOWN'
+    assert rates(mode,two)['mode_rate']==immature and rates(mode,three)['mode_rate']==mature
+    assert rates(mode,unknown)['mode_rate']==(None if mode in ('Base Deployment','Left Overweight') else mature)
+
+
+def test_G7_amended_maturity_cannot_enlarge_same_day_locked_B0_or_release_pending_cash(tmp_path):
+    immature=rates(signals=amended_source_slots('8'));mature=rates(signals=amended_source_slots('9'))
+    c=new_cycle('100',speed_result=immature);assert Decimal(c['B0'])==15
+    assert Decimal(room(c,speed_result=mature)['cycle_room'])==15
+    c=event(c,remaining='15',speed_result=mature)
+    c=event(c,eid='FILL',state='PARTIAL_FILL',filled='5',remaining='10',speed_result=mature)
+    c=event(c,eid='PENDING',state='CANCEL_PENDING',filled='5',remaining='10',speed_result=mature)
+    assert Decimal(room(c,speed_result=mature)['cycle_room'])==0
+    assert Decimal(room(c,speed_result=mature)['cycle_committed'])==10
+    c=event(c,eid='RELEASE',state='CANCELLED',filled='5',remaining='0',speed_result=mature)
+    assert Decimal(room(c,speed_result=mature)['cycle_room'])==10
+    store=CycleLedgerStore(tmp_path/'synthetic.sqlite',create=True);store.save(c,expected_revision=None)
+    raised=new_cycle('100',speed_result=mature);raised['revision']=c['revision']+1
+    with pytest.raises(ValueError,match='INITIAL_FACTS_IMMUTABLE'):store.save(raised,expected_revision=c['revision'])
+    assert Decimal(store.get(c['slice_cycle_id'])['B0'])==15
+
+
+def test_G7_amended_mature_votes_do_not_override_known_prohibition_or_other_owner():
+    mature=rates(signals=amended_source_slots('9'));c=new_cycle('100',speed_result=mature)
+    assert new_cycle('100',speed_result=mature,permission=False) is None
+    assert room(c,speed_result=mature,permission=False)['cycle_room']=='0'
+    assert room(c,speed_result=mature,trend_allowed=False)['cycle_room']=='0'
+    other={**OWNER,'client_id':'OTHER_SYNTHETIC_MEMBER'}
+    assert cycle_id(owner=other,session_id=SESSION,exchange='SYNTHETIC_X',asset_id='SYNTHETIC')!=c['slice_cycle_id']
+    r={**event(c,remaining='25',speed_result=mature)['intents']['I1']['receipt'],'owner':other}
+    with pytest.raises(ValueError,match='OWNER_ASSET'):event(c,receipt=r,speed_result=mature)
+
+
+@pytest.mark.parametrize('cause',['hard_gate','runaway_down'])
+def test_G7_original_stock_engine_keeps_risk_prohibition_with_amended_mature_sources(cause):
+    from test_v10_stock_integration import adopted_case,bind_context
+    from stock_engine import run_stock_engine
+    req,facts,contract=adopted_case();context=facts['approved_v10_context']
+    context['maturity_signals']=amended_source_slots('9')
+    if cause=='hard_gate':facts['core']['hard_gate_predicates']=['TRUE']
+    else:
+        facts['core']['down_break']=['TRUE']*3
+        facts['core']['down_accel']=['TRUE']*8
+    context['shared_allocation_request']['slices'][0]['slice']='0';bind_context(facts,contract)
+    result=run_stock_engine(ROOT,req,facts,contract)
+    if cause=='hard_gate':
+        assert result['execution'].execution_amount==0 and result['daily_slice']['cap']=='0'
+        assert result['core_state'].permission.hard_gate.value=='TRIGGERED'
+    else:
+        assert result['core_state'].technical.runaway_down.value=='TRUE'
+        assert result['approved_v10_analysis']['right_entry']['truth']=='FALSE'
+        assert result['status']=='INSUFFICIENT_DATA' and result['execution'] is None
+        context['maturity_signals']=slots(0);bind_context(facts,contract)
+        baseline=run_stock_engine(ROOT,req,facts,contract)
+        assert baseline['core_state']==result['core_state'] and baseline['deployment']==result['deployment']
+        assert baseline['status']==result['status'] and baseline['execution'] is None

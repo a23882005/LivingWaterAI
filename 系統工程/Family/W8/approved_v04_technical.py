@@ -13,6 +13,11 @@ from technical_source_bridge import NAMES,_originals,predicate_votes
 import approved_v04_numeric as n
 D=Decimal
 U='UNKNOWN';T='TRUE';F='FALSE'
+MATURITY_AMENDMENT={
+    'id':'FAMILY_V82_M1_M8_20261105',
+    'source_reference':'https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6661861925',
+    'contract_export_sha256':'0983b732c03cb6d894f0127565d6205807345f9ae49f0e923c60e9daabe33755',
+    'scope':['M1','M8'],'performance_validation':'NOT_CLAIMED'}
 
 
 def load_profile(path):
@@ -289,13 +294,17 @@ def _produce(rows,*,profile,is_etf,close_only):
     turn=both(cmp(at(k,t-2),at(k,t-1),'ge'),cmp(at(d,t-2),at(d,t-1),'ge'),
         cmp(at(k),at(k,t-1),'gt'),cmp(at(d),at(d,t-1),'ge'))
     price_not_lower=both(chain(l,[t-2,t-1,t],'le'),cmp(at(c),at(c,t-2),'ge'))
-    shrunk=both(cmp(at(c),at(c,t-1),'lt'),cmp(at(v),at(vma),'lt'))
+    # Owner amendment: exactly the prior 20 completed bars, excluding s.
+    # Keep the inclusive vma used by the other approved predicates unchanged.
+    shrunk=both(cmp(at(c),at(c,t-1),'lt'),
+        cmp(at(v),D('.60')*at(v,t-1) if at(v,t-1) is not None else None,'le'),
+        cmp(at(v),at(vma,t-1),'lt'))
     candle_range=at(h)-at(l) if None not in (at(h),at(l)) else None
     close_position=(at(c)-at(l))/candle_range if at(c) is not None and candle_range is not None and candle_range>0 else None
     prev5low=min(l[-6:-1]) if len(l)>=6 and None not in l[-6:-1] else None
     stop_candle=both(cmp(candle_range,D(0),'gt'),cmp(at(c),at(o),'ge'),
-        cmp(close_position,D('.75'),'ge'),cmp(at(l),prev5low,'lt'))
-    mature_values=[None if td is None else td[1] in (5,6,7,8,9),either(n.cross(k,d),turn),
+        cmp(close_position,D('.45'),'ge'),cmp(at(l),prev5low,'ge'))
+    mature_values=[None if td is None else td[1]==9,either(n.cross(k,d),turn),
         both(cmp(at(hist,t-1),at(hist),'lt'),cmp(at(hist),D(0),'lt')),
         cmp(at(dif),at(dif,t-1),'gt'),cmp(at(emv),at(emv,t-1),'gt'),cmp(at(rsi),at(rsi,t-1),'gt'),
         price_not_lower,either(shrunk,stop_candle)]
@@ -303,6 +312,12 @@ def _produce(rows,*,profile,is_etf,close_only):
         'reason':'FORMAL_EXTREME_VALUATION_REQUIRED' if i==9 and value is None else
         'REQUIRED_SOURCE_OR_REFERENCE_UNAVAILABLE' if value is None else 'COMPUTED'} for i,value in enumerate(reduction_values,1)]
     maturity=[{'id':'M'+str(i),'truth':truth(value),'rule_ref':'V82 v1.0 TECH5.2'} for i,value in enumerate(mature_values,1)]
+    for slot in maturity:
+        if slot['id'] in MATURITY_AMENDMENT['scope']:
+            slot['rule_ref']=MATURITY_AMENDMENT['id']+' '+slot['id']
+    amendment={**deepcopy(MATURITY_AMENDMENT),'as_of_session':rows[-1]['Date'],
+        'M8_components':{'A':truth(shrunk),'B':truth(stop_candle)},
+        'completed_session_attestation':'SEPARATELY_REQUIRED_AT_MARKET_INTAKE'}
     scores=[D(0),D('.5'),D('.8'),D(1),D('1.5'),D('1.8'),D(2),D('2.5'),D(3),D(4)]
     return {'schema_version':'Family.W8.ApprovedV10Technical.v1','profile_id':profile['profile_id'],
         'spec_sha256':profile['spec_sha256'],'approval_status':'APPROVED_FOR_IMPLEMENTATION','spec_version':'1.0','source_commit':profile['source_commit'],
@@ -310,6 +325,7 @@ def _produce(rows,*,profile,is_etf,close_only):
         'ma20_ok':truth(ma20_ok),'off_low':truth(off_low),
         'numeric_decimal':{key:str(value) if value is not None else None for key,value in numeric.items()},
         'technical_reduction_signals':reduction,'left_maturity_signals':maturity,
+        'maturity_rule_amendment':amendment,
         'trend_timing_inputs':{'bars':[{key:str(series_[i]) if series_[i] is not None else None
             for key,series_ in (('Open',o),('High',h),('Low',l),('Close',c))}
             for i in range(max(0,count-5),count)],

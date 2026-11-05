@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install verified crawler dependencies
-        run: python -m pip install requests pandas yfinance pypdf
+        run: python -m pip install requests pandas yfinance pypdf exchange_calendars
       - name: Core 18 fresh crawl and validation
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T22:29:32.197Z",
+  "updated_at": "2026-11-05T22:47:18.430Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4188,5 +4188,103 @@
     "real_cycles": 0,
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_20261106_pr59_234221e_issuer_pass_and_buy_quantity_bug_merged_dispatch": {
+    "timestamp_iso": "2026-11-05T22:47:18.430Z",
+    "owner": "Family中PM／全案總PM",
+    "PR59_HEAD_at_acceptance": "234221e1f173483b747c3ad2500a70d02600ccef",
+    "live_HEAD_at_write": "234221e1f173483b747c3ad2500a70d02600ccef",
+    "parent": "218ce4ae573bb751db17316000625666c20c688e",
+    "tree": "92a0d3ea34f677f292331520c382140ccc55756b",
+    "decision": "PASS_SCOPED_CURRENT_ISSUER_DISTRIBUTION_OBSERVATIONS_AND_SOURCE_QUALIFICATION_GUARD",
+    "changed_files": 5,
+    "inherited_scoped_PASS": [
+      "af16a9d",
+      "c91a511",
+      "6d7f224",
+      "218ce4a"
+    ],
+    "QA": {
+      "program_zip": {
+        "id": "1j4fJloPOkKdM5RRWJZ_Sw1VjBJZxynsY",
+        "bytes": 32736601,
+        "sha256": "572aa4b8c8bd0fe5b4d8e1aa17743ac04f06beeaacf38e9eb4cdcc86f9c91f88"
+      },
+      "sources_zip": {
+        "id": "1_Aw5cbCIeVvS3sXP8ZmmEcu9U9ZwUkdr",
+        "bytes": 27455753,
+        "sha256": "56c3ebcf0db916aec449a91a514b8b3baa4fa03ef41469ca6a2309c9af31995a"
+      },
+      "original_receipt": {
+        "id": "14Nf5cny-Cjvoy9J8e8-DzipD2mPpBXPI",
+        "bytes": 25231,
+        "sha256": "50d2bb484aa536ef512f44f143ca4c174ea5310905e03be3c8fc254e76e37e84"
+      },
+      "original_handoff_text": "1RNAaZ3TYd0d_lGmac3fM1X6Nv6ro5vDx",
+      "remote_redownload_hashes_and_ZIP_CRC": "3 raw files SHA/bytes PASS; ZIP CRC2/2; 8/8 payload SHA/bytes PASS",
+      "independent_isolated_restore": "fixed Git head/parent/tree; 1174/1174 tracked source SHA+bytes; 1558 git commits; 22442/22442 original mapped files; previous 22361 retained; overwrites 0",
+      "independent_native_pytest": "106/106 PASS in local Python3.13.5/pytest9.0.2; new issuer+Massive+history source 3 suites",
+      "independent_real_original_source_replay": "SGOV issuer original 77 rows; IB 60 numeric same; Massive 59 same/1 unconfirmed raw difference; four member each source-only DB/output exact PASS",
+      "original_Codex_Junit_verified_not_PM_rerun": "TARGETED 106/106, COMBINED 2133/2133 from original Python3.12; no errors/failures/skips",
+      "original_first_timeout_record": "204 collected, 1 existing 5s timeout fail under simultaneous workloads; isolated 1/1 then clean full 2133/2133 success unchanged; concurrency suspected, not conclusively established",
+      "verified_same_HEAD_six_CI_success": [
+        42106731814,
+        42106731590,
+        42106731524,
+        42106731559,
+        42106731598,
+        42106731528
+      ],
+      "original_Codex_nine_probe_replays": "Original delivery verified, PM new issuer probe personally rerun; other probes based on original retained evidence, not mislabelled PM reruns",
+      "scope_only": true
+    },
+    "SGOV_discrepancy": {
+      "session": "2026-03-02",
+      "issuer_original": "0.27239",
+      "issuer_displayed": "0.272390",
+      "ib_original": "0.27239",
+      "massive_original": "0.2724",
+      "per_share_diff_usd": "0.00001",
+      "cause": "UNVERIFIED_ORIGINALS_PRESERVED",
+      "historical_PIT": false,
+      "qualified_native_actions": false,
+      "qP": false,
+      "qV": false,
+      "broker_cash_qualified": false
+    },
+    "new_bug_issue": "FAMILY-V82-W8-BUY-QTY-VALUATION-001",
+    "new_bug_status": "BUG_CONFIRMED_SYNTHETIC__CODE_FIX_REQUIRED",
+    "new_bug_detail_doc": "1o8CFlrKk2Y_WWldE2o84HWhGjoXu0zd0o9brNT0gZH8",
+    "new_bug_scope": "BUY final quantity must satisfy valuation exposure cap AND cash cost cap, post-fill completion and residual gap use valuation price; do not change nine-stage/B0/pending/shared pools/49+13/PR60",
+    "private_QA_and_combined_contract": {
+      "id": "1YizGHthoddmiDhEN3qyJaAkBz7hkWXjAHFAPpPHfij4",
+      "folder": "Google Drive root/TEMP",
+      "verified_readback": true
+    },
+    "combined_codex_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6671473207",
+    "existing_prior_bug_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6671155800",
+    "governance": {
+      "construction_doc": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "file_management_doc": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "masterWBS": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "readback": "3/3 PASS",
+      "backups_in_Family_Private_Backup": [
+        "1J-yVa-blkCqRuGz7PFlgBhbap0BdtXQYbu-gB9pahas",
+        "1Xw6WqL8qhxfDEt4RnnHPIOQtsZ_djWCCyuJ1kT9u2Ec",
+        "1Hzmzr264nJXCRqkvM-y7t8dkUuOvvca7vrSZeNLJJ7c"
+      ],
+      "code_by_PM_changed": false
+    },
+    "next_writer": "Original V82 Codex single Writer PR59; minimal buy quantity bug fix then finish lawful PIT/qP/qV same-cutoff money C7B CycleLedger Work9 Mentor",
+    "next_middle_PM": "independent QA next PR59 delta, family four households 14x4=56 real E2E, Gate D, four projects, Trial, Gate E",
+    "completed_previous_Gates": "PRESERVED",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "pr59": "DRAFT_UNMERGED",
+    "pr60": "CLOSED_SCOPE_PRESERVED"
   }
 }

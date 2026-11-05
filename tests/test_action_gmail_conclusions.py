@@ -19,11 +19,12 @@ class ConclusionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / 'QA.json').write_text(json.dumps({'rolling15': {
-                'windowStart':'2026-10-22', 'windowEnd':'2026-11-05',
-                'validArchivedDays':12, 'missingDates':['2026-10-23','2026-11-01','2026-11-02']}}))
+                'windowStart':'2026-10-15', 'windowEnd':'2026-11-04', 'tradingDays':15,
+                'validArchivedDays':13, 'missingDates':['2026-10-15','2026-10-22']}}))
             summary = '\n'.join(report.rolling15_lines(root))
-            self.assertIn('12/15日', summary)
-            self.assertIn('2026-11-02', summary)
+            self.assertIn('13/15交易日', summary)
+            self.assertIn('2026-10-22', summary)
+            self.assertIn('美股休市自動跳過', summary)
             self.assertIn('研究參考', summary)
             self.assertNotIn('部署成功', summary)
 

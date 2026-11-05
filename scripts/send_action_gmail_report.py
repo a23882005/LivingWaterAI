@@ -115,11 +115,11 @@ def rolling15_lines(root):
         if not isinstance(observation, dict):
             continue
         return [
-            "15日觀察（本次建置存檔覆蓋；部署結果另見Workflow結論）："
+            "15交易日觀察（美股休市自動跳過；本次建置存檔覆蓋）："
             + str(observation.get("windowStart", "NA")) + "～" + str(observation.get("windowEnd", "NA")),
-            "合格存檔 " + str(observation.get("validArchivedDays", "NA")) + "/15日；缺日："
+            "合格存檔 " + str(observation.get("validArchivedDays", "NA")) + "/15交易日；開市但缺合格分數："
             + ("、".join(observation.get("missingDates") or []) or "無"),
-            "日變化分級為研究參考，非V70正式門檻；缺值維持NA。",
+            "圖線連接有效觀測；休市不列NA，開市缺分數不補值。前一交易日變化分級為研究參考，非V70正式門檻。",
         ]
     return []
 

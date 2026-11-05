@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.v703_rolling_history import history_payload, embed_history, SCHEMA
+from scripts.v703_rolling_history import history_payload, embed_history, observation_summary, SCHEMA
 
 HTML = ROOT / '系統工程/總經V70/V70-3-27.html'
 
@@ -62,6 +62,17 @@ class ArchiveTests(unittest.TestCase):
             built = (Path(temp)/'index.html').read_text()
             payload = json.loads(re.search(r'<script id="v703-daily-history" type="application/json">(.*?)</script>', built, re.S)[1])
             self.assertEqual(payload, history_payload())
+            qa = json.loads((Path(temp)/'QA.json').read_text())
+            self.assertEqual(qa['rolling15'], observation_summary(payload))
+
+    def test_action_summary_counts_missing_calendar_dates(self):
+        payload = {'rows':[{'date':'2026-10-21'}, {'date':'2026-11-04'}, {'date':'2026-11-05'}],
+                   'archiveThrough':'2026-11-05'}
+        summary = observation_summary(payload, dt.date(2026, 11, 5))
+        self.assertEqual(summary['windowStart'], '2026-10-22')
+        self.assertEqual(summary['validArchivedDays'], 2)
+        self.assertEqual(len(summary['missingDates']), 13)
+        self.assertNotIn('2026-10-21', summary['missingDates'])
 
 
 @unittest.skipIf(os.environ.get('V703_SKIP_BROWSER') == '1', 'Archive-only deploy checks; browser cases run in regression job')

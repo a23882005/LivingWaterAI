@@ -65,3 +65,15 @@ def embed_history(markup, payload):
     if count != 1:
         raise ValueError("Missing V70 daily history embedding point")
     return result
+
+
+def observation_summary(payload, today=None):
+    """Describe archived coverage, without claiming current/live publication."""
+    today = today or dt.datetime.now(ZoneInfo("Asia/Taipei")).date()
+    start = today - dt.timedelta(days=14)
+    dates = {(start + dt.timedelta(days=i)).isoformat() for i in range(15)}
+    available = {row["date"] for row in payload["rows"] if row["date"] in dates}
+    return {"schema": SCHEMA, "timezone": "Asia/Taipei", "calendarDays": 15,
+            "windowStart": start.isoformat(), "windowEnd": today.isoformat(),
+            "validArchivedDays": len(available), "missingDates": sorted(dates - available),
+            "archiveThrough": payload.get("archiveThrough")}

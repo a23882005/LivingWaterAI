@@ -1,5 +1,6 @@
 """Verify actual email subjects/bodies without connecting to Gmail."""
 import importlib.util
+import json
 import os
 from pathlib import Path
 import sys
@@ -14,6 +15,18 @@ spec.loader.exec_module(report)
 
 
 class ConclusionTests(unittest.TestCase):
+    def test_rolling15_summary_reports_archive_coverage_without_claiming_deployment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'QA.json').write_text(json.dumps({'rolling15': {
+                'windowStart':'2026-10-22', 'windowEnd':'2026-11-05',
+                'validArchivedDays':12, 'missingDates':['2026-10-23','2026-11-01','2026-11-02']}}))
+            summary = '\n'.join(report.rolling15_lines(root))
+            self.assertIn('12/15日', summary)
+            self.assertIn('2026-11-02', summary)
+            self.assertIn('研究參考', summary)
+            self.assertNotIn('部署成功', summary)
+
     def render_email(self, conclusion, branch="family/example"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

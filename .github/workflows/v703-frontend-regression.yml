@@ -126,6 +126,13 @@ jobs:
                   assert all(x['source'].startswith('https://') for x in snapshot['wallstreet'])
                   print('WALLSTREET5_BROWSER_E2E_PASS',flush=True)
                   assert not errors,('JS runtime errors',errors)
+                  observation=page.evaluate('window.v703Rolling15.state')
+                  assert len(observation['rows'])==15
+                  assert observation['rows'][-1]['date']==page.evaluate('window.v703Rolling15.taipeiDate()')
+                  assert page.locator('#r15-reference-rows tr').count()==4
+                  assert observation['latest'] is not None
+                  assert abs(observation['latest']['score']-page.evaluate('window.v703Latest.macroSafety'))<.001
+                  print('V703_ROLLING15_BROWSER_PASS',json.dumps(observation,ensure_ascii=False),flush=True)
                   print('V703_BROWSER_E2E_PASS',flush=True)
                   browser.close()
           finally:

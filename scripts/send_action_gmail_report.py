@@ -109,6 +109,21 @@ def family_market_lines(cache_root=Path("data/market_history")):
         lines.append(f"- {symbol}｜{'、'.join(clients)}｜資料日期 {date}｜收盤 {fmt_close(close)}｜日漲跌幅 {fmt_pct(pct)}｜狀態 {status}")
     return lines
 
+def rolling15_lines(root):
+    for path in root.rglob("QA.json"):
+        observation = (load_json(path) or {}).get("rolling15")
+        if not isinstance(observation, dict):
+            continue
+        return [
+            "15日觀察（本次建置存檔覆蓋；部署結果另見Workflow結論）："
+            + str(observation.get("windowStart", "NA")) + "～" + str(observation.get("windowEnd", "NA")),
+            "合格存檔 " + str(observation.get("validArchivedDays", "NA")) + "/15日；缺日："
+            + ("、".join(observation.get("missingDates") or []) or "無"),
+            "日變化分級為研究參考，非V70正式門檻；缺值維持NA。",
+        ]
+    return []
+
+
 def make_summary(root, name):
     files = list(root.rglob("*.json"))
     for p in files:
@@ -158,6 +173,7 @@ def main():
         f"Run ID：{run_id}",
         f"執行紀錄：{run_url or '未提供'}",
     ]
+    lines.extend(rolling15_lines(root))
     subject_label = {
         "success": "成功摘要",
         "failure": "🚨失敗警報",

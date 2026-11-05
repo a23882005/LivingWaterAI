@@ -13,9 +13,9 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 try:
-    from v703_rolling_history import embed_history, history_payload
+    from v703_rolling_history import embed_history, history_payload, observation_summary
 except ModuleNotFoundError:
-    from scripts.v703_rolling_history import embed_history, history_payload
+    from scripts.v703_rolling_history import embed_history, history_payload, observation_summary
 
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
@@ -633,12 +633,14 @@ def build(macro_path, supplement_path, html_path, dest):
     out.mkdir(parents=True, exist_ok=True)
     copy_research_charts(out)
     updated_html = _quarterly_chart_markup(updated_html)
-    updated_html = embed_history(updated_html, history_payload())
+    rolling_history = history_payload()
+    updated_html = embed_history(updated_html, rolling_history)
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,
           "requiredScoring": 22, "requiredScoringValidated": len(scoring_valid),
-          "asOf": feed["asOf"], "missing": sorted(missing), "problems": calc_problems}
+          "asOf": feed["asOf"], "missing": sorted(missing), "problems": calc_problems,
+          "rolling15": observation_summary(rolling_history)}
     (out / "QA.json").write_text(json.dumps(qa, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("QUALITY_GATE_" + ("PASS" if qa["ready"] else "BLOCKED") + ": " + json.dumps(qa, ensure_ascii=False))
     return qa["ready"]

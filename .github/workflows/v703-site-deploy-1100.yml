@@ -306,6 +306,15 @@ jobs:
                   assert len(live["indicators"])==28
                   assert "V70_macro_latest.json" in page
                   assert "V70-3-27" in page
+                  assert page.count('id="v703-rolling15"')==1
+                  import re
+                  from scripts.v703_rolling_history import observation_summary
+                  history=json.loads(re.search(r'<script id="v703-daily-history" type="application/json">(.*?)</script>',page,re.S)[1])
+                  qa=json.loads(Path('build/site/QA.json').read_text())
+                  assert observation_summary(history)==qa['rolling15']
+                  assert history['schema']=='V70.3/daily-observation-v1'
+                  assert 'id="r15-chart"' in page and 'id="r15-reference-rows"' in page
+                  print('HOSTINGER_ROLLING15_LIVE_PASS',json.dumps(qa['rolling15'],ensure_ascii=False))
                   assert live['wallStreetFive']['forecasts']==expected['wallStreetFive']['forecasts']
                   assert live['sourceSnapshot']['wallstreet5']==expected['sourceSnapshot']['wallstreet5']
                   assert page.count('公開數字／自寫摘要／來源連結；全文未授權')==5

@@ -5,6 +5,7 @@ on:
       - test/v70-zero-cost-source-verification-20261106
     paths:
       - experiments/v70_zero_cost_candidates_20261106.py
+      - experiments/v70_official_workbooks_20261106.py
       - .github/workflows/v70-zero-cost-18-comparison-20261106.yml
   workflow_dispatch:
 permissions:
@@ -53,5 +54,26 @@ jobs:
         with:
           name: v70-zero-cost-public-7-candidates
           path: build/v70_zero_cost_candidate_20261106/
+          if-no-files-found: warn
+          retention-days: 14
+
+  official-workbooks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official spreadsheet reader
+        run: python -m pip install --disable-pip-version-check -q openpyxl==3.1.5
+      - name: Verify Census/BEA public official xlsx content
+        run: python -u experiments/v70_official_workbooks_20261106.py
+      - name: Preserve raw URLs, workbook hashes, sheet metadata and errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-census-bea-public-workbook-proof
+          path: build/v70_official_workbook_verification_20261106/
           if-no-files-found: warn
           retention-days: 14

@@ -1,0 +1,51 @@
+name: V70 temporary core18 then supplement8 full verification 20261106
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v70-temp-full-refresh-20261106.yml'
+permissions:
+  contents: read
+concurrency:
+  group: v70-temp-refresh-20261106
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install verified crawler dependencies
+        run: python -m pip install requests pandas yfinance pypdf
+      - name: Core 18 fresh crawl and validation
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          mkdir -p build/temp-v70/core18
+          python "系統工程/總經V70/總經爬蟲18項.py" --out build/temp-v70/core18 --cache data/18_macro_verification.json
+          python scripts/validate_macro18_outputs.py build/temp-v70/core18
+          cp build/temp-v70/core18/18_macro_verification.json data/18_macro_verification.json
+      - name: Supplement 8 fresh verification
+        run: |
+          python scripts/refresh_v703_predeploy.py
+          python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
+          cp data/18_macro_verification.json build/temp-v70/core18.json
+          cp data/8_macro_supplement_verified.json build/temp-v70/supplement8.json
+      - name: Full V70 builder and 22 scoring gates
+        run: |
+          python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
+          python scripts/build_daily_v703_site.py
+      - name: Publish diagnostic artifacts including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-temp-20261106-${{ github.run_id }}
+          path: |
+            build/temp-v70/
+            build/site/
+          if-no-files-found: warn
+          retention-days: 7

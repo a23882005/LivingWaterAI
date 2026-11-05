@@ -185,9 +185,44 @@ class RollingBrowserTests(unittest.TestCase):
         self.assertEqual(page.locator('#r15-rows tr').count(),2);self.assertEqual(page.locator('#r15-reference-rows tr').count(),4)
         rounded=self.open_panel(fixture([('2026-11-04',62.745)]))
         self.assertIn('62.75',rounded.locator('#r15-stats').inner_text())
-        self.assertTrue(page.evaluate('document.querySelector("#r15-chart").parentElement.scrollWidth>document.querySelector("#r15-chart").parentElement.clientWidth'))
+        self.assertTrue(page.evaluate('document.querySelector("#r15-chart").parentElement.scrollWidth<=document.querySelector("#r15-chart").parentElement.clientWidth'))
         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),390)
         page.locator('#r15-chart circle').last.focus();self.assertIn('台灣快照 2026-11-05',page.locator('#r15-point').inner_text())
+
+    def test_fifteen_points_fit_phone_and_resize_without_scrolling(self):
+        from scripts.v703_rolling_history import observation_summary
+        days=observation_summary(empty_payload(),now=NOW)['sessionDates']
+        page=self.open_panel(fixture([(day,50+i%5) for i,day in enumerate(days)]),mobile=True)
+        self.assertEqual(page.locator('#r15-chart circle').count(),15)
+        self.assertEqual(page.locator('#r15-chart path.r15-segment').count(),14)
+        self.assertEqual(page.locator('#r15-chart .r15-date').count(),15)
+        for width in [320,390,768]:
+            page.set_viewport_size({'width':width,'height':900})
+            page.wait_for_function('Math.abs(document.querySelector("#r15-chart").viewBox.baseVal.width-document.querySelector("#r15-chart").parentElement.clientWidth)<1')
+            boxes=page.evaluate("""() => {const svg=document.querySelector('#r15-chart');return {svg:svg.getBoundingClientRect().toJSON(),dots:[...svg.querySelectorAll('circle')].map(e=>e.getBoundingClientRect().toJSON()),overflow:svg.parentElement.scrollWidth>svg.parentElement.clientWidth}}""")
+            self.assertFalse(boxes['overflow'])
+            for dot in boxes['dots']:
+                self.assertGreaterEqual(dot['left'],boxes['svg']['left'])
+                self.assertLessEqual(dot['right'],boxes['svg']['right'])
+        page.locator('#r15-chart').click(position={'x':100,'y':50})
+        self.assertIn('美股交易日',page.locator('#r15-point').inner_text())
+
+    def test_smooth_curve_passes_through_points_and_stays_within_adjacent_values(self):
+        page=self.open_panel(empty_payload())
+        for values in [[50,55,53,62,62,58],[0,100,0,100],[30,30,30],[80,70,20,19]]:
+            segments=page.evaluate('(values)=>window.v703Rolling15.smoothSegments(values.map((y,i)=>({x:i*20,y})))',values)
+            self.assertEqual(len(segments),len(values)-1)
+            for i,s in enumerate(segments):
+                self.assertEqual(s['start']['y'],values[i]);self.assertEqual(s['end']['y'],values[i+1])
+                for j in range(101):
+                    t=j/100;value=(1-t)**3*s['start']['y']+3*(1-t)**2*t*s['c1']['y']+3*(1-t)*t*t*s['c2']['y']+t**3*s['end']['y']
+                    self.assertGreaterEqual(value,min(values[i:i+2])-1e-8)
+                    self.assertLessEqual(value,max(values[i:i+2])+1e-8)
+                if i:
+                    previous=segments[i-1]
+                    left=(previous['end']['y']-previous['c2']['y'])/(previous['end']['x']-previous['c2']['x'])
+                    right=(s['c1']['y']-s['start']['y'])/(s['c1']['x']-s['start']['x'])
+                    self.assertAlmostEqual(left,right,places=10)
 
     def test_full_dashboard_keeps_original_verified_score(self):
         from v703_browser_fixture import feed,NOW as fixture_now

@@ -117,7 +117,7 @@
 </div>
 </div>
 </nav>
-<!-- 2026/11/05｜15日滾動觀察 v2：交易日連續曲線｜正式每日稽核快照；參考區間不改動原計分。 -->
+<!-- 2026/11/05｜15日滾動觀察 v3：單屏平滑曲線｜正式每日稽核快照；參考區間不改動原計分。 -->
 <style>
 #v703-rolling15{max-width:1200px;margin:24px auto;padding:0 16px;color:#e2e8f0;font:15px/1.7 system-ui,sans-serif}
 #v703-rolling15 .r15-card{padding:24px;border:1px solid #475569;border-radius:20px;background:linear-gradient(135deg,#17263c,#0f172a)}
@@ -128,7 +128,8 @@
 #v703-rolling15 .r15-stat{padding:14px;border:1px solid #334155;border-radius:12px;background:#1e293b}
 #v703-rolling15 .r15-stat strong{display:block;font-size:25px;color:#f8fafc;font-variant-numeric:tabular-nums}
 #v703-rolling15 .r15-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-#v703-rolling15 svg{width:100%;min-width:660px;height:auto;display:block}
+#v703-rolling15 .r15-chart-frame{width:100%;max-width:100%;min-width:0;overflow:hidden}
+#v703-rolling15 svg{width:100%;max-width:100%;min-width:0;height:auto;display:block}
 #v703-rolling15 table{width:100%;border-collapse:collapse;font-size:14px}
 #v703-rolling15 th,#v703-rolling15 td{text-align:left;border-bottom:1px solid #334155;padding:10px 12px;white-space:nowrap}
 #v703-rolling15 th{color:#bae6fd;background:#1e293b}
@@ -142,11 +143,11 @@
   <p class="r15-muted">依美股NYSE已收盤交易日觀察最近15日，週末與休市日自動略過。台灣快照對應最近已收盤交易日，每個交易日保留最後合格分數，分數越高表示體質越佳。</p>
   <p id="r15-period" class="r15-muted"></p>
   <div id="r15-stats" class="r15-stats" aria-live="polite"></div>
-  <div class="r15-scroll" tabindex="0" aria-label="15日趨勢圖，可左右捲動查看日期">
+  <div class="r15-chart-frame" aria-label="15交易日趨勢圖，完整顯示不需左右捲動">
    <svg id="r15-chart" viewBox="0 0 900 340" role="img" aria-labelledby="r15-chart-title r15-chart-desc"></svg>
   </div>
   <p id="r15-point" class="r15-muted" aria-live="polite">選取圖上圓點可查看當日分數。</p>
-  <p class="r15-muted">休市日自動略過，藍線連接所有有效觀測，圖形不留空格或斷點。開市日若缺合格分數，另列於下方說明，不補造數值。點選圓點可查看交易日與台灣快照日期。</p>
+  <p class="r15-muted">15交易日區間在同一畫面完整顯示，無須左右拖動。平滑曲線通過各筆原始分數點；休市略過，開市缺分數另列說明。點選圖形可查看日期與分數。</p>
   <p id="r15-status" class="r15-notice" aria-live="polite">正在讀取每日紀錄…</p>
   <h3>每日變化多少才值得注意？</h3>
   <p class="r15-muted">以下為研究參考區間，尚非V70正式門檻；依相鄰兩個美股交易日的分數差絕對值分類。</p>
@@ -239,20 +240,43 @@
  }
  const numberFormat=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:false});
  const fmt=x=>Number.isFinite(x)?numberFormat.format(x):'NA',signed=x=>Number.isFinite(x)?(x>0?'+':'')+fmt(x):'NA';
- function chart(points){
-  const x=i=>points.length<=1?858:60+i*798/(points.length-1),y=n=>278-n*2.28;
-  let s='<title id="r15-chart-title">最近15個交易日總經體質分連續曲線</title><desc id="r15-chart-desc">縱軸0至100分。休市日自動略過，橫軸只列有效交易日，所有有效觀測相連；開市缺分數另列，不補造數值。</desc>';
-  for(let n=0;n<=100;n+=20)s+=`<line x1="60" y1="${y(n)}" x2="858" y2="${y(n)}" stroke="#334155" stroke-dasharray="4 6"/><text x="46" y="${y(n)+5}" text-anchor="end" fill="#a8b8cb" font-size="13">${n}</text>`;
-  s+='<text x="60" y="25" fill="#a8b8cb" font-size="13">總經體質分（0–100）</text>';
-  points.forEach((r,i)=>{
-   s+=`<text x="${x(i)}" y="308" text-anchor="middle" fill="#a8b8cb" font-size="12">${r.date.slice(5).replace('-','/')}</text>`;
-   if(i>0)s+=`<line class="r15-segment" x1="${x(i-1)}" y1="${y(points[i-1].score)}" x2="${x(i)}" y2="${y(r.score)}" stroke="#60a5fa" stroke-width="3"/>`;
-   if(i===points.length-1)s+=`<line x1="${x(i)}" y1="45" x2="${x(i)}" y2="278" stroke="#94a3b8" stroke-dasharray="3 4"/>`;
-   const label=`美股交易日 ${r.date}：${fmt(r.score)}分；台灣快照 ${r.snapshotDateTaipei}；${r.kind==='current'?'本頁合格計算':'已存檔快照'}`;
-   s+=`<circle data-r15-index="${i}" tabindex="0" role="img" aria-label="${esc(label)}" cx="${x(i)}" cy="${y(r.score)}" r="${i===points.length-1?6:4}" fill="#60a5fa" stroke="#0f172a" stroke-width="2"><title>${esc(label)}</title></circle>`;
-   if(i===points.length-1)s+=`<text x="${x(i)}" y="${y(r.score)-14}" text-anchor="middle" fill="#bfdbfe" font-size="14" font-weight="700">${fmt(r.score)}</text>`;
+ // Monotone cubic Hermite segments: every original point stays fixed and each
+ // curve remains within the adjacent values, including turning points/plateaus.
+ function smoothSegments(coordinates){
+  if(coordinates.length<2)return [];
+  const n=coordinates.length,d=coordinates.slice(1).map((p,i)=>(p.y-coordinates[i].y)/(p.x-coordinates[i].x));
+  const m=coordinates.map((_,i)=>i===0?d[0]:i===n-1?d[n-2]:d[i-1]*d[i]<=0?0:2/(1/d[i-1]+1/d[i]));
+  for(let i=0;i<d.length;i++){
+   if(d[i]===0){m[i]=m[i+1]=0;continue;}
+   const a=m[i]/d[i],b=m[i+1]/d[i],length=Math.hypot(a,b);
+   if(length>3){const scale=3/length;m[i]=scale*a*d[i];m[i+1]=scale*b*d[i];}
+  }
+  return d.map((_,i)=>{
+   const a=coordinates[i],b=coordinates[i+1],third=(b.x-a.x)/3;
+   return {start:a,end:b,c1:{x:a.x+third,y:a.y+m[i]*third},c2:{x:b.x-third,y:b.y-m[i+1]*third}};
   });
-  document.getElementById('r15-chart').innerHTML=s;
+ }
+ function chart(points){
+  const svg=document.getElementById('r15-chart'),width=Math.max(1,svg.parentElement.clientWidth);
+  const compact=width<520,height=compact?230:285,left=compact?30:42,right=width-18,top=32,bottom=height-(compact?56:40);
+  const x=i=>points.length<=1?(left+right)/2:left+i*(right-left)/(points.length-1),y=n=>bottom-n*(bottom-top)/100;
+  const coordinates=points.map((r,i)=>({x:x(i),y:y(r.score)})),segments=smoothSegments(coordinates);
+  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+  let s='<title id="r15-chart-title">最近15個交易日總經體質分平滑曲線</title><desc id="r15-chart-desc">15交易日區間完整顯示，無須左右捲動。平滑曲線通過原始分數點，休市略過，缺值另列說明。</desc>';
+  for(let n=0;n<=100;n+=20)s+=`<line x1="${left}" y1="${y(n)}" x2="${right}" y2="${y(n)}" stroke="#334155" stroke-dasharray="3 5"/><text x="${left-8}" y="${y(n)+4}" text-anchor="end" fill="#a8b8cb" font-size="${compact?10:12}">${n}</text>`;
+  s+=`<text x="${left}" y="17" fill="#a8b8cb" font-size="${compact?10:12}">總經體質分（0–100）</text>`;
+  segments.forEach(({start:a,end:b,c1,c2})=>{
+   s+=`<path class="r15-segment" d="M ${a.x} ${a.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${b.x} ${b.y}" fill="none" stroke="#60a5fa" stroke-width="${compact?2.3:2.7}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+  points.forEach((r,i)=>{
+   const date=r.date.slice(5).replace('-','/');
+   s+=compact?`<text class="r15-date" transform="translate(${x(i)+2} ${bottom+13}) rotate(-58)" text-anchor="end" fill="#a8b8cb" font-size="10">${date}</text>`:`<text class="r15-date" x="${x(i)}" y="${bottom+23}" text-anchor="middle" fill="#a8b8cb" font-size="12">${date}</text>`;
+   if(i===points.length-1)s+=`<line x1="${x(i)}" y1="${top}" x2="${x(i)}" y2="${bottom}" stroke="#94a3b8" stroke-dasharray="2 4"/>`;
+   const label=`美股交易日 ${r.date}：${fmt(r.score)}分；台灣快照 ${r.snapshotDateTaipei}；${r.kind==='current'?'本頁合格計算':'已存檔快照'}`;
+   s+=`<circle data-r15-index="${i}" tabindex="0" role="img" aria-label="${esc(label)}" cx="${x(i)}" cy="${y(r.score)}" r="${i===points.length-1?(compact?3.8:4.5):(compact?2.3:3)}" fill="#60a5fa" stroke="#0f172a" stroke-width="1.2"><title>${esc(label)}</title></circle>`;
+   if(i===points.length-1)s+=`<text x="${x(i)}" y="${y(r.score)-11}" text-anchor="${points.length>1?'end':'middle'}" fill="#bfdbfe" font-size="${compact?11:13}" font-weight="700">${fmt(r.score)}</text>`;
+  });
+  svg.innerHTML=s;
  }
  let lastKey='';
  function render(){
@@ -278,11 +302,21 @@
   document.getElementById('r15-rows').innerHTML=state.points.map(r=>`<tr><th scope="row">${r.date}</th><td>${fmt(r.score)}</td><td>${signed(r.delta)}</td><td>${esc(r.versionChanged?'版本不同，暫不比較':classify(r.delta))}</td><td>${r.snapshotDateTaipei}</td><td>${r.kind==='current'?'本頁合格計算（未存檔）':'已存檔快照'}</td></tr>`).join('');
   chart(state.points);window.v703Rolling15.state=state;
  }
- window.v703Rolling15={makeWindow,classify,taipeiDate,sessionFor,sessionsFor,render};
+ window.v703Rolling15={makeWindow,classify,taipeiDate,sessionFor,sessionsFor,smoothSegments,render};
  function start(){
-  render();const svg=document.getElementById('r15-chart');svg.parentElement.scrollLeft=svg.parentElement.scrollWidth;
+  render();const svg=document.getElementById('r15-chart');
+  let chartWidth=svg.parentElement.clientWidth;
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{
+   const width=svg.parentElement.clientWidth;
+   if(width>0&&Math.abs(width-chartWidth)>.5){chartWidth=width;chart(window.v703Rolling15.state.points);}
+  }).observe(svg.parentElement);
   const showPoint=event=>{
-   const target=event.target.closest('[data-r15-index]');if(!target)return;
+   let target=event.target.closest('[data-r15-index]');
+   if(!target&&event.type==='click'){
+    const box=svg.getBoundingClientRect(),where=(event.clientX-box.left)*svg.viewBox.baseVal.width/box.width;
+    target=[...svg.querySelectorAll('circle[data-r15-index]')].reduce((best,node)=>!best||Math.abs(Number(node.getAttribute('cx'))-where)<Math.abs(Number(best.getAttribute('cx'))-where)?node:best,null);
+   }
+   if(!target)return;
    const row=window.v703Rolling15.state.points[Number(target.dataset.r15Index)];
    document.getElementById('r15-point').textContent=`美股交易日 ${row.date}｜台灣快照 ${row.snapshotDateTaipei}｜體質分 ${fmt(row.score)}｜較前一交易日 ${signed(row.delta)}｜${classify(row.delta)}`;
   };

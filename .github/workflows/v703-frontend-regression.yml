@@ -131,6 +131,8 @@ jobs:
                   assert len(observation['rows'])==15
                   assert observation['rows'][-1]['date']==observation['windowEnd']
                   assert page.locator('#r15-chart .r15-segment').count()==max(0,len(observation['points'])-1)
+                  assert page.locator('#r15-chart path.r15-segment').count()==max(0,len(observation['points'])-1)
+                  assert page.evaluate('document.querySelector("#r15-chart").parentElement.scrollWidth<=document.querySelector("#r15-chart").parentElement.clientWidth')
                   assert all(__import__('datetime').date.fromisoformat(r['date']).weekday()<5 for r in observation['rows'])
                   assert page.locator('#r15-reference-rows tr').count()==4
                   assert observation['latest'] is not None

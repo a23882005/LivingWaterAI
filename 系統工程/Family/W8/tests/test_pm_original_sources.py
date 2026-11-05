@@ -4,6 +4,7 @@ from datetime import datetime,timezone
 from hashlib import sha256
 from pathlib import Path
 import json
+import sqlite3
 import pytest
 from test_massive_daily_source import fixture as massive_fixture
 from test_member_financial_facts import case as money_case,save
@@ -12,6 +13,7 @@ from ibkr_daily_source import audit,PRICE_BASIS
 from historical_source_qualification import bind
 from member_financial_facts import broker_observations
 from pm_source_document import read,history
+from family_input import TABLES,read_snapshot
 
 HERE=Path(__file__).resolve().parents[1]
 
@@ -155,6 +157,12 @@ def test_text_duplicate_json_keys_cannot_choose_one_of_two_original_values(tmp_p
 
 def account_case(tmp_path):
     req,_,_=money_case();at='2026-11-04T01:00:00Z'
+    recipient=tmp_path/'recipient.db'
+    with sqlite3.connect(recipient) as db:
+        db.execute('CREATE TABLE family_member_identity(client_id TEXT, family_alias TEXT)')
+        db.execute('INSERT INTO family_member_identity VALUES (?,?)',(req['client_id'],'Joseph'))
+        for table in TABLES:db.execute('CREATE TABLE '+table+'(client_id TEXT, value TEXT)')
+    req['client_snapshot']['payload']=read_snapshot(recipient,expected_client_id=req['client_id'])
     original=dict(schema='Family.PM.IBKR.ReadOnlyObservation.v1',client_scope='Joseph ONLY; SYNTHETIC',
         retrieved_at_utc=at,finance_eligibility='OBSERVED_NOT_CONFIRMED_FULL_FINANCE',trading='NONE',
         source_tool_names=['get_account_balances','get_account_positions','get_account_summary',
@@ -169,7 +177,8 @@ def account_case(tmp_path):
         **{k:req[k] for k in ('client_id','run_id','evaluation_at')},
         source_db_sha256=req['client_snapshot']['payload']['source_sha256'],
         snapshot_digest=req['client_snapshot']['payload']['payload_digest'],target_version=1,
-        source_reference='SYNTHETIC_PM_ACCOUNT_ONLY',available_at=at,member_scope='Joseph',pm_document_source=doc)
+        source_reference='SYNTHETIC_PM_ACCOUNT_ONLY',available_at=at,member_scope='Joseph',pm_document_source=doc,
+        recipient_snapshot_source=dict(local_path=str(recipient),sha256=req['client_snapshot']['payload']['source_sha256']))
     return req,original,manifest
 
 
@@ -197,3 +206,48 @@ def test_pm_negative_cash_nav_mismatch_and_unresolved_orders_remain_non_executab
 def test_private_account_receipts_cannot_cross_member_scope_or_become_confirmations(tmp_path,change):
     req,o,m=account_case(tmp_path);change(req,o,m);m['pm_document_source']=write_document(Path(m['pm_document_source']['local_path']),o)
     with pytest.raises((PermissionError,ValueError)):broker_observations(req,save(tmp_path/'manifest.json',m))
+
+
+@pytest.mark.parametrize('alias',['mou','Arthur','Lilian'])
+@pytest.mark.parametrize('forged_identity',[False,True])
+def test_consistently_rebound_private_manifest_cannot_read_Joseph_for_another_household(tmp_path,monkeypatch,alias,forged_identity):
+    req,_,m=account_case(tmp_path)
+    client='SYNTHETIC_'+alias
+    proof=m['recipient_snapshot_source'];db_path=Path(proof['local_path'])
+    with sqlite3.connect(db_path) as db:
+        db.execute('UPDATE family_member_identity SET client_id=?,family_alias=?',(client,alias))
+    req['client_id']=client
+    req['client_snapshot']['payload']=read_snapshot(db_path,expected_client_id=client)
+    snapshot=req['client_snapshot']['payload']
+    # Even a coherent outer manifest/hash and a forged payload alias cannot
+    # turn the other household's original DB into the private recipient.
+    if forged_identity:snapshot['identity']['family_alias']='Joseph'
+    m.update(client_id=client,source_db_sha256=snapshot['source_sha256'],snapshot_digest=snapshot['payload_digest'])
+    proof['sha256']=snapshot['source_sha256']
+    calls=[]
+    monkeypatch.setattr('pm_source_document.account',lambda *args:calls.append(args))
+    with pytest.raises(PermissionError,match='ORIGINAL_RECIPIENT_MISMATCH'):
+        broker_observations(req,save(tmp_path/'rebound.json',m))
+    assert calls==[]
+
+
+@pytest.mark.parametrize('change',['missing','null','hash','identity_client','identity_alias','tables','changed_DB','missing_DB'])
+def test_private_source_requires_exact_original_recipient_snapshot_before_account_read(tmp_path,monkeypatch,change):
+    from family_input import digest
+    req,_,m=account_case(tmp_path);snapshot=req['client_snapshot']['payload'];proof=m['recipient_snapshot_source']
+    if change=='missing':m.pop('recipient_snapshot_source')
+    elif change=='null':m['recipient_snapshot_source']=None
+    elif change=='hash':proof['sha256']='0'*64
+    elif change=='identity_client':snapshot['identity']['client_id']='OTHER'
+    elif change=='identity_alias':snapshot['identity']['family_alias']='Arthur'
+    elif change=='tables':
+        snapshot['tables']['portfolio_position'].append(dict(client_id=req['client_id'],value='INJECTED'))
+        snapshot['payload_digest']=digest(snapshot['tables']);m['snapshot_digest']=snapshot['payload_digest']
+    elif change=='changed_DB':
+        with sqlite3.connect(proof['local_path']) as db:
+            db.execute('INSERT INTO portfolio_position VALUES (?,?)',(req['client_id'],'CHANGED'))
+    else:Path(proof['local_path']).unlink()
+    calls=[];monkeypatch.setattr('pm_source_document.account',lambda *args:calls.append(args))
+    with pytest.raises((PermissionError,FileNotFoundError)):
+        broker_observations(req,save(tmp_path/'invalid_recipient.json',m))
+    assert calls==[]

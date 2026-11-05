@@ -6,8 +6,9 @@ substitute for the existing complete reconciliation and funding contracts.
 """
 from copy import deepcopy
 from decimal import Decimal
+from pathlib import Path
 
-from family_input import digest
+from family_input import digest, read_snapshot
 from member_market_source import time
 from w1_portfolio_observations import major_amount
 
@@ -126,6 +127,17 @@ def broker_observations(request, descriptor):
         from pm_source_document import account
         if manifest.get('calls') or manifest.get('member_scope')!='Joseph':
             raise PermissionError('MEMBER_PM_BROKER_SINGLE_ORIGINAL_AND_RECIPIENT_REQUIRED')
+        # A re-labelled manifest is not proof of the private document's recipient.
+        # Replay the same sealed W1 DB before reading any private account rows.
+        # This verifies household routing only, not broker ownership or funding.
+        recipient=manifest.get('recipient_snapshot_source')
+        if (not isinstance(recipient,dict) or not recipient.get('local_path')
+            or recipient.get('sha256')!=snapshot['source_sha256']):
+            raise PermissionError('MEMBER_PM_BROKER_RECIPIENT_SNAPSHOT_REQUIRED')
+        actual=read_snapshot(Path(recipient['local_path']),expected_client_id=request['client_id'])
+        if (actual!=snapshot or actual['source_sha256']!=recipient['sha256']
+            or actual['identity'].get('family_alias')!='Joseph'):
+            raise PermissionError('MEMBER_PM_BROKER_ORIGINAL_RECIPIENT_MISMATCH')
         calls,original=account(manifest['pm_document_source'],manifest['available_at'])
         references=[deepcopy(manifest['pm_document_source'])]
         positions=calls['positions'].get('positions');balances=calls['balances'].get('balances')

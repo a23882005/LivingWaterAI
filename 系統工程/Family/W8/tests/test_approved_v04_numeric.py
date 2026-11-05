@@ -5,12 +5,10 @@ dependency. Decimal(50, HALF_EVEN) is the specified implementation arithmetic;
 Fraction is an independent exact-math oracle. Oracle tolerance is solely a test
 allowance for Decimal rounding, NEVER a signal-comparison epsilon.
 """
-from decimal import Decimal, getcontext, ROUND_HALF_EVEN
+from decimal import Decimal, localcontext, ROUND_HALF_EVEN
 from fractions import Fraction
 import unittest
 
-getcontext().prec = 50
-getcontext().rounding = ROUND_HALF_EVEN
 D = Decimal
 from pathlib import Path
 import sys
@@ -51,6 +49,15 @@ def exact_ema(xs, alpha):
 
 
 class NumericSpecTests(unittest.TestCase):
+    def setUp(self):
+        # Keep the oracle's specified arithmetic local to each test. Collection
+        # must not change the unchanged V75 engine's process Decimal context.
+        context=localcontext()
+        numeric=context.__enter__()
+        self.addCleanup(context.__exit__,None,None,None)
+        numeric.prec=50
+        numeric.rounding=ROUND_HALF_EVEN
+
     def assertExactOracle(self, actual, rational):
         expected = D(rational.numerator)/D(rational.denominator)
         self.assertLessEqual(abs(actual-expected), D('1e-45'))

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T20:53:57.958Z",
+  "updated_at": "2026-11-05T21:12:45.588Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3978,5 +3978,50 @@
     "real_cycles": 0,
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_h5_successor_pr59_234221e_intake_20261106": {
+    "family_pm_role": "全案中PM／總PM",
+    "intake_date_taipei": "2026/11/06",
+    "handover_zip_ids": [
+      "1wY2bd_6uQspqu-iKBv43UlHVnc0vVvgr",
+      "1bsAySFPPrFDag3MxOEpDjNTCxViuNwPb",
+      "1K4kXkIIMt-Jh9hKX3U-wikVAt8AMEtHT"
+    ],
+    "handover_zip_sha_crc_manifest": "3/3 ZIP SHA256/CRC, 35/35 payload SHA/bytes PASS; four members 14x4=56 rows",
+    "existing_scoped_acceptances": "PRESERVED af16a9d / c91a511 / 6d7f224 / 218ce4a",
+    "latest_pr59_head": "234221e1f173483b747c3ad2500a70d02600ccef",
+    "previous_pm_accepted_head": "218ce4ae573bb751db17316000625666c20c688e",
+    "pr59_delta": "1 commit / 5 changed files; iShares current distribution observations and restricted C7 source route, no qualified historical PIT / qP / qV / cash",
+    "github_pr59_same_head_ci": {
+      "completed_success": "6/6",
+      "run_ids": [
+        42106731814,
+        42106731590,
+        42106731524,
+        42106731559,
+        42106731598,
+        42106731528
+      ]
+    },
+    "new_commit_pm_status": "QA_PENDING_ORIGINAL_ZIPS_MANIFEST_RECEIPT_AND_INDEPENDENT_NATIVE_REEXECUTION",
+    "dispatched_to_original_v82_codex": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6669654032",
+    "next_code_writer": "Original V82 Codex; PR59 only Writer; evidence two ZIP + receipt and lawful financial mainchain PIT/qP/qV/same-cutoff cash-SGOV-pending -> C7B/schema83 -> CycleLedger -> Work9/Mentor",
+    "middle_pm_next": "Independently restore/QA next Codex delivery, update Family construction and file management; 4x14 E2E, Gate D, four Projects, Trial, Gate E",
+    "drive_family_construction_doc": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+    "drive_family_file_management_doc": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+    "governance_backups": [
+      "1ysqvIPe5R8DuxZBiIXxz-HjN4AH6OJMJgLRmv1h94N8",
+      "1_avlurLFe4PDP9SnGV0WEkY_bd7RC0B3IDFZBCWUbDc"
+    ],
+    "gate_changes": "NONE",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "pr59": "DRAFT_UNMERGED",
+    "pr60": "CLOSED_SCOPE_PRESERVED",
+    "work_scope": "Family only. GitHub code + private Drive DB + ChatGPT user-initiated execution. No trade or Family always-on host"
   }
 }

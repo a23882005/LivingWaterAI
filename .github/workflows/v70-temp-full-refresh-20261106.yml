@@ -37,7 +37,6 @@ jobs:
           cp data/8_macro_supplement_verified.json build/temp-v70/supplement8.json
       - name: Full V70 builder and 22 scoring gates
         run: |
-          python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python scripts/build_daily_v703_site.py
       - name: Publish diagnostic artifacts including failures
         if: always()

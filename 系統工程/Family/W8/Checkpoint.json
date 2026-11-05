@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T21:12:45.588Z",
+  "updated_at": "2026-11-05T21:26:00.000Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4023,5 +4023,78 @@
     "pr59": "DRAFT_UNMERGED",
     "pr60": "CLOSED_SCOPE_PRESERVED",
     "work_scope": "Family only. GitHub code + private Drive DB + ChatGPT user-initiated execution. No trade or Family always-on host"
+  },
+  "pm_h5_full_three_zip_study_verified_20261106": {
+    "time_taipei": "2026/11/06 05:26",
+    "scope": "Read/verify H5 three handover ZIPs, 35 payloads + 3 MANIFEST; no main-code changes or new gate",
+    "drive_folder": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "zips": [
+      {
+        "id": "1wY2bd_6uQspqu-iKBv43UlHVnc0vVvgr",
+        "name": "Family_中PM_交接ZIP1_全案總PM職責與治理_20261106_H5.zip",
+        "sha256": "64bcd78a74f159355529574c4ca02e692fc32f98aecaf9595eb0d0a769a5c1d4",
+        "entries": 13,
+        "manifest_payloads": 12,
+        "payload_integrity": "12/12 PASS"
+      },
+      {
+        "id": "1bsAySFPPrFDag3MxOEpDjNTCxViuNwPb",
+        "name": "Family_中PM_交接ZIP2_已驗成果正式證據與來源_20261106_H5.zip",
+        "sha256": "3433542736091cd1d650f789609366b62e09c7af98a56a983da4007599a51080",
+        "entries": 14,
+        "manifest_payloads": 13,
+        "payload_integrity": "13/13 PASS"
+      },
+      {
+        "id": "1K4kXkIIMt-Jh9hKX3U-wikVAt8AMEtHT",
+        "name": "Family_中PM_交接ZIP3_續工契約四戶56格與Gate_20261106_H5.zip",
+        "sha256": "fc3a32a7d3af28c4ffb3637a697f6f9eae3c66027e6f86965c725ddd1ecab68e",
+        "entries": 11,
+        "manifest_payloads": 10,
+        "payload_integrity": "10/10 PASS"
+      }
+    ],
+    "checks": "35/35 payload SHA256, byte size, 3/3 ZIP CRC and external SHA256; 38 entries unique and UTF-8; every text, TSV/CSV, receipt/template JSON, H4 archive and MANIFEST fully read",
+    "matrix": {
+      "rows": 56,
+      "unique_member_menu_pairs": 56,
+      "member_counts": {
+        "Joseph": 14,
+        "MOU": 14,
+        "Arthur": 14,
+        "Lilian": 14
+      },
+      "current_w8_status": "56/56 W8_FULL_E2E_NOT_YET_ACCEPTED, source_run_id empty, observed NOT_RUN_THIS_HANDOFF"
+    },
+    "receipt_218ce4a": {
+      "head": "218ce4ae573bb751db17316000625666c20c688e",
+      "source_events": 186,
+      "source_matches": 185,
+      "unreconciled_sgov_diff_per_share_USD": "0.00001",
+      "original_Codex_local_combined_test_evidence": 2087,
+      "six_CI": 6,
+      "full_financial_pass": 0
+    },
+    "prior_PASS": "PRESERVED af16a9d,c91a511,6d7f224,218ce4a",
+    "PR59_active_intake": "234221e1f173483b747c3ad2500a70d02600ccef, CI6/6, PM new original evidence and independent QA PENDING",
+    "PR59_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6669654032",
+    "governance": {
+      "construction_doc": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "file_management_doc": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "backups": [
+        "1WeqVtpFx2EUdQeFLMFHOgrABV8GqZcYyA3XZQYRJRjo",
+        "1MNwqpuQ9zNi7__mUzC8H1KI91Vx2l9Hg17e3q9k045s"
+      ],
+      "docs_readback": "PENDING"
+    },
+    "next": "Original V82 Codex only PR59 Writer continues formal financial chain and evidence handoff; Family PM independently validates then governs W8 4x14 Gate D Projects Trial Gate E",
+    "status": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "full_finance_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trade": "NONE"
+    }
   }
 }

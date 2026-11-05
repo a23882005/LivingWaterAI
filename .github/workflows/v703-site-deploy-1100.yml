@@ -63,9 +63,38 @@ jobs:
           git add -f data/audit/fed_target_evidence_*.html.gz
           if ! git diff --cached --quiet; then
             git commit -m "data(v703): refresh real Fed evidence and dated macro inputs"
-            git fetch origin main
-            git rebase origin/main
-            git push origin HEAD:main
+            # Concurrent 09:00/10:00 producers may update the same JSON.
+            # On conflict, discard only this unpushed local commit and re-run
+            # real source verification against the latest main. Never choose
+            # ours/theirs blindly or force-push validated data.
+            published=false
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if git rebase origin/main && git push origin HEAD:main; then
+                published=true
+                break
+              fi
+              git rebase --abort 2>/dev/null || true
+              if [ "$attempt" -eq 3 ]; then
+                echo "::error::V703_SOURCE_RACE: three bounded verification retries exhausted"
+                break
+              fi
+              echo "::warning::Concurrent macro source update; re-verifying on latest main (attempt $((attempt+1))/3)"
+              git reset --hard origin/main
+              python scripts/refresh_v703_predeploy.py > build/site/predeploy-retry.log 2>&1 || {
+                cat build/site/predeploy-retry.log
+                exit 1
+              }
+              python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
+              git add data/18_macro_verification.json data/8_macro_supplement_verified.json data/v703_official_monthly_release_calendar.json
+              git add -f data/audit/fed_target_evidence_*.html.gz
+              if git diff --cached --quiet; then
+                published=true
+                break
+              fi
+              git commit -m "data(v703): refresh verified evidence after concurrent update"
+            done
+            test "$published" = true
           fi
       - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |

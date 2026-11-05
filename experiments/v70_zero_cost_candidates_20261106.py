@@ -52,7 +52,7 @@ def add(name, original, candidate, equivalence, url, reader, license_note):
     try:
         payload = reader(url)
         result.update(payload)
-        result.setdefault("status", "NUMERIC_VERIFIED")
+        result["status"] = "NUMERIC_VERIFIED" if ("value" in payload and "observation_date" in payload) else payload.get("status", "SOURCE_PAGE_VERIFIED_NUMERIC_PENDING")
     except Exception as exc:
         result.update(status="FAIL", error=type(exc).__name__ + ": " + str(exc)[:250])
     RESULTS.append(result)

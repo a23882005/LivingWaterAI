@@ -16,7 +16,7 @@
       "sha256": "a8d25478873ddcaaee567738874b340347c8e046b98c6ec59278c871c6cd5555"
     },
     {
-      "path": "contracts_c7/69_C_Work7_V70_\u8cc7\u7522\u6846\u67b6\u6574\u5408_LockedResidual_RadarSnapshot.md",
+      "path": "contracts_c7/69_C_Work7_V70_資產框架整合_LockedResidual_RadarSnapshot.md",
       "sha256": "a2ee7abda757e0ead51b8025bbc6cf3d4bcb59db358dcb9cc6065583c8c21d7a"
     },
     {
@@ -145,7 +145,7 @@
     },
     {
       "path": "../../Family/W8/historical_source_qualification.py",
-      "sha256": "20a6f972bef71b3bfbb901431eb0f96e9c5a36c1bc5ccae5ba0b616046b98b87"
+      "sha256": "61bd9ba12edf698e68d9abeb91adbc0aab4126fa512362324e79d03a5e8dfda4"
     },
     {
       "path": "../../Family/W5/mentor_bridge.py",
@@ -160,7 +160,7 @@
       "sha256": "bfd993ad253ba8baff1326adaa941878e59921a128c714d15dde5b3944e1bb89"
     },
     {
-      "path": "../../Family/W8/\u5951\u7d04/FAMILY_MENTOR_SCOPE_CONSUMER_Producer\u4ecb\u9762_v1.0_20261031.md",
+      "path": "../../Family/W8/契約/FAMILY_MENTOR_SCOPE_CONSUMER_Producer介面_v1.0_20261031.md",
       "sha256": "85f57fc8cde09100709e89fe024aa548e01ee684a49ea515c412d8677dbb5729"
     },
     {
@@ -230,6 +230,10 @@
     {
       "path": "../../Family/W8/massive_action_source.py",
       "sha256": "6621597c1f96356bdd5d27ce45728cf9d76ccde999d1c6ca62c07a5dee90b22f"
+    },
+    {
+      "path": "../../Family/W8/ishares_distribution_source.py",
+      "sha256": "5d5e933351b8a93a67a9a0d01c92af873fe92ec2a2d31df0dfbd08f1517de636"
     }
   ]
 }

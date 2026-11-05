@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-04T08:54:47Z",
+  "updated_at": "2026-11-05T07:08:33Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "新對話Family中PM／全案總PM接手工程管理+獨立QA；原V82 Codex／PR59繼續已核准qP診斷與正式金融主鏈；原PR60報表線維持結案",
-  "next_action": "下一對話Family中PM第一動作：獨立驗PR59新head fdf244f（三支檔案、六CI全綠），以中PM最後已驗a87971f為基準，不誤認fdf已正式PM PASS；同時核各戶既存金融資金/SGOV/pending/Target來源，續原正式金融主鏈、四戶56項→Gate D→四Project→Trial→Gate E，保留HOLD/NONE與既有Gate。",
+  "next_owner": "原 V82 Codex：PR59 唯一施工者；Family中PM：四戶真實金融來源、獨立驗收、工程與檔案治理；報表 PR60 既有分段結案待金融合格後再發工單",
+  "next_action": "PR59 沿 qP/qV/PIT→同輪 NAV/已結算/SGOV/未結委託→C7B/schema83→日切片/帳本→Work9/Mentor 續工；中PM獨立驗下一版與四戶56項 E2E，Gate D→Trial→Gate E。PR60來源回顧 PASS 保留，金融合格後再整合。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3364,5 +3364,92 @@
     "production": "HOLD",
     "trading": "NONE",
     "next_owner": "Original V82 Codex PR59 next qualified sources and finance pipeline; middle PM independent next-delta QA + four-household 56-menu E2E/Gate D/Trial/Gate E"
+  },
+  "pm_pr59_abc0bb4_independent_acceptance_20261105": {
+    "acceptance_taiwan": "2026/11/05",
+    "reviewer": "Family中PM／Family總PM",
+    "verdict": "PASS_SCOPED",
+    "prior_pm_accepted_head": "37665b388d2f6981aa0c511143fd965df780d809",
+    "latest_scoped_head": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
+    "tree_sha": "6e0d36d4ed20e1d6f4cd4e2a17897e8ea8506a28",
+    "delta": "1 commit / 8 files",
+    "new_code": "系統工程/Family/W8/sgov_confirmed_units.py",
+    "added_tests": "59; targeted including 48 related = 107/107 PASS",
+    "original_zip_sha256": {
+      "code": "b1b403b53d4efd8d49c3a609f02ab54a5db6f15c72ed5e523ba6513900c3df4a",
+      "sources": "e7a7687ca61bf6794f54263ed8d7645436fc5f2cfa89ac057e0319d32ea6da67",
+      "final_receipt": "eb16527acd8e6f9693c2df793ad659b0d8dc79a763ed2a81eecf85766ea865be"
+    },
+    "independent_restore": {
+      "git_files_hashes": "1165/1165",
+      "git_commits": 1471,
+      "inner_payload_hashes": "3720/3720",
+      "source_canonical_mappings": "12130/12130",
+      "overwrites": 0,
+      "core_native_sha": "132/132",
+      "c_manifest": "54/54",
+      "w5_dependency_lock": "112/112"
+    },
+    "independent_tests": {
+      "pytest_targeted": "107/107 PASS",
+      "qP_Golden": "12/12 PASS",
+      "business_49_plus_13": "12/12 PASS",
+      "DB": "4/4",
+      "facts": "4/4",
+      "c7_qualification": "33/33",
+      "twse": "4/4",
+      "household_double_replay": {
+        "securities": 42,
+        "stocks": 33,
+        "byte_exact": true
+      }
+    },
+    "synthetic_sgov": {
+      "NAV": "1000",
+      "bond": "534",
+      "dry": "356",
+      "cash_available": "40",
+      "reserved": "10",
+      "authorization": "50",
+      "occupied": "75",
+      "capacity": "25",
+      "cash_release_created": false,
+      "real_member_role_confirmations": 0
+    },
+    "original_ci": {
+      "workflows": "6/6 SUCCESS",
+      "artifact_id": 13391994275,
+      "artifact_sha256": "2e0c3bbb8811a8a546a763e45bf35d62b6bacfb5397e7ce6c4c674964dba06f9",
+      "w5": "559/559",
+      "w8": "1360/1360",
+      "failure_error_skipped": 0
+    },
+    "private_review_doc_id": "19CNKgpN18b4vCGSbIgMRbDUa47oihiMWugmYJZFImLM",
+    "private_review_location": "Google Drive root/TEMP",
+    "public_pr_review": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6652006806",
+    "no_financial_promotion": true,
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "w7": "PASS_CLOSED",
+    "w8": "IN_PROGRESS",
+    "production": "HOLD",
+    "trade": "NONE",
+    "draft_unmerged": true,
+    "next_codex": "Continue PR59 only: full legal own PIT/qP/qV -> same cutoff NAV, settled/reserved/authorized, real SGOV & pending -> C7B/schema83 -> daily slice/Drive CycleLedger -> Work9/Mentor, under existing contract.",
+    "next_pm": "Independent QA future PR59 delta, four-household 56 E2E & Gate D/Trial/Gate E; maintain engineering/file governance and real source ownership."
+  },
+  "current_family_pm_verdict_20261105": {
+    "accepted_incremental_sha": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
+    "decision": "PASS_SCOPED",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "pr59_draft": true,
+    "pr60_scope": "CLOSED_SCOPE",
+    "governance": "Independent QA documented on Drive and PR59 comment",
+    "next_action": "Original Codex continues legal qP/qV/PIT and same-run real finance; PM validates real sources, next delta and E2E."
   }
 }

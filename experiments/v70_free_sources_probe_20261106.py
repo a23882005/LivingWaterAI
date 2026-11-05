@@ -29,7 +29,7 @@ TARGETS = [
      "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv", "treasury", 21),
     ("EIA_WTI_SPOT", "EIA Cushing WTI daily spot price XLS",
      "https://www.eia.gov/dnav/pet/hist_xls/RWTCd.xls", "eia_xls", 30),
-    ("BLS_UNEMPLOYMENT", "BLS unadjusted? LNS14000000 unemployment rate, seasonally adjusted",
+    ("BLS_UNEMPLOYMENT", "BLS LNS14000000 unemployment rate, seasonally adjusted",
      "https://api.bls.gov/publicAPI/v2/timeseries/data/LNS14000000?startyear=2025&endyear=2026", "bls", 90),
 ]
 
@@ -69,8 +69,8 @@ def parse_treasury(blob, name):
         raise ValueError("Empty Treasury CSV")
     sample=rows[0]
     date_key=next((k for k in sample if k.strip().lower() in ("date","record_date")),None)
-    ten=next((k for k in sample if k.strip().lower() in ("10-year","10 year","10-year treasury")),None)
-    two=next((k for k in sample if k.strip().lower() in ("2-year","2 year","2-year treasury")),None)
+    ten=next((k for k in sample if k.strip().lower() in ("10-year","10 year","10-year treasury","10 yr")),None)
+    two=next((k for k in sample if k.strip().lower() in ("2-year","2 year","2-year treasury","2 yr")),None)
     if not date_key or not ten or not two:
         raise ValueError("Missing date/2-year/10-year columns: "+repr(list(sample)))
     obs=[]

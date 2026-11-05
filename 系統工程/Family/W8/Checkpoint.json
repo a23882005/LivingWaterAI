@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T08:46:23Z",
+  "updated_at": "2026-11-05T10:25:49Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原 V82 Codex PR59唯一Writer續M1最小修改與原金融主鏈；Family中PM驗收新增量/同步管理；A線正式docx由原文件Owner依最新Owner核准同步。",
-  "next_action": "依PR59留言#6653634352，在Family/W8 approved_v04_technical.py修改M1為LowTD==9（持續9得1票）；精確測C1~C6與完整CI，回交中PM稽核，沿原PIT/qP/qV及同輪金融主鏈續工。",
+  "next_owner": "Family中PM新對話接任（4戶全案總PM）：先獨立驗 PR59 af16a9d 新增量；原V82 Codex維持PR59唯一程式Writer並完成Owner新核准M1 LowTD==9，報表PR60不重工",
+  "next_action": "依Google Drive root/TEMP H4三ZIP先讀ZIP1/00_給新對話_先讀我.txt再ZIP2/3。中PM獨立驗af16a9d 2commits/10files, code+evidence originals with SHA/CRC/restore/135 targeted and 6 FamilyCI; next qa M1 single clause and C1-C6；金融正本→全NAV→ledger→Work9；PM 4家56格/ GateD/Trial/GateE。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3618,6 +3618,61 @@
       "engineering": "1dBAd_xBJwv0P3FUnmdb4FiCgHTx-rm_Zn_26v12ZvgA",
       "files": "1xlhJEjxEuxYp2Qpqzq1h5FCsmtNuAslvSMBYla4xciU",
       "wbs": "1157_cHSfHyQ3_d2ldxjjFy9FThXYtvHYn-X6UFkcoHY"
+    }
+  },
+  "pm_h4_handover_3zip_20261105": {
+    "role": "Family家人版中PM兼全案總PM，Joseph/MOU/Arthur/Lilian四戶，直到Gate E",
+    "generated_at_taiwan": "2026/11/05 18:24（台灣時間）",
+    "folder": "Google Drive root/TEMP",
+    "folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "zip1": {
+      "file": "Family_中PM_交接ZIP1_總PM責任_治理與首工序_20261105_H4.zip",
+      "fileId": "1ejY_OppxyHqwIdhQ-Gd3bEUtqODkcEJu",
+      "sha256": "c9e8b4b5964a162159006933b25b371ad650d61eae558167604ab71da3da631d",
+      "bytes": 40402
+    },
+    "zip2": {
+      "file": "Family_中PM_交接ZIP2_已驗成果_來源與最新版本_20261105_H4.zip",
+      "fileId": "1yp5bAbGFHtTslWff064Edxe_Ff-vQjBT",
+      "sha256": "9dea13e8543174356cf818d04970b1c90c71e93a70ff8e85a1eed9b930a379d8",
+      "bytes": 31118
+    },
+    "zip3": {
+      "file": "Family_中PM_交接ZIP3_剩餘工序_Codex契約_56格_20261105_H4.zip",
+      "fileId": "1LD9_FGNCYkOiiB62mxSl53wqN2Xkf1r-",
+      "sha256": "88576e9402f869b9a97ca6a06d84dc4fa15fcbccca7f08b4eb9eb8f38584cf5e",
+      "bytes": 39896
+    },
+    "remote_readback": "3/3 bytes, SHA256, ZIP CRC and per-file manifest PASS",
+    "h3_material": "Embedded under H3_歷史原件_僅供追溯/ for audit only, not live first task",
+    "latest_observed_PR59": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
+    "latest_observed_PR59_status": "DRAFT_UNMERGED",
+    "last_middle_pm_scoped_PASS": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
+    "pending_independent_QA": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44 incremental 2 commits/10files; Codex 50new targeted135 W5 559 W8 1410 6 FamilyCI, originals Drive two Zips/receipt",
+    "approved_but_unimplemented_M1": "LowTD == 9 counts one M1 vote; LowTD0..8 FALSE; missing UNKNOWN, old 5..9 code still in af16",
+    "M1_spec": "Google Drive root/TEMP ID 1V1k-zz76exzDS7SQdBZ1NicQxQHaizlTX46qoUYEqpU",
+    "M1_PR59_contract": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6653634352",
+    "codex_owner": "Original V82 Codex sole PR59 writer for legal PIT/qP/qV, same-run NAV/SGOV/settled/pending, C7B/schema83, slice/ledger/Work9/Mentor, M1 latest approved single-clause",
+    "PM_next": "Family middle PM fresh read H4 all three; independent QA new PR59 fixed SHA and future M1 latest code, then W8 4household×14=56 E2E, GateD, 4 ChatGPT Projects, Trial, GateE; original PR60 docs/report CLOSED_SCOPE",
+    "gates": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "full_finance_PASS": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trade": "NONE"
+    },
+    "governance_files": [
+      "root 檔案管理.md",
+      "Family家人版_施工管理.md",
+      "家人版_檔案管理.md",
+      "Family家人版_全生命週期MasterWBS_v6.1.0",
+      "GitHub Family/W8/Checkpoint.json"
+    ],
+    "backups": {
+      "Family工程管理": "1F6vkYBpi9XMxmHm7OAqRQEc2-3lNAOh2RKFFH8Ug6Ek",
+      "Family檔案管理": "1JVEcBAK9E7fay4QcIiChyg-DPt23aDGGwo2KdG6cQ7o",
+      "MasterWBS": "11am7aetY3r1-Zzuv5eRpjHeJgp7nShAc8OHGDWQ_h08"
     }
   }
 }

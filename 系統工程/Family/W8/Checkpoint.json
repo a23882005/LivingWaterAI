@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T15:30:26.992Z",
+  "updated_at": "2026-11-05T17:43:00Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3439,8 +3439,8 @@
     "next_pm": "Independent QA future PR59 delta, four-household 56 E2E & Gate D/Trial/Gate E; maintain engineering/file governance and real source ownership."
   },
   "current_family_pm_verdict_20261105": {
-    "accepted_incremental_sha": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
-    "decision": "PASS_SCOPED_SOURCE_WIRING_AND_REPLAY",
+    "accepted_incremental_sha": "c91a5114a475a488c1c136c424245f1b4afd4cb4",
+    "decision": "PASS_SCOPED_M1_M8_APPROVED_AMENDMENT_AND_FINANCIAL_REGRESSION",
     "W7": "PASS_CLOSED",
     "W8": "IN_PROGRESS",
     "full_financial_PASS": 0,
@@ -3450,7 +3450,7 @@
     "pr59_draft": true,
     "pr60_scope": "CLOSED_SCOPE",
     "governance": "Independent QA documented on Drive and PR59 comment",
-    "next_action": "原V82 Codex PR59依中PM 2026/11/05最新M1+M8合同作最小改動並回交；中PM獨立驗收，W8仍IN_PROGRESS。",
+    "next_action": "PR59 Codex continues compliant finance PIT/qP/qV and same-cutoff NAV/settled/SGOV/pending/C7B/schema83/ledger. Middle PM independently QA next delta, full 56 features remain unaccepted.",
     "pm_verified_at": "2026-11-05T10:45:37Z",
     "validation_scope": "金融來源接線/觀察與隔離重播；非完整金融Gate"
   },
@@ -3688,7 +3688,7 @@
     "trade": "NONE"
   },
   "pm_owner_approved_m1_m8_20261105": {
-    "status": "SPEC_APPROVED_CONTRACT_DISPATCHED__IMPLEMENTATION_QA_PENDING",
+    "status": "SPEC_APPROVED_IMPLEMENTED_IN_PR59_SCOPE_QA_PASS__FULL_FINANCE_PENDING",
     "source": "Owner approved / dot 2026-11-05 final Family handoff",
     "contract_name": "Family_V82_M1_M8_最新核准修訂_PR59正式施工契約_20261105",
     "official_codex_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6661861925",
@@ -3705,9 +3705,65 @@
     },
     "acceptance": "G1-G8 boundary and regressions + 6 Family CI + W5/W8 + 4 household isolation",
     "performance_backtest": "EXPLICITLY_WAIVED_BY_OWNER_FOR_THIS_CHANGE",
-    "implementation": "PENDING",
-    "pm_independent_qa": "PENDING",
+    "implementation": "IMPLEMENTED_C91A511_SCOPED_QA_PASS",
+    "pm_independent_qa": "PASS_SCOPED_2026_11_06",
     "prior_scope": "Earlier M1-only comment #6653634352 superseded for its M8 unchanged sentence only",
-    "evidence_boundary": "Existing PR59 af16 source integration scoped PASS preserved; no executable M1/M8 new rule PASS."
+    "evidence_boundary": "Existing PR59 af16 source integration scoped PASS preserved; no executable M1/M8 new rule PASS.",
+    "implementation_head": "c91a5114a475a488c1c136c424245f1b4afd4cb4",
+    "pm_qa_doc_id": "1ujGfwVEo6ffb0nHZHB_YFdi_IgD_QXtCZmGsAaNMyeg"
+  },
+  "pm_pr59_c91a511_m1_m8_independent_acceptance_20261106": {
+    "formal_decision": "PASS_SCOPED_M1_M8_APPROVED_AMENDMENT_AND_FINANCIAL_REGRESSION",
+    "fixed_head": "c91a5114a475a488c1c136c424245f1b4afd4cb4",
+    "parent": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
+    "tree": "7d3d8e2c85c29c16ccf11853f8c1c1cba8e05fa6",
+    "owner": "Family中PM（總PM）",
+    "signed_at_taipei": "2026-11-06 01:43",
+    "formal_private_PM_QA_doc_id": "1ujGfwVEo6ffb0nHZHB_YFdi_IgD_QXtCZmGsAaNMyeg",
+    "code_zip_id": "1f0z5dzl5foWNO5o91YsqJMb4a7zQQ8UH",
+    "source_zip_id": "1qG93F6kR1UmBri74tSyxl_IbB2_zWQ94",
+    "final_receipt_id": "1xll8SORjvFkbOfK2Tr3pQpyLL8v_vsgx",
+    "handoff_id": "1qwaxjmCZ9g5GqnlgesNGQ0zhW4P_5pmf",
+    "code_original_sha256": "8be3ef8eae023524c9e8f85eb56f843d468b94abed5eaf684813a1220638f9bb",
+    "source_original_sha256": "8c990a8d0c532c2613d762ceb20adc4a1df5317c8dc83aa94adce1cbecba1413",
+    "receipt_original_sha256": "22654eb6a01659701399c7818fd48f3bf54addbb21676ed64343f9473144979e",
+    "independent_verification": {
+      "zip_code_crc_and_manifest": "PASS 5 payloads",
+      "zip_source_crc_and_manifest": "PASS 3 payloads",
+      "sha_mapped_programs": "1169/1169 PASS",
+      "full_git_history_commits": 1555,
+      "mapped_private_source_entries": "18802/18802 PASS",
+      "overwritten_canonical_paths": 0,
+      "changed_git_files": 5,
+      "G1_G8_targeted_local_pytest": "130/130 PASS (60 new+70 regression)",
+      "real_amended_history_technical": "39/39 replay exact",
+      "four_member_source_qualification": "4 DB snapshots + 4 financial facts + 33 C7 source qualifications PASS",
+      "twse_sources": "4/4 PASS",
+      "qp_golden_business": "12 qP golden + 12 business/49+13 PASS",
+      "synthetic_sgov_guard": "PASS (synthetic only)",
+      "PM_real_market_sources": "7 IB tickers/8771 daily bars/186 corporate actions; 501 Massive VT bars exact",
+      "four_member_42_securities": "4 households, 42 securities, two stored outputs byte-identical and SHA-aligned",
+      "github_six_ci": "6/6 success directly read through GitHub API",
+      "github_junit": "W5 567/567; W8 1462/1462; failures/errors/skips 0; source GitHub CI+delivered XML"
+    },
+    "independent_extra_local_broad_exploration": {
+      "collected": "2029 tests W5+W8 in combined command",
+      "environment": "local Python 3.13.5 / pytest 9.0.2; official CI 3.12 / pytest 8.3.5",
+      "finding": "Existing W5 bond_target_mentor test fails after 20 tests in both af16 parent and c91 amended version under identical combined local invocation; standalone each passes; affected test, bond_engine, V75 work4 SHA unchanged",
+      "verdict": "out_of_contract_preexisting_test_order_or_environment_issue; not counted as broad local suite PASS; monitor separately; no M1/M8 change evidence"
+    },
+    "performance_backtest": "OWNER_WAIVED_NOT_RUN",
+    "rule_sot_alignment": "Owner-approved M1+M8 Family addendum is new canonical changed clauses; upstream v1.0 historical text remains under corresponding spec owner",
+    "scope_only": true,
+    "existing_af16_scoped_pass_preserved": true,
+    "w7": "PASS_CLOSED",
+    "w8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "pr_state": "DRAFT_UNMERGED",
+    "next_owner": "Original V82 Codex PR59 only writer continues legal PIT/qP/qV, same cutoff NAV/settled/SGOV/pending, C7B/schema83, CycleLedger/Work9/Mentor",
+    "PM_next": "Independently QA new finance delta, 4 household x14 E2E, GateD, projects, Trial, GateE"
   }
 }

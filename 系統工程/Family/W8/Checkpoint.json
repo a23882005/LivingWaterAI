@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T19:50:45.728Z",
+  "updated_at": "2026-11-05T20:33:50.048Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3439,8 +3439,8 @@
     "next_pm": "Independent QA future PR59 delta, four-household 56 E2E & Gate D/Trial/Gate E; maintain engineering/file governance and real source ownership."
   },
   "current_family_pm_verdict_20261105": {
-    "accepted_incremental_sha": "6d7f224dd223ab8a92af23eeac9aa4e97ae87d61",
-    "decision": "PASS_SCOPED_PRIVATE_PM_RECIPIENT_DB_GUARD_AND_DECIMAL_TEST_ISOLATION",
+    "accepted_incremental_sha": "218ce4ae573bb751db17316000625666c20c688e",
+    "decision": "PASS_SCOPED_PUBLIC_CORPORATE_ACTION_RECEIPT_BINDING_AND_PROVIDER_DIFF_PRESERVATION",
     "W7": "PASS_CLOSED",
     "W8": "IN_PROGRESS",
     "full_financial_PASS": 0,
@@ -3450,7 +3450,7 @@
     "pr59_draft": true,
     "pr60_scope": "CLOSED_SCOPE",
     "governance": "Independent QA documented on Drive and PR59 comment",
-    "next_action": "PR59 sole Codex continues legal PIT/qP/qV and same-cutoff NAV/settled/SGOV/pending to C7B/schema83/ledger/Work9/Mentor; PM independently QA next delta; four-household 56 E2E pending.",
+    "next_action": "Original V82 Codex PR59 continues PIT complete native action entitlement, qP/qV and same-cutoff NAV/settled cash/reservations/pending/SGOV to C7B/schema83→CycleLedger→Work9/Mentor; PM separately accepts next delta.",
     "pm_verified_at": "2026-11-05T10:45:37Z",
     "validation_scope": "金融來源接線/觀察與隔離重播；非完整金融Gate"
   },
@@ -3879,5 +3879,78 @@
       "trade": "NONE"
     },
     "next_owner": "Family中PM keeps version ledger; V70 Owner retains UI/source authority; PR59 only writer if later specifically authorized Family source-refresh delta"
+  },
+  "pm_pr59_218ce4a_public_actions_scoped_acceptance_20261106": {
+    "decision": "PASS_SCOPED_PUBLIC_CORPORATE_ACTION_RECEIPT_BINDING_AND_PROVIDER_DIFF_PRESERVATION",
+    "accepted_head": "218ce4ae573bb751db17316000625666c20c688e",
+    "parent": "6d7f224dd223ab8a92af23eeac9aa4e97ae87d61",
+    "tree": "998f7df60898f9cc2cdc29765c6a212c8c034ece",
+    "pm": "Family中PM（全案總PM）",
+    "signed_taipei": "2026/11/06 04:33",
+    "private_qa_doc_id": "1IMX5-XmpTddMVi0CoO9Ns8EZFqI9q-6Tb8hyPuPUngE",
+    "pr59_owner_instruction_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6668600423",
+    "handoff_id": "1WHCquoYF-hFZh6W_9AMWNEK49u5epPL7",
+    "program_zip": {
+      "id": "1vVsm1_nVx6MTMRffrzh0wVcSpzcG26vR",
+      "bytes": 32722594,
+      "sha256": "aac7574b9af12068296111d3808da77fe9d4d569c3caa9f6911018f567aa0d46"
+    },
+    "original_zip": {
+      "id": "195KS8ok2OhjycMc_I-rW46uwP7o_n6_S",
+      "bytes": 26821586,
+      "sha256": "049070273b2c186bc6ba76b1af2a0ebd557c5c5c02958a6d9a41f881be7a589f"
+    },
+    "receipt_json": {
+      "id": "1gxBx8EcJW12UcRAkLlJoFSgKZ3IwFy8c",
+      "bytes": 16480,
+      "sha256": "138002ad0c8d6c88cb46991994412bca6146b07b75f72c3ea6a24a1208d9190c"
+    },
+    "independent_verification": {
+      "outer_zip_crc_shas": "2/2 PASS",
+      "inner_manifest_payloads": "5 code + 3 source PASS",
+      "code_verified": "1172/1172",
+      "git_history_commits": 1557,
+      "mapped_canonical_sources": "22361/22361 SHA and size PASS",
+      "parent_mappings_preserved": 22194,
+      "new_mappings": 167,
+      "no_overwrite": true,
+      "modified_git_files": 5,
+      "local_targeted_pytest": "60/60 PASS (42 new + 18 unchanged)",
+      "independent_corporate_action_probe": "7 symbols/186 records/1 preserved exact mismatch/4 member source-only routes PASS",
+      "previous_scoped_legacy_probes": "7/7 PASS, individually re-executed by PM",
+      "github_six_workflows": "6/6 completed success directly read at accepted HEAD",
+      "original_codex_python312_junit": "2087/2087 PASS from delivered COMBINED.xml independently parsed",
+      "original_github_junit": "W5 567/567, W8 1520/1520 all zero fail/error/skip",
+      "four_household_full_canonical_cycle_qa": "NOT_RUN_BY_PM; public source-only not true Menu04 cold start"
+    },
+    "action_records": {
+      "symbols": 7,
+      "observations": 186,
+      "exact_numeric_matches": 185,
+      "original_value_differences": 1,
+      "disputed_event": {
+        "symbol": "SGOV",
+        "session": "2026-03-02",
+        "ib_original_per_share": "0.27239",
+        "massive_original_per_share": "0.2724",
+        "difference_usd": "0.00001",
+        "resolution": "UNRECONCILED_ORIGINAL_VALUES_PRESERVED"
+      },
+      "full_coverage_qualified": false,
+      "historical_release_and_revision_PIT": false,
+      "qp_qualified": false,
+      "qv_qualified": false,
+      "qualified_native_actions": false
+    },
+    "prior_scoped_acceptances": "PRESERVED: af16 source, c91 M1/M8, 6d recipient DB/Decimal",
+    "unchanged_native_rules": "V70 / V82 / V75 / C financial rules; M1/M8; nine stages",
+    "scope_only": true,
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "pr_state": "DRAFT_UNMERGED",
+    "next_code_writer": "Original V82 Codex PR59, PIT/action entitlement basis/SGOV difference/qP/qV/same cutoff NAV/settled/SGOV/pending, C7B/schema83 then CycleLedger Work9/Mentor",
+    "middle_pm_next": "independent QA new finance delta, four households 56 E2E, GateD, Trial, GateE"
   }
 }

@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "b653c5d43c0e4e56102eeea29b8933bbcf20c9a0c26c2c490908b93d05f7fc0e"
+    "sha256": "6f6b39f3b0cd269733bfdb4fa505bf89fa1e0fcde4a3b7a7c6f136a020e7d6e4"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -527,7 +527,7 @@
   },
   {
     "path": "系統工程/Family/W8/historical_source_qualification.py",
-    "sha256": "fc6b27adfa239863108ca520560603758c594552949a963817ec246f8fc426ae"
+    "sha256": "20a6f972bef71b3bfbb901431eb0f96e9c5a36c1bc5ccae5ba0b616046b98b87"
   },
   {
     "path": "系統工程/Family/W8/massive_daily_source.py",
@@ -585,5 +585,9 @@
     "path": "系統工程/Family/W8/ibkr_daily_source.py",
     "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211",
     "reason": "PR59 PM原件、IB Last日K及本人帳戶觀察接線；不改原生規則、不釋放金融資格"
+  },
+  {
+    "path": "系統工程/Family/W8/massive_action_source.py",
+    "sha256": "6621597c1f96356bdd5d27ce45728cf9d76ccde999d1c6ca62c07a5dee90b22f"
   }
 ]

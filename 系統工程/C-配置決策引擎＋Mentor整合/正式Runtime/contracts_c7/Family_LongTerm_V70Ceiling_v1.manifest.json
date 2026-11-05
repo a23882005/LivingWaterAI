@@ -145,7 +145,7 @@
     },
     {
       "path": "../../Family/W8/historical_source_qualification.py",
-      "sha256": "fc6b27adfa239863108ca520560603758c594552949a963817ec246f8fc426ae"
+      "sha256": "20a6f972bef71b3bfbb901431eb0f96e9c5a36c1bc5ccae5ba0b616046b98b87"
     },
     {
       "path": "../../Family/W5/mentor_bridge.py",
@@ -226,6 +226,10 @@
     {
       "path": "../../Family/W8/ibkr_daily_source.py",
       "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211"
+    },
+    {
+      "path": "../../Family/W8/massive_action_source.py",
+      "sha256": "6621597c1f96356bdd5d27ce45728cf9d76ccde999d1c6ca62c07a5dee90b22f"
     }
   ]
 }

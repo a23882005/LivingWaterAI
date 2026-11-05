@@ -113,7 +113,10 @@ def read_market(descriptor,symbol,evaluation_at):
 def bind(sources,request,symbol):
     result={}
     if not isinstance(sources,dict) or not sources:raise ValueError('HISTORY_INTAKE_NAMED_SOURCE_REQUIRED')
-    if set(sources)-{'sec_filings','market_acquisition','twse_own_history','ibkr_history'}:raise ValueError('HISTORY_INTAKE_UNKNOWN_SOURCE_ROUTE')
+    if set(sources)-{'sec_filings','market_acquisition','twse_own_history','ibkr_history','corporate_actions'}:raise ValueError('HISTORY_INTAKE_UNKNOWN_SOURCE_ROUTE')
+    if sources.get('corporate_actions') is not None:
+        from massive_action_source import read
+        result['corporate_actions']=read(sources['corporate_actions'],symbol,request['evaluation_at'])
     if sources.get('sec_filings') is not None:
         from sec_publication_source import read
         result['sec_filings']=read(sources['sec_filings'],symbol,request['evaluation_at'])

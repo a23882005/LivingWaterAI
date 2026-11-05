@@ -53,14 +53,32 @@ def normalized_evidence(request,source):
                 roles=source.get('sgov_role_source') or {}
                 if roles.get('status')=='SOURCE_DERIVED_ACCOUNTING' and physical:
                     from decimal import Decimal
+                    quantities=None
+                    if roles.get('role_quantities') is not None:
+                        if any(roles.get(k)!=request.get(k) for k in ('client_id','run_id','owner')) or roles.get('source_db_sha256')!=request['client_snapshot']['payload']['source_sha256']:
+                            raise PermissionError('V75_SGOV_ROLE_OWNER_RUN_OR_DB_CONFLICT')
+                        from sgov_confirmed_units import validated_units,RoleSourceUnavailable
+                        try:quantities=validated_units(roles)
+                        except RoleSourceUnavailable:
+                            facts['policy_missing_fields']=['mixed_sgov_role_share_quantities'];continue
+                        if Decimal(quantities['physical_quantity'])!=Decimal(quantity):
+                            raise PermissionError('V75_SGOV_ROLE_PHYSICAL_QUANTITY_CONFLICT')
                     bond=Decimal(roles['roles']['sgov_bond_bucket_amount']['amount'])
                     value=Decimal(physical['valuation']['amount'])
                     if bond not in (0,value):
-                        facts['policy_missing_fields']=['mixed_sgov_role_share_quantities'];continue
+                        from sgov_confirmed_units import validated_units,RoleSourceUnavailable
+                        try:quantities=quantities or validated_units(roles)
+                        except RoleSourceUnavailable:
+                            facts['policy_missing_fields']=['mixed_sgov_role_share_quantities'];continue
+                        if Decimal(quantities['physical_quantity'])!=Decimal(quantity):
+                            raise PermissionError('V75_SGOV_ROLE_PHYSICAL_QUANTITY_CONFLICT')
+                        quantity=quantities['bond_quantity']
+                    else:quantity=quantity if bond>0 else '0'
                     facts['sgov_role_binding']={**deepcopy(roles['roles']),
-                        'physical_quantity':quantity,'physical_value':physical['valuation']['amount'],
+                        'physical_quantity':physical['quantity'],'physical_value':physical['valuation']['amount'],
                         'source_digest':roles['digest']}
-                    quantity=quantity if bond>0 else '0'
+                    if roles.get('role_quantities') is not None:
+                        facts['sgov_role_binding']['role_quantities']=deepcopy(roles['role_quantities'])
                 else:
                     facts['policy_missing_fields']=['sgov_role_source'];continue
             facts['existing_policy']={'current_position_quantity':quantity,

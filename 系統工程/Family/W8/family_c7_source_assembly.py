@@ -164,6 +164,10 @@ class SourceAssembler:
             iid=projection['source_to_native'][row['instrument_id']];item=projection['targets'][iid]
             p=identities.get(row.get('ticker'),{})
             kind=asset_kind(p) or ('cash' if row.get('asset_type') in ('CASH','cash') else None)
+            if row.get('ticker')=='SGOV' and {'SGOV_BOND','SGOV_DRY'}<=set(projection['targets']):
+                if asset_kind(p)!='bond ETF':kind=None
+                elif iid=='SGOV_BOND':kind='bond ETF'
+                elif iid=='SGOV_DRY':kind='cash'
             if kind is None:
                 self.field('approved_long_term_target.positions.'+iid+'.asset_type',None,state=ADAPTER,
                     code='C7_ORIGINAL_ASSET_BUCKET_CLASSIFICATION_REQUIRED',sources=[{'original_target_row':deepcopy(row)}])
@@ -296,12 +300,15 @@ class SourceAssembler:
             if record not in scope['budget_normalizations']:scope['budget_normalizations'].append(record)
             return value
         positions=[];exposures=[];funding=[];nav=Decimal(0);cash_known=True
-        aggregate={};nav_refs={};position_effects={};cash_reserved={};broker_orders={}
+        aggregate={};nav_refs={};position_effects={};cash_reserved={};broker_orders={};sgov_partitions=[]
         with localcontext() as numeric:
             numeric.prec=50
             for account in accounts:
                 owner=account['owner'];factor=rate(owner);subtotal=Decimal(0)
                 if not isinstance(account.get('positions'),list):raise ValueError('C7_ASSEMBLY_ACCOUNT_POSITIONS_REQUIRED')
+                sgov_rows=[p for p in account['positions'] if p.get('ticker',p.get('asset_id'))=='SGOV']
+                if any(p.get('sgov_role_binding') is not None for p in sgov_rows) and len(sgov_rows)!=1:
+                    raise ValueError('C7_SGOV_PHYSICAL_AND_LOGICAL_POSITIONS_CANNOT_BE_DUPLICATED')
                 for p in account['positions']:
                     iid=p['asset_id']
                     if p['position_id'] in position_effects:raise ValueError('C7_ASSEMBLY_POSITION_IDENTITY_CONFLICT')
@@ -319,15 +326,21 @@ class SourceAssembler:
                     canonical_kind='cash' if kind=='CASH' else known_kind
                     if canonical_kind is None:
                         self.field('current_positions.'+iid+'.asset_type',None,state=ADAPTER,code='C7_CURRENT_PRODUCT_BUCKET_SOURCE_REQUIRED')
-                    canonical={'instrument_id':iid,'ticker':p.get('ticker',iid),'display_name':None,
-                        'asset_type':canonical_kind or 'UNKNOWN',
-                        'market':None,'base_currency':owner['currency'],'value_state':'KNOWN','weight':None,
-                        'portfolio_amount':None,'source_reference_ids':[sid]}
-                    if iid in aggregate:
-                        if aggregate[iid]['canonical']!=canonical:
-                            raise ValueError('C7_ASSEMBLY_CROSS_ACCOUNT_ASSET_UNIT_MAPPING_REQUIRED')
-                        aggregate[iid]['amount']+=value*factor
-                    else:aggregate[iid]={'canonical':canonical,'amount':value*factor}
+                    from sgov_confirmed_units import position_partition
+                    partition=position_partition(self.request,owner,p,(getattr(self,'approved_projection',None) or {}).get('targets',{}))
+                    views=[(iid,canonical_kind,value)]
+                    if partition is not None:
+                        views,role_receipt=partition;sgov_partitions.append(role_receipt)
+                    for view_id,view_kind,view_value in views:
+                        canonical={'instrument_id':view_id,'ticker':p.get('ticker',iid),'display_name':None,
+                            'asset_type':view_kind or 'UNKNOWN',
+                            'market':None,'base_currency':owner['currency'],'value_state':'KNOWN','weight':None,
+                            'portfolio_amount':None,'source_reference_ids':[sid]}
+                        if view_id in aggregate:
+                            if aggregate[view_id]['canonical']!=canonical:
+                                raise ValueError('C7_ASSEMBLY_CROSS_ACCOUNT_ASSET_UNIT_MAPPING_REQUIRED')
+                            aggregate[view_id]['amount']+=view_value*factor
+                        else:aggregate[view_id]={'canonical':canonical,'amount':view_value*factor}
                     if kind=='STOCK':exposures.append({'event_id':p['position_id'],'economic_effect_ids':deepcopy(p['economic_effect_ids']),
                         'kind':'CONFIRMED_POSITION','owner':deepcopy(owner),'asset_id':iid,'amount':str(value),'currency':owner['currency'],
                         'intent_id':None,'side':None,'amount_basis':'CONFIRMED_NOTIONAL','receipt':deepcopy(proof)})
@@ -463,6 +476,10 @@ class SourceAssembler:
         scope['preference_locks']=self.field('preference_locks',locks if protected and current is not None else None,
             code='C7_CONFIRMED_HOLDING_DIRECTIVES_REQUIRED',sources=[self.raw[-1]])
         self.observations={'account_nav_reconciliation':nav_refs,'original_coverage':deepcopy(coverage)}
+        if sgov_partitions:
+            self.observations['sgov_physical_role_partitions']=sgov_partitions
+            self.derived('sgov_confirmed_units',{'source_db_sha256':snapshot['source_sha256'],
+                'position_role_partitions':sgov_partitions},as_of=facts['as_of'],available_at=facts['available_at'])
         if terminal_acknowledgments:
             self.observations['terminal_order_acknowledgments']=terminal_acknowledgments
         if replacement_replay is not None:

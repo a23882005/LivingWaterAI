@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "63a7ecd0c27181254df5f79b333c1ef27d94a4dc40932a5598c55f2664c99f28"
+    "sha256": "366d5ae0ae5fdca668a8f92990260969e5fb9167ac87e7a45dd2b4641d36f17d"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -407,7 +407,7 @@
   },
   {
     "path": "系統工程/Family/W8/deployment_c7_sources.py",
-    "sha256": "29ae6e119ded6a0048bc3a0095537dfcf312ddbead31f4c41ecfedd822c1ac0f"
+    "sha256": "3f76aca985c562770fca67d109fe21c0ad9bd6795f20e82feddcf588bc6b413b"
   },
   {
     "path": "系統工程/Family/W5/family_runner.py",
@@ -447,7 +447,7 @@
   },
   {
     "path": "系統工程/Family/W8/family_c7_source_assembly.py",
-    "sha256": "704c3f1dfa17d1232f18f6b2f3103362cb7b14d38a8c53dd526f801c5411a169"
+    "sha256": "df02277f3d84cb16f7c89212f2927780159fc0f157a259557d13237178db9e73"
   },
   {
     "path": "系統工程/Family/W8/v70_tactical_input.py",
@@ -560,5 +560,20 @@
     "path": "系統工程/Family/W8/replacement_order_source.py",
     "sha256": "208ea4ebb18271fa634c5529df85227b01d9f5c825e5dbb716637780efd87428",
     "reason": "PR59 來源所有者已確認的替換委託接線；不推定現金釋放"
+  },
+  {
+    "path": "系統工程/Family/W8/sgov_confirmed_units.py",
+    "sha256": "304530ba558a2bb2c48b3b735e97035de0dfa82ba0efa2800093be0fa82e711e",
+    "reason": "PR59 SGOV 原確認版本、實體單位與既有 V75/C7 消費接線；不改核心/不釋放現金"
+  },
+  {
+    "path": "系統工程/Family/W8/sgov_role_source.py",
+    "sha256": "1c6e57244095238a51fb9e78aee1b65f2d1b3f80d45bb327cfb5bdf82e698252",
+    "reason": "PR59 SGOV 原確認版本、實體單位與既有 V75/C7 消費接線；不改核心/不釋放現金"
+  },
+  {
+    "path": "系統工程/Family/W8/v75_native_attempt.py",
+    "sha256": "6a197d4450849664fa52ed986537a77aa13dfe531433a1f500f5501463e81edf",
+    "reason": "PR59 SGOV 原確認版本、實體單位與既有 V75/C7 消費接線；不改核心/不釋放現金"
   }
 ]

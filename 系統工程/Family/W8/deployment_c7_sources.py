@@ -4,7 +4,7 @@ Long-term approval is retained as its own source. It never confirms a new
 tactical proposal. A source section being present does not mean C7 is ready.
 """
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal,localcontext
 from hashlib import sha256
 from pathlib import Path
 import json
@@ -120,16 +120,41 @@ def reference_currencies(request, analysis):
         for symbol,rows in proofs.items()}
 
 
-def current_sgov_roles(roles, physical_value, reference_value):
+def current_sgov_roles(roles, physical_value, reference_value, *, role_source=None):
     bond = Decimal(roles['sgov_bond_bucket_amount']['amount'])
     dry = Decimal(roles['sgov_dry_powder_bucket_amount']['amount'])
+    if not all(v.is_finite() for v in (bond,dry,Decimal(physical_value))):
+        raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
     if bond < 0 or dry < 0 or bond + dry != Decimal(physical_value):
         raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    reference_value=Decimal(str(reference_value))
+    if not all(v.is_finite() for v in (bond,dry,reference_value)) or reference_value<0:
+        raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    if Decimal(physical_value)==0 and reference_value!=0:
+        raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    if role_source is not None and (role_source.get('roles')!=roles
+        or Decimal(role_source['physical']['valuation']['amount'])!=Decimal(physical_value)):
+        raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    quantities=None
+    if role_source is not None and role_source.get('role_quantities') is not None:
+        from sgov_confirmed_units import validated_units
+        quantities=validated_units(role_source)
     if bond == 0:
         return [('SGOV_BOND', 'bond ETF', Decimal(0)), ('SGOV_DRY', 'cash', reference_value)]
     if dry == 0:
         return [('SGOV_BOND', 'bond ETF', reference_value), ('SGOV_DRY', 'cash', Decimal(0))]
-    raise ValueError('C7_CURRENT_MIXED_SGOV_ROLE_QUANTITIES_REQUIRED')
+    if role_source is None:raise ValueError('C7_CURRENT_MIXED_SGOV_ROLE_QUANTITIES_REQUIRED')
+    from sgov_confirmed_units import validated_units,number
+    if role_source.get('roles')!=roles or Decimal(role_source['physical']['valuation']['amount'])!=Decimal(physical_value):
+        raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    quantities=quantities or validated_units(role_source);physical=number(quantities['physical_quantity'])
+    if physical<=0:raise PermissionError('C7_CURRENT_SGOV_ROLE_VALUE_MISMATCH')
+    with localcontext() as numeric:
+        numeric.prec=50
+        unit_reference_price=reference_value/physical
+        bond_reference=number(quantities['bond_quantity'])*unit_reference_price
+        dry_reference=reference_value-bond_reference
+    return [('SGOV_BOND','bond ETF',bond_reference),('SGOV_DRY','cash',dry_reference)]
 
 
 def metric(value, unit, at, refs, *, quality='OK', freshness='UNKNOWN'):
@@ -269,7 +294,8 @@ def extend(root, request, analysis, prepared, context, sources):
             if symbol == 'SGOV' and {'SGOV_BOND', 'SGOV_DRY'}.issubset(set(projection['source_to_native'].values())):
                 roles = analysis['sgov_role_source']['roles']
                 role_values = current_sgov_roles(roles,
-                    analysis['sgov_role_source']['physical']['valuation']['amount'], value)
+                    analysis['sgov_role_source']['physical']['valuation']['amount'], value,
+                    role_source=analysis['sgov_role_source'])
             for iid, asset_type, role_value in role_values:
                 current_lines.append({'instrument_id': iid, 'ticker': symbol, 'display_name': None,
                     'asset_type': asset_type, 'market': None,

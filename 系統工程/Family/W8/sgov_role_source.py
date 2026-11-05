@@ -6,7 +6,7 @@ defensive holdings for equity purchases. Neither is a new owner confirmation.
 """
 from copy import deepcopy
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal,localcontext
 from hashlib import sha256
 from pathlib import Path
 from family_input import digest
@@ -68,7 +68,34 @@ def produce(request,context,report):
     if out['physical'] is None:
         out['issues'].append('SGOV_PHYSICAL_VALUATION_SOURCE_REQUIRED');return finish()
     if any(snapshot['tables'].get(k) for k in ('sgov_role_proposal','sgov_role_confirmation')):
-        out['issues'].append('EXISTING_ROLE_ROWS_REQUIRE_ACTIVE_VERSION_SELECTION');return finish()
+        from sgov_confirmed_units import select,units,validated_units,RoleSourceUnavailable
+        try:
+            if request['owner'].get('client_id')!=request['client_id']:
+                raise RoleSourceUnavailable('SGOV_ROLE_OWNER_CLIENT_BINDING_CONFLICT')
+            selected=select(request,request['owner'].get('account'),out['physical']['quantity'])
+            quantities=units(selected,out['physical']['quantity'])
+            value=Decimal(out['physical']['valuation']['amount']);price=Decimal(out['physical']['price'])
+            with localcontext() as numeric:
+                numeric.prec=50
+                bond=Decimal(quantities['bond_quantity'])*price;dry=value-bond
+            currency=out['physical']['valuation']['currency']
+            out.update(status='SOURCE_DERIVED_ACCOUNTING',evidence_state='VERIFIED',
+                evaluation_at=request['evaluation_at'],
+                purpose='MIXED' if min(selected['proposal']['bond_core_bps'],selected['proposal']['dry_powder_bps'])>0
+                    else 'BOND' if selected['proposal']['bond_core_bps']>0 else 'DRY_POWDER',
+                owner_role_confirmation=deepcopy(selected['confirmation']),role_quantities=quantities,
+                source_basis={'kind':'EXISTING_CONFIRMED_POSITION_ROLE_VERSION','confirmed_position_role':selected},
+                roles={'sgov_bond_bucket_amount':{'amount':str(bond),'currency':currency},
+                    'sgov_dry_powder_bucket_amount':{'amount':str(dry),'currency':currency}},
+                physical_role_sum_reconciled=True,unallocated_amount={'amount':'0','currency':currency})
+            validated_units(out)
+        except RoleSourceUnavailable as error:
+            out.update(status='ROLE_SOURCE_UNRESOLVED',evidence_state='UNKNOWN',purpose=None,
+                owner_role_confirmation=None,roles=None,source_basis=None)
+            out.pop('role_quantities',None);out.pop('physical_role_sum_reconciled',None);out.pop('unallocated_amount',None)
+            out.pop('evaluation_at',None)
+            out['issues'].append(str(error))
+        return finish()
     proof=context.get('approved_document_target_source')
     documented=None
     if proof is not None:

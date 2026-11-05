@@ -61,7 +61,7 @@
     },
     {
       "path": "../../Family/W8/deployment_c7_sources.py",
-      "sha256": "29ae6e119ded6a0048bc3a0095537dfcf312ddbead31f4c41ecfedd822c1ac0f"
+      "sha256": "3f76aca985c562770fca67d109fe21c0ad9bd6795f20e82feddcf588bc6b413b"
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
@@ -81,7 +81,7 @@
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
-      "sha256": "704c3f1dfa17d1232f18f6b2f3103362cb7b14d38a8c53dd526f801c5411a169"
+      "sha256": "df02277f3d84cb16f7c89212f2927780159fc0f157a259557d13237178db9e73"
     },
     {
       "path": "../../Family/W8/w1_portfolio_observations.py",
@@ -214,6 +214,10 @@
     {
       "path": "../../Family/W8/replacement_order_source.py",
       "sha256": "208ea4ebb18271fa634c5529df85227b01d9f5c825e5dbb716637780efd87428"
+    },
+    {
+      "path": "../../Family/W8/sgov_confirmed_units.py",
+      "sha256": "304530ba558a2bb2c48b3b735e97035de0dfa82ba0efa2800093be0fa82e711e"
     }
   ]
 }

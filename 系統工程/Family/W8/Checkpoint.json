@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T21:26:00.000Z",
+  "updated_at": "2026-11-05T22:29:32.197Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4097,5 +4097,96 @@
       "production": "HOLD",
       "trade": "NONE"
     }
+  },
+  "pm_20261106_v82_order_qty_exposure_basis_defect": {
+    "id": "FAMILY-V82-W8-BUY-QTY-VALUATION-001",
+    "status": "BUG_CONFIRMED_SYNTHETIC__MINIMAL_FIX_DISPATCHED__CODE_REPAIR_NOT_YET_VERIFIED",
+    "detection": "Owner forwarded dot two-cycle synthetic FamilyRunner discrepancy; PM independently reproduces on immutable core",
+    "current_pr59_head_at_intake": "234221e1f173483b747c3ad2500a70d02600ccef",
+    "accepted_original_code_head": "218ce4ae573bb751db17316000625666c20c688e",
+    "immutable_code_zip_drive_id": "1vVsm1_nVx6MTMRffrzh0wVcSpzcG26vR",
+    "immutable_code_zip_sha256": "aac7574b9af12068296111d3808da77fe9d4d569c3caa9f6911018f567aa0d46",
+    "source_runtime_path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
+    "source_git_blob_sha": "6341e06250d0180d5a9f46d0f8e9334f1ed57ca6",
+    "formal_rule": "V82.md v1.22.0 CMR9.1; same-run valuation for FinalGap; order price for cash notional",
+    "deterministic_counterexample": {
+      "project_target": "100",
+      "stage": "8",
+      "target": "95",
+      "confirmed_qty": "9.4",
+      "valuation_price": "10",
+      "projected_before": "94",
+      "gap": "1",
+      "normalized_order_price": "9.9",
+      "lot": "0.001",
+      "actual_original_qty": "0.101",
+      "order_notional": "0.9999",
+      "actual_valuation_exposure": "1.01",
+      "actual_post_position": "95.01",
+      "displayed_completion_percent": "94.9999",
+      "correct_completion_percent": "95.01",
+      "max_allowed_qty_under_dual_check": "0.100"
+    },
+    "independent_native_probes": {
+      "cases": 9,
+      "exposure_breach": 3,
+      "completion_mismatch": 6,
+      "cash_breach": 0,
+      "source": "read-only isolated original core",
+      "python": "3.13.5",
+      "independent_existing_pytest": "31/31 PASS",
+      "caveat": "not complete FamilyRunner two-cycle or true four-household source-backed E2E"
+    },
+    "exact_bug_lines": {
+      "calculate_position_gap": "145–160 correct valuation basis",
+      "build_buy_execution_plan": "187 max min / 199+211 qty at order price only / 214–215 order notional cap / 218–222 post completion and residual at order notional"
+    },
+    "consumer_paths": [
+      "系統工程/Family/W5/stock_engine.py",
+      "系統工程/Family/W5/native_pipeline.py",
+      "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/canonical_output.py",
+      "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py"
+    ],
+    "fix_contract": {
+      "exposure": "qty * canonical_valuation_price <= positive_gap AND exposure caps",
+      "cash": "qty * normalized_order_price + applicable_fee <= settled cash AND cash caps",
+      "post_fill": "projected_post = gap.projected_position_amount + qty * valuation_price; residual_gap in valuation basis",
+      "unknown": "preserve formal UNKNOWN, do not fabricate cap/price/fees",
+      "keep_unchanged": [
+        "nine stage",
+        "M1/M8",
+        "Base/Left/Right/Trend",
+        "B0",
+        "CycleLedger",
+        "funding pools",
+        "49+13",
+        "PR60 design",
+        "trading authority"
+      ]
+    },
+    "private_qa_and_contract": {
+      "id": "1o8CFlrKk2Y_WWldE2o84HWhGjoXu0zd0o9brNT0gZH8",
+      "folder": "Google Drive root/TEMP",
+      "readback": "PASS"
+    },
+    "codex_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6671155800",
+    "production_scope": "Original V82 Codex PR59 only Writer, V82 shared core change follows original Owner authority; Family PM independently QA after new delivery",
+    "governance": {
+      "family_construction": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "family_files": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "readbacks": "2/2 PASS",
+      "prewrite_backup_ids": [
+        "1-76VhnJ9xWGb7G9nZbsRq32GGYcpZbGX0WikDpJdjIo",
+        "1BFcSqrs_X0BRdQBTALH1y5XvHnJ8ZDB86aV8b9AzZ1Y"
+      ]
+    },
+    "sell_scope": "Read-only check of sell/reduction path; no confirmed parallel sell quantity defect; no change authorized without evidence",
+    "prior_accepted": "af16/c91/6d/218 PR59 scoped PASS preserved; PR60 CLOSED_SCOPE",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

@@ -25,7 +25,7 @@ class OfficialMonthlyReleaseTests(unittest.TestCase):
             self.observed["m04"], value=54.5, observation_date="2026-09-01",
             source_url="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
             method="Frozen September 2026 ISM headline regression fixture")
-        self.now = dt.datetime(2026, 10, 18, 8, 15, tzinfo=dt.timezone.utc)
+        # Freeze m15 as well: live core may have advanced to October while\n        # this regression deliberately exercises the September release cycle.\n        self.observed["m15"] = dict(\n            self.observed["m15"], value=54.9, observation_date="2026-09-01",\n            source_url="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services-pmi/september/",\n            method="Frozen September 2026 ISM services regression fixture")\n        self.now = dt.datetime(2026, 10, 18, 8, 15, tzinfo=dt.timezone.utc)
         self.today = self.now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
         self.calendar_data = json.loads(CALENDAR.read_text(encoding="utf-8"))
         self.calendar_data["checked_at_utc"] = "2026-10-18T08:00:00Z"

@@ -8,6 +8,8 @@ on:
     paths:
       - '.github/workflows/v703-frontend-regression.yml'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/v703_rolling_history.py'
+      - 'tests/test_v703_rolling15.py'
       - 'tests/policy_case_matrix.py'
       - 'tests/test_v703_policy*.py'
       - 'tests/v703_browser_fixture.py'
@@ -146,6 +148,7 @@ jobs:
         run: |
           mkdir -p build/w7-browser
           set -o pipefail
+          python -m unittest discover -s tests -p 'test_v703_rolling15.py' -v 2>&1 | tee build/w7-browser/rolling15.log
           python -m unittest discover -s tests -p 'test_v703_snapshot_frontend.py' -v 2>&1 | tee build/w7-browser/snapshot-cases.log
           python -u - <<'PYTEST' 2>&1 | tee build/w7-browser/cases.log
           import sys,json,copy,datetime

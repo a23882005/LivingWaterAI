@@ -12,6 +12,11 @@ import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
+try:
+    from v703_rolling_history import embed_history, history_payload
+except ModuleNotFoundError:
+    from scripts.v703_rolling_history import embed_history, history_payload
+
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
     "m06_output_gap", "m03_qqq", "m03_spy", "m03_vt",
@@ -628,6 +633,7 @@ def build(macro_path, supplement_path, html_path, dest):
     out.mkdir(parents=True, exist_ok=True)
     copy_research_charts(out)
     updated_html = _quarterly_chart_markup(updated_html)
+    updated_html = embed_history(updated_html, history_payload())
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,

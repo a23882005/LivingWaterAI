@@ -11,6 +11,8 @@ on:
     paths:
       - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/v703_rolling_history.py'
+      - 'tests/test_v703_rolling15.py'
       - 'scripts/refresh_v703_predeploy.py'
       - 'scripts/capture_v703_daily_snapshot.py'
       - 'scripts/monthly_research/macro_safety_monthly.py'
@@ -98,6 +100,7 @@ jobs:
           fi
       - name: Validate 18 core plus 8 supplement inputs; build V70-3-27
         run: |
+          V703_SKIP_BROWSER=1 python -m unittest discover -s tests -p 'test_v703_rolling15.py' -v
           python -m py_compile scripts/build_daily_v703_site.py
           python -m py_compile scripts/refresh_v703_predeploy.py
           test -s data/18_macro_verification.json

@@ -117,6 +117,170 @@
 </div>
 </div>
 </nav>
+<!-- 2026/11/05｜15日滾動觀察 v1｜正式每日稽核快照；參考區間不改動原計分。 -->
+<style>
+#v703-rolling15{max-width:1200px;margin:24px auto;padding:0 16px;color:#e2e8f0;font:15px/1.7 system-ui,sans-serif}
+#v703-rolling15 .r15-card{padding:24px;border:1px solid #475569;border-radius:20px;background:linear-gradient(135deg,#17263c,#0f172a)}
+#v703-rolling15 h2{font-size:24px;font-weight:700;color:#bae6fd;margin:0 0 8px}
+#v703-rolling15 h3{font-size:18px;font-weight:700;margin:20px 0 8px}
+#v703-rolling15 .r15-muted{color:#a8b8cb;font-size:13px}
+#v703-rolling15 .r15-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}
+#v703-rolling15 .r15-stat{padding:14px;border:1px solid #334155;border-radius:12px;background:#1e293b}
+#v703-rolling15 .r15-stat strong{display:block;font-size:25px;color:#f8fafc;font-variant-numeric:tabular-nums}
+#v703-rolling15 .r15-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#v703-rolling15 svg{width:100%;min-width:660px;height:auto;display:block}
+#v703-rolling15 table{width:100%;border-collapse:collapse;font-size:14px}
+#v703-rolling15 th,#v703-rolling15 td{text-align:left;border-bottom:1px solid #334155;padding:10px 12px;white-space:nowrap}
+#v703-rolling15 th{color:#bae6fd;background:#1e293b}
+#v703-rolling15 .r15-notice{border-left:3px solid #60a5fa;padding:8px 12px;background:#1e293b;margin:12px 0}
+#v703-rolling15 circle:focus{outline:none;stroke:#fbbf24;stroke-width:4}
+@media(max-width:640px){#v703-rolling15{padding:0 12px}#v703-rolling15 .r15-card{padding:16px}#v703-rolling15 .r15-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#v703-rolling15 h2{font-size:21px}}
+</style>
+<section id="v703-rolling15" aria-labelledby="r15-title">
+ <div class="r15-card">
+  <h2 id="r15-title">總經體質分｜15日滾動觀察</h2>
+  <p class="r15-muted">以台灣日期計算，含今天共15個日曆日；每日保留最後一筆合格快照。分數越高表示體質越佳。缺值不補零、不沿用前值。</p>
+  <p id="r15-period" class="r15-muted"></p>
+  <div id="r15-stats" class="r15-stats" aria-live="polite"></div>
+  <div class="r15-scroll" tabindex="0" aria-label="15日趨勢圖，可左右捲動查看日期">
+   <svg id="r15-chart" viewBox="0 0 900 340" role="img" aria-labelledby="r15-chart-title r15-chart-desc"></svg>
+  </div>
+  <p id="r15-point" class="r15-muted" aria-live="polite">選取圖上圓點可查看當日分數。</p>
+  <p class="r15-muted">藍線為合格分數；空白日期代表沒有合格紀錄，折線於缺值處中斷。點選／聚焦圓點可查看日期與分數，手機可左右捲動圖表。</p>
+  <p id="r15-status" class="r15-notice" aria-live="polite">正在讀取每日紀錄…</p>
+  <h3>每日變化多少才值得注意？</h3>
+  <p class="r15-muted">以下為照片所示的研究參考區間，尚非V70正式門檻；依相鄰兩個日曆日的分數差絕對值分類。</p>
+  <div class="r15-scroll"><table aria-label="每日分數變化研究參考區間">
+   <thead><tr><th scope="col">單日分數變化</th><th scope="col">參考意義</th></tr></thead>
+   <tbody id="r15-reference-rows"><tr><td>±0～1分（含1）</td><td>一般波動</td></tr>
+    <tr><td>超過±1～3分（含3）</td><td>值得觀察</td></tr>
+    <tr><td>超過±3～5分（含5）</td><td>明顯變化，檢查原因</td></tr>
+    <tr><td>超過±5分</td><td>重大變化，優先調查</td></tr></tbody>
+  </table></div>
+  <p class="r15-notice">若分數連續多日下降，請同步檢查信用利差、VIX、流動性與景氣指標。單日變動幅度尚不足以判定熊市將來臨；這些觀察不自動改動原有評分、CAP或配置門檻。</p>
+  <details><summary style="cursor:pointer;font-weight:700;margin-top:16px">展開15日每日分數與變化明細</summary>
+   <div class="r15-scroll"><table aria-label="15日每日分數明細"><thead><tr><th scope="col">日期（台灣）</th><th scope="col">體質分</th><th scope="col">較昨日</th><th scope="col">研究參考</th><th scope="col">紀錄</th></tr></thead><tbody id="r15-rows"></tbody></table></div>
+  </details>
+ </div>
+</section>
+<script id="v703-daily-history" type="application/json">{"schema":"V70.3/daily-observation-v1","archiveThrough":"2026-11-05","rows":[{"date":"2026-10-19","score":54.423,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-19T15:54:46.349219Z","recordId":"2d867ddaa66889189e9c3343f68a4ea7f53e50aaeb93edea8ab432c68fe852c3","sourceCommit":"e770f31b80e6dd09e2a73a170f6a29db4a8e4005","kind":"archive"},{"date":"2026-10-20","score":54.588,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-20T03:23:03.720004Z","recordId":"79b18cc42509fbcf142ba9af1a3d727d4d70f056e02e0127604e4fce18fff48d","sourceCommit":"2498cbef51d651982a14e391c7a81e40ee0ea8ab","kind":"archive"},{"date":"2026-10-21","score":55.431,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-21T03:24:04.096522Z","recordId":"21401122e9f905d71fd36d8894815d5b7130785c28b831acef38f5cb972ca8b1","sourceCommit":"4b83c4863e40ad6116c7d4e51b4653d27fe633b0","kind":"archive"},{"date":"2026-10-22","score":57.196,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-22T10:30:55.784753Z","recordId":"583b4c6abe290ed70ff5f855fe1b184abb725e3fc9522d2720bcfdc0cb3aa578","sourceCommit":"a766fcfb8ef60e308aec50d9b14e19d2a9598703","kind":"archive"},{"date":"2026-10-24","score":55.255,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-24T13:41:39.106036Z","recordId":"15094a22693cfdeaa166904e9bf58bcc25c0ff4cb33a684e05ad3ab9df4f1e6c","sourceCommit":"3bcac532f2d3712f06592df3fe9ed5fe4932091a","kind":"archive"},{"date":"2026-10-25","score":55.255,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-25T03:21:26.982476Z","recordId":"9de89fc4a00c36791940fb268ca2fb59785cc40e815769df22c06a7427f9be9f","sourceCommit":"53977b37e5330e11db3f9624a2f2b47a9432ae49","kind":"archive"},{"date":"2026-10-26","score":55.195,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-26T06:15:25.082732Z","recordId":"86fe3cce6173f84ffaed800b03c330e17f7433ad764fcc632c3659c6c3111325","sourceCommit":"37975284fb714809746e9feb2c18311f61dc5c59","kind":"archive"},{"date":"2026-10-27","score":55.171,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-27T03:25:44.047438Z","recordId":"87d8c51dc7e4e1fabf57119afd6c147fd6bc0f38a74a8a0e68691377c04acb6a","sourceCommit":"dcf9b97358a5d3415200f5f914a7bc03deead8f9","kind":"archive"},{"date":"2026-10-28","score":56.564,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-28T03:33:52.045535Z","recordId":"b7ebebbc3c33ff7475cd4b76726d693f2e32d5d4bef938dd416aadbcafc2b9ca","sourceCommit":"a7549a0e2e8919f9e0bb35de71df918ba1bc0e6e","kind":"archive"},{"date":"2026-10-29","score":58.914,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-29T03:37:21.790085Z","recordId":"f0ced6784a52e26c0b8a3d26994b618421c5f936c283a498f4398f107f35c04f","sourceCommit":"6b595f03a1ae2003c3b66aeb98ce7994f06c0bb8","kind":"archive"},{"date":"2026-10-30","score":60.479,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-30T03:37:20.352024Z","recordId":"f418f08f2105a2b6567ef10b97bb399d0c5f1efda407d822c2f8b8b75a43a25a","sourceCommit":"ce99cb280925840553926b5c5d0fd6dbc67d7c4e","kind":"archive"},{"date":"2026-10-31","score":59.081,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-10-31T03:35:41.146196Z","recordId":"6063b1f4f441d19b9dc4885c80ecf3c4fc03105373358af62c962c9e008e750f","sourceCommit":"6576356fb0c641aa93664f2979238ece11ae81a3","kind":"archive"},{"date":"2026-11-03","score":59.167,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-11-03T03:41:34.342685Z","recordId":"00af4ca4fa13c1dbd3c8d17be6c1873b9d05523638cb454ce4875e5a5616fcaa","sourceCommit":"6d33d0086d1fcae01d265c47e5d986e176582a41","kind":"archive"},{"date":"2026-11-04","score":58.496,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-11-04T03:53:14.408509Z","recordId":"fcb136d57e48d277b5be6ad2a008ddbd3f01edc40ba79f7601fcd15e1a6b6b0d","sourceCommit":"98953d98a0fafbf0ff9b77a9555b709baf0315c6","kind":"archive"},{"date":"2026-11-05","score":62.715,"version":"V70.3-MULTI-RISK-20261013","feedAsOf":"2026-11-05T06:00:10.555564Z","recordId":"bef8efb611da861051666eb83cc918420e83f5f319d208970b28d9c913a47f96","sourceCommit":"86eb3026dbe12f8a02a5bff21854165f456f3db9","kind":"archive"}]}</script>
+<script id="v703-rolling15-code">
+(function(){
+ 'use strict';
+ const DAY=86400000, SCHEMA='V70.3/daily-observation-v1';
+ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function taipeiDate(value=new Date()){
+  const p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(value);
+  const v=t=>p.find(x=>x.type===t).value;return `${v('year')}-${v('month')}-${v('day')}`;
+ }
+ function validDate(s){return /^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s;}
+ function validRow(r){return r&&validDate(r.date)&&typeof r.score==='number'&&Number.isFinite(r.score)&&r.score>=0&&r.score<=100&&typeof r.version==='string'&&r.version.length>0&&Number.isFinite(Date.parse(r.feedAsOf))&&taipeiDate(new Date(r.feedAsOf))===r.date;}
+ function classify(delta){
+  if(!Number.isFinite(delta))return 'NA｜無相鄰日資料';
+  const n=Math.abs(delta);return n<=1?'一般波動':n<=3?'值得觀察':n<=5?'明顯變化，檢查原因':'重大變化，優先調查';
+ }
+ function makeWindow(payload,today,current=null){
+  if(!validDate(today))throw new Error('Invalid window date');
+  const byDate=new Map();
+  for(const row of payload?.schema===SCHEMA&&Array.isArray(payload.rows)?payload.rows:[]){
+   if(!validRow(row)||row.kind!=='archive')continue;
+   const prior=byDate.get(row.date);
+   if(!prior||Date.parse(row.feedAsOf)>=Date.parse(prior.feedAsOf))byDate.set(row.date,{...row});
+  }
+  if(validRow(current)&&current.date===today&&current.kind==='current'){
+   const prior=byDate.get(today);
+   if(!prior||Date.parse(current.feedAsOf)>Date.parse(prior.feedAsOf))byDate.set(today,{...current});
+  }
+  const end=Date.parse(today+'T00:00:00Z');
+  const rows=Array.from({length:15},(_,i)=>{
+   const date=new Date(end-(14-i)*DAY).toISOString().slice(0,10);
+   return byDate.get(date)||{date,score:null,kind:'missing'};
+  });
+  rows.forEach((r,i)=>{
+   const prev=rows[i-1];r.delta=Number.isFinite(r.score)&&Number.isFinite(prev?.score)&&prev.version===r.version?r.score-prev.score:null;
+   r.versionChanged=Number.isFinite(r.score)&&Number.isFinite(prev?.score)&&prev.version!==r.version;
+  });
+  const available=rows.filter(r=>Number.isFinite(r.score)),latest=available.at(-1)||null,first=available[0];
+  let declines=0;
+  if(latest){for(let i=rows.indexOf(latest);i>0&&rows[i].delta!==null&&rows[i].delta<0;i--)declines++;}
+  const versions=new Set(available.map(r=>r.version));
+  return {rows,latest,available:available.length,declines,mixedVersions:versions.size>1,
+   net:available.length>=2&&versions.size===1?latest.score-first.score:null,first};
+ }
+ let payload={schema:SCHEMA,rows:[]},historyError=false;
+ try{payload=JSON.parse(document.getElementById('v703-daily-history').textContent);if(payload.schema!==SCHEMA||!Array.isArray(payload.rows))throw new Error('schema');}catch(e){historyError=true;}
+ function currentRow(today){
+  const latest=window.v703Latest,batch=window.v703SourceBatch;
+  if(window.v703DemoMode===true||window.v703FeedVerified!==true||latest?.syntheticInputs===true||String(latest?.status||'').startsWith('DEMO_'))return null;
+  if(latest?.dataValidation?.allMacroValuesPresent!==true||latest?.dataValidation?.allDatesAndSourcesValid!==true||!batch?.asOf||!Number.isFinite(Date.parse(batch.asOf)))return null;
+  if(taipeiDate(new Date(batch.asOf))!==today||window.v703CanPublishFormalAllocation?.()!==true)return null;
+  return {date:today,score:latest.macroSafety,version:latest.ruleVersion,feedAsOf:batch.asOf,kind:'current'};
+ }
+ const fmt=x=>Number.isFinite(x)?x.toFixed(2):'NA',signed=x=>Number.isFinite(x)?(x>0?'+':'')+x.toFixed(2):'NA';
+ function chart(rows){
+  const x=i=>60+i*57,y=n=>278-n*2.28;
+  let s='<title id="r15-chart-title">最近15日總經體質分趨勢</title><desc id="r15-chart-desc">縱軸0至100分，橫軸為台灣日期；缺值斷線，完整數值見下方明細。</desc>';
+  for(let n=0;n<=100;n+=20){s+=`<line x1="60" y1="${y(n)}" x2="858" y2="${y(n)}" stroke="#334155" stroke-dasharray="4 6"/><text x="46" y="${y(n)+5}" text-anchor="end" fill="#a8b8cb" font-size="13">${n}</text>`;}
+  s+='<text x="60" y="25" fill="#a8b8cb" font-size="13">總經體質分（0–100）</text>';
+  let last=-1;const latest=rows.findLastIndex(r=>Number.isFinite(r.score));
+  rows.forEach((r,i)=>{
+   s+=`<text x="${x(i)}" y="308" text-anchor="middle" fill="#a8b8cb" font-size="12">${r.date.slice(5).replace('-','/')}</text>`;
+   if(!Number.isFinite(r.score)){s+=`<text x="${x(i)}" y="274" text-anchor="middle" fill="#64748b" font-size="11">NA</text>`;last=-1;return;}
+   if(last===i-1&&last>=0&&!r.versionChanged)s+=`<line class="r15-segment" x1="${x(last)}" y1="${y(rows[last].score)}" x2="${x(i)}" y2="${y(r.score)}" stroke="#60a5fa" stroke-width="3"/>`;
+   if(i===latest)s+=`<line x1="${x(i)}" y1="45" x2="${x(i)}" y2="278" stroke="#94a3b8" stroke-dasharray="3 4"/>`;
+   const label=r.date+'：'+fmt(r.score)+'分；'+(r.kind==='current'?'本頁合格計算':'已存檔快照');
+   s+=`<circle data-r15-index="${i}" tabindex="0" role="img" aria-label="${esc(label)}" cx="${x(i)}" cy="${y(r.score)}" r="${i===latest?6:4}" fill="#60a5fa" stroke="#0f172a" stroke-width="2"><title>${esc(label)}</title></circle>`;
+   if(i===latest)s+=`<text x="${x(i)}" y="${y(r.score)-14}" text-anchor="middle" fill="#bfdbfe" font-size="14" font-weight="700">${fmt(r.score)}</text>`;
+   last=i;
+  });
+  document.getElementById('r15-chart').innerHTML=s;
+ }
+ let lastKey='';
+ function render(){
+  const today=taipeiDate(),current=currentRow(today);
+  const state=makeWindow(payload,today,current),key=JSON.stringify(state)+historyError;
+  if(key===lastKey)return;lastKey=key;
+  const l=state.latest;
+  document.getElementById('r15-period').textContent=`觀察區間：${state.rows[0].date} ～ ${today}｜有效紀錄 ${state.available}/15 日｜每日存檔截至：${payload.archiveThrough||'尚無紀錄'}`;
+  const stat=(title,value,note)=>`<div class="r15-stat"><span class="r15-muted">${title}</span><strong>${esc(value)}</strong><span class="r15-muted">${esc(note)}</span></div>`;
+  document.getElementById('r15-stats').innerHTML=stat('最近有效體質分',fmt(l?.score),l?l.date+'｜'+(l.kind==='current'?'本頁合格計算，尚未存檔':'已存檔快照'):'區間內無紀錄')+
+   stat('較前一日變化',signed(l?.delta),l?classify(l.delta):'等待資料')+
+   stat('區間首末有效日變化',signed(state.net),state.first&&l?state.first.date+' → '+l.date:'至少需兩日紀錄')+
+   stat('連續下降',l?state.declines+'天':'NA','截至最近有效日；缺值／版本變更即中斷');
+  const notes=[];
+  if(historyError)notes.push('每日紀錄讀取失敗。');
+  if(!state.available)notes.push('本15日區間尚無合格紀錄，分數與變化保留NA。');
+  else{
+   notes.push('最近有效日 '+l.date+'：'+(l.versionChanged?'評分版本變更，不比較日變化':classify(l.delta))+'。');
+   if(l.date!==today)notes.push('今日尚無合格紀錄；以上為歷史快照。');
+   if(state.available<15)notes.push('缺少 '+(15-state.available)+' 日紀錄，缺值不補造。');
+   if(state.mixedVersions)notes.push('區間含不同評分版本，首末變化為NA，版本交界斷線。');
+  }
+  if(window.v703DemoMode===true)notes.push('示範模式不加入觀察紀錄。');
+  document.getElementById('r15-status').textContent=notes.join(' ');
+  document.getElementById('r15-rows').innerHTML=state.rows.map(r=>`<tr><th scope="row">${r.date}</th><td>${fmt(r.score)}</td><td>${signed(r.delta)}</td><td>${esc(r.versionChanged?'評分版本不同，暫不比較':classify(r.delta))}</td><td>${r.kind==='missing'?'無合格紀錄':r.kind==='current'?'本頁合格計算（未存檔）':'已存檔快照'}</td></tr>`).join('');
+  chart(state.rows);window.v703Rolling15.state=state;
+ }
+ window.v703Rolling15={makeWindow,classify,taipeiDate,render};
+ function start(){
+  render();
+  const svg=document.getElementById('r15-chart');
+  svg.parentElement.scrollLeft=svg.parentElement.scrollWidth;
+  const showPoint=event=>{
+   const target=event.target.closest('[data-r15-index]');if(!target)return;
+   const row=window.v703Rolling15.state.rows[Number(target.dataset.r15Index)];
+   document.getElementById('r15-point').textContent=row.date+'｜體質分 '+fmt(row.score)+'｜較昨日 '+signed(row.delta)+'｜'+classify(row.delta);
+  };
+  svg.addEventListener('click',showPoint);svg.addEventListener('focusin',showPoint);
+  const result=document.getElementById('v703-result');
+  if(result)new MutationObserver(render).observe(result,{childList:true,subtree:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});
+  setInterval(render,60000);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
+
 <section id="v703-family-profile" class="max-w-7xl mx-auto px-4 mt-5 mb-5" aria-label="家人版配置條件">
  <div class="rounded-2xl border border-cyan-700 bg-slate-800 p-5 shadow-lg">
   <h2 class="font-bold text-lg text-cyan-300 mb-2">🍎 家人版｜先選人生情境與投資風格</h2>

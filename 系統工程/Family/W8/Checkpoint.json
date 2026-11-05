@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T08:18:38Z",
+  "updated_at": "2026-11-05T08:46:23Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原 V82 Codex PR59持續所有合法PIT/qP/qV與現金/SGOV/ledger程式；Family中PM完成本輪Joseph IB source acquisition/true split proofs、接續來源及獨立QA",
-  "next_action": "原V82 Codex直接沿現有價格basis/Corporate Action契約消費Joseph新7檔IB5年行情與Massive獨立raw來源；SOXX2026/11/05 3:1、IBKR2025 4:1須正確避免跨源混價。隨後續PIT/qP/qV→同輪NAV/SGOV/settled/未結委託→C7B/ledger→Work9；中PM維持獨立驗收及家人4x14端到端工序。",
+  "next_owner": "原 V82 Codex PR59唯一Writer續M1最小修改與原金融主鏈；Family中PM驗收新增量/同步管理；A線正式docx由原文件Owner依最新Owner核准同步。",
+  "next_action": "依PR59留言#6653634352，在Family/W8 approved_v04_technical.py修改M1為LowTD==9（持續9得1票）；精確測C1~C6與完整CI，回交中PM稽核，沿原PIT/qP/qV及同輪金融主鏈續工。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3558,5 +3558,66 @@
     "trade": "NONE",
     "data_usage_rule": "Do not mix raw and split-adjusted source values or double-adjust share quantities; original V82 source validation owns qualification and calculations",
     "scope": "PM read-only source acquisition; no original PR59 code changes; 4-household PRIVATE assets remain isolated"
+  },
+  "pm_owner_approved_m1_low_td9_scope_contract_20261105": {
+    "source": "Owner-approved handoff from V82 teaching master; independent AI甲/AI乙/DOT review context",
+    "state": "APPROVED_AND_CONTRACT_POSTED__AWAIT_ORIGINAL_CODEX_PR59_IMPLEMENTATION",
+    "priority": "latest owner approval overrides only original v1.0 TECH5.2 M1 LowTD5..9",
+    "origin_pr59_head": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
+    "exact_code_path": "系統工程/Family/W8/approved_v04_technical.py",
+    "code_line_at_verified_head": 298,
+    "verified_code_blob_sha": "fb94f8a3d5614cc4d51623e09fc3bce479c93fad",
+    "old": "None if td is None else td[1] in (5,6,7,8,9)",
+    "owner_approved": "None if td is None else td[1] == 9",
+    "semantics": "Known LowTD 0-8 FALSE; LowTD9 TRUE one vote, including post-9 maintained9; interrupted FALSE, high9 low0 FALSE, data missing UNKNOWN; canonical M1 single slot",
+    "preserve": [
+      "M2-M8 conditions",
+      "maturity 3-of-8 Kleene",
+      "low TD score and *4 values",
+      "Base/Left/Right/Trend",
+      "five Price Map levels / nine cumulative stages",
+      "Left IMMATURE15% MATURE25%",
+      "Hard Gate / Runaway Down",
+      "cash/NAV/SGOV/committed/settlement/day slice",
+      "Right independent criteria",
+      "A/B/C and PR60 code ownership"
+    ],
+    "relevant_test_paths": [
+      "系統工程/Family/W8/tests/test_approved_v04_technical.py",
+      "系統工程/Family/W8/tests/test_approved_v04_numeric.py",
+      "系統工程/Family/W5/tests/test_v10_daily_slice.py"
+    ],
+    "read_only_owner_refs": [
+      "系統工程/Family/W8/approved_v04_numeric.py",
+      "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+      "系統工程/股票V80/文件歸檔/V82_v1.0_正式實作/V82_Three_Layer_Quant_Rules_Formal_Implementation_v1.0.docx"
+    ],
+    "tests_required": [
+      "LowTD 0..8 false, 9 and continuing9 true, reset/high9 false, insufficient history unknown",
+      "M1 TRUE + two other TRUE => MATURE Left25%",
+      "M1 FALSE + two TRUE => IMMATURE Left15% (under fully known other false slots)",
+      "M1 FALSE + three other TRUE => MATURE Left25%",
+      "M1 UNKNOWN + two TRUE => UNKNOWN, with three TRUE => MATURE",
+      "full W5/W8 6CI, all four households 42 assets replay, existing pass preservation"
+    ],
+    "private_spec_doc_id": "1V1k-zz76exzDS7SQdBZ1NicQxQHaizlTX46qoUYEqpU",
+    "private_spec_doc_folder": "Google Drive root/TEMP",
+    "github_codex_contract": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6653634352",
+    "shared_formal_source_policy": "V82 v1.0 TECH5.2 M1 older 5-9 superseded by latest Owner amendment; original A-owned formal archive docx synchronized by its owner only with backup/versions, no Family writer crossover",
+    "code_writer": "Original V82 Codex sole PR59 writer; no coding committed by middle PM",
+    "pm_owner": "Family中PM: PM governance and independent post-delivery QA",
+    "acceptance": "PENDING_INCREMENTAL_QA",
+    "existing_scoped_pass_preserved": true,
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE",
+    "backups": {
+      "engineering": "1dBAd_xBJwv0P3FUnmdb4FiCgHTx-rm_Zn_26v12ZvgA",
+      "files": "1xlhJEjxEuxYp2Qpqzq1h5FCsmtNuAslvSMBYla4xciU",
+      "wbs": "1157_cHSfHyQ3_d2ldxjjFy9FThXYtvHYn-X6UFkcoHY"
+    }
   }
 }

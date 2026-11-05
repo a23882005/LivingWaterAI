@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T08:08:06Z",
+  "updated_at": "2026-11-05T08:18:38Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原 V82 Codex PR59 施工／Family中PM 對帳與獨立驗收；報表PR60既有SOURCE_REVIEW成果維持",
-  "next_action": "原Codex接收中PM新的Joseph IB私有來源、VT 5年IB與Massive 501條合法行情觀察及工具真實時間收據；依正式原有來源門檻完成PIT/qP/qV→全戶NAV/結算/SGOV/委託→C7B→ledger，Family中PM續獨立QA及四戶56格E2E、Gate D/Trial/Gate E。",
+  "next_owner": "原 V82 Codex PR59持續所有合法PIT/qP/qV與現金/SGOV/ledger程式；Family中PM完成本輪Joseph IB source acquisition/true split proofs、接續來源及獨立QA",
+  "next_action": "原V82 Codex直接沿現有價格basis/Corporate Action契約消費Joseph新7檔IB5年行情與Massive獨立raw來源；SOXX2026/11/05 3:1、IBKR2025 4:1須正確避免跨源混價。隨後續PIT/qP/qV→同輪NAV/SGOV/settled/未結委託→C7B/ledger→Work9；中PM維持獨立驗收及家人4x14端到端工序。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3502,5 +3502,61 @@
     "trade": "NONE",
     "original_writer": "V82 Codex PR59; unchanged",
     "public_handoff": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6652932141"
+  },
+  "pm_joseph_ib_6_more_assets_split_basis_20261105": {
+    "status": "PM_PUBLIC_MARKET_OBSERVATION_AND_ISSUER_SPLIT_BASIS_VERIFIED",
+    "asset_symbols": [
+      "NVDA",
+      "PPH",
+      "QQQ",
+      "SOXX",
+      "SGOV",
+      "IBKR"
+    ],
+    "IB_extra_assets_daily_bars": 7518,
+    "IB_extra_corporate_action_records": 166,
+    "total_with_VT_daily_bars": 8771,
+    "total_with_VT_corporate_action_records": 186,
+    "exchange_calendar_check": "6 assets 1253/1253 each, zero missing sessions",
+    "IB_OHLC_invalid_counts": {
+      "NVDA": 3,
+      "PPH": 42,
+      "QQQ": 4,
+      "SOXX": 16,
+      "SGOV": 32,
+      "IBKR": 0
+    },
+    "split_basis_proof": [
+      {
+        "ticker": "SOXX",
+        "effective": "2026-11-05",
+        "split_ratio": "3:1",
+        "last_raw_presplit_close_on_2026_11_04": "450.41",
+        "IB_history_adjusted_close_on_2026_11_04": "150.13666666666668",
+        "issuer_source": "https://www.sec.gov/Archives/edgar/data/1100663/000119312526361162/d133118d497.htm"
+      },
+      {
+        "ticker": "IBKR",
+        "effective": "2025-06-18",
+        "split_ratio": "4:1",
+        "raw_presplit_close_on_2025_06_17": "208.17",
+        "IB_history_adjusted_close_on_2025_06_17": "52.0425",
+        "company_source": "https://investors.interactivebrokers.com/mkt/getSecFiling.php?date_added=2025-05-08+08%3A56%3A51.252628&id=101"
+      }
+    ],
+    "private_source_filenames": [
+      "Family_PM_PR59_Joseph_IB持股6標的_五年日K與公司行動原件_批次1_20261105",
+      "Family_PM_PR59_Joseph_IB持股6標的_五年日K與公司行動原件_批次2_20261105"
+    ],
+    "private_report_filename": "Family_PM_PR59_Joseph_IB與VT行情_實測來源驗證及Codex交接_20261105",
+    "public_codex_handoff": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6653133751",
+    "origin": "IB read-only public historical quotes, Massive adjusted=false split comparison",
+    "formal_PIT_qP_qV_completed": 0,
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "data_usage_rule": "Do not mix raw and split-adjusted source values or double-adjust share quantities; original V82 source validation owns qualification and calculations",
+    "scope": "PM read-only source acquisition; no original PR59 code changes; 4-household PRIVATE assets remain isolated"
   }
 }

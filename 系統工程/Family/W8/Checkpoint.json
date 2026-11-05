@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T19:14:53.687Z",
+  "updated_at": "2026-11-05T19:50:45.728Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3817,5 +3817,67 @@
     "approval_scope": "OWNER_APPROVED_FAMILY_SOURCE_GUARD_AND_TEST_REPAIR_ONLY",
     "next_owner": "Original V82 Codex PR59 sole writer for lawful PIT/qP/qV, same-run NAV/settled/SGOV/pending, C7B/schema83, CycleLedger, Work9/Mentor",
     "middle_pm_next": "independent QA next financial delta; four-household 56 case E2E; Gate D; four projects; Trial; Gate E"
+  },
+  "pm_v70_15tradingday_visual_upstream_handover_20261106": {
+    "owner": "V70 Codex: upstream web UI/HTML/10 Tasks; Family中PM: Family dependency version tracking only",
+    "status": "UPSTREAM_DISPLAY_UPDATE_VERIFIED__FAMILY_VERSION_DIFFERENCE_RECORDED__NO_FAMILY_CODE_CHANGE",
+    "accepted_handover_taipei": "2026/11/06 03:50",
+    "upstream_commits": {
+      "source_visual": "7b124cc05d8911c39d823f5d3f04752e38583d81",
+      "final_announcement": "b8a145e1dd01b0ad0836f026ba51c4eb66a1c3a0"
+    },
+    "github_main_source": {
+      "path": "系統工程/總經V70/V70-3-27.html",
+      "git_blob_sha": "d3db0dd506207f451d57476965f8610892fafeac",
+      "includes_15tradingday_responsive_monotone_chart": true
+    },
+    "github_notice_path": "系統工程/總經V70/跨專案正式通知_V70-3-27.md",
+    "github_daily_update_procedure": "系統工程/總經V70/每天總經及html更新程序.md",
+    "deployed_drive_html": {
+      "file_id": "1kWdpjQgfrYZYcHyMrN1BpNxcKvXqnUz7",
+      "folder": "Google Drive root/系統工程/總經V70",
+      "file_name": "V70-3-27.html",
+      "bytes": 358754,
+      "sha256": "eb0fa123c1b33316b4a486a8f4839682453c21175987e13d2ca9d915f696094c",
+      "readback": "downloaded SHA256 matches 2026-11-05 upstream deployment announcement"
+    },
+    "actions": {
+      "site_deploy_41995180104": "build-and-deploy success",
+      "browser_regression_41995179932": "2 jobs success",
+      "gmail_notice_41995413787": "email-result-report success (secondary email-connection-test skipped)"
+    },
+    "display_contract": "15 latest completed XNYS sessions, exclude weekends/holidays, respect early closing and DST, last qualifying snapshot per session, keep missing trading-session explanation without imputing; phone 320/390/768 full window; remove 660px min/plot horizontal scroll; small nodes/tilted dates; resized responsive; monotone cubic Hermite through original values without overshoot; table remains independently scrollable; no change score/CAP/allocation/V82/V75",
+    "data_in_announcement": "2026-11-05 observation 13 qualifying of 15 completed trading sessions; 16 relevant tests PASS",
+    "family_w8_runtime": {
+      "frozen_pr59_head_at_audit": "6d7f224dd223ab8a92af23eeac9aa4e97ae87d61",
+      "file": "系統工程/Family/W8/v70_original_runtime.cjs",
+      "reads": "repo_root/系統工程/總經V70/V70-3-27.html and V70_macro_latest.json with SHA gate",
+      "pinned_older_v70_git_blob": "d45ba53a272bcc98e9a0e1618a38d7fe5daa856d",
+      "pinned_older_does_not_contain_new_rolling15_chart": true,
+      "source_alignment_status": "VERSION_DIFFERENCE_LOGGED__REVIEW_ONLY_ON_FORMAL_FAMILY_INTEGRATION__NO_UNAPPROVED_AUTO_REPLACE"
+    },
+    "website_live_fetch_this_turn": "UNVERIFIED_DIRECT_HTTP__PUBLIC_FETCH_CACHE_MISS; verified upstream GitHub Actions and announced deployment receipt",
+    "v70_zip": "V70-3-27_15日滾動觀察_程式與圖表_20261105.zip (claimed by V70 Codex); corresponding accessible File ID not found in official V70 Drive folder in current search; ask original V70 owner if artifact needed",
+    "tasks": "V70 owner reports 10 related Tasks notified with 4 enabled/6 paused; Family PM did not alter tasks",
+    "governance": {
+      "family_construction_doc": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "family_file_management_doc": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "family_wbs_doc": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "backups": [
+        "16O7NJZKRH1iCK8MIDIkIfvXppBQ3qxrNFNC3Tda_DB8",
+        "1ZOaNxHllPI99Oe2RSoSfAK8SoNy26ohUwaK8BtGdB_o",
+        "1xfrqUqfHdtNC3pPQbAQ4DKYBIqvyvr8vB2D_tQ07iiA"
+      ]
+    },
+    "inherited_family_status": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "previous_scoped_pass": "PRESERVED",
+      "full_finance_pass": 0,
+      "real_cycle": 0,
+      "production": "HOLD",
+      "trade": "NONE"
+    },
+    "next_owner": "Family中PM keeps version ledger; V70 Owner retains UI/source authority; PR59 only writer if later specifically authorized Family source-refresh delta"
   }
 }

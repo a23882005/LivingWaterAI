@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T07:08:33Z",
+  "updated_at": "2026-11-05T08:08:06Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "原 V82 Codex：PR59 唯一施工者；Family中PM：四戶真實金融來源、獨立驗收、工程與檔案治理；報表 PR60 既有分段結案待金融合格後再發工單",
-  "next_action": "PR59 沿 qP/qV/PIT→同輪 NAV/已結算/SGOV/未結委託→C7B/schema83→日切片/帳本→Work9/Mentor 續工；中PM獨立驗下一版與四戶56項 E2E，Gate D→Trial→Gate E。PR60來源回顧 PASS 保留，金融合格後再整合。",
+  "next_owner": "原 V82 Codex PR59 施工／Family中PM 對帳與獨立驗收；報表PR60既有SOURCE_REVIEW成果維持",
+  "next_action": "原Codex接收中PM新的Joseph IB私有來源、VT 5年IB與Massive 501條合法行情觀察及工具真實時間收據；依正式原有來源門檻完成PIT/qP/qV→全戶NAV/結算/SGOV/委託→C7B→ledger，Family中PM續獨立QA及四戶56格E2E、Gate D/Trial/Gate E。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3451,5 +3451,56 @@
     "pr60_scope": "CLOSED_SCOPE",
     "governance": "Independent QA documented on Drive and PR59 comment",
     "next_action": "Original Codex continues legal qP/qV/PIT and same-run real finance; PM validates real sources, next delta and E2E."
+  },
+  "pm_real_ib_vt_source_observation_20261105": {
+    "scope": "Family middle PM read-only qualified-source candidate acquisition and independent original W8 price reader probe",
+    "status": "PM_SOURCE_OBSERVATIONS_RECEIVED_AND_ORIGINAL_MARKET_READER_PASS",
+    "primary_report": "Google Drive root/TEMP/Family_PM_PR59_Joseph_IB與VT行情_實測來源驗證及Codex交接_20261105",
+    "private_source_documents": [
+      "Family_PM_PR59_Joseph_IB_真實持倉現金委託唯讀原件_20261105",
+      "Family_PM_PR59_VT_IB5年與Massive日K配息交叉查證_20261105",
+      "Family_PM_PR59_VT_Massive已簽來源時間及501日K_20261105"
+    ],
+    "source_scope": "Joseph IB account only, private broker data must not enter public repository or other family finance",
+    "VT_public_market_evidence": {
+      "IB_regular_daily_sessions": 1253,
+      "IB_cash_dividend_events": 20,
+      "Massive_original_adjusted_false_completed_bars": 501,
+      "overlapping_close_exact": "501/501",
+      "overlapping_exdividend_payout_exact": "20/20",
+      "independent_XNYS_sessions_exact": "1253/1253",
+      "IB_OHLC_outside_high_low_count": 9,
+      "provider_open_high_low_volume_not_interchangeable": true,
+      "raw_source_capture_receipt": "Actual Massive tool query start and end timestamps and immutable returned CSV captured in private Drive"
+    },
+    "original_runtime_test": {
+      "code_sha": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
+      "read_entry": "系統工程/Family/W8/member_market_source.py:read_market -> massive_daily_source.load",
+      "asset_id": "VT",
+      "symbol": "VT",
+      "observed_date": "2026-11-04",
+      "read_bars": 501,
+      "invalid_source_rows": 0,
+      "discarded_before_last_gap": 0,
+      "price_basis": "RAW_UNADJUSTED_PROVIDER_OHLC__NOT_PIT_WEALTH",
+      "formal_deployment_eligible": false,
+      "decision": "PASS_OBSERVATION_ONLY"
+    },
+    "financial_source_status": "Joseph IB current broker snapshot acquired as private observation; requires same-time and owner/settlement/order/position reconciliation, and historical publication, corporate actions and same-primary qV before formal financial release.",
+    "broker_actions": 0,
+    "official_DB_mutated": false,
+    "ledger_mutated": false,
+    "strategy_changes": 0,
+    "PR59_program_changes": 0,
+    "PR60_changes": 0,
+    "formal_qP_qV_COMPLETE": 0,
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "production": "HOLD",
+    "trade": "NONE",
+    "original_writer": "V82 Codex PR59; unchanged",
+    "public_handoff": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6652932141"
   }
 }

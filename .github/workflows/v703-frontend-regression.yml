@@ -37,6 +37,11 @@ jobs:
           python -m py_compile scripts/build_daily_v703_site.py scripts/send_action_gmail_report.py
           python -m unittest discover -s tests -p 'test_v703_monthly_release.py' -v
           python -m unittest discover -s tests -p 'test_v703_failure_mail.py' -v
+          python -m pip install --disable-pip-version-check -q requests
+          # Browser QA uses independently refreshed real evidence in its own workspace.
+          # It never pushes or deploys; source failures still fail the test.
+          python scripts/refresh_v703_predeploy.py
+          python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
           python scripts/build_daily_v703_site.py --html '系統工程/總經V70/V70-3-27.html' --out build/site
           python - <<'PY'
           import json

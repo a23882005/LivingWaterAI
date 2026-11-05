@@ -5,6 +5,8 @@ on:
   # Legacy 11h cron migrated to v703-site-deploy-1100.yml; manual dispatch retained.
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - '.github/workflows/update-v70.yml'
       - '系統工程/總經V70/總經爬蟲程式16項.py'
@@ -26,6 +28,7 @@ concurrency:
 
 jobs:
   macro24:
+    if: github.ref == 'refs/heads/main'
     # V70.3 daily macro 8+16: verify published data first; Hostinger deployment requires independently validated credentials and rollout gate.
     runs-on: ubuntu-latest
     timeout-minutes: 45

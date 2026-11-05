@@ -1,3 +1,3 @@
 snapshot_month,snapshot_date,source_daily_observation_date,health_score,previous_snapshot_date,previous_health_score,elapsed_months,delta_points,slope_points_per_month,sp500_start_date,sp500_start_close,sp500_forward_end_date,sp500_forward_end_close,sp500_forward_3m_return_pct,return_status,score_status,neutral_imputed_items,run_timestamp_utc,source_commit
 2026-10,2026-10-19,2026-10-19,54.423,,,,,,,,,,,SOURCE_PENDING,FORMAL_VALID,,2026-10-19T15:55:48Z,e770f31b80e6dd09e2a73a170f6a29db4a8e4005
-2026-11,2026-11-05,2026-11-05,62.715,2026-10-19,54.423,0.5483871,8.292,15.12070588,,,,,,SOURCE_PENDING,FORMAL_VALID,,2026-11-05T06:01:21Z,86eb3026dbe12f8a02a5bff21854165f456f3db9
+2026-11,2026-11-05,2026-11-05,62.745,2026-10-19,54.423,0.5483871,8.322,15.17541176,,,,,,SOURCE_PENDING,FORMAL_VALID,,2026-11-05T07:23:02Z,506fd4583a0bd405721eced0e1f01bf2f0f9fe95

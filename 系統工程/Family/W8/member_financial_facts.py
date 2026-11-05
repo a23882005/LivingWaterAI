@@ -121,6 +121,45 @@ def broker_observations(request, descriptor):
     calls = {}; failures = []; references = []
     methods = dict(positions='get_account_positions', balances='get_account_balances',
                    summary='get_account_summary', orders='get_account_orders', trades='get_account_trades')
+    pm_quality=None
+    if manifest.get('pm_document_source') is not None:
+        from pm_source_document import account
+        if manifest.get('calls') or manifest.get('member_scope')!='Joseph':
+            raise PermissionError('MEMBER_PM_BROKER_SINGLE_ORIGINAL_AND_RECIPIENT_REQUIRED')
+        calls,original=account(manifest['pm_document_source'],manifest['available_at'])
+        references=[deepcopy(manifest['pm_document_source'])]
+        positions=calls['positions'].get('positions');balances=calls['balances'].get('balances')
+        if not isinstance(positions,list) or not isinstance(balances,list):
+            raise ValueError('MEMBER_PM_BROKER_ORIGINAL_POSITIONS_AND_BALANCES_REQUIRED')
+        gross=calls['summary'].get('gross_position_value');nav=calls['summary'].get('net_liquidation')
+        selected=[b for b in balances if b.get('currency')=='USD']
+        if len(selected)!=1:raise ValueError('MEMBER_BROKER_CASH_CURRENCY_AMBIGUOUS')
+        contract_ids=[]
+        for row in positions:
+            contract=row.get('contract_id')
+            if (type(contract) is not int or contract<=0 or row.get('currency')!='USD'
+                or row.get('asset_class')!='STK' or not row.get('contract_description')):
+                raise PermissionError('MEMBER_PM_BROKER_POSITION_IDENTITY_OR_CURRENCY')
+            contract_ids.append(contract)
+            for key in ('position','market_price','market_value'):number(row.get(key))
+        if len(contract_ids)!=len(set(contract_ids)):raise ValueError('MEMBER_PM_BROKER_DUPLICATE_CONTRACT')
+        value=sum((Decimal(number(r['market_value'])) for r in positions),Decimal(0))
+        balance=selected[0];cash=Decimal(number(balance['settled_cash']))
+        pm_quality=dict(original_captured_at=original['retrieved_at_utc'],client_scope=original['client_scope'],
+            original_finance_eligibility=original['finance_eligibility'],
+            position_market_value_sum=str(value),broker_gross_position_value=number(gross),
+            position_sum_minus_broker_gross=str(value-Decimal(number(gross))),
+            broker_NAV_observation=number(nav),position_sum_plus_cash_minus_NAV=str(value+Decimal(number(balance['cash_balance']))-Decimal(number(nav))),
+            cash_total_observation=number(balance['cash_balance']),settled_cash_observation=str(cash),
+            negative_settled_cash=cash<0,BASE_is_not_additional_account=True,
+            source_numbers_preserved_as_decimal_spellings=True,qualifies_complete_portfolio_NAV=False,
+            quantities_adjusted_again=False,orders_complete=False,owner_and_same_cutoff_qualified=False,
+            SGOV_role_confirmation_created=False,old_database_positions_overwritten=False)
+        observed_symbols={r['contract_description'].split()[0] for r in positions}
+        trades=calls['trades'].get('trades');orders=calls['orders'].get('orders')
+        if not isinstance(trades,list) or not isinstance(orders,list):raise ValueError('MEMBER_PM_BROKER_ORIGINAL_TRADES_AND_ORDERS_REQUIRED')
+        pm_quality['trade_symbols_without_exact_position_symbol']=sorted({r['symbol'] for r in trades}-observed_symbols)
+        pm_quality['trade_listing_aliases_merged']=False
     for name, item in manifest.get('calls', {}).items():
         if name not in methods:
             raise PermissionError('MEMBER_BROKER_OBSERVATION_METHOD_REQUIRED')
@@ -155,16 +194,19 @@ def broker_observations(request, descriptor):
     orders = calls.get('orders', {}).get('orders')
     trades = calls.get('trades', {}).get('trades')
     unresolved = [deepcopy(r) for r in orders or [] if r.get('order_status') == 'REPLACED']
-    return dict(source_descriptor=deepcopy(descriptor), original_call_references=references,
+    result=dict(source_descriptor=deepcopy(descriptor), original_call_references=references,
                 owner_binding='UNVERIFIED_CONNECTION_OBSERVATION', provider_snapshot_as_of=None,
                 capture_is_not_provider_snapshot_time=True, cash_observations=cash,
                 positions=deepcopy(positions), orders=deepcopy(orders), trades=deepcopy(trades),
-                trade_query=deepcopy(manifest.get('calls', {}).get('trades', {}).get('arguments')),
+                trade_query=({'period':'DAYS_30'} if pm_quality is not None else
+                    deepcopy(manifest.get('calls', {}).get('trades', {}).get('arguments'))),
                 summary_observations=deepcopy(calls.get('summary')), provider_failures=failures,
                 replaced_orders_requiring_successor_or_release=unresolved,
                 pending_exposure=None, orders_complete=False, complete_NAV=None,
                 qualified_available_cash=None, margin_funds_used_as_cash=False,
                 replacement_release_inferred=False)
+    if pm_quality is not None:result['PM_document_reconciliation_quality']=pm_quality
+    return result
 
 
 def produce(request, normalized, broker_source=None):

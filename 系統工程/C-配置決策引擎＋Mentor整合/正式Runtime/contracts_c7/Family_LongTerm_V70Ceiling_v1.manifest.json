@@ -105,7 +105,7 @@
     },
     {
       "path": "../../Family/W8/member_market_source.py",
-      "sha256": "b9dc8bea3da3101095597bf4631eb89e14bf4305ba6d6657fc89255302cfef6c"
+      "sha256": "3cacf2591d03a066fbe0ad3fe36987cd2d5999b5fc139155e77c88db32b99dee"
     },
     {
       "path": "../../Family/W8/all_asset_coverage.py",
@@ -145,7 +145,7 @@
     },
     {
       "path": "../../Family/W8/historical_source_qualification.py",
-      "sha256": "3bcd35f80d3b9b7151141a1e3f4711a0f398e2735ef1bdcfecbd37bfa6175af3"
+      "sha256": "fc6b27adfa239863108ca520560603758c594552949a963817ec246f8fc426ae"
     },
     {
       "path": "../../Family/W5/mentor_bridge.py",
@@ -197,7 +197,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_facts.py",
-      "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
+      "sha256": "9dd4bb4cd4372299dc4486bf05a16b640be9603b2fe9e888b7d6ed6cfd0ed2e6"
     },
     {
       "path": "../../Family/W8/twse_own_history_source.py",
@@ -218,6 +218,14 @@
     {
       "path": "../../Family/W8/sgov_confirmed_units.py",
       "sha256": "304530ba558a2bb2c48b3b735e97035de0dfa82ba0efa2800093be0fa82e711e"
+    },
+    {
+      "path": "../../Family/W8/pm_source_document.py",
+      "sha256": "10cff9a63903abb2625762fffa9a1b1ea150e305e1996065752e8e299abe249a"
+    },
+    {
+      "path": "../../Family/W8/ibkr_daily_source.py",
+      "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211"
     }
   ]
 }

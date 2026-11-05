@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "366d5ae0ae5fdca668a8f92990260969e5fb9167ac87e7a45dd2b4641d36f17d"
+    "sha256": "b34e7e7eeea72e38b9bb6feebbd8bd0d3f2833f0d6a438eef27d3b50deb215bd"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -491,7 +491,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
-    "sha256": "b9dc8bea3da3101095597bf4631eb89e14bf4305ba6d6657fc89255302cfef6c"
+    "sha256": "3cacf2591d03a066fbe0ad3fe36987cd2d5999b5fc139155e77c88db32b99dee"
   },
   {
     "path": "系統工程/Family/W8/all_asset_coverage.py",
@@ -527,7 +527,7 @@
   },
   {
     "path": "系統工程/Family/W8/historical_source_qualification.py",
-    "sha256": "3bcd35f80d3b9b7151141a1e3f4711a0f398e2735ef1bdcfecbd37bfa6175af3"
+    "sha256": "fc6b27adfa239863108ca520560603758c594552949a963817ec246f8fc426ae"
   },
   {
     "path": "系統工程/Family/W8/massive_daily_source.py",
@@ -539,7 +539,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_facts.py",
-    "sha256": "b3df144b0a92554aedbf7587920a774ad837127885854537d7801d5582d91902"
+    "sha256": "9dd4bb4cd4372299dc4486bf05a16b640be9603b2fe9e888b7d6ed6cfd0ed2e6"
   },
   {
     "path": "系統工程/Family/W8/twse_own_history_source.py",
@@ -575,5 +575,15 @@
     "path": "系統工程/Family/W8/v75_native_attempt.py",
     "sha256": "6a197d4450849664fa52ed986537a77aa13dfe531433a1f500f5501463e81edf",
     "reason": "PR59 SGOV 原確認版本、實體單位與既有 V75/C7 消費接線；不改核心/不釋放現金"
+  },
+  {
+    "path": "系統工程/Family/W8/pm_source_document.py",
+    "sha256": "10cff9a63903abb2625762fffa9a1b1ea150e305e1996065752e8e299abe249a",
+    "reason": "PR59 PM原件、IB Last日K及本人帳戶觀察接線；不改原生規則、不釋放金融資格"
+  },
+  {
+    "path": "系統工程/Family/W8/ibkr_daily_source.py",
+    "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211",
+    "reason": "PR59 PM原件、IB Last日K及本人帳戶觀察接線；不改原生規則、不釋放金融資格"
   }
 ]

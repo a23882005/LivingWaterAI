@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T20:33:50.048Z",
+  "updated_at": "2026-11-05T20:53:57.958Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -983,8 +983,8 @@
     "trading": "NONE",
     "android_ios_device_uat": "DEFERRED"
   },
-  "next_owner": "Family中PM新對話接任（4戶全案總PM）：先獨立驗 PR59 af16a9d 新增量；原V82 Codex維持PR59唯一程式Writer並完成Owner新核准M1 LowTD==9，報表PR60不重工",
-  "next_action": "依Google Drive root/TEMP H4三ZIP先讀ZIP1/00_給新對話_先讀我.txt再ZIP2/3。中PM獨立驗af16a9d 2commits/10files, code+evidence originals with SHA/CRC/restore/135 targeted and 6 FamilyCI; next qa M1 single clause and C1-C6；金融正本→全NAV→ledger→Work9；PM 4家56格/ GateD/Trial/GateE。",
+  "next_owner": "Family中PM新對話接任四戶總PM，原V82 Codex維持PR59唯一程式Writer",
+  "next_action": "讀Drive/TEMP H5 ZIP1→ZIP2→ZIP3與最新治理/Checkpoint；核PR59 live HEAD對218ce4a已驗版，僅驗新增量。原Codex續合法PIT/qP/qV與同輪NAV/settled/SGOV/pending至C7B/schema83→CycleLedger→Work9/Mentor，中PM獨立QA並完成四戶56項E2E→Gate D→Trial→Gate E。",
   "execution_mode": "REAL_FAMILY_DATA_END_TO_END",
   "owner_decision_20261025": {
     "instruction": "W8以四戶真實Drive/DB為唯一正式驗收，全部十四項應實際能讀、能修改、能保存、遠端讀回；持倉差異以指揮官最新截圖核對後修改本人正式DB；已有合成測試只留回歸輔助證據，不再以合成測試代替真實結果。",
@@ -3952,5 +3952,31 @@
     "pr_state": "DRAFT_UNMERGED",
     "next_code_writer": "Original V82 Codex PR59, PIT/action entitlement basis/SGOV difference/qP/qV/same cutoff NAV/settled/SGOV/pending, C7B/schema83 then CycleLedger Work9/Mentor",
     "middle_pm_next": "independent QA new finance delta, four households 56 E2E, GateD, Trial, GateE"
+  },
+  "pm_h5_handover_3zip_20261106": {
+    "status": "PRIVATE_DRIVE_3ZIP_VERIFIED",
+    "folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "zip_file_ids": [
+      "1wY2bd_6uQspqu-iKBv43UlHVnc0vVvgr",
+      "1bsAySFPPrFDag3MxOEpDjNTCxViuNwPb",
+      "1K4kXkIIMt-Jh9hKX3U-wikVAt8AMEtHT"
+    ],
+    "zip_sha256": [
+      "64bcd78a74f159355529574c4ca02e692fc32f98aecaf9595eb0d0a769a5c1d4",
+      "3433542736091cd1d650f789609366b62e09c7af98a56a983da4007599a51080",
+      "fc3a32a7d3af28c4ffb3637a697f6f9eae3c66027e6f86965c725ddd1ecab68e"
+    ],
+    "zip_sizes": [
+      21020,
+      24860,
+      17251
+    ],
+    "verified": "3/3 raw download SHA256 ZIP CRC and entry manifest PASS",
+    "last_pm_accepted_sha": "218ce4ae573bb751db17316000625666c20c688e",
+    "scoped_persisted": true,
+    "full_finance_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

@@ -1,18 +1,18 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-11-05T16:34:34.969472+08:00",
+  "generated_at": "2026-11-06T00:36:21.521595+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
-    "OK": 18,
-    "STALE": 0,
+    "OK": 13,
+    "STALE": 5,
     "MISSING": 6
   },
   "independent_indicators": {
     "total": 23,
     "excluded_duplicate": "s03 (same VIX as m07)",
     "summary": {
-      "OK": 17,
-      "STALE": 0,
+      "OK": 12,
+      "STALE": 5,
       "MISSING": 6
     }
   },
@@ -20,9 +20,9 @@
     "m07": {
       "id": "m07",
       "label": "VIX",
-      "value": 20.83,
+      "value": 16.61,
       "unit": "",
-      "observation_date": "2026-11-03",
+      "observation_date": "2026-11-04",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -104,9 +104,9 @@
     "m02": {
       "id": "m02",
       "label": "HY OAS",
-      "value": 3.4,
+      "value": 3.32,
       "unit": "%",
-      "observation_date": "2026-11-03",
+      "observation_date": "2026-11-04",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
@@ -121,8 +121,8 @@
       "observation_date": "2026-09-01",
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
-      "status": "OK",
-      "detail": "統計月份2026-09；8月54.6",
+      "status": "STALE",
+      "detail": "統計月份2026-09；8月54.6; 距今 66 天 > 65 天",
       "error": ""
     },
     "m05": {
@@ -140,7 +140,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 101.386002,
+      "value": 101.546997,
       "unit": "",
       "observation_date": "2026-11-05",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -152,7 +152,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 87.860001,
+      "value": 90.260002,
       "unit": "USD/bbl",
       "observation_date": "2026-11-05",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -164,9 +164,9 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 93.879997,
+      "value": 94.116898,
       "unit": "",
-      "observation_date": "2026-11-04",
+      "observation_date": "2026-11-05",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
       "status": "OK",
@@ -217,8 +217,8 @@
       "observation_date": "2026-09-01",
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
-      "status": "OK",
-      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4",
+      "status": "STALE",
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4; 距今 66 天 > 65 天",
       "error": ""
     },
     "m16": {
@@ -241,8 +241,8 @@
       "observation_date": "2026-09-01",
       "source_url": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
-      "status": "OK",
-      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率",
+      "status": "STALE",
+      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率; 距今 66 天 > 65 天",
       "error": ""
     },
     "m19": {
@@ -253,8 +253,8 @@
       "observation_date": "2026-09-01",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
-      "status": "OK",
-      "detail": "",
+      "status": "STALE",
+      "detail": "; 距今 66 天 > 65 天",
       "error": ""
     },
     "m20": {
@@ -265,16 +265,16 @@
       "observation_date": "2026-09-01",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
-      "status": "OK",
-      "detail": "注意歷史值可能修訂",
+      "status": "STALE",
+      "detail": "注意歷史值可能修訂; 距今 66 天 > 65 天",
       "error": ""
     },
     "s03": {
       "id": "s03",
       "label": "VIX 短期",
-      "value": 20.83,
+      "value": 16.61,
       "unit": "",
-      "observation_date": "2026-11-03",
+      "observation_date": "2026-11-04",
       "source_url": "https://api.stlouisfed.org/fred/series/observations",
       "method": "與 m07 同步",
       "status": "OK",
@@ -284,7 +284,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 34.8,
+      "value": 21.873469,
       "unit": "",
       "observation_date": "2026-11-05",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",

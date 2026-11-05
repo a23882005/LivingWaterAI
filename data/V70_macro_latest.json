@@ -1,10 +1,10 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-11-05T16:34:34.969472+08:00",
+  "asOf": "2026-11-06T00:36:21.521595+08:00",
   "indicators": {
     "m07": {
-      "value": 20.83,
-      "dataDate": "2026-11-03",
+      "value": 16.61,
+      "dataDate": "2026-11-04",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
@@ -24,18 +24,11 @@
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m02": {
-      "value": 3.4,
-      "dataDate": "2026-11-03",
+      "value": 3.32,
+      "dataDate": "2026-11-04",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
-    },
-    "m04": {
-      "value": 54.5,
-      "dataDate": "2026-09-01",
-      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
-      "unit": "",
-      "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對"
     },
     "m05": {
       "value": 2.565841,
@@ -45,22 +38,22 @@
       "method": "FRED CPILFESL 同一數列 YoY"
     },
     "m09": {
-      "value": 101.386002,
+      "value": 101.546997,
       "dataDate": "2026-11-05",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 87.860001,
+      "value": 90.260002,
       "dataDate": "2026-11-05",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 93.879997,
-      "dataDate": "2026-11-04",
+      "value": 94.116898,
+      "dataDate": "2026-11-05",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
@@ -85,47 +78,24 @@
       "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
       "unit": "USD bn",
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元"
-    },
-    "m15": {
-      "value": 54.9,
-      "dataDate": "2026-09-01",
-      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
-      "unit": "",
-      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對"
-    },
-    "m18": {
-      "value": 0.0,
-      "dataDate": "2026-09-01",
-      "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
-      "unit": "",
-      "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值"
-    },
-    "m19": {
-      "value": 4.2,
-      "dataDate": "2026-09-01",
-      "source": "https://api.stlouisfed.org/fred/series/observations",
-      "unit": "%",
-      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
-    },
-    "m20": {
-      "value": 50.666667,
-      "dataDate": "2026-09-01",
-      "source": "https://api.stlouisfed.org/fred/series/observations",
-      "unit": "千人",
-      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人"
     }
   },
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 16,
+    "valid": 11,
     "totalRequired": 21,
     "missing": [
       "m06: MISSING (not verified OK)",
       "m03_qqq: MISSING (not verified OK)",
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
-      "m16: MISSING (not verified OK)"
+      "m04: STALE (not verified OK)",
+      "m15: STALE (not verified OK)",
+      "m16: MISSING (not verified OK)",
+      "m18: STALE (not verified OK)",
+      "m19: STALE (not verified OK)",
+      "m20: STALE (not verified OK)"
     ]
   }
 }

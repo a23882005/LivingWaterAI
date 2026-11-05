@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T10:25:49Z",
+  "updated_at": "2026-11-05T15:30:26.992Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3439,8 +3439,8 @@
     "next_pm": "Independent QA future PR59 delta, four-household 56 E2E & Gate D/Trial/Gate E; maintain engineering/file governance and real source ownership."
   },
   "current_family_pm_verdict_20261105": {
-    "accepted_incremental_sha": "abc0bb47c402c708dfdecb5fb799479cf9e0ea58",
-    "decision": "PASS_SCOPED",
+    "accepted_incremental_sha": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
+    "decision": "PASS_SCOPED_SOURCE_WIRING_AND_REPLAY",
     "W7": "PASS_CLOSED",
     "W8": "IN_PROGRESS",
     "full_financial_PASS": 0,
@@ -3450,7 +3450,9 @@
     "pr59_draft": true,
     "pr60_scope": "CLOSED_SCOPE",
     "governance": "Independent QA documented on Drive and PR59 comment",
-    "next_action": "Original Codex continues legal qP/qV/PIT and same-run real finance; PM validates real sources, next delta and E2E."
+    "next_action": "原V82 Codex PR59依中PM 2026/11/05最新M1+M8合同作最小改動並回交；中PM獨立驗收，W8仍IN_PROGRESS。",
+    "pm_verified_at": "2026-11-05T10:45:37Z",
+    "validation_scope": "金融來源接線/觀察與隔離重播；非完整金融Gate"
   },
   "pm_real_ib_vt_source_observation_20261105": {
     "scope": "Family middle PM read-only qualified-source candidate acquisition and independent original W8 price reader probe",
@@ -3674,5 +3676,38 @@
       "Family檔案管理": "1JVEcBAK9E7fay4QcIiChyg-DPt23aDGGwo2KdG6cQ7o",
       "MasterWBS": "11am7aetY3r1-Zzuv5eRpjHeJgp7nShAc8OHGDWQ_h08"
     }
+  },
+  "pm_pr59_af16_scoped_acceptance_20261105": {
+    "head": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
+    "decision": "PASS_SCOPED_SOURCE_WIRING_AND_REPLAY",
+    "evidence": "Family中PM 2026/11/05 18:45已正式驗收私人來源接線與重播",
+    "verified_tests": "targeted 135/135 (local), W5 559/559 and W8 1410/1410 JUnit, Family CI 6/6",
+    "financial_full_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade": "NONE"
+  },
+  "pm_owner_approved_m1_m8_20261105": {
+    "status": "SPEC_APPROVED_CONTRACT_DISPATCHED__IMPLEMENTATION_QA_PENDING",
+    "source": "Owner approved / dot 2026-11-05 final Family handoff",
+    "contract_name": "Family_V82_M1_M8_最新核准修訂_PR59正式施工契約_20261105",
+    "official_codex_dispatch": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6661861925",
+    "current_implementation_head": "af16a9ded0c1925b15ed902ed90c8aeed42d3f44",
+    "writer": "original V82 Codex PR59 only",
+    "middle_pm": "independent QA and Family governance",
+    "spec": {
+      "M1": "LowTD == 9 TRUE exactly one vote (including sustained 9); LowTD 0..8 FALSE; insufficient UNKNOWN",
+      "M8": "(C[s]<C[s-1] AND V[s]<=0.60*V[s-1] AND V[s]<mean(V[s-20..s-1])) OR (H[s]>L[s] AND C[s]>=O[s] AND (C[s]-L[s])/(H[s]-L[s])>=0.45 AND L[s]>=min(L[s-5..s-1]))",
+      "signal_date": "s=latest completed market session; prior20 and prior5 windows EXCLUDE s; no double-shift; intraday provisional excluded",
+      "truth": "Kleene 3-valued AND/OR, M1 and M8 each <=1 vote; M7 and M8 may both TRUE",
+      "slice_rates": "Base 10/20%; Left 15/25%; M>=3 votes mature; UNKNOWN preserved",
+      "unchanged": "M2..M7, Right, Trend, 5-layer/9-stage, B0/cycle, HardGate, RunawayDown, V70/V75 and funding"
+    },
+    "acceptance": "G1-G8 boundary and regressions + 6 Family CI + W5/W8 + 4 household isolation",
+    "performance_backtest": "EXPLICITLY_WAIVED_BY_OWNER_FOR_THIS_CHANGE",
+    "implementation": "PENDING",
+    "pm_independent_qa": "PENDING",
+    "prior_scope": "Earlier M1-only comment #6653634352 superseded for its M8 unchanged sentence only",
+    "evidence_boundary": "Existing PR59 af16 source integration scoped PASS preserved; no executable M1/M8 new rule PASS."
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T17:43:00Z",
+  "updated_at": "2026-11-05T19:14:53.687Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -3439,8 +3439,8 @@
     "next_pm": "Independent QA future PR59 delta, four-household 56 E2E & Gate D/Trial/Gate E; maintain engineering/file governance and real source ownership."
   },
   "current_family_pm_verdict_20261105": {
-    "accepted_incremental_sha": "c91a5114a475a488c1c136c424245f1b4afd4cb4",
-    "decision": "PASS_SCOPED_M1_M8_APPROVED_AMENDMENT_AND_FINANCIAL_REGRESSION",
+    "accepted_incremental_sha": "6d7f224dd223ab8a92af23eeac9aa4e97ae87d61",
+    "decision": "PASS_SCOPED_PRIVATE_PM_RECIPIENT_DB_GUARD_AND_DECIMAL_TEST_ISOLATION",
     "W7": "PASS_CLOSED",
     "W8": "IN_PROGRESS",
     "full_financial_PASS": 0,
@@ -3450,7 +3450,7 @@
     "pr59_draft": true,
     "pr60_scope": "CLOSED_SCOPE",
     "governance": "Independent QA documented on Drive and PR59 comment",
-    "next_action": "PR59 Codex continues compliant finance PIT/qP/qV and same-cutoff NAV/settled/SGOV/pending/C7B/schema83/ledger. Middle PM independently QA next delta, full 56 features remain unaccepted.",
+    "next_action": "PR59 sole Codex continues legal PIT/qP/qV and same-cutoff NAV/settled/SGOV/pending to C7B/schema83/ledger/Work9/Mentor; PM independently QA next delta; four-household 56 E2E pending.",
     "pm_verified_at": "2026-11-05T10:45:37Z",
     "validation_scope": "金融來源接線/觀察與隔離重播；非完整金融Gate"
   },
@@ -3765,5 +3765,57 @@
     "pr_state": "DRAFT_UNMERGED",
     "next_owner": "Original V82 Codex PR59 only writer continues legal PIT/qP/qV, same cutoff NAV/settled/SGOV/pending, C7B/schema83, CycleLedger/Work9/Mentor",
     "PM_next": "Independently QA new finance delta, 4 household x14 E2E, GateD, projects, Trial, GateE"
+  },
+  "pm_pr59_6d7f224_scoped_acceptance_20261106": {
+    "decision": "PASS_SCOPED_PRIVATE_PM_RECIPIENT_DB_GUARD_AND_DECIMAL_TEST_ISOLATION",
+    "accepted_head": "6d7f224dd223ab8a92af23eeac9aa4e97ae87d61",
+    "accepted_parent": "c91a5114a475a488c1c136c424245f1b4afd4cb4",
+    "tree": "8c9c0bba84df8404e8631f7beba6ebb3deb5d92d",
+    "signed_taipei": "2026/11/06 03:14",
+    "pm": "Family中PM（總PM）",
+    "acceptance_document_id": "1199jWaXR2npUxNe7jaYTgnOq9c9c81cflIPYSMEW70s",
+    "code_zip_id": "16RmGb3sR0y9e3CUaAzHjxl8uVLrCFV05",
+    "code_zip_sha256": "cab18bb4ce82ef6daf08c265e4609394095f20cbb5753e0e286385ce94cde58a",
+    "source_zip_id": "13RnPViVoqnsC3rVnpDyI1u9hm2wMqCKK",
+    "source_zip_sha256": "49f3e5f72dd61cbea9e7c4450ff6937d2d6279a87ae36ed54e4c43d29ad66080",
+    "receipt_id": "1-6ptEOvtodQKiEpYf6YSWbDt0gJv1jg8",
+    "receipt_sha256": "f9ff755f52d13707ccf0097fcdbac7923267f59213dae57b4333e347758300e0",
+    "handoff_id": "1tV-TOaODNh4K365RkS0SghfNk0dxTmvw",
+    "isolated_restored_git": {
+      "code_files": "1170/1170 SHA and size PASS",
+      "history_commits": 1556,
+      "source_map_files": "22194/22194 SHA and size PASS",
+      "overwrites": 0,
+      "modified_files": 6
+    },
+    "pm_independent": {
+      "targeted_pytest": "150/150 PASS",
+      "original_receipt_probes": "7/7 PASS",
+      "four_households_source_snapshots": "4 DB + 4 financial + 33 C7 PASS",
+      "twse": "4/4 PASS",
+      "amended_technical": "39/39 PASS",
+      "cross_household_negative_cases": "6/6 rejected before Joseph private account parser; private parser called 0",
+      "synthetic_qp_business": "12 qP Golden + 12 49+13 business PASS",
+      "original_pm_broker_history": "7 IB / 8771 daily bars / 186 actions; VT Massive 501 PASS",
+      "synthetic_sgov": "PASS; synthetic only",
+      "official_same_head_actions": "6/6 SUCCESS",
+      "original_ci_xml": "W5 567/567, W8 1478/1478, no errors/fails/skips",
+      "original_py312_combined_xml": "2045/2045 PASS (independently parsed; originated from Codex Python3.12)",
+      "extra_local_python313": "2031 passed, 4 failed, 10 errors in one 2045 collected suite; 12 W5 cases caused by unset W5_W2_ROOT in isolated workspace, 2 V70 cases missing jsdom",
+      "independent_w5_path_fix": "W5 original mentor+recovery test files 24/24 PASS after pointing W5_W2_ROOT to vendored w2",
+      "original_v70_jsdom_local": "ENV_DEPENDENCY_MISSING; 2 cases verified successful in official CI only"
+    },
+    "regression_boundary": "C91 M1/M8 PASS and earlier af16 source PASS preserved; no native V82/V75/C rule changes",
+    "official_family_v82_financial_qualifications": {
+      "qp_complete": 0,
+      "qv_complete": 0,
+      "full_finance_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trade": "NONE"
+    },
+    "approval_scope": "OWNER_APPROVED_FAMILY_SOURCE_GUARD_AND_TEST_REPAIR_ONLY",
+    "next_owner": "Original V82 Codex PR59 sole writer for lawful PIT/qP/qV, same-run NAV/settled/SGOV/pending, C7B/schema83, CycleLedger, Work9/Mentor",
+    "middle_pm_next": "independent QA next financial delta; four-household 56 case E2E; Gate D; four projects; Trial; Gate E"
   }
 }

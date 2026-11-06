@@ -1,8 +1,10 @@
 name: Family W8 post-trade regression
 on:
   pull_request:
-    branches: [main]
+    branches: [main, family/w8-complete-04-joseph-mou]
     paths:
+      - '系統工程/Family/W5/market_session_source.py'
+      - '系統工程/Family/W8/v82_approved_context.py'
       - '系統工程/Family/W8/**'
       - '系統工程/Family/W5/**'
       - '系統工程/Family/W7/family_menu.py'

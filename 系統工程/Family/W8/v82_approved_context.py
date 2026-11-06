@@ -24,7 +24,7 @@ def read_source(descriptor,request,symbol):
     if not data.get('source_reference') or timestamp(data['available_at'],'available_at')>timestamp(request['evaluation_at'],'evaluation_at'):
         raise PermissionError('V82_APPROVED_SOURCE_NOT_AVAILABLE_AT_CUTOFF')
     # A caller cannot paste the projection produced below into a source file.
-    if 'verified_market_identity' in data or 'native_history_source_readback' in data:
+    if any(k in data for k in ('verified_market_identity','native_history_source_readback','session_source_readback')):
         raise PermissionError('V82_MARKET_IDENTITY_DERIVED_PROJECTION_NOT_AN_INPUT')
     evidence=data.get('market_identity_source')
     if evidence is not None:
@@ -87,6 +87,13 @@ def read_source(descriptor,request,symbol):
         histories,receipt=read(data['native_history_source'],request,symbol)
         data.update(histories)
         data['native_history_source_readback']=receipt
+    if data.get('session_source') is not None:
+        from market_session_source import read
+        session,readback=read(data['session_source'],identity=dict(owner=request['owner'],asset_id=symbol,
+            source_db_sha256=expected['source_db_sha256'],evaluation_at=request['evaluation_at']))
+        if data.get('session') and data['session']!=session:
+            raise PermissionError('V82_SESSION_SOURCE_PROJECTION_CONFLICT')
+        data['session']=session;data['session_source_readback']=readback
     return data
 
 
@@ -160,6 +167,9 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
         'source_binding':{'analysis_core_digest':digest(row['core_observation']),
             'technical_digest':digest(approved),'source_reference':extra.get('source_reference'),
             'supplementary_facts_supplied':bool(extra)}}
+    if extra.get('session_source') is not None:
+        context['session_source']=deepcopy(extra['session_source'])
+        context['session_source_readback']=deepcopy(extra['session_source_readback'])
     if row.get('history_source_qualification') is not None:
         context['source_binding']['history_source_qualification_digest']=row['history_source_qualification']['digest']
         # Source observations cannot fill valuation_history/price_history or

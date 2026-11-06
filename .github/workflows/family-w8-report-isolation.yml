@@ -10,6 +10,8 @@ on:
       - '系統工程/Family/W7/tests/test_family_menu.py'
   pull_request:
     paths:
+      - '系統工程/Family/W5/market_session_source.py'
+      - '系統工程/Family/W8/v82_approved_context.py'
       - '.github/workflows/family-w8-report-isolation.yml'
       - '系統工程/Family/W6/runtime/report_archive.py'
       - '系統工程/Family/W6/runtime/test_report_archive.py'

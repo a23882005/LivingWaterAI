@@ -53,7 +53,7 @@
     },
     {
       "path": "../../Family/W5/v82_slice_bridge.py",
-      "sha256": "b6e091c693cb9a6597481424cbfc474746fc4acb94c9090fd4ace7fccd2915be"
+      "sha256": "3b9ca83e7b6b7b7f7205342a1d874bcd9fe6e1443dc12ec41b55387ac81f1521"
     },
     {
       "path": "../../Family/W5/family_runner.py",
@@ -105,7 +105,7 @@
     },
     {
       "path": "../../Family/W8/member_market_source.py",
-      "sha256": "3cacf2591d03a066fbe0ad3fe36987cd2d5999b5fc139155e77c88db32b99dee"
+      "sha256": "4ba6a53d70f6f47e91f88be939a68717b1b46944312d362970bb0f691f4582aa"
     },
     {
       "path": "../../Family/W8/all_asset_coverage.py",
@@ -209,7 +209,7 @@
     },
     {
       "path": "../../Family/W8/v82_approved_context.py",
-      "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59"
+      "sha256": "06d3543b4e06b8f66f968f8ab8bd691fcebfeb369e5f4ec28d73b618ce517d8a"
     },
     {
       "path": "../../Family/W8/replacement_order_source.py",
@@ -234,6 +234,10 @@
     {
       "path": "../../Family/W8/ishares_distribution_source.py",
       "sha256": "5d5e933351b8a93a67a9a0d01c92af873fe92ec2a2d31df0dfbd08f1517de636"
+    },
+    {
+      "path": "../../Family/W5/market_session_source.py",
+      "sha256": "2dca2316ec4fc32d26214b88f07d7466ffd1d81e2534e79a2db04a7d29d74bb1"
     }
   ]
 }

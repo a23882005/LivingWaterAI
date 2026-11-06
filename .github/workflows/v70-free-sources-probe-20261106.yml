@@ -1,0 +1,33 @@
+# Isolated read-only source test, no deployment and no repository writes.
+# Owner-requested probe for 2026-11-06. It may be removed once QA is recorded.
+name: V70 Official Free Sources HTTP Probe 20261106
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'experiments/v70_free_sources_probe_20261106.py'
+      - '.github/workflows/v70-free-sources-probe-20261106.yml'
+permissions:
+  contents: read
+jobs:
+  free-source-probe:
+    if: github.event.pull_request.head.ref == 'test/v70-free-sources-probe-20261106'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install XLS parser (no credentials)
+        run: python -m pip install --disable-pip-version-check -q xlrd==2.0.2
+      - name: Attempt actual numerical downloads from official US sources
+        run: python -u experiments/v70_free_sources_probe_20261106.py
+      - name: Save observed HTTP outcomes and dates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-official-free-source-probe-results
+          path: build/v70_free_source_probe/
+          if-no-files-found: warn
+          retention-days: 7

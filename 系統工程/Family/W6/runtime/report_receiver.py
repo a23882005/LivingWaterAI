@@ -153,6 +153,7 @@ def receive_action(result, request):
         require(result.get('canonical_result') is None and result.get('mentor') is None, 'FAILED_RESULT_HAS_ADVICE')
         return {'status': status, 'items': [], 'issue_codes': deepcopy(result.get('issue_codes', [])),
                 'display': '本次引擎未產生可採用的部署建議。', 'execution_advice_allowed': False,
+                'broker_execution_allowed': False,
                 'source_run_id': result['run_id']}
     require(result.get('client_id') == request['client_id'], 'RESULT_CLIENT')
     require(result.get('input_digest') == input_digest(request), 'RESULT_INPUT_DIGEST')
@@ -162,7 +163,20 @@ def receive_action(result, request):
     canonical = mentor.get('canonical_deployment_result')
     require(isinstance(canonical, dict) and isinstance(canonical.get('items'), list), 'CANONICAL_REQUIRED')
     require(mentor.get('canonical_deployment_result_sha256') == digest(canonical), 'CANONICAL_DIGEST')
-    require(mentor.get('execution_advice_allowed') is False, 'MENTOR_EXECUTION_SCOPE')
+    advice = mentor.get('execution_advice_allowed')
+    require(type(advice) is bool, 'MENTOR_EXECUTION_SCOPE')
+    # Legacy False receipts need no new flags. Any explicit broker permission
+    # must still be the boolean False; strings and numeric 0 are not permission.
+    require('broker_execution_allowed' not in mentor
+            or mentor['broker_execution_allowed'] is False, 'MENTOR_BROKER_EXECUTION_SCOPE')
+    require('recommendations_allowed' not in mentor
+            or type(mentor['recommendations_allowed']) is bool, 'MENTOR_RECOMMENDATION_SCOPE')
+    if advice is True:
+        require(mentor.get('contract_name') == 'Family.W5.mentor.v1'
+                and mentor.get('recommendations_allowed') is True
+                and mentor.get('broker_execution_allowed') is False
+                and mentor.get('production') == 'HOLD'
+                and mentor.get('trade_action') == 'NO_TRADE', 'MENTOR_EXECUTION_SCOPE')
     ids = [x['item_id'] for x in canonical['items']]
     require(len(ids) == len(set(ids)), 'DUPLICATE_ACTION_ITEM')
     for item in canonical['items']:
@@ -171,6 +185,9 @@ def receive_action(result, request):
     return {'status': status, 'items': deepcopy(canonical['items']),
             'issue_codes': deepcopy(mentor.get('unknown_reason_codes', [])),
             'data_provenance': result['data_provenance'], 'execution_advice_allowed': False,
+            # Keep the old report-boundary flag; preserve the producer's
+            # distinct advice flag explicitly instead of rewriting its receipt.
+            'source_execution_advice_allowed': advice, 'broker_execution_allowed': False,
             'display': '工程合成測試，非家人建議。' if result['data_provenance'] == 'SYNTHETIC' else '引擎分析原值；未授權執行交易。',
             'source_run_id': result['run_id'], 'canonical_digest': digest(canonical)}
 

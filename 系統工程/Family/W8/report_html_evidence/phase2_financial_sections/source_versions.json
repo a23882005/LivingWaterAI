@@ -1,0 +1,76 @@
+{
+  "work_order": "FAMILY-REPORT-PHASE2-20261103-r1",
+  "consumer_base": "4dc4f1cba0035afe2cf8a37f51a146494dfb05fd",
+  "accepted_business_consumer": "9bd61094ce11f2601fd7c6fa7dc6024dc9b85c59",
+  "producer": "dd36143b2fca18997c2256a5e5d5fe0ee43c23d6",
+  "producer_tree": "5c21d7813d81661359f0a74a78c7d4ff5b702c42",
+  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "code": [
+    {
+      "path": "系統工程/Family/W8/report_canonical_adapter.py",
+      "bytes": 42211,
+      "sha256": "e9a9189f12f7f07f718e51aef7fae815ff583d1ecc346c5d5986cdd37667cf35"
+    },
+    {
+      "path": "系統工程/Family/W8/w6_current_data.py",
+      "bytes": 14465,
+      "sha256": "5da97e748c3758ea5595b7efe32119875828f6c7bda9d68c104daee1dd650b97"
+    },
+    {
+      "path": "系統工程/Family/W8/report_financial_sections.py",
+      "bytes": 25849,
+      "sha256": "f000b35818cf713ca666226a337735ebd3dd8e0b72c82f35e0579cbc77490506"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/fixtures/report_html/synthetic.py",
+      "bytes": 29114,
+      "sha256": "188c6c8723af9b9f141a4262aed25443547f268a753d86c6a17bf42d8f798ae1"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/test_report_canonical_adapter.py",
+      "bytes": 39129,
+      "sha256": "21597f8c55cbdd8e26e6e3f5586d5784a1cc48fd66f33d67976e791616bcb9f1"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/test_report_financial_sections.py",
+      "bytes": 7581,
+      "sha256": "b1fe63ca9748bf3458499b3d64b06da7a40f64481f76143c5b7ca5d3c9634fa3"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/test_report_rendered_html.py",
+      "bytes": 29824,
+      "sha256": "876d3d85b8994cf8f575c5760b9ca404e8c30dcd569ab3196655da724dacaa49"
+    }
+  ],
+  "unchanged": [
+    {
+      "path": "系統工程/Family/W8/w6_member_render.py",
+      "sha256": "d202e7f6454d42c8ab34e1ec67cf8945f323a13fe41ab9a701aafd5ec80c5021",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W6/runtime/report_receiver.py",
+      "sha256": "040408ee5114e66faa5b1698b58e562cc68b005822a28124f26a2afc473761fa",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W8/Checkpoint.json",
+      "sha256": "beb5928f68d08fb76fe88c30897b7b5419e34a6727aa71200d5fd1e655f17722",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/README.md",
+      "sha256": "f184df8d94d60e6bd7590db10e01fe961ad3cd5d9d6d45afe7d28673ede2501c",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W8/report_html_evidence/README.md",
+      "sha256": "e84891b8a90a0a73fa86022a2b7609f2b367107fbb257a6a2548b3abb1ba09e5",
+      "equal_base": true
+    }
+  ],
+  "real_inputs": "PRIVATE_PM_FROZEN_SOURCE_REVIEW_ONLY",
+  "complete_financial_assertion": false,
+  "raw_original_inputs_modified": false,
+  "trade_authorization": "NONE"
+}

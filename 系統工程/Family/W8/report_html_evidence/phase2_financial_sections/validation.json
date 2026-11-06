@@ -1,0 +1,50 @@
+{
+  "scope": "PUBLIC_SYNTHETIC_TESTS_AND_DEIDENTIFIED_QA",
+  "pytest_main_cases": 281,
+  "subtests_passed": 149,
+  "junit_total_including_subtests": 430,
+  "real_chromium_main_cases": 15,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "duration_seconds": 76.48,
+  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=<jsdom-node_modules> PYTHONPATH=<pytest-subtests-path>:<repo>/系統工程/Family/W8:<repo>/系統工程/Family/W5:<repo>/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=<approved.zip> REPORT_HTML_EVIDENCE_DIR=<evidence-dir> python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --tb=short --junitxml=<evidence-dir>/junit.xml",
+  "new_tests": [
+    "seven pure display/coverage/immutability tests including 15 negative subcases",
+    "two real Chromium all-asset chapter/PDF/ZIP/PNG tests"
+  ],
+  "existing_tests": "phase1 native Work9/Mentor permissions and exact amount/ratio; canonical C/radar/targets; DB-only; legacy member receipts; source wrapping; original delivery/lookup guards",
+  "private_actual_intake": {
+    "households_passed": 4,
+    "rejected_cross_client_or_tamper_cases": 8,
+    "new_source_review_reports": 4,
+    "pages": [
+      42,
+      44,
+      25,
+      26
+    ],
+    "source_cards": 274,
+    "all_source_texts_equal": true,
+    "pdf_bounds_and_full_text": "PASS",
+    "all_pages_exact_zip_png": "PASS",
+    "narrow_offline_readers": 4,
+    "full_financial_PASS": 0,
+    "new_financial_engine_runs": 0,
+    "DB_writes": 0,
+    "PM_acceptance": "PENDING"
+  },
+  "limits": {
+    "direct_file_url": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "offline_saved_byte_load": "PASS",
+    "real_Project_login": "NOT_RUN",
+    "Android_iOS_physical_UAT": "DEFERRED_BY_OWNER"
+  },
+  "remote_CI": "SEPARATE_PUBLISH_RECEIPT; existing workflow does not select all local phase2/browser cases",
+  "public_JUnit_redaction": {
+    "fields": "client identity in legacy parametrized testcase names",
+    "unique_identity_tokens": 6,
+    "all_counts_outcomes_and_times_preserved": true,
+    "original_JUnit": "Private complete evidence package tests/junit.original.xml"
+  }
+}

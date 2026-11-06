@@ -106,6 +106,31 @@ def atomic_write_text(path, content):
             temporary.unlink()
 
 
+def last_completed_vix_session(now_utc=None):
+    """Last XNYS session with its official close at least 30 minutes in the past.
+
+    Uses the real NYSE calendar (including holidays/early closes) and New York
+    clock via exchange_calendars, never the Taiwan calendar date. The buffer
+    avoids treating an unfinished VIX EOD publication as a closing observation.
+    """
+    import exchange_calendars as xcals
+    now_utc = now_utc or dt.datetime.now(dt.timezone.utc)
+    if now_utc.tzinfo is None:
+        raise ValueError("VIX clock must include timezone")
+    now_utc = now_utc.astimezone(dt.timezone.utc)
+    # UTC can already be the next calendar day after New York close.
+    from zoneinfo import ZoneInfo
+    ny_date = now_utc.astimezone(ZoneInfo("America/New_York")).date()
+    calendar = xcals.get_calendar("XNYS")
+    sessions = calendar.sessions_in_range(
+        pd.Timestamp(ny_date - dt.timedelta(days=15)), pd.Timestamp(ny_date))
+    for session in reversed(sessions):
+        close_utc = calendar.session_close(session).to_pydatetime()
+        if now_utc >= close_utc + dt.timedelta(minutes=30):
+            return session.date()
+    raise ValueError("No completed XNYS session in VIX lookback")
+
+
 class Fetcher:
     def __init__(self, timeout=40):
         self.s=requests.Session()
@@ -194,6 +219,15 @@ class Fetcher:
             params=urlencode({'series_id':series,'api_key':api_key,'file_type':'json',
                               'observation_start':earliest})
             providers.insert(0,('FRED_OFFICIAL_API','https://api.stlouisfed.org/fred/series/observations?'+params))
+        # VIX: follow the declared Cboe primary source before FRED even when
+        # FRED_API_KEY is configured. Reject providers lagging the latest
+        # completed US session; never mistake successful HTTP for fresh close.
+        required_vix_session = None
+        if series == 'VIXCLS':
+            required_vix_session = last_completed_vix_session()
+            priority = {'CBOE_OFFICIAL_VIX': 0, 'YAHOO_VIX_CHART': 1,
+                        'FRED_OFFICIAL_API': 2, 'FRED_CSV': 3}
+            providers.sort(key=lambda item: priority.get(item[0], 99))
         retried=set()
         self.fredattempts[series]=[]
         for provider,url in providers:
@@ -224,7 +258,10 @@ class Fetcher:
                     chart=response.json()['chart']['result'][0]
                     stamps=chart['timestamp']
                     closes=chart['indicators']['quote'][0]['close']
-                    dates=pd.to_datetime(stamps,unit='s',utc=True).tz_convert(None)
+                    if chart.get('meta',{}).get('symbol') not in (None,'^VIX'):
+                        raise ValueError('Yahoo VIX instrument identity mismatch')
+                    dates=(pd.to_datetime(stamps,unit='s',utc=True)
+                           .tz_convert('America/New_York').tz_localize(None))
                     values=pd.to_numeric(closes,errors='coerce')
                 elif provider=='CBOE_OFFICIAL_VIX':
                     frame=pd.read_csv(StringIO(response.text))
@@ -251,6 +288,16 @@ class Fetcher:
                 data=pd.DataFrame({'date':dates,'value':values}).dropna()
                 data=data.sort_values('date').drop_duplicates('date',keep='last')
                 if data.empty: raise ValueError('No numeric observations')
+                if series == 'VIXCLS':
+                    # Ignore possible intraday/future candles. A provider is
+                    # accepted only if its latest *completed* session matches
+                    # the XNYS calendar; otherwise try the next provider.
+                    data = data.loc[data['date'].dt.date <= required_vix_session]
+                    if (data.empty or data['date'].iloc[-1].date() != required_vix_session):
+                        observed = 'none' if data.empty else str(data['date'].iloc[-1].date())
+                        raise ValueError(
+                            'VIX_LAGGED_SESSION: expected=' + required_vix_session.isoformat()
+                            + ' observed=' + observed + '; try newer source')
                 out=pd.Series(data['value'].to_numpy(),index=pd.DatetimeIndex(data['date']),name=series)
                 # Reject truncated BLS histories before caching: allow the next
                 # provider to supply sufficient data for the actual calculation.

@@ -145,12 +145,12 @@
       "value": 55.5,
       "unit": "",
       "observation_date": "2026-10-01",
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/news-publications/inside-supply-management-magazine/blog/2026/2026-11/ism-pmi-reports-roundup-october-2026-manufacturing/",
-      "method": "Official ISM dated monthly roundup headline PMI",
+      "source_url": "https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html",
+      "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
-      "detail": "",
+      "detail": "2026-10官方製造業PMI 55.5；前月54.5",
       "error": "",
-      "attempted_at": "2026-11-06T04:11:06.332873+00:00",
+      "attempted_at": "2026-11-06T21:40:40+08:00",
       "attempt_result": "SUCCESS",
       "source_attempts": {
         "ISM_m04": [
@@ -165,12 +165,18 @@
             "result": "OK",
             "verified_at": "2026-11-06T04:11:07.474816+00:00",
             "observation_date": "2026-10-01"
+          },
+          {
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-11-06T21:40:40+08:00",
+            "observation_date": "2026-10-01"
           }
         ]
       },
       "cache_used": false,
       "cache_source": null,
-      "last_verified_at": "2026-11-06T04:11:07.474816+00:00",
+      "last_verified_at": "2026-11-06T21:40:40+08:00",
       "source_evidence": {
         "series": {
           "ISM_m04": [

@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-05T22:47:18.430Z",
+  "updated_at": "2026-11-06T03:32:02.998Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4286,5 +4286,178 @@
     "trade": "NONE",
     "pr59": "DRAFT_UNMERGED",
     "pr60": "CLOSED_SCOPE_PRESERVED"
-  }
+  },
+  "pm_20261106_pr59_3f7ea0d_buy_qty_dual_price_scoped_acceptance": {
+    "timestamp_iso": "2026-11-06T03:32:02.997Z",
+    "authority": "Family中PM/全案總PM",
+    "decision": "PASS_SCOPED_BUY_QUANTITY_DUAL_PRICE_VALUATION_AND_CASH_FEE_RECONCILIATION",
+    "issue": "FAMILY-V82-W8-BUY-QTY-VALUATION-001",
+    "issue_current": "BUG_FIX_ACCEPTED_SCOPED_ON_3F7EA0D",
+    "pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+    "pr59_parent": "234221e1f173483b747c3ad2500a70d02600ccef",
+    "pr59_tree": "12d9fdf7541ac16c9c57a442d02560223562f78c",
+    "pr59_scope_changed_files": 15,
+    "previous_scoped_PASS_preserved": [
+      "af16a9d",
+      "c91a511",
+      "6d7f224",
+      "218ce4a",
+      "234221e"
+    ],
+    "deliverables": {
+      "code_zip": {
+        "name": "V82_PR59_3f7ea0d_買進股數與估值完成率修正_程式與完整Git_20261106.zip",
+        "file_id": "1h3mz2FTZp9xq4qQts2Kr_c_P9ylKfi2l",
+        "bytes": 32771517,
+        "sha256": "cacaccd5dfb11bec534a0adff27069ea0d83329911834e9bc9a39afcb34b5f1d"
+      },
+      "evidence_zip": {
+        "name": "V82_PR59_3f7ea0d_買進股數與估值完成率修正_原件與四戶來源證據_20261106.zip",
+        "file_id": "1nvpEoM9dfFcPjPq_Z3U1luNeWY_-KBAn",
+        "bytes": 27877784,
+        "sha256": "9bb945a4eb0b160ea7e0fe97f24b18c3aa9898be73aff5ef6e5aee894490fb21"
+      },
+      "receipt": {
+        "name": "V82_PR59_3f7ea0d_買進股數與估值完成率修正_完整校驗收據_20261106.json",
+        "file_id": "14rMqf8wCpSQcy4yxHSh_C91ewYH0MZyd",
+        "bytes": 702583,
+        "sha256": "c6c670788b4df15ad01a373a83db82119b8c50da3e3b07441c67913d2e2e07f9"
+      },
+      "handoff_text": {
+        "file_id": "1rT-BxvEinkAWxjH-HHF5dNKe1bnM93iG"
+      },
+      "location": "Google Drive root/TEMP",
+      "temp_folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+      "permissions": "owner-only/shared=false"
+    },
+    "pm_independent_QA": {
+      "downloaded_all_3_SHA_bytes": "PASS_3_3",
+      "zip_CRC": "PASS_2_2",
+      "inner_manifest_SHA_bytes": "PASS_9_9",
+      "isolated_restoration": {
+        "repo_HEAD_verified": true,
+        "tree_verified": true,
+        "code_files": 1175,
+        "git_history_commits": 1559,
+        "mapped_source_records": 22528,
+        "zero_overwrite": true,
+        "restore_local_sha256": "09baceedcc95f80a16fe5e6892b1be81519eee545e7bdbdf6ca0ab5737fc9e84"
+      },
+      "actual_native_pytest": {
+        "count": 91,
+        "passed": 91,
+        "failed": 0,
+        "environment": "Python3.13.5; new test_buy_quantity_price_basis.py plus three existing Family W5 test modules"
+      },
+      "native_w8": {
+        "passed": 50,
+        "total": 50,
+        "status": "PASS",
+        "exit_code": 0
+      },
+      "native_w10": {
+        "passed": 30,
+        "total": 30,
+        "status": "PASS",
+        "exit_code": 0
+      },
+      "native_w11": {
+        "passed": 63,
+        "total": 64,
+        "status": "FAIL_PREEXISTING_HISTORIC_C04_REGISTRY_MISSING",
+        "exit_code": 1,
+        "missing_source": "系統工程/股票V80/正式Runtime/A78_W02_Reason_Error_Code_Registry.json"
+      },
+      "original_CI_junit_verified_from_bytes_not_PM_rerun": {
+        "W5": {
+          "passed": 613,
+          "total": 613
+        },
+        "W8": {
+          "passed": 1566,
+          "total": 1566
+        },
+        "combined": {
+          "passed": 2179,
+          "total": 2179,
+          "fail": 0,
+          "error": 0,
+          "skip": 0
+        }
+      },
+      "CI_six_success_on_same_HEAD": [
+        42135708284,
+        42135708303,
+        42135708363,
+        42135708251,
+        42135708249,
+        42135708240
+      ],
+      "original_Codex_local_tests": {
+        "passed": 2178,
+        "failed": 1,
+        "total": 2179,
+        "error": 0,
+        "skip": 0,
+        "failed_test": "test_real_late_result_cannot_replace_retry_publication",
+        "reason": "5 second computation timeout; root cause unverified, original proof retained"
+      },
+      "nine_synthetic_cases": {
+        "parent_exposure_over": 3,
+        "parent_post_completion_mismatch": 6,
+        "new_exposure_over": 0,
+        "new_post_completion_mismatch": 0
+      },
+      "actual_case": {
+        "target": "100",
+        "stage_rate": "0.95",
+        "confirmed_qty": "9.4",
+        "canonical_valuation_price": "10",
+        "order_price": "9.9",
+        "lot": "0.001",
+        "fee": "0",
+        "new_order_qty": "0.100",
+        "new_cash_notional": "0.990",
+        "new_valuation_increment": "1.000",
+        "new_completion_rate": "0.95",
+        "new_remaining_gap": "0"
+      },
+      "hold_timeouts_and_missing_registry": true
+    },
+    "permanent_PM_qa_doc": {
+      "name": "PM_PR59_3f7ea0d_買進股數雙價格與完成率_獨立驗收_PASS_SCOPED_20261106",
+      "file_id": "1j3km4TJz00OGwlNyCMz0H2m5Doa8mN9Ph_OiCKqBtaw",
+      "url": "https://docs.google.com/document/d/1j3km4TJz00OGwlNyCMz0H2m5Doa8mN9Ph_OiCKqBtaw/edit",
+      "private": true
+    },
+    "official_github_review": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6676084624",
+    "governance": {
+      "construction_doc": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "file_management_doc": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "master_WBS": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "pre_write_backups": [
+        "1PcjLxJ4D6pDDUQVgGC5Tmg5ZG0GDtLn1eJKeu5U9SzY",
+        "1sGEb5LX4M11zWYepF-WOpqf1oSGOvhSpKg6UUJTFuws",
+        "1CLyhvWZjwCuRXxqNUbCkDfRGdUOHw_RaNeynlgovv2Q"
+      ],
+      "formal_rule": "V82.md v1.22.0 unchanged",
+      "code_owner": "Original V82 Codex is unique PR59 writer",
+      "pm_code_write": false
+    },
+    "PR59": "DRAFT_UNMERGED",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "next_writer": "Original V82 Codex continues lawful historical event publication/revision PIT, rights basis, same Primary qP/qV, four-household same-cutoff NAV/settled/reserved/pending SGOV, then C7B/schema83/CycleLedger/Work9/Mentor",
+    "next_middle_PM": "independently QA next PR59 delta, then four household 14x4=56 real E2E, GateD, four Projects, Trial, GateE by approved sequence",
+    "W11_historical_missing_source_not_waived": true,
+    "original_local_timeout_not_waived": true,
+    "PR60": "CLOSED_SCOPE_PRESERVED",
+    "PR61": "READ_ONLY"
+  },
+  "pm_latest_pr59_scoped_acceptance_key": "pm_20261106_pr59_3f7ea0d_buy_qty_dual_price_scoped_acceptance",
+  "pm_latest_buy_quantity_bug_status": "FIX_ACCEPTED_SCOPED_ON_3f7ea0d"
 }

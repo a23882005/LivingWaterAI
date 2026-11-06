@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-06T03:32:02.998Z",
+  "updated_at": "2026-11-06T04:57:53.310Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4459,5 +4459,144 @@
     "PR61": "READ_ONLY"
   },
   "pm_latest_pr59_scoped_acceptance_key": "pm_20261106_pr59_3f7ea0d_buy_qty_dual_price_scoped_acceptance",
-  "pm_latest_buy_quantity_bug_status": "FIX_ACCEPTED_SCOPED_ON_3f7ea0d"
+  "pm_latest_buy_quantity_bug_status": "FIX_ACCEPTED_SCOPED_ON_3f7ea0d",
+  "pm_20261106_nasdaq_23h_20261206_scope_source_code_review_and_codex_contract": {
+    "timestamp_iso": "2026-11-06T04:57:53.309Z",
+    "owner": "Family中PM全案PM",
+    "official_scope": "NASDAQ_23H_20261206_COMPATIBILITY_ONLY",
+    "status": "PM_SOURCE_AND_CODE_REVIEWED__CANDIDATE_CONTRACT_DISPATCHED__NEW_23H_NOT_IMPLEMENTED_OR_TESTED",
+    "investment_mother_rule": {
+      "name": "V82.md",
+      "drive_root_file_id": "1EObD96ptt3Io_YtTNGTWW1bms30wKguz",
+      "version": "v1.22.0",
+      "last_modified_tw": "2026/11/06 04:52",
+      "changed_by_23h": false
+    },
+    "approved_buy_quantity_fix": {
+      "pr59_sha": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "PM": "PASS_SCOPED",
+      "reference": "1j3km4TJz00OGwlNyCMz0H2m5Doa8mN9Ph_OiCKqBtaw",
+      "no_change": true
+    },
+    "fresh_pr59_current_head_at_disposition": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+    "git_repo": "a23882005/LivingWaterAI",
+    "pr59": 59,
+    "pr59_state": "DRAFT_UNMERGED",
+    "PM_contract": {
+      "title": "Family_PM_Nasdaq_23H_20261206_正式現況盤點與Codex最小施工契約_v0.1_20261106",
+      "version": "v0.1",
+      "drive_file_id": "1mhoLviSU3fQAVmPZyJwv2Masxkw1R51zyh7OM31GFQk",
+      "folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+      "private_owner_only": true,
+      "readback": true
+    },
+    "official_announcement": {
+      "date": "2026-12-06",
+      "night_start": "2026-12-06 21:00 America/New_York",
+      "taipei": "2026-12-07 10:00 Asia/Taipei",
+      "nasdaq_url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-46",
+      "data_url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=DN2026-8",
+      "sec_url": "https://www.sec.gov/files/rules/sro/nasdaq/2026/34-105199.pdf",
+      "condition": "SIP and exchange/broker/provider launch readiness still to be confirmed"
+    },
+    "test_universe": [
+      "ADBE",
+      "AVGO",
+      "CPAI",
+      "DRAM",
+      "DYNF",
+      "GOOG",
+      "IBKR",
+      "MDT",
+      "MSFT",
+      "NVDA",
+      "PPH",
+      "QQQ",
+      "SGOV",
+      "SMH",
+      "SOXX",
+      "VT",
+      "ZTS"
+    ],
+    "three_layer_readiness": {
+      "exchange_night": "PLANNED_SEC_RULES_APPROVED__LAUNCH_PENDING",
+      "IB_new_session_route_account_permissions": "UNKNOWN_USER_DOT_HAS_EXISTING_OVERNIGHT_QUOTES_NOT_23H_NEW_ROUTE",
+      "provider_night_trade_daily_volume": "UNKNOWN_NEEDS_SOURCE_SPECIFIC_RECEIPTS"
+    },
+    "code_paths_reviewed": [
+      "系統工程/Family/W8/member_market_source.py",
+      "系統工程/Family/W8/qualified_equity_inputs.py",
+      "系統工程/Family/W8/massive_daily_source.py",
+      "系統工程/Family/W8/nasdaq_daily_source.py",
+      "系統工程/Family/W8/ibkr_daily_source.py",
+      "系統工程/Family/W8/approved_v04_technical.py",
+      "系統工程/Family/W5/v82_slice_bridge.py",
+      "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/daily_slice.py",
+      "系統工程/Family/W8/v82_ledger_drive.py",
+      "系統工程/Family/W8/replacement_order_source.py",
+      "系統工程/Family/W8/post_trade_state.py"
+    ],
+    "findings": {
+      "existing_ledger_same_session_b0": "EXISTING_NATIVE_INVARIANTS_PASS_IF_CORRECT_SESSION_ID_SUPPLIED",
+      "actual_night_event_to_session_id_producer": "UNVERIFIED_SOURCE_BASIS_NO_23H_ACCEPTANCE",
+      "daily_signal": "KEEP_EXISTING_COMPLETED_RTH_DAILY_ONLY_UNTIL_PROVIDER_BASIS_ATTESTED",
+      "massive_volume": "FORM_T_EXTENDED_TRADES_CAN_CHANGE_DAILY_VOLUME_WITHOUT_CHANGING_DAILY_OHLC_IN_DOCUMENTED_ENDPOINT; NEW_9PM_SESSION_NOT_ATTESTED",
+      "M8": "APPROVED_A_B_UNCHANGED; SOURCE_BASIS_CHANGE_REQUIRES_OWNER_APPROVAL",
+      "cancelled_order": "BROKER_CONFIRMATION_REQUIRED_FOR_LIVE_ORDER_RELEASE; LOCAL_RELEASED_SEPARATE",
+      "trading": "NO_NEW_ORDERS"
+    },
+    "PM_readonly_baseline_QA": {
+      "existing_native_pytest": {
+        "passed": 137,
+        "total": 137,
+        "files": [
+          "test_v10_daily_slice.py",
+          "test_massive_daily_source.py",
+          "test_qualified_equity_inputs.py",
+          "test_m1_m8_amendment.py"
+        ],
+        "status": "PASS_EXISTING_INVARIANTS_NOT_23H_IMPLEMENTATION"
+      },
+      "independent_synthetic_probe": {
+        "passed": 13,
+        "total": 13,
+        "sha256": "ebba7d91e105527574be32046b1fb64350e212b35d09971df7520a26655b8638",
+        "scope": "CONDITIONAL_CORRECT_SESSION_ID__NO_REAL_NIGHT_MARKET_PRODUCER"
+      },
+      "existing_regression_log_sha256": "bbea7bdbb94491d08a0a1539fa80b24e83b380a1b375b7f19c2cd1c04ef31e3a",
+      "test_new_23h_feature_completed": 0,
+      "real_sip_broker_data_gate_completed": 0
+    },
+    "test_contract": "T01-T11 defined in PM Doc; 17 instruments x exchange/source/broker evidence",
+    "codex_contract": {
+      "writer": "Original V82 Codex as sole code writer",
+      "github_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6677269409",
+      "candidate_branch_requested": "family/nasdaq-23h-compat-20261206",
+      "candidate_base_commit": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "draft_stacked_PR_base_requested": "family/w8-complete-04-joseph-mou",
+      "branch_created": false,
+      "new_PR_number": null,
+      "first_deliverable": "Precise original source producers, existing/new code diff, T01-T11 tests and evidence before minimal patch",
+      "existing_PM_PASS_preserved": true
+    },
+    "governance": {
+      "construction_id": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "file_management_id": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "master_WBS_id": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "all_prewrite_backups_in_family_private": [
+        "1fs5QSosaJk3WNFu-h0dUjuvIfIZNSixlFcbxwPDi8kg",
+        "1RXqK17ZzvinlFMk7WjHbd4Ynb0IOyL7H9Pv3--tMUvA",
+        "1gzyzklKbbG_UzGS_4vehMLGEBfumAxolhgS_5iwX4TE"
+      ],
+      "readback": "PENDING_GOV_CHECKPOINT_CONFIRMATION"
+    },
+    "restrictions": "NO_V82_STRATEGY_CHANGE_NO_M8_VOLUME_REBASIS_WITHOUT_OWNER_APPROVAL_NO_24H_HOST_NO_NEW_DB_NO_AUTO_BROKER_ORDERS",
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "financial_PASS": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE"
+  },
+  "pm_latest_nasdaq_23h_contract_key": "pm_20261106_nasdaq_23h_20261206_scope_source_code_review_and_codex_contract"
 }

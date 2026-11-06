@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-06T05:41:11.387Z",
+  "updated_at": "2026-11-06T09:25:13.873Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4659,5 +4659,91 @@
     "production": "HOLD",
     "trade": "NONE"
   },
-  "pm_latest_codex_sequential_work_order_key": "pm_20261106_pr59_financial_source_receipt_plus_nasdaq23h_sequential_dispatch"
+  "pm_latest_codex_sequential_work_order_key": "pm_20261106_pr59_financial_source_receipt_plus_nasdaq23h_sequential_dispatch",
+  "pm_h6_20261106_three_zip_successor_handoff_completed": {
+    "timestamp_utc": "2026-11-06T09:25:13.873Z",
+    "owner": "Family_middle_PM / overall project PM",
+    "decision": "HANDOFF_COMPLETE_THREE_PRIVATE_DRIVE_ZIPS_VERIFIED",
+    "root_temp_folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "root_temp_folder_url": "https://drive.google.com/drive/folders/1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "packs": [
+      {
+        "label": "ZIP1 role/governance",
+        "title": "Family中PM_20261106_交接ZIP1_職責治理與正式規則.zip",
+        "file_id": "1uSMlRun1kOc_ijB-KuCo_aKbSPSmVTfn",
+        "bytes": 14986,
+        "sha256": "1b61e8ea88d5382b100b1b484baeed9f3075047989e6fa2f44dda0811cd59ce7",
+        "members": 10
+      },
+      {
+        "label": "ZIP2 PR59/finance",
+        "title": "Family中PM_20261106_交接ZIP2_PR59金融已驗收與來源續工.zip",
+        "file_id": "1fBrg87SF9w-YlObGVNVlheZhL6y7MaGU",
+        "bytes": 14460,
+        "sha256": "5b7f1d85b98acc85d901387fe9bbf0389235e10fd9881fabb2e78cef7a9b7886",
+        "members": 10
+      },
+      {
+        "label": "ZIP3 Nasdaq23H",
+        "title": "Family中PM_20261106_交接ZIP3_Nasdaq23H候選施工與驗收.zip",
+        "file_id": "1S0A1pUJqOfXO7EwZOEoKwY93QAl-wa-s",
+        "bytes": 13794,
+        "sha256": "d9c6df517cd7441d524919cf379429b3438d829f4acb47316b7f7fe86cc1dcf7",
+        "members": 10
+      }
+    ],
+    "QA": {
+      "remote_redownload_identical_bytes": true,
+      "zip_crc_pass": 3,
+      "internal_manifest_sha_pass": 3,
+      "shared": false,
+      "owner_only": true,
+      "old_bundles_unchanged": true,
+      "private_account_files_not_packed": true
+    },
+    "baseline": {
+      "v82_version_last_checked": "v1.22.0",
+      "v82_mtime_taipei": "2026/11/06 04:52",
+      "v82_file_id": "1EObD96ptt3Io_YtTNGTWW1bms30wKguz",
+      "pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "prior_scoped_passes_preserved": [
+        "af16a9d",
+        "c91a511",
+        "6d7f224",
+        "218ce4a",
+        "234221e",
+        "3f7ea0d"
+      ]
+    },
+    "source_QA": {
+      "codex_self_report": "four DB identity/SHA 4/4; 90d executions 50 incl SGOV 21",
+      "PM_status": "NEW_PRIVATE_RAW_SOURCE_FILE_IDS_SHA_AND_CUTOFF_PENDING_INDEPENDENT_QA"
+    },
+    "two_stream_sequence": {
+      "first": "PR59 financial source evidence, opening position, PIT same Primary qPqV, same cutoff own account",
+      "second": "independent Nasdaq23H draft candidate, 17 tickers/T01-T11, no strategy rule changes"
+    },
+    "next_role": "successor Family middle PM re-reads live V82/Checkpoint/PR59, independently QA next Codex source packet, records all gates",
+    "formal_documents": {
+      "root_filepolicy_id": "1OSLqc4U5bFCAKe94V_UlAWTM8WH1t2O9",
+      "family_construction": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "family_file_management": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "master_wbs": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "pre_write_backup_ids": [
+        "17MrUW_SG1xHAlPUpo1EVab8SmK-oDkpIiGjZjm4bWqI",
+        "1B09DXm-ZiH1xcN197nxiNIO1OzKqryMZEjvRYZewo1A",
+        "1HIpHtyb9H-LhR_CwJEcWNIkeAPJZ1mHKHbM64Mobyik"
+      ]
+    },
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE",
+    "PR59": "DRAFT_UNMERGED",
+    "PR60": "CLOSED_SCOPE",
+    "PR61": "READ_ONLY"
+  },
+  "pm_latest_handoff_key": "pm_h6_20261106_three_zip_successor_handoff_completed"
 }

@@ -1,0 +1,49 @@
+# One-time owner-requested launch of the unchanged official deployment.
+# No schedule, no custom deployment, and no direct use of deployment secrets.
+name: Firepillar AI temporary website update 20261106
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v703-temp-firepillar-deploy-20261106.yml'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: v703-temp-firepillar-deploy-20261106
+  cancel-in-progress: false
+jobs:
+  dispatch-official-deploy:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event.head_commit.message == 'ci(v703): temporary deploy approved firepillar header' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify approved HTML and dispatch the existing official deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXPECTED_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          actual_head="$(gh api "repos/$GH_REPO/branches/main" --jq '.commit.sha')"
+          test "$actual_head" = "$EXPECTED_HEAD" || {
+            echo "::error::main changed after this one-time request; stop without deploying."
+            exit 1
+          }
+          actual_blob="$(gh api "repos/$GH_REPO/git/trees/$EXPECTED_HEAD?recursive=1" --jq '.tree[] | select(.path == "系統工程/總經V70/V70-3-27.html") | .sha')"
+          test "$actual_blob" = '7974b5eb16ad5cdd8e07dbdcdea8fcee3630a0dc' || {
+            echo "::error::Approved visible-header HTML does not match; stop without deploying."
+            exit 1
+          }
+          gh api --method POST "repos/$GH_REPO/actions/workflows/v703-site-deploy-1100.yml/dispatches" -f ref=main
+          {
+            echo '## One-time deployment request submitted'
+            echo "Source commit: $EXPECTED_HEAD"
+            echo "Approved HTML blob: $actual_blob"
+            echo 'Official workflow: v703-site-deploy-1100.yml'
+            echo 'All existing publication QA, source validation, retries, and live readback remain unchanged.'
+            echo 'Submission is not deployment success; inspect the official workflow run.'
+          } >> "$GITHUB_STEP_SUMMARY"

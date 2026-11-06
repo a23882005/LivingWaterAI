@@ -20,6 +20,7 @@ import time
 import tempfile
 import hashlib
 from pathlib import Path
+from urllib.parse import urlparse
 
 D009_RUN_STARTED=time.monotonic()
 D009_FETCH_DEADLINE_SECONDS=18*60
@@ -87,6 +88,67 @@ def load_source_config():
             raise ValueError('D009 invalid tolerance: '+key)
     return config
 
+
+
+MONTHLY_OFFICIAL_IDS = frozenset(("m04", "m05", "m15", "m18", "m19", "m20"))
+OFFICIAL_CALENDAR_DOMAINS = frozenset(("www.bls.gov", "www.ismworld.org", "fred.stlouisfed.org"))
+
+
+def verified_monthly_calendar(today, now_utc=None):
+    """Only source-backed official releases may extend the latest monthly observation's validity."""
+    now_utc = now_utc or dt.datetime.now(dt.timezone.utc)
+    if now_utc.tzinfo is None:
+        raise ValueError("Official release clock must be timezone aware")
+    now_utc = now_utc.astimezone(dt.timezone.utc)
+    path = Path(__file__).resolve().parents[2] / "data/v703_official_monthly_release_calendar.json"
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        if raw.get("schema") != "V70.3/monthly-official-release-calendar-v1":
+            raise ValueError("unrecognized calendar schema")
+        checked = dt.datetime.fromisoformat(raw["checked_at_utc"].replace("Z", "+00:00"))
+        if checked.tzinfo is None or checked > now_utc:
+            raise ValueError("calendar verification time invalid")
+        items = raw["items"]
+        if not MONTHLY_OFFICIAL_IDS.issubset(items):
+            raise ValueError("missing required monthly calendar entries")
+        approved = {}
+        for key in MONTHLY_OFFICIAL_IDS:
+            data = items[key]
+            month = data["observation_month"]
+            if not re.fullmatch(r"20\d{2}-(0[1-9]|1[0-2])", month):
+                raise ValueError(key + ": invalid observation month")
+            observed = dt.date.fromisoformat(month + "-01")
+            published = dt.date.fromisoformat(data["publication_date"])
+            upcoming = dt.datetime.fromisoformat(data["next_release_at_utc"].replace("Z", "+00:00"))
+            source = urlparse(data["calendar_source_url"])
+            if (upcoming.tzinfo is None or not observed <= published <= today
+                    or not published < upcoming.date() <= observed + dt.timedelta(days=105)
+                    or source.scheme != "https" or source.hostname not in OFFICIAL_CALENDAR_DOMAINS):
+                raise ValueError(key + ": unverified monthly release schedule")
+            approved[key] = data
+        return approved
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print("OFFICIAL_MONTHLY_CALENDAR_UNAVAILABLE", str(exc)[:200], flush=True)
+        return {}
+
+
+def release_certified_live_month(item, calendar, now_utc):
+    """A successful live provider observation is fresh until the NEXT official release."""
+    key = item.get("id")
+    record = calendar.get(key)
+    if (key not in MONTHLY_OFFICIAL_IDS or not record
+            or item.get("attempt_result") != "SUCCESS"
+            or item.get("cache_used") or not item.get("last_verified_at")
+            or item.get("status") not in ("OK", "USABLE")):
+        return False
+    try:
+        observation = dt.date.fromisoformat(item["observation_date"])
+        verified = dt.datetime.fromisoformat(item["last_verified_at"].replace("Z", "+00:00"))
+        next_release = dt.datetime.fromisoformat(record["next_release_at_utc"].replace("Z", "+00:00"))
+        return (verified.tzinfo is not None and verified <= now_utc < next_release
+                and observation.strftime("%Y-%m") == record["observation_month"])
+    except (KeyError, TypeError, ValueError):
+        return False
 
 def atomic_write_text(path, content):
     """Replace validated UTF-8 output atomically, leaving prior file intact on failure."""
@@ -524,11 +586,12 @@ def ism_official(f, key):
     family='pmi' if key=='m04' else 'services'
     label='Manufacturing' if key=='m04' else 'Services'
     now=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
-    # Latest released ISM report is normally previous calendar month.
+    # Prefer this month's target. If that official report page is temporarily
+    # unavailable, check the SAME month's official newsroom roundup instead.
+    # Do not return last month's PMI as a newly fetched current headline.
     target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
     attempts=[]
-    # Once this month's release window passes, never accept an older PMI as newly retrieved.
-    candidates=(target,) if now.day>7 else (target,target-1)
+    candidates=(target,)
     for period in candidates:
         slug=months[period.month-1]
         url=f'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/{family}/{slug}/'
@@ -586,7 +649,9 @@ def ism_official(f, key):
             body=re.sub(r'\s+',' ',body)
             if not re.search(rf'{months[period.month-1]}\s+Manufacturing',body,re.I):
                 raise ValueError('ISM roundup report month/sector mismatch')
-            match=re.search(r'Manufacturing\s+PMI.{0,90}?(?:at|of|to)\s*(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',body,re.I)
+            # The roundup can say "Manufacturing PMI ... increased ... to at 55.5 percent".
+            # Its month/sector identity was checked above; reject unrelated subindexes.
+            match=re.search(r'Manufacturing\s+PMI.{0,210}?(?:at|registered|of)\s*(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',body,re.I)
             if not match: raise ValueError('ISM roundup headline value not found')
             value=float(match.group(1))
             if not 0<=value<=100: raise ValueError('ISM roundup PMI out of range')
@@ -718,7 +783,7 @@ def validate_manual(k,v):
     return row(k,value,v['observation_date'],v['source_url'],
                '人工查證輸入：'+v['method'],detail=v.get('detail',''))
 
-def freshen(r,today):
+def freshen(r,today,release_calendar=None,now_utc=None):
     if r['status'] not in ('OK','USABLE'):return r
     if r['observation_date'] is None:return r
     age=(today-dt.date.fromisoformat(r['observation_date'])).days
@@ -743,7 +808,8 @@ def freshen(r,today):
     limit=65 if r['id'] in monthly else 12
     if age<0:
         r['status']='MISSING';r['error']='觀測日期在未來，拒絕使用';r['value']=None
-    elif age>limit:
+    elif age>limit and not release_certified_live_month(
+            r, release_calendar or {}, now_utc or dt.datetime.now(dt.timezone.utc)):
         r['status']='STALE';r['detail']+=(f'; 距今 {age} 天 > {limit} 天')
     return r
 
@@ -939,7 +1005,11 @@ def run(outdir,overrides_path=None,cache_path=None):
             if k=='s03': raise ValueError('s03 是 m07 的複用欄位，請只覆寫 m07')
             verified=validate_manual(k,v)
             original=results[k]
-            if original['status']=='OK' and verified['observation_date']<original['observation_date']:
+            if (original['status']=='OK' and
+                    (verified['observation_date']<original['observation_date'] or
+                     (verified['observation_date']==original['observation_date'] and
+                      original.get('source_evidence') and
+                      abs(float(original['value'])-float(verified['value']))<1e-9))):
                 print('SKIP 舊覆寫:',k)
             else:
                 for field in ('attempted_at','attempt_result','source_attempts'):
@@ -984,13 +1054,16 @@ def run(outdir,overrides_path=None,cache_path=None):
                     except (ValueError,TypeError,KeyError,OverflowError) as e:
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)
         except (OSError,ValueError,TypeError) as e:print('忽略損壞快取',e,file=sys.stderr)
-    for k in results: freshen(results[k],today)
+    now_utc=dt.datetime.now(dt.timezone.utc)
+    official_calendar=verified_monthly_calendar(today,now_utc)
+    for k in results: freshen(results[k],today,official_calendar,now_utc)
     # Preserve actual source observation dates and mark cached/old observations.
     for k,r in results.items():
         if k=='s03' or not r.get('observation_date'): continue
         age=(today-dt.date.fromisoformat(r['observation_date'])).days
         limit=config['indicators'][k]['max_age_days']
-        if age>limit and r['status'] in ('OK','USABLE'):
+        if (age>limit and r['status'] in ('OK','USABLE')
+                and not release_certified_live_month(r,official_calendar,now_utc)):
             r['status']='STALE'
             r['detail']+=(f'; D009 source config age {age} > {limit} days')
     # m07 和 s03 必須一致，不允許歷史快取、人工覆寫造成互相矛盾。

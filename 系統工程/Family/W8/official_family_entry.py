@@ -8,6 +8,7 @@ Google Drive remains the sole official customer-record store.
 import hashlib
 import json
 import importlib.util
+from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -170,7 +171,9 @@ class OfficialFamilyEntry:
             # No caller-controlled target selector: the W5 trusted source
             # should determine scope, never guess among independent purposes.
             missing.append("single_confirmed_target_purpose")
-        if self.analysis_provider is None or missing:
+        externally_bound = (getattr(self.analysis_provider,
+            "supports_external_target_source", False) is True)
+        if self.analysis_provider is None or (missing and not externally_bound):
             if self.analysis_provider is None:
                 missing.append("official_market_and_approved_engine_request")
             intake = getattr(self, "current_source_provider", None)
@@ -194,15 +197,86 @@ class OfficialFamilyEntry:
             or request.get("client_snapshot", {}).get("payload", {}).get("source_sha256") != current["source_sha256"]):
             raise PermissionError("OFFICIAL_ANALYSIS_SOURCE_MISMATCH")
         context = runner.context_provider()
+        member_binding=context.get('member_v82_analysis_binding',{})
+        if member_binding:
+            if (member_binding.get('schema_version')!='Family.W8.MemberV82Binding.v1'
+                or member_binding.get('client_id')!=self.client_id or context.get('client_id')!=self.client_id
+                or member_binding.get('run_id')!=request.get('run_id')
+                or member_binding.get('source_db_sha256')!=current['source_sha256']
+                or member_binding.get('source_data_provenance')!='SOURCE_BACKED'):
+                raise PermissionError('OFFICIAL_MEMBER_V82_BINDING_MISMATCH')
+            decision=runner.analyze(request)
+            from family_input import digest
+            component=decision.get('component_report_digest',decision.get('report_digest'))
+            complete=decision.get('full_native_pipeline_complete') is True
+            if (component!=member_binding['report_digest']
+                or decision.get('report_digest')!=digest({k:v for k,v in decision.items() if k!='report_digest'})
+                or complete!=(decision.get('full_native_mentor_reached') is True)
+                or complete!=(decision.get('status')=='FINANCIAL_PIPELINE_COMPLETE')
+                or complete!=(decision.get('canonical_result') is not None)
+                or decision.get('trade_action')!='NO_TRADE' or decision.get('trade_authorization')!='NONE'):
+                raise PermissionError('OFFICIAL_MEMBER_V82_RESULT_MISMATCH')
+            return {**decision,'source_sha256':current['source_sha256']}
+        analysis_binding=context.get('holdings_analysis_binding',{})
+        if analysis_binding:
+            if (analysis_binding.get('schema_version')!='Family.W8.HoldingsAnalysisBinding.v1'
+                or analysis_binding.get('client_id')!=self.client_id
+                or context.get('client_id')!=self.client_id
+                or analysis_binding.get('run_id')!=request.get('run_id')
+                or analysis_binding.get('source_db_sha256')!=current['source_sha256']
+                or analysis_binding.get('source_data_provenance')!='SOURCE_BACKED'):
+                raise PermissionError('OFFICIAL_HOLDINGS_ANALYSIS_BINDING_MISMATCH')
+            decision=runner.analyze(request)
+            if decision.get('report_digest')!=analysis_binding['report_digest']:
+                raise PermissionError('OFFICIAL_HOLDINGS_ANALYSIS_RESULT_MISMATCH')
+            # Family A statuses never promote a local component to Work9 canonical.
+            return {**decision,'source_sha256':current['source_sha256']}
+        source_binding=context.get('source_production_binding',{})
+        source_failure_bound=(source_binding.get('schema_version')=='Family.W8.SourceProductionBinding.v1'
+            and source_binding.get('client_id')==self.client_id
+            and source_binding.get('source_db_sha256')==current['source_sha256']
+            and source_binding.get('run_id')==request.get('run_id')
+            and source_binding.get('data_provenance')=='SOURCE_BACKED')
         if (context.get("client_id") != self.client_id
-            or context.get("native_binding", {}).get("data_provenance") != "SOURCE_BACKED"):
+            or (context.get("native_binding", {}).get("data_provenance") != "SOURCE_BACKED"
+                and not source_failure_bound)):
             raise PermissionError("OFFICIAL_ANALYSIS_PROVENANCE_REQUIRED")
         decision = runner.analyze(request)
         if decision.get("status") != "OK":
-            return {"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
+            result={"status": "DATA_UNAVAILABLE", "code": "UPSTREAM_ANALYSIS_INCOMPLETE",
                     "client_id": self.client_id, "source_sha256": current["source_sha256"],
                     "issue_codes": decision.get("issue_codes", []),
+                    "canonical_result": None, "mentor": None, "trade_action": "NO_TRADE",
                     "trade_authorization": "NONE"}
+            review = decision.get('configuration_review')
+            if review is not None:
+                if (review.get('schema_version') != 'Family.W5.ConfigurationReview.v1'
+                    or review.get('client_id') != self.client_id
+                    or review.get('run_id') != request.get('run_id')
+                    or review.get('evaluation_at') != request.get('evaluation_at')
+                    or review.get('owner') != request.get('owner')
+                    or review.get('source_db_sha256') != current['source_sha256']
+                    or review.get('full_native_pipeline_complete') is not False
+                    or review.get('full_native_mentor_reached') is not False
+                    or review.get('trade_action') != 'NO_TRADE'):
+                    raise PermissionError('OFFICIAL_CONFIGURATION_REVIEW_BINDING_MISMATCH')
+                result['configuration_review'] = deepcopy(review)
+                progress = review.get('deployment_progress')
+                if progress is not None:
+                    if (progress.get('schema_version') != 'Family.W8.DeploymentProgressReview.v1'
+                        or any(progress.get(k) != review.get(k) for k in
+                            ('client_id','run_id','owner','evaluation_at','source_db_sha256'))
+                        or progress.get('full_native_pipeline_complete') is not False
+                        or progress.get('full_native_mentor_reached') is not False
+                        or progress.get('trade_action') != 'NO_TRADE'):
+                        raise PermissionError('OFFICIAL_DEPLOYMENT_PROGRESS_BINDING_MISMATCH')
+            if source_failure_bound:
+                result.update(source_production=decision.get('source_production'),
+                    call_trace=decision.get('call_trace',[]),mentor=decision.get('mentor'))
+                report=decision.get('source_production') or {}
+                result.update(analysis_summary=report.get('analysis_summary'),
+                    analysis_mode=report.get('analysis_mode'),cash_trial=report.get('cash_trial'))
+            return result
         if decision.get("client_id") != self.client_id or decision.get("data_provenance") != "SOURCE_BACKED":
             raise PermissionError("OFFICIAL_RESULT_CLIENT_MISMATCH")
         for key in ("run_id", "evaluation_at"):
@@ -231,6 +305,8 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                coordinator, principal_provider, analysis_provider=None,
                                other_handlers=None, completion_checks=None, report_store=None, report_renderer=None,
                                trusted_analysis_source_producer=None,
+                               official_holdings_decision=None, official_drive_file_id=None,
+                               official_holdings_previous_snapshot=None,
                                trusted_w6_current_input_producer=None, approved_w6_renderer=None,
                                approved_w6_archive=None, current_source_provider=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
@@ -251,7 +327,10 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
         provider_module = importlib.util.module_from_spec(provider_spec)
         provider_spec.loader.exec_module(provider_module)
         analysis_provider = provider_module.OnDemandAnalysisProvider(
-            trusted_analysis_source_producer)
+            trusted_analysis_source_producer,
+            official_holdings_decision=official_holdings_decision,
+            official_holdings_previous_snapshot=official_holdings_previous_snapshot,
+            official_file_id=official_drive_file_id)
     official = OfficialFamilyEntry(
         auth=auth, login_account=login_account, client_id=client_id,
         coordinator=coordinator, principal_provider=principal_provider,

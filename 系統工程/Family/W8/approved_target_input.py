@@ -1,0 +1,342 @@
+"""Read existing approved document targets into a native analysis input view.
+
+This is not W2 proposal signing or a database mutation. The trusted operator
+binds a downloaded, reviewed source and explicit instrument/role mappings.
+Original approval timing and capital remain unknown when the source lacks them.
+"""
+from copy import deepcopy
+from datetime import datetime, timezone
+from decimal import Decimal
+from hashlib import sha256
+from pathlib import Path
+import json
+import re
+
+
+def _digest(obj):
+    return sha256(json.dumps(obj,sort_keys=True,ensure_ascii=False,
+        separators=(',', ':'),allow_nan=False).encode()).hexdigest()
+
+
+def read_document_target_money(text,source_line):
+    """Read only the exact approved table row and its currency-labelled header.
+
+    A displayed approximate conversion remains secondary evidence. An absent
+    row/amount never becomes zero; no current NAV or FX is manufactured.
+    """
+    lines=text.splitlines();found=[]
+    for index,line in enumerate(lines):
+        if line!=source_line:continue
+        cells=[v.strip().replace('**','') for v in line.strip().strip('|').split('|')]
+        header=None
+        for prior in reversed(lines[max(0,index-30):index]):
+            if not prior.strip():break
+            cols=[v.strip().replace('**','') for v in prior.strip().strip('|').split('|')]
+            if len(cols)==len(cells) and any('目標' in c for c in cols) and not any(re.fullmatch(r':?-+:?',c) for c in cols):
+                # Skip other data rows; a header must name the asset and amount.
+                if any(c in ('標的','子桶','資產') for c in cols):header=cols;break
+        if header is None:continue
+        for position,(label,value) in enumerate(zip(header,cells)):
+            if not ('目標金額' in label or '目標台幣' in label or '目標美元' in label):continue
+            currency='TWD' if 'NT$' in label or '台幣' in label or 'NT$' in value else 'USD' if 'US$' in label or '美元' in label or 'US$' in value else None
+            if currency is None:continue
+            cleaned=value.replace('NT$','').replace('US$','').replace(',','').strip()
+            if not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?',cleaned):continue
+            amount=Decimal(cleaned)
+            if not amount.is_finite() or amount<0:continue
+            found.append({'value_state':'KNOWN','amount':str(amount),'currency':currency,
+                'source_row':source_line,'source_column':label,'source_column_index':position,
+                'scope':'EXISTING_APPROVED_TARGET__NOT_CURRENT_NAV'})
+    unique={(r['amount'],r['currency']) for r in found}
+    if len(unique)==1:return found[0]
+    return {'value_state':'UNKNOWN','amount':None,'currency':None,
+        'reason':'APPROVED_TABLE_AMOUNT_OR_CURRENCY_MISSING' if not unique else 'APPROVED_TABLE_AMOUNT_AMBIGUOUS'}
+
+
+def enrich_document_target_view(target,proof):
+    """Repair a read-only source mapping, retaining the same approved weights.
+
+    No signing event, approval version or DB row is created. The new view hash
+    is derived from the unchanged source; the old view is retained in lineage.
+    """
+    if target.get('source_kind')!='EXISTING_APPROVED_DOCUMENT':return deepcopy(target),deepcopy(proof)
+    path=Path(proof['local_source_path']);raw=path.read_bytes()
+    if sha256(raw).hexdigest()!=proof['source_sha256'] or _digest(target)!=proof['target_view_digest']:
+        raise PermissionError('APPROVED_TARGET_SOURCE_OR_VIEW_CHANGED')
+    text=raw.decode('utf-8-sig');view=deepcopy(target);record=view['payload'];draft=record['draft'];changed=False
+    for line in draft['target_lines']:
+        original=line.get('original_document_row')
+        if not original or original not in text.splitlines():raise PermissionError('APPROVED_TARGET_ROW_NOT_IN_SOURCE')
+        money=read_document_target_money(text,original)
+        current=line.get('target_amount',{})
+        if current.get('value_state')=='KNOWN':
+            if money.get('value_state')=='KNOWN' and (Decimal(str(current['amount']))!=Decimal(money['amount']) or current['currency']!=money['currency']):
+                raise ValueError('APPROVED_TARGET_AMOUNT_SOURCE_CONFLICT')
+            continue
+        if money['value_state']=='KNOWN':line['target_amount']=money;changed=True
+    # The active allocation may explicitly name existing holdings at 0% in
+    # the paragraph following its table. Absence from a table alone is never
+    # zero. Read only this table's following paragraph, not older allocations.
+    source_lines=text.splitlines()
+    signature={r['original_document_row'] for r in draft['target_lines']
+        if r.get('original_document_row','').startswith('|')}
+    table_ends=[];block=[]
+    for i,s in enumerate(source_lines+['']):
+        if s.startswith('|'):block.append(s);continue
+        if signature and signature.issubset(set(block)):table_ends.append(i-1)
+        block=[]
+    currencies={r.get('target_amount',{}).get('currency') for r in draft['target_lines']
+        if r.get('target_amount',{}).get('value_state')=='KNOWN'}
+    if len(table_ends)==1 and len(currencies)==1 and all(r.get('target_amount',{}).get('value_state')=='KNOWN' for r in draft['target_lines']):
+        currency=next(iter(currencies))
+        for source_line in source_lines[table_ends[0]+1:table_ends[0]+13]:
+            if source_line.startswith('#'):break
+            match=re.match(r'^[-*]\s*([A-Z0-9]+(?:[／/、][A-Z0-9]+)+)目前[^\n]*長期目標\s*0\s*%',source_line)
+            if not match:continue
+            for symbol in re.split('[／/、]',match.group(1)):
+                existing=[r for r in draft['target_lines'] if r.get('ticker')==symbol]
+                if existing:
+                    if any(r['weight'].get('value_state')!='KNOWN' or Decimal(str(r['weight']['value']))!=0 for r in existing):
+                        raise ValueError('APPROVED_ZERO_TARGET_SOURCE_CONFLICT')
+                    continue
+                draft['target_lines'].append({'instrument_id':symbol,'ticker':symbol,
+                    'asset_type':'EXISTING_ASSET__NATIVE_TYPE_UNVERIFIED',
+                    'weight':{'value':0,'value_state':'KNOWN'},
+                    'target_amount':{'value_state':'KNOWN','amount':'0','currency':currency,
+                        'source_row':source_line,'source_column':'EXPLICIT_APPROVED_ZERO_PERCENT_TARGET',
+                        'scope':'EXPLICIT_ZERO_TARGET__NOT_ABSENT_ROW_DEFAULT'},
+                    'source_reference_ids':[proof['source_reference']],
+                    'original_document_row':source_line,
+                    'policy':'NO_NEW_BUY__NOT_AN_AUTOMATIC_SELL_INSTRUCTION'})
+                changed=True
+    amounts=[r['target_amount'] for r in draft['target_lines']]
+    currencies={a.get('currency') for a in amounts}
+    if all(a.get('value_state')=='KNOWN' for a in amounts) and len(currencies)==1:
+        denominator={'value_state':'KNOWN','amount':str(sum((Decimal(a['amount']) for a in amounts),Decimal(0))),
+            'currency':next(iter(currencies)),'scope':'SUM_OF_APPROVED_TARGET_AMOUNTS__NOT_CURRENT_MARKET_NAV'}
+        if draft.get('denominator')!=denominator:draft['denominator']=denominator;changed=True
+    if not changed:return view,deepcopy(proof)
+    draft['source_mapping_lineage']={'previous_view_digest':_digest(target),'previous_target_hash':target['target_hash'],
+        'source_sha256':proof['source_sha256'],'operation':'READ_EXISTING_EXPLICIT_AMOUNTS','approval_unchanged':True}
+    draft['draft_hash']=_digest({k:v for k,v in draft.items() if k!='draft_hash'})
+    record['target_hash']=view['target_hash']=draft['draft_hash']
+    mapped=deepcopy(proof);mapped['target_view_digest']=_digest(view)
+    return view,mapped
+
+
+def build_approved_target_view(*, client_id, source_path, source_reference,
+        source_available_at, target_version, allocation_version, rows, mappings):
+    """Return a lossless target view plus independently trusted source proof.
+
+    rows contain exact original Markdown source_line, source_columns and weight;
+    mappings explicitly name instrument_id/ticker/asset_type per original row.
+    No amount is calculated from an incomplete investment-pool denominator.
+    """
+    if not re.fullmatch(r'fam_[0-9a-f]{32}',str(client_id)):
+        raise ValueError('TARGET_CLIENT_REQUIRED')
+    when=datetime.fromisoformat(source_available_at.replace('Z','+00:00'))
+    if when.utcoffset() is None:
+        raise ValueError('TARGET_SOURCE_TIMEZONE_REQUIRED')
+    if type(target_version) is not int or target_version < 1:
+        raise ValueError('TARGET_VERSION_REQUIRED')
+    if not source_reference or not allocation_version or not rows or len(rows)!=len(mappings):
+        raise ValueError('TARGET_SOURCE_AND_EXPLICIT_MAPPING_REQUIRED')
+    path=Path(source_path).resolve(strict=True);raw=path.read_bytes();text=raw.decode('utf-8')
+    source_sha=sha256(raw).hexdigest();lines=[];ids=set();total=Decimal(0)
+    for row,mapping in zip(rows,mappings):
+        line=row['source_line']
+        if line not in text.splitlines():raise ValueError('TARGET_ROW_NOT_IN_SOURCE')
+        cells=[c.strip().replace('**','') for c in line.strip().strip('|').split('|')]
+        weight=Decimal(cells[1].rstrip('%'))/100
+        if weight!=Decimal(row['weight']) or not weight.is_finite() or not 0<=weight<=1:
+            raise ValueError('TARGET_WEIGHT_SOURCE_MISMATCH')
+        if any(not isinstance(mapping.get(k),str) or not mapping[k].strip()
+               for k in ('instrument_id','ticker','asset_type')):
+            raise ValueError('TARGET_INSTRUMENT_MAPPING_REQUIRED')
+        if mapping['instrument_id'] in ids:raise ValueError('TARGET_DUPLICATE_INSTRUMENT_ROLE')
+        ids.add(mapping['instrument_id']);total+=weight
+        lines.append({**deepcopy(mapping),'weight':{'value':float(weight),'value_state':'KNOWN'},
+            'target_amount':read_document_target_money(text,line),
+            'source_reference_ids':[source_reference],
+            'original_document_row':line})
+    if total!=1:raise ValueError('TARGET_DOCUMENT_TOTAL_NOT_ONE')
+    confirmation_run='APPROVED-DOC-'+source_sha[:24]
+    allocation_id='DOC-TARGET-'+_digest({'client':client_id,'source':source_sha,'version':allocation_version})[:24]
+    draft={'identity':{'client_id':client_id,'run_id':confirmation_run},
+        'allocation_id':allocation_id,'target_lines':lines,
+        'denominator':{'value_state':'UNKNOWN','amount':None,'currency':None},
+        'is_trade_authorized':False,'original_allocation_version':allocation_version}
+    draft['draft_hash']=_digest(draft)
+    evidence={'action':'READ_EXISTING_APPROVAL','approval_origin':'EXISTING_APPROVED_DOCUMENT',
+        'original_confirmed_at':None,'original_confirmed_by':None,
+        'confirmed_at':source_available_at,'confirmed_by':'DOCUMENTED_OWNER_DECISION',
+        'time_basis':'APPROVAL_RECORD_AVAILABLE_BY__NOT_ORIGINAL_SIGNING_TIME',
+        'source_reference_ids':[source_reference]}
+    record={'version':target_version,'target_id':allocation_id,'target_hash':draft['draft_hash'],
+        'status':'APPROVED_DOCUMENT_VIEW','draft':draft,'confirmation_evidence':evidence,
+        'confirmation_evidence_hash':_digest(evidence),'source_reference_ids':[source_reference]}
+    view={'source_kind':'EXISTING_APPROVED_DOCUMENT','payload':record,
+        'target_hash':record['target_hash'],'target_version':target_version,
+        'confirmation_run_id':confirmation_run}
+    proof={'schema_version':'Family.W5.ApprovedDocumentTargetSource.v1','client_id':client_id,
+        'local_source_path':str(path),'source_sha256':source_sha,
+        'source_reference':source_reference,'source_available_at':source_available_at,
+        'target_view_digest':_digest(view),'data_provenance':'SOURCE_BACKED'}
+    return {'target':view,'trusted_approved_target_source':proof,
+        'trade_authorization':'NONE','database_written':False}
+
+
+def bind_document_account_scope(snapshot, target_pack, *, account_key, broker,
+                                broker_source_label, currency, funding_domain):
+    """Bind an existing member-local brokerage category for analysis only.
+
+    This never asserts a full brokerage account number, cash availability,
+    holdings completeness or authority to read a connected broker account.
+    """
+    proof=deepcopy(target_pack['trusted_approved_target_source'])
+    if snapshot['client_id']!=proof['client_id']:
+        raise PermissionError('ACCOUNT_DOCUMENT_CLIENT_MISMATCH')
+    matches=[r for r in snapshot['tables']['portfolio_account'] if r['account_key']==account_key]
+    if len(matches)!=1:raise ValueError('ACCOUNT_CATEGORY_MISSING_OR_AMBIGUOUS')
+    text=Path(proof['local_source_path']).read_text()
+    if not broker_source_label or broker_source_label not in text:
+        raise ValueError('ACCOUNT_BROKER_NOT_IN_APPROVED_SOURCE')
+    if any(not isinstance(v,str) or not v.strip() for v in (broker,currency,funding_domain)):
+        raise ValueError('ACCOUNT_CATEGORY_MAPPING_REQUIRED')
+    owner={'client_id':snapshot['client_id'],'funding_domain':funding_domain,
+        'broker':broker,'account':account_key,'currency':currency}
+    return {'schema_version':'Family.W5.DocumentAccountScope.v1','owner':owner,
+        'source':proof,'source_snapshot_digest':snapshot['payload_digest'],
+        'original_account_row':deepcopy(matches[0]),
+        'scope_kind':'MEMBER_LOCAL_BROKER_CATEGORY_ANALYSIS_ONLY',
+        'external_broker_account_id':None,'cash_verified':False,
+        'holdings_completeness_verified':False,'trade_authorization':'NONE'}
+
+
+def bind_official_holdings(snapshot, *, official_file_id, account_key,
+                          owner_decision, evaluation_at,previous_snapshot=None):
+    """Apply an operator-recorded Owner decision to the existing official DB.
+
+    The decision is trusted executor context, not a menu payload. It accepts
+    existing holdings as the analysis baseline, without creating a portfolio,
+    changing quantities, dating old observations anew, or asserting cash.
+    The receipt is bound to one member, official File ID and exact DB bytes.
+    """
+    client=snapshot.get('client_id')
+    decision=deepcopy(owner_decision)
+    if previous_snapshot is not None:
+        return rebind_unchanged_official_holdings(snapshot,previous_snapshot,
+            official_file_id=official_file_id,account_key=account_key,
+            owner_decision=decision,evaluation_at=evaluation_at)
+    if (snapshot.get('schema_version')!='Family.W5.W1Snapshot.v1'
+        or snapshot.get('data_provenance')!='SOURCE_BACKED'
+        or snapshot.get('payload_digest')!=_digest(snapshot.get('tables'))
+        or not re.fullmatch(r'[0-9a-f]{64}',str(snapshot.get('source_sha256','')))):
+        raise ValueError('OFFICIAL_HOLDINGS_SNAPSHOT_REQUIRED')
+    if (decision.get('schema_version')!='Family.W8.OwnerOfficialHoldingsDecision.v1'
+        or decision.get('action')!='ACCEPT_EXISTING_OFFICIAL_HOLDINGS'
+        or not decision.get('source_reference') or not decision.get('statement')
+        or decision.get('client_id')!=client
+        or decision.get('official_file_id')!=official_file_id
+        or decision.get('source_db_sha256')!=snapshot['source_sha256']):
+        raise PermissionError('OFFICIAL_HOLDINGS_OWNER_DECISION_MISMATCH')
+    at=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
+    decided=datetime.fromisoformat(decision['recorded_at'].replace('Z','+00:00'))
+    if at.utcoffset() is None or decided.utcoffset() is None or decided>at:
+        raise ValueError('OFFICIAL_HOLDINGS_DECISION_TIME_INVALID')
+    accounts=snapshot['tables'].get('portfolio_account',[])
+    if sum(r.get('account_key')==account_key and r.get('client_id')==client for r in accounts)!=1:
+        raise ValueError('OFFICIAL_HOLDINGS_ACCOUNT_REQUIRED')
+    return {'state':'COMPLETE','account_key':account_key,
+        'snapshot_digest':snapshot['payload_digest'],
+        'as_of':decision['recorded_at'],
+        'as_of_basis':'OWNER_ACCEPTANCE_RECORDED_AT__POSITION_OBSERVATIONS_UNCHANGED',
+        'source_reference':decision['source_reference'],
+        'schema_version':'Family.W8.OfficialHoldingsAcceptance.v1',
+        'client_id':client,'official_file_id':official_file_id,
+        'source_db_sha256':snapshot['source_sha256'],
+        'owner_decision':decision,'owner_decision_digest':_digest(decision),
+        'holdings_status':'OFFICIAL','cash_settlement_asserted':False,
+        'database_written':False,'trade_authorization':'NONE'}
+
+
+def rebind_unchanged_official_holdings(snapshot,previous_snapshot,*,official_file_id,
+                                     account_key,owner_decision,evaluation_at):
+    """Keep the original acceptance only when its actual holdings still match.
+
+    Later target/registry updates do not constitute a new owner decision.
+    Preserve the original decision bytes and time, and record both versions.
+    A changed sealed intake, quantity, identity, or account requires its own
+    source review; updating only the old decision's DB hash is never allowed.
+    """
+    from decimal import Decimal
+    previous=bind_official_holdings(previous_snapshot,official_file_id=official_file_id,
+        account_key=account_key,owner_decision=owner_decision,evaluation_at=evaluation_at)
+    if (snapshot.get('client_id')!=previous_snapshot['client_id']
+        or snapshot.get('schema_version')!=previous_snapshot['schema_version']
+        or snapshot.get('data_provenance')!='SOURCE_BACKED'
+        or snapshot.get('payload_digest')!=_digest(snapshot.get('tables'))
+        or not re.fullmatch(r'[0-9a-f]{64}',str(snapshot.get('source_sha256','')))):
+        raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_SNAPSHOT_MISMATCH')
+    for table in ('portfolio_snapshot_run','portfolio_snapshot_item','portfolio_snapshot_lineage'):
+        if snapshot['tables'].get(table)!=previous_snapshot['tables'].get(table):
+            raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_CHANGED')
+    from official_holdings_source import project_official_holdings
+    old=project_official_holdings(previous_snapshot,evaluation_at=evaluation_at)
+    current=project_official_holdings(snapshot,evaluation_at=evaluation_at)
+    if old['source_layer_conflicts'] or current['source_layer_conflicts']:
+        raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_CONFLICT')
+    old_accounts=[r for r in previous_snapshot['tables']['portfolio_account'] if r['account_key']==account_key]
+    accounts=[r for r in snapshot['tables']['portfolio_account'] if r['account_key']==account_key]
+    if len(old_accounts)!=1 or len(accounts)!=1 or any(
+            accounts[0].get(k)!=old_accounts[0].get(k) for k in ('client_id','account_key','account_currency')):
+        raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_ACCOUNT_CHANGED')
+    # Original sealed quantities are accepted facts. New formal ledger rows
+    # may make them explicit, but cannot silently add/change a holding.
+    expected={}
+    for row in old['analysis_security_positions']:
+        if row['source_kind']=='SEALED_W6' and row.get('broker_label')!='IB':continue
+        if row['source_kind']=='OWNER_SCREENSHOT_SOURCE':
+            markers=[r for r in previous_snapshot['tables']['portfolio_snapshot_item']
+                if r.get('run_id')==row['source_run_id']
+                and r.get('domain_code')=='OWNER_SCREENSHOT_SOURCE'
+                and r.get('field_key')=='broker_account_number'
+                and r.get('entity_key')=='IB_SCREEN']
+            if len(markers)!=1:raise PermissionError('OFFICIAL_HOLDINGS_ORIGINAL_BROKER_SOURCE_REQUIRED')
+        symbol=row['symbol']
+        if symbol in expected or row['quantity'] is None:
+            raise PermissionError('OFFICIAL_HOLDINGS_ACCEPTED_SOURCE_AMBIGUOUS')
+        expected[symbol]=Decimal(row['quantity'])
+    ledger={}
+    for row in current['ledger_positions']:
+        if row['account_key']!=account_key:continue
+        symbol=row['symbol'];at=datetime.fromisoformat(row['observed_at'].replace('Z','+00:00'))
+        prior_at=(datetime.fromisoformat(ledger[symbol]['observed_at'].replace('Z','+00:00'))
+            if symbol in ledger else None)
+        if prior_at is None or at>prior_at:ledger[symbol]=row
+        elif at==prior_at and row!=ledger[symbol]:
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_POSITION_AMBIGUOUS')
+    # Legacy ledger symbols already represented in the accepted sealed layer
+    # can retain older quantities. A later OWNER_VERIFIED row must agree.
+    for symbol,row in ledger.items():
+        if symbol not in expected:
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_ADDED_POSITION')
+        if row['source_row'].get('position_source_kind')=='OWNER_VERIFIED' and (
+                row['quantity'] is None or Decimal(row['quantity'])!=expected[symbol]):
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_QUANTITY_CHANGED')
+    prior_registry={r['ticker']:r for r in previous_snapshot['tables']['portfolio_instrument']}
+    for symbol,old_row in prior_registry.items():
+        new=[r for r in snapshot['tables']['portfolio_instrument'] if r.get('ticker')==symbol]
+        if len(new)!=1 or any(old_row.get(k) is not None and new[0].get(k)!=old_row[k]
+                for k in ('instrument_key','instrument_type','ticker','quote_currency','exchange_code','isin')):
+            raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_IDENTITY_CHANGED')
+    result=deepcopy(previous)
+    result.update(snapshot_digest=snapshot['payload_digest'],source_db_sha256=snapshot['source_sha256'])
+    result['snapshot_rebinding']={'schema_version':'Family.W8.UnchangedHoldingsRebinding.v1',
+        'previous_source_db_sha256':previous_snapshot['source_sha256'],
+        'previous_snapshot_digest':_digest(previous_snapshot),
+        'current_snapshot_digest':_digest(snapshot),
+        'accepted_source_digest':_digest({k:previous_snapshot['tables'].get(k) for k in
+            ('portfolio_snapshot_run','portfolio_snapshot_item','portfolio_snapshot_lineage')}),
+        'original_decision_unchanged':True,'new_owner_approval_asserted':False}
+    return result

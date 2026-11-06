@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:livingwater:family:mentor-advice-scope:v1",
+  "title": "Family.W5.MentorAdviceScope.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recommendations_allowed", "execution_advice_allowed", "broker_execution_allowed", "financial_mutation_allowed", "trade_authorization", "production", "trade_action"],
+  "properties": {
+    "schema_version": {"const": "Family.W5.MentorAdviceScope.v1"},
+    "recommendations_allowed": {"type": "boolean", "const": true},
+    "execution_advice_allowed": {"type": "boolean", "const": true},
+    "broker_execution_allowed": {"type": "boolean", "const": false},
+    "financial_mutation_allowed": {"type": "boolean", "const": false},
+    "trade_authorization": {"const": "NONE"},
+    "production": {"const": "HOLD"},
+    "trade_action": {"const": "NO_TRADE"}
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "VOO",
+  "source_url": "https://advisors.vanguard.com/investments/products/voo/vanguard-sp-500-etf",
+  "source_artifact_sha256": "6bad6abce8c0510f56381ef67fceb6a3edd82db8db4c526ed008c1b5dcc01e6c",
+  "retrieved_at": "2026-10-30T05:18:00.907654+00:00",
+  "is_stock_etf": true,
+  "replication": "INDEX_REPLICATION",
+  "evidence_kind": "OFFICIAL_ISSUER_BENCHMARK_AND_OBJECTIVE",
+  "evidence_reference": "PRIVATE_HANDOFF:product_sources/VOO.html#SHA256:6bad6abce8c0510f56381ef67fceb6a3edd82db8db4c526ed008c1b5dcc01e6c",
+  "fund_name": "Vanguard S&P 500 ETF",
+  "benchmark": "S&P 500 Index",
+  "excerpts": [
+    "S&P 500 Index",
+    "large-capitalization stocks"
+  ],
+  "market_scope": "US_LARGE_CAP_BROAD_INDEX"
+}

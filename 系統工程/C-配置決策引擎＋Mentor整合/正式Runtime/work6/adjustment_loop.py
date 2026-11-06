@@ -595,6 +595,17 @@ def _slot(snapshot: Optional[Mapping[str, Any]], reason: Optional[str] = None) -
     return {"value_state": "KNOWN", "snapshot": deepcopy(dict(snapshot)), "reason": reason} if snapshot else _none_slot(reason or "Not available")
 
 
+def final_target_weight(final: Mapping[str, Any], instrument_id: str) -> Optional[float]:
+    """Read the existing complete-target weight rule, independently of Current.
+
+    Callers must validate that the supplied allocation is a complete confirmed
+    target before interpreting an absent instrument as zero. Unknown weights
+    remain unknown. This is the same lookup used by the drift calculation.
+    """
+    targets = _index_positions(final)
+    return _weight(targets[instrument_id]) if instrument_id in targets else 0.0
+
+
 def _drift_snapshot(current: Mapping[str, Any], final: Optional[Mapping[str, Any]],
                     preference_states: Mapping[str, Mapping[str, Any]], evaluated_at: str) -> Dict[str, Any]:
     if final is None:
@@ -610,7 +621,7 @@ def _drift_snapshot(current: Mapping[str, Any], final: Optional[Mapping[str, Any
     active = _active_locks(preference_states)
     for iid in universe:
         cw = _weight(cur[iid]) if iid in cur else 0.0
-        tw = _weight(tar[iid]) if iid in tar else 0.0
+        tw = final_target_weight(final, iid)
         # Universe absence is a real zero only for a KNOWN complete allocation, not an UNKNOWN sentinel.
         if cw is None or tw is None:
             items.append({"instrument_id": iid, "ticker": (cur.get(iid) or tar.get(iid) or {}).get("ticker"),

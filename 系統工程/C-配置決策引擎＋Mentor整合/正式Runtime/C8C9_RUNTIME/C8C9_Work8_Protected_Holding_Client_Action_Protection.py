@@ -19,6 +19,7 @@ from functools import lru_cache
 from hashlib import sha256
 import json
 import math
+import importlib.util
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -114,8 +115,18 @@ def _validator(path: Path) -> Draft202012Validator:
     return Draft202012Validator(_load_schema(path))
 
 
+def _absence_contract():
+    import importlib.util
+    path=Path(__file__).resolve().parents[4]/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py'
+    spec=importlib.util.spec_from_file_location('c7_confirmed_absence_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def _schema(value: Any, path: Path, code: str) -> None:
-    errors = sorted(_validator(path).iter_errors(value), key=lambda e: list(e.absolute_path))
+    validator=_validator(path);absence=_absence_contract()
+    if absence.is_extended(value):validator=Draft202012Validator(absence.extend_schema(validator.schema))
+    errors = sorted(validator.iter_errors(value), key=lambda e: list(e.absolute_path))
     if errors:
         e = errors[0]
         loc = "/".join(str(x) for x in e.absolute_path) or "$"
@@ -220,8 +231,18 @@ def protect_client_action(request: Mapping[str, Any]) -> dict[str, Any]:
     c7 = _mapping(req.get("c_work7_asset_framework_result"), "c_work7_asset_framework_result")
     # RECHECK2 hardening: Work8 consumes a serialized C Work7 result directly, so
     # validate the exact frozen C7 schema before relying on a selected subset.
-    _schema(c7, _C7_SCHEMA, "C8C9.W8.C_WORK7_SCHEMA")
-    if c7.get("contract_name") != C_WORK7_CONTRACT_NAME or c7.get("contract_version") != C_WORK7_CONTRACT_VERSION:
+    family_version = c7.get("contract_version") == "C-W7-FAMILY-LT-v1.0.0"
+    if family_version:
+        # Explicit PM-approved profile; the frozen legacy schema remains exact.
+        spec=importlib.util.spec_from_file_location("c7_family_serialized_contract",_ROOT/"work7/family_long_term.py")
+        family=importlib.util.module_from_spec(spec);spec.loader.exec_module(family)
+        try:family.validate_result(c7)
+        except ValueError as exc:_fail("C8C9.W8.C_WORK7_FAMILY_SOURCE",str(exc))
+        if any(value != "PASS" for value in c7.get("hard_checks",{}).values()):
+            _fail("C8C9.W8.C_WORK7_FAMILY_HARD_CHECKS","All original C7 hard checks must pass")
+    else:
+        _schema(c7, _C7_SCHEMA, "C8C9.W8.C_WORK7_SCHEMA")
+    if c7.get("contract_name") != C_WORK7_CONTRACT_NAME or (not family_version and c7.get("contract_version") != C_WORK7_CONTRACT_VERSION):
         _fail("C8C9.W8.C_WORK7_CONTRACT", "C Work7 contract/version mismatch")
     identity = _mapping(c7.get("identity"), "c_work7.identity")
     if identity.get("run_id") != run_id:

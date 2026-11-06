@@ -1,0 +1,38 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "DYNF",
+  "evidence_kind": "OFFICIAL_ISSUER_OBJECTIVE_AND_STRUCTURE",
+  "verified_on": "2026-10-29",
+  "source_scope": "PUBLIC_PRODUCT_STRUCTURE__NOT_CURRENT_VALUATION_OR_SAFETY",
+  "fund_name": "iShares U.S. Equity Factor Rotation Active ETF",
+  "source_url": "https://www.blackrock.com/us/individual/products/307283/blackrock-us-equity-factor-rotation-etf",
+  "is_stock_etf": true,
+  "structure_kind": "ACTIVE_BROAD_EQUITY_FACTOR_ROTATION",
+  "benchmark": "MSCI USA Index",
+  "published_holding_count": 262,
+  "factors": [
+    "value",
+    "quality",
+    "momentum",
+    "size",
+    "growth",
+    "minimum volatility"
+  ],
+  "CUSIP": "09290C103",
+  "excerpts": [
+    "The iShares U.S. Equity Factor Rotation Active ETF seeks to outperform the U.S. equity market by dynamically allocating across historically rewarded style factors such as value, quality, momentum, size, growth, and minimum volatility. The fund offers a way to pursue enhanced returns through active factor rotation."
+  ],
+  "sources": [
+    {
+      "source_url": "https://www.blackrock.com/us/individual/products/307283/blackrock-us-equity-factor-rotation-etf",
+      "source_sha256": "477d5af9b55f17f0d2172acdd8f98a5c9d4b13d9d4b21b42171290a7fcf30c67",
+      "available_at": "2026-10-29T01:21:25.474059+00:00"
+    },
+    {
+      "source_url": "https://www.blackrock.com/us/individual/products/307283/ishares-u-s-equity-factor-rotation-active-etf/latest-holdings.csv",
+      "source_sha256": "419cc7b562e092407c7f0e4e6a811a1cca88c9e3ceaf1b2b87810cb9a616f7e8",
+      "available_at": "2026-10-29T01:34:43.690702+00:00"
+    }
+  ],
+  "classification_notes": "Active factor rotation selects a US-equity portfolio; the structural grade uses the moderately concentrated broad-core branch, not the global full-market branch."
+}

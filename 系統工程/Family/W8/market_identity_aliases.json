@@ -1,0 +1,25 @@
+{
+  "schema_version": "Family.W8.AnalysisMarketAliases.v1",
+  "aliases": {
+    "VWRA": {
+      "provider_symbol": "VWRA.L",
+      "reference_exchange": "XLON",
+      "reference_timezone": "Europe/London",
+      "quote_currency": "USD",
+      "isin": "IE00BK5BQT80",
+      "product": "Vanguard FTSE All-World UCITS ETF USD Accumulating",
+      "source_url": "https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating",
+      "source_section": "Purchase information / USD - London Stock Exchange",
+      "source_facts": {
+        "exchange_ticker": "VWRA",
+        "reuters": "VWRA.L",
+        "sedol": "BK5XTF1",
+        "distribution": "Accumulating"
+      },
+      "verified_on": "2026-10-27",
+      "verification_time_precision": "DAY_ONLY",
+      "history_policy": "CONTIGUOUS_VALID_SUFFIX_FOR_ANALYSIS_ONLY",
+      "scope": "ANALYSIS_REFERENCE_VENUE_ONLY__NOT_HELD_VENUE_OR_ORDER_IDENTITY"
+    }
+  }
+}

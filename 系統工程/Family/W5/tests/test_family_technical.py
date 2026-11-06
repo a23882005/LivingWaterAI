@@ -76,6 +76,24 @@ def test_partial_known_signals_preserved_and_unknown_not_promoted():
     assert result['status']!='OK' and result['mentor'] is None
 
 
+def test_new_real_artifact_uses_its_receipt_not_old_october_boundary():
+    from technical_source_bridge import build_partial_technical
+    rows,m=case()
+    m.update(data_provenance='SOURCE_BACKED',evaluation_mode='SNAPSHOT_AFTER_ACQUISITION',
+        market_region='global',fetch_completed_at='2026-10-26T01:00:00Z',
+        artifact_written_at='2026-10-26T01:01:00Z')
+    # Synthetic prices exercise timestamp logic only; this test does not attest
+    # a real instrument, source receipt or market observation.
+    before=build_partial_technical(rows,metadata=m,
+        evaluated_at='2026-10-26T01:00:30Z',repo_path=ROOT)
+    after=build_partial_technical(rows,metadata=m,
+        evaluated_at='2026-10-26T01:02:00Z',repo_path=ROOT)
+    assert 'SNAPSHOT_NOT_YET_AVAILABLE' in before['issue_codes']
+    assert after['snapshot_available_at']=='2026-10-26T01:01:00Z'
+    assert after['historical_pit_verified'] is False
+    assert after['td9']['events'][0]['available_at']=='2026-10-26T01:01:00Z'
+
+
 @pytest.mark.parametrize('client',['SYNTHETIC_A','SYNTHETIC_B','SYNTHETIC_C','SYNTHETIC_D'])
 def test_four_clients_reject_foreign_technical_source(client):
     r,c=integrated_case();c['technical_source']['family_owner']['client_id']=client

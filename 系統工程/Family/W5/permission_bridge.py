@@ -16,9 +16,11 @@ def effective(rows,confirmations,keys,at):
     return latest
 
 
-def project_permissions(snapshot,*,account,evaluation_at):
+def project_permissions(snapshot,*,account,evaluation_at,positions=None):
     t=snapshot['tables'];at=timestamp(evaluation_at,'evaluation_at');client=snapshot['client_id']
     held={r['instrument_key'] for r in t['portfolio_position'] if r['account_key']==account and timestamp(r['as_of_utc'],'position.as_of')<=at}
+    if positions is not None:
+        held={r['instrument_key'] for r in positions}
     all_ids=held|{r['instrument_key'] for r in t['universe_membership']}|{r['instrument_key'] for r in t['portfolio_instrument']}
     output=[]
     for asset in sorted(all_ids):

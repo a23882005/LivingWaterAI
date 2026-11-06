@@ -55,6 +55,7 @@ class CurrentSourcesTest(unittest.TestCase):
     def snapshot(self):
         return {'schema_version':'Family.W5.W1Snapshot.v1','client_id':CLIENT,
                 'data_provenance':'SOURCE_BACKED','tables':self.tables,
+                'payload_digest':M._module('official_holdings_source')._digest(self.tables),
                 'source_sha256':hashlib.sha256(self.db.read_bytes()).hexdigest()}
 
     def intake(self,**kwargs):

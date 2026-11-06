@@ -1,0 +1,20 @@
+V82-CYCLE-PENDING-RELEASE｜Codex修復回交
+依據：https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6511847368
+基準5a54ce2，保留並合併中PMmain 036f841（含獨立報告線交接2eaa56e），不修改報告／HTML線程式。
+
+重現與原因
+中PM原probe原文複製至私人目錄執行：G0=100、B0=25、OPEN filled0/remaining25，傳CANCEL_PENDING filled0/remaining0且release_confirmed=False，舊版接受、room從0升25，SQLite亦可保存。
+舊版incremental=max(new_total-old_total,0)僅校驗增加，未拒絕LIVE意圖的filled+remaining下降。既有pending測試未傳縮額，漏掉此反例。
+
+最小修補
+daily_slice.py新增共同_validate_intent_transition，由update_intent與CycleLedgerStore.save使用。LIVE總占額不得未確認下降；取消／替換待確認不得以縮remaining釋放，改標OPEN/PARTIAL_FILL亦不能繞過。部分成交只把committed移至spent；終止狀態須release_confirmed=True，直接storage亦執行。比較依輸入Decimal精度進行，避免極小縮額先被四捨五入抹去。
+LEDGER_IMPLEMENTATION_VERSION=V82_DAILY_SLICE_LEDGER_1.0.1。既有profile與cycle id版本不變，G0/B0及同日額度不重置；不修改M、Stage、模式率、SGOV角色、原MIN、49/13欄與客戶配置。來源鎖保留5a54ce2的daily_slice原hash及本次PM授權、版本和新hash，121份來源／相依校驗通過。
+
+驗證範圍
+新增test_v10_pending_commitment.py，35個具名案例：full/partial縮額、已partial fill後縮額、cancel/replace pending、pending旗標不能單獨釋放、核實fill守恆、確認cancel/expired/rejected後只釋放remaining、同日event冪等／新worker／SQLite重讀、原子拒絕直接storage縮額、storage確認旗標、高精度及現行速率降低。
+修補前最初33例25失敗／8通過，證明反例會抓到原缺陷；最終35例加既有daily slice16例，51通過。中PM原probe修補後拒絕未確認縮額，CYCLE_UNCONFIRMED_COMMITMENT_REDUCTION；成熟37500與未成熟22500仍一致。probe內固定head標籤屬原5a54ce2查核腳本，實際被測runtime新hash另存provenance，沒有改歷史probe或JSON。
+完整必要回歸：W5 480通過、W8 621通過；來源／相依121通過。最新提交及CI另見同輪Checkpoint與私人回交證據。本輪未重跑私人兩戶E2E；原兩戶C7 RETURN_TO_V70、Drive帳本同步與合格真實來源尚未通過的狀態不變。原生226項舊成績不冒稱此次重新執行。
+
+回交
+改檔：daily_slice.py、source_lock.json、test_v10_pending_commitment.py、W5/W8 Checkpoint、本guide及本紀錄。私人證據存Drive根目錄TEMP之本次增量包，保留V82_Codex_Completion_20261030.zip與全部前包。
+中PM待獨立重跑反例／續驗。Production HOLD、NO_TRADE；無正式私人DB／券商操作，不擴展Arthur/Lilian。

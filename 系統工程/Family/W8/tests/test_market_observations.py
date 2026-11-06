@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 HERE=Path(__file__).resolve().parents[1]
 ROOT=HERE.parents[2]
-sys.path.insert(0,str(ROOT/'系統工程/Family/W5'))
+sys.path[:0]=[str(HERE),str(ROOT/'系統工程/Family/W5')]
 from family_input import digest
 spec=importlib.util.spec_from_file_location('market_observations_test',HERE/'on_demand_market_observations.py')
 M=importlib.util.module_from_spec(spec);spec.loader.exec_module(M)
@@ -64,12 +64,131 @@ class ObservationsTest(unittest.TestCase):
         self.assertFalse(result['formal_deployment_eligible'])
         self.assertIn('emv_14',result['numeric'])
         self.assertNotIn('emv_3_3',result['numeric'])
+        named={r['name']:r for group in result['observed_named_signals'].values() for r in group}
+        self.assertNotEqual(named['dif_up']['truth'],'UNKNOWN')
+        self.assertNotEqual(named['ma5_gt_ma10_gt_ma20']['truth'],'UNKNOWN')
+        self.assertEqual(named['atr_expanding_fast']['truth'],'UNKNOWN')
+        self.assertEqual(named['kd_golden_cross']['truth'],'UNKNOWN')
 
     def test_stock_does_not_receive_bond_predicates(self):
         result=M.evaluate_observed_history(self.rows,repo_root=ROOT,
             evaluation_at='2026-10-02T00:00:00Z',macro=self.macro,asset_id='VT')
         self.assertEqual(result['v75_original_predicates'],{})
         self.assertEqual(result['v75_scope'],'NOT_A_V75_SUPPORTED_BOND')
+
+    def test_approved_price_algorithms_are_not_limited_to_global_etf_identity(self):
+        profile={'approval_status':'APPROVED_FOR_IMPLEMENTATION','profile_id':'SYNTHETIC'}
+        self.snapshot['tables']['portfolio_instrument'][0]['ticker']='TESTSTOCK'
+        self.manifest['items']['TESTSTOCK']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'TESTSTOCK.csv';self.write()
+        before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:
+            M.build_member_market_observations(self.snapshot,[],self.macro,repo_root=self.root,
+                evaluation_at='2026-10-02T00:00:00Z',approved_rule_profile=profile)
+        self.assertEqual(engine.call_args.kwargs['approved_rule_profile'],profile)
+        self.assertIsNone(engine.call_args.kwargs['is_etf'])
+        self.assertEqual(self.snapshot,before)
+
+    def configure_vwra_alias(self):
+        folder=self.root/'系統工程/Family/W8';folder.mkdir(parents=True)
+        row={'provider_symbol':'VWRA.L','reference_exchange':'XLON','reference_timezone':'Europe/London',
+            'quote_currency':'USD','isin':'SYNTHETIC_ISIN','source_url':'https://issuer.example/synthetic',
+            'verified_on':'2026-10-01','history_policy':'CONTIGUOUS_VALID_SUFFIX_FOR_ANALYSIS_ONLY',
+            'scope':'ANALYSIS_REFERENCE_ONLY'}
+        (folder/'market_identity_aliases.json').write_text(json.dumps({
+            'schema_version':'Family.W8.AnalysisMarketAliases.v1','aliases':{'VWRA':row}}))
+        self.snapshot['tables']['portfolio_instrument'][0].update(ticker='VWRA',quote_currency='USD')
+        self.manifest['items']['VWRA.L']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'VWRA.L.csv';self.write()
+
+    def test_reviewed_alias_preserves_holding_symbol_and_currency_checks(self):
+        self.configure_vwra_alias();before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            asset=self.build()['assets'][0]
+        self.assertEqual(asset['symbol'],'VWRA');self.assertEqual(asset['provider_symbol'],'VWRA.L')
+        self.assertFalse(asset['analysis_identity_mapping']['held_exchange_inferred'])
+        self.assertEqual(self.snapshot,before)
+        self.snapshot['tables']['portfolio_instrument'][0]['quote_currency']='CHF'
+        self.assertEqual(self.build()['missing'][0]['code'],'ANALYSIS_MARKET_ALIAS_IDENTITY_MISMATCH')
+
+    def test_approved_unheld_bond_uses_cache_without_creating_a_holding(self):
+        self.manifest['items']['SPSB']=self.manifest['items'].pop('SGOV');self.write_manifest()
+        self.path=self.folder/'SPSB.csv';self.write()
+        self.snapshot['tables'].update(portfolio_position=[],portfolio_instrument=[])
+        target={'payload':{'draft':{'identity':{'client_id':'MEMBER'},'target_lines':[
+            {'instrument_id':'APPROVED_SPSB','ticker':'SPSB'}]}}}
+        before=deepcopy((self.snapshot,target))
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',approved_target=target)
+        self.assertEqual(out['missing'],[])
+        self.assertEqual(out['assets'][0]['symbol'],'SPSB')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'SOURCE_SYMBOL_ONLY')
+        self.assertEqual((self.snapshot,target),before)
+        target['payload']['draft']['identity']['client_id']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'TARGET_CLIENT_MISMATCH'):
+            M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',approved_target=target)
+
+    def test_advisory_candidate_does_not_become_holding_or_approved_target(self):
+        spsb=self.folder/'SPSB.csv';spsb.write_bytes(self.path.read_bytes())
+        self.manifest['items']['SPSB']=deepcopy(self.manifest['items']['SGOV']);self.write_manifest()
+        before=deepcopy(self.snapshot)
+        with patch.object(M,'evaluate_observed_history',return_value={'numeric':{}}),\
+             patch('bond_advisory.candidates',return_value=['SGOV','SPSB']):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',bond_advisory_candidates=['SPSB'])
+            candidate=next(r for r in out['assets'] if r['symbol']=='SPSB')
+            self.assertEqual(candidate['instrument_key'],'BOND_ADVISORY:SPSB')
+            self.assertEqual(candidate['advisory_candidate_scope'],'BOND_RECOMMENDATIONS_ONLY')
+            self.assertFalse(candidate['formal_identity_verified'])
+            self.assertEqual(self.snapshot,before)
+            with self.assertRaisesRegex(PermissionError,'UNIVERSE_MISMATCH'):
+                M.build_member_market_observations(self.snapshot,[],self.macro,
+                    repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',bond_advisory_candidates=['QQQ'])
+
+    def test_approved_target_cannot_replace_sealed_holding_listing(self):
+        self.configure_vwra_alias();self.snapshot['tables']['portfolio_position']=[]
+        self.snapshot['payload_digest']=digest(self.snapshot['tables'])
+        holdings={'client_id':'MEMBER','source_db_sha256':'a'*64,
+            'snapshot_digest':self.snapshot['payload_digest'],'analysis_security_positions':[
+                {'symbol':'VWRA','instrument':deepcopy(self.snapshot['tables']['portfolio_instrument'][0]),
+                 'source_row':{'source_reference':'SYNTHETIC_SEALED_HOLDING'}}]}
+        target={'payload':{'draft':{'identity':{'client_id':'MEMBER'},'target_lines':[
+            {'instrument_id':'APPROVED_VWRA','ticker':'VWRA'}]}}}
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',
+                official_holdings=holdings,approved_target=target)
+        self.assertEqual(out['missing'],[])
+        self.assertEqual(out['assets'][0]['provider_symbol'],'VWRA.L')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'KNOWN')
+
+    def test_bad_prefix_uses_contiguous_suffix_without_repair_or_middle_row_deletion(self):
+        self.configure_vwra_alias();self.rows[0]['High']=1;self.write();before=self.path.read_bytes()
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}) as engine:
+            asset=self.build()['assets'][0]
+        self.assertEqual(len(engine.call_args.args[0]),27)
+        self.assertEqual(asset['history_quality']['excluded_prefix_rows'],1)
+        self.assertEqual(asset['history_quality']['analysis_start'],'2026-09-02')
+        self.assertEqual(self.path.read_bytes(),before)
+        self.assertFalse(asset['history_quality']['source_values_modified'])
+
+    def test_bad_latest_bar_cannot_be_hidden_by_suffix_policy(self):
+        self.configure_vwra_alias();self.rows[-1]['High']=1;self.write()
+        with patch.object(M,'evaluate_observed_history') as engine:out=self.build()
+        engine.assert_not_called()
+        self.assertEqual(out['missing'][0]['code'],'CACHE_SAMPLE_INSUFFICIENT_AFTER_SOURCE_ERRORS')
+
+    def test_close_only_components_do_not_invent_high_low_or_atr(self):
+        first=M.evaluate_close_history(self.rows,repo_root=ROOT)
+        changed=deepcopy(self.rows)
+        for row in changed:row.update(High=-999,Low=999,Volume=-1)
+        second=M.evaluate_close_history(changed,repo_root=ROOT)
+        self.assertEqual(first['numeric'],second['numeric'])
+        self.assertIsNotNone(first['numeric']['ma20'])
+        self.assertIsNone(first['numeric']['atr14']);self.assertIsNone(first['numeric']['kd_k_9_3'])
+        self.assertEqual(first['observed_named_signals']['right_signals'][0]['truth'],'UNKNOWN')
 
     def test_exact_member_symbol_cache_and_source_hash(self):
         with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
@@ -85,9 +204,57 @@ class ObservationsTest(unittest.TestCase):
         out=self.build();self.assertEqual(out['assets'],[])
         self.assertEqual(out['missing'][0]['code'],'EXACT_SYMBOL_CACHE_UNAVAILABLE')
 
+    def test_sealed_symbol_missing_from_registry_is_still_observed(self):
+        self.snapshot['tables']['portfolio_position']=[]
+        self.snapshot['tables']['portfolio_instrument']=[]
+        self.snapshot['payload_digest']='bound-snapshot'
+        holdings={'client_id':'MEMBER','source_db_sha256':'a'*64,
+            'snapshot_digest':'bound-snapshot','analysis_security_positions':[
+                {'symbol':'SGOV','instrument':None,'source_row':{'source_reference':'SYNTHETIC_SEALED_SOURCE'}}]}
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',official_holdings=holdings)
+        self.assertEqual(out['assets'][0]['symbol'],'SGOV')
+        self.assertEqual(out['assets'][0]['instrument_registry_state'],'SOURCE_SYMBOL_ONLY')
+        self.assertFalse(out['assets'][0]['formal_identity_verified'])
+        holdings['source_db_sha256']='b'*64
+        with self.assertRaisesRegex(PermissionError,'HOLDINGS_SNAPSHOT_MISMATCH'):
+            M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',official_holdings=holdings)
+
+    def test_unverified_same_day_bar_does_not_erase_prior_history(self):
+        self.rows.append({**self.rows[-1],'Date':'2026-10-02'})
+        self.write();self.manifest['items']['SGOV'].update(rows=len(self.rows),latest_observation='2026-10-02');self.write_manifest()
+        raw=self.path.read_bytes()
+        with patch.object(M,'evaluate_observed_history',return_value={'formal_deployment_eligible':False}):
+            out=self.build()
+        self.assertEqual(len(out['assets']),1)
+        row=out['assets'][0];self.assertEqual(row['observed_date'],'2026-09-28')
+        self.assertEqual(row['rows'],28);self.assertEqual(row['history_quality']['source_latest_observation'],'2026-10-02')
+        self.assertEqual(len(row['history_quality']['excluded_unverified_session_rows']),1)
+        self.assertEqual(raw,self.path.read_bytes());self.assertFalse(row['formal_identity_verified'])
+        self.rows[-1]['Date']='2026-10-03';self.write()
+        self.manifest['items']['SGOV']['latest_observation']='2026-10-03';self.write_manifest()
+        self.assertEqual(self.build()['missing'][0]['code'],'CACHE_FORMING_OR_FUTURE_BAR')
+
     def test_bad_ohlc_rejected(self):
         self.rows[-1]['High']=1;self.write()
         out=self.build();self.assertEqual(out['missing'][0]['code'],'CACHE_OHLCV_INVALID')
+
+    def test_stock_close_only_fallback_is_explicit_and_never_used_for_v75(self):
+        self.rows[-1]['High']=1;self.write()
+        def build():
+            return M.build_member_market_observations(self.snapshot,[],self.macro,
+                repo_root=self.root,evaluation_at='2026-10-02T00:00:00Z',allow_independent_close_analysis=True)
+        self.assertEqual(build()['missing'][0]['code'],'CACHE_OHLCV_INVALID')
+        stock=self.folder/'SYNTHETICSTOCK.csv';stock.write_bytes(self.path.read_bytes())
+        self.snapshot['tables']['portfolio_instrument'][0]['ticker']='SYNTHETICSTOCK'
+        self.manifest['items']['SYNTHETICSTOCK']=self.manifest['items']['SGOV'];self.write_manifest()
+        with patch.object(M,'evaluate_close_history',return_value={'numeric':{'ma20':120,'atr14':None}}) as call:
+            out=build()
+        self.assertEqual(len(out['assets']),1);self.assertEqual(call.call_count,1)
+        self.assertIsNone(out['assets'][0]['numeric']['atr14'])
+        self.assertTrue(out['assets'][0]['history_quality']['scope'].startswith('CLOSE_ONLY'))
 
     def test_manifest_mismatch_rejected(self):
         self.manifest['items']['SGOV']['rows']+=1;self.write_manifest()

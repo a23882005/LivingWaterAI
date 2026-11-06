@@ -103,6 +103,10 @@ def build_project_menu(*, family_login, project_name, login_account,
                        client_id, family_alias, downloaded_db_path,
                        official_drive_file_id, verified_drive_sha256,
                        trusted_analysis_source_producer=None,
+                       native_source_config=None,
+                       member_v82_source_config=None,
+                       official_holdings_decision=None,
+                       official_holdings_previous_snapshot=None,
                        trusted_w6_current_input_producer=None,
                        approved_w6_archive=None, approved_w6_renderer=None,
                        report_store=None, other_handlers=None,
@@ -118,6 +122,30 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     source_module=_load(ROOT/"on_demand_current_sources.py","family_w8_current_sources")
+    if member_v82_source_config is not None:
+        if trusted_analysis_source_producer is not None or native_source_config is not None:
+            raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
+        config=dict(member_v82_source_config)
+        if config.get('client_id')!=client_id or config.get('source_db_sha256')!=verified_drive_sha256:
+            raise PermissionError('MEMBER_V82_CONFIG_CLIENT_OR_DB_MISMATCH')
+        if config.get('member_db_path') is not None and Path(config['member_db_path']).resolve()!=Path(downloaded_db_path).resolve():
+            raise PermissionError('MEMBER_V82_DB_OVERRIDE_REJECTED')
+        config['member_db_path']=str(Path(downloaded_db_path).resolve())
+        config['member_drive_binding']={'account':login_account,'client_id':client_id,
+            'file_id':official_drive_file_id,'family_alias':family_alias}
+        member=_load(ROOT/'member_v82_analysis.py','family_w8_member_v82_source')
+        trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
+    if native_source_config is not None:
+        if trusted_analysis_source_producer is not None:
+            raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
+        config=dict(native_source_config)
+        if config.get('flow','HOLDINGS_ANALYSIS')!='HOLDINGS_ANALYSIS':
+            raise ValueError('MENU04_INCOMPLETE_DEPLOYMENT_DIAGNOSTIC_NOT_A_PRODUCTION_ENTRY')
+        if config.get('db_path') is not None and Path(config['db_path']).resolve()!=Path(downloaded_db_path).resolve():
+            raise PermissionError('NATIVE_PRODUCER_DB_OVERRIDE_REJECTED')
+        config['db_path']=downloaded_db_path
+        native=_load(ROOT/'native_asset_source.py','family_w8_native_source')
+        trusted_analysis_source_producer=native.AssetSourceProducer(**config)
     def current_source_provider(snapshot):
         try:
             return source_module.build_current_sources(snapshot,downloaded_db_path)
@@ -220,6 +248,9 @@ def build_project_menu(*, family_login, project_name, login_account,
         client_id=client_id,coordinator=coordinator,
         principal_provider=coordinator.principal,
         trusted_analysis_source_producer=trusted_analysis_source_producer,
+        official_holdings_decision=official_holdings_decision,
+        official_holdings_previous_snapshot=official_holdings_previous_snapshot,
+        official_drive_file_id=official_drive_file_id,
         trusted_w6_current_input_producer=trusted_w6_current_input_producer,
         approved_w6_archive=approved_w6_archive,
         approved_w6_renderer=approved_w6_renderer,

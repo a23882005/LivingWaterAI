@@ -6,7 +6,8 @@ without inventing Price-Map→Stage mappings or a second funding engine.
 """
 from __future__ import annotations
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation, ROUND_FLOOR
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR, localcontext
+from functools import wraps
 from typing import Any, Mapping, Sequence
 from .enums import (ACTIVE_ORDER_STATES, CANONICAL_DEPLOYMENT_TARGET_RATE_PCT,
     NormalDeploymentMode, OrderLifecycleState, PredicateTruth)
@@ -18,6 +19,33 @@ NOT_APPLICABLE="NOT_APPLICABLE"
 
 STAGE_RATE_PCT={f"STAGE_{i+1}": Decimal(str(v)) for i,v in enumerate(CANONICAL_DEPLOYMENT_TARGET_RATE_PCT)}
 LEFT_STAGES=frozenset({f"STAGE_{i}" for i in range(2,8)})
+EXECUTION_DECIMAL_VERSION='V82_EXECUTION_DECIMAL_1.0.1'
+
+
+def _execution_precision(fn):
+    """Keep source-cap precision before legal lot flooring (CMR9.1).
+
+    A 40-digit proportional cap must not round up to the next lot under a
+    caller's default 28-digit context. This changes no cap or target formula.
+    """
+    @wraps(fn)
+    def exact(*args,**kwargs):
+        values=[kwargs.get('order_working_price'),kwargs.get('minimum_lot'),kwargs.get('normalized_order_price'),
+            kwargs.get('canonical_valuation_price'),kwargs.get('fee_reserve'),
+            *kwargs.get('required_known_caps',()),*kwargs.get('required_valuation_caps',()),
+            *kwargs.get('required_cash_use_caps',())]
+        gap=kwargs.get('gap');budget=kwargs.get('bound_equity_budget')
+        plan=kwargs.get('execution_plan')
+        if plan is not None:values.extend((plan.execution_quantity,plan.execution_price,plan.execution_amount))
+        if gap is not None:values.extend((gap.positive_deployment_gap,gap.project_target_position_amount,gap.projected_position_amount))
+        if budget is not None:values.append(budget.amount)
+        numbers=[v for v in (_d(x) for x in values) if v is not None]
+        digits=max((len(v.as_tuple().digits) for v in numbers),default=28)
+        with localcontext() as ctx:
+            span=max((v.adjusted() for v in numbers),default=0)-min((v.as_tuple().exponent for v in numbers),default=0)
+            ctx.prec=max(80,2*digits+32,span+32);ctx.rounding=ROUND_FLOOR
+            return fn(*args,**kwargs)
+    return exact
 
 def _d(v: Any) -> Decimal | None:
     if isinstance(v,bool): return None
@@ -136,9 +164,12 @@ def calculate_position_gap(*, project_target_position_amount:Any, target_rate:An
     projected_rate=(projected/target if target>0 else None)
     return PositionGap(target,target_amount,confirmed,active_buy,active_sell,projected,gap,max(gap,Decimal("0")),actual,projected_rate)
 
+@_execution_precision
 def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
     bound_equity_budget:BoundEquityBudgetView, order_working_price:Any,
     minimum_lot:Any, required_known_caps:Sequence[Any]=(),
+    canonical_valuation_price:Any=None, fee_reserve:Any=None,
+    required_valuation_caps:Sequence[Any]=(), required_cash_use_caps:Sequence[Any]=(),
     order_type:str="LIMIT", time_in_force:str="GTC", scheduling_mode:str="MANUAL",
     broker_or_adapter_constraints:Any=None, order_intent_id:str|None=None,
     normalized_order_price:Any=None, execution_currency:str|None=None, reconciliation_required:bool=False,
@@ -147,6 +178,9 @@ def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
 
     Tick normalization belongs to the Execution Adapter. For LIMIT intents W8
     requires normalized_order_price; it never fabricates a legal tick.
+    The formal pre-round MIN remains unchanged. Producer-classified valuation
+    caps additionally bind quantity*valuation_price; cash-use caps include the
+    reliable adapter's fee reserve. A reserve is not a fabricated fee schedule.
     """
     reasons=[]
     if not execution_currency or execution_currency != bound_equity_budget.currency:
@@ -160,6 +194,12 @@ def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
         if d is None or d<0:
             return _blocked_unknown("REQUIRED_CAP_UNKNOWN_OR_INVALID")
         caps.append(d)
+    exposure_caps=[];cash_caps=[budget]
+    for values,destination in ((required_valuation_caps,exposure_caps),(required_cash_use_caps,cash_caps)):
+        for x in values:
+            d=_d(x)
+            if d is None or d<0:return _blocked_unknown("REQUIRED_CAP_UNKNOWN_OR_INVALID")
+            destination.append(d)
     max_buy=min([gap.positive_deployment_gap,budget,*caps] if caps else [gap.positive_deployment_gap,budget])
     if reconciliation_required: return _known_no_action(max_buy,gap.positive_deployment_gap,("RECONCILIATION_REQUIRED",))
     if t_plus_1_recheck_required and not t_plus_1_recheck_passed:
@@ -172,10 +212,6 @@ def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
         return _known_no_action(max_buy,gap.positive_deployment_gap,("MAXIMUM_ALLOWED_BUY_AMOUNT_ZERO",))
     if wp is None or wp<=0 or lot is None or lot<=0:
         return _blocked_unknown("ORDER_PRICE_OR_LOT_UNKNOWN_OR_INVALID",max_buy,gap.positive_deployment_gap)
-    raw=max_buy/wp
-    qty=(raw/lot).to_integral_value(rounding=ROUND_FLOOR)*lot
-    if qty<=0:
-        return _known_no_action(max_buy,gap.positive_deployment_gap,("POSITIVE_NON_EXECUTABLE_RESIDUAL_GAP",))
     price=_d(normalized_order_price)
     if order_type.upper()=="LIMIT":
         if price is None or price<=0:
@@ -183,20 +219,44 @@ def build_buy_execution_plan(*, gap:PositionGap, permission:PermissionResult,
     else:
         # Market order has no fabricated fixed execution price.
         return _blocked_unknown("MARKET_PRICE_PLAN_REQUIRES_EXECUTION_ADAPTER",max_buy,gap.positive_deployment_gap)
-    # Normalized price can change notional; floor again against the authoritative ceiling.
-    qty=(max_buy/price/lot).to_integral_value(rounding=ROUND_FLOOR)*lot
+    valuation=_d(canonical_valuation_price);fee=_d(fee_reserve)
+    if valuation is None or valuation<=0:
+        return _blocked_unknown("CANONICAL_VALUATION_PRICE_REQUIRED",max_buy,gap.positive_deployment_gap)
+    if fee is None or fee<0:
+        return _blocked_unknown("EXECUTION_FEE_RESERVE_REQUIRED",max_buy,gap.positive_deployment_gap)
+    exposure_limit=min([gap.positive_deployment_gap,*exposure_caps])
+    cash_limit=min(cash_caps)
+    notional_limit=min(max_buy,max(cash_limit-fee,Decimal(0)))
+    raw=min(notional_limit/price,exposure_limit/valuation)
+    # Only the adapter-normalized price and legal lot determine final quantity.
+    # An earlier working-price floor must not discard a legal normalized lot.
+    qty=(raw/lot).to_integral_value(rounding=ROUND_FLOOR)*lot
     if qty<=0:
         return _known_no_action(max_buy,gap.positive_deployment_gap,("POSITIVE_NON_EXECUTABLE_RESIDUAL_GAP",))
     notional=qty*price
     if notional>max_buy: raise AssertionError("BUY_NOTIONAL_EXCEEDS_MAXIMUM")
+    exposure=qty*valuation
+    if exposure>exposure_limit:raise AssertionError("BUY_VALUATION_EXPOSURE_EXCEEDS_MAXIMUM")
+    if notional+fee>cash_limit:raise AssertionError("BUY_CASH_USE_WITH_FEES_EXCEEDS_MAXIMUM")
     if not order_intent_id:
         return _blocked_unknown("ORDER_INTENT_ID_REQUIRED",max_buy,gap.positive_deployment_gap)
-    post=gap.projected_position_amount+notional
+    post=gap.projected_position_amount+exposure
     projected_post=(post/gap.project_target_position_amount if gap.project_target_position_amount>0 else None)
     plan=StructuredOrderPlan(True,order_type.upper(),price,qty,time_in_force,scheduling_mode,
         broker_or_adapter_constraints,order_intent_id)
-    residual=max(gap.positive_deployment_gap-notional,Decimal("0"))
+    remaining=gap.positive_deployment_gap-exposure
+    residual=remaining if remaining>0 else Decimal("0")
     return ExecutionPlan("BUY",max_buy,notional,qty,price,projected_post,plan,residual,tuple(reasons))
+
+@_execution_precision
+def execution_price_basis(*, execution_plan:ExecutionPlan, canonical_valuation_price:Any, fee_reserve:Any) -> Mapping[str,Any]:
+    """Exact accounting projections for the existing cash and evidence consumers."""
+    qty=execution_plan.execution_quantity;valuation=_d(canonical_valuation_price);fee=_d(fee_reserve)
+    return {'canonical_valuation_price':valuation,
+        'valuation_increment':qty*valuation if qty is not None and valuation is not None else None,
+        'configured_fee_reserve':fee,
+        'required_cash_amount':(execution_plan.execution_amount+fee if qty is not None and qty>0 and fee is not None
+            else Decimal(0) if qty==0 else None)}
 
 def _known_no_action(max_buy:Decimal,residual:Decimal,reasons:tuple[str,...]) -> ExecutionPlan:
     return ExecutionPlan("NO_NEW_BUY",max_buy,Decimal("0"),Decimal("0"),None,None,

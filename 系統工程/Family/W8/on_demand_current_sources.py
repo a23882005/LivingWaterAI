@@ -15,13 +15,15 @@ import os
 import sqlite3
 import subprocess
 import sys
+from copy import deepcopy
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[2]
 
 
 def _module(name):
-    spec=importlib.util.spec_from_file_location('current_sources_'+name,HERE/(name+'.py'))
+    path=(HERE.parent/'W5' if name=='official_holdings_source' else HERE)/(name+'.py')
+    spec=importlib.util.spec_from_file_location('current_sources_'+name,path)
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -35,6 +37,17 @@ def _time(value):
     out=datetime.fromisoformat(value.replace('Z','+00:00'))
     if out.utcoffset() is None:raise ValueError('SOURCE_TIMEZONE_REQUIRED')
     return out.astimezone(timezone.utc)
+
+
+def read_official_holdings(snapshot, *, evaluation_at=None):
+    """Read existing ledger and sealed source quantities without a new DB.
+
+    Keep source layers explicit: a screenshot intake time is not an observation
+    time, and an instrument absent from the old registry is still a real source
+    holding. No absent position, cash balance or account mapping becomes zero.
+    """
+    return _module('official_holdings_source').project_official_holdings(
+        snapshot, evaluation_at=evaluation_at)
 
 
 def run_original_v70(repo_root,strategic,*,evaluation_at):
@@ -136,10 +149,12 @@ def build_current_sources(snapshot,db_path,*,repo_root=REPO,evaluation_at=None):
         except (RuntimeError,OSError,subprocess.TimeoutExpired) as e:
             missing.append(str(e))
         if v70 and v70['status']!='V70_DATA_READY':missing.append('v70_original_data_validation')
+    holdings=read_official_holdings(snapshot,evaluation_at=when)
     observations=None
     try:
         observations=_module('on_demand_market_observations').build_member_market_observations(
-            snapshot,targets,macro,repo_root=repo_root,evaluation_at=when)
+            snapshot,targets,macro,repo_root=repo_root,evaluation_at=when,
+            official_holdings=holdings)
     except ImportError as e:
         missing.append('OBSERVATION_RUNTIME_DEPENDENCY_REQUIRED:'+str(e))
     if hashlib.sha256(path.read_bytes()).hexdigest()!=original_hash:
@@ -147,6 +162,8 @@ def build_current_sources(snapshot,db_path,*,repo_root=REPO,evaluation_at=None):
     return {'schema_version':'Family.W8.CurrentNativeSources.v1','status':'SOURCE_INPUTS_READ',
             'client_id':client,'source_db_sha256':original_hash,'evaluation_at':when,
             'confirmed_target_details':targets,'strategic':strategic,
+            'official_asset_facts':facts,
+            'official_holdings':holdings,
             'funding_latest':funding,'funding_planning_rows':planning,'macro':macro,'v70':v70,
             'market_observations':observations,
             'monetary_tactical_amounts':None,'monetary_amount_reason':'C7_VERIFIED_INVESTMENT_POOL_BASE_REQUIRED',

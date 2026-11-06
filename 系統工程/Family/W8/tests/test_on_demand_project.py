@@ -97,6 +97,10 @@ class ChatGPTRuntimeTest(unittest.TestCase):
         self.assertEqual(result["status"],"DATA_UNAVAILABLE")
         self.assertEqual(result["result"]["trade_authorization"],"NONE")
 
+    def test_incomplete_deployment_diagnostic_cannot_be_wired_as_menu04(self):
+        with self.assertRaisesRegex(ValueError,'INCOMPLETE_DEPLOYMENT_DIAGNOSTIC_NOT_A_PRODUCTION_ENTRY'):
+            self.menu(native_source_config={'flow':'DEPLOYMENT'})
+
     def test_logout_invalidates_local_session(self):
         menu=self.menu()
         menu.login("synthetic-secret")

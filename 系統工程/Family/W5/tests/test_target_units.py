@@ -110,3 +110,59 @@ def test_native_bond_invalid_input_does_not_publish_unified_result():
     assert result['status']=='INVALID_INPUT'
     assert result['unified_result'] is None
     assert 'US_GENERIC_CORE_TARGET_RATIO_MISMATCH' in result['bond_result']['runtime_ready']['output']['reason_codes']
+
+
+def test_native_hard_wait_reaches_original_work9_and_mentor_without_cutover():
+    b,s=bound_case()
+    for item in b['bond_evidence'].values():
+        item['metrics']['PRED-004']['hy_oas_bps']='900'
+    before=deepcopy((b,s))
+    result=run_native_pipeline(ROOT,b,c7_source=s)
+    assert result['status']=='NATIVE_PIPELINE_COMPLETE'
+    assert result['read_only_native_wait_review'] is True
+    assert result['formal_deployment_ready'] is False
+    ready=result['bond_runtime_readiness']
+    assert ready['runtime_ready'] is False and ready['cutover_state']=='BLOCKED'
+    assert set(ready['blocking_reason_codes'])=={
+        'WORK6_UPSTREAM_GATE_NOT_PASS','WORK6_BLOCKING_CLASSIFICATION:HARD_WAIT'}
+    decisions={d['asset_id']:d for d in ready['output']['per_asset_decisions']}
+    assert decisions['SPSB']['new_money_action']=='WAIT'
+    assert Decimal(decisions['SPSB']['deploy_amount']['amount'])==0
+    assert decisions['SGOV']['deployment_state']!='HARD_WAIT'
+    assert result['funding_aggregate']['equity_used']=='0'
+    assert Decimal(result['funding_aggregate']['bond_used'])==100
+    # The remaining $250 is a native undeployed contribution, not a $250 SGOV
+    # buy or an addition to today's existing $40 defensive SGOV holding.
+    assert Decimal(ready['output']['v75_undeployed_to_sgov']['amount'])==250
+    assert result['sgov_reconciliation']['contribution_applied_to_holdings'] is False
+    u=result['unified_result']
+    explained=explain_native(ROOT,result['work9_request'],u,trusted_context={
+        'client_id':'qa-client','run_id':'qa-run-3','owner':u['owner'],'currency':u['currency'],
+        'analysis_permission':'ANALYZE_ONLY','trade_authorization':'NONE',
+        'runtime_mode':'REAL_DETERMINISTIC','data_provenance':'SYNTHETIC',
+        'expected_result_digest':digest(u)})
+    assert explained and 'C8C9.Work9.build_unified_deployment' in result['call_trace']
+    assert result['production']=='HOLD' and result['trade_action']=='NO_TRADE'
+    assert (b,s)==before
+
+
+def test_missing_predicate_does_not_become_a_native_wait_or_fund_sgov():
+    b,s=bound_case();b['bond_evidence']['SPSB']['metrics']['PRED-008']={}
+    result=run_native_pipeline(ROOT,b,c7_source=s)
+    assert result['status']=='INSUFFICIENT_DATA' and result['unified_result'] is None
+    bond=result['bond_result']
+    assert bond['canonical'] is None
+    assert bond['independent_asset_evaluations']['undeployed_amount'] is None
+    assert bond['independent_asset_evaluations']['incomplete_assets']==['SPSB']
+    assert result['stock_result']
+
+
+def test_native_wait_review_never_ignores_additional_cutover_blockers():
+    from bond_engine import run_bond_engine
+    from native_pipeline import _native_wait_review
+    b,_=bound_case()
+    for item in b['bond_evidence'].values():item['metrics']['PRED-004']['hy_oas_bps']='900'
+    bond=run_bond_engine(ROOT,b['bond_request'],b['bond_evidence'])
+    assert _native_wait_review(bond)
+    bond['runtime_ready']['blocking_reason_codes'].append('WORK6_RULE_VERSION_MISMATCH')
+    assert not _native_wait_review(bond)

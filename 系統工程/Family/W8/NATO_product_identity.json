@@ -1,0 +1,14 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "NATO",
+  "fund_name": "Future of Defence UCITS ETF",
+  "source_url": "https://hanetf.com/fund/nato-future-of-defence-etf/",
+  "verified_on": "2026-10-28",
+  "source_scope": "ISSUER_PRODUCT_IDENTITY_ONLY__NOT_CURRENT_SAFETY",
+  "industry_focus": "defence and cyber defence theme",
+  "evidence_kind": "OFFICIAL_ISSUER_PRODUCT_PAGE",
+  "is_stock_etf": true,
+  "is_single_industry": false,
+  "is_thematic": true,
+  "isin": "IE000OJ5TQP4"
+}

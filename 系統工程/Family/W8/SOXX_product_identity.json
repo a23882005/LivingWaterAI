@@ -1,0 +1,12 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "SOXX",
+  "fund_name": "iShares Semiconductor ETF",
+  "source_url": "https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf",
+  "verified_on": "2026-10-28",
+  "source_scope": "ISSUER_PRODUCT_IDENTITY_ONLY__NOT_VALUATION_OR_CURRENT_SAFETY",
+  "industry_focus": "semiconductor industry",
+  "evidence_kind": "OFFICIAL_ISSUER_PRODUCT_PAGE",
+  "is_stock_etf": true,
+  "is_single_industry": true
+}

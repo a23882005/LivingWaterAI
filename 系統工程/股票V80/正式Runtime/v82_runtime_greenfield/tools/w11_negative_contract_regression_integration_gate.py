@@ -136,7 +136,7 @@ def g03():
     truth(validate_order_transition(OrderLifecycleState.SUBMITTED,OrderLifecycleState.FILLED))
 check('G03','INTEGRATION',g03)
 def g04():
-    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=1000,target_rate=.6,confirmed_position_qty=0,canonical_valuation_price=100); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); x=build_buy_execution_plan(gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=4,normalized_order_price=9,execution_currency='USD',order_intent_id='G04'); truth(x.execution_quantity%Decimal('4')==0); truth(x.execution_amount<=x.maximum_allowed_buy_amount)
+    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=1000,target_rate=.6,confirmed_position_qty=0,canonical_valuation_price=100); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); x=build_buy_execution_plan(canonical_valuation_price=100, fee_reserve=Decimal('0'), gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=4,normalized_order_price=9,execution_currency='USD',order_intent_id='G04'); truth(x.execution_quantity%Decimal('4')==0); truth(x.execution_amount<=x.maximum_allowed_buy_amount)
 check('G04','INTEGRATION',g04)
 def g05():
     with tempfile.TemporaryDirectory() as td:
@@ -165,10 +165,10 @@ def e6():
     raises(lambda:calculate_position_gap(project_target_position_amount=100,target_rate=.5,confirmed_position_qty=0,canonical_valuation_price=10,active_orders=[ActiveOrderExposure('s','SELL',OrderLifecycleState.OPEN,Decimal('2'),Decimal('0'))]),'RECONCILIATION_REQUIRED')
 check('ECASE06','EDGE',e6)
 def e7():
-    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=100,target_rate=.5,confirmed_position_qty=0,canonical_valuation_price=10); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); eq(build_buy_execution_plan(gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=100,normalized_order_price=10,execution_currency='USD',order_intent_id='e7').action,'NO_NEW_BUY')
+    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=100,target_rate=.5,confirmed_position_qty=0,canonical_valuation_price=10); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); eq(build_buy_execution_plan(canonical_valuation_price=10, fee_reserve=Decimal('0'), gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=100,normalized_order_price=10,execution_currency='USD',order_intent_id='e7').action,'NO_NEW_BUY')
 check('ECASE07','EDGE',e7)
 def e8():
-    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=100,target_rate=.5,confirmed_position_qty=0,canonical_valuation_price=10); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); eq(build_buy_execution_plan(gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=1,normalized_order_price=10,execution_currency='TWD',order_intent_id='e8').action,'BLOCKED_UNKNOWN')
+    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=100,target_rate=.5,confirmed_position_qty=0,canonical_valuation_price=10); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); eq(build_buy_execution_plan(canonical_valuation_price=10, fee_reserve=Decimal('0'), gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=1,normalized_order_price=10,execution_currency='TWD',order_intent_id='e8').action,'BLOCKED_UNKNOWN')
 check('ECASE08','EDGE',e8)
 check('ECASE09','EDGE',lambda: eq(select_deployment_mode(runaway_up=PredicateTruth.UNKNOWN,right_add=PredicateTruth.TRUE,left_buy_point=PredicateTruth.FALSE),NormalDeploymentMode.UNKNOWN))
 check('ECASE10','EDGE',lambda: eq(arbitrate_primary_special_classification({'TRUE_RISK_REDUCTION':PredicateTruth.FALSE,'RUNAWAY_DOWN':PredicateTruth.FALSE,'TECHNICAL_REDUCTION':PredicateTruth.FALSE,'RUNAWAY_UP':PredicateTruth.FALSE,'RIGHT_ADD':PredicateTruth.FALSE,'LEFT_BUY_POINT':PredicateTruth.FALSE}),'無特殊分類'))
@@ -196,7 +196,7 @@ det('D03',lambda: arbitrate_permission(safety_sufficiency=SufficiencyResult(True
 det('D04',lambda: arbitrate_primary_special_classification({'TRUE_RISK_REDUCTION':PredicateTruth.FALSE,'RUNAWAY_DOWN':PredicateTruth.FALSE,'TECHNICAL_REDUCTION':PredicateTruth.FALSE,'RUNAWAY_UP':PredicateTruth.FALSE,'RIGHT_ADD':PredicateTruth.TRUE,'LEFT_BUY_POINT':PredicateTruth.TRUE}))
 det('D05',lambda: select_deployment_mode(runaway_up=PredicateTruth.FALSE,right_add=PredicateTruth.TRUE,left_buy_point=PredicateTruth.TRUE))
 def exec_tuple():
-    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=1000,target_rate=.6,confirmed_position_qty=0,canonical_valuation_price=100); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); x=build_buy_execution_plan(gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=1,normalized_order_price=10,execution_currency='USD',order_intent_id='d'); return (x.action,x.execution_amount,x.execution_quantity,x.execution_price,x.residual_gap_amount)
+    b=validate_and_bind_funding(base()).bound_equity_budget; g=calculate_position_gap(project_target_position_amount=1000,target_rate=.6,confirmed_position_qty=0,canonical_valuation_price=100); p=PermissionResult(HardGateState.NOT_TRIGGERED,True,()); x=build_buy_execution_plan(canonical_valuation_price=100, fee_reserve=Decimal('0'), gap=g,permission=p,bound_equity_budget=b,order_working_price=10,minimum_lot=1,normalized_order_price=10,execution_currency='USD',order_intent_id='d'); return (x.action,x.execution_amount,x.execution_quantity,x.execution_price,x.residual_gap_amount)
 det('D06',exec_tuple)
 det('D07',lambda: tuple((k,v.value) for k,v in analysis49().fields.items()))
 det('D08',lambda: tuple(project_formal_execution_view(analysis49()).fields.items()))

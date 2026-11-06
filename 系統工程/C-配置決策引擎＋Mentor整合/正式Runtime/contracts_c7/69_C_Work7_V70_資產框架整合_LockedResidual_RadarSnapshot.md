@@ -168,3 +168,40 @@ RECHECK6 正常 formal fixture 必須同時：
 - `pm_gate.work8_released=false`
 
 RECHECK6 完成後必須 **STOP 回 ABC 小PM Gate #1**。六項 Gate 全 PASS 後才可能放行 A78／A79+；C Work8 仍須等待後續 ABC Runtime Readiness Gate 正式 RELEASE。
+# Family 新 scope 附錄｜2026-10-30 中PM方案B
+
+本附錄只適用 `FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1`。正式裁定為
+`系統工程/Family/W8/契約/V82_C7_長期目標與當輪額度分離_中PM裁定_v1.0_20261030.md`，
+SHA-256 `112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0`。
+以下原當輪 scope、§4、bucket equality、`CONFIRMED_TARGET_WOULD_CHANGE` 及原 schema 均繼續有效。
+
+新 scope 使用 input 83、Work6 result 84、Work7 result 85 與 `Family_LongTerm_V70Ceiling_v1.manifest.json`。
+Family source 明訂 `Family.W5.Work6Source.v2`／`Family.W5.C7Source.v2`；沒有正式新 scope 及完整來源，不自動切換。
+`work6.family_long_term_read.run_existing_long_term` 只接受 `REVIEW_ONLY/KEEP_PENDING`，
+呼叫原 C Work5、protected／Drift／Radar 函式，讀取原核准者與時間，不呼叫確認函式，不新增歷史簽名事件。
+
+原核准 `approved_long_term_target`、權重、投資池本金及 `Project Target` 金額原樣保留。
+Work6 的 derived effective view 使用 Current NAV 供持倉權重、Preference Lock 與 Drift；其金額不能當作新的 Project Target。
+兩種 base 的來源與角色放在 nested `family_scope_evidence`，`target_units` 從原核准投資池取得 V82 Gap 金額。
+protected effective Final 等於真正 Current、Drift 為0；若因此無法維持100%或有治理衝突，阻擋而不做 residual 重配。
+
+`work7.family_long_term.capacity` 沿工程63-B消費原V70總金額及同base總池cap：
+`occupied = confirmed + effective remaining BUY + other commitments - confirmed releases`，
+`room=max(ceiling-occupied,0)`，`capacity=min(room,settled authorized available funding)`。
+來源含 owner／account／run／cutoff／原件hash與事件識別。未確認取消不釋放；同事件不重算；
+net available cash不再扣reserved。未知Required cap/cash保留UNKNOWN，已知總額度耗盡可以證明新增0，未知原件仍保留。
+新 scope 不要求長期 bucket 等於 V70 bucket，不縮放長期目標；單純 overage 只限制新增，不產生強制賣出。
+
+Family `family_ceiling_bridge` 把 capacity 交給既有 MIN 與 CMR-ALLOC-01，保留原 gross V70 payload、G0/B0、
+日切片、fees及lot。多account以各自原owner/bucket及唯一owner/asset unit進入同一原allocator，
+不複製全戶capacity、不共用別帳戶cash。缺FX正規化原件時具名拒收，不以匯率預設值繼續。
+serialized Work8 consumer 明確辨別新版本並重播 scope／capacity／snapshot digest；舊 frozen schema 不更動。
+
+所有原 C7 hard checks 保留。成功最多 `READY_FOR_PM_GATE`；`pm_gate`、a78/a79、Work8 release仍為pending/false。
+下游可產出僅供驗收的read-only分析，但 `formal_deployment_ready=false`，不下單、不買資料、不視為Production放行。
+49個canonical分析欄與13個展示欄不增加；新證據只在版本化 sidecar。
+
+驗收測試：`Family/W5/tests/test_c7_family_ceiling.py`、`test_family_ceiling_bridge.py`、
+原 `test_c7_engine.py` 黃金檔、`test_target_units.py` 及既有 cycle／pending commitment 回歸。
+合成QA與本人金融實跑分開。缺核准本金、Current NAV、帳戶來源、FX、訂單對帳或適用cap時，
+列實際欄位與來源缺口，不以空ledger、0現金或模擬數字冒充本人資料。

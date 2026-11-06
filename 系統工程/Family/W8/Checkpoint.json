@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-06T04:57:53.310Z",
+  "updated_at": "2026-11-06T05:41:11.387Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4598,5 +4598,66 @@
     "production": "HOLD",
     "trade": "NONE"
   },
-  "pm_latest_nasdaq_23h_contract_key": "pm_20261106_nasdaq_23h_20261206_scope_source_code_review_and_codex_contract"
+  "pm_latest_nasdaq_23h_contract_key": "pm_20261106_nasdaq_23h_20261206_scope_source_code_review_and_codex_contract",
+  "pm_20261106_pr59_financial_source_receipt_plus_nasdaq23h_sequential_dispatch": {
+    "timestamp_utc": "2026-11-06T05:41:11.385Z",
+    "authority": "Family_middle_PM",
+    "status": "CODEX_SOURCE_SUPPLEMENT_REPORTED__PM_RAW_RECEIPT_PENDING__CONTRACT_AND_WORK_ORDER_DISPATCHED",
+    "pr59": {
+      "head_seen": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "status": "DRAFT_UNMERGED",
+      "existing_scoped_pass_preserved": true,
+      "code_changes_new_since_3f": false,
+      "source_new_reported_by_codex": true,
+      "source_independent_verification": "PENDING_SOURCE_FILE_IDS_SHA_ORIGINAL_CUTOFF"
+    },
+    "per_household_source_data": {
+      "codex_replay_claim": "SELF_REPORTED_ONLY",
+      "private_primary_doc_file_id": "1f4Thgl-CIQzdHFZ3_nUJDqzgED7FhNfvzEQVbVT5EFQ",
+      "privacy": "Do not record owner/account/holdings/trade details in public Github repo",
+      "scope": "Four-household DB provenance, finite-window trades, opening/closing position reconciliation, PIT same-primary qP/qV, same-cutoff own-account settled+reserved+pending/SGOV, C7B/schema83→CycleLedger→Work9/Mentor",
+      "next": "Codex provide all private raw source file IDs, names, SHA, query dates, quantity bridge and missing historical evidence before PM QA"
+    },
+    "separated_nasdaq_23h": {
+      "source_contract_file_id": "1mhoLviSU3fQAVmPZyJwv2Masxkw1R51zyh7OM31GFQk",
+      "candidate_branch_name": "family/nasdaq-23h-compat-20261206",
+      "candidate_branch_created": false,
+      "candidate_PR_created": false,
+      "candidate_base_pr59_sha": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "state": "NOT_IMPLEMENTED_OR_ACCEPTED",
+      "sequence": "after first financial source evidence handoff, then independent 23H candidate minimal diff, no parallel same-shared-runtime writer",
+      "test_requirements": "T01-T11 + 17 tickers + venue/broker/data separately, no rule changes"
+    },
+    "PM_coordination_private_contract": {
+      "file_id": "1f4Thgl-CIQzdHFZ3_nUJDqzgED7FhNfvzEQVbVT5EFQ",
+      "title": "Family中PM_PR59四戶成交來源續工＋Nasdaq23H獨立施工_順序交辦_20261106",
+      "folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+      "shared": false,
+      "readback_verified": true
+    },
+    "github_codex_order": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6677867587",
+    "baseline": {
+      "V82_file_id": "1EObD96ptt3Io_YtTNGTWW1bms30wKguz",
+      "V82_version": "v1.22.0",
+      "V82_mtime_tw": "2026/11/06 04:52",
+      "previous_fix": "PASS_SCOPED_3f7ea0d"
+    },
+    "PM_governance": {
+      "construction_doc_id": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "files_doc_id": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "master_wbs_doc_id": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "prewrite_private_backups": [
+        "1O8HPo1Gx5cmJ51UcqU-QGoAEqZlw_Z-t03Nwl0EX8jk",
+        "1BrVY3HIMrhJOtobuRBecJr8e66zg5ZkL9wVoM5RRTtI",
+        "1ihUwmV9tiF60W0yZOS3kEo3bT5ZvYc3nJzieOfyvipU"
+      ]
+    },
+    "W7": "PASS_CLOSED",
+    "W8": "IN_PROGRESS",
+    "full_financial_pass": 0,
+    "real_cycles": 0,
+    "production": "HOLD",
+    "trade": "NONE"
+  },
+  "pm_latest_codex_sequential_work_order_key": "pm_20261106_pr59_financial_source_receipt_plus_nasdaq23h_sequential_dispatch"
 }

@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install requests pandas yfinance pypdf
+      - run: python -m pip install requests pandas yfinance pypdf 'exchange-calendars>=4.5,<5'
       - name: Compile original macro source and regression test
         run: python -m py_compile '系統工程/總經V70/總經爬蟲18項.py' tests/test_macro18_ism_sahm.py
       - name: ISM/Sahm source unit regression

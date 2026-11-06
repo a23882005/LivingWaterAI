@@ -35,6 +35,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
     if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY','IBKR_LAST_DAILY_OBSERVATION') or source.get('symbol') != symbol
             or not source.get('source_reference') or time(source['retrieved_at']) > time(evaluation_at)):
         raise PermissionError('MEMBER_MARKET_SOURCE_IDENTITY_OR_TIME')
+    if source.get('observation_kind') not in (None,'DAILY_OHLC'):
+        raise ValueError('MEMBER_MARKET_NIGHT_QUOTE_IS_NOT_DAILY_OHLC')
     completion=None
     if source['provider']=='NASDAQ_HISTORICAL':
         from nasdaq_daily_source import load
@@ -50,6 +52,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         if chart.get('error') or len(chart.get('result') or []) != 1:
             raise ValueError('MEMBER_MARKET_PROVIDER_ERROR')
         raw = chart['result'][0]; meta = raw['meta']
+        if (meta.get('dataGranularity') not in (None,'1d') or
+            time(evaluation_at)>=time('2026-12-07T02:00:00Z') and meta.get('dataGranularity')!='1d'):
+            raise ValueError('MEMBER_MARKET_INTRADAY_IS_NOT_COMPLETED_DAILY')
         quotes = raw['indicators']['quote'][0]; stamps = raw['timestamp']
     expected = {'symbol': source['provider_symbol'], 'currency': source['currency'],
                 'exchangeTimezoneName': source['timezone'], 'exchangeName': source['provider_exchange']}

@@ -23,12 +23,12 @@
       "status": "OK"
     },
     "m04": {
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "last_alert_date": "2026-11-06",
       "status": "STALE"
     },
     "m05": {
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "last_alert_date": "2026-11-06",
       "status": "STALE"
     },
@@ -73,17 +73,17 @@
       "status": "OK"
     },
     "m18": {
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "last_alert_date": "2026-11-06",
       "status": "STALE"
     },
     "m19": {
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "last_alert_date": "2026-11-06",
       "status": "STALE"
     },
     "m20": {
-      "consecutive_failures": 1,
+      "consecutive_failures": 2,
       "last_alert_date": "2026-11-06",
       "status": "STALE"
     },

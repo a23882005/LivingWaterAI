@@ -42,7 +42,7 @@ jobs:
           python-version: '3.11'
       - name: Isolated repair regression
         run: |
-          python -m pip install requests pandas
+          python -m pip install requests pandas yfinance pypdf 'exchange-calendars>=4.5,<5'
           mkdir -p build/repair-qa
           set -o pipefail
           python -m unittest discover -s tests -p "test_d009_*.py" -v 2>&1 | tee build/repair-qa/state-alert.log
@@ -70,7 +70,7 @@ jobs:
           python-version: '3.11'
       - name: Install and static QA
         run: |
-          python -m pip install requests pandas yfinance pypdf
+          python -m pip install requests pandas yfinance pypdf 'exchange-calendars>=4.5,<5'
           python -m json.tool "系統工程/總經V70/macro_source_config.json" > /dev/null
           python -m py_compile "系統工程/總經V70/總經爬蟲18項.py" scripts/macro18_state.py scripts/macro18_alert.py scripts/validate_macro18_outputs.py
           python "系統工程/總經V70/總經爬蟲18項.py" --self-test

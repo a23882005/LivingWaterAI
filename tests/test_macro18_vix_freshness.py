@@ -130,8 +130,8 @@ class VixFreshnessTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'All FRED sources failed'):
                 f.fred('VIXCLS')
         self.assertNotIn('VIXCLS', f.fredcache)
-        # The existing malformed-source retry policy can retry FRED twice.
-        self.assertGreaterEqual(len(f.fredattempts['VIXCLS']), 4)
+        # An old but valid quote advances to the next source without retry.
+        self.assertEqual(len(f.fredattempts['VIXCLS']), 4)
         self.assertEqual([a['provider'] for a in f.fredattempts['VIXCLS'][:2]],
                          ['CBOE_OFFICIAL_VIX', 'YAHOO_VIX_CHART'])
         self.assertTrue(all(x['result'] == 'FAILED'

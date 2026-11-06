@@ -73,6 +73,18 @@ class OfficialMonthlyReleaseTests(unittest.TestCase):
                                            release.date(), self.calendar, release)
                 self.assertTrue(any("monthly data stale" in x for x in errors), errors)
 
+    def test_66_day_latest_month_is_valid_until_official_november_release(self):
+        # 2026/11/06: September is 66 calendar days old, but the official
+        # October CPI and jobs reports have not yet been released at this time.
+        # This regression guards the real 18/22 -> 22/22 V70 incident.
+        now = dt.datetime(2026, 11, 6, 4, 0, tzinfo=dt.timezone.utc)
+        day = now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
+        self.assertEqual((day - dt.date(2026, 9, 1)).days, 66)
+        for key in ("m05", "m18", "m19", "m20"):
+            with self.subTest(key=key):
+                item = dict(self.observed[key], status="OK", observation_date="2026-09-01")
+                self.assertEqual(builder._validate(key, item, day, self.calendar, now), [])
+
     def test_unverified_month_and_no_calendar_fail_closed(self):
         data = dict(self.observed["m04"], observation_date="2026-08-01")
         self.assertTrue(builder._validate("m04", data, self.today, self.calendar, self.now))

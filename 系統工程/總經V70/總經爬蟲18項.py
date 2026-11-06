@@ -339,7 +339,10 @@ class Fetcher:
                 # A malformed successful FRED response used to be cached and
                 # immediately abandoned. Retry it once with the HTTP cache
                 # cleared; normal provider throttling/deadline still apply.
-                malformed=isinstance(exc,(ValueError,pd.errors.ParserError))
+                # A valid but lagged VIX close is not a malformed HTTP body.
+                # Move to the next provider instead of retrying an old quote.
+                malformed=(isinstance(exc,(ValueError,pd.errors.ParserError))
+                           and not (series=='VIXCLS' and str(exc).startswith('VIX_LAGGED_SESSION:')))
                 if (provider in ('FRED_OFFICIAL_API','FRED_CSV') and malformed
                         and response is not None and getattr(response,'status_code',0)==200
                         and provider not in retried):

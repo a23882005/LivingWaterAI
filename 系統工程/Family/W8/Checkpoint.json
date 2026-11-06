@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-06T15:51:15.468Z",
+  "updated_at": "2026-11-06T17:35:34.931Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4874,5 +4874,118 @@
     "investment_rule_changed": false,
     "runtime_changed": false,
     "customer_db_modified": false
-  }
+  },
+  "pm_h9_20261107_pr67_nasdaq23h_candidate_independent_scoped_pass": {
+    "timestamp_utc": "2026-11-06T17:35:34.931Z",
+    "owner": "Family_middle_PM",
+    "type": "INDEPENDENT_SCOPE_QA",
+    "decision": "PASS_SCOPED_NASDAQ23H_SOURCE_BOUND_SESSION_AND_DAILY_INPUT_CANDIDATE",
+    "project_rule_sot": {
+      "V82_file_id": "1EObD96ptt3Io_YtTNGTWW1bms30wKguz",
+      "version": "v1.22.0",
+      "first_line_modified_taipei": "2026/11/06 04:52"
+    },
+    "github": {
+      "repo": "a23882005/LivingWaterAI",
+      "pr_number": 67,
+      "pr_url": "https://github.com/a23882005/LivingWaterAI/pull/67",
+      "pr_state": "DRAFT_OPEN_UNMERGED",
+      "head": "3b9307cf4d224f307b7c7cad3a69ff8f40d4d561",
+      "tree": "c05fba37ad3346b91dc3f6b7653bfce98a985e6e",
+      "stacked_base_pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "changed_files": 13,
+      "parent_files_unchanged": 1165,
+      "original_pr59_unchanged": true
+    },
+    "private_source": {
+      "folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+      "candidate_zip_file_id": "1uDK5RCid3LmF1Xh9TLAKHRFI5F0KYw1A",
+      "candidate_zip_bytes": 2452192,
+      "candidate_zip_sha256": "f9e97c104e6aab6ff6592436ab89f353eb4a71c2e46df2648161c2b9dc4bc70e",
+      "independent_manifest_verified": "121/121",
+      "zip_crc": "PASS",
+      "baseline_code_zip_file_id": "1h3mz2FTZp9xq4qQts2Kr_c_P9ylKfi2l",
+      "baseline_code_sha256": "cacaccd5dfb11bec534a0adff27069ea0d83329911834e9bc9a39afcb34b5f1d",
+      "receipt_file_id": "1ONGvOaovZQA5z9PzwLEKcqATsjlDKaU8",
+      "source_private": "OWNER_ONLY"
+    },
+    "independent_restore": {
+      "code_files_verified": 1178,
+      "baseline_git_history_commits": 1559,
+      "candidate_git_history_commits": 1560,
+      "overwrites": 0,
+      "git_head_tree_exact": true
+    },
+    "qa": {
+      "independent_new_cases": {
+        "passed": 53,
+        "failed": 0
+      },
+      "independent_targeted_cases": {
+        "passed": 200,
+        "failed": 0,
+        "includes_new53": true
+      },
+      "github_ci": {
+        "workflows_completed_success": 6,
+        "w5_junit_passed": 666,
+        "w8_junit_passed": 1566,
+        "total_original_junit_passed": 2232,
+        "pm_reran_all_2232": false
+      },
+      "t01_t11_casebook_reviewed": 11,
+      "t07_three_layer_symbols": 17,
+      "t07_new_real_qualification_pass": 0,
+      "t08_actual_daily_rows_per_symbol": 23,
+      "t08_symbols": [
+        "QQQ",
+        "NVDA"
+      ],
+      "t08_valid_comparison_points": 6,
+      "t08_changed_m8_components": 0,
+      "t08_current_provider_recalculation": "MATCH_ORIGINAL_JSON",
+      "official_source_capture_sha": "9/9",
+      "direct_dependency_sha": "176/176"
+    },
+    "invariant_boundary": {
+      "daily_b0": "UNCHANGED",
+      "m1_m8": "UNCHANGED",
+      "buy_quantity_dual_price": "UNCHANGED",
+      "canonical49_execution13": "UNCHANGED",
+      "sell": "UNCHANGED",
+      "volume_policy": "UNCHANGED",
+      "broker_order_instructions": "NONE",
+      "real_23h_feed_route_account": "UNKNOWN",
+      "service_activated": false
+    },
+    "documentation": {
+      "private_pm_qa_file_id": "18_4pHic_xTpD3PzxIKACj3SXp_iAiMTpK4SBySaLNJM",
+      "github_gate_comment": "https://github.com/a23882005/LivingWaterAI/pull/67#issuecomment-6691209835",
+      "original_doc_prewrite_backups": [
+        "12-UN16IF3_D1FL4pKBhgmZXoFNGAghcS6CMvhdLm1pc",
+        "1Iq8yXKTAqfkgJm9yIEq01YNusHYWVlJo9Ek-mmcNo3o",
+        "1MmuQp5YkW0yxME1o0jUWaA_1IvW5fVcuhr_vKvwfp1M"
+      ],
+      "governance_readback": "3 docs verified"
+    },
+    "next": {
+      "original_codex": "Continue financial PR59 qualified same-cutoff broker identity, PIT/qP/qV, NAV/settled/reserved/pending and position reconciliation; 23H new feed/routes only on independent PR67 when actual source exists.",
+      "middle_pm": "Independently validate next PR59 financial sources, continue FAM W8; keep PR67 candidate isolated and later verify live T01–T11/17 entitlement."
+    },
+    "status": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "pr59": "DRAFT_UNMERGED",
+      "pr67": "DRAFT_UNMERGED",
+      "full_finance_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trade": "NONE",
+      "real_23h_route_pass": 0
+    },
+    "investment_rule_changed": false,
+    "runtime_production_deployed": false,
+    "private_db_modified": false
+  },
+  "pm_latest_nasdaq_23h_gate_key": "pm_h9_20261107_pr67_nasdaq23h_candidate_independent_scoped_pass"
 }

@@ -21,6 +21,11 @@ class OfficialMonthlyReleaseTests(unittest.TestCase):
         # Frozen 2026-10-18 historical case: current production inputs are allowed
         # to move forward without retroactively altering this regression scenario.
         self.observed = json.loads(CORE.read_text(encoding="utf-8"))["items"]
+        # Reproduce 2026-10-18 STATUS as well as observation dates.
+        # Today's live m05/m18/m19/m20 may legitimately be STALE in November;
+        # that must not invalidate a frozen historical pre-release scenario.
+        for key in MONTHLY_SIX:
+            self.observed[key] = dict(self.observed[key], status="OK")
         self.observed["m04"] = dict(
             self.observed["m04"], value=54.5, observation_date="2026-09-01",
             source_url="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",

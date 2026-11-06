@@ -220,7 +220,7 @@ def execute_case(*, run_id: str, confirmed_qty: Decimal = Decimal("0"), project_
         active_orders=active_orders,
     )
     plan = build_buy_execution_plan(
-        gap=gap,
+        canonical_valuation_price=Decimal("10"), fee_reserve=Decimal('0'), gap=gap,
         permission=core.permission,
         bound_equity_budget=bound.bound_equity_budget,
         order_working_price=Decimal("10"),

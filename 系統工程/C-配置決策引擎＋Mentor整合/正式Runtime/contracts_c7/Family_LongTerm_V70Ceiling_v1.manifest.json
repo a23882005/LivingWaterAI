@@ -45,11 +45,11 @@
     },
     {
       "path": "../../Family/W5/stock_engine.py",
-      "sha256": "4a4842fb68d259c4acbd52a1a1e81a8ddd7b334f1ccb15278019546e385590cc"
+      "sha256": "d57d1a4cbfb2cd86ae9b3cd49f7524116c5ef9512d703a6f2afe1e421e8ea32c"
     },
     {
       "path": "../../Family/W5/native_pipeline.py",
-      "sha256": "68c632a45c9e09057f1c9c1882c63070494da2f324d087505dcecfdcfafac030"
+      "sha256": "dbe2c7afedf984bc9093d23c4a4ec7e4d1a1adca314a73e3d8d0b0e5ebaa4654"
     },
     {
       "path": "../../Family/W5/v82_slice_bridge.py",

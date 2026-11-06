@@ -27,14 +27,14 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
-      "sha256": "82eb080acd23b5dd2def5ef9e6a1882600c0b7f24c71f52dd6d042427fab19ec",
-      "git_blob_sha": "6341e06250d0180d5a9f46d0f8e9334f1ed57ca6",
-      "size": 13588,
-      "family_revision": "OWNER_20261030_V82_APPROVED_V1_0_COMPLETION",
+      "sha256": "d8d4f42bb52492611d22779e18bffd9b208c631e718f7f7a8a81c0ef828c23de",
+      "git_blob_sha": "65f2fda635f0a908a24d6254e389ff31f75b78f9",
+      "size": 16141,
+      "family_revision": "OWNER_PM_20261106_NATIVE_BUY_QUANTITY_PRICE_BASIS_FIX",
       "authorization": {
-        "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
-        "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
-        "scope": "Approved PV2/PV3/CMR7/CMR8/CMR9 native integration; exact Decimal lot flooring version1.0.1 preserves original MIN"
+        "scope": "PM issuecomment-6671473207 and issuecomment-6671155800: preserve formal MIN, additionally bound final quantity by valuation exposure and cash plus explicit fee reserve; compute estimated completion at valuation price",
+        "contract_sha256": "01945926e4806cc219fd68c604d61828c863af8a0cd91a5f3e1acb8f7143f692",
+        "parent_commit": "234221e1f173483b747c3ad2500a70d02600ccef"
       },
       "upstream": {
         "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",

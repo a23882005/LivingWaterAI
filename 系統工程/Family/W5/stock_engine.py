@@ -47,7 +47,7 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *,
     from livingwater_v82_runtime.core_rules import EvidenceFact,evaluate_core_rule_state
     from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus,OrderLifecycleState
     from livingwater_v82_runtime.deployment import (select_deployment_mode,resolve_deployment_stage,
-        calculate_position_gap,build_buy_execution_plan,ActiveOrderExposure)
+        calculate_position_gap,build_buy_execution_plan,execution_price_basis,ActiveOrderExposure)
     adapter=load_c_module(repo_path,4)
     built=adapter.build_v82_runtime_input(req)
     wire=built['v82_runtime_input']; binding=built['integration_binding']
@@ -123,7 +123,30 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *,
     gap=calculate_position_gap(project_target_position_amount=wire['client_target']['project_target_position'],
         target_rate=stage.target_rate,confirmed_position_qty=wire['confirmed_position_snapshot']['quantity'],
         canonical_valuation_price=facts['valuation_price'],active_orders=orders)
+    # Keep the formal pre-round MIN; classify its producers for the final
+    # quantity checks instead of treating a cash budget as valuation exposure.
     caps=[cap['amount'],*facts['required_known_caps']]
+    valuation_caps=[cap['amount'],*facts['required_known_caps']]
+    cash_use_caps=[]
+    costs=(approved_context.get('execution_costs') if approved is not None else facts.get('execution_costs')) or {}
+    from livingwater_v82_runtime.approved_profiles import number
+    fee_value=number(costs.get('fee_reserve'),'0') if costs.get('source_reference') else None
+    if costs.get('currency',binding['currency'])!=binding['currency']:
+        raise StockEvidenceError('EXECUTION_FEE_CURRENCY_MISMATCH')
+    cap_audit=[{'producer':'Work3.V70_or_C7_incremental_capacity','basis':'VALUATION_EXPOSURE',
+        'amount':cap['amount'],'currency':binding['currency']},
+        {'producer':'V82.validate_and_bind_funding.bound_equity_budget','basis':'CASH_WITH_FEES',
+            'amount':funded.bound_equity_budget.amount,'currency':binding['currency'],
+            'source_contract':funded.bound_equity_budget.source_contract,
+            'source_reference_ids':funded.bound_equity_budget.source_reference_ids},
+        *[{'producer':'QualifiedStockEvidence.additional_position_caps','basis':'VALUATION_EXPOSURE',
+            'amount':v,'currency':binding['currency']} for v in facts['required_known_caps']]]
+    if family_ceiling is not None:
+        # C7 capacity is MIN(exposure room, authorized funding), so its
+        # funding component also bounds total cash including the fee reserve.
+        cash_use_caps.append(family_ceiling['amount'])
+        cap_audit.append({'producer':'C7.incremental_capacity_funding_component','basis':'CASH_WITH_FEES',
+            'amount':family_ceiling['amount'],'currency':binding['currency']})
     if approved is not None:
         from livingwater_v82_runtime.approved_decision import slice_cap
         from livingwater_v82_runtime.slice_allocation import allocate
@@ -132,16 +155,14 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *,
             positive_gap=gap.positive_deployment_gap,known_zero_capacity=known_zero)
         caps.append(sliced['cap']);result['daily_slice']=sliced
         trace.append('V82.CMR8.daily_cycle_room_to_existing_MIN')
-        execution_costs=approved_context.get('execution_costs') or {}
-        fee=execution_costs.get('fee_reserve')
-        from livingwater_v82_runtime.approved_profiles import number
         snapshot=approved_context.get('cycle_snapshot') or {}
         if snapshot.get('status')=='PROPOSED' and snapshot.get('cycle') is not None:
             proposed=snapshot['cycle']
             if number(proposed['G0'])!=gap.positive_deployment_gap or proposed['initial_speed']!=approved['speed']:
                 raise StockEvidenceError('PROPOSED_CYCLE_INITIAL_GAP_OR_SPEED_MISMATCH')
-        fee_value=number(fee,'0') if execution_costs.get('source_reference') else None
         no_new=sliced['cap']=='0'
+        cap_audit.append({'producer':'V82.daily_slice.cycle_room','basis':'ORDER_NOTIONAL',
+            'amount':sliced['cap'],'currency':binding['currency']})
         layers=approved.get('funding_layers')
         if layers is not None:
             available=req['work3_handoff']['funding_context']['settlement']['cash_state']['available']
@@ -151,6 +172,8 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *,
                 if not no_new:caps.append(None)
         fee_cap=max(funded.bound_equity_budget.amount-fee_value,Decimal(0)) if fee_value is not None else None
         caps.append('0' if no_new else fee_cap)
+        cap_audit.append({'producer':'V82.adapter_fee_reserve_notional_room',
+            'basis':'ORDER_NOTIONAL_AFTER_FEE_RESERVE','amount':fee_cap,'currency':binding['currency']})
         allocation_request=deepcopy(approved_context.get('shared_allocation_request'))
         shared=None
         if allocation_request is not None and not no_new:
@@ -167,15 +190,28 @@ def run_stock_engine(repo_path, adapter_request, evidence, producer_contract, *,
         result['shared_slice_allocation']=shared
         selected=(shared or {}).get('selected_allocation') if family_ceiling is not None else (shared or {}).get('allocations',{}).get(binding['asset_id'])
         caps.append('0' if no_new else selected)
+        # The proportional allocation is the intersection of a shared cash
+        # bucket and V70 room. Enforce both parts without changing allocation.
+        valuation_caps.append('0' if no_new else selected)
+        cash_use_caps.append('0' if no_new else selected)
+        cap_audit.append({'producer':'V82.CMR_ALLOC_01.selected_allocation',
+            'basis':'VALUATION_EXPOSURE_AND_CASH_WITH_FEES','amount':selected,'currency':binding['currency']})
         if no_new:
             result['daily_slice']['unresolved_caps_retained_in_evidence']=deepcopy(facts['required_known_caps'])
             caps=[Decimal(0)]  # Known prohibition, not a fabricated observation.
+            valuation_caps=[Decimal(0)];cash_use_caps=[]
         trace.append('V82.CMR9.shared_slice_cap_to_existing_MIN')
     plan=build_buy_execution_plan(gap=gap,permission=state.permission,
         bound_equity_budget=funded.bound_equity_budget,order_working_price=facts['order_working_price'],
         minimum_lot=facts['minimum_lot'],required_known_caps=caps,
+        canonical_valuation_price=facts['valuation_price'],fee_reserve=fee_value,
+        required_valuation_caps=valuation_caps,required_cash_use_caps=cash_use_caps,
         normalized_order_price=facts['normalized_order_price'],execution_currency=binding['currency'],
         order_intent_id=facts['order_intent_id'])
+    result['execution_basis']={**execution_price_basis(execution_plan=plan,
+        canonical_valuation_price=facts['valuation_price'],fee_reserve=fee_value),'fee_source':deepcopy(costs),
+        'bound_cash_budget':funded.bound_equity_budget.amount,'currency':binding['currency'],
+        'run_id':binding['run_id'],'cap_sources':cap_audit,'formal_pre_round_MIN_preserved':True}
     trace.extend(['V82.calculate_position_gap','V82.build_buy_execution_plan'])
     return {**result,'status':plan.action,'position_gap':gap,'execution':plan}
 

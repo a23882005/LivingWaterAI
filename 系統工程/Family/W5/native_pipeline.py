@@ -7,7 +7,7 @@ from copy import deepcopy
 from decimal import Decimal
 from family_input import digest
 from runtime_loader import load_c_module
-from stock_engine import run_stock_engine,assemble_stock_output
+from stock_engine import run_stock_engine,assemble_stock_output,_plain
 from bond_engine import run_bond_engine
 from funding_guard import check_aggregate
 from sgov_bridge import reconcile_sgov
@@ -96,7 +96,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
     owner=({'client_id':client,**w3['owner'],'currency':w3['currency']} if family_sources is None
            else family_sources['funding']['family_owner'])
     claims=[{'claim_id':'V82:'+stock_output['asset_id'],'owner':owner,'run_id':run_id,
-             'asset_class':'EQUITY','amount':stock['execution'].execution_amount,
+             'asset_class':'EQUITY','amount':stock['execution_basis']['required_cash_amount'],
              'source_engine':'V82','asset_id':stock_output['asset_id']}]
     for d in bond['runtime_ready']['output']['per_asset_decisions']:
         if d['deploy_amount'] is None:raise PipelineError('BOND_DEPLOYMENT_UNKNOWN')
@@ -152,6 +152,7 @@ def run_native_pipeline(repo_path, bundle, stock_source=None, family_sources=Non
         'stock_result':stock_output,'bond_result':bond['canonical'],'funding_aggregate':aggregate,
         **({'stock_local_plan':{'execution_amount':str(stock['execution'].execution_amount)
             if stock['execution'].execution_amount is not None else None,
+            'execution_basis':_plain(stock['execution_basis']),
             'approved_v10_analysis':deepcopy(stock['approved_v10_analysis']),
             'daily_slice':deepcopy(stock['daily_slice']),
             **({'family_ceiling_binding':deepcopy(stock['family_ceiling_binding'])} if stock.get('family_ceiling_binding') else {}),

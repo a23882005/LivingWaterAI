@@ -119,13 +119,13 @@ def test_same_input_37500_slice_and_legacy_100000_150000_probe_use_legal_price_l
     bound=validate_and_bind_funding(out['built_input']['v82_runtime_input'])
     legacy=build_buy_execution_plan(gap=out['position_gap'],permission=out['core_state'].permission,
         bound_equity_budget=bound.bound_equity_budget,order_working_price='100',minimum_lot='1',
-        required_known_caps=['100000'],normalized_order_price='100',execution_currency='USD',order_intent_id='SYNTHETIC_OLD_PROBE')
+        required_known_caps=['100000'],normalized_order_price='100',canonical_valuation_price='100',fee_reserve='0',execution_currency='USD',order_intent_id='SYNTHETIC_OLD_PROBE')
     assert legacy.execution_amount==100000
     req,facts,contract=stage4_case(200000);out=run_stock_engine(ROOT,req,facts,contract)
     bound=validate_and_bind_funding(out['built_input']['v82_runtime_input'])
     legacy=build_buy_execution_plan(gap=out['position_gap'],permission=out['core_state'].permission,
         bound_equity_budget=bound.bound_equity_budget,order_working_price='100',minimum_lot='1',
-        required_known_caps=['200000'],normalized_order_price='100',execution_currency='USD',order_intent_id='SYNTHETIC_OTHER_OLD_PROBE')
+        required_known_caps=['200000'],normalized_order_price='100',canonical_valuation_price='100',fee_reserve='0',execution_currency='USD',order_intent_id='SYNTHETIC_OTHER_OLD_PROBE')
     assert legacy.execution_amount==150000 and out['execution'].execution_amount==37500
 
 

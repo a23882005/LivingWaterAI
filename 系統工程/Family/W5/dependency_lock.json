@@ -212,7 +212,7 @@
   {
     "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/tools/w8_deployment_execution_gate.py",
     "sha": "1ca49d8fd7162ee4c34ced8f189255bd44a696e2",
-    "sha256": "e97eb0749d6980c31a491aadbbb0735dab92495a7da3d0e4ad92734f802fe66e",
+    "sha256": "281030e222702b591f74bc2aac3363150ec7f0303e921434eb6df41fdbfe8db6",
     "reason": "對應原生回歸或本線直接schema/指定總經feed依賴"
   },
   {
@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "93a9b78f827212fcf012b1a55d3cecfb045557ee206e28de92a28af5219a059e"
+    "sha256": "df59b639a0829b122244f12ad2bf9f5c76e34143dcd566474476bdf3f120a584"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -395,11 +395,11 @@
   },
   {
     "path": "系統工程/Family/W5/stock_engine.py",
-    "sha256": "4a4842fb68d259c4acbd52a1a1e81a8ddd7b334f1ccb15278019546e385590cc"
+    "sha256": "d57d1a4cbfb2cd86ae9b3cd49f7524116c5ef9512d703a6f2afe1e421e8ea32c"
   },
   {
     "path": "系統工程/Family/W5/native_pipeline.py",
-    "sha256": "68c632a45c9e09057f1c9c1882c63070494da2f324d087505dcecfdcfafac030"
+    "sha256": "dbe2c7afedf984bc9093d23c4a4ec7e4d1a1adca314a73e3d8d0b0e5ebaa4654"
   },
   {
     "path": "系統工程/Family/W5/v82_slice_bridge.py",

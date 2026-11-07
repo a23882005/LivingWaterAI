@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-06T17:35:34.931Z",
+  "updated_at": "2026-11-07T23:11:08.267Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4987,5 +4987,135 @@
     "runtime_production_deployed": false,
     "private_db_modified": false
   },
-  "pm_latest_nasdaq_23h_gate_key": "pm_h9_20261107_pr67_nasdaq23h_candidate_independent_scoped_pass"
+  "pm_latest_nasdaq_23h_gate_key": "pm_h9_20261107_pr67_nasdaq23h_candidate_independent_scoped_pass",
+  "pm_20261108_nasdaq23h_information_handoff": {
+    "entry_type": "EXTERNAL_MARKET_STRUCTURE_INFORMATION_HANDOFF_NO_CODE_CHANGE",
+    "document_date_taipei": "2026/11/08",
+    "asof_utc": "2026-11-07T23:11:08.267Z",
+    "owner": "Family middle PM",
+    "requester": "Family Owner",
+    "status": "RECORDED_GOVERNANCE_ONLY",
+    "notice": "Nasdaq Global Trading Hours scheduled for 2026-12-06 21:00 Eastern (2026-12-07 10:00 Asia/Taipei, standard time). Not live as of 2026-11-08.",
+    "official_evidence": [
+      "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-46",
+      "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-56",
+      "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-66",
+      "https://www.nasdaqtrader.com/TraderNews.aspx?id=DN2026-8"
+    ],
+    "preproduction": "2026-11-01 onward designated TEST symbols only. Nasdaq 2026-11-06 ETA2026-66 preproduction session 21:00–03:55 ET. Planned full live night 21:00–04:00 ET is distinct; actual launch/entitlements pending.",
+    "market_date_rule": {
+      "reference_date": "2026-12-07 Monday",
+      "sessions_ET": [
+        {
+          "name": "night",
+          "start": "previous_day_21:00",
+          "end": "current_04:00"
+        },
+        {
+          "name": "premarket",
+          "start": "current_04:00",
+          "end": "current_09:30"
+        },
+        {
+          "name": "regular",
+          "start": "current_09:30",
+          "end": "current_16:00"
+        },
+        {
+          "name": "afterhours",
+          "start": "current_16:00",
+          "end": "current_20:00"
+        }
+      ],
+      "maintenance_ET": "20:00–21:00",
+      "same_trade_date": true,
+      "time_zone": "America/New_York daylight savings aware"
+    },
+    "user_proposed_chart_modes": [
+      {
+        "mode": 0,
+        "period": "REGULAR_ONLY",
+        "open": "first_eligible_regular_trade",
+        "final_at_ET": "16:00"
+      },
+      {
+        "mode": 1,
+        "period": "PRE_PLUS_REGULAR_PLUS_AFTER",
+        "open": "first_eligible_premarket_trade",
+        "final_at_ET": "20:00"
+      },
+      {
+        "mode": 2,
+        "period": "NIGHT_PLUS_PRE_PLUS_REGULAR_PLUS_AFTER",
+        "open": "first_eligible_night_trade",
+        "final_at_ET": "20:00"
+      }
+    ],
+    "chart_mode_caveat": "Conceptual Family analysis; Futu actual mobile daily OHLC/volume chart modes and live availability not yet confirmed. No trade means no actual eligible opening print.",
+    "price_baselines": {
+      "full_trade_day_pct": "compare current quote with previous trading day valid adjusted regular 16:00 close",
+      "period_specific_pct": "data-provider/broker defined; could be distinct from full_day_pct",
+      "candlestick_body": "Close versus that mode's first eligible Open",
+      "warning": "Do not equate current % change fields with candlestick body color or assume every Futu field has identical base."
+    },
+    "symbol_universe_candidates": [
+      "ADBE",
+      "AVGO",
+      "CPAI",
+      "DRAM",
+      "DYNF",
+      "GOOG",
+      "IBKR",
+      "MDT",
+      "MSFT",
+      "NVDA",
+      "PPH",
+      "QQQ",
+      "SGOV",
+      "SMH",
+      "SOXX",
+      "VT",
+      "ZTS"
+    ],
+    "source_qualifications": {
+      "nasdaq_live_night": "UNKNOWN",
+      "broker_IBKR_route_account": "UNKNOWN",
+      "broker_Futu_kline_display": "UNKNOWN",
+      "new_night_feed_and_volume": "UNKNOWN",
+      "actual_17_symbols_new_route_PASS": 0
+    },
+    "preserved": {
+      "PR67": {
+        "status": "PASS_SCOPED_CANDIDATE_ONLY",
+        "head": "3b9307cf4d224f307b7c7cad3a69ff8f40d4d561",
+        "draft": true
+      },
+      "PR59": {
+        "status": "DRAFT_WITH_PRIOR_SCOPED_PASSES",
+        "head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb"
+      },
+      "M1_M8_B0_VOLUME_BUY_QUANTITY": "UNCHANGED",
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "FullFinancialPASS": 0,
+      "RealCycles": 0,
+      "Production": "HOLD",
+      "Trade": "NONE",
+      "strategy_changed": false,
+      "runtime_changed": false,
+      "official_member_DB_changed": false
+    },
+    "documentation": {
+      "family_project_management_document_id": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "family_file_management_document_id": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "family_master_wbs_document_id": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "prewrite_backup_file_ids": [
+        "1HwLE-KrFayVyHEY93yYc0rYq3Wnn1eeBvRfrA1s5HYM",
+        "1HEmBv7JWIjQgJETm2J64gQpayglI4Z3LJjSTXCEF6bk",
+        "1uRYhgH32iZhaGxvR--TGg4tWsQtcWOq0Pn-Wrjcqu48"
+      ]
+    },
+    "next_owner": "Family middle PM tracks this as upstream dependency; PR59 source-finance work remains current ordered priority, PR67 future real night source/route validation only on qualified evidence."
+  },
+  "pm_latest_nasdaq_23h_information_key": "pm_20261108_nasdaq23h_information_handoff"
 }

@@ -1,6 +1,7 @@
 """Regression tests for direct official ISM and Sahm sources."""
 import datetime as dt
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -12,6 +13,8 @@ import pandas as pd
 spec=importlib.util.spec_from_file_location('macro18_sources',Path(__file__).resolve().parents[1]/'系統工程/總經V70/總經爬蟲18項.py')
 macro=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(macro)
+
+MONTHLY_CALENDAR_FIXTURE = Path(__file__).parent / 'fixtures/monthly_official_release_calendar_20261106.json'
 
 class FakeResponse:
     def __init__(self,text): self.text=text
@@ -93,8 +96,11 @@ class SourceTests(unittest.TestCase):
     def test_live_month_release_gate_and_cached_source_fail_closed(self):
         now=RealDatetime(2026,11,6,4,0,tzinfo=dt.timezone.utc)
         today=now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
-        calendar=macro.verified_monthly_calendar(today,now)
-        self.assertEqual(len(calendar),6)
+        # Keep this frozen pre-release case independent of daily production refreshes.
+        fixture=MONTHLY_CALENDAR_FIXTURE.read_text(encoding='utf-8')
+        with patch.object(macro.Path,'read_text',return_value=fixture):
+            calendar=macro.verified_monthly_calendar(today,now)
+        self.assertEqual(set(calendar),{'m04','m05','m15','m18','m19','m20'})
         row=macro.row('m19',4.2,'2026-09-01',
                       'https://fred.stlouisfed.org/series/UNRATE','live official')
         row.update(attempt_result='SUCCESS',cache_used=False,
@@ -112,6 +118,14 @@ class SourceTests(unittest.TestCase):
         ):
             self.assertFalse(macro.release_certified_live_month(changed,calendar,now))
         self.assertFalse(macro.release_certified_live_month(row,{},now))
+
+    def test_monthly_calendar_rejects_future_verification(self):
+        now=RealDatetime(2026,11,6,4,0,tzinfo=dt.timezone.utc)
+        today=now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()
+        fixture=json.loads(MONTHLY_CALENDAR_FIXTURE.read_text(encoding='utf-8'))
+        fixture['checked_at_utc']='2026-11-06T04:00:01Z'
+        with patch.object(macro.Path,'read_text',return_value=json.dumps(fixture)):
+            self.assertEqual(macro.verified_monthly_calendar(today,now),{})
 
     def test_sahm_published_series_preferred(self):
         fake=SimpleNamespace(fred=lambda name:pd.Series([0.21],index=pd.to_datetime(['2026-09-01'])),

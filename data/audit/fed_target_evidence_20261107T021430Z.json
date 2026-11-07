@@ -1,0 +1,52 @@
+{
+  "schema": "fed-target-evidence-v1/audit-v1",
+  "captured_at": "2026-11-07T10:14:30+08:00",
+  "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+  "http_status": 200,
+  "response_length_bytes": 105282,
+  "response_sha256": "e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6",
+  "result": "CURRENT_CONFIRMED",
+  "excerpt": "Fed官方頁目前2026年9月17日起目標區間為3.75–4.00%；頁面最後更新2026年9月16日。",
+  "policy": {
+    "publication_date": "2026-09-16",
+    "effective_date": "2026-09-17",
+    "lower_bound": 3.75,
+    "upper_bound": 4,
+    "midpoint": 3.875
+  },
+  "corroboration": [
+    {
+      "site": "FRED DFEDTARL",
+      "url": "https://fred.stlouisfed.org/series/DFEDTARL",
+      "metric_or_horizon": "目標區間下限",
+      "status": "FOUND",
+      "checked_at": "2026-11-07T10:14:30+08:00",
+      "value": 3.75,
+      "unit": "%",
+      "observation_date": "2026-11-06",
+      "notes": "直接取得成功；官方每日序列3.75%；SHA256=21d99996ea866b85ce1d2a86e6c933a3e090e2a21a2ba74a292e64d901604c62"
+    },
+    {
+      "site": "FRED DFEDTARU",
+      "url": "https://fred.stlouisfed.org/series/DFEDTARU",
+      "metric_or_horizon": "目標區間上限",
+      "status": "FOUND",
+      "checked_at": "2026-11-07T10:14:30+08:00",
+      "value": 4,
+      "unit": "%",
+      "observation_date": "2026-11-06",
+      "notes": "直接取得成功；官方每日序列4.00%；SHA256=3a9000d1132ede2a3195f0e071dc5117d9aa5011c06d9b5c3d6c251a2b8b211f"
+    },
+    {
+      "site": "ALFRED DFEDTARU",
+      "url": "https://alfred.stlouisfed.org/series?seid=DFEDTARU",
+      "metric_or_horizon": "目標區間上限歷史vintage",
+      "status": "FOUND",
+      "checked_at": "2026-11-07T10:14:30+08:00",
+      "value": 4,
+      "unit": "%",
+      "observation_date": "2026-11-06",
+      "notes": "直接取得成功；ALFRED觀測4.00%；SHA256=5fa427581a140c62435f27af50d380e94bcadef0dcfef31d142501045502046a"
+    }
+  ]
+}

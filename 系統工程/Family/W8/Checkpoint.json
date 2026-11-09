@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-09T17:31:37.153Z",
+  "updated_at": "2026-11-09T17:43:08.020Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -5264,5 +5264,78 @@
     "existing_official_DB_or_ledger_writes": 0,
     "broker_order_actions": 0,
     "old_handoff_archives_preserved": true
+  },
+  "pm_h12_20261110_successor_3zip_and_financial_source_fresh_read_codex_dispatch": {
+    "status": "PASS_SCOPED_HANDBACK_AND_SOURCE_ARCHIVE_INTEGRITY_ONLY",
+    "performed_on_taipei": "2026/11/10",
+    "owner": "Family中PM（總PM）",
+    "v82": "v1.22.0; 2026/11/06 04:52 Taiwan",
+    "pr59": {
+      "head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "draft": true,
+      "existing_scoped_passes_preserved": true,
+      "real_financial_reconciliation_pass": 0
+    },
+    "pr67": {
+      "head": "3b9307cf4d224f307b7c7cad3a69ff8f40d4d561",
+      "draft": true,
+      "existing_candidate_scoped_pass_preserved": true,
+      "new_real_night_route_pass": 0
+    },
+    "handoff": {
+      "zip_count": 3,
+      "original_drive_ids": [
+        "1SUT0wwbCYFe6HYJofTppKSVmOChpDMLS",
+        "1_x-0YuX0dJRPAz2dKpBU8AqqGml_c03G",
+        "1Ao0Rm97FXHwDjI8VDrEx-TTqbDd9lxvh"
+      ],
+      "crc_pass": "3/3",
+      "manifest_payload_sha_pass": "26/26",
+      "outer_sha_match": "3/3"
+    },
+    "original_codex_financial_source": {
+      "drive_file_id": "1gziE8ysmlxANvLtI60A3AEM1-VL3PKEA",
+      "original_date": "2026/11/08",
+      "sha256": "7b9dd7b535811179589ff3438d9949b56ccb896f7d5eac2456f861f049ab362c",
+      "zip_crc": "PASS",
+      "manifest_sha": "11/11",
+      "source_evidence_index_rows": 22819,
+      "finance_audit_zip_crc": "PASS",
+      "four_households_zip_crc": "PASS",
+      "qP_qualified": false,
+      "qV_qualified": false,
+      "qualified_NAV": null,
+      "qualified_available_cash": null,
+      "qualified_closed_position_rows": 0,
+      "unbound_broker_executions": 50,
+      "qualification_note": "Missing verified account identity, same cutoff, full opening-to-closing history, PIT, same-Primary qP/qV, NAV/settled/reserved/pending and SGOV roles; old raw inventory and native replay passes still hold."
+    },
+    "unique_writer": "Original V82 Codex, PR59 existing contractual scope only; PR67 on independent candidate branch",
+    "official_dispatch_pr59_issue_comment": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6747083577",
+    "governance_doc_ids": {
+      "construction": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "file_management": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "master_wbs": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo"
+    },
+    "governance_prewrite_backups": [
+      "1ve5_A4IXSYLmeDrRVHzW8WUgoePDkzoekdRuFl3P58o",
+      "1roZTgPhb5T0AlVO3ghkKKDZ7tYGA1HF3ZPfFfvFrflI",
+      "1Z2o7u36oGewctmJOzw3PifpPND_l1caUckbxNIVbW9s"
+    ],
+    "next_step": "Wait for or locate original Codex same-cutoff/owner-tagged qualified source originals under existing PR59 contract, independent PM reconciliation and scoped gate; then C7B/schema83->CycleLedger->Work9/Mentor->56 household E2E->Gate D->Trial->Gate E. PR67 new real sessions qualified separately.",
+    "gates_unchanged": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "full_financial_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trading": "NONE",
+      "pr60": "CLOSED_SCOPE",
+      "pr61": "READ_ONLY"
+    },
+    "source_or_strategy_changed": false,
+    "new_runtime_code_commits": 0,
+    "existing_official_DB_or_ledger_writes": 0,
+    "broker_order_actions": 0
   }
 }

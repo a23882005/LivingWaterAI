@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-08T20:41:38.065Z",
+  "updated_at": "2026-11-09T17:31:37.153Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -4745,7 +4745,7 @@
     "PR60": "CLOSED_SCOPE",
     "PR61": "READ_ONLY"
   },
-  "pm_latest_handoff_key": "pm_h6_20261106_three_zip_successor_handoff_completed",
+  "pm_latest_handoff_key": "pm_h11_20261110_three_zip_successor_handoff_completed",
   "pm_h7_20261106_successor_independent_source_receipt": {
     "timestamp_utc": "2026-11-06T11:04:17.895Z",
     "owner": "Family_middle_PM_overall_project_PM",
@@ -5177,5 +5177,92 @@
     },
     "recorded_at_utc": "2026-11-08T20:41:38.065Z"
   },
-  "pm_latest_pr59_source_replay_gate_key": "pm_h10_20261109_pr59_44_source_rows_native14_replay_scoped_gate_recorded"
+  "pm_latest_pr59_source_replay_gate_key": "pm_h10_20261109_pr59_44_source_rows_native14_replay_scoped_gate_recorded",
+  "pm_h11_20261110_three_zip_successor_handoff_completed": {
+    "timestamp_utc": "2026-11-09T17:31:37.153Z",
+    "date_taipei": "2026/11/10",
+    "decision": "COMPLETE_PRIVATE_THREE_ZIP_HANDOFF_SCOPE_ONLY",
+    "family_middle_pm_role": "Full Family Project General PM / engineering management and independent QA owner",
+    "family_scope": "4 households Joseph, MOU, Arthur, Lilian; no other project scope; no change to investment rules or code",
+    "formal_source_v82": {
+      "file_id": "1EObD96ptt3Io_YtTNGTWW1bms30wKguz",
+      "version": "v1.22.0",
+      "modified_taipei": "2026/11/06 04:52"
+    },
+    "uploaded_private_folder_id": "1wJyRyfaMXJN7h4zXTk3RmfK329V6s3OA",
+    "private_owner_only_verified": true,
+    "packages": [
+      {
+        "ordinal": 1,
+        "name": "Family中PM_20261110_新對話交接ZIP1_總PM職責與治理.zip",
+        "file_id": "1SUT0wwbCYFe6HYJofTppKSVmOChpDMLS",
+        "size_bytes": 15529,
+        "sha256": "afd7a1d877404550ddaa5e13a320b5796363776950633773a6c8a9dc1c506e01",
+        "payload_count": 9,
+        "zip_entries": 11,
+        "crc": "PASS",
+        "manifest": "PASS",
+        "redownload_sha": "PASS"
+      },
+      {
+        "ordinal": 2,
+        "name": "Family中PM_20261110_新對話交接ZIP2_PR59金融進度與來源續工.zip",
+        "file_id": "1_x-0YuX0dJRPAz2dKpBU8AqqGml_c03G",
+        "size_bytes": 11274,
+        "sha256": "c220ff9a0e596364a542857fc5ca40ee015015193182fced659c78a388b08b5b",
+        "payload_count": 8,
+        "zip_entries": 10,
+        "crc": "PASS",
+        "manifest": "PASS",
+        "redownload_sha": "PASS"
+      },
+      {
+        "ordinal": 3,
+        "name": "Family中PM_20261110_新對話交接ZIP3_PR67夜盤與剩餘工序.zip",
+        "file_id": "1Ao0Rm97FXHwDjI8VDrEx-TTqbDd9lxvh",
+        "size_bytes": 11583,
+        "sha256": "b4074e18cc373fd95fb06264b75acdde9d65a950aacaba789a27dbe8ea27097d",
+        "payload_count": 9,
+        "zip_entries": 11,
+        "crc": "PASS",
+        "manifest": "PASS",
+        "redownload_sha": "PASS"
+      }
+    ],
+    "governance_docs": {
+      "FamilyConstruction": "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "FamilyFileManagement": "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "MasterWBS": "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo",
+      "prewrite_backup_ids": [
+        "17KOEhT5etdPKn0X4KBWYNkynwpYmasekGzqiuhpkg5Y",
+        "1AbTm2DWtYcTNQnK8boPXODaGUMLJsjSKw3Xa5WnN37A",
+        "1-av24YKlW1fqjq6npZDGJuXq4Cq4pL5oJYytdKfR3Vc"
+      ]
+    },
+    "source_last_verified": {
+      "pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "pr67_head": "3b9307cf4d224f307b7c7cad3a69ff8f40d4d561",
+      "pr59_gate_key": "pm_h10_20261109_pr59_44_source_rows_native14_replay_scoped_gate_recorded",
+      "pr67_gate_key": "pm_h9_20261107_pr67_nasdaq23h_candidate_independent_scoped_pass",
+      "nasdaq_notice_key": "pm_20261108_nasdaq23h_information_handoff"
+    },
+    "next_step": "Incoming middle PM Fresh Reads current rules/PR59 and newly qualified four-household same-cutoff broker owner+events+PIT/qP/qV+funds, performs independent QA and records scoped Gate. Original V82 Codex sole writer under existing contract. Continue C7B/schema83→CycleLedger→Work9/Mentor→56 live household E2E→Gate D→4 Project Trial→Gate E. PR67 actual 23H external qualification remains separate UNKNOWN.",
+    "gates_unchanged": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "PR59": "DRAFT_OPEN_UNMERGED_PRIOR_SCOPED_PASSES",
+      "PR67": "DRAFT_OPEN_UNMERGED_CANDIDATE_SCOPED_PASS",
+      "full_financial_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trading": "NONE",
+      "pr60": "CLOSED_SCOPE",
+      "pr61": "READ_ONLY"
+    },
+    "source_or_strategy_changed": false,
+    "new_runtime_code_commits": 0,
+    "existing_official_DB_or_ledger_writes": 0,
+    "broker_order_actions": 0,
+    "old_handoff_archives_preserved": true
+  }
 }

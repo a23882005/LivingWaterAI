@@ -1,134 +1,134 @@
 {
   "region": "global",
-  "generated_utc": "2026-11-08T23:25:12.851325+00:00",
+  "generated_utc": "2026-11-09T23:29:08.098784+00:00",
   "universe_source": "config/ib_global_symbols.txt",
   "data_source": "Yahoo Finance via yfinance",
   "items": {
     "VOO": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 4066,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 4067,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "VT": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 4621,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 4622,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "QQQ": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6753,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6754,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "SGOV": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 1619,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 1620,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "TLT": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6109,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6110,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "IEF": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6109,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6110,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "SPLB": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 4444,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 4445,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "SPSB": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 4238,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 4239,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "SOXX": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6368,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6369,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "PPH": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6733,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6734,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "NVDA": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6753,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6754,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "MSFT": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6753,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6754,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "GOOGL": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 5591,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 5592,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "VALL.L": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 57,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 58,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "VWRA.L": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 1843,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 1844,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "NATO.CN": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 1248,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 1249,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "DRAM": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 152,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 153,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "GOOG": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 5591,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 5592,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "SMH": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 6647,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 6648,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "ZTS": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 3463,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 3464,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     },
     "IBKR": {
       "status": "OK",
-      "latest_observation": "2026-11-06",
-      "rows": 4910,
-      "last_verified_utc": "2026-11-08T23:25:12.851325+00:00"
+      "latest_observation": "2026-11-09",
+      "rows": 4911,
+      "last_verified_utc": "2026-11-09T23:29:08.098784+00:00"
     }
   }
 }

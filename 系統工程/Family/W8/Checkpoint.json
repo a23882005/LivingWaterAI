@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-09T17:43:08.020Z",
+  "updated_at": "2026-11-09T21:30:30.940Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -5337,5 +5337,87 @@
     "new_runtime_code_commits": 0,
     "existing_official_DB_or_ledger_writes": 0,
     "broker_order_actions": 0
+  },
+  "pm_h13_20261110_codex_source_coordination_ytd83_private_index_and_scoped_work_order": {
+    "status": "SOURCE_COORDINATION_COMPLETE__NEXT_PRELIGHT_CODEX_DISPATCHED",
+    "date_taipei": "2026/11/10",
+    "authority": "Family中PM（總PM）",
+    "versions": {
+      "v82": "v1.22.0_20261106_0452_TW",
+      "pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+      "pr67_head": "3b9307cf4d224f307b7c7cad3a69ff8f40d4d561"
+    },
+    "private_index": {
+      "title": "Family中PM_PR59_四戶金融來源現況與Codex最小續工契約_20261110",
+      "drive_id": "1fUBUwNDCKCR-hPMaX13iC-14apaT0VRylGYKCqeEUb8",
+      "status": "PRIVATE_OWNER_ONLY_READBACK_VERIFIED"
+    },
+    "joseph_ib_fresh_readonly": {
+      "title": "Family中PM_PR59_Joseph_IB_20261110_YTD83筆與10持倉_只讀原始查核收據",
+      "drive_id": "13cjihrfbgX-8tgeQSOzYQ-uFXYabvSrlN97VbdLUFcs",
+      "utc_capture_started": "2026-11-09T21:22:58.218Z",
+      "request_period": "YEAR_TO_DATE",
+      "executions": 83,
+      "distinct_trade_ids": 83,
+      "sgov_trade_rows": 37,
+      "positions": 10,
+      "provider_cutoff": null,
+      "account_binding_verified": false,
+      "source_state": "READ_ONLY_UNQUALIFIED_BROKER_OBSERVATION",
+      "no_broker_orders_created": true
+    },
+    "existing_sources": {
+      "family_db_identity_count": 4,
+      "db_position_rows": 44,
+      "native_replays": 14,
+      "prior_unbound_executions": 50,
+      "first_prior_execution": "2026-08-21T16:17:34Z",
+      "last_prior_execution": "2026-11-05T15:27:45Z",
+      "historical_qp_qv_full_finance_qualified": false,
+      "same_cutoff_account_owner_verified": false
+    },
+    "codex_dispatch": {
+      "url": "https://github.com/a23882005/LivingWaterAI/pull/59#issuecomment-6751914569",
+      "key": "PR59-SOURCE-BINDING-PREFLIGHT-20261110",
+      "single_writer": "Original V82 Codex",
+      "approved_read_paths": [
+        "系統工程/Family/W8/family_c7_source_assembly.py",
+        "系統工程/Family/W8/historical_source_qualification.py"
+      ],
+      "approved_change_paths_if_needed": [
+        "系統工程/Family/W8/member_reconciliation_source.py",
+        "系統工程/Family/W8/member_financial_producer.py",
+        "direct tests"
+      ],
+      "result": "DATA_QUALIFICATION_DIAG_ONLY__SOURCE_REVIEW_UNTIL_BROKER_OWNER_CUTOFF_PIT",
+      "must_preserve": "all prior scoped passes, 49/13, M1/M8, B0, no trading"
+    },
+    "current_writer": "Family中PM: source verification, privacy, QA/gates, governance; original Codex: implementation only",
+    "backed_up_governance_ids": {
+      "construction": "1iA3yBCDSZU72me9hk6OGk4tuSJW7-7obhk2BH3CCJtw",
+      "file_management": "1spcW4atSshHCsjGf8zEDSSj9Dtv9iu9iApNKnDsQOE8",
+      "master_wbs": "1Hpx3yURGQWnGpexwURtGu2sxtkbcIO4hZNw1YXjAgRc"
+    },
+    "official_docs_updated": [
+      "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo"
+    ],
+    "unchanged_gates": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "PR59": "DRAFT_PRIOR_SCOPED_PASS",
+      "PR67": "DRAFT_CANDIDATE_SCOPED_PASS",
+      "full_financial_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trading": "NONE",
+      "PR60": "CLOSED_SCOPE",
+      "PR61": "READ_ONLY"
+    },
+    "zero_runtime_code_change_this_PM": true,
+    "zero_member_official_db_write": true,
+    "zero_ledger_write": true,
+    "zero_broker_trade_action": true
   }
 }

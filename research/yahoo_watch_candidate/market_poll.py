@@ -14,6 +14,7 @@ from gmail_smoke import MailOutbox
 from monitor_core import observe
 from safe_notify import send_notice
 from original_rd_observer import observed_rd
+from execution_health import collect as collect_execution
 
 
 def fetch(symbol):
@@ -62,13 +63,13 @@ def fingerprint(report):
     return {k:report.get(k) for k in fields}
 
 
-def build_batch(reports,now,run,repo):
+def build_batch(reports,now,run,repo,execution=None):
     items=sorted(reports,key=lambda r:r['symbol'])
     identity={'day':now.date().isoformat(),'items':[fingerprint(r) for r in items]}
     key='observation-batch-v1:'+hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()
     return dict(schema='LW_MARKET_BATCH_V1',event_id=key,notice_kind='REFERENCE_ONLY',
         generated_at=now.isoformat(),run_id=run,run_url='https://github.com/'+repo+'/actions/runs/'+run,
-        formal_v82_executed=False,items=items)
+        formal_v82_executed=False,items=items,**({'execution':execution} if execution is not None else {}))
 
 
 def main():
@@ -123,7 +124,9 @@ def main():
         report['event_id']='observation-item:'+hashlib.sha256(json.dumps(fingerprint(report),sort_keys=True).encode()).hexdigest()
         reports.append(report)
     if reports:
-        batch=build_batch(reports,datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo)
+        execution=collect_execution(repo,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_TOKEN'],os.environ.get('GITHUB_EVENT_NAME','UNKNOWN'))
+        print(json.dumps({'execution_health':execution},sort_keys=True))
+        batch=build_batch(reports,datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo,execution)
         state=send_notice(batch,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
             recipient=os.environ['GMAIL_ADDRESS'],app_password=os.environ['GMAIL_APP_PASSWORD'])
         counts[state]=counts.get(state,0)+1

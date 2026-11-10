@@ -23,6 +23,9 @@ FIELDS = {'schema','event_id','symbol','source','observed_at','bar_start_utc',
 def canonical(report):
     if isinstance(report,dict) and report.get('schema')=='LW_MARKET_BATCH_V1':
         allowed={'schema','event_id','notice_kind','generated_at','run_id','run_url','formal_v82_executed','items'}
+        if 'execution' in report:
+            from execution_health import validate
+            validate(report['execution']);allowed.add('execution')
         if set(report)!=allowed or report['notice_kind']!='REFERENCE_ONLY' or report['formal_v82_executed'] is not False:
             raise ValueError('INVALID_BATCH_ENVELOPE')
         if any(not isinstance(report[k],str) or not report[k] or len(report[k])>512 or any(ord(c)<32 for c in report[k]) for k in ('event_id','generated_at','run_id','run_url')):

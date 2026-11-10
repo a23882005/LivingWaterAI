@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T06:29:12.426Z",
+  "updated_at": "2026-11-10T06:34:08.660Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6184,6 +6184,36 @@
     "formal_db_writes": 0,
     "ledger_writes": 0,
     "broker_actions": 0,
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "pm_h32_20261110_reported_asset_pool_calculated": {
+    "status": "PM_VALUATION_WORKSHEET_AND_ORIGINAL_WEIGHT_TARGETS_COMPLETED",
+    "scope": "Client-provided assets only; H31 unreported cash exclusion retained",
+    "new_sources": [
+      "Owner securities screen",
+      "Direct IB summary and balances",
+      "Alpha Vantage USD/TWD quote"
+    ],
+    "source_times": "RETAINED_SEPARATELY",
+    "exact_synchronized_account_reconciliation": false,
+    "approved_weight_rows": 12,
+    "weight_sum": "100%",
+    "decimal_arithmetic": "CHECKED",
+    "ib_cash_double_counted": false,
+    "unreported_cash_requested": false,
+    "private_source_saved_and_redownload_verified": true,
+    "pr_comment_id": 6760794940,
+    "next_owner": {
+      "source_integration": "Original PR59 V82 Codex",
+      "independent_acceptance": "Family middle PM"
+    },
+    "formal_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_actions": 0,
+    "existing_passes": "PRESERVED",
+    "full_finance_pass": 0,
+    "real_cycle": 0,
     "production": "HOLD",
     "trading": "NONE"
   }

@@ -1,0 +1,43 @@
+# Authorized observation deployment: enabled on main; set variable to false or disable workflow to pause.
+name: Yahoo ten-minute reference monitor (not full V82)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/yahoo-reference-monitor.yml']
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: yahoo-reference-monitor-notice
+  cancel-in-progress: false
+jobs:
+  reference:
+    if: github.repository == 'a23882005/LivingWaterAI' && github.ref == 'refs/heads/main' && vars.V82_REFERENCE_MONITOR_ENABLED != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/checkout@v4
+        with:
+          ref: '3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb'
+          path: original-v82
+          persist-credentials: false
+      - name: Install original locked numeric dependencies
+        run: python -m pip install -r original-v82/系統工程/Family/W5/requirements.lock
+      - run: python research/yahoo_watch_candidate/run_tests.py
+      - name: Observe available Yahoo bars and report explicit source status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_ADDRESS: a23882005@gmail.com
+          V82_ORIGINAL_ROOT: ${{ github.workspace }}/original-v82
+          STOP_SYMBOLS: ${{ vars.V82_MONITOR_STOP_SYMBOLS }}
+          WATCH_SYMBOLS: ${{ vars.V82_WATCH_SYMBOLS || '0050.TW,VT,SOXX,TSM' }}
+        run: python research/yahoo_watch_candidate/market_poll.py

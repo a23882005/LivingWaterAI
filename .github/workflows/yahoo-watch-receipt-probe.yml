@@ -1,0 +1,31 @@
+name: Yahoo monitor public receipt synthetic probe
+on:
+  push:
+    branches: ['candidate/yahoo-watch-router-20261110']
+    paths:
+      - '.github/workflows/yahoo-watch-receipt-probe.yml'
+      - 'research/yahoo_watch_candidate/github_outbox_probe.py'
+      - 'research/yahoo_watch_candidate/github_json_outbox.py'
+permissions:
+  contents: write
+concurrency:
+  group: yahoo-watch-synthetic-receipt-probe
+  cancel-in-progress: false
+jobs:
+  synthetic-only:
+    if: github.repository == 'a23882005/LivingWaterAI' && github.ref == 'refs/heads/candidate/yahoo-watch-router-20261110'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Synthetic unit tests only
+        run: python research/yahoo_watch_candidate/run_tests.py
+      - name: Public receipt CAS probe without SMTP
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python research/yahoo_watch_candidate/github_outbox_probe.py

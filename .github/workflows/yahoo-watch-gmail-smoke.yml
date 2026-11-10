@@ -1,0 +1,29 @@
+name: Yahoo monitor Gmail synthetic smoke
+on:
+  push:
+    branches: ['candidate/yahoo-watch-router-20261110']
+    paths: ['.github/workflows/yahoo-watch-gmail-smoke.yml']
+permissions:
+  contents: write
+concurrency:
+  group: yahoo-watch-gmail-synthetic-smoke
+  cancel-in-progress: false
+jobs:
+  send-one-test:
+    if: github.repository == 'a23882005/LivingWaterAI' && github.ref == 'refs/heads/candidate/yahoo-watch-router-20261110'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python research/yahoo_watch_candidate/run_tests.py
+      - name: Send synthetic TEST notice only
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_ADDRESS: a23882005@gmail.com
+        run: python research/yahoo_watch_candidate/gmail_smoke.py

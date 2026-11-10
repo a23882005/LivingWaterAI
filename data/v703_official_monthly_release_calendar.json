@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/monthly-official-release-calendar-v1",
-  "checked_at_utc": "2026-11-09T03:46:54+00:00",
+  "checked_at_utc": "2026-11-10T02:14:08+00:00",
   "explanation": "Official next data publication, not observation month age. Never use a past date to certify freshness. Fail closed when record's observation month mismatches.",
   "items": {
     "m04": {

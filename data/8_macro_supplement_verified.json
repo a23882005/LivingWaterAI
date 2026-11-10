@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-11-10T10:11:30+08:00",
-  "as_of_taipei": "2026-11-10T10:11:30+08:00",
+  "generated_at": "2026-11-10T10:14:07+08:00",
+  "as_of_taipei": "2026-11-10T10:14:07+08:00",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -11,8 +11,8 @@
       "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，本輪重新取得原始HTTP並實算SHA256=e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6；稽核檔data/audit/fed_target_evidence_20261110T021130Z.html.gz",
-      "retrieval_time": "2026-11-10T10:11:30+08:00",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=0ba9bb9f12b3b32ae1eebf3498ad9ede6178b78f3fe964c28ebf6087a2771858，稽核檔data/audit/fed_target_evidence_20261110T021407Z.html.gz",
+      "retrieval_time": "2026-11-10T10:14:07+08:00",
       "publication_date": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-06",
       "policy_schema": "fed-target-evidence-v1",
@@ -25,13 +25,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "last_verified_at": "2026-11-10T10:11:30+08:00",
+      "last_verified_at": "2026-11-10T10:14:07+08:00",
       "source_evidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-10T10:11:30+08:00",
+        "checked_at": "2026-11-10T10:14:07+08:00",
         "result": "CURRENT_CONFIRMED",
-        "excerpt": "2026 official current target: September 17 3.75-4.00; maintained October 28; original response archived",
-        "response_sha256": "e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6",
+        "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
+        "response_sha256": "0ba9bb9f12b3b32ae1eebf3498ad9ede6178b78f3fe964c28ebf6087a2771858",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -39,7 +39,7 @@
           "effective_date": "2026-09-17"
         },
         "upper_bound": {
-          "value": 4.0,
+          "value": 4,
           "effective_date": "2026-09-17"
         },
         "value": 3.875
@@ -50,11 +50,11 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC現行目標區間",
           "status": "FOUND",
-          "checked_at": "2026-11-10T10:11:30+08:00",
+          "checked_at": "2026-11-10T10:14:07+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
-          "notes": "原始官方HTTP已保存並實算SHA256｜本輪HTTP 200，取得105282 bytes，內容SHA256=e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6"
+          "notes": "原始官方HTTP已保存並實算SHA256"
         },
         {
           "site": "FRED DFEDTARL",
@@ -276,8 +276,8 @@
       "source_url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "INDEX/MMFI 日期2026-11-09收盤49.50%，採EOD收盤非盤中LAST",
-      "retrieval_time": "2026-11-10T10:11:30+08:00",
+      "detail": "INDEX/MMFI 日期2026-11-09收盤49.5%，採EOD收盤非盤中LAST；來源SHA256=b9f383555ca10dcb445a457724945a262c2c8605bfe7c1ba9fbbfe505a63afaf",
+      "retrieval_time": "2026-11-10T10:14:07+08:00",
       "publication_date": "2026-11-09",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-08; observation 2026-11-06",
       "candidate_checks": [
@@ -308,11 +308,11 @@
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日均線百分比",
           "status": "FOUND",
-          "checked_at": "2026-11-10T10:11:30+08:00",
+          "checked_at": "2026-11-10T10:14:07+08:00",
           "value": 49.5,
           "unit": "%",
           "observation_date": "2026-11-09",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=76984729d6e0124e2d951cf2d3fa81edbda296b2489ba50718edcde340dad6e0｜本輪HTTP 200，取得48882 bytes，內容SHA256=6f087176675f676937055179df2f96f31686a13042a0b4e10f466caaefecae85"
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=b9f383555ca10dcb445a457724945a262c2c8605bfe7c1ba9fbbfe505a63afaf"
         },
         {
           "site": "TradingView",
@@ -335,8 +335,8 @@
       "source_url": "https://stockanalysis.com/etf/qqq/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "QQQ Forward PE 19.98，資料日2026-11-09",
-      "retrieval_time": "2026-11-10T10:11:30+08:00",
+      "detail": "QQQ Forward PE 19.98，頁面資料日2026-11-09",
+      "retrieval_time": "2026-11-10T10:14:07+08:00",
       "publication_date": "2026-11-09",
       "vintage": "market/page date 2026-11-06; freshly retrieved 2026-11-08",
       "candidate_checks": [
@@ -378,11 +378,11 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-10T10:11:30+08:00",
+          "checked_at": "2026-11-10T10:14:07+08:00",
           "value": 19.98,
           "unit": "倍 Forward",
           "observation_date": "2026-11-09",
-          "notes": "真實網頁明示Forward PE=19.98；TTM未採用｜本輪HTTP 200，取得157843 bytes，內容SHA256=62f7b3c993c0298f796743607bd69c2a4329963f6a4c8b5c5b66dba013b40af4"
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "last_verified_at": "2026-11-08T10:25:43+08:00",
@@ -396,15 +396,15 @@
     },
     "m03_spy": {
       "label": "SPY未來12個月Forward P/E",
-      "value": 19.4,
+      "value": 18.91,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-06",
-      "source_url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
-      "method": "State Street官方頁明示Price/Earnings Ratio FY1",
+      "observation_date": "2026-11-09",
+      "source_url": "https://stockanalysis.com/etf/spy/",
+      "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "SPY Price/Earnings Ratio FY1 19.40，資料日2026-11-06",
-      "retrieval_time": "2026-11-10T10:11:30+08:00",
-      "publication_date": "2026-11-06",
+      "detail": "SPY Forward PE 18.91，頁面資料日2026-11-09",
+      "retrieval_time": "2026-11-10T10:14:07+08:00",
+      "publication_date": "2026-11-09",
       "vintage": "market/page date 2026-11-06; freshly retrieved 2026-11-08",
       "candidate_checks": [
         {
@@ -445,11 +445,11 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-10T10:11:30+08:00",
+          "checked_at": "2026-11-10T10:14:07+08:00",
           "value": 18.91,
           "unit": "倍 Forward",
           "observation_date": "2026-11-09",
-          "notes": "StockAnalysis明示Forward PE=18.91，作跨站核對；正式採候選順序較前之State Street FY1｜本輪HTTP 200，取得158597 bytes，內容SHA256=4b7c61b53656b76206f1df8757bf73800baf1be51f22ac3e0c441e1d56a00c39"
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "last_verified_at": "2026-11-08T10:25:43+08:00",
@@ -469,8 +469,8 @@
       "source_url": "https://stockanalysis.com/etf/vt/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "VT Forward PE 14.92，資料日2026-11-09",
-      "retrieval_time": "2026-11-10T10:11:30+08:00",
+      "detail": "VT Forward PE 14.92，頁面資料日2026-11-09",
+      "retrieval_time": "2026-11-10T10:14:07+08:00",
       "publication_date": "2026-11-09",
       "vintage": "market/page date 2026-11-06; freshly retrieved 2026-11-08",
       "candidate_checks": [
@@ -512,11 +512,11 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-10T10:11:30+08:00",
+          "checked_at": "2026-11-10T10:14:07+08:00",
           "value": 14.92,
           "unit": "倍 Forward",
           "observation_date": "2026-11-09",
-          "notes": "真實網頁明示Forward PE=14.92；TTM未採用｜本輪HTTP 200，取得134900 bytes，內容SHA256=18a2c053b9705e32541d16cba318be7371bd1c050c0b8d952df5aab32248a3c2"
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "last_verified_at": "2026-11-08T10:25:43+08:00",
@@ -537,5 +537,5 @@
     "output gap採CBO 2026-02 vintage的2026Q3 GDPPOT 24,200.4446936與BEA/FRED 2026Q3 GDPC1 24,611.077一致口徑計算；未使用年度平均或模板值。",
     "本輪配對核心為2026-11-04T09:56:39.118404+08:00，09:00核心18項及s03重複傳輸欄已讀回，19筆status均為OK。"
   ],
-  "refresh_method": "2026-11-10本輪重新取得32個候選頁面；數值按各來源最新有效觀測期，未以TTM替代Forward/FY1，亦未刷新失敗來源的觀測日。"
+  "refresh_method": "Official Fed full raw HTTP reverified; other values retain dated observations unless independently refreshed"
 }

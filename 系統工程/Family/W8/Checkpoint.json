@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T03:13:21Z",
+  "updated_at": "2026-11-10T03:20:28.923Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -5971,6 +5971,42 @@
     "formal_member_db_writes": 0,
     "ledger_writes": 0,
     "broker_actions": 0,
+    "full_finance_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "pm_h23_20261110_direct_ib_readonly": {
+    "scope": "Direct broker read-only query requested by Commander; PM evidence acquisition",
+    "acquisition_start_utc": "2026-11-10T03:17:41.168Z",
+    "acquisition_end_utc": "2026-11-10T03:18:07.599Z",
+    "successful_query_types": [
+      "positions",
+      "balances",
+      "summary",
+      "trades_year_to_date",
+      "orders_including_today_completed"
+    ],
+    "initial_internal_errors": [
+      "positions",
+      "balances"
+    ],
+    "retry_once_success": true,
+    "position_count": 10,
+    "ytd_execution_count": 83,
+    "prior83_existing_fields_equal": true,
+    "all_prior_position_quantities_equal": true,
+    "explicit_settled_cash_field_received": true,
+    "account_metrics_separated": true,
+    "current_order_rows": 0,
+    "formal_full_period_reconciliation": "PENDING_REMAINING_SOURCE_EVIDENCE",
+    "next_owner": "Family middle PM",
+    "new_codex_work_order": false,
+    "existing_passes": "PRESERVED",
+    "runtime_changes": 0,
+    "formal_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_trade_actions": 0,
     "full_finance_pass": 0,
     "real_cycle": 0,
     "production": "HOLD",

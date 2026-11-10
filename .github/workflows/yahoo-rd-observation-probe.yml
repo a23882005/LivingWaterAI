@@ -2,7 +2,7 @@ name: Original RD source observation probe (no email)
 on:
   push:
     branches: ['candidate/yahoo-watch-router-20261110']
-    paths: ['.github/workflows/yahoo-rd-observation-probe.yml']
+    paths: ['.github/workflows/yahoo-rd-observation-probe.yml', 'research/yahoo_watch_candidate/**/*.py', 'research/yahoo_watch_candidate/*.py']
 permissions:
   contents: read
 jobs:

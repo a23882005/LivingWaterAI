@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T04:07:50.417Z",
+  "updated_at": "2026-11-10T04:23:12.889Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6108,6 +6108,34 @@
     "next_action": "Resolve current approved pool scope and Taiwan-side asset/cash sources; retain completed IB observations",
     "new_code_work_order": false,
     "preflight_rerun": false,
+    "existing_passes": "PRESERVED",
+    "runtime_changes": 0,
+    "formal_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_actions": 0,
+    "full_finance_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "pm_h29_20261110_dynamic_pool_source_resolution": {
+    "status": "SOURCE_SCOPE_RESOLVED_EXISTING_DATA_PRESERVED",
+    "scope": "Private owner-approved dynamic-pool rule and cross-account correction corroborated in archived original and existing sealed source",
+    "pool_scope_approval": "ALREADY_DOCUMENTED",
+    "remaining_numeric_inputs": "Complete valuation and cash facts",
+    "existing_cross_account_source": "PRESENT_IN_SEALED_W6_DB_SOURCE",
+    "formal_db_update_needed_for_this_correction": false,
+    "source_zip_crc": "PASS",
+    "formal_db_integrity": "OK",
+    "formal_db_foreign_key_violations": 0,
+    "code_review": "READ_ONLY",
+    "codex_continuation": "Reuse existing sealed sources; zero code change if already compliant; minimal source-selection or diagnostic correction only if a defect is established",
+    "pr_notification_comment_id": 6758915465,
+    "preflight_rerun": false,
+    "next_owner": {
+      "program": "Original PR59 V82 Codex",
+      "financial_originals_and_acceptance": "Family middle PM"
+    },
     "existing_passes": "PRESERVED",
     "runtime_changes": 0,
     "formal_db_writes": 0,

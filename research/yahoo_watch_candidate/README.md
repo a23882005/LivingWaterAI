@@ -16,3 +16,10 @@ Run `python -m unittest discover -s tests -v` in this directory. The 20 syntheti
 A future independent workflow may poll every ten minutes; GitHub cron is best-effort, not a real-time guarantee. Existing full-history workflows must not be repurposed into full-history updates every ten minutes. Do not commit private snapshots or email bodies, expose them in logs/summary, or store them in publicly downloadable artifacts.
 
 A private outbox must reserve event IDs before send, mark confirmed sends, and reconcile uncertain SMTP results before retry. Ephemeral caches cannot guarantee deduplication. Monitoring status is not trading permission; lack of a notification does not prove lack of a buying opportunity. No paid service or changed V82 threshold is part of this candidate.
+
+## Tested notification and producer interfaces
+`formal_adapter.py` projects the existing approved decision's `left_inputs.price_condition_at_least_one` and the original technical bridge's `native_technical_aggregation.runaway_down`; it never recalculates their formulas or exports account identities. Output hashes and source qualification receipts are mandatory, but must come from trusted original execution; JSON claims are not authentication.
+
+`safe_notify.py` adds an allowlisted metadata-only message, no stdout/stderr/body logging, and a SQLite PENDING/SENT outbox. Pending is durably reserved before SMTP. Any uncertain delivery, including server acceptance followed by persistence failure, requires reconciliation rather than blind automatic resend. SMTP acceptance is not inbox-delivery proof. The caller must provide an independently verified private persistent filesystem; an ephemeral runner or publicly downloadable artifact is not acceptable. No real SMTP send or persistent service was enabled.
+
+Run the tests as above: 33 synthetic tests. Data qualification, private persistent storage deployment, credential validity and inbox delivery still require real integration verification. The existing temporary shared-writer probe cleans itself up and must not be mistaken for an operating persistent outbox.

@@ -1,3 +1,4 @@
+# TEST metadata allowlist verified before SMTP.
 name: Yahoo monitor Gmail synthetic smoke
 on:
   push:

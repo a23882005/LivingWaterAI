@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: yahoo-reference-monitor-notice
   cancel-in-progress: false

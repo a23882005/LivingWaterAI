@@ -1,0 +1,22 @@
+{
+  "schema": "Family.PM.SourceDiagnosticSupplement.v1",
+  "record": "H19_20261110",
+  "owner": "Family中PM（總PM）",
+  "status": "SOURCE_ARITHMETIC_EXPLANATION_VERIFIED_BROKER_STATEMENT_PENDING",
+  "scope": "Source reconciliation only; no new financial Gate or code work order",
+  "baseline_checkpoint_path": "系統工程/Family/W8/Checkpoint.json",
+  "baseline_checkpoint_blob": "c21e80b452debc1f1e37a88d4bd9eb3b5178bbd7",
+  "baseline_checkpoint_modified": false,
+  "v82_master": "v1.22.0; document time 2026/11/06 04:52 Asia/Taipei",
+  "pr59_head": "3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb",
+  "private_evidence_drive_id": "1ZfUfXou-QmpZU2_XpDyv6hZJeUo1mq54",
+  "private_evidence_sha256": "40c5ad5e1e49ed469a5cb76eb85024bad2f91ccaa07a558e57f052198bf275cf",
+  "source_index_drive_id": "1fUBUwNDCKCR-hPMaX13iC-14apaT0VRylGYKCqeEUb8",
+  "pm_executed_checks": {"passed": 17, "total": 17, "type": "Decimal arithmetic, source equality, event uniqueness, timezone conversion, read-only SQLite provenance and unchanged hashes"},
+  "financial_values_and_trade_identifiers": "Restricted to private Drive evidence; intentionally omitted from public repository",
+  "governance": {"source_index_appended": true, "construction_management_appended": true, "file_management_appended": true, "master_wbs_appended": true, "prewrite_backups_created": true},
+  "interpretation": "A concrete intervening-transaction omission explains the earlier source discrepancy numerically; definitive account/statement completeness verification remains with PM.",
+  "next_owner": "Family middle PM: reconcile official broker statement beginning before the intervening transactions. Original Codex preserves accepted baseline until verified new inputs or a concrete authorized implementation change is supplied.",
+  "unchanged": {"W7": "PASS_CLOSED", "W8": "IN_PROGRESS", "full_financial_pass": 0, "real_cycle": 0, "production": "HOLD", "trading": "NONE", "existing_scoped_passes_preserved": true},
+  "writes_to_runtime_member_db_cycleledger_or_broker": 0
+}

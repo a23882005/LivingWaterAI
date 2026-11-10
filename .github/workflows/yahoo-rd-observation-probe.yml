@@ -1,13 +1,13 @@
 name: Original RD source observation probe (no email)
 on:
   push:
-    branches: ['candidate/yahoo-watch-router-20261110']
+    branches: ['candidate/yahoo-watch-router-20261110', 'candidate/watch-execution-health-20261110']
     paths: ['.github/workflows/yahoo-rd-observation-probe.yml', 'research/yahoo_watch_candidate/**/*.py', 'research/yahoo_watch_candidate/*.py']
 permissions:
   contents: read
 jobs:
   observe:
-    if: github.repository == 'a23882005/LivingWaterAI' && github.ref == 'refs/heads/candidate/yahoo-watch-router-20261110'
+    if: github.repository == 'a23882005/LivingWaterAI' && (github.ref == 'refs/heads/candidate/yahoo-watch-router-20261110' || github.ref == 'refs/heads/candidate/watch-execution-health-20261110')
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

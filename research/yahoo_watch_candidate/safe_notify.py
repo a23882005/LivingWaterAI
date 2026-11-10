@@ -21,6 +21,21 @@ FIELDS = {'schema','event_id','symbol','source','observed_at','bar_start_utc',
 
 
 def canonical(report):
+    if isinstance(report,dict) and report.get('schema')=='LW_MARKET_BATCH_V1':
+        allowed={'schema','event_id','notice_kind','generated_at','run_id','run_url','formal_v82_executed','items'}
+        if set(report)!=allowed or report['notice_kind']!='REFERENCE_ONLY' or report['formal_v82_executed'] is not False:
+            raise ValueError('INVALID_BATCH_ENVELOPE')
+        if any(not isinstance(report[k],str) or not report[k] or len(report[k])>512 or any(ord(c)<32 for c in report[k]) for k in ('event_id','generated_at','run_id','run_url')):
+            raise ValueError('INVALID_BATCH_METADATA')
+        if not isinstance(report['items'],list) or not 1<=len(report['items'])<=60:
+            raise ValueError('INVALID_BATCH_SIZE')
+        for item in report['items']:
+            if not isinstance(item,dict) or item.get('schema')!='LW_MARKET_NOTICE_V1' or item.get('formal_v82_executed') is not False or item.get('notice_kind')!='REFERENCE_ONLY':
+                raise ValueError('INVALID_BATCH_ITEM')
+            canonical(item)
+        encoded=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
+        if len(encoded.encode())>512000:raise ValueError('BATCH_TOO_LARGE')
+        return encoded
     if not isinstance(report, dict) or set(report) - FIELDS:
         raise ValueError('UNAPPROVED_REPORT_FIELDS')
     if report.get('schema') != 'LW_MARKET_NOTICE_V1':

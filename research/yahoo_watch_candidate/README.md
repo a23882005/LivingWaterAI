@@ -3,7 +3,7 @@
 This candidate does not change or execute the complete V82 strategy. No trading, account holdings or allocation inputs are included.
 
 ## Verified
-- `python run_tests.py`: 41 unittest + 8 public-state tests pass locally.
+- `python run_tests.py`: 47 unittest + 8 public-state tests pass locally.
 - GitHub synthetic CAS probe run 42755330078 passed: two contenders, one reservation, readback, restart deduplication, uncertain-write retention; actual emails zero.
 - Gmail TEST smoke run 42755548047 passed SMTP acceptance; inbox confirmation must be checked separately. TEST messages are never market signals. Earlier smoke run 42755500652 failed before sending due to a metadata allowlist mismatch, fixed before the successful run.
 - Local private SQLite/flock probe also passes 12-process contention and interruption/restart. This is NOT a Hostinger deployment claim.
@@ -20,7 +20,7 @@ This candidate does not change or execute the complete V82 strategy. No trading,
 
 `yahoo-reference-monitor.yml` is a main-only candidate schedule at minutes 3,13,23,33,43,53, guarded by repository variable V82_REFERENCE_MONITOR_ENABLED=true. It is not active merely because this PR exists. Existing schedules are unchanged. GitHub cron is best-effort; executions can be delayed or lost, and pending concurrency jobs can be replaced.
 
-The reference entry point `market_poll.py` can fetch configured public symbols (default 0050.TW,VT,SOXX,TSM), report quote time/session/delay, and deliver deduplicated pipeline-health notices. Every notice says REFERENCE_ONLY, formal_v82_executed=false, FORMAL_AUTOSTART_BLOCKED_UNKNOWN. It DOES NOT claim the requested full-strategy automatic buying-opportunity monitor is ready. Source-quality states repeat at most once per symbol/status/UTC day; same-day recurrence is intentionally suppressed. No new buy or decline threshold is invented.
+The reference entry point `market_poll.py` now runs `original_rd_observer.py` on completed daily observations using the pinned original producer. Source status OBSERVED_DAILY_FORMULA AND original RunawayDown TRUE starts observation without requiring valuation. Its durable activation receipt keeps monitoring active across later FALSE/UNKNOWN; V82_MONITOR_STOP_SYMBOLS or the global enable flag provides manual stopping. Only active symbols fetch 5m reference bars. An inactive FALSE emits no email; missing/unqualified data may emit a deduplicated health notice. Every notice remains REFERENCE_ONLY and formal_v82_executed=false. It DOES NOT claim a complete V82 buying-opportunity engine. Source-quality states repeat at most once per symbol/status/UTC day; same-day recurrence is intentionally suppressed. No new buy or decline threshold is invented.
 
 ## Task consumer contract
 Sender and fixed subject must match the authorized Gmail account and `[V82-WATCH] Market observation (not a buy instruction)`.
@@ -28,3 +28,10 @@ Body JSON schema is LW_MARKET_NOTICE_V1. Required metadata includes event_id, ge
 
 ## Remaining real integration gates
 Formal automatic activation needs the original producer running against qualified daily data; the existing qualification route is scoped and must not be generalized. Yahoo 5m does not establish daily/source/corporate-action qualification. Missing futures and true overnight coverage remain UNKNOWN. Formal rule content/version verification and genuine event occurrences must be supplied before any formal market signal can be sent. Do not call the reference workflow a completed V82 financial engine.
+
+## Original RD runner verification
+Real GitHub run 42763313261 passed: 55 candidate tests, 25 original source tests, and actual Yahoo -> unchanged original completed-session intake -> approved RD formula. VT and TSM reached 2026-11-09 daily observations (RD FALSE). 0050 correctly stayed UNKNOWN while 2026-11-10 final close was not yet available after the exchange close. SOXX stayed UNKNOWN due to a split event in the requested source window. This is a source/formula observation success, not full financial qualification.
+
+Nineteen public tickers were separately observed locally: 16 reached the current completed US daily formula (11 FALSE, 5 UNKNOWN); 0050 had the pending-close limit, SOXX the split-window limit, and SGOV retained the original fixed-income route. This is not a verified inventory of all household holdings. Non-US/non-Taiwan calendars and fixed-income instruments are not silently mapped to US equity rules.
+
+RunawayDown is a severe-downtrend condition. Using it alone will not detect every early-left opportunity. It only activates monitoring and never bypasses original safety or becomes permission to buy. A true predicate requires no valuation input, but a financial buy decision still requires the full original rule chain.

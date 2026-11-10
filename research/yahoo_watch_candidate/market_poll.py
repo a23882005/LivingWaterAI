@@ -9,7 +9,7 @@ import re
 import time
 import urllib.parse
 import urllib.request
-from github_json_outbox import GithubContentsBackend,event_key
+from github_json_outbox import GithubContentsBackend,GithubJsonOutbox,event_key
 from gmail_smoke import MailOutbox
 from monitor_core import observe
 from safe_notify import send_notice
@@ -50,6 +50,27 @@ def activity(observation,previously_active=False,manual_stop=False):
     return previously_active or (observation.get('status')=='OBSERVED_DAILY_FORMULA' and observation.get('runaway_down')=='TRUE')
 
 
+def rotated(symbols,run_number):
+    offset=run_number%len(symbols)
+    return symbols[offset:]+symbols[:offset]
+
+
+def fingerprint(report):
+    # Provider data identity changes on a new completed bar, not on polling time.
+    fields=('symbol','source','quote_time','session','data_status','reason','delay_seconds',
+            'market_price','rd_observation','daily_session','monitor_status','activation_basis')
+    return {k:report.get(k) for k in fields}
+
+
+def build_batch(reports,now,run,repo):
+    items=sorted(reports,key=lambda r:r['symbol'])
+    identity={'day':now.date().isoformat(),'items':[fingerprint(r) for r in items]}
+    key='observation-batch-v1:'+hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()
+    return dict(schema='LW_MARKET_BATCH_V1',event_id=key,notice_kind='REFERENCE_ONLY',
+        generated_at=now.isoformat(),run_id=run,run_url='https://github.com/'+repo+'/actions/runs/'+run,
+        formal_v82_executed=False,items=items)
+
+
 def main():
     repo=os.environ['GITHUB_REPOSITORY']
     if repo!='a23882005/LivingWaterAI' or os.environ.get('GITHUB_REF_NAME')!='main':
@@ -58,14 +79,20 @@ def main():
     symbols=list(dict.fromkeys(s.strip() for s in symbols if s.strip()))
     if not symbols or len(symbols)>60 or any(not re.fullmatch(r'[A-Z0-9.^=-]{1,20}',s) for s in symbols):
         raise ValueError('WATCH_UNIVERSE_INVALID')
-    stopped=set(os.environ.get('STOP_SYMBOLS','').split(','))
+    stopped={s.strip() for s in os.environ.get('STOP_SYMBOLS','').split(',') if s.strip()}
+    symbols=rotated(symbols,int(os.environ.get('GITHUB_RUN_NUMBER','0')))
     backend=GithubContentsBackend(token=os.environ['GITHUB_TOKEN'],repository=repo,branch='main',
         path='research/yahoo_watch_candidate/state/notice.json')
-    outbox=MailOutbox(backend);counts={}
+    outbox=MailOutbox(backend);activation=GithubJsonOutbox(backend);counts={};reports=[]
     started=time.monotonic()
     for index,symbol in enumerate(symbols):
         if time.monotonic()-started>300:
-            counts['NOT_EVALUATED_TIME_BUDGET']=len(symbols)-index;break
+            counts['NOT_EVALUATED_TIME_BUDGET']=len(symbols)-index
+            for remaining in symbols[index:]:
+                report=build_notice(remaining,{},datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo)
+                report.update(reason='NOT_EVALUATED_TIME_BUDGET',monitor_status='NOT_EVALUATED')
+                reports.append(report)
+            break
         if symbol in stopped:
             counts['MANUALLY_STOPPED']=counts.get('MANUALLY_STOPPED',0)+1;continue
         now=datetime.now(timezone.utc)
@@ -75,6 +102,11 @@ def main():
         activation_id='rd-observation-activation-v1:'+symbol
         prior=doc['events'].get(event_key(activation_id)) in ('PENDING','SENT')
         active=activity(observation,prior)
+        if active and not prior:
+            # Durable watch activation receipt, separate event namespace from mail.
+            # PENDING also preserves active intent after interruption; no trade.
+            state=activation.reserve(event_key(activation_id))
+            if state=='RESERVED':activation.mark_sent(event_key(activation_id))
         if not active and observation.get('runaway_down')=='FALSE':
             counts['INACTIVE_NO_RD_OBSERVATION']=counts.get('INACTIVE_NO_RD_OBSERVATION',0)+1;continue
         payload={}
@@ -88,9 +120,11 @@ def main():
             activation_basis='ORIGINAL_APPROVED_RD_DAILY_PRICE_FORMULA_OBSERVATION_ONLY',
             monitor_status='ACTIVE_OBSERVATION_NOT_BUY' if active else 'ACTIVATION_UNKNOWN',
             reason=reason)
-        report['event_id']=(activation_id if active and not prior else
-            'rd-observation-health-v1:'+now.date().isoformat()+':'+symbol+':'+rd+':'+report['data_status']+':'+reason)
-        state=send_notice(report,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
+        report['event_id']='observation-item:'+hashlib.sha256(json.dumps(fingerprint(report),sort_keys=True).encode()).hexdigest()
+        reports.append(report)
+    if reports:
+        batch=build_batch(reports,datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo)
+        state=send_notice(batch,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
             recipient=os.environ['GMAIL_ADDRESS'],app_password=os.environ['GMAIL_APP_PASSWORD'])
         counts[state]=counts.get(state,0)+1
     print(json.dumps({'status_counts':counts,'formal_v82_executed':False},sort_keys=True))

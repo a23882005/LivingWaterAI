@@ -13,3 +13,16 @@ class Tests(unittest.TestCase):
     def test_tw_delay_explicit(self):
         r=build_notice('0050.TW',{},datetime(2026,11,10,tzinfo=timezone.utc),'1','owner/repo')
         self.assertEqual(r['delay_seconds'],1200);self.assertEqual(r['notice_kind'],'REFERENCE_ONLY')
+
+class ActivityTests(unittest.TestCase):
+    def test_only_original_true_starts(self):
+        from market_poll import activity
+        self.assertTrue(activity({'status':'OBSERVED_DAILY_FORMULA','runaway_down':'TRUE'}))
+        self.assertFalse(activity({'status':'UNKNOWN','runaway_down':'TRUE'}))
+        self.assertFalse(activity({'status':'OBSERVED_DAILY_FORMULA','runaway_down':'UNKNOWN'}))
+    def test_unknown_never_stops_prior(self):
+        from market_poll import activity
+        self.assertTrue(activity({'status':'UNKNOWN','runaway_down':'UNKNOWN'},True))
+    def test_manual_stop(self):
+        from market_poll import activity
+        self.assertFalse(activity({'status':'OBSERVED_DAILY_FORMULA','runaway_down':'TRUE'},True,True))

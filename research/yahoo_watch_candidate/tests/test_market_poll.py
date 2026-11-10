@@ -64,3 +64,39 @@ class BatchTests(unittest.TestCase):
     def test_rotation_covers_all_first_positions(self):
         from market_poll import rotated
         symbols=['A','B','C','D'];self.assertEqual({rotated(symbols,n)[0] for n in range(4)},set(symbols))
+
+class EndToEndBatchTests(unittest.TestCase):
+    def test_two_symbols_one_mail_new_data_only(self):
+        import copy,contextlib,io,json,os
+        from unittest.mock import patch
+        import market_poll
+        from safe_notify import send_notice as real_send
+        class Backend:
+            doc={'schema':'PUBLIC_NOTICE_STATE_V1','events':{}}
+            version=0
+            def __init__(self,**kw):pass
+            def read(self):return str(self.version),copy.deepcopy(self.doc)
+            def compare_and_swap(self,sha,doc):
+                if sha!=str(self.version):raise ValueError('conflict')
+                type(self).doc=copy.deepcopy(doc);type(self).version+=1
+        messages=[]
+        class SMTP:
+            def __init__(self,*a,**k):pass
+            def __enter__(self):return self
+            def __exit__(self,*a):pass
+            def login(self,*a):pass
+            def send_message(self,msg):messages.append(msg);return {}
+        bar=['2026-11-10T00:50:00Z']
+        original_build=market_poll.build_notice
+        def build(*args):
+            r=original_build(*args);r.update(quote_time=bar[0],market_price=150.,data_status='OBSERVED');return r
+        def send(report,**kw):return real_send(report,smtp_factory=SMTP,**kw)
+        env={'GITHUB_REPOSITORY':'a23882005/LivingWaterAI','GITHUB_REF_NAME':'main','WATCH_SYMBOLS':'VT,TSM',
+             'GITHUB_RUN_ID':'fixture','GITHUB_RUN_NUMBER':'1','GITHUB_TOKEN':'synthetic','GMAIL_ADDRESS':'fixture@example.invalid',
+             'GMAIL_APP_PASSWORD':'synthetic','V82_ORIGINAL_ROOT':'fixture','STOP_SYMBOLS':''}
+        with patch.dict(os.environ,env),patch.object(market_poll,'GithubContentsBackend',Backend),patch.object(market_poll,'observed_rd',return_value={'status':'OBSERVED_DAILY_FORMULA','runaway_down':'TRUE','reason':'SYNTHETIC'}),patch.object(market_poll,'fetch',return_value={}),patch.object(market_poll,'build_notice',side_effect=build),patch.object(market_poll,'send_notice',side_effect=send),contextlib.redirect_stdout(io.StringIO()):
+            market_poll.main();market_poll.main();bar[0]='2026-11-10T01:00:00Z';market_poll.main()
+        self.assertEqual(len(messages),2)
+        for msg in messages:
+            payload=json.loads(msg.get_content().split('\n',1)[1]);self.assertEqual(payload['schema'],'LW_MARKET_BATCH_V1');self.assertEqual(len(payload['items']),2)
+            self.assertFalse(payload['formal_v82_executed'])

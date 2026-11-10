@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T01:10:54.692Z",
+  "updated_at": "2026-11-10T01:32:42.336Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -5696,5 +5696,57 @@
       "pr61": "READ_ONLY"
     },
     "runtime_code_or_member_db_or_ledger_or_broker_modified": false
-  }
+  },
+  "pm_h18_20261110_joseph_ib_sgov_partial_reconciliation_original_receipt": {
+    "recorded_date_taipei": "2026/11/10",
+    "owner": "Family中PM（總PM）",
+    "status": "PARTIAL_SOURCE_RECONCILIATION_GAP_IDENTIFIED__BROKER_OWNER_AND_CUTOFF_UNVERIFIED",
+    "source_scope": "Joseph Family only",
+    "evidence_location": "PRIVATE_GOOGLE_DRIVE_ROOT_TEMP",
+    "private_original_receipt_id": "118WHcoBOFEmXeISuJLblJjBxqXGOYwWnD9_KPNf1EFE",
+    "private_source_index_id": "1fUBUwNDCKCR-hPMaX13iC-14apaT0VRylGYKCqeEUb8",
+    "protected_financial_values": "PROVIDED_ONLY_IN_PRIVATE_DRIVE_SOURCE_INDEX_AND_QA_RECEIPT",
+    "source_qualification": {
+      "original_db_self_reported_position_kept": true,
+      "new_ib_quarter_and_ytd_trade_raw_preserved": true,
+      "account_identity_verified": false,
+      "same_provider_cutoff_verified": false,
+      "opening_history_verified": false,
+      "transfers_verified": false,
+      "broker_terminal_orders_verified": false,
+      "valid_for_full_financial_calc": false
+    },
+    "workflow": "PM obtains official broker statement and complete history/cash/SGOV evidence; original V82 Codex continues existing PR59 only after verified qualified inputs",
+    "existing_codex_gate": "H15_PASS_SCOPED_PRESERVED",
+    "previous_PM_H17": "PRIVATE_H17_FOUR_HOUSEHOLD_FIRST_SOURCE_BLOCKERS_PRESERVED",
+    "governance_updated": [
+      "1fUBUwNDCKCR-hPMaX13iC-14apaT0VRylGYKCqeEUb8",
+      "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo"
+    ],
+    "governance_prewrite_backup_ids": [
+      "1ZLyd5v10eIgmhC43YcIRXIJkfPe5zZbbBsUVx3KYMDM",
+      "1d9N7ghoZzvkZmfNrOafVJHmi018FIpOWx8goGopg2A8",
+      "1W-ZjCfxz51wI7W3SiDAD_UWdd3j_eSbJQzgpSypZ0qo",
+      "1S9hD80LfxQDW5-DP4bYyW4VnstefmS8W3kI_vaw_G1I"
+    ],
+    "unchanged": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "finance_full_pass": 0,
+      "real_cycle": 0,
+      "production": "HOLD",
+      "trading": "NONE",
+      "PR59": "DRAFT_3f7ea0d_PRIOR_SCOPED_PASSES_PRESERVED",
+      "PR67": "DRAFT_3b9307c_CANDIDATE_SCOPED_PASS_PRESERVED",
+      "PR60": "CLOSED_SCOPE",
+      "PR61": "READ_ONLY"
+    },
+    "runtime_code_changes": 0,
+    "official_member_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_writes": 0
+  },
+  "pm_latest_source_gap_key": "pm_h18_20261110_joseph_ib_sgov_partial_reconciliation_original_receipt"
 }

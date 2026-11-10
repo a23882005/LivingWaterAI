@@ -23,3 +23,10 @@ A private outbox must reserve event IDs before send, mark confirmed sends, and r
 `safe_notify.py` adds an allowlisted metadata-only message, no stdout/stderr/body logging, and a SQLite PENDING/SENT outbox. Pending is durably reserved before SMTP. Any uncertain delivery, including server acceptance followed by persistence failure, requires reconciliation rather than blind automatic resend. SMTP acceptance is not inbox-delivery proof. The caller must provide an independently verified private persistent filesystem; an ephemeral runner or publicly downloadable artifact is not acceptable. No real SMTP send or persistent service was enabled.
 
 Run the tests as above: 33 synthetic tests. Data qualification, private persistent storage deployment, credential validity and inbox delivery still require real integration verification. The existing temporary shared-writer probe cleans itself up and must not be mistaken for an operating persistent outbox.
+
+## Isolated private filesystem probe
+`private_outbox_probe.py` is a Linux/POSIX server-ready synthetic probe, not an enabled service. It creates a NEW 0700 `.v82-watch-synthetic-RUN_ID` directory beneath an explicitly authorized non-public parent, refuses reuse, and leaves its synthetic recovery evidence in place. It uses `flock` plus SQLite transactions and does not invoke SMTP, read credentials, access existing DBs or print private paths/row bodies.
+
+Example, only after verifying the target private parent: `python private_outbox_probe.py probe --parent VERIFIED_PRIVATE_PARENT --run-id UNIQUE_TEST_ID`.
+
+Local verification: 12 competing processes produced exactly one reservation and 11 deduplications; forced process termination after committed PENDING retained PENDING on restart; SENT remained deduplicated; SQLite integrity check passed. Added rejection tests cover existing directories, public paths, symlinks and path traversal IDs. Total: 38 synthetic tests. These are LOCAL results, not Hostinger verification. The probe requires a trusted authenticated deployment path; do not expose secrets to untrusted PR jobs or repurpose a production/TEMP DB.

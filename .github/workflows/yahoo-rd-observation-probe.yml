@@ -1,0 +1,33 @@
+name: Original RD source observation probe (no email)
+on:
+  push:
+    branches: ['candidate/yahoo-watch-router-20261110']
+    paths: ['.github/workflows/yahoo-rd-observation-probe.yml']
+permissions:
+  contents: read
+jobs:
+  observe:
+    if: github.repository == 'a23882005/LivingWaterAI' && github.ref == 'refs/heads/candidate/yahoo-watch-router-20261110'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: '3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb'
+          path: original-v82
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r original-v82/系統工程/Family/W5/requirements.lock
+      - run: python research/yahoo_watch_candidate/run_tests.py
+      - name: Original source gate regression
+        working-directory: original-v82
+        run: python -m pytest 系統工程/Family/W8/tests/test_qualified_equity_inputs.py -q
+      - name: Real Yahoo daily observation through original RD formula
+        env:
+          V82_ORIGINAL_ROOT: ${{ github.workspace }}/original-v82
+        run: python research/yahoo_watch_candidate/original_rd_probe.py

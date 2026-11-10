@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-09T22:22:49.332Z",
+  "updated_at": "2026-11-10T01:10:54.692Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -5591,5 +5591,110 @@
     "next_owner": "Family中PM to obtain qualifying original account/same-cutoff/PIT/qP-qV/funds/SGOV evidence; original Codex unique code writer reuses accepted PR59 chain once newly qualified inputs are handed back; PM independently QA and record Gate; no old PASS reruns or full finance gate claimed",
     "code_or_member_db_or_ledger_or_trading_changed_by_pm": false
   },
-  "pm_latest_pr59_source_preflight_gate_key": "pm_h15_20261110_pr59_preflight_zero_code_independent_scoped_qa"
+  "pm_latest_pr59_source_preflight_gate_key": "pm_h15_20261110_pr59_preflight_zero_code_independent_scoped_qa",
+  "pm_h16_20261110_real_member_db_fresh_read_financial_originals_gaps_after_codex_ack": {
+    "date_taipei": "2026/11/10",
+    "authority": "Family中PM（總PM）",
+    "status": "PRIVATE_SOURCE_FACT_REVIEW_COMPLETE__FULL_FINANCE_STILL_UNQUALIFIED",
+    "triggers": "Original V82 Codex formally acknowledged PR59 3f7ea0d, PR67 independent candidate; next responsibilities with Family middle PM",
+    "scope": "Fresh authenticated Google Drive four original Family DB raw bytes and only directly related project source docs; no unrelated folders or projects",
+    "verified_raw_member_sqlite": {
+      "all": "4/4_SHA256_EXACT_PREVIOUSLY_VERIFIED__sqlite_integrity_ok__foreign_key_violations_0",
+      "Joseph": {
+        "file_id": "1-jZMLhhhSKiynwre2EReyrqsQitIHiYf",
+        "sha": "631976c89eb2d45fff632c7ca5d5893c8491c56f26f45fb558e608bfa9cbe51e",
+        "position_rows": 7,
+        "final_target_version_rows": 0,
+        "cash_snapshot_rows": 2,
+        "verified_settled_cash": false,
+        "portfolio_event_rows": 0
+      },
+      "MOU": {
+        "file_id": "1B7Xkb76aMyklJcMjGhDw_ExcCWB9snZT",
+        "sha": "8ea0e4dcdb1dcc2e8ab9af36929bf9ca57c561340345e4cbfd42ccee5ab88d69",
+        "position_rows": 29,
+        "final_target_version_rows": 1,
+        "final_target_allocation_rows": 17,
+        "cash_snapshot_rows": 0,
+        "portfolio_event_rows": 0
+      },
+      "Arthur": {
+        "file_id": "1j-LD8Q8acSgbkj8rwY-_aB8PSJO_0S1j",
+        "sha": "90dd9bf3dfa98417b6d0729c052e4db7240cbbb107e79bf0f2d5a13d5aece5ea",
+        "position_rows": 2,
+        "latest_2454_qty": 25,
+        "position_as_of_utc": "2026-10-26T05:50:00Z",
+        "reported_investable_twd": 50000,
+        "cash_settled_verified": false,
+        "portfolio_event_rows": 0
+      },
+      "Lilian": {
+        "file_id": "1EGSqzoq46n2G1uwy1vbggqr9gwZqNCZw",
+        "sha": "1c836a1fd5a51ea7873bbd68a0dc9aa0e2879df7f900cfadc807b96891fa40da",
+        "position_rows": 6,
+        "latest_as_of_utc": "2026-10-26T01:39:00Z",
+        "latest_confirmed_shares": {
+          "0050": "6548",
+          "VOO": "3",
+          "BNDW": "10"
+        },
+        "reported_twd_cash": 100000,
+        "duplicated_historical_cash_keys_not_independent": true,
+        "cash_data_state": "NEEDS_REVIEW",
+        "portfolio_event_rows": 0
+      }
+    },
+    "source_business_receipts": [
+      {
+        "name": "Joseph股債交易紀錄.md",
+        "id": "1gSAJywlWVwatYS7Oy_DMK1HLQGY-GWHy",
+        "reported_date": "2026/09/15-16",
+        "scope": "OLDER_OWNER_CONFIRMATION_NOT_SAME_CUTOFF_BROKER_SETTLEMENT"
+      },
+      {
+        "name": "mou股債交易紀錄.md",
+        "id": "1tdYpd5CBgTKkeQO9csRdGHW7KtJt6TFV",
+        "scope": "PROTO_LOG_EMPTY_DOES_NOT_MEAN_ZERO_EXECUTIONS"
+      },
+      {
+        "name": "Family_四戶金融來源補齊_交原V82Codex_20261103.md",
+        "id": "1r1e5cQAQxx2EAwQ-xK9-HI-hayzu6SgT",
+        "scope": "LILIAN_NEWEST_CONFIRMED_SHARES_AND_PROFILE_DECISIONS"
+      },
+      {
+        "name": "Family_PM_四戶正式原件核對結果_20261031.txt",
+        "id": "1zxTMT1o-9pGqZeUAMIPkR8BDOQuDnfOl",
+        "scope": "OLD_PARTIAL_SOURCE_CONTEXT_RECONCILED_WITH_LATER_LILIAN_DB"
+      }
+    ],
+    "source_notes": "Folder-scoped search in Family private TEMP, root four project names and direct 4 project folders did not surface additional named official same-provider-cutoff full broker statements; may be other unknown locations; no unsupported absence claim.",
+    "missing_source_owner": "Family中PM obtains/independently verifies real broker owner-account mapping, same provider-cutoff full opening/trade/transfer/split/closing, settled/reserved/pending and SGOV, historical PIT and same primary qP/qV; no repeat request for already confirmed positions/targets",
+    "next_codex": "Existing PR59 original code-writer only after newly qualified original receipts, then PM independent scoped QA",
+    "H13_source_index_id": "1fUBUwNDCKCR-hPMaX13iC-14apaT0VRylGYKCqeEUb8",
+    "H15_scoped_gate_preserved": true,
+    "governance_docs_updated": [
+      "1GdoI3Xo4kD1GS_pG_UwbKHMIHSicEycTG75mEY44NBg",
+      "1a6EmKnsBc-hmJjfyh0e9XonGZqR6dMjh2Ejo3Lw_dII",
+      "1coxJ34aDseT09Oxo6OdiMlR6GmYm8RQckvnpr9KlRdo"
+    ],
+    "prewrite_backups": [
+      "14UVr5BPqbCh6VKZlBCLKU6F6-g0mizRaQFrxTJqxuSk",
+      "1eTd-kSNndd6AOJ7fLeMSepfMj32z3bTLovXDx0qbCCE",
+      "15ygefW6eMMtug2527jmJjFejByYZihOAuyWrLWhOs_M",
+      "1RvQxM-aNhi-MehXgdFfYXq57RAW-0ggmZcyq8oTQd4k"
+    ],
+    "status_unchanged": {
+      "W7": "PASS_CLOSED",
+      "W8": "IN_PROGRESS",
+      "full_finance_pass": 0,
+      "real_cycles": 0,
+      "production": "HOLD",
+      "trading": "NONE",
+      "pr59": "DRAFT",
+      "pr67": "DRAFT_CANDIDATE",
+      "pr60": "CLOSED_SCOPE",
+      "pr61": "READ_ONLY"
+    },
+    "runtime_code_or_member_db_or_ledger_or_broker_modified": false
+  }
 }

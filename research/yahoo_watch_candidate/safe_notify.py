@@ -14,7 +14,9 @@ from email.message import EmailMessage
 
 FIELDS = {'schema','event_id','symbol','source','observed_at','bar_start_utc',
           'bar_end_utc','age_seconds','session','data_status','reason',
-          'rule_sha256','snapshot_id','valid_until','monitor_status'}
+          'rule_sha256','snapshot_id','valid_until','monitor_status',
+          'notice_kind','run_id','run_url','generated_at','quote_time',
+          'delay_seconds','market_price','market_change_percent','formal_v82_executed'}
 
 
 def canonical(report):

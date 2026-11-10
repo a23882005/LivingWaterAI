@@ -125,6 +125,7 @@ def main():
         reports.append(report)
     if reports:
         execution=collect_execution(repo,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_TOKEN'],os.environ.get('GITHUB_EVENT_NAME','UNKNOWN'))
+        print(json.dumps({'execution_health':execution},sort_keys=True))
         batch=build_batch(reports,datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo,execution)
         state=send_notice(batch,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
             recipient=os.environ['GMAIL_ADDRESS'],app_password=os.environ['GMAIL_APP_PASSWORD'])

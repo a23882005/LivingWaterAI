@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T06:26:50.529Z",
+  "updated_at": "2026-11-10T06:29:12.426Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6162,6 +6162,28 @@
     "broker_actions": 0,
     "full_finance_pass": 0,
     "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "pm_h31_20261110_owner_reported_cash_scope_override": {
+    "status": "OWNER_SCOPE_CLARIFIED_AND_PRIOR_CASH_REQUEST_WITHDRAWN",
+    "owner_instruction": "Process client-provided assets and reported cash only",
+    "unreported_cash": "OUT_OF_SCOPE_NOT_REQUIRED",
+    "unreported_cash_requests": "STOPPED",
+    "engineering_dependency_on_unreported_cash": false,
+    "valuation_scope": "CURRENT_CLIENT_PROVIDED_ASSET_SCOPE",
+    "existing_reported_cash": "PRESERVE_VALUE_TIME_AND_QUALIFICATION",
+    "unknown_external_cash": "NOT_ESTIMATED_OR_ZERO_FILLED",
+    "supersedes": "H30 bank-tab request and H28/H29 requirements for unreported cash completeness",
+    "pr_notification_comment_id": 6760717063,
+    "next_owner": {
+      "source_and_scope": "Family middle PM",
+      "code": "Original PR59 V82 Codex"
+    },
+    "existing_passes": "PRESERVED",
+    "formal_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_actions": 0,
     "production": "HOLD",
     "trading": "NONE"
   }

@@ -1,10 +1,10 @@
 {
   "schema": "macro18-latest-diagnostics-v1",
-  "report_sha256": "540ac50b442d8cf85ff086545c134c8382b0b275fc04adcfc2048072c4261342",
-  "recorded_at": "2026-11-11T13:13:05.094864+00:00",
+  "report_sha256": "ae561f10881479a34f2f930b23c8a806e7216856ac8550bb070065a2a9c21e53",
+  "recorded_at": "2026-11-11T13:31:57.102905+00:00",
   "report": {
     "schema": "V70.3/18-macro-collector-v1",
-    "generated_at": "2026-11-11T21:13:04.779076+08:00",
+    "generated_at": "2026-11-11T21:31:56.867480+08:00",
     "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
     "summary": {
       "OK": 18,
@@ -34,28 +34,28 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:12.719365+00:00",
+        "attempted_at": "2026-11-11T13:31:06.028140+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:13.069207+00:00",
+              "verified_at": "2026-11-11T13:31:06.454958+00:00",
               "observation_date": "2026-11-10"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:13.069207+00:00",
+        "last_verified_at": "2026-11-11T13:31:06.454958+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
               {
                 "provider": "CBOE_OFFICIAL_VIX",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:13.069207+00:00",
+                "verified_at": "2026-11-11T13:31:06.454958+00:00",
                 "observation_date": "2026-11-10"
               }
             ]
@@ -74,7 +74,7 @@
         "status": "OK",
         "detail": "Matched observation date for nominal 10Y minus 2Y",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:13.069494+00:00",
+        "attempted_at": "2026-11-11T13:31:06.455314+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -94,7 +94,7 @@
         "status": "OK",
         "detail": "10Y TIPS real yield",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:33.339357+00:00",
+        "attempted_at": "2026-11-11T13:31:23.598896+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -114,28 +114,28 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:51.446151+00:00",
+        "attempted_at": "2026-11-11T13:31:40.878684+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:51.822293+00:00",
+              "verified_at": "2026-11-11T13:31:43.266117+00:00",
               "observation_date": "2026-11-09"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:51.822293+00:00",
+        "last_verified_at": "2026-11-11T13:31:43.266117+00:00",
         "source_evidence": {
           "series": {
             "BAMLH0A0HYM2": [
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:51.822293+00:00",
+                "verified_at": "2026-11-11T13:31:43.266117+00:00",
                 "observation_date": "2026-11-09"
               }
             ]
@@ -154,40 +154,40 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:51.822474+00:00",
+        "attempted_at": "2026-11-11T13:31:43.266357+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m04": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "FAILED",
-              "attempted_at": "2026-11-11T13:12:52.329058+00:00",
+              "attempted_at": "2026-11-11T13:31:43.712064+00:00",
               "error": "ISM report date or sector headline mismatch"
             },
             {
               "provider": "ISM_OFFICIAL_ROUNDUP",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:52.983730+00:00",
+              "verified_at": "2026-11-11T13:31:44.423915+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:52.983730+00:00",
+        "last_verified_at": "2026-11-11T13:31:44.423915+00:00",
         "source_evidence": {
           "series": {
             "ISM_m04": [
               {
                 "provider": "ISM_OFFICIAL",
                 "result": "FAILED",
-                "attempted_at": "2026-11-11T13:12:52.329058+00:00",
+                "attempted_at": "2026-11-11T13:31:43.712064+00:00",
                 "error": "ISM report date or sector headline mismatch"
               },
               {
                 "provider": "ISM_OFFICIAL_ROUNDUP",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:52.983730+00:00",
+                "verified_at": "2026-11-11T13:31:44.423915+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -207,7 +207,7 @@
         "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
         "error": "All FRED sources failed for CPILFESL | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: Value",
         "retrieval_error": "All FRED sources failed for CPILFESL | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: Value",
-        "attempted_at": "2026-11-11T13:12:52.983822+00:00",
+        "attempted_at": "2026-11-11T13:31:44.424000+00:00",
         "attempt_result": "FAILED",
         "source_attempts": {
           "CPILFESL": [
@@ -215,7 +215,7 @@
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:53.199261+00:00",
+              "attempted_at": "2026-11-11T13:31:44.660084+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
               "response_sha256": "2e459b1ceb576e87a39f0fa5e57a215f1f2cc964c90556048e63e9b862ce086c"
@@ -224,7 +224,7 @@
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:54.187778+00:00",
+              "attempted_at": "2026-11-11T13:31:46.045375+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
               "response_sha256": "2e459b1ceb576e87a39f0fa5e57a215f1f2cc964c90556048e63e9b862ce086c"
@@ -233,34 +233,34 @@
               "provider": "BLS_HISTORY_V2",
               "result": "FAILED",
               "error": "BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:54.410080+00:00",
+              "attempted_at": "2026-11-11T13:31:46.213099+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "5c002a23f82b36a3370ea03791cfa3cb42160f1fb379bee9b9ba48b684c7bedb"
+              "response_sha256": "b03b2ed98ec004ff91aea26c94d26bd8e3ccd025ee9c63bde0d5ee8f6486777c"
             },
             {
               "provider": "BLS_HISTORY_V1",
               "result": "FAILED",
               "error": "BLS_HISTORY_V1: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:54.554741+00:00",
+              "attempted_at": "2026-11-11T13:31:46.376191+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "f3678096e50867bb04c0567a6cd60be9a5fd26ddfd480d5ce5804c5d72c5f18b"
+              "response_sha256": "726df79e28ccb74873200ae49c4789d101472189733385f171190ca52fffd674"
             },
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "FAILED",
               "error": "BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:54.662273+00:00",
+              "attempted_at": "2026-11-11T13:31:46.529141+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "e73d3a09e5653019f976f635f9bf14e735b1f1a1b90b7ae36accbf3bc5512f84"
+              "response_sha256": "12b0fb198db9f4e9ac8e1ff674e6d9af8291706d71fc51cf3d38831ab5b03929"
             },
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:54.747137+00:00",
+              "attempted_at": "2026-11-11T13:31:46.616567+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -269,7 +269,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-11T13:12:55.695759+00:00",
+              "attempted_at": "2026-11-11T13:31:47.565522+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -279,8 +279,8 @@
         "cache_used": true,
         "cache_source": {
           "file": "18_macro_verification.json",
-          "sha256": "14cd14bffccea1e24b92b947e227e3f69651ba31736b8da38e4ede110027670b",
-          "generated_at": "2026-11-11T09:59:02.983754+08:00",
+          "sha256": "4df30e36368d482b52e2144c7f413b3b5589ea7aeee3f294c67838538329ad00",
+          "generated_at": "2026-11-11T21:13:04.779076+08:00",
           "observation_date": "2026-09-01"
         },
         "last_verified_at": "2026-11-10T01:59:39.681268+00:00",
@@ -300,7 +300,7 @@
       "m09": {
         "id": "m09",
         "label": "DXY",
-        "value": 102.568001,
+        "value": 102.660004,
         "unit": "",
         "observation_date": "2026-11-11",
         "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -308,7 +308,7 @@
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:55.695941+00:00",
+        "attempted_at": "2026-11-11T13:31:47.565658+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -320,7 +320,7 @@
       "m10": {
         "id": "m10",
         "label": "WTI",
-        "value": 87.32,
+        "value": 87.220001,
         "unit": "USD/bbl",
         "observation_date": "2026-11-11",
         "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -328,7 +328,7 @@
         "status": "OK",
         "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:56.211814+00:00",
+        "attempted_at": "2026-11-11T13:31:48.369321+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -348,7 +348,7 @@
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:56.384254+00:00",
+        "attempted_at": "2026-11-11T13:31:48.488681+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -368,7 +368,7 @@
         "status": "OK",
         "detail": "5Y nominal minus 5Y TIPS real yield on same day",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:56.502985+00:00",
+        "attempted_at": "2026-11-11T13:31:48.644110+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -388,7 +388,7 @@
         "status": "OK",
         "detail": "5Y breakeven change from 2026-10-09",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:56.509298+00:00",
+        "attempted_at": "2026-11-11T13:31:48.652085+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -408,14 +408,14 @@
         "status": "OK",
         "detail": "開始=2026-08-05, 結束=2026-11-04, 單位十億美元; Fed Δ=-0.422000, TGA Δ=6.923000, RRP Δ=-1.425000; 淨流動性 Δ=-5.920000",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:56.515299+00:00",
+        "attempted_at": "2026-11-11T13:31:48.659534+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "RRPONTSYD": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:58.838693+00:00",
+              "verified_at": "2026-11-11T13:31:50.851566+00:00",
               "observation_date": "2026-11-10"
             }
           ],
@@ -423,7 +423,7 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:56.749679+00:00",
+              "verified_at": "2026-11-11T13:31:49.363474+00:00",
               "observation_date": "2026-11-04"
             }
           ],
@@ -431,21 +431,21 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:57.762878+00:00",
+              "verified_at": "2026-11-11T13:31:49.902272+00:00",
               "observation_date": "2026-11-04"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:56.749679+00:00",
+        "last_verified_at": "2026-11-11T13:31:49.363474+00:00",
         "source_evidence": {
           "series": {
             "RRPONTSYD": [
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:58.838693+00:00",
+                "verified_at": "2026-11-11T13:31:50.851566+00:00",
                 "observation_date": "2026-11-10"
               }
             ],
@@ -453,7 +453,7 @@
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:56.749679+00:00",
+                "verified_at": "2026-11-11T13:31:49.363474+00:00",
                 "observation_date": "2026-11-04"
               }
             ],
@@ -461,7 +461,7 @@
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:57.762878+00:00",
+                "verified_at": "2026-11-11T13:31:49.902272+00:00",
                 "observation_date": "2026-11-04"
               }
             ]
@@ -480,28 +480,28 @@
         "status": "OK",
         "detail": "Services headline; not subindex",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:58.840874+00:00",
+        "attempted_at": "2026-11-11T13:31:50.854195+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m15": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:58.990141+00:00",
+              "verified_at": "2026-11-11T13:31:51.279543+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:58.990141+00:00",
+        "last_verified_at": "2026-11-11T13:31:51.279543+00:00",
         "source_evidence": {
           "series": {
             "ISM_m15": [
               {
                 "provider": "ISM_OFFICIAL",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:58.990141+00:00",
+                "verified_at": "2026-11-11T13:31:51.279543+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -520,7 +520,7 @@
         "status": "OK",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:58.990239+00:00",
+        "attempted_at": "2026-11-11T13:31:51.279629+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -540,28 +540,28 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-11T13:13:02.053610+00:00",
+        "attempted_at": "2026-11-11T13:31:54.360480+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "SAHMREALTIME": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:13:02.251506+00:00",
+              "verified_at": "2026-11-11T13:31:54.565304+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:13:02.251506+00:00",
+        "last_verified_at": "2026-11-11T13:31:54.565304+00:00",
         "source_evidence": {
           "series": {
             "SAHMREALTIME": [
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:13:02.251506+00:00",
+                "verified_at": "2026-11-11T13:31:54.565304+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -580,28 +580,28 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-11T13:13:02.251669+00:00",
+        "attempted_at": "2026-11-11T13:31:54.565502+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "UNRATE": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:13:03.770414+00:00",
+              "verified_at": "2026-11-11T13:31:55.582020+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:13:03.770414+00:00",
+        "last_verified_at": "2026-11-11T13:31:55.582020+00:00",
         "source_evidence": {
           "series": {
             "UNRATE": [
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:13:03.770414+00:00",
+                "verified_at": "2026-11-11T13:31:55.582020+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -620,28 +620,28 @@
         "status": "OK",
         "detail": "注意歷史值可能修訂",
         "error": "",
-        "attempted_at": "2026-11-11T13:13:03.770589+00:00",
+        "attempted_at": "2026-11-11T13:31:55.582200+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "PAYEMS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-11T13:13:04.494021+00:00",
+              "verified_at": "2026-11-11T13:31:56.727736+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:13:04.494021+00:00",
+        "last_verified_at": "2026-11-11T13:31:56.727736+00:00",
         "source_evidence": {
           "series": {
             "PAYEMS": [
               {
                 "provider": "FRED_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:13:04.494021+00:00",
+                "verified_at": "2026-11-11T13:31:56.727736+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -660,28 +660,28 @@
         "status": "OK",
         "detail": "同一 VIX 數列",
         "error": "",
-        "attempted_at": "2026-11-11T13:12:12.719365+00:00",
+        "attempted_at": "2026-11-11T13:31:06.028140+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-11T13:12:13.069207+00:00",
+              "verified_at": "2026-11-11T13:31:06.454958+00:00",
               "observation_date": "2026-11-10"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-11T13:12:13.069207+00:00",
+        "last_verified_at": "2026-11-11T13:31:06.454958+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
               {
                 "provider": "CBOE_OFFICIAL_VIX",
                 "result": "OK",
-                "verified_at": "2026-11-11T13:12:13.069207+00:00",
+                "verified_at": "2026-11-11T13:31:06.454958+00:00",
                 "observation_date": "2026-11-10"
               }
             ]
@@ -692,7 +692,7 @@
       "s04": {
         "id": "s04",
         "label": "CNN Fear & Greed",
-        "value": 36.914286,
+        "value": 36.714286,
         "unit": "",
         "observation_date": "2026-11-11",
         "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
@@ -700,7 +700,7 @@
         "status": "OK",
         "detail": "來源為 CNN 非公開保證 API",
         "error": "",
-        "attempted_at": "2026-11-11T13:13:04.494693+00:00",
+        "attempted_at": "2026-11-11T13:31:56.728578+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -720,7 +720,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-11T13:13:00.153488+00:00"
+        "retrieved_at": "2026-11-11T13:31:52.367375+00:00"
       },
       {
         "observation_date": "2026-08-01",
@@ -731,7 +731,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-11T13:13:01.067397+00:00"
+        "retrieved_at": "2026-11-11T13:31:53.371895+00:00"
       },
       {
         "observation_date": "2026-09-01",
@@ -742,7 +742,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-11T13:13:02.053510+00:00"
+        "retrieved_at": "2026-11-11T13:31:54.360391+00:00"
       }
     ]
   }

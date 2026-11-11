@@ -7,6 +7,8 @@ on:
       - '系統工程/Family/W8/official_family_entry.py'
   pull_request:
     paths:
+      - '系統工程/Family/W5/market_session_source.py'
+      - '系統工程/Family/W8/v82_approved_context.py'
       - '.github/workflows/family-w8-official-entry.yml'
       - '系統工程/Family/W8/official_family_entry.py'
   workflow_dispatch:

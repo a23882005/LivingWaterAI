@@ -46,12 +46,25 @@ def bind(repo_path,request,context):
             and facts.get('source_db_sha256')==identity['snapshot_id']
             and timestamp(facts['available_at'],'available_at')<=timestamp(request['evaluation_at'],'evaluation_at'),
             'V82_APPROVED_SOURCE_SCOPE_OR_TIME_MISMATCH','approved_v10_context.source')
+    from market_session_source import prepare,requires_source
+    synthetic=context['native_binding']['data_provenance']=='SYNTHETIC'
+    require(synthetic or not requires_source(source.get('session') or {},request['evaluation_at'])
+        or source.get('session_source') is not None,
+        'V82_23H_SESSION_SOURCE_REQUIRED','approved_v10_context.session',status='DATA_UNAVAILABLE')
+    if source.get('session_source') is not None:
+        resolved=prepare(source,allow_synthetic=synthetic)
+        require(source.get('session')==resolved['session'] and
+            source.get('session_source_readback')==resolved['session_source_readback'],
+            'V82_SESSION_SOURCE_REPLAY_MISMATCH','approved_v10_context.session',status='DATA_UNAVAILABLE')
     snapshot=source.get('cycle_snapshot') or {};cycle=snapshot.get('cycle')
     if cycle is not None:
         validate_cycle(cycle)
         require(cycle['profile_version']==VERSION and cycle['owner']==request['owner'] and cycle['asset_id']==identity['asset_id'],
             'V82_CYCLE_OWNER_PROFILE_MISMATCH','approved_v10_context.cycle_snapshot')
-        if context['native_binding']['data_provenance']!='SYNTHETIC':
+        if source.get('session_source') is not None:
+            require(cycle['session_id']==source['session']['session_id'] and cycle['exchange']==source['session']['exchange'],
+                'V82_CYCLE_SESSION_SOURCE_MISMATCH','approved_v10_context.session',status='DATA_UNAVAILABLE')
+        if context['native_binding']['data_provenance']!='SYNTHETIC' and source.get('session_source') is None:
             session=source.get('session') or {}
             require(all(session.get(k) for k in ('calendar_id','calendar_version','planning_start_at','planning_end_at')),
                 'V82_CYCLE_SESSION_CALENDAR_REQUIRED','approved_v10_context.session',status='DATA_UNAVAILABLE')
@@ -87,15 +100,21 @@ def _own_commit_replay(before,current,request_digest,intent_id):
     return expected==current
 
 
-def ensure_cycle(source, analysis, *, gap, permission, exposure_reconciled, execution_inputs_qualified):
+def ensure_cycle(source, analysis, *, gap, permission, exposure_reconciled, execution_inputs_qualified, allow_synthetic_session=False):
     """Read fixed G0/B0 or propose the first cycle for atomic final commitment.
 
     Called only by the operator source producer, after qualification. Session
     and authority come from its verified supplementary source, not menu payload.
     """
     from livingwater_v82_runtime.daily_slice import CycleLedgerStore,cycle_id,open_cycle
-    out=deepcopy(source);authority=out.get('planning_ledger_source') or {};session=out.get('session') or {};identity=out['identity']
+    from market_session_source import prepare
+    out=prepare(source,allow_synthetic=allow_synthetic_session);authority=out.get('planning_ledger_source') or {};session=out.get('session') or {};identity=out['identity']
     if not authority or authority.get('planning_write_authorized') is not True:return out
+    from market_session_source import requires_source
+    if source.get('session_source') is None and requires_source(session,identity['evaluation_at']):
+        out['cycle_snapshot']={'status':'QUALIFIED_SESSION_CALENDAR_REQUIRED','cycle':None,
+            'ledger_path':authority['local_path'],'source_reference':authority['source_reference']}
+        return out
     if authority.get('owner')!=identity['owner'] or not authority.get('source_reference'):
         raise PermissionError('V82_PLANNING_LEDGER_AUTHORITY_MISMATCH')
     if not session.get('session_id') or not session.get('exchange') or type(session.get('open_for_planning')) is not bool:

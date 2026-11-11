@@ -117,7 +117,7 @@ class CPIFetchRetriesTests(unittest.TestCase):
             raw = (url * 3).encode()
             self.session.get.return_value = response(body=raw)
             self.assertEqual(refresh.fetch_cpi_official_evidence(self.session, url), raw)
-            self.session.get.assert_called_once_with(url, timeout=(10, 60))
+            self.session.get.assert_called_once_with(url, timeout=(10, 60), headers=refresh.CPI_OFFICIAL_HEADERS)
         self.sleep.assert_not_called()
 
     def test_retry_timeout_connection_429_and_server_errors(self):
@@ -128,7 +128,7 @@ class CPIFetchRetriesTests(unittest.TestCase):
                 self.sleep.reset_mock()
                 self.session.get.side_effect = [failure, response()]
                 self.assertEqual(refresh.fetch_cpi_official_evidence(self.session, cpi.FRED_CPI), b'x'*150)
-                self.assertEqual(self.session.get.call_args_list, [call(cpi.FRED_CPI, timeout=(10, 60))]*2)
+                self.assertEqual(self.session.get.call_args_list, [call(cpi.FRED_CPI, timeout=(10, 60), headers=refresh.CPI_OFFICIAL_HEADERS)]*2)
                 self.sleep.assert_called_once_with(1)
 
     def test_exhaustion_is_bounded_and_propagates_without_cache(self):

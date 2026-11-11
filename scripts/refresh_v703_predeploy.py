@@ -36,11 +36,21 @@ def fetch(session,url):
     return r.content
 
 
+# Match the existing official macro collector's successful transport settings.
+CPI_OFFICIAL_HEADERS = {
+    'User-Agent':'LivingWaterAI-MacroCollector/1.3 (+GitHub Actions; official data research)',
+    'Accept':'application/json,text/csv,text/plain,*/*',
+    'Accept-Language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Accept-Encoding':'gzip, deflate',
+    'Connection':'keep-alive',
+}
+
+
 def fetch_cpi_official_evidence(session, url):
     """Retry transient official-source failures only; never substitute cached evidence."""
     for attempt in range(3):
         try:
-            response = session.get(url, timeout=(10, 60))
+            response = session.get(url, timeout=(10, 60), headers=CPI_OFFICIAL_HEADERS)
             response.raise_for_status()
             raw = response.content
             if len(raw) < 100:

@@ -1,6 +1,6 @@
 {
   "schema": "D009-alert-state-v1",
-  "updated_at": "2026-11-10",
+  "updated_at": "2026-11-11",
   "indicators": {
     "m07": {
       "consecutive_failures": 0,
@@ -28,9 +28,9 @@
       "status": "OK"
     },
     "m05": {
-      "consecutive_failures": 0,
-      "last_alert_date": null,
-      "status": "OK"
+      "consecutive_failures": 1,
+      "last_alert_date": "2026-11-11",
+      "status": "STALE"
     },
     "m09": {
       "consecutive_failures": 0,

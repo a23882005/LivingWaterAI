@@ -6,7 +6,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 AUDIT = pathlib.Path(os.environ.get("V703_AUDIT_PATH", ROOT / "data" / "24_macro_verification.json"))
-FEED = pathlib.Path(os.environ.get("V703_FEED_PATH", ROOT / "data" / "V70_macro_latest.json"))
+FEED = pathlib.Path(os.environ.get("V703_FEED_PATH", ROOT / "data" / "legacy" / "V70_macro_latest.json"))
 SIX = {"m06", "m03_qqq", "m03_spy", "m03_vt", "m16", "s05"}
 
 class ProductionAuditIntegrity(unittest.TestCase):

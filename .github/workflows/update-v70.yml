@@ -183,12 +183,12 @@ jobs:
         run: |
           mkdir -p data
           cp build/macro24/24_macro_verification.json data/24_macro_verification.json
-          cp build/macro24/V70_macro_latest.json data/V70_macro_latest.json
-          # Keep same-name feed beside root V70.3 HTML when deployed from repository root.
-          cp build/macro24/V70_macro_latest.json V70_macro_latest.json
+          # Legacy research output must not overwrite the canonical v3 publication mirrors.
+          mkdir -p data/legacy
+          cp build/macro24/V70_macro_latest.json data/legacy/V70_macro_latest.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/24_macro_verification.json data/V70_macro_latest.json V70_macro_latest.json
+          git add data/24_macro_verification.json data/legacy/V70_macro_latest.json
           git add data/market_history/*.csv data/market_history/manifest.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Macro audit unchanged" >> "$GITHUB_STEP_SUMMARY"
@@ -197,6 +197,6 @@ jobs:
             git pull --rebase origin main
             git push
           fi
-          echo "Canonical website source: 系統工程/總經V70/V70-3-11.html; Hostinger public_html/index.html upload/restore not yet implemented in this workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "Legacy research audit only. Current website source: 系統工程/總經V70/V70-3-27.html; canonical publishing is owned by v703-site-deploy-1100.yml." >> "$GITHUB_STEP_SUMMARY"
 
 # Manual 16-item GitHub Runner diagnostic trigger: 2026-10-14

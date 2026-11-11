@@ -11,6 +11,9 @@ on:
     paths:
       - '系統工程/總經V70/V70-3-27.html'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/v703_cpi_availability.py'
+      - 'scripts/validate_v703_publication.py'
+      - 'tests/test_v703_cpi_data_only.py'
       - 'scripts/v703_rolling_history.py'
       - 'requirements.txt'
       - 'tests/test_v703_rolling15.py'
@@ -64,6 +67,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/18_macro_verification.json data/8_macro_supplement_verified.json data/v703_official_monthly_release_calendar.json
           git add -f data/audit/fed_target_evidence_*.html.gz
+          git add -f data/audit/cpi_unavailable_*.gz
           if ! git diff --cached --quiet; then
             git commit -m "data(v703): refresh real Fed evidence and dated macro inputs"
             # Concurrent 09:00/10:00 producers may update the same JSON.
@@ -91,6 +95,7 @@ jobs:
               python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
               git add data/18_macro_verification.json data/8_macro_supplement_verified.json data/v703_official_monthly_release_calendar.json
               git add -f data/audit/fed_target_evidence_*.html.gz
+              git add -f data/audit/cpi_unavailable_*.gz
               if git diff --cached --quiet; then
                 published=true
                 break
@@ -111,13 +116,16 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_mmfi_fallback.py' -v
           python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
           python -m unittest discover -s tests -p 'test_v703_publication.py' -v
+          python -m unittest discover -s tests -p 'test_v703_cpi_data_only.py' -v
+          python -m unittest discover -s tests -p 'test_v703_downstream_data_only.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_daily_capture.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
           python -m unittest discover -s tests -p 'test_bank_macro_monthly.py' -v
           python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27.html" --out build/site
-      - name: Require complete 22 of 22 scoring inputs before publishing
+      - name: Require formal 22 of 22 or approved CPI data-only publication
+        id: publication_gate
         run: |
           python - <<'PY'
           import json
@@ -125,11 +133,15 @@ jobs:
           feed=json.loads(Path('build/site/V70_macro_latest.json').read_text(encoding='utf-8'))
           v=feed['verification']
           assert feed['schema']=='V70.3/family-macro-feed-v3', 'wrong V70 feed schema'
-          assert v['ready'] is True, 'V70-3-27 data incomplete; preserve existing published site'
+          from scripts.validate_v703_publication import validate_publication_gate
+          mode=validate_publication_gate(feed)
+          import os
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('scoring_allowed='+str(mode=='FORMAL').lower()+'\n')
           assert v['independentIndicators']==25
           assert v['transportIndicators']==28 and len(feed['indicators'])==28
-          assert v['totalRequired']==26 and v['valid']==26
-          assert v['requiredScoringIndicators']==22 and v['requiredScoringIndicatorsValidated']==22
+          assert v['totalRequired']==26 and v['valid']==(26 if mode=='FORMAL' else 25)
+          assert v['requiredScoringIndicators']==22 and v['requiredScoringIndicatorsValidated']==(22 if mode=='FORMAL' else 21)
           assert feed['monthlyReleaseCalendar']['schema']=='V70.3/monthly-official-release-calendar-v1'
           assert len(feed['monthlyReleaseCalendar']['items'])==6
           assert feed['sourceSnapshot']['officialReleaseCalendar']
@@ -172,18 +184,20 @@ jobs:
           from scripts.macro18_state import atomic_write
           source=Path('build/site/V70_macro_latest.json')
           data=json.loads(source.read_text(encoding='utf-8'))
-          target=Path('系統工程/總經V70/V70_macro_latest.json')
-          atomic_write(target, source.read_bytes())
-          assert json.loads(target.read_text(encoding='utf-8'))==data
+          for name in ('系統工程/總經V70/V70_macro_latest.json','data/V70_macro_latest.json','V70_macro_latest.json'):
+              target=Path(name)
+              atomic_write(target, source.read_bytes())
+              assert json.loads(target.read_text(encoding='utf-8'))==data
+          atomic_write('系統工程/總經V70/V70-3-27.html',Path('build/site/index.html').read_bytes())
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --mixed origin/main
-            git add "系統工程/總經V70/V70_macro_latest.json"
+            git add "系統工程/總經V70/V70_macro_latest.json" "系統工程/總經V70/V70-3-27.html" data/V70_macro_latest.json V70_macro_latest.json
             if ! git diff --cached --quiet; then
-              git commit -m "data(V70-3-27): publish verified 28-indicator feed"
+              git commit -m "data(V70-3-27): synchronize current publication feed and HTML"
             fi
             if git push origin HEAD:main; then break; fi
             if [ "$attempt" -eq 3 ]; then echo "GitHub colocated feed publish failed" >&2; exit 1; fi
@@ -301,9 +315,10 @@ jobs:
                   verify_live_payload(expected,live,Path('build/site/index.html').read_text(encoding='utf8'),page)
                   assert live["schema"]==expected["schema"]
                   assert live["asOf"]==expected["asOf"]
-                  assert live["verification"]["ready"] is True
+                  from scripts.validate_v703_publication import validate_publication_gate
+                  mode=validate_publication_gate(live)
                   assert live["verification"]["independentIndicators"]==25
-                  assert live["verification"]["requiredScoringIndicatorsValidated"]==22
+                  assert live["verification"]["requiredScoringIndicatorsValidated"]==(22 if mode=="FORMAL" else 21)
                   assert len(live["indicators"])==28
                   assert "V70_macro_latest.json" in page
                   assert "V70-3-27" in page
@@ -365,7 +380,9 @@ jobs:
           from pathlib import Path
           data=json.loads(Path('build/site/V70_macro_latest.json').read_text(encoding='utf8'))
           receipt={'schema':'V70.3/verified-deployment-receipt-v1',
-                   'status':'LIVE_VERIFIED',
+                   'status':'LIVE_VERIFIED' if data['verification']['ready'] else 'LIVE_DATA_ONLY',
+                   'publication':data['publication'],
+                   'scoringAllowed':data['verification']['ready'],
                    'asOf':data['asOf'],
                    'verifiedAtUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
                    'githubRunId':os.environ['GITHUB_RUN_ID'],
@@ -468,7 +485,13 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.50,<2'
           python -m playwright install chromium --with-deps
+      - name: Verify data-only live page cannot produce formal scores
+        if: steps.publication_gate.outputs.scoring_allowed == 'false'
+        env:
+          SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+        run: python scripts/verify_v703_data_only_live.py --feed build/site/V70_macro_latest.json --site-url "${SITE_BASE_URL:-https://www.happihelp.com}"
       - name: Capture daily Macro Safety score after full live verification
+        if: steps.publication_gate.outputs.scoring_allowed == 'true'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
           SOURCE_COMMIT: ${{ github.sha }}
@@ -479,6 +502,7 @@ jobs:
             --archive data/macro_safety_daily.csv \
             --source-commit "$SOURCE_COMMIT"
       - name: Build monthly Macro Safety series from real observations
+        if: steps.publication_gate.outputs.scoring_allowed == 'true'
         run: |
           MONTH_ARGS=$(python - <<'PY'
           import csv
@@ -528,12 +552,14 @@ jobs:
             --run-timestamp-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             "${MONTH_ARGS_ARRAY[@]}"
       - name: Build monthly bank forecast and Macro Safety comparison CSV
+        if: steps.publication_gate.outputs.scoring_allowed == 'true'
         run: |
           python scripts/monthly_research/build_bank_macro_monthly.py \
             --bank-register experiments/macro-safety-monthly-research/bank_forecast_register_research.csv \
             --macro-monthly data/macro_safety_monthly.csv \
             --output experiments/macro-safety-monthly-research/bank_macro_monthly_snapshot.csv
       - name: Publish immutable daily Macro Safety archive row
+        if: steps.publication_gate.outputs.scoring_allowed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

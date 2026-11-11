@@ -8,6 +8,10 @@ on:
     paths:
       - '.github/workflows/v703-frontend-regression.yml'
       - 'scripts/build_daily_v703_site.py'
+      - 'scripts/v703_cpi_availability.py'
+      - 'tests/test_v703_cpi_data_only.py'
+      - 'tests/test_v703_data_only_frontend.py'
+      - 'tests/test_v703_downstream_data_only.py'
       - 'scripts/v703_rolling_history.py'
       - 'requirements.txt'
       - 'tests/test_v703_rolling15.py'
@@ -228,6 +232,11 @@ jobs:
           from pathlib import Path
           Path('build/w7-browser/result.json').write_text(json.dumps({'fixture':'SYNTHETIC ONLY','cases':results,'count':len(results),'status':'PASS'},indent=2))
           PYTEST
+      - name: CPI data-only source, display and downstream safety regression
+        run: |
+          python -m unittest discover -s tests -p 'test_v703_cpi_data_only.py' -v
+          python -m unittest discover -s tests -p 'test_v703_data_only_frontend.py' -v
+          python -m unittest discover -s tests -p 'test_v703_downstream_data_only.py' -v
       - uses: actions/upload-artifact@v4
         if: always()
         with:

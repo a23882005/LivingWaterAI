@@ -1,0 +1,821 @@
+{
+  "schema": "V70.3/family-macro-feed-v3",
+  "asOf": "2026-11-11T03:00:00Z",
+  "verification": {
+    "ready": true,
+    "valid": 26,
+    "totalRequired": 26,
+    "independentIndicators": 25,
+    "sources": [
+      "09:00/18",
+      "10:00/8"
+    ],
+    "usableWithCaveat": [
+      "m06",
+      "m06_output_gap",
+      "s05"
+    ],
+    "transportFields": 26,
+    "requiredScoringIndicators": 22,
+    "requiredScoringIndicatorsValidated": 22,
+    "missing": [],
+    "problems": [],
+    "transportIndicators": 28
+  },
+  "indicators": {
+    "m07": {
+      "value": 16.46,
+      "dataDate": "2026-11-10",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m01": {
+      "value": 0.35,
+      "dataDate": "2026-11-10",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m08": {
+      "value": 2.74,
+      "dataDate": "2026-11-10",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m02": {
+      "value": 3.23,
+      "dataDate": "2026-11-10",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m04": {
+      "value": 54.5,
+      "dataDate": "2026-10-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m05": {
+      "value": 2.565841,
+      "dataDate": "2026-10-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m09": {
+      "value": 101.839996,
+      "dataDate": "2026-11-10",
+      "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m10": {
+      "value": 101.410004,
+      "dataDate": "2026-11-10",
+      "source": "https://finance.yahoo.com/quote/CL=F/",
+      "unit": "USD/bbl",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m12": {
+      "value": 101.099998,
+      "dataDate": "2026-11-10",
+      "source": "https://finance.yahoo.com/quote/%5EMOVE/",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m13": {
+      "value": 2.37,
+      "dataDate": "2026-11-10",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m17": {
+      "value": 0.02,
+      "dataDate": "2026-11-10",
+      "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "unit": "pp",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m14": {
+      "value": -77.286,
+      "dataDate": "2026-11-10",
+      "source": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD",
+      "unit": "USD bn",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m15": {
+      "value": 54.9,
+      "dataDate": "2026-10-01",
+      "source": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m16": {
+      "value": -0.7,
+      "dataDate": "2026-09-01",
+      "source": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m18": {
+      "value": 0.0,
+      "dataDate": "2026-10-01",
+      "source": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m19": {
+      "value": 4.2,
+      "dataDate": "2026-10-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m20": {
+      "value": 50.666667,
+      "dataDate": "2026-10-01",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "千人",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "s03": {
+      "value": 16.46,
+      "dataDate": "2026-11-10",
+      "source": "https://api.stlouisfed.org/fred/series/observations",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "s04": {
+      "value": 17.938322,
+      "dataDate": "2026-11-10",
+      "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "unit": "",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    },
+    "m06_rate": {
+      "value": 4.125,
+      "dataDate": "2026-07-30",
+      "source": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+      "unit": "%",
+      "method": "official target midpoint",
+      "status": "OK",
+      "detail": "",
+      "policySchema": "fed-target-evidence-v1",
+      "effectiveDate": "2026-07-30",
+      "lowerBound": {
+        "value": 4.0,
+        "effective_date": "2026-07-30"
+      },
+      "upperBound": {
+        "value": 4.25,
+        "effective_date": "2026-07-30"
+      },
+      "lastVerifiedAt": "2026-11-11T02:05:00Z",
+      "sourceEvidence": {
+        "value": 4.125,
+        "effective_date": "2026-07-30",
+        "publication_date": "2026-07-29",
+        "lower_bound": {
+          "value": 4.0,
+          "effective_date": "2026-07-30"
+        },
+        "upper_bound": {
+          "value": 4.25,
+          "effective_date": "2026-07-30"
+        },
+        "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+        "checked_at": "2026-11-11T02:05:00Z",
+        "result": "CURRENT_CONFIRMED",
+        "excerpt": "Synthetic fixture only: current target interval",
+        "response_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "candidateChecks": [
+        {
+          "site": "0",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "1",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "2",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "3",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        }
+      ],
+      "retrievalTime": "2026-11-11T02:00:00Z",
+      "publicationDate": "2026-07-29"
+    },
+    "m06_inf": {
+      "value": 3.9,
+      "dataDate": "2026-10-01",
+      "source": "https://www.newyorkfed.org/newsevents/news/research/2026/20261007",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "0",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "1",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "2",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "3",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        }
+      ],
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-10-07",
+      "vintage": "September 2026 SCE release"
+    },
+    "m06_rstar": {
+      "value": 1.00864835850403,
+      "dataDate": "2026-09-30",
+      "source": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "0",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "1",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "2",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "3",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        }
+      ],
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-08-28",
+      "vintage": "2026Q2 real-time as-released, not current revised model"
+    },
+    "m06_output_gap": {
+      "value": 1.4005,
+      "dataDate": "2026-09-30",
+      "source": "https://fred.stlouisfed.org/series/GDPC1",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "0",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "1",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "2",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        },
+        {
+          "site": "3",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "metric_or_horizon": "Fed target",
+          "status": "FOUND",
+          "checked_at": "2026-11-11T02:05:00Z"
+        }
+      ],
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-09-30",
+      "vintage": "BEA 2026-09-30 actual GDP + CBO 2026-02 potential GDP | observation quarter 2026-Q2"
+    },
+    "s05": {
+      "value": 28.28,
+      "dataDate": "2026-11-10",
+      "source": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "unit": "%",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "Macroaxis",
+          "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+          "metric_or_horizon": "MMFI百分比／NYSE 50日廣度",
+          "status": "FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": 28.28,
+          "unit": "%",
+          "observation_date": "2026-10-16",
+          "notes": "頁面直接顯示Updated Oct 16, 2026及28.28。"
+        },
+        {
+          "site": "Barchart",
+          "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
+          "metric_or_horizon": "$MMFI NYSE 50日廣度",
+          "status": "BLOCKED",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "頁面要求啟用JavaScript並通過機器人驗證，無法讀取數值。"
+        },
+        {
+          "site": "EODData",
+          "url": "https://www.eoddata.com/stockquote/NYSE/MMFI.htm",
+          "metric_or_horizon": "NYSE/MMFI",
+          "status": "BLOCKED",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "本輪讀取器無法存取該URL。"
+        },
+        {
+          "site": "TradingView",
+          "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
+          "metric_or_horizon": "Percent of all NYSE stocks above own 50-day SMA",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "%",
+          "observation_date": null,
+          "notes": "頁面確認指標名稱與NYSE/50日SMA定義，但市場關閉頁未回傳可核驗數值。"
+        }
+      ],
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-10-16",
+      "vintage": "2026-10-16 market close"
+    },
+    "m03_qqq": {
+      "value": 21.57,
+      "dataDate": "2026-11-10",
+      "source": "https://stockanalysis.com/etf/qqq/",
+      "unit": "倍 Forward",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
+          "metric_or_horizon": "Forward P/E / forwardPE / FY1",
+          "status": "BLOCKED",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "本輪讀取器無法存取Yahoo key-statistics頁。"
+        },
+        {
+          "site": "Invesco",
+          "url": "https://www.invesco.com/qqq-etf/en/about.html",
+          "metric_or_horizon": "QQQ官方Forward/FY1 P/E",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "官方頁可直接開啟，但本輪可見內容未呈現Forward或FY1 P/E。"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "QQQ Forward/Projected/FY1 P/E",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "首頁可存取但未直接提供QQQ Forward/FY1數值。"
+        },
+        {
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/qqq/",
+          "metric_or_horizon": "Forward PE",
+          "status": "FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": 21.57,
+          "unit": "倍 Forward",
+          "observation_date": "2026-10-16",
+          "notes": "QQQ頁直接顯示Forward PE 21.57；另列PE Ratio 29.05但未採用。"
+        }
+      ],
+      "lastVerifiedAt": "2026-11-11T02:00:00Z",
+      "sourceEvidence": {
+        "label": "Forward P/E",
+        "value": 21.57,
+        "url": "https://stockanalysis.com/etf/qqq/"
+      },
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-10-17",
+      "vintage": "StockAnalysis last checked 2026-10-17; market close 2026-10-16"
+    },
+    "m03_spy": {
+      "value": 20.59,
+      "dataDate": "2026-11-10",
+      "source": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+      "unit": "倍 Forward",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
+          "metric_or_horizon": "Forward P/E / forwardPE / FY1",
+          "status": "BLOCKED",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "HTTP 429 Too Many Requests。"
+        },
+        {
+          "site": "State Street",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+          "metric_or_horizon": "Price/Earnings Ratio FY1",
+          "status": "FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": 20.59,
+          "unit": "倍 FY1",
+          "observation_date": "2026-10-15",
+          "notes": "官方頁直接顯示FY1 20.59並明示forecasted one-year EPS。"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "SPY Forward/Projected/FY1 P/E",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "首頁可存取但未直接提供SPY Forward/FY1數值。"
+        },
+        {
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/spy/",
+          "metric_or_horizon": "Forward PE",
+          "status": "FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": 19.76,
+          "unit": "倍 Forward",
+          "observation_date": "2026-10-16",
+          "notes": "頁面直接顯示Forward PE 19.76，作交叉核對；正式採用官方FY1。"
+        }
+      ],
+      "lastVerifiedAt": "2026-11-11T02:00:00Z",
+      "sourceEvidence": {
+        "label": "Forward P/E",
+        "value": 20.59,
+        "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy"
+      },
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-10-17",
+      "vintage": "State Street fund characteristics as of 2026-10-15"
+    },
+    "m03_vt": {
+      "value": 16.22,
+      "dataDate": "2026-11-10",
+      "source": "https://stockanalysis.com/etf/vt/",
+      "unit": "倍 Forward",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only",
+      "candidateChecks": [
+        {
+          "site": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
+          "metric_or_horizon": "Forward P/E / forwardPE / FY1",
+          "status": "BLOCKED",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "HTTP 429 Too Many Requests。"
+        },
+        {
+          "site": "Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+          "metric_or_horizon": "VT官方Forward/FY1 P/E",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "官方頁可開啟但本輪文字讀回為空，未取得可驗證Forward/FY1值。"
+        },
+        {
+          "site": "Portfolio Visualizer",
+          "url": "https://www.portfoliovisualizer.com/",
+          "metric_or_horizon": "VT Forward/Projected/FY1 P/E",
+          "status": "NOT_FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": null,
+          "unit": "倍 Forward",
+          "observation_date": null,
+          "notes": "首頁可存取但未直接提供VT Forward/FY1數值。"
+        },
+        {
+          "site": "StockAnalysis",
+          "url": "https://stockanalysis.com/etf/vt/",
+          "metric_or_horizon": "Forward PE",
+          "status": "FOUND",
+          "checked_at": "2026-10-18T10:04:32+08:00",
+          "value": 16.22,
+          "unit": "倍 Forward",
+          "observation_date": "2026-10-16",
+          "notes": "VT頁直接顯示Forward PE 16.22；另列PE Ratio 20.78但未採用。"
+        }
+      ],
+      "lastVerifiedAt": "2026-11-11T02:00:00Z",
+      "sourceEvidence": {
+        "label": "Forward P/E",
+        "value": 16.22,
+        "url": "https://stockanalysis.com/etf/vt/"
+      },
+      "retrievalTime": "2026-10-18T10:04:32+08:00",
+      "publicationDate": "2026-10-17",
+      "vintage": "StockAnalysis last checked 2026-10-17; market close 2026-10-16"
+    },
+    "m06": {
+      "value": -2.43389835850403,
+      "dataDate": "2026-09-30",
+      "source": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm | https://www.newyorkfed.org/newsevents/news/research/2026/20261007 | https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx | https://fred.stlouisfed.org/series/GDPC1",
+      "unit": "%pt",
+      "method": "synthetic fixture",
+      "status": "OK",
+      "detail": "Synthetic browser acceptance fixture only"
+    }
+  },
+  "news": [],
+  "leiHistory": [
+    {
+      "observation_date": "2026-07-01",
+      "value": -1.4,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
+      "publication_date": "2026-08-20",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-18T01:31:23.102550+00:00"
+    },
+    {
+      "observation_date": "2026-08-01",
+      "value": -1.1,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
+      "publication_date": "2026-09-20",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-18T01:31:24.112766+00:00"
+    },
+    {
+      "observation_date": "2026-09-01",
+      "value": -0.7,
+      "unit": "%",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
+      "publication_date": "2026-10-18",
+      "status": "OK",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "retrieved_at": "2026-10-18T01:31:25.040566+00:00"
+    }
+  ],
+  "monthlyReleaseCalendar": {
+    "schema": "V70.3/monthly-official-release-calendar-v1",
+    "items": {
+      "m04": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-01",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+      },
+      "m05": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-14",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://www.bls.gov/schedule/news_release/cpi.htm"
+      },
+      "m15": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-05",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+      },
+      "m18": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-02",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://fred.stlouisfed.org/releases/calendar?rid=456&y=2026"
+      },
+      "m19": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-02",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://www.bls.gov/schedule/news_release/empsit.htm"
+      },
+      "m20": {
+        "observation_month": "2026-10",
+        "publication_date": "2026-10-02",
+        "next_release_at_utc": "2026-12-10T13:30:00Z",
+        "calendar_source_url": "https://www.bls.gov/schedule/news_release/empsit.htm"
+      }
+    }
+  },
+  "wallStreetFive": {
+    "schema": "V70.3/wallstreet-five-forecast-v1",
+    "as_of_date": "2026-10-17",
+    "cross_check_date": "2026-10-06",
+    "cross_check_source": "https://www.marketscreener.com/news/major-brokerages-forecasts-for-s-p-500-index-in-2026-ce7859dad18dfe26",
+    "index": "S&P 500",
+    "units": "index points",
+    "horizon_end_date": "2026-12-31",
+    "licensing": "僅展示可公開核實的預測數字、事實性自行撰寫摘要及公開來源連結；不重製研究報告全文，研究內容授權未取得。",
+    "notes": "每列 publication_date 是該筆目標公開可核對的原始公布日，非 2026-10-17 重新發布；全數截至路透社 2026-10-06 彙整交叉核對。使用者如更新此檔，建置器會自動更新網頁，不改總經風控分數。",
+    "forecasts": [
+      {
+        "firm_id": "goldman",
+        "firm_name": "高盛 Goldman Sachs",
+        "publisher": "Goldman Sachs Research",
+        "publication_date": "2026-05-28",
+        "horizon": "2026年年底",
+        "horizon_end_date": "2026-12-31",
+        "target": 8000,
+        "summary": "預估企業獲利持續帶動美股；AI 基礎建設仍是成長來源，但利率與估值可能限制漲幅。",
+        "source_url": "https://www.goldmansachs.com/insights/articles/s-and-p-500-forecast-to-climb-as-earnings-growth-powers-stocks-higher",
+        "source_type": "官方公開文章"
+      },
+      {
+        "firm_id": "jpm",
+        "firm_name": "摩根大通 J.P. Morgan",
+        "publisher": "J.P. Morgan Global Research",
+        "publication_date": "2026-08-10",
+        "horizon": "2026年年底",
+        "horizon_end_date": "2026-12-31",
+        "target": 8000,
+        "summary": "將年底目標由7,800調升至8,000；主要依據是企業獲利與大型科技公司AI投資帶來的營收成長。",
+        "source_url": "https://www.reuters.com/business/jp-morgan-lifts-2026-end-target-sp-500-8000-ai-earnings-strength-2026-08-10/",
+        "source_type": "Reuters 公開新聞"
+      },
+      {
+        "firm_id": "morgan",
+        "firm_name": "摩根士丹利 Morgan Stanley",
+        "publisher": "Morgan Stanley Research",
+        "publication_date": "2026-05-15",
+        "horizon": "2026年年底",
+        "horizon_end_date": "2026-12-31",
+        "target": 8000,
+        "summary": "企業獲利與AI支出支持美股；同時提醒通膨再升及融資成本上升可能壓縮估值。",
+        "source_url": "https://www.morganstanley.com/insights/articles/investment-outlook-midyear-2026",
+        "source_type": "官方公開文章"
+      },
+      {
+        "firm_id": "bofa",
+        "firm_name": "美國銀行 BofA Global Research",
+        "publisher": "BofA Global Research",
+        "publication_date": "2026-09-14",
+        "horizon": "2026年年底",
+        "horizon_end_date": "2026-12-31",
+        "target": 7400,
+        "summary": "年底目標由7,100調升至7,400，但仍提醒股市可能先回檔；其12個月7,800目標屬不同期限。",
+        "source_url": "https://www.thestreet.com/investing/stocks/bank-of-america-resets-its-sp-500-price-target-with-a-clause",
+        "source_type": "公開財經媒體"
+      },
+      {
+        "firm_id": "ubs",
+        "firm_name": "瑞銀 UBS Global Wealth Management",
+        "publisher": "UBS Global Wealth Management",
+        "publication_date": "2026-08-21",
+        "horizon": "2026年年底",
+        "horizon_end_date": "2026-12-31",
+        "target": 8100,
+        "summary": "企業獲利預估上調，加上AI應用與景氣韌性支撐美股；瑞銀另有不同部門展望，這裡只列財富管理部門。",
+        "source_url": "https://www.investing.com/news/economy-news/ubs-global-wealth-management-lifts-sp-500-yearend-target-to-8100-4871173",
+        "source_type": "Reuters 轉載"
+      }
+    ]
+  },
+  "derived": {
+    "m21": {
+      "value": 1,
+      "method": "All three consecutive published monthly LEI YoY values < 0",
+      "independentIndicator": false
+    }
+  },
+  "dataUpdatedAt": "2026-11-11T03:00:00Z",
+  "sourceSnapshot": {
+    "macro18": "8ed868ef05bbf0a211fe1bac21319378cdb29623",
+    "macro8": "81b6f5d73c4916a5ff71ea44232c171f2598fce2",
+    "officialReleaseCalendar": "7e7b94c622009c52ca725dc6987132b9214c2f7f",
+    "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
+    "macro18GeneratedAt": "2026-10-18T09:31:26.557288+08:00",
+    "macro8GeneratedAt": "2026-10-18T10:04:32+08:00"
+  },
+  "testFixture": "SYNTHETIC NOVEMBER FRONTEND ONLY",
+  "batchDateTaipei": "2026-11-11"
+}

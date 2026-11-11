@@ -1,15 +1,15 @@
 {
   "schema": "D009-actions-proof-v1",
-  "run_id": "42739511073",
+  "run_id": "42942645473",
   "run_attempt": "1",
-  "commit_sha": "c0e6b7fa115275fd28c19aa11b65b080dbfce08b",
-  "verified_at_utc": "2026-11-10T01:59:51.318228+00:00",
+  "commit_sha": "2c40d84dca82ef6ecf013eeb874b900550f14341",
+  "verified_at_utc": "2026-11-11T01:59:05.164791+00:00",
   "independent_indicators": 18,
   "rows": 19,
   "statuses": {
-    "OK": 19,
+    "OK": 18,
     "USABLE": 0,
-    "STALE": 0,
+    "STALE": 1,
     "MISSING": 0
   },
   "checks": [

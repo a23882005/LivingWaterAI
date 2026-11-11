@@ -6311,5 +6311,22 @@
     "real_cycle": 0,
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_h36_20261111_0050_price_map_candidate_and_event_sources": {
+    "status": "RESEARCH_MAP_AND_EVENT_ORIGINALS_VERIFIED",
+    "price_cutoff": "2026-11-10T13:30:00+08:00",
+    "reference_close_twd": 99.7,
+    "twse_overlap_ohlc_sessions": 26,
+    "confirmed_swing_low_twd": 87.55,
+    "research_observation_zone_twd": [
+      94.45,
+      95.28
+    ],
+    "formal_price_map": "UNKNOWN",
+    "event_gap_safety": "UNKNOWN",
+    "known_events_first_tw_session": "2026-11-11",
+    "next_owner": "Family PM",
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

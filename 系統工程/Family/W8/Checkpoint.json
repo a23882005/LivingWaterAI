@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-10T06:34:08.660Z",
+  "updated_at": "2026-11-11T00:29:12.392Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6214,6 +6214,52 @@
     "existing_passes": "PRESERVED",
     "full_finance_pass": 0,
     "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE"
+  },
+  "pm_h33_20261111_left_monitor_latency_contract": {
+    "status": "CONTRACT_SAVED_AND_THREE_THREAD_NOTIFICATIONS_POSTED",
+    "formal_rule_version": "V82 v1.22.0",
+    "formal_rule_changed": false,
+    "owner_authorization": "Engineering repair and candidate research continuation",
+    "contract_filename": "V82_H33_左側接線與盤中監測延遲回測_統一修正契約_20261111.md",
+    "contract_private_archive_verified": true,
+    "contract_sha256": "d2bd21e7a12b2b88bf5eb2f2807d66dbc60bcd6783325283cd3f4afe63355e2d",
+    "owners": {
+      "monitor": "Original merged PR70 author; new correction branch and draft PR",
+      "formal_left_wiring": "Original PR59 sole writer",
+      "candidate_research": "Tasks/dot research dialogue; implementation through assigned code lines",
+      "independent_acceptance_and_governance": "Family middle PM"
+    },
+    "notifications": [
+      {
+        "thread": 69,
+        "id": 6783232741
+      },
+      {
+        "thread": 70,
+        "id": 6783232978
+      },
+      {
+        "thread": 59,
+        "id": 6783233268
+      }
+    ],
+    "scope": [
+      "Fetch baseline intraday data before activation",
+      "Per-symbol freshness and execution timing",
+      "Trace and connect approved Left predicate sources",
+      "Replay availability/notification/execution latency without hindsight"
+    ],
+    "acceptance_cases": "T01-T09 in unified contract",
+    "candidate_rule_promotion": "PENDING_RESEARCH_AND_OWNER_DECISION",
+    "new_schedules_created": 0,
+    "new_hosting_services": 0,
+    "runtime_changes_by_pm": 0,
+    "formal_db_writes": 0,
+    "ledger_writes": 0,
+    "broker_actions": 0,
+    "existing_passes": "PRESERVED",
     "production": "HOLD",
     "trading": "NONE"
   }

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-11T13:33:21.384930+00:00",
+  "generated_at_utc": "2026-11-11T13:49:23.877231+00:00",
   "source": "yfinance (unofficial Yahoo Finance wrapper)",
   "price_basis": "Close=unadjusted; Adj Close=provider-adjusted; dividend cashflows separate",
   "warning": "Adjusted Close is not a tax-adjusted, investor-specific total return",

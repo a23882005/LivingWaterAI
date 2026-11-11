@@ -257,10 +257,17 @@ def main():
 
     # Retain original observation/check dates for any source unavailable this run.
     # The authorized exception publishes data only, never a made-up CPI YoY.
-    from v703_cpi_availability import FRED_CPI, BLS_CPI, verify_official_gap
+    from v703_cpi_availability import FRED_CPI, verify_official_gap, load_archived_official_release, add_archived_notice_provenance
     cpi_csv = fetch_cpi_official_evidence(session, FRED_CPI)
-    cpi_release = fetch_cpi_official_evidence(session, BLS_CPI)
-    cpi_evidence = verify_official_gap(cpi_csv, cpi_release, dt.datetime.now(dt.timezone.utc))
+    # The BLS notice is immutable dated evidence already obtained before HTTP 403.
+    # Never retry or bypass that denial; re-fetch only the FRED observations.
+    notice_manifest = json.loads((ROOT/'data/cpi_official_release_20261110.json').read_text())
+    cpi_now = dt.datetime.now(dt.timezone.utc)
+    cpi_release = load_archived_official_release(
+        (ROOT/'data/audit/cpi_official_release_20261110.html.gz').read_bytes(), notice_manifest, cpi_now)
+    cpi_evidence = add_archived_notice_provenance(
+        verify_official_gap(cpi_csv, cpi_release, cpi_now), notice_manifest)
+    print('CPI_DATED_BLS_EVIDENCE',notice_manifest['publicationDate'],notice_manifest['sourceVerifiedAtUtc'],notice_manifest['sourceSha256'],flush=True)
     b['items']['m05'].pop('official_unavailable', None)
     if cpi_evidence:
         b['items']['m05']['official_unavailable'] = cpi_evidence

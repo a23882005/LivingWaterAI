@@ -7,6 +7,7 @@ import html
 import json
 import re
 import sys
+import time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -33,6 +34,26 @@ def fetch(session,url):
     r.raise_for_status()
     if len(r.content)<100: raise ValueError('short response '+url)
     return r.content
+
+
+def fetch_cpi_official_evidence(session, url):
+    """Retry transient official-source failures only; never substitute cached evidence."""
+    for attempt in range(3):
+        try:
+            response = session.get(url, timeout=(10, 60))
+            response.raise_for_status()
+            raw = response.content
+            if len(raw) < 100:
+                raise ValueError('short response ' + url)
+            return raw
+        except requests.RequestException as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            transient = (isinstance(exc, (requests.Timeout, requests.ConnectionError))
+                         or status == 429 or (status is not None and 500 <= status <= 599))
+            # Certificate/access failures are not transient availability failures.
+            if isinstance(exc, requests.exceptions.SSLError) or not transient or attempt == 2:
+                raise
+            time.sleep(attempt + 1)
 
 
 def revise_candidate(row,site,stamp,value,date,note):
@@ -227,8 +248,8 @@ def main():
     # Retain original observation/check dates for any source unavailable this run.
     # The authorized exception publishes data only, never a made-up CPI YoY.
     from v703_cpi_availability import FRED_CPI, BLS_CPI, verify_official_gap
-    cpi_csv = fetch(session, FRED_CPI)
-    cpi_release = fetch(session, BLS_CPI)
+    cpi_csv = fetch_cpi_official_evidence(session, FRED_CPI)
+    cpi_release = fetch_cpi_official_evidence(session, BLS_CPI)
     cpi_evidence = verify_official_gap(cpi_csv, cpi_release, dt.datetime.now(dt.timezone.utc))
     b['items']['m05'].pop('official_unavailable', None)
     if cpi_evidence:

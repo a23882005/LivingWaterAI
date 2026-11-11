@@ -10,7 +10,8 @@ import re
 FRED_CPI = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL'
 BLS_CPI = 'https://www.bls.gov/news.release/cpi.htm'
 REASON = 'CPI_YOY_BASE_PERIOD_MISSING'
-NOTICE = '官方資料不足：2025-10 同比基期缺失，2026-10 核心 CPI 年增率無法計算；正式總分停算。'
+CALCULATION_POLICY = 'CPI_EXCLUDED_WITHIN_GROUP_MEAN'
+NOTICE = '官方資料不足：2025-10 同比基期缺失，核心 CPI 年增率不參與計分。暫行總分沿群內有效值平均，通膨群僅使用 m13；m13 有效權重由 6.3% 提高至 12.6%。非完整 22 項正式總分，不作正式配置。'
 
 
 def _text(raw):

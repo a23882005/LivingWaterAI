@@ -39,7 +39,7 @@ def verify_live_payload(expected,live,expected_html,live_html):
 
 
 def validate_publication_gate(feed, now=None):
-    """Allow a verified CPI-only data update; formal scoring stays strict."""
+    """Allow a CPI-excluded provisional calculation; formal scoring stays strict."""
     now = now or dt.datetime.now(dt.timezone.utc)
     validate_current_contract(feed, now)
     v = feed.get('verification', {})
@@ -63,6 +63,9 @@ def validate_publication_gate(feed, now=None):
                 or publication.get('schema') != 'V70.3/publication-state-v1'
                 or publication.get('mode') != 'DATA_ONLY' or publication.get('scoringAllowed') is not False
                 or publication.get('reason') != builder.CPI_REASON
+                or publication.get('provisionalScoringAllowed') is not True
+                or publication.get('calculationPolicy') != builder.CPI_CALCULATION_POLICY
+                or publication.get('excludedIndicators') != ['m05']
                 or rows.get('m05', {}).get('value') is not None
                 or rows.get('m05', {}).get('status') != 'OFFICIAL_UNAVAILABLE'
                 or rows.get('m05', {}).get('dataDate') != '2026-10-01'

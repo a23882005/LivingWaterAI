@@ -213,9 +213,9 @@ def main():
         qa = (load_json(qa_files[0]) or {}) if qa_files else {}
         data_only = qa.get('publication', {}).get('mode') == 'DATA_ONLY'
         if data_only:
-            subject_label = '資料更新成功・總分暫停'
-            lines.append('網站資料更新及線上讀回成功；CPI 官方資料不足，正式總分及配置暫停。')
-            lines.append('本次未產生正式總分，也未新增合格每日分數存檔；不得沿用舊分數當現況。')
+            subject_label = '資料更新成功・CPI 排除暫行計算'
+            lines.append('網站資料更新及線上讀回成功；CPI 官方缺同比基期，排除 m05 後沿群內有效值平均顯示暫行總分，非完整 22 項正式分數。')
+            lines.append('通膨群由 m13 計算，其有效權重由 6.3% 變為 12.6%；其餘群、加速器及 CAP 不變。本次未產生正式配置或正式每日分數存檔，不得把暫行結果冒充正式。')
         if "11h Verified V70.3 Site Deploy" in run_name:
             if not data_only:
                 lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")

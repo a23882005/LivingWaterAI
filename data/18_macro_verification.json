@@ -145,12 +145,12 @@
       "value": 55.5,
       "unit": "",
       "observation_date": "2026-10-01",
-      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/news-publications/inside-supply-management-magazine/blog/2026/2026-11/ism-pmi-reports-roundup-october-2026-manufacturing/",
-      "method": "Official ISM dated monthly roundup headline PMI",
+      "source_url": "https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html",
+      "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
-      "detail": "",
+      "detail": "2026-10官方製造業PMI 55.5；前月54.5",
       "error": "",
-      "attempted_at": "2026-11-11T13:31:43.266357+00:00",
+      "attempted_at": "2026-11-11T21:47:03+08:00",
       "attempt_result": "SUCCESS",
       "source_attempts": {
         "ISM_m04": [
@@ -165,12 +165,18 @@
             "result": "OK",
             "verified_at": "2026-11-11T13:31:44.423915+00:00",
             "observation_date": "2026-10-01"
+          },
+          {
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-11-11T21:47:03+08:00",
+            "observation_date": "2026-10-01"
           }
         ]
       },
       "cache_used": false,
       "cache_source": null,
-      "last_verified_at": "2026-11-11T13:31:44.423915+00:00",
+      "last_verified_at": "2026-11-11T21:47:03+08:00",
       "source_evidence": {
         "series": {
           "ISM_m04": [
@@ -291,6 +297,29 @@
             }
           ]
         }
+      },
+      "official_unavailable": {
+        "schema": "V70.3/cpi-official-unavailability-v1",
+        "reason": "CPI_YOY_BASE_PERIOD_MISSING",
+        "observationMonth": "2026-10",
+        "missingBaseMonth": "2025-10",
+        "currentIndex": 339.9,
+        "baseIndex": null,
+        "publicationDate": "2026-11-10",
+        "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
+        "verifiedAtUtc": "2026-11-11T13:47:05.480139+00:00",
+        "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
+        "seriesUrl": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
+        "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
+        "seriesSha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c",
+        "message": "官方資料不足：2025-10 同比基期缺失，核心 CPI 年增率不參與計分。暫行總分沿群內有效值平均，通膨群僅使用 m13；m13 有效權重由 6.3% 提高至 12.6%。非完整 22 項正式總分，不作正式配置。",
+        "noticeEvidence": {
+          "mode": "ARCHIVED_OFFICIAL_RELEASE",
+          "sourceVerifiedAtUtc": "2026-11-11T13:27:22.777417+00:00",
+          "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
+          "publicationDate": "2026-11-10"
+        },
+        "seriesRetrievedAtUtc": "2026-11-11T13:47:05.480139+00:00"
       }
     },
     "m09": {

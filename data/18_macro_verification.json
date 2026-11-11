@@ -168,7 +168,7 @@
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
       "error": "",
-      "attempted_at": "2026-11-11T10:06:11+08:00",
+      "attempted_at": "2026-11-11T11:45:19+08:00",
       "attempt_result": "SUCCESS",
       "source_attempts": {
         "ISM_m04": [
@@ -189,12 +189,18 @@
             "result": "OK",
             "verified_at": "2026-11-11T10:06:11+08:00",
             "observation_date": "2026-10-01"
+          },
+          {
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-11-11T11:45:19+08:00",
+            "observation_date": "2026-10-01"
           }
         ]
       },
       "cache_used": false,
       "cache_source": null,
-      "last_verified_at": "2026-11-11T10:06:11+08:00",
+      "last_verified_at": "2026-11-11T11:45:19+08:00",
       "source_evidence": {
         "series": {
           "ISM_m04": [

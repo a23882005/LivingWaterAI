@@ -36,11 +36,21 @@ def fetch(session,url):
     return r.content
 
 
+# Match the existing official macro collector's successful transport settings.
+CPI_OFFICIAL_HEADERS = {
+    'User-Agent':'LivingWaterAI-MacroCollector/1.3 (+GitHub Actions; official data research)',
+    'Accept':'application/json,text/csv,text/plain,*/*',
+    'Accept-Language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Accept-Encoding':'gzip, deflate',
+    'Connection':'keep-alive',
+}
+
+
 def fetch_cpi_official_evidence(session, url):
     """Retry transient official-source failures only; never substitute cached evidence."""
     for attempt in range(3):
         try:
-            response = session.get(url, timeout=(10, 60))
+            response = session.get(url, timeout=(10, 60), headers=CPI_OFFICIAL_HEADERS)
             response.raise_for_status()
             raw = response.content
             if len(raw) < 100:
@@ -247,10 +257,17 @@ def main():
 
     # Retain original observation/check dates for any source unavailable this run.
     # The authorized exception publishes data only, never a made-up CPI YoY.
-    from v703_cpi_availability import FRED_CPI, BLS_CPI, verify_official_gap
+    from v703_cpi_availability import FRED_CPI, verify_official_gap, load_archived_official_release, add_archived_notice_provenance
     cpi_csv = fetch_cpi_official_evidence(session, FRED_CPI)
-    cpi_release = fetch_cpi_official_evidence(session, BLS_CPI)
-    cpi_evidence = verify_official_gap(cpi_csv, cpi_release, dt.datetime.now(dt.timezone.utc))
+    # The BLS notice is immutable dated evidence already obtained before HTTP 403.
+    # Never retry or bypass that denial; re-fetch only the FRED observations.
+    notice_manifest = json.loads((ROOT/'data/cpi_official_release_20261110.json').read_text())
+    cpi_now = dt.datetime.now(dt.timezone.utc)
+    cpi_release = load_archived_official_release(
+        (ROOT/'data/audit/cpi_official_release_20261110.html.gz').read_bytes(), notice_manifest, cpi_now)
+    cpi_evidence = add_archived_notice_provenance(
+        verify_official_gap(cpi_csv, cpi_release, cpi_now), notice_manifest)
+    print('CPI_DATED_BLS_EVIDENCE',notice_manifest['publicationDate'],notice_manifest['sourceVerifiedAtUtc'],notice_manifest['sourceSha256'],flush=True)
     b['items']['m05'].pop('official_unavailable', None)
     if cpi_evidence:
         b['items']['m05']['official_unavailable'] = cpi_evidence

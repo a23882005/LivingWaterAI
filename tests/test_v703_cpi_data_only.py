@@ -97,6 +97,48 @@ class OfficialCpiGapTests(unittest.TestCase):
             with self.subTest(index=index),self.assertRaises(ValueError):validate_publication_gate(bad,NOW)
 
 
+class ArchivedOfficialNoticeTests(unittest.TestCase):
+    def setUp(self):
+        self.root=Path(__file__).resolve().parents[1]
+        self.manifest=json.loads((self.root/'data/cpi_official_release_20261110.json').read_text())
+        self.compressed=(self.root/'data/audit/cpi_official_release_20261110.html.gz').read_bytes()
+        self.now=dt.datetime(2026,11,13,3,tzinfo=dt.timezone.utc)
+
+    def test_dated_notice_plus_fresh_series_is_transparent_and_valid(self):
+        raw=cpi.load_archived_official_release(self.compressed,self.manifest,self.now)
+        ev=cpi.add_archived_notice_provenance(cpi.verify_official_gap(CSV,raw,self.now),self.manifest)
+        self.assertTrue(cpi.valid_official_gap(ev,self.now))
+        self.assertEqual(ev['seriesRetrievedAtUtc'],self.now.isoformat())
+        self.assertEqual(ev['noticeEvidence']['sourceVerifiedAtUtc'],self.manifest['sourceVerifiedAtUtc'])
+        self.assertNotEqual(ev['verifiedAtUtc'],ev['noticeEvidence']['sourceVerifiedAtUtc'])
+        self.assertEqual(ev['sourceSha256'],cpi.PINNED_BLS_SHA256)
+        self.assertFalse(cpi.valid_official_gap(ev,self.now+dt.timedelta(hours=26)))
+
+    def test_modified_archive_manifest_and_future_source_time_are_rejected(self):
+        import gzip
+        with self.assertRaises(ValueError):cpi.load_archived_official_release(gzip.compress(b'changed'),self.manifest,self.now)
+        for key,value in [('sourceSha256','0'*64),('sourceUrl','https://example.com'),
+                          ('observationMonth','2026-11'),('nextReleaseAtUtc','2027-01-01T00:00:00+00:00'),
+                          ('sourceVerifiedAtUtc','2026-12-01T00:00:00+00:00')]:
+            bad=copy.deepcopy(self.manifest);bad[key]=value
+            with self.subTest(key=key),self.assertRaises(ValueError):cpi.load_archived_official_release(self.compressed,bad,self.now)
+
+    def test_archive_never_overrides_new_series_or_expiry(self):
+        raw=cpi.load_archived_official_release(self.compressed,self.manifest,self.now)
+        for csv in (CSV.replace(b'2025-10-01,\n',b'2025-10-01,331\n'),CSV+b'2026-11-01,340\n'):
+            self.assertIsNone(cpi.verify_official_gap(csv,raw,self.now))
+        with self.assertRaises(ValueError):cpi.verify_official_gap(CSV,raw,dt.datetime(2026,12,10,13,30,tzinfo=dt.timezone.utc))
+
+    def test_notice_provenance_cannot_claim_a_new_download(self):
+        raw=cpi.load_archived_official_release(self.compressed,self.manifest,self.now)
+        ev=cpi.add_archived_notice_provenance(cpi.verify_official_gap(CSV,raw,self.now),self.manifest)
+        ev['noticeEvidence']['sourceSha256']='0'*64
+        self.assertFalse(cpi.valid_official_gap(ev,self.now))
+        ev=cpi.add_archived_notice_provenance(cpi.verify_official_gap(CSV,raw,self.now),self.manifest)
+        ev['seriesRetrievedAtUtc']=self.manifest['sourceVerifiedAtUtc']
+        self.assertFalse(cpi.valid_official_gap(ev,self.now))
+
+
 def response(status=200, body=b'x' * 150):
     result = requests.Response()
     result.status_code = status
@@ -117,7 +159,7 @@ class CPIFetchRetriesTests(unittest.TestCase):
             raw = (url * 3).encode()
             self.session.get.return_value = response(body=raw)
             self.assertEqual(refresh.fetch_cpi_official_evidence(self.session, url), raw)
-            self.session.get.assert_called_once_with(url, timeout=(10, 60))
+            self.session.get.assert_called_once_with(url, timeout=(10, 60), headers=refresh.CPI_OFFICIAL_HEADERS)
         self.sleep.assert_not_called()
 
     def test_retry_timeout_connection_429_and_server_errors(self):
@@ -128,7 +170,7 @@ class CPIFetchRetriesTests(unittest.TestCase):
                 self.sleep.reset_mock()
                 self.session.get.side_effect = [failure, response()]
                 self.assertEqual(refresh.fetch_cpi_official_evidence(self.session, cpi.FRED_CPI), b'x'*150)
-                self.assertEqual(self.session.get.call_args_list, [call(cpi.FRED_CPI, timeout=(10, 60))]*2)
+                self.assertEqual(self.session.get.call_args_list, [call(cpi.FRED_CPI, timeout=(10, 60), headers=refresh.CPI_OFFICIAL_HEADERS)]*2)
                 self.sleep.assert_called_once_with(1)
 
     def test_exhaustion_is_bounded_and_propagates_without_cache(self):

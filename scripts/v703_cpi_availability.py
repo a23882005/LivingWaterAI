@@ -2,6 +2,7 @@
 import csv
 import datetime as dt
 import hashlib
+import gzip
 import html
 import io
 import math
@@ -9,6 +10,7 @@ import re
 
 FRED_CPI = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL'
 BLS_CPI = 'https://www.bls.gov/news.release/cpi.htm'
+PINNED_BLS_SHA256 = '8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268'
 REASON = 'CPI_YOY_BASE_PERIOD_MISSING'
 CALCULATION_POLICY = 'CPI_EXCLUDED_WITHIN_GROUP_MEAN'
 NOTICE = '官方資料不足：2025-10 同比基期缺失，核心 CPI 年增率不參與計分。暫行總分沿群內有效值平均，通膨群僅使用 m13；m13 有效權重由 6.3% 提高至 12.6%。非完整 22 項正式總分，不作正式配置。'
@@ -18,6 +20,39 @@ def _text(raw):
     value = raw.decode('utf-8', 'replace')
     value = re.sub(r'<(?:script|style)\b[^>]*>.*?</(?:script|style)>', ' ', value, flags=re.I|re.S)
     return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', value)))
+
+
+def load_archived_official_release(compressed, manifest, now):
+    """Authenticate dated source evidence already acquired before access was refused."""
+    if now.tzinfo is None or not isinstance(manifest, dict):
+        raise ValueError('archived CPI source manifest/clock invalid')
+    verified = dt.datetime.fromisoformat(manifest['sourceVerifiedAtUtc'].replace('Z','+00:00'))
+    published = dt.datetime(2026,11,10,13,30,tzinfo=dt.timezone.utc)
+    if (manifest.get('schema') != 'V70.3/archived-official-cpi-release-v1'
+            or manifest.get('sourceUrl') != BLS_CPI
+            or manifest.get('sourceSha256') != PINNED_BLS_SHA256
+            or manifest.get('publicationDate') != '2026-11-10'
+            or manifest.get('observationMonth') != '2026-10'
+            or manifest.get('nextReleaseAtUtc') != '2026-12-10T13:30:00+00:00'
+            or manifest.get('archivePath') != 'data/audit/cpi_official_release_20261110.html.gz'
+            or verified.tzinfo is None or not published <= verified <= now + dt.timedelta(minutes=5)):
+        raise ValueError('archived CPI source provenance invalid')
+    raw = gzip.decompress(compressed)
+    if hashlib.sha256(raw).hexdigest() != PINNED_BLS_SHA256:
+        raise ValueError('archived CPI source hash mismatch')
+    return raw
+
+
+def add_archived_notice_provenance(evidence, manifest):
+    if evidence is None:
+        return None
+    if evidence['sourceSha256'] != manifest['sourceSha256']:
+        raise ValueError('CPI notice provenance does not match verified evidence')
+    evidence['noticeEvidence'] = {'mode':'ARCHIVED_OFFICIAL_RELEASE',
+        'sourceVerifiedAtUtc':manifest['sourceVerifiedAtUtc'],
+        'sourceSha256':manifest['sourceSha256'], 'publicationDate':manifest['publicationDate']}
+    evidence['seriesRetrievedAtUtc'] = evidence['verifiedAtUtc']
+    return evidence
 
 
 def verify_official_gap(csv_raw, bls_raw, now):
@@ -71,6 +106,16 @@ def valid_official_gap(evidence, now):
         verified = dt.datetime.fromisoformat(evidence['verifiedAtUtc'].replace('Z','+00:00'))
         expires = dt.datetime.fromisoformat(evidence['nextReleaseAtUtc'].replace('Z','+00:00'))
         index = evidence['currentIndex']
+        notice = evidence.get('noticeEvidence')
+        if notice is not None:
+            notice_verified = dt.datetime.fromisoformat(notice['sourceVerifiedAtUtc'].replace('Z','+00:00'))
+            if (notice.get('mode') != 'ARCHIVED_OFFICIAL_RELEASE'
+                    or notice.get('sourceSha256') != PINNED_BLS_SHA256
+                    or evidence.get('sourceSha256') != PINNED_BLS_SHA256
+                    or notice.get('publicationDate') != '2026-11-10'
+                    or not dt.datetime(2026,11,10,13,30,tzinfo=dt.timezone.utc) <= notice_verified <= verified
+                    or evidence.get('seriesRetrievedAtUtc') != evidence.get('verifiedAtUtc')):
+                return False
         return (evidence.get('schema') == 'V70.3/cpi-official-unavailability-v1'
                 and evidence.get('reason') == REASON
                 and evidence.get('observationMonth') == '2026-10'

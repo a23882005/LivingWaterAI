@@ -1,0 +1,11 @@
+{
+  "schema": "V70.3/archived-official-cpi-release-v1",
+  "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
+  "publicationDate": "2026-11-10",
+  "observationMonth": "2026-10",
+  "sourceVerifiedAtUtc": "2026-11-11T13:27:22.777417+00:00",
+  "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
+  "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
+  "archivePath": "data/audit/cpi_official_release_20261110.html.gz",
+  "note": "Previously retrieved official BLS release. This is dated source evidence, not a new download. Fresh FRED observations and all other gates are required on every publication."
+}

@@ -620,6 +620,21 @@
                     document.getElementById('v703-source-'+cfg.id)?.value===row.source;
             });
         }
+        window.v703CanCalculateProvisional = function() {
+            const doc=window.v703FeedDocument,p=doc?.publication;
+            if(window.v703ProvisionalFeedValidated!==true||window.v703DataLoaded!==true||
+               window.v703DemoMode===true||!v703SnapshotCurrent(doc?.asOf)||
+               p?.provisionalScoringAllowed!==true||p?.calculationPolicy!=='CPI_EXCLUDED_WITHIN_GROUP_MEAN'||
+               JSON.stringify(p?.excludedIndicators)!=='["m05"]'||p?.mode!=='DATA_ONLY'||p?.scoringAllowed!==false)return false;
+            window.v703ValidateDates();
+            return (window.v703DateIssues||[]).every(x=>x.startsWith('m05:')) &&
+              macroConfig.filter(cfg=>cfg.id!=='m05').every(cfg=>{
+                const row=window.v703VerifiedInputSnapshot?.[cfg.id],input=document.getElementById('in_'+cfg.id);
+                return row&&input&&input.value.trim()!==''&&Number(input.value)===Number(row.value)&&
+                  document.getElementById('v703-date-'+cfg.id)?.value===row.dataDate&&
+                  document.getElementById('v703-source-'+cfg.id)?.value===row.source;
+              });
+        };
         function v703DateNowUTC() {
             const d = new Date(Date.now()+8*3600000);
             return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
@@ -1338,6 +1353,7 @@ function v703CalcM06Gap(){
 
 
                 function calcTotal() {
+            window.v703ProvisionalSnapshot=null;
             // A data-only publication cannot regain a total through cached/manual values.
             if(window.v703DataOnly===true){
                 for(const id of ['in_m05','cap_in_m05']){const el=document.getElementById(id);if(el)el.value='';}
@@ -1351,7 +1367,12 @@ function v703CalcM06Gap(){
 
 
             // --- 讀取「風險分數」(0~10) ---
+            const provisional=window.v703CanCalculateProvisional?.()===true;
             const getRisk = (id) => {
+                if(provisional){
+                    if(id==='m05')return NaN;
+                    return v703RiskForConfig(macroConfig.find(c=>c.id===id),Number(document.getElementById('in_'+id)?.value));
+                }
                 const el = document.getElementById(`sc_${id}`);
                 const v = parseFloat(el ? el.innerText : NaN);
                 return isFinite(v) ? v : NaN;
@@ -1393,7 +1414,7 @@ function v703CalcM06Gap(){
                 groupRisk[g] = gr;
                 if (gr !== null) { weightedSum += gr * weights[g]; weightSum += weights[g]; }
             }
-            const allGroupInputsPresent=Object.values(groups).every(ids=>ids.every(id=>Number.isFinite(getRisk(id))));
+            const allGroupInputsPresent=Object.values(groups).every(ids=>ids.every(id=>(provisional&&id==='m05')||Number.isFinite(getRisk(id))));
             // Never renormalize around a missing weighted group or missing group member:
             // that silently changes the model weights and makes an incomplete score look complete.
             const avgRiskBase = weightSum===100 && allGroupInputsPresent ? (weightedSum/100) : NaN;
@@ -1516,7 +1537,19 @@ if (recBlack) {
 
 
             const capMin = Math.min(cap_panic, cap_crisis, cap_recession);
-            const mSafe_final = Math.min(mSafe_raw, capMin);
+            const computedFinal = Math.min(mSafe_raw, capMin);
+            const mSafe_final = provisional ? NaN : computedFinal;
+            if(provisional&&Number.isFinite(computedFinal))window.v703ProvisionalSnapshot={
+                status:'PROVISIONAL_CPI_EXCLUDED',asOf:window.v703FeedDocument.asOf,
+                calculationPolicy:'CPI_EXCLUDED_WITHIN_GROUP_MEAN',excludedIndicators:['m05'],
+                requiredIndicatorsAvailable:21,requiredIndicatorsTotal:22,
+                effectiveWeights:{m05:0,m13:12.6},originalWeights:{m05:6.3,m13:6.3},
+                denominator:100,groupWeights:{...weights},groupRisk:{...groupRisk},
+                avgRiskBase,accelAdd,avgRiskAdj,mSafe_raw,mSafe_final:computedFinal,
+                cap_panic,cap_crisis,cap_recession,
+                formula:'Σ(群內有效風險平均×原群權重)/100；通膨群=m13；加速器與CAP不變',
+                formalAllocationAllowed:false,formalArchiveAllowed:false
+            };
 
 
             // --- 封頂說明 ---
@@ -1678,7 +1711,7 @@ if (recBlack) {
                 captureLivingWaterV70State({
                     calculatedAt: new Date().toISOString(),
                     avgRiskBase, accelAdd, avgRiskAdj,
-                    mSafe_raw, mSafe_final,
+                    mSafe_raw:provisional?NaN:mSafe_raw, mSafe_final,
                     cap_panic, cap_crisis, cap_recession, capNote,
                     panicWhy, crisis, recWhy,
                     isEmerg, groupRisk, bScore,
@@ -1686,6 +1719,13 @@ if (recBlack) {
                     allocation: (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) ? alloc.meta : null,
                     allocationItems: alloc.items
                 });
+            }
+            if(window.v703ProvisionalSnapshot){
+                const score=window.v703ProvisionalSnapshot.mSafe_final;
+                if(msEl)msEl.innerText='暫行 '+score.toFixed(1);
+                if(mbEl)mbEl.style.width=score+'%';
+                if(zEl)zEl.innerText='暫行總分｜排除m05 CPI；m13權重6.3%→12.6%；非完整22項正式分數';
+                if(coverageUI)coverageUI.textContent='暫行計分資料21/22項｜m05官方資料不足並排除｜通膨群僅m13，權重6.3%→12.6%｜不得正式配置或正式歸檔';
             }
         }
 
@@ -2597,12 +2637,22 @@ if (recBlack) {
    const snap=window.v703MacroSnapshot;
    const valid=window.v703CanPublishFormalAllocation() && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
    if(!valid){
+     const provisional=window.v703CanCalculateProvisional?.()===true?window.v703ProvisionalSnapshot:null;
+     if(!provisional){
+       window.v703ProvisionalSnapshot=null;
+       if(window.v703DataOnly){
+         const score=document.getElementById('macro-safety-val'),bar=document.getElementById('macro-bar');
+         if(score)score.innerText='NA';if(bar)bar.style.width='0%';
+         const zone=document.getElementById('macro-zone-text');if(zone)zone.innerText='資料未完整驗證；暫行總分目前不可用';
+         if(window.v703DataLoaded){const status=document.getElementById('family-data-status');if(status)status.textContent='CPI 官方資料不足；暫行計算契約、其餘資料或時效未通過，暫行總分目前不可用；正式配置暫停。';}
+       }
+     }
      const rawScore=window.v703DataOnly!==true&&finite(snap?.mSafe_final)?snap.mSafe_final:null;
      const coverage=window.v703Coverage||{};
      const issue=(window.v703DateIssues||[]).join('；');
      const safeIssue=issue.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
      box.innerHTML='<div class="text-amber-200 font-bold">⚠ 正式八類配置：暫停</div>'+
-       (rawScore!==null?'<div>已載入總經數值 '+(coverage.available??'—')+'/'+(coverage.total??21)+' 項｜研究用安全分數：<b>'+rawScore.toFixed(1)+'/100</b></div>':'<div>總經數值尚未完整載入；目前沒有可計算的安全分數。</div>')+
+       (provisional?'<div><strong>暫行總分：'+provisional.mSafe_final.toFixed(1)+'/100</strong>｜CPI 官方資料不足，排除m05；通膨群只用m13，有效權重6.3%→12.6%。21/22項，非完整正式分數；不得作正式配置或每日正式歸檔。</div>':rawScore!==null?'<div>已載入總經數值 '+(coverage.available??'—')+'/'+(coverage.total??21)+' 項｜研究用安全分數：<b>'+rawScore.toFixed(1)+'/100</b></div>':'<div>總經數值尚未完整載入；目前沒有可計算的安全分數。</div>')+
        '<div>完整快照來源／品質、日期驗證未全部通過，因此暫不顯示正式配置比例。'+(issue?'<br>檢查訊息：'+safeIssue:'')+'</div>';
      window.v703Latest=null;return;
    }
@@ -3586,7 +3636,7 @@ if (recBlack) {
   if(summary)summary.textContent='傳輸欄位 '+entries.length+'（非獨立計分指標數）｜上次建置：正常 '+counts['正常']+'｜過期 '+counts['過期']+'｜缺資料 '+counts['缺資料']+
     (historical?'｜目前：歷史快照；整批快照超過26小時或時間無效，禁止正式配置。':
      '｜目前逐項檢查：正常 '+currentCounts['正常']+'｜過期 '+currentCounts['過期']+'｜缺資料 '+currentCounts['缺資料']+'；正式可用性以完整載入驗證為準。');
-  if(feed.publication?.mode==='DATA_ONLY'&&summary)summary.textContent+='｜CPI 官方資料不足；僅更新資料，總分與正式配置暫停。';
+  if(feed.publication?.mode==='DATA_ONLY'&&summary)summary.textContent+='｜CPI 官方資料不足；m05維持NA。若符合暫行計算契約，通膨群只用m13（6.3%→12.6%）；正式配置暫停。';
   body.replaceChildren();
   for(const [id,r] of entries){
    const tr=document.createElement('tr');tr.className='align-top';
@@ -3841,6 +3891,8 @@ if (recBlack) {
    let selectedDoc=null;
    window.v703FeedLoadIssue='';
    window.v703DataLoaded=false;
+   window.v703ProvisionalFeedValidated=false;
+   window.v703ProvisionalSnapshot=null;
    window.v703FeedVerified=false;
    window.v703Latest=null;
    try{
@@ -3949,6 +4001,7 @@ if (recBlack) {
      window.v703VerifiedInputSnapshot=JSON.parse(JSON.stringify(data));
      window.v703SourceBatch.verified=!dataOnly;
      window.v703DataLoaded=true;
+     window.v703ProvisionalFeedValidated=dataOnly;
      if(!dataOnly)lastDataOnlyDocument=null;
      window.v703FeedVerified=!dataOnly;
      window.v703CreditGateBlocked=dataOnly;
@@ -3956,15 +4009,17 @@ if (recBlack) {
             if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
-     showBanner(doc,dataOnly?'僅更新資料：CPI 官方資料不足，總分暫停':snapshotOld?'歷史已驗證快照（非今日更新）':'已驗證');
+     showBanner(doc,dataOnly?window.v703ProvisionalSnapshot?'CPI 官方資料不足：暫行總分（排除m05）':'僅更新資料：CPI 官方資料不足，總分暫停':snapshotOld?'歷史已驗證快照（非今日更新）':'已驗證');
      void showLastSuccessfulDeployment(doc);
      const valid=window.v703Latest;
-     status.textContent=dataOnly?'已讀取最新資料（'+doc.asOf+'）；CPI 官方資料不足，總分及正式配置暫停，不以舊值或中性分數補齊。':valid?'✅ 已讀取總經快照（'+String(doc.asOf||'時間依各指標')+'），並完成資料日期驗證。':'⚠ 快照已讀取，但資料已過期或未通過完整驗證；正式配置顯示 NA。';
+     status.textContent=dataOnly?'已讀取最新資料（'+doc.asOf+'）；CPI 官方資料不足；'+(window.v703ProvisionalSnapshot?'暫行總分 '+window.v703ProvisionalSnapshot.mSafe_final.toFixed(1)+'，排除m05；m13有效權重6.3%→12.6%；正式配置及正式歸檔暫停。':'總分及正式配置暫停，不以舊值或中性分數補齊。'):valid?'✅ 已讀取總經快照（'+String(doc.asOf||'時間依各指標')+'），並完成資料日期驗證。':'⚠ 快照已讀取，但資料已過期或未通過完整驗證；正式配置顯示 NA。';
      const items=Array.isArray(doc.news)?doc.news.slice(0,5):[];
      newsBox.textContent=items.length?'最近重要新聞：'+items.map(x=>typeof x==='string'?x:(x.title||x.summary||'')).join('；'):'';
    }catch(err){
      sourceMode='hold';
      window.v703DataLoaded=false;
+     window.v703ProvisionalFeedValidated=false;
+     window.v703ProvisionalSnapshot=null;
      window.v703FeedVerified=false;
      window.v703CreditGateBlocked=true;
      window.v703FeedLoadIssue='快照載入未通過：'+String(err.message||err);

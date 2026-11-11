@@ -21,7 +21,9 @@ def data_only():
     return {'schema': 'V70.3/family-macro-feed-v3', 'asOf': '2026-11-11T00:00:00Z',
             'verification': {'ready': False, 'publicationReady': True},
             'publication': {'schema': 'V70.3/publication-state-v1', 'mode': 'DATA_ONLY',
-                            'reason': 'CPI_YOY_BASE_PERIOD_MISSING', 'scoringAllowed': False},
+                            'reason': 'CPI_YOY_BASE_PERIOD_MISSING', 'scoringAllowed': False,
+                            'provisionalScoringAllowed':True,'calculationPolicy':'CPI_EXCLUDED_WITHIN_GROUP_MEAN',
+                            'excludedIndicators':['m05']},
             'indicators': {'m05': {'value': None, 'status': 'OFFICIAL_UNAVAILABLE'}}}
 
 

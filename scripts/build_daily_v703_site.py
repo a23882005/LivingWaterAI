@@ -17,9 +17,9 @@ try:
 except ModuleNotFoundError:
     from scripts.v703_rolling_history import embed_history, history_payload, observation_summary
 try:
-    from v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE
+    from v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
 except ModuleNotFoundError:
-    from scripts.v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE
+    from scripts.v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
 
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
@@ -618,6 +618,9 @@ def build(macro_path, supplement_path, html_path, dest):
         "publication": {"schema":"V70.3/publication-state-v1",
             "mode":"FORMAL" if scoring_ready else ("DATA_ONLY" if data_only else "BLOCKED"),
             "scoringAllowed":scoring_ready,
+            "provisionalScoringAllowed":data_only,
+            "calculationPolicy":CPI_CALCULATION_POLICY if data_only else None,
+            "excludedIndicators":["m05"] if data_only else [],
             "reason":CPI_REASON if data_only else (None if scoring_ready else "QUALITY_GATE_FAILED"),
             "notice":CPI_NOTICE if data_only else ("資料完整，可正式計分。" if scoring_ready else "資料未通過品質檢查。")},
         "indicators": indicators, "news": [], "leiHistory": lei_history,

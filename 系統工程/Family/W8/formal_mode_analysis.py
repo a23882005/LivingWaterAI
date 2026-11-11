@@ -136,6 +136,60 @@ def event_coverage(request):
         'reason':'NEWS_ROWS_ARE_NOT_A_VERIFIED_NEGATIVE_EVENT_SEARCH_OR_COMPLETE_ACTIVE_EVENT_REGISTRY'}
 
 
+def left_entry_sources(row,request):
+    """Bind source-owner Work41 assertions; never invent missing price rules."""
+    from v82_core_source import left_inputs,LEFT_PRICE,LEFT_EVENT
+    inputs=left_inputs(row['core_observation'].get('qualified_core_source'),request,row['symbol'])
+    conditions={};audit={}
+    definitions={
+        'price_map_zone':'original asset-local map, bounds and first-Left eligibility',
+        'near_confirmed_low':'approved asset-local proximity rule and confirmed pivot validity',
+        'near_important_ma_or_support':'approved asset-local proximity rule and eligible support',
+        'meaningful_drawdown':'approved asset-local reference high, basis, window and meaningful depth rule'}
+    for name in LEFT_PRICE:
+        record=inputs.get(name);conditions[name]=tri(record['value']) if record else None
+        if record:
+            original=record['original_assertion'];market=row['market']
+            from v82_core_source import time
+            identity=market.get('market_identity') or {}
+            # One exact completed observation, not an alias, another listing,
+            # another adjustment basis or a previous-session double shift.
+            if (not market.get('source_sha256') or original.get('market_source_sha256')!=market['source_sha256']
+                or not all(identity.get(k) for k in ('exchange','currency','provider_symbol'))
+                or original.get('market_identity')!=identity
+                or not market.get('completed_session_close_at')
+                or time(original['session_close_at'])!=time(market['completed_session_close_at'])
+                or original.get('price_basis')!=(market.get('history_quality') or {}).get('price_basis')):
+                raise PermissionError('V82_LEFT_MARKET_IDENTITY_BASIS_OR_COMPLETED_SESSION_MISMATCH:'+name)
+        audit[name]={'truth':truth(conditions[name]),
+            'status':'BOUND_ORIGINAL_SOURCE' if record and conditions[name] is not None else
+                'SOURCE_GAP' if record or name=='price_map_zone' else 'SPEC_GAP',
+            'required_definition':definitions[name],
+            'source_gap':record is None or conditions[name] is None,
+            'source_leaf':deepcopy(record),'rule_reference':'V82 Work41-A',
+            'no_default_threshold_or_stage_mapping':True}
+    coverage=event_coverage(request);record=inputs.get(LEFT_EVENT);event_clear=None
+    if record:
+        from livingwater_v82_runtime.approved_profiles import event_recheck
+        original=record['original_assertion']
+        recheck=event_recheck(original['event_dependencies'],
+            dependency_scope_verified=original['event_dependency_scope_verified'])
+        event_clear=both(tri(record['value']),tri(recheck.value))
+        coverage.update(status='BOUND_ORIGINAL_EVENT_SOURCE',
+            confirmed_no_uncontrollable_event_gap=truth(event_clear),
+            original_event_source=deepcopy(record),event_recheck_truth=recheck.value,
+            reason='ORIGINAL_ASSERTION_AND_WORK34_DEPENDENT_EVENT_RECHECK__NOT_NEWS_ABSENCE')
+        # An explicit uncontrolled-gap veto cannot coexist with a clear Core
+        # Hard Gate. Return a source conflict rather than a usable permission.
+        if tri(record['value']) is False and row['core_observation']['result']['permission']['hard_gate']=='NOT_TRIGGERED':
+            raise PermissionError('V82_LEFT_EVENT_VETO_CORE_GATE_CONFLICT')
+    audit[LEFT_EVENT]={'truth':truth(event_clear),
+        'status':'BOUND_ORIGINAL_SOURCE' if record else 'SOURCE_GAP',
+        'required_source':'explicit gap-risk assertion, complete domain/active registry checkpoint and dependent Work34 rechecks',
+        'source_leaf':deepcopy(record),'absence_inferred_from_news':False}
+    return conditions,event_clear,coverage,audit
+
+
 def build_formal_conclusion(root,row,request,*,target_projection=None,approved_source_descriptor=None):
     dep,P,M=native(root);core=row['core_observation']['result'];market=row['market'];approved=market.get('approved_technical',{})
     technical=core['technical'];up=tri(technical['runaway_up']);right_technical=tri(technical['right_confirmation']);down=tri(technical['runaway_down'])
@@ -154,15 +208,21 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     if credit==2:credit_base=None # Explicit core/high-beta applicability evidence is required.
     hard_gate=core['permission']['hard_gate']
     gate_clear=True if hard_gate=='NOT_TRIGGERED' else False if hard_gate=='TRIGGERED' else None
-    coverage=event_coverage(request)
-    uncontrollable_event_gap_clear=None
+    price_sources,uncontrollable_event_gap_clear,coverage,left_audit=left_entry_sources(row,request)
     left_safety=both(gate_clear,neg(down),credit_base,uncontrollable_event_gap_clear)
     target=target_for_symbol(request,row['symbol'],projection=target_projection)
-    price_conditions={'valuation_reasonable_or_cheap':value_zone,'price_map_zone':None,
-        'near_confirmed_low':None,'near_important_ma_or_support':None,'meaningful_drawdown':None}
+    price_conditions={'valuation_reasonable_or_cheap':value_zone,**price_sources}
     from v82_approved_context import build as build_approved_context
     approved_context,decision=build_approved_context(root,row,request,fundamental=fundamental,
         price_conditions=price_conditions,left_safety=left_safety,source_descriptor=approved_source_descriptor)
+    # A supplemental aggregate is a further veto, never a replacement for
+    # Work41's separately sourced safety leaves. Reuse the original evaluator
+    # if the existing context builder supplied a less restrictive aggregate.
+    effective_safety=truth(both(left_safety,tri(approved_context['left_safety'])))
+    if approved_context['left_safety']!=effective_safety:
+        from livingwater_v82_runtime.approved_decision import evaluate
+        approved_context['left_safety']=effective_safety
+        decision=evaluate(approved_context,core)
     right=tri(decision['market_predicates']['right'])
     fundamental=tri(approved_context['fundamentals_viable'])
     modes={k:deepcopy(decision[k]) for k in ('market_predicates','left_inputs','selected_mode','formal_stage','canonical_target_rate','call_trace')}
@@ -220,7 +280,7 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'scope':'ORIGINAL_CORE_SAFETY_PERMISSION__FULL_EXECUTION_NOT_RUN',
         'right_or_runaway_false_is_not_buy_veto':True,'gap_used_in_permission':False,
         'broker_trade_authorization':request['trade_authorization']}
-    groups=gap_matrix(row,target,coverage,orders)
+    groups=gap_matrix(row,target,coverage,orders,left_audit=left_audit)
     result={'schema_version':'Family.W8.FormalModeConclusion.v1','status':'INCOMPLETE_REQUIRED_FACTS',
         'binding':{'client_id':request['client_id'],'run_id':request['run_id'],
             'owner':deepcopy(request['owner']),'source_db_sha256':request['client_snapshot']['payload']['source_sha256'],
@@ -233,6 +293,7 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'left_safety_inputs':{'hard_gate_clear':truth(gate_clear),'not_runaway_down':truth(neg(down)),
             'credit_allows_normal_addition':truth(credit_base),
             'uncontrollable_event_gap_negations_absent':truth(uncontrollable_event_gap_clear)},
+        'left_entry_source_audit':left_audit,
         **modes,'approved_project_target':target,'nine_stage_reference':reference,'order_source':orders,
         'deployment_gap':gap,'buy_permission':permission,'event_coverage':coverage,
         'gap_groups':groups,'trade_action':'NO_TRADE','deployment_status':'NOT_RUN'}
@@ -246,7 +307,7 @@ def etf_viability_audit(row,request):
         row['native_product_identity'].get('product_evidence'))
 
 
-def gap_matrix(row,target,coverage,orders):
+def gap_matrix(row,target,coverage,orders,*,left_audit=None):
     def item(field,kind,source,impact,repair):
         return {'field':field,'gap_kind':kind,'existing_source':source,'affects':impact,'repair':repair}
     return {
@@ -259,13 +320,14 @@ def gap_matrix(row,target,coverage,orders):
         'fundamentals_and_events':[
             item('ETF viable structural facts','SOURCE_FACTS_MISSING','Issuer structure and dated fundamentals; no complete current structural assertions',
                 ['Base entry','Left','Right','Stage','buy permission'], 'Bind active fund/mandate/NAV/redemption/termination and authorized exposure facts'),
-            item('event coverage/checkpoint','PRODUCER_AND_SOURCE_COVERAGE_MISSING',coverage,
+            item('event coverage/checkpoint',coverage['status'],coverage,
                 ['safety','event-dependent T+1','buy permission'], 'Run required-domain event producer and bind cutoff/checkpoint; confirmed absence only after successful coverage')],
         'market_identity_calendar_fx':[
             item('left.price_map_zone/near_confirmed_low/near_important_ma_or_support/meaningful_drawdown',
-                'QUALIFIED_PRICE_MAP_PRODUCER_NOT_CONNECTED',
-                {'history_path':row['market']['source_path'],'rule':'V82 Work41-A; v1.0 PV2/PV3'},
-                ['Left price OR branches'], 'Compute each authorized branch from qualified price/wealth/calendar inputs; do not invent a near-MA tolerance or relabel MA20_OK as Left entry'),
+                'SOURCE_BINDING_CONNECTED__SEE_PER_LEAF_SPEC_AND_SOURCE_GAPS',
+                {'history_path':row['market']['source_path'],'rule':'V82 Work41-A; v1.0 PV2/PV3',
+                    'leaf_audit':deepcopy(left_audit)},
+                ['Left price OR branches'], 'Reuse original approved source-owner predicates; unresolved definitions/sources stay UNKNOWN. MA20_OK and maturity are not Left entry votes'),
             item('price basis/session availability','SOURCE_ATTESTATION_MISSING','Exact symbol historical cache and issuer identity',
                 ['canonical valuation price','weekly/monthly context','gap'], 'Bind provider field basis and actual market-session/availability receipts'),
             item('same-run reporting FX','SOURCE_FACT_MISSING','Target source currency differs from IB USD',

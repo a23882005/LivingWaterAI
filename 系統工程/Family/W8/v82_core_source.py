@@ -12,6 +12,9 @@ import json
 
 SCHEMA='Family.W8.V82CoreSource.v1'
 SAFETY=('safety.macro','safety.credit_liquidity','safety.material_events','safety.etf_structure')
+LEFT_PRICE=('price_map_zone','near_confirmed_low','near_important_ma_or_support','meaningful_drawdown')
+LEFT_EVENT='uncontrollable_event_gap_clear'
+LEFT_LEAVES=tuple('left.'+name for name in (*LEFT_PRICE,LEFT_EVENT))
 
 
 def time(value):
@@ -39,10 +42,10 @@ def read(descriptor,request,symbol):
         raise PermissionError('V82_CORE_SOURCE_NOT_AVAILABLE')
     leaves={}
     for name,record in data.get('leaves',{}).items():
-        if name not in (*SAFETY,'hard_gate_predicates','structural_confirmation','theses','valuation_metrics','fundamental_fields'):
+        if name not in (*SAFETY,*LEFT_LEAVES,'hard_gate_predicates','structural_confirmation','theses','valuation_metrics','fundamental_fields'):
             raise ValueError('V82_CORE_SOURCE_UNKNOWN_LEAF:'+name)
         proof=record.get('proof',{})
-        _bytes(proof)
+        original=_bytes(proof)
         # A producer's source contract must explicitly bound freshness. No
         # blanket "N/A" converts a current capture into formal safety evidence.
         if (not proof.get('source_reference') or not proof.get('methodology_reference')
@@ -51,6 +54,47 @@ def read(descriptor,request,symbol):
             or not proof.get('pit_receipt_reference')):
             raise PermissionError('V82_CORE_LEAF_VALIDITY_OR_PIT_REQUIRED:'+name)
         value=deepcopy(record.get('value'))
+        if name in LEFT_LEAVES:
+            # Replay the source owner's assertion, not a pasted price vote or
+            # an invented near-support/drawdown formula. Asset-local methods
+            # must already have an explicit approved definition and reference.
+            assertion=json.loads(original)
+            bound={**expected,'run_id':request['run_id'],'evaluation_at':request['evaluation_at']}
+            definition=assertion.get('rule_definition') or {}
+            if (value not in ('TRUE','FALSE','UNKNOWN')
+                or assertion.get('schema_version')!='Family.W8.VerifiedLeftAssertion.v1'
+                or any(assertion.get(k)!=v for k,v in bound.items())
+                or assertion.get('field_path')!=name or assertion.get('value')!=value
+                or assertion.get('validation_status')!='VERIFIED'
+                or definition.get('approval_state')!='APPROVED_EXISTING_RULE'
+                or not definition.get('authority_reference')
+                or definition.get('methodology_reference')!=proof['methodology_reference']
+                or definition.get('rule_reference')!=('V82 Work41-D / Work34' if name=='left.'+LEFT_EVENT else 'V82 Work41-A')
+                or any(assertion.get(k)!=proof[k] for k in ('as_of','available_at','valid_until'))):
+                raise PermissionError('V82_LEFT_ORIGINAL_ASSERTION_OR_DEFINITION_REQUIRED:'+name)
+            if (not proof.get('retrieved_at') or assertion.get('retrieved_at')!=proof['retrieved_at']
+                or not time(proof['available_at'])<=time(proof['retrieved_at'])<=time(data['available_at'])):
+                raise PermissionError('V82_LEFT_ORIGINAL_ACQUISITION_TIME_REQUIRED:'+name)
+            if name!='left.'+LEFT_EVENT:
+                if (assertion.get('observation_scope')!='COMPLETED_SESSION'
+                    or not assertion.get('session_close_at')
+                    or time(assertion['session_close_at'])>time(proof['as_of'])
+                    or not assertion.get('price_basis')):
+                    raise PermissionError('V82_LEFT_COMPLETED_SESSION_AND_BASIS_REQUIRED:'+name)
+            else:
+                coverage=assertion.get('coverage') or {};required=coverage.get('required_domains')
+                if (not isinstance(required,list) or not required or len(required)!=len(set(required))
+                    or set(coverage.get('checked_domains',[]))!=set(required)
+                    or not coverage.get('required_domain_scope_reference')
+                    or not coverage.get('event_registry_checkpoint')
+                    or coverage.get('active_event_registry_reviewed') is not True
+                    or not coverage.get('coverage_cutoff')
+                    or time(coverage['coverage_cutoff'])!=time(proof['as_of'])
+                    or assertion.get('event_dependency_scope_verified') is not True
+                    or not isinstance(assertion.get('event_dependencies'),list)):
+                    raise PermissionError('V82_LEFT_EVENT_COVERAGE_AND_DEPENDENCIES_REQUIRED')
+            leaves[name]={'value':value,'proof':deepcopy(proof),'original_assertion':assertion}
+            continue
         if name in SAFETY:
             if value not in ('TRUE','FALSE'):
                 raise ValueError('V82_CORE_SAFETY_TRUTH_REQUIRED:'+name)
@@ -84,7 +128,17 @@ def read(descriptor,request,symbol):
                     raise PermissionError('V82_CORE_FIELD_PROOF_MISMATCH:'+name)
         leaves[name]={'value':value,'proof':deepcopy(proof)}
     return {'schema_version':SCHEMA,'source_sha256':descriptor['sha256'],
-        'source_reference':data['source_reference'],'leaves':leaves}
+        'source_reference':data['source_reference'],'leaves':leaves,
+        **({'source_descriptor':deepcopy(descriptor)} if set(leaves)&set(LEFT_LEAVES) else {})}
+
+
+def left_inputs(qualified_source,request,symbol):
+    """Re-read the existing Core-source seam before exposing original Left leaves."""
+    source=qualified_source or {}
+    if not set(source.get('leaves',{}))&set(LEFT_LEAVES):return {}
+    if read(source['source_descriptor'],request,symbol)!=source:
+        raise PermissionError('V82_LEFT_ORIGINAL_SOURCE_REPLAY_MISMATCH')
+    return {name[5:]:deepcopy(record) for name,record in source['leaves'].items() if name in LEFT_LEAVES}
 
 
 def arguments(source,*,broad_etf):
@@ -94,6 +148,9 @@ def arguments(source,*,broad_etf):
     from livingwater_v82_runtime.enums import PredicateTruth,RequirementLevel,DataQuality,Freshness,PitStatus
     result={};resolved=set();safety=[]
     for name,leaf in source['leaves'].items():
+        # Left source assertions are consumed by Work41, not as extra kwargs
+        # or safety/valuation facts in the unchanged Core.
+        if name in LEFT_LEAVES:continue
         if name=='safety.etf_structure' and not broad_etf:
             raise PermissionError('V82_CORE_ETF_STRUCTURE_ON_INDIVIDUAL_STOCK')
         if name in ('theses','structural_confirmation') and broad_etf:

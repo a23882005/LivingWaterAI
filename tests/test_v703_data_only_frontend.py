@@ -118,7 +118,7 @@ class DataOnlyBrowserTests(snapshot.SnapshotBrowserTests):
                        verifiedAtUtc=doc['asOf'], publication=doc['publication'])
         page.route('**/v703_deployment_receipt.json', lambda r: r.fulfill(json=receipt))
         page.evaluate('window.v703ReloadFeed()')
-        page.wait_for_function("document.querySelector('#v703-update-banner').textContent.includes('線上資料更新驗收（不含計分）')")
+        page.wait_for_function("document.querySelector('#v703-update-banner').textContent.includes('線上資料更新驗收（非完整正式計分）')")
         self.assert_data_only(page)
         receipt['status'] = 'LIVE_VERIFIED'
         page.evaluate('window.v703ReloadFeed()')

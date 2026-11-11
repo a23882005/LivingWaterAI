@@ -3752,7 +3752,7 @@ if (recBlack) {
        : receipt.status==='LIVE_VERIFIED'&&receipt.publication?.mode!=='DATA_ONLY'&&receipt.publication?.scoringAllowed!==false;
      if(!receiptOK||receipt.asOf!==doc.asOf||
         !Number.isFinite(when)||when>Date.now()+300000)throw Error('receipt/feed mismatch');
-     banner.textContent+=(dataOnly?'｜線上資料更新驗收（不含計分）：':'｜線上部署驗收：')+(taipeiStamp(receipt.verifiedAtUtc)||'日期未提供');
+     banner.textContent+=(dataOnly?'｜線上資料更新驗收（非完整正式計分）：':'｜線上部署驗收：')+(taipeiStamp(receipt.verifiedAtUtc)||'日期未提供');
    }catch(error){banner.textContent+='｜線上部署驗收紀錄待確認';}
  }
  // Seed every scoring control from the values embedded in this HTML before any

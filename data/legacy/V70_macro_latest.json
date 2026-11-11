@@ -1,73 +1,66 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-11-07T12:49:21.721907+08:00",
+  "asOf": "2026-11-11T21:14:32.107845+08:00",
   "indicators": {
     "m07": {
-      "value": 28.18,
-      "dataDate": "2026-11-05",
+      "value": 19.92,
+      "dataDate": "2026-11-09",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m01": {
-      "value": 0.35,
-      "dataDate": "2026-11-06",
+      "value": 0.25,
+      "dataDate": "2026-11-10",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV"
     },
     "m08": {
-      "value": 2.63,
-      "dataDate": "2026-11-06",
+      "value": 2.78,
+      "dataDate": "2026-11-10",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV"
     },
     "m02": {
-      "value": 3.48,
-      "dataDate": "2026-11-05",
+      "value": 3.34,
+      "dataDate": "2026-11-09",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
-    "m05": {
-      "value": 2.565841,
-      "dataDate": "2026-09-01",
-      "source": "https://api.stlouisfed.org/fred/series/observations",
-      "unit": "%",
-      "method": "FRED CPILFESL 同一數列 YoY"
-    },
     "m09": {
-      "value": 102.278999,
-      "dataDate": "2026-11-06",
+      "value": 102.567001,
+      "dataDate": "2026-11-11",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 90.339996,
-      "dataDate": "2026-11-06",
+      "value": 87.339996,
+      "dataDate": "2026-11-11",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 92.772102,
-      "dataDate": "2026-11-06",
+      "value": 92.43,
+      "dataDate": "2026-11-10",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close"
     },
     "m13": {
-      "value": 2.29,
-      "dataDate": "2026-11-06",
+      "value": 2.25,
+      "dataDate": "2026-11-10",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
     },
     "m17": {
-      "value": -0.08,
-      "dataDate": "2026-11-06",
+      "value": -0.09,
+      "dataDate": "2026-11-10",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE"
@@ -97,7 +90,7 @@
   "news": [],
   "verification": {
     "ready": false,
-    "valid": 13,
+    "valid": 12,
     "totalRequired": 21,
     "missing": [
       "m06: MISSING (not verified OK)",
@@ -105,6 +98,7 @@
       "m03_spy: MISSING (not verified OK)",
       "m03_vt: MISSING (not verified OK)",
       "m04: STALE (not verified OK)",
+      "m05: STALE (not verified OK)",
       "m15: STALE (not verified OK)",
       "m16: MISSING (not verified OK)",
       "m18: STALE (not verified OK)"

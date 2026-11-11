@@ -6287,5 +6287,29 @@
       "intraday_monitoring": "PR70 original Codex"
     },
     "scope": "Candidate wiring only; formal policy unchanged."
+  },
+  "pm_h35_20261111_h33_b_original_source_audit": {
+    "status": "SOURCE_AUDIT_COMPLETED_GAPS_REMAIN",
+    "scope": "Four existing H34 dated replays and referenced sources",
+    "v82": "v1.22.0",
+    "assets": [
+      "VT",
+      "SOXX",
+      "0050",
+      "QQQ"
+    ],
+    "asset_local_technical_observations": 4,
+    "qualified_price_map_assertions": 0,
+    "qualified_event_gap_assertions": 0,
+    "left": "UNKNOWN",
+    "next": {
+      "owner": "Family PM",
+      "priority_asset": "0050",
+      "task": "Qualify asset-local price map and matching event coverage"
+    },
+    "financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

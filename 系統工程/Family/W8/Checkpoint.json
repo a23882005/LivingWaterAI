@@ -6262,5 +6262,30 @@
     "existing_passes": "PRESERVED",
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_h34_20261111_h33_b_scoped_independent_acceptance": {
+    "status": "PASS_SCOPED_H33_B_FORMAL_LEFT_SOURCE_WIRING",
+    "pr": 59,
+    "commit": "c2be33acf5a3d5e7831429ebc87818985769778c",
+    "pm_replay": {
+      "synthetic_pass": 11,
+      "original_tamper_rejection_pass": 1,
+      "existing_dated_rows_pass": 4,
+      "formal_stage_for_existing_rows": "UNKNOWN"
+    },
+    "same_commit_ci": {
+      "success": 6,
+      "w5_pass": 613,
+      "w8_pass": 1607
+    },
+    "financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE",
+    "next": {
+      "left_source_review": "Family PM",
+      "intraday_monitoring": "PR70 original Codex"
+    },
+    "scope": "Candidate wiring only; formal policy unchanged."
   }
 }

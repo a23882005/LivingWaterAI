@@ -270,6 +270,36 @@ def _m06_component_issues(inputs, today, releases, now_utc):
     return issues
 
 
+def _scoring_source_diagnostics(inputs, scoring_valid):
+    """Explain failed scoring inputs without changing validation or source values."""
+    diagnostics = []
+    for key in sorted(SCORING_IDS - scoring_valid):
+        item = inputs.get(key) or {}
+        diagnostic = {"id": key, "label": item.get("label", key),
+                      "status": item.get("status", "MISSING"),
+                      "observationDate": item.get("observation_date"),
+                      "code": "SCORING_INPUT_INVALID"}
+        # A provider can respond successfully while lacking the exact YoY base.
+        # Do not infer an official publication outage or substitute another month.
+        errors = [str(item.get("retrieval_error", "")), str(item.get("error", ""))]
+        attempts = item.get("source_attempts") or {}
+        if isinstance(attempts, dict):
+            for attempt in attempts.get("CPILFESL", []):
+                if isinstance(attempt, dict) and attempt.get("result") == "FAILED":
+                    errors.append(str(attempt.get("error", "")))
+        if key == "m05":
+            periods = sorted(set(re.findall(
+                r"Insufficient CPILFESL history; missing (\d{4}-(?:0[1-9]|1[0-2]))\b",
+                "\n".join(errors))))
+            if periods:
+                diagnostic.update(code="CPI_YOY_BASE_PERIOD_MISSING", missingBasePeriods=periods,
+                    sourceUrl="https://fred.stlouisfed.org/series/CPILFESL",
+                    message="Core CPI 年增率缺少去年同月基期 " + "、".join(periods)
+                    + "；無法計算本期年增率，禁止以月增率、其他月份或舊值替代。")
+        diagnostics.append(diagnostic)
+    return diagnostics
+
+
 def _validate(key, item, today, releases=None, now_utc=None):
     problems = []
     if not isinstance(item, dict):
@@ -640,6 +670,8 @@ def build(macro_path, supplement_path, html_path, dest):
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,
           "requiredScoring": 22, "requiredScoringValidated": len(scoring_valid),
           "asOf": feed["asOf"], "missing": sorted(missing), "problems": calc_problems,
+          "failureStage": None if feed["verification"]["ready"] else "V70_SCORING_QUALITY_GATE",
+          "scoringSourceDiagnostics": _scoring_source_diagnostics(inputs, scoring_valid),
           "rolling15": observation_summary(rolling_history)}
     (out / "QA.json").write_text(json.dumps(qa, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("QUALITY_GATE_" + ("PASS" if qa["ready"] else "BLOCKED") + ": " + json.dumps(qa, ensure_ascii=False))

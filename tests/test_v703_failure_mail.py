@@ -16,6 +16,40 @@ SPEC.loader.exec_module(mail_report)
 
 
 class GmailFailureNotificationTests(unittest.TestCase):
+    def test_cpi_baseline_failure_precedes_archive_statistics_and_preserves_gate(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=pathlib.Path(td)
+            (root/"artifact").mkdir()
+            (root/"artifact"/"QA.json").write_text(json.dumps({
+                "ready":False, "requiredScoringValidated":21, "missing":[],
+                "failureStage":"V70_SCORING_QUALITY_GATE",
+                "problems":["m05: status STALE"],
+                "scoringSourceDiagnostics":[{"id":"m05", "label":"Core CPI YoY",
+                    "observationDate":"2026-09-01", "code":"CPI_YOY_BASE_PERIOD_MISSING",
+                    "message":"Core CPI 年增率缺少去年同月基期 2025-10；無法計算本期年增率。"}],
+                "rolling15":{"windowStart":"2026-10-21", "windowEnd":"2026-11-10",
+                    "tradingDays":15, "validArchivedDays":13, "missingDates":["2026-10-22","2026-11-10"]}
+            },ensure_ascii=False),encoding="utf8")
+            env={"SOURCE_RUN_NAME":"LivingWaterAI 11h Verified V70.3 Site Deploy",
+                 "SOURCE_RUN_ID":"12345", "SOURCE_RUN_CONCLUSION":"failure",
+                 "GMAIL_APP_PASSWORD":"dummy"}
+            old=os.getcwd()
+            try:
+                os.chdir(td)
+                with patch.dict(os.environ,env,clear=True), patch.object(sys,"argv",["report","--artifact-dir","artifact"]),patch.object(mail_report.smtplib,"SMTP_SSL") as smtp:
+                    mail_report.main()
+                    sent=smtp.return_value.__enter__.return_value.send_message.call_args.args[0]
+                body=sent.get_body(preferencelist=("plain",)).get_content()
+                self.assertIn("21/22",body)
+                self.assertIn("2025-10",body)
+                self.assertIn("本次尚未上傳網站",body)
+                self.assertIn("發布門檻維持 22/22",body)
+                self.assertNotIn("全步驟成功",body)
+                self.assertLess(body.index("Core CPI"),body.index("13/15交易日"))
+                self.assertNotIn("缺失：無",body)
+            finally:
+                os.chdir(old)
+
     def test_failure_reports_actual_qa_without_claiming_success(self):
         with tempfile.TemporaryDirectory() as td:
             root=pathlib.Path(td)

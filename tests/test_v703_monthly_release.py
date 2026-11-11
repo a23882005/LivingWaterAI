@@ -16,6 +16,30 @@ MONTHLY_SIX = ("m04", "m05", "m15", "m18", "m19", "m20")
 
 
 class OfficialMonthlyReleaseTests(unittest.TestCase):
+    def test_missing_cpi_base_is_diagnosed_without_accepting_stale_value(self):
+        from copy import deepcopy
+        item = {"label": "Core CPI YoY", "status": "STALE", "value": 2.565841,
+                "observation_date": "2026-09-01", "source_url": "https://fred.stlouisfed.org/series/CPILFESL",
+                "method": "historical cache", "retrieval_error": "All FRED sources failed",
+                "source_attempts": {"CPILFESL": [
+                    {"result": "FAILED", "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10"}]}}
+        before = deepcopy(item)
+        diagnostics = builder._scoring_source_diagnostics({"m05": item}, set(builder.SCORING_IDS)-{"m05"})
+        self.assertEqual(len(diagnostics), 1)
+        self.assertEqual(diagnostics[0]["code"], "CPI_YOY_BASE_PERIOD_MISSING")
+        self.assertEqual(diagnostics[0]["missingBasePeriods"], ["2025-10"])
+        self.assertEqual(item, before)
+        now = dt.datetime(2026, 11, 11, tzinfo=dt.timezone.utc)
+        self.assertIn("m05: status STALE", builder._validate("m05", item, now.date(), {}, now))
+
+    def test_diagnostics_do_not_reuse_old_errors_for_valid_cpi_or_infer_outage(self):
+        valid = {"m05": {"status": "OK", "error": "Insufficient CPILFESL history; missing 2025-10"}}
+        self.assertEqual(builder._scoring_source_diagnostics(valid, set(builder.SCORING_IDS)), [])
+        invalid = {"m05": {"status": "STALE", "error": "HTTP request timed out"}}
+        result = builder._scoring_source_diagnostics(invalid, set(builder.SCORING_IDS)-{"m05"})
+        self.assertEqual(result[0]["code"], "SCORING_INPUT_INVALID")
+        self.assertNotIn("missingBasePeriods", result[0])
+
     def setUp(self):
         # The existing archived fixture contains September observations and the
         # corresponding official release calendar. Never read mutable production

@@ -173,7 +173,6 @@ def main():
         f"Run ID：{run_id}",
         f"執行紀錄：{run_url or '未提供'}",
     ]
-    lines.extend(rolling15_lines(root))
     subject_label = {
         "success": "成功摘要",
         "failure": "🚨失敗警報",
@@ -191,14 +190,35 @@ def main():
         if qa_files:
             qa = load_json(qa_files[0]) or {}
             lines.append("品質驗證：必要計分 "+str(qa.get("requiredScoringValidated","NA"))+"/22")
-            lines.append("缺失："+("、".join(map(str, qa.get("missing") or [])) or "無"))
+            lines.append("缺少欄位："+("、".join(map(str, qa.get("missing") or [])) or "無（不代表所有計分資料合格）"))
+            if qa.get("failureStage") == "V70_SCORING_QUALITY_GATE":
+                lines.append("停止階段：資料品質檢查未通過，本次尚未上傳網站；不是 Hostinger 上傳失敗。")
+                lines.append("發布門檻維持 22/22；未發布本次分數，也未補造每日存檔。")
+            for item in qa.get("scoringSourceDiagnostics") or []:
+                if not isinstance(item, dict):
+                    continue
+                lines.append("未通過指標："+str(item.get("id", "NA"))+" "+str(item.get("label", ""))
+                             +"；資料日期 "+str(item.get("observationDate") or "NA"))
+                if item.get("message"):
+                    lines.append("原因："+str(item["message"]))
             lines.extend(["錯誤："+str(x) for x in (qa.get("problems") or [])[:30]])
         else:
             lines.append("未取得 QA.json；請查看 GitHub Actions 執行連結及失敗步驟。")
-        lines.extend(["", "修復方向：依失敗步驟排查資料來源／月資料發布日／Hostinger上傳／線上驗證。"])
+        if qa_files and qa.get("failureStage") == "V70_SCORING_QUALITY_GATE":
+            lines.extend(["", "修復方向：核對未通過指標的原始資料與同期間基期；資料齊全前維持停止發布，不放寬門檻。"])
+        else:
+            lines.extend(["", "修復方向：依失敗步驟排查資料來源／月資料發布日／Hostinger上傳／線上驗證。"])
     elif conclusion == "success":
+        qa_files = list(root.rglob("QA.json"))
+        qa = (load_json(qa_files[0]) or {}) if qa_files else {}
+        data_only = qa.get('publication', {}).get('mode') == 'DATA_ONLY'
+        if data_only:
+            subject_label = '資料更新成功・總分暫停'
+            lines.append('網站資料更新及線上讀回成功；CPI 官方資料不足，正式總分及配置暫停。')
+            lines.append('本次未產生正式總分，也未新增合格每日分數存檔；不得沿用舊分數當現況。')
         if "11h Verified V70.3 Site Deploy" in run_name:
-            lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
+            if not data_only:
+                lines.append("部署與網站讀回：本次 Workflow 全步驟成功，包含 Hostinger 首頁與 JSON 線上驗證。")
         lines.extend(["", "實際資料與答案：", *make_summary(root, run_name), "", *family_market_lines(), "",
                       "附件為該次 GitHub Actions 上傳的原始資料 artifact 壓縮檔；內容以本次實際執行輸出為準。"])
     else:
@@ -213,6 +233,7 @@ def main():
             lines.append("本次工作流程已取消；請由執行紀錄確認取消時的步驟與部署狀態。")
         else:
             lines.append("請由執行紀錄確認此結論及需要處理的事項。")
+    lines.extend(rolling15_lines(root))
     report_text = "\n".join(lines)
     print(report_text)
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")

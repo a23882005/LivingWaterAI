@@ -14,7 +14,7 @@ class PublicationContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate_current_contract(f,NOW)
     def test_live_payload_exact_match(self):
         f=feed()
-        with patch('scripts.validate_v703_publication.validate_current_contract',return_value=True):
+        with patch('scripts.validate_v703_publication.validate_current_contract',return_value=True), patch('scripts.validate_v703_publication.validate_publication_gate',return_value='FORMAL'):
             verify_live_payload(f,copy.deepcopy(f),'HTML','HTML')
             wrong=copy.deepcopy(f);wrong['indicators']['m02']['value']+=1
             with self.assertRaises(ValueError):verify_live_payload(f,wrong,'HTML','HTML')

@@ -16,6 +16,10 @@ try:
     from v703_rolling_history import embed_history, history_payload, observation_summary
 except ModuleNotFoundError:
     from scripts.v703_rolling_history import embed_history, history_payload, observation_summary
+try:
+    from v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE
+except ModuleNotFoundError:
+    from scripts.v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE
 
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
@@ -268,6 +272,43 @@ def _m06_component_issues(inputs, today, releases, now_utc):
         issues.extend(_validate(key, inputs.get(key), today, releases, now_utc))
         issues.extend(_validate_candidate_checks(key, inputs.get(key)))
     return issues
+
+
+def _scoring_source_diagnostics(inputs, scoring_valid):
+    """Explain failed scoring inputs without changing validation or source values."""
+    diagnostics = []
+    for key in sorted(SCORING_IDS - scoring_valid):
+        item = inputs.get(key) or {}
+        diagnostic = {"id": key, "label": item.get("label", key),
+                      "status": item.get("status", "MISSING"),
+                      "observationDate": item.get("observation_date"),
+                      "code": "SCORING_INPUT_INVALID"}
+        # A provider can respond successfully while lacking the exact YoY base.
+        # Do not infer an official publication outage or substitute another month.
+        errors = [str(item.get("retrieval_error", "")), str(item.get("error", ""))]
+        attempts = item.get("source_attempts") or {}
+        if isinstance(attempts, dict):
+            for attempt in attempts.get("CPILFESL", []):
+                if isinstance(attempt, dict) and attempt.get("result") == "FAILED":
+                    errors.append(str(attempt.get("error", "")))
+        if key == "m05":
+            periods = sorted(set(re.findall(
+                r"Insufficient CPILFESL history; missing (\d{4}-(?:0[1-9]|1[0-2]))\b",
+                "\n".join(errors))))
+            if periods:
+                diagnostic.update(code="CPI_YOY_BASE_PERIOD_MISSING", missingBasePeriods=periods,
+                    sourceUrl="https://fred.stlouisfed.org/series/CPILFESL",
+                    message="Core CPI 年增率缺少去年同月基期 " + "、".join(periods)
+                    + "；無法計算本期年增率，禁止以月增率、其他月份或舊值替代。")
+        diagnostics.append(diagnostic)
+    return diagnostics
+
+
+def _cpi_data_only_eligible(missing, valid_config, scoring_valid, problems, evidence, now):
+    return (not missing and set(MACRO_CONFIG_IDS)-valid_config == {'m05'}
+            and SCORING_IDS-scoring_valid == {'m05'}
+            and bool(problems) and all(problem.startswith('m05:') for problem in problems)
+            and valid_official_gap(evidence, now))
 
 
 def _validate(key, item, today, releases=None, now_utc=None):
@@ -550,11 +591,21 @@ def build(macro_path, supplement_path, html_path, dest):
         row = indicators.get(key, {})
         if not row.get("lastVerifiedAt") or not row.get("sourceEvidence"):
             calc_problems.append(key + ": Forward/FY1 evidence does not match verified candidate source/value")
+    scoring_ready = not calc_problems and not missing and len(valid_config) == 26 and len(scoring_valid) == 22
+    cpi_evidence = inputs['m05'].get('official_unavailable')
+    data_only = not scoring_ready and _cpi_data_only_eligible(
+        missing, valid_config, scoring_valid, calc_problems, cpi_evidence, now)
+    if data_only:
+        # Public data must never expose the old cached YoY as the new observation.
+        indicators['m05'] = {'value':None, 'dataDate':'2026-10-01', 'unit':'%',
+            'source':cpi_evidence['sourceUrl'], 'method':'BLS/FRED 官方同比基期缺失驗證',
+            'status':'OFFICIAL_UNAVAILABLE', 'detail':CPI_NOTICE,
+            'lastVerifiedAt':cpi_evidence['verifiedAtUtc'], 'officialUnavailable':cpi_evidence}
     feed = {
         "schema": "V70.3/family-macro-feed-v3",
         "asOf": now.isoformat().replace("+00:00", "Z"),
         "verification": {
-            "ready": not calc_problems and not missing and len(valid_config) == 26 and len(scoring_valid) == 22,
+            "ready": scoring_ready, "publicationReady": scoring_ready or data_only,
             "valid": len(valid_config), "totalRequired": 26,
             "independentIndicators": 25,
             "sources": ["09:00/18", "10:00/8"],
@@ -564,6 +615,11 @@ def build(macro_path, supplement_path, html_path, dest):
             "missing": sorted(missing), "problems": calc_problems,
             "transportIndicators": len(indicators),
         },
+        "publication": {"schema":"V70.3/publication-state-v1",
+            "mode":"FORMAL" if scoring_ready else ("DATA_ONLY" if data_only else "BLOCKED"),
+            "scoringAllowed":scoring_ready,
+            "reason":CPI_REASON if data_only else (None if scoring_ready else "QUALITY_GATE_FAILED"),
+            "notice":CPI_NOTICE if data_only else ("資料完整，可正式計分。" if scoring_ready else "資料未通過品質檢查。")},
         "indicators": indicators, "news": [], "leiHistory": lei_history,
         "monthlyReleaseCalendar": {
             "schema": "V70.3/monthly-official-release-calendar-v1",
@@ -621,12 +677,14 @@ def build(macro_path, supplement_path, html_path, dest):
     )
     if bank_count != 1 or updated_html.count('公開數字／自寫摘要／來源連結；全文未授權') != 5:
         raise ValueError("WALLSTREET5: HTML table render failed")
-    updated_html = updated_html.replace(
-        "資料查核日：等待建置｜統一比較 2026 年底目標；各機構原始發布日不同。",
-        "資料查核日：" + html.escape(feed["wallStreetFive"]["as_of_date"])
-        + "｜路透社彙整交叉核對：" + html.escape(feed["wallStreetFive"]["cross_check_date"])
-        + "｜統一比較 2026 年底目標（不同機構原始發布日不同）。",
-    )
+    asof_text = ("資料查核日：" + html.escape(feed["wallStreetFive"]["as_of_date"])
+                 + "｜路透社彙整交叉核對：" + html.escape(feed["wallStreetFive"]["cross_check_date"])
+                 + "｜統一比較 2026 年底目標（不同機構原始發布日不同）。")
+    updated_html, asof_count = re.subn(
+        r'(<div id="v703-wallstreet-asof"[^>]*>).*?(</div>)',
+        lambda match: match.group(1)+asof_text+match.group(2), updated_html, count=1, flags=re.S)
+    if asof_count != 1:
+        raise ValueError("WALLSTREET5: dated status node missing")
     if "資料查核日：等待建置" in updated_html or 'id="v703-wallstreet-rows"' not in updated_html:
         raise ValueError("WALLSTREET5: placeholder still present after build")
     out = Path(dest)
@@ -638,12 +696,15 @@ def build(macro_path, supplement_path, html_path, dest):
     (out / "V70_macro_latest.json").write_text(json.dumps(feed, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out / "index.html").write_text(updated_html, encoding="utf-8")
     qa = {"ready": feed["verification"]["ready"], "independent": 25, "transport": 28,
+          "publicationReady": feed["verification"]["publicationReady"], "publication":feed['publication'],
           "requiredScoring": 22, "requiredScoringValidated": len(scoring_valid),
           "asOf": feed["asOf"], "missing": sorted(missing), "problems": calc_problems,
+          "failureStage": None if feed["verification"]["publicationReady"] else "V70_SCORING_QUALITY_GATE",
+          "scoringSourceDiagnostics": _scoring_source_diagnostics(inputs, scoring_valid),
           "rolling15": observation_summary(rolling_history)}
     (out / "QA.json").write_text(json.dumps(qa, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("QUALITY_GATE_" + ("PASS" if qa["ready"] else "BLOCKED") + ": " + json.dumps(qa, ensure_ascii=False))
-    return qa["ready"]
+    return qa["publicationReady"]
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 /* One-shot execution of the existing V70 HTML. No external network or strategy copy. */
 const fs=require('fs'),path=require('path'),vm=require('vm'),crypto=require('crypto');
-const {JSDOM}=require('jsdom');
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 async function main(input){
  const root=path.resolve(input.repo_root);
@@ -12,6 +11,21 @@ async function main(input){
     ||Math.abs(stock+bond-100)>1e-8)throw Error('APPROVED_STRATEGIC_BASE_REQUIRED');
  const stamp=Date.parse(input.evaluation_at);
  if(!Number.isFinite(stamp)||Date.parse(feed.asOf)>stamp)throw Error('V70_EVALUATION_TIME_INVALID');
+ // Gate the current feed before executing HTML: embedded/cache scores must not
+ // survive a newer unready or explicitly non-scoring publication.
+ const publication=feed.publication||{};
+ if(feed.verification?.ready!==true||publication.mode==='DATA_ONLY'||publication.scoringAllowed===false){
+  return {schema_version:'Family.W8.OriginalV70.v1',status:'V70_DATA_UNAVAILABLE',
+   source_html_sha256:hash(html),source_feed_sha256:hash(raw),feed_as_of:feed.asOf,
+   evaluation_at:input.evaluation_at,strategic:{stock,bond},
+   gates:{data_complete:false,dates_verified:false,feed_verified:false,demo:false,
+    credit_blocked:false,can_publish:false},
+   tactical_percentages:null,macro_snapshot:null,original_latest:null,
+   load_issue:publication.mode==='DATA_ONLY'?'V70_DATA_ONLY_SCORING_DISABLED':'V70_FEED_NOT_READY',
+   publication:feed.publication||null,warnings:[],local_reads:[],
+   ui_profile_defaults_are_not_client_facts:true,monetary_amounts:null,trade_authorization:'NONE'};
+ }
+ const {JSDOM}=require('jsdom');
  const dom=new JSDOM(html.toString('utf8'),{runScripts:'outside-only',url:'https://family.invalid/V70-3-27.html'});
  const w=dom.window,NativeDate=w.Date;
  w.Date=class extends NativeDate{constructor(...a){super(...(a.length?a:[stamp]));}static now(){return stamp;}};

@@ -225,6 +225,18 @@ def main():
             print('FORWARD_RETAIN_ORIGINAL_DATED_VALUE',ticker,str(exc)[:100],flush=True)
 
     # Retain original observation/check dates for any source unavailable this run.
+    # The authorized exception publishes data only, never a made-up CPI YoY.
+    from v703_cpi_availability import FRED_CPI, BLS_CPI, verify_official_gap
+    cpi_csv = fetch(session, FRED_CPI)
+    cpi_release = fetch(session, BLS_CPI)
+    cpi_evidence = verify_official_gap(cpi_csv, cpi_release, dt.datetime.now(dt.timezone.utc))
+    b['items']['m05'].pop('official_unavailable', None)
+    if cpi_evidence:
+        b['items']['m05']['official_unavailable'] = cpi_evidence
+        for suffix, raw in (('series.csv.gz', cpi_csv), ('release.html.gz', cpi_release)):
+            (ROOT/'data/audit'/('cpi_unavailable_20261110_'+suffix)).write_bytes(gzip.compress(raw,mtime=0))
+        print('CPI_OFFICIAL_UNAVAILABLE_DATA_ONLY', cpi_evidence['observationMonth'], flush=True)
+
     a['generated_at']=now
     a['as_of_taipei']=now
     a['refresh_method']='Official Fed full raw HTTP reverified; other values retain dated observations unless independently refreshed'

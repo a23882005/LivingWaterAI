@@ -1,0 +1,1 @@
+Family PF audit anchor field validation. 2026-10-14. Commits 67d5e9454618df024761885e56ba74bdd0de577f, c79a1291979a9564ef024714f39c58c10c69b08f. GitHub Actions run 38428784896: 214 passed; demo passed. Gate A HOLD; WORK13 0/29. PR 2 Draft.

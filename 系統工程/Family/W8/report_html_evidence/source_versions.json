@@ -1,0 +1,46 @@
+{
+  "base": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+  "baseline_git_blobs": {
+    "formal_report_source.py": "8c7dde6d3582119a7fc56250d357af29536b5cda",
+    "w6_current_data.py": "e14010dcb44efdf5af0e818db6055ec865abf7ba",
+    "w6_member_render.py": "82fced51f2b51e4ecc50a3a2235900df99bdcd92",
+    "on_demand_w6.py": "95df26177eb1d065e2e1d0bc5aca090edff3ba68",
+    "Checkpoint.json": "a42f21a637bb8ca60d1bfab2c513087d3396d6de"
+  },
+  "reference_pr59": "5a54ce25c1dedc39c781aa2e6acd9f867b581d56",
+  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "continuation_start": "b6a146b33fa7aae8c725ebbe28cdd375a449aaf9",
+  "continuation_reference_pr59": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+  "tested_program_sha256": {
+    "formal_report_source.py": "06b432042a7f1a74392a07cd94f7139c56f84a6f954163df9d4683abf9b0e346",
+    "on_demand_w6.py": "c22ef951b70368629e86db3e8ba2f61e1d15427d70f65b42df33cf7fe1042fd7",
+    "on_demand_report_delivery.py": "951102c5a55d959212e1e9cfc400a114eea75e7e6de37e1dce62e7b0e85fd0ae",
+    "report_canonical_adapter.py": "b0d4b287def35bacd68452580dbbd10aec7f878f62a17f3499cdb24b15b7b29d",
+    "w6_current_data.py": "ce31b75220453fba1c60cd382a332396303c98b5c4b3d53387963c1233455b04",
+    "w6_member_render.py": "d202e7f6454d42c8ab34e1ec67cf8945f323a13fe41ab9a701aafd5ec80c5021"
+  },
+  "original_local_head_preserved": "e3bfae8ceae9d308e1f840eceb186fd3d0db95c0",
+  "layout_repair": {
+    "base_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+    "pm_repair_contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+    "main_metadata_checked": "434091b9adbe614d30e6bd7cc0e33d263cfcd3be",
+    "pr59_head_observed_only": "6a9dddd15dd19d3e668c20ac0033e1b99f7a6cba",
+    "frozen_upstream_source_unchanged": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+    "main_allowlist_overlap": false,
+    "shared_governance_files_modified": false
+  },
+  "latest_db_source_review": {
+    "base_commit": "1fe71862d7b3b69b55cd09c9796e7ff26e599e07",
+    "renderer_unchanged_from_accepted_1fe71862": true,
+    "main_checked": "494a0a5dd0171905c9314afedc4cfa51a1f4ed97",
+    "main_allowed_file_overlap": false,
+    "PR59_head_observed_only": "ac1d73715a837796a729616005f18575fc9c3afd",
+    "native_financial_producer_consumed": false,
+    "reader": "Family/W5/family_input.read_snapshot",
+    "formal_source": "formal_report_source.build_report_source",
+    "current_adapter": "w6_current_data.build_w6_current_data",
+    "renderer": "on_demand_w6.OnDemandW6Renderer",
+    "production_change": "Allow explicitly unknown NAV only in validated SOURCE_REVIEW without canonical C",
+    "private_DB_or_shared_governance_writes": 0
+  }
+}

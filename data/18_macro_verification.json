@@ -150,7 +150,7 @@
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
       "error": "",
-      "attempted_at": "2026-11-11T21:47:03+08:00",
+      "attempted_at": "2026-11-12T10:05:03+08:00",
       "attempt_result": "SUCCESS",
       "source_attempts": {
         "ISM_m04": [
@@ -171,12 +171,18 @@
             "result": "OK",
             "verified_at": "2026-11-11T21:47:03+08:00",
             "observation_date": "2026-10-01"
+          },
+          {
+            "provider": "ISM_OFFICIAL",
+            "result": "OK",
+            "verified_at": "2026-11-12T10:05:03+08:00",
+            "observation_date": "2026-10-01"
           }
         ]
       },
       "cache_used": false,
       "cache_source": null,
-      "last_verified_at": "2026-11-11T21:47:03+08:00",
+      "last_verified_at": "2026-11-12T10:05:03+08:00",
       "source_evidence": {
         "series": {
           "ISM_m04": [
@@ -307,7 +313,7 @@
         "baseIndex": null,
         "publicationDate": "2026-11-10",
         "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
-        "verifiedAtUtc": "2026-11-11T13:47:05.480139+00:00",
+        "verifiedAtUtc": "2026-11-12T02:05:05.619600+00:00",
         "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
         "seriesUrl": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
         "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
@@ -319,7 +325,7 @@
           "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
           "publicationDate": "2026-11-10"
         },
-        "seriesRetrievedAtUtc": "2026-11-11T13:47:05.480139+00:00"
+        "seriesRetrievedAtUtc": "2026-11-12T02:05:05.619600+00:00"
       }
     },
     "m09": {

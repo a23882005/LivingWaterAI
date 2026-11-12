@@ -19,4 +19,26 @@ def feed():
     rows['s03']=copy.deepcopy(rows['m07'])
     rows['m16']['dataDate']=d['leiHistory'][-1]['observation_date']
     rows['m16']['value']=d['leiHistory'][-1]['value']
+    # The embedded production feed can legitimately be DATA_ONLY while the
+    # official CPI year-over-year base period is unavailable.  This synthetic
+    # fixture, however, is used by tests for the *formal* archive path.  Make
+    # that distinction explicit instead of inheriting today's production
+    # publication state into an unrelated formal-archive unit test.
+    d['verification'].update(
+        ready=True,
+        publicationReady=True,
+        valid=26,
+        requiredScoringIndicatorsValidated=22,
+        problems=[],
+        missing=[],
+    )
+    d['publication']={
+        'schema':'V70.3/publication-state-v1',
+        'mode':'FORMAL',
+        'scoringAllowed':True,
+        'provisionalScoringAllowed':False,
+        'calculationPolicy':'ALL_REQUIRED_INDICATORS',
+        'excludedIndicators':[],
+        'reason':None,
+    }
     return d

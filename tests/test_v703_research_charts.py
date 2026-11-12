@@ -47,7 +47,8 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("完整逐季數值表（28 季）", page)
         self.assertIn("2026-10-01", page)
         self.assertIn("季度資料不插值成月資料", page)
-        self.assertIn("動能上修／下修家數", page)
+        self.assertIn("五家機構微分上修數", page)
+        self.assertIn("五家機構微分下修數", page)
         self.assertTrue(all("後三個月實際報酬" in alt for alt in parser.alts))
         names = ("Macro-SaFe｜原始值", "高盛｜原始值", "美國銀行｜原始值", "摩根士丹利｜原始值", "瑞銀｜原始值", "摩根大通｜原始值")
         positions = [page.index(f"<figcaption class=\"text-sm font-semibold text-slate-100 mb-2\">{name}") for name in names]

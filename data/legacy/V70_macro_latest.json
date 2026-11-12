@@ -1,10 +1,10 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-11-11T21:49:22.984617+08:00",
+  "asOf": "2026-11-12T10:10:31.634088+08:00",
   "indicators": {
     "m07": {
-      "value": 19.92,
-      "dataDate": "2026-11-09",
+      "value": 19.46,
+      "dataDate": "2026-11-10",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
@@ -31,14 +31,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m09": {
-      "value": 102.666,
+      "value": 102.859001,
       "dataDate": "2026-11-11",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 87.43,
+      "value": 85.669998,
       "dataDate": "2026-11-11",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",

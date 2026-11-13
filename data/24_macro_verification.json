@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-11-13T23:35:26.358934+08:00",
+  "generated_at": "2026-11-14T01:33:49.720197+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 14,
@@ -122,7 +122,7 @@
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
       "method": "人工查證輸入：ISM官方2026年9月Manufacturing PMI；截至2026-10-14已核對",
       "status": "STALE",
-      "detail": "統計月份2026-09；8月54.6; 距今 73 天 > 65 天",
+      "detail": "統計月份2026-09；8月54.6; 距今 74 天 > 65 天",
       "error": ""
     },
     "m05": {
@@ -140,7 +140,7 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 103.218002,
+      "value": 103.359001,
       "unit": "",
       "observation_date": "2026-11-13",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -152,7 +152,7 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 89.260002,
+      "value": 88.669998,
       "unit": "USD/bbl",
       "observation_date": "2026-11-13",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -164,7 +164,7 @@
     "m12": {
       "id": "m12",
       "label": "MOVE",
-      "value": 101.262497,
+      "value": 99.252701,
       "unit": "",
       "observation_date": "2026-11-13",
       "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
@@ -218,7 +218,7 @@
       "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
       "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
       "status": "STALE",
-      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4; 距今 73 天 > 65 天",
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4; 距今 74 天 > 65 天",
       "error": ""
     },
     "m16": {
@@ -242,7 +242,7 @@
       "source_url": "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
       "method": "人工查證輸入：ALFRED官方SAHMREALTIME，2026-10-02發布之2026-09觀測值",
       "status": "STALE",
-      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率; 距今 73 天 > 65 天",
+      "detail": "單位為百分點(pp)，非百分比；使用官方已發布Real-time Sahm Rule數列，不自行補造2025-10失業率; 距今 74 天 > 65 天",
       "error": ""
     },
     "m19": {
@@ -284,7 +284,7 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 37.571429,
+      "value": 37.685714,
       "unit": "",
       "observation_date": "2026-11-13",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",

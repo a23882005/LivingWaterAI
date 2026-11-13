@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-11-12T18:39:24+08:00",
-  "as_of_taipei": "2026-11-12T18:39:24+08:00",
+  "generated_at": "2026-11-13T10:01:54+08:00",
+  "as_of_taipei": "2026-11-13T10:01:54+08:00",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -270,15 +270,15 @@
     },
     "s05": {
       "label": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
-      "value": 48.89,
+      "value": 45.77,
       "unit": "%",
-      "observation_date": "2026-11-11",
+      "observation_date": "2026-11-12",
       "source_url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
       "detail": "INDEX/MMFI 日期2026-11-11收盤48.89%，採EOD收盤非盤中LAST；來源SHA256=fa26fcbe3268d17a81f9f32a4763011f093db0ba3a983c8856d3e6b90a4bfc91",
-      "retrieval_time": "2026-11-12T18:39:24+08:00",
-      "publication_date": "2026-11-11",
+      "retrieval_time": "2026-11-13T10:01:54+08:00",
+      "publication_date": "2026-11-12",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10",
       "candidate_checks": [
         {
@@ -308,11 +308,11 @@
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日均線百分比",
           "status": "FOUND",
-          "checked_at": "2026-11-12T18:39:24+08:00",
-          "value": 48.89,
+          "checked_at": "2026-11-13T10:01:54+08:00",
+          "value": 45.77,
           "unit": "%",
-          "observation_date": "2026-11-11",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=fa26fcbe3268d17a81f9f32a4763011f093db0ba3a983c8856d3e6b90a4bfc91"
+          "observation_date": "2026-11-12",
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；2026-11-12完整交易日收盤45.77，本輪以實際瀏覽器頁面查核"
         },
         {
           "site": "TradingView",
@@ -329,15 +329,15 @@
     },
     "m03_qqq": {
       "label": "QQQ未來12個月Forward P/E",
-      "value": 20.57,
+      "value": 20.47,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-11",
+      "observation_date": "2026-11-12",
       "source_url": "https://stockanalysis.com/etf/qqq/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "QQQ Forward PE 20.57，頁面資料日2026-11-11",
-      "retrieval_time": "2026-11-12T18:39:24+08:00",
-      "publication_date": "2026-11-11",
+      "retrieval_time": "2026-11-13T10:01:54+08:00",
+      "publication_date": "2026-11-12",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
         {
@@ -378,10 +378,10 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-12T18:39:24+08:00",
-          "value": 20.57,
+          "checked_at": "2026-11-13T10:01:54+08:00",
+          "value": 20.47,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-11",
+          "observation_date": "2026-11-12",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
@@ -396,15 +396,15 @@
     },
     "m03_spy": {
       "label": "SPY未來12個月Forward P/E",
-      "value": 19.25,
+      "value": 19.0,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-11",
+      "observation_date": "2026-11-12",
       "source_url": "https://stockanalysis.com/etf/spy/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "SPY Forward PE 19.25，頁面資料日2026-11-11",
-      "retrieval_time": "2026-11-12T18:39:24+08:00",
-      "publication_date": "2026-11-11",
+      "retrieval_time": "2026-11-13T10:01:54+08:00",
+      "publication_date": "2026-11-12",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
         {
@@ -445,10 +445,10 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-12T18:39:24+08:00",
-          "value": 19.25,
+          "checked_at": "2026-11-13T10:01:54+08:00",
+          "value": 19.0,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-11",
+          "observation_date": "2026-11-12",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
@@ -463,15 +463,15 @@
     },
     "m03_vt": {
       "label": "VT未來12個月Forward P/E",
-      "value": 15.3,
+      "value": 15.21,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-11",
+      "observation_date": "2026-11-12",
       "source_url": "https://stockanalysis.com/etf/vt/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "VT Forward PE 15.3，頁面資料日2026-11-11",
-      "retrieval_time": "2026-11-12T18:39:24+08:00",
-      "publication_date": "2026-11-11",
+      "retrieval_time": "2026-11-13T10:01:54+08:00",
+      "publication_date": "2026-11-12",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
         {
@@ -512,10 +512,10 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-12T18:39:24+08:00",
-          "value": 15.3,
+          "checked_at": "2026-11-13T10:01:54+08:00",
+          "value": 15.21,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-11",
+          "observation_date": "2026-11-12",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],

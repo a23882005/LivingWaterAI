@@ -1,9 +1,9 @@
 {
   "schema": "D009-actions-proof-v1",
-  "run_id": "43180617662",
+  "run_id": "43388099452",
   "run_attempt": "1",
-  "commit_sha": "fd444314cc3de0f4947e5170832ac794867f58e1",
-  "verified_at_utc": "2026-11-12T08:10:31.037141+00:00",
+  "commit_sha": "1f36e7655bce52bc1d013f29239bdcb24eb3ded8",
+  "verified_at_utc": "2026-11-13T07:47:22.420783+00:00",
   "independent_indicators": 18,
   "rows": 19,
   "statuses": {

@@ -44,6 +44,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         if reconciliation_source is not None:context['member_reconciliation_source']=deepcopy(reconciliation_source)
         if public_binding is not None:context['public_history_source_binding']=deepcopy(public_binding)
         return assemble(root,request,context,artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
+    normalized=None
     if reconciliation_source is not None:
         from member_reconciliation_source import read
         normalized=read(root,reconciliation_source,request)
@@ -71,6 +72,9 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         raise PermissionError('MEMBER_PRODUCER_ORIGINAL_BOOTSTRAP_SCOPE_MISMATCH')
     from deployment_c7_sources import FAMILY_PROFILE
     if context.get('family_c7_profile')!=FAMILY_PROFILE:raise PermissionError('MEMBER_PRODUCER_EXPLICIT_C7_PROFILE_REQUIRED')
+    from dated_document_target_source import is_dated,bind_producer_seed
+    if is_dated(request['confirmed_target']):
+        cfg,attempt['dated_target_source_binding']=bind_producer_seed(cfg,request,normalized)
     # The Member's current approval governs this run. An older bootstrap may
     # retain a withdrawn historical money table; never calculate from it when
     # the current approved investment pool is unresolved.

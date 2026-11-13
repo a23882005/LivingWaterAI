@@ -77,7 +77,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "ef4e4edc82952df650aba0eea88a9c13a8922099b15b3b34fcdffaa944525ea3"
+      "sha256": "d6192530542c84c5e610c9800478999833fd2d9e278c2850d72873556803031e"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "f9f03a107b6adc51f508b32001d5da18aaf48b67b78c11aa50ee571242162e71"
+      "sha256": "1aa6b8eae0b89d14facc4a8511cda8c6f1e0ef32b032411a2ec5945f0491896d"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -234,6 +234,10 @@
     {
       "path": "../../Family/W8/ishares_distribution_source.py",
       "sha256": "5d5e933351b8a93a67a9a0d01c92af873fe92ec2a2d31df0dfbd08f1517de636"
+    },
+    {
+      "path": "../../Family/W8/dated_document_target_source.py",
+      "sha256": "b7b5e82cc40cc1a5cf9e835507c4cdf81ef8a19261be7cb1812389e33f394764"
     }
   ]
 }

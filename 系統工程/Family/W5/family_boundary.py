@@ -55,6 +55,12 @@ def validate_target(target,client_id,evaluation_at,*,approved_document_source=No
         return module.validate(target,official_target_source,snapshot,evaluation_at.isoformat())
     if target.get('source_kind')=='EXISTING_APPROVED_DOCUMENT':
         source=approved_document_source or {}
+        if source.get('dated_pool_binding') or (target.get('payload',{}).get('draft',{}).get('source_mapping_lineage') or {}).get('operation')=='READ_DATED_REPORTED_POOL_WITH_EXISTING_APPROVAL':
+            import sys
+            path=Path(__file__).resolve().parent.parent/'W8'
+            if str(path) not in sys.path:sys.path.insert(0,str(path))
+            from dated_document_target_source import replay
+            replay(target,source,evaluation_at=evaluation_at.isoformat(),snapshot=snapshot)
         require(source.get('schema_version')=='Family.W5.ApprovedDocumentTargetSource.v1'
                 and source.get('client_id')==client_id and source.get('data_provenance')=='SOURCE_BACKED',
                 'APPROVED_TARGET_TRUSTED_SOURCE_REQUIRED','approved_document_source')

@@ -60,6 +60,9 @@ def enrich_document_target_view(target,proof):
     is derived from the unchanged source; the old view is retained in lineage.
     """
     if target.get('source_kind')!='EXISTING_APPROVED_DOCUMENT':return deepcopy(target),deepcopy(proof)
+    if proof.get('dated_pool_binding') or (target.get('payload',{}).get('draft',{}).get('source_mapping_lineage') or {}).get('operation')=='READ_DATED_REPORTED_POOL_WITH_EXISTING_APPROVAL':
+        from dated_document_target_source import replay
+        return replay(target,proof)
     path=Path(proof['local_source_path']);raw=path.read_bytes()
     if sha256(raw).hexdigest()!=proof['source_sha256'] or _digest(target)!=proof['target_view_digest']:
         raise PermissionError('APPROVED_TARGET_SOURCE_OR_VIEW_CHANGED')
@@ -125,7 +128,8 @@ def enrich_document_target_view(target,proof):
 
 
 def build_approved_target_view(*, client_id, source_path, source_reference,
-        source_available_at, target_version, allocation_version, rows, mappings):
+        source_available_at, target_version, allocation_version, rows, mappings,
+        dated_pool_source=None, evaluation_at=None):
     """Return a lossless target view plus independently trusted source proof.
 
     rows contain exact original Markdown source_line, source_columns and weight;
@@ -182,8 +186,15 @@ def build_approved_target_view(*, client_id, source_path, source_reference,
         'local_source_path':str(path),'source_sha256':source_sha,
         'source_reference':source_reference,'source_available_at':source_available_at,
         'target_view_digest':_digest(view),'data_provenance':'SOURCE_BACKED'}
-    return {'target':view,'trusted_approved_target_source':proof,
+    pack={'target':view,'trusted_approved_target_source':proof,
         'trade_authorization':'NONE','database_written':False}
+    if dated_pool_source is not None:
+        from dated_document_target_source import project
+        inputs=dict(client_id=client_id,source_path=str(source_path),source_reference=source_reference,
+            source_available_at=source_available_at,target_version=target_version,
+            allocation_version=allocation_version,rows=deepcopy(rows),mappings=deepcopy(mappings))
+        return project(pack,dated_pool_source,inputs,evaluation_at)
+    return pack
 
 
 def bind_document_account_scope(snapshot, target_pack, *, account_key, broker,

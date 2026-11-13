@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "df59b639a0829b122244f12ad2bf9f5c76e34143dcd566474476bdf3f120a584"
+    "sha256": "10986fdebafc302c9b6711ad9725d1ec5ccc73898c5b8bd4e670038b5046722c"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -423,7 +423,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_producer.py",
-    "sha256": "ef4e4edc82952df650aba0eea88a9c13a8922099b15b3b34fcdffaa944525ea3"
+    "sha256": "d6192530542c84c5e610c9800478999833fd2d9e278c2850d72873556803031e"
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
@@ -487,7 +487,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_v82_analysis.py",
-    "sha256": "f9f03a107b6adc51f508b32001d5da18aaf48b67b78c11aa50ee571242162e71"
+    "sha256": "1aa6b8eae0b89d14facc4a8511cda8c6f1e0ef32b032411a2ec5945f0491896d"
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
@@ -593,5 +593,10 @@
   {
     "path": "系統工程/Family/W8/ishares_distribution_source.py",
     "sha256": "5d5e933351b8a93a67a9a0d01c92af873fe92ec2a2d31df0dfbd08f1517de636"
+  },
+  {
+    "path": "系統工程/Family/W8/dated_document_target_source.py",
+    "sha256": "b7b5e82cc40cc1a5cf9e835507c4cdf81ef8a19261be7cb1812389e33f394764",
+    "reason": "PR59 日期資產池來源與原核准權重重建及重播；不新增簽核或資金資格"
   }
 ]

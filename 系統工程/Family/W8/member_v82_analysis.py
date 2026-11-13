@@ -65,7 +65,11 @@ def _historical_target_source(snapshot, config, evaluation_at):
     expected = args.pop('sha256')
     if sha256(raw).hexdigest() != expected:
         raise PermissionError('MEMBER_TARGET_DOCUMENT_HASH_MISMATCH')
-    view = build_approved_target_view(**args)['target']
+    if args.get('dated_pool_source') is not None:args['evaluation_at']=evaluation_at
+    pack = build_approved_target_view(**args);view=pack['target']
+    if args.get('dated_pool_source') is not None:
+        from dated_document_target_source import replay
+        return replay(view,pack['trusted_approved_target_source'],evaluation_at=evaluation_at,snapshot=snapshot)[0]
     # Preserve dated table amounts as source facts, without reusing a superseded
     # investment-pool assumption as today's target denominator.
     for line in view['payload']['draft']['target_lines']:

@@ -365,17 +365,17 @@
 <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
 <div>
 <a class="text-blue-400 hover:text-white border-b border-dashed border-slate-600 transition-colors" href="https://fred.stlouisfed.org/series/DGS10" target="_blank">10Y Yield</a>
-<span>: 5.242%</span>
+<span id="bond-nominal-yield">: NA</span>
 </div>
 <span>-</span>
 <div>
 <a class="text-blue-400 hover:text-white border-b border-dashed border-slate-600 transition-colors" href="https://tradingeconomics.com/united-states/core-inflation-rate" target="_blank">Core CPI</a>
-<span>: 2.6%</span>
+<span id="bond-cpi-yoy">: NA</span>
 </div>
 <span>=</span>
-<span class="text-white font-bold text-sm">2.64%</span>
+<span id="bond-real-yield" class="text-white font-bold text-sm">NA</span>
 </div>
-<p class="text-xs text-slate-500 mt-3 border-t border-slate-700/50 pt-2"><i class="fas fa-info-circle mr-1"></i> 下方數值由系統背景資料更新；家人無須輸入。</p>
+<p class="text-xs text-slate-500 mt-3 border-t border-slate-700/50 pt-2"><i class="fas fa-info-circle mr-1"></i> <span id="bond-data-status">待合格名目 10Y 與核心 CPI 年增率；缺資料不計算 bScore。</span></p>
 </div>
 <div class="bg-slate-900/40 rounded-xl p-4 border border-slate-700">
 <div class="flex justify-between items-center mb-6">
@@ -383,12 +383,12 @@
 <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-600 font-mono"><span class="text-red-400">0分:-1.0%</span> | <span class="text-yellow-400">5分:+0.5%</span> | <span class="text-green-400">10分:+2.0%</span></span>
 </div>
 <div class="flex gap-4 items-center">
-<div class="relative"><input class="raw-input w-24" id="bond-raw" oninput="updateBond(this.value)" type="text" value="2.64"/><span class="absolute right-2 top-2 text-xs text-slate-500">%</span></div>
+<div class="relative"><input class="raw-input w-24" id="bond-raw" readonly="" type="text" value="" placeholder="NA"/><span class="absolute right-2 top-2 text-xs text-slate-500">%</span></div>
 <div class="flex-1 relative h-8">
 <div class="ruler-bond-bg"></div>
 <input class="w-full h-full absolute top-0 z-20 opacity-100" disabled="" id="bond-slider" max="10" min="0" step="0.1" type="range" value="5"/>
 </div>
-<div class="w-12 text-right font-mono font-bold text-xl text-green-400" id="bond-score-display">5.0</div>
+<div class="w-12 text-right font-mono font-bold text-xl text-green-400" id="bond-score-display">NA</div>
 </div>
 </div>
 </div>
@@ -558,7 +558,7 @@
 
         // V70.3: bond real-yield input -> 0..10 score; t0=-1%, t5=0.5%, t10=2%.
         function updateBond(val) {
-            const raw = String(val ?? '').trim();
+            const raw = window.v703BondInputsQualified === true ? String(val ?? '').trim() : '';
             const num = raw === '' ? NaN : Number(raw);
             const slider = document.getElementById('bond-slider');
             const score = document.getElementById('bond-score-display');
@@ -575,6 +575,23 @@
             if (typeof calcTotal === 'function') calcTotal();
         }
 
+
+        // The current verified feed contains TIPS (m08), not nominal DGS10.
+        // Never substitute m08 or a hard-coded nominal yield for this formula.
+        function v703SyncBondCard(data = null) {
+            window.v703BondInputsQualified = false;
+            const cpi = data?.m05;
+            const ok = cpi && ['OK','USABLE'].includes(cpi.status) &&
+                cpi.value !== null && String(cpi.value).trim() !== '' && Number.isFinite(Number(cpi.value));
+            document.getElementById('bond-cpi-yoy').textContent = ok ? ': '+cpi.value+'%（'+cpi.dataDate+'）' : ': NA';
+            document.getElementById('bond-nominal-yield').textContent = ': NA';
+            document.getElementById('bond-real-yield').textContent = 'NA';
+            document.getElementById('bond-raw').value = '';
+            document.getElementById('bond-data-status').textContent = ok
+                ? '核心 CPI 已驗證；本批未提供合格名目 10Y，實質收益率與 bScore 為 NA。TIPS 不代替名目 10Y。'
+                : '核心 CPI 年增率未取得合格資料；本批亦無合格名目 10Y，實質收益率與 bScore 為 NA。';
+            updateBond('');
+        }
 
         // Metadata: a user's manual entry date is NOT automatically today's observation date.
         // For each indicator require a valid observation date and actual source, and check frequency freshness.
@@ -966,12 +983,8 @@ function recalcNetLiquidity() {
     setText('nl_d13w_out', d13w);
 
 
-    // 把 Δ13W 回寫到「淨流動性 Δ13W」(m14)
-    if (Number.isFinite(d13w)) {
-        const capInput = document.getElementById('cap_in_m14');
-        if (capInput) capInput.value = String(Math.round(d13w * 100) / 100);
-        syncCapInput('m14', String(d13w));
-    }
+    // Historical teaching example only. Current m14 comes from the verified feed.
+
 }
 
 
@@ -1026,7 +1039,7 @@ function renderCapControls() {
         const netliqExtra = (c.id === 'm14')
             ? `
                 <div class="mt-3 border-t border-slate-700/60 pt-3">
-                    <div class="text-[11px] text-slate-300 font-bold mb-2">用 FED / RRP / TGA 算出 Δ13W（自動回寫到「淨流動性 Δ13W」）
+                    <div class="text-[11px] text-slate-300 font-bold mb-2">歷史教學範例：2026 年 1–2 月 FED / RRP / TGA（不回寫當期 Δ13W）
 <div class="small muted" style="margin-top:8px;line-height:1.5;">本期日期：RRP 2026-02-02｜FED/TGA 2026-01-28<br>13週前日期：RRP 2025-11-03｜FED/TGA 2025-10-29</div></div>
 
 
@@ -2420,7 +2433,7 @@ if (recBlack) {
 
         {
             const bi = document.getElementById('bond-raw');
-            updateBond(bi ? bi.value : '1.94');
+            v703SyncBondCard();
         }
     </script>
 <div class="max-w-5xl mx-auto px-6 py-10 mt-6 border-t border-slate-800/50">
@@ -4226,6 +4239,8 @@ if (recBlack) {
      window.v703VerifiedInputSnapshot=JSON.parse(JSON.stringify(data));
      window.v703SourceBatch.verified=!dataOnly;
      window.v703DataLoaded=true;
+     updateCapBps();
+     v703SyncBondCard(data);
      window.v703ProvisionalFeedValidated=dataOnly;
      if(!dataOnly)lastDataOnlyDocument=null;
      window.v703FeedVerified=!dataOnly;
@@ -4243,6 +4258,7 @@ if (recBlack) {
    }catch(err){
      sourceMode='hold';
      window.v703DataLoaded=false;
+     v703SyncBondCard();
      window.v703ProvisionalFeedValidated=false;
      window.v703ProvisionalSnapshot=null;
      window.v703FeedVerified=false;

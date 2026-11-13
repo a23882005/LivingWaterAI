@@ -497,8 +497,8 @@
 </details>
 <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl">
 <h3 class="text-xs text-slate-500 font-bold uppercase mb-3 tracking-widest"><i class="fas fa-bullhorn mr-1"></i>指揮官指令</h3>
-<div class="text-sm text-white mb-3 leading-relaxed border-l-2 border-blue-500 pl-3" id="final-stock">計算中...</div>
-<div class="text-sm text-white leading-relaxed border-l-2 border-green-500 pl-3" id="final-bond">計算中...</div>
+<div class="text-sm text-white mb-3 leading-relaxed border-l-2 border-blue-500 pl-3" id="final-stock">[股票] 等待資料驗證；尚未發布指令。</div>
+<div class="text-sm text-white leading-relaxed border-l-2 border-green-500 pl-3" id="final-bond">[債券] 等待資料驗證；尚未發布指令。</div>
 </div>
 </div>
 </div>
@@ -1717,7 +1717,7 @@ if (recBlack) {
 
 
             if (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) updateOrders(mSafe_final, bScore, isEmerg, alloc.meta);
-            else {for(const id of ["stock-action","bond-action"]) {const el=document.getElementById(id);if(el)el.textContent="資料未驗證，暫停新配置／交易建議";}}
+            else { renderOrdersUnavailable(); }
 
 
             // 保存本輪 V70.3 計算結果，供客戶專屬 Markdown 交接檔輸出。
@@ -2003,6 +2003,22 @@ if (recBlack) {
             }
         }
 
+
+        // A blocked publication is a final state, not an ongoing calculation.
+        // Clear prior successful orders too (expired feed / reload / manual edits).
+        function renderOrdersUnavailable() {
+            const reason = window.v703DataOnly === true
+                ? 'CPI 官方年增率缺資料；暫行總分僅供參考，不產生正式配置或交易指令。'
+                : '必要資料、日期或核准配置基準未通過驗證，不產生交易指令。';
+            for (const [id, label] of [['final-stock', '股票'], ['final-bond', '債券']]) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = `[${label}] 暫停發布：${reason}`;
+            }
+            for (const id of ['stock-action', 'bond-action']) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '資料未驗證，暫停新配置／交易建議';
+            }
+        }
 
         function updateOrders(mSafe, bScore, isEmerg, meta = {}) {
             let sa="", sc="", ba="", bc="";
@@ -2651,6 +2667,7 @@ if (recBlack) {
    const snap=window.v703MacroSnapshot;
    const valid=window.v703CanPublishFormalAllocation() && snap && finite(snap.mSafe_final) && snap.allocation && ['sTot','bTot','cTot','S0','B0','T'].every(k=>finite(snap.allocation[k])) && Math.abs(snap.allocation.S0+snap.allocation.B0-100)<0.01;
    if(!valid){
+     renderOrdersUnavailable();
      const provisional=window.v703CanCalculateProvisional?.()===true?window.v703ProvisionalSnapshot:null;
      if(!provisional){
        window.v703ProvisionalSnapshot=null;

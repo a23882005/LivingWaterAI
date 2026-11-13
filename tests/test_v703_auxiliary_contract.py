@@ -25,3 +25,6 @@ class AuxiliaryContractTests(unittest.TestCase):
   h=HTML.read_text();card=h[h.index('id="bond-nominal-yield"'):h.index('id="bond-score-display"')]
   for old in ('5.242%','2.6%','2.64%'):self.assertNotIn(old,card)
   self.assertIn('歷史教學範例：2026 年 1–2 月',h)
+
+  self.assertNotIn("自動回寫到上方「淨流動性 Δ13W」欄位，用於所有計算",h)
+  self.assertIn("歷史範例結果，不回寫當期指標、不參與當期計分",h)

@@ -31,7 +31,7 @@ permissions:
   contents: read
 jobs:
   v703-browser:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix/v703-cpi-official-transport' || github.ref == 'refs/heads/fix/v703-stale-auxiliary-cards'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/fix/v703-cpi-official-transport' || github.ref == 'refs/heads/fix/v703-stale-auxiliary-cards' || github.ref == 'refs/heads/fix/v703-commander-publication-state'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -79,6 +79,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_v703_auxiliary_contract.py' -v
           python -m unittest discover -s tests -p 'test_v703_auxiliary_cards.py' -v
+          python -m unittest discover -s tests -p 'test_v703_commander_state.py' -v
       - name: Browser test data-only display without formal scores; never deploy
         if: steps.publication.outputs.mode == 'DATA_ONLY'
         run: |

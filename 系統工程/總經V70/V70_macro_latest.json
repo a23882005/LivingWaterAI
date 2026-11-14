@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-11-14T02:07:32.089928Z",
+  "asOf": "2026-11-14T09:48:59.530652Z",
   "verification": {
     "ready": false,
     "publicationReady": true,
@@ -38,30 +38,30 @@
   },
   "indicators": {
     "m07": {
-      "value": 18.7,
-      "dataDate": "2026-11-12",
+      "value": 19.3,
+      "dataDate": "2026-11-13",
       "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "unit": "",
       "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-13T07:46:33.021694+00:00",
+      "lastVerifiedAt": "2026-11-14T07:31:29.578046+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-13T07:46:33.021694+00:00",
-              "observation_date": "2026-11-12"
+              "verified_at": "2026-11-14T07:31:29.578046+00:00",
+              "observation_date": "2026-11-13"
             }
           ]
         }
       }
     },
     "m01": {
-      "value": 0.24,
-      "dataDate": "2026-11-12",
+      "value": 0.27,
+      "dataDate": "2026-11-13",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
@@ -71,8 +71,8 @@
       "sourceEvidence": null
     },
     "m08": {
-      "value": 2.86,
-      "dataDate": "2026-11-12",
+      "value": 2.91,
+      "dataDate": "2026-11-13",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
@@ -82,22 +82,22 @@
       "sourceEvidence": null
     },
     "m02": {
-      "value": 3.3,
-      "dataDate": "2026-11-11",
+      "value": 3.2,
+      "dataDate": "2026-11-12",
       "source": "https://api.stlouisfed.org/fred/series/observations",
       "unit": "%",
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-13T07:47:06.920192+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:06.454227+00:00",
       "sourceEvidence": {
         "series": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:06.920192+00:00",
-              "observation_date": "2026-11-11"
+              "verified_at": "2026-11-14T07:32:06.454227+00:00",
+              "observation_date": "2026-11-12"
             }
           ]
         }
@@ -111,20 +111,20 @@
       "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
-      "lastVerifiedAt": "2026-11-14T10:07:23+08:00",
+      "lastVerifiedAt": "2026-11-14T17:48:48+08:00",
       "sourceEvidence": {
         "series": {
           "ISM_m04": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "FAILED",
-              "attempted_at": "2026-11-13T07:47:07.218609+00:00",
+              "attempted_at": "2026-11-14T07:32:06.984631+00:00",
               "error": "ISM report date or sector headline mismatch"
             },
             {
               "provider": "ISM_OFFICIAL_ROUNDUP",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:08.019204+00:00",
+              "verified_at": "2026-11-14T07:32:07.540151+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -139,7 +139,7 @@
       "method": "BLS/FRED 官方同比基期缺失驗證",
       "status": "OFFICIAL_UNAVAILABLE",
       "detail": "官方資料不足：2025-10 同比基期缺失，核心 CPI 年增率不參與計分。暫行總分沿群內有效值平均，通膨群僅使用 m13；m13 有效權重由 6.3% 提高至 12.6%。非完整 22 項正式總分，不作正式配置。",
-      "lastVerifiedAt": "2026-11-14T02:07:26.735880+00:00",
+      "lastVerifiedAt": "2026-11-14T09:48:55.146235+00:00",
       "officialUnavailable": {
         "schema": "V70.3/cpi-official-unavailability-v1",
         "reason": "CPI_YOY_BASE_PERIOD_MISSING",
@@ -149,7 +149,7 @@
         "baseIndex": null,
         "publicationDate": "2026-11-10",
         "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
-        "verifiedAtUtc": "2026-11-14T02:07:26.735880+00:00",
+        "verifiedAtUtc": "2026-11-14T09:48:55.146235+00:00",
         "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
         "seriesUrl": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
         "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
@@ -161,11 +161,11 @@
           "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
           "publicationDate": "2026-11-10"
         },
-        "seriesRetrievedAtUtc": "2026-11-14T02:07:26.735880+00:00"
+        "seriesRetrievedAtUtc": "2026-11-14T09:48:55.146235+00:00"
       }
     },
     "m09": {
-      "value": 103.153999,
+      "value": 103.410004,
       "dataDate": "2026-11-13",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
@@ -176,7 +176,7 @@
       "sourceEvidence": null
     },
     "m10": {
-      "value": 88.610001,
+      "value": 88.559998,
       "dataDate": "2026-11-13",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
@@ -187,8 +187,8 @@
       "sourceEvidence": null
     },
     "m12": {
-      "value": 98.43,
-      "dataDate": "2026-11-12",
+      "value": 98.790001,
+      "dataDate": "2026-11-13",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
@@ -198,8 +198,8 @@
       "sourceEvidence": null
     },
     "m13": {
-      "value": 2.31,
-      "dataDate": "2026-11-12",
+      "value": 2.3,
+      "dataDate": "2026-11-13",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
@@ -210,12 +210,12 @@
     },
     "m17": {
       "value": -0.03,
-      "dataDate": "2026-11-12",
+      "dataDate": "2026-11-13",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
-      "detail": "5Y breakeven change from 2026-10-09",
+      "detail": "5Y breakeven change from 2026-10-13",
       "lastVerifiedAt": null,
       "sourceEvidence": null
     },
@@ -227,22 +227,22 @@
       "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元",
       "status": "OK",
       "detail": "開始=2026-08-05, 結束=2026-11-04, 單位十億美元; Fed Δ=-0.422000, TGA Δ=6.923000, RRP Δ=-1.425000; 淨流動性 Δ=-5.920000",
-      "lastVerifiedAt": "2026-11-13T07:47:11.623898+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:11.503879+00:00",
       "sourceEvidence": {
         "series": {
           "RRPONTSYD": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:13.649638+00:00",
-              "observation_date": "2026-11-12"
+              "verified_at": "2026-11-14T07:32:13.475780+00:00",
+              "observation_date": "2026-11-13"
             }
           ],
           "WALCL": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:11.623898+00:00",
+              "verified_at": "2026-11-14T07:32:11.503879+00:00",
               "observation_date": "2026-11-11"
             }
           ],
@@ -250,7 +250,7 @@
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:12.624826+00:00",
+              "verified_at": "2026-11-14T07:32:12.541377+00:00",
               "observation_date": "2026-11-11"
             }
           ]
@@ -265,14 +265,14 @@
       "method": "ISM official monthly report headline PMI",
       "status": "OK",
       "detail": "Services headline; not subindex",
-      "lastVerifiedAt": "2026-11-13T07:47:13.751160+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:13.561947+00:00",
       "sourceEvidence": {
         "series": {
           "ISM_m15": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:13.751160+00:00",
+              "verified_at": "2026-11-14T07:32:13.561947+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -298,14 +298,14 @@
       "method": "Official FRED Sahm Rule Recession Indicator (real-time vintage), published series",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-13T07:47:17.109552+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:17.374719+00:00",
       "sourceEvidence": {
         "series": {
           "SAHMREALTIME": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:17.109552+00:00",
+              "verified_at": "2026-11-14T07:32:17.374719+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -320,14 +320,14 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-13T07:47:18.085629+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:18.439183+00:00",
       "sourceEvidence": {
         "series": {
           "UNRATE": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:18.085629+00:00",
+              "verified_at": "2026-11-14T07:32:18.439183+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -342,14 +342,14 @@
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
-      "lastVerifiedAt": "2026-11-13T07:47:19.100228+00:00",
+      "lastVerifiedAt": "2026-11-14T07:32:19.348466+00:00",
       "sourceEvidence": {
         "series": {
           "PAYEMS": [
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-13T07:47:19.100228+00:00",
+              "verified_at": "2026-11-14T07:32:19.348466+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -357,29 +357,29 @@
       }
     },
     "s03": {
-      "value": 18.7,
-      "dataDate": "2026-11-12",
+      "value": 19.3,
+      "dataDate": "2026-11-13",
       "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "unit": "",
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",
-      "lastVerifiedAt": "2026-11-13T07:46:33.021694+00:00",
+      "lastVerifiedAt": "2026-11-14T07:31:29.578046+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-13T07:46:33.021694+00:00",
-              "observation_date": "2026-11-12"
+              "verified_at": "2026-11-14T07:31:29.578046+00:00",
+              "observation_date": "2026-11-13"
             }
           ]
         }
       }
     },
     "s04": {
-      "value": 39.828571,
+      "value": 38.6,
       "dataDate": "2026-11-13",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
@@ -396,7 +396,7 @@
       "unit": "%",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=3d664e610f2318ec98f071bc74363bbc1d81885ff2148e17a8f008562ba5d60f，稽核檔data/audit/fed_target_evidence_20261114T020723Z.html.gz",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=e9f70a717d8d54b0adf2d1e56519bad653534d17d1b014428352b83b4f8102d5，稽核檔data/audit/fed_target_evidence_20261114T094848Z.html.gz",
       "policySchema": "fed-target-evidence-v1",
       "effectiveDate": "2026-09-17",
       "lowerBound": {
@@ -407,13 +407,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "lastVerifiedAt": "2026-11-14T10:07:23+08:00",
+      "lastVerifiedAt": "2026-11-14T17:48:48+08:00",
       "sourceEvidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-14T10:07:23+08:00",
+        "checked_at": "2026-11-14T17:48:48+08:00",
         "result": "CURRENT_CONFIRMED",
         "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
-        "response_sha256": "3d664e610f2318ec98f071bc74363bbc1d81885ff2148e17a8f008562ba5d60f",
+        "response_sha256": "e9f70a717d8d54b0adf2d1e56519bad653534d17d1b014428352b83b4f8102d5",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -432,7 +432,7 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC現行目標區間",
           "status": "FOUND",
-          "checked_at": "2026-11-14T10:07:23+08:00",
+          "checked_at": "2026-11-14T17:48:48+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
@@ -472,7 +472,7 @@
           "notes": "直接取得成功；ALFRED觀測4.00%；SHA256=b8d0bed9ae007f1374226b1d10817e841d1173e49e2e7ee77baa6c91356471df｜本輪HTTP 200，取得65662 bytes，內容SHA256=1a8bd01ef20be543433d7bea29da93dfd1f33f9f0305db1e2eeb3f0821b5c1ec"
         }
       ],
-      "retrievalTime": "2026-11-14T10:07:23+08:00",
+      "retrievalTime": "2026-11-14T17:48:48+08:00",
       "publicationDate": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-10"
     },
@@ -657,7 +657,7 @@
       "unit": "%",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "INDEX/MMFI 日期2026-11-13收盤45.87%，採EOD收盤非盤中LAST；來源SHA256=dde3dc68a6a27632143e8df5fc9e1533fe4bb30b9f27379ec28b3f5c8904b686",
+      "detail": "INDEX/MMFI 日期2026-11-13收盤45.87%，採EOD收盤非盤中LAST；來源SHA256=7eca1d870ea510d9605c4fa6a84928431f82509887b71680dde47ad6b1fcc10b",
       "candidateChecks": [
         {
           "site": "Macroaxis",
@@ -686,11 +686,11 @@
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日均線百分比",
           "status": "FOUND",
-          "checked_at": "2026-11-14T10:07:23+08:00",
+          "checked_at": "2026-11-14T17:48:48+08:00",
           "value": 45.87,
           "unit": "%",
           "observation_date": "2026-11-13",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=dde3dc68a6a27632143e8df5fc9e1533fe4bb30b9f27379ec28b3f5c8904b686"
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=7eca1d870ea510d9605c4fa6a84928431f82509887b71680dde47ad6b1fcc10b"
         },
         {
           "site": "TradingView",
@@ -704,22 +704,22 @@
           "notes": "定義可核對但靜態頁未列可驗證EOD數值；SHA256=6cd450c7d39108d0c7566b0a67f27c6bd5d54a8510347be87a6a46d5c4811058｜本輪HTTP 200，取得323380 bytes，內容SHA256=a9447894ff70c6e2f984be7001e07721b28fa1d23e99519762938f3421b61a55"
         }
       ],
-      "retrievalTime": "2026-11-14T10:07:23+08:00",
+      "retrievalTime": "2026-11-14T17:48:48+08:00",
       "publicationDate": "2026-11-13",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10"
     },
     "m03_qqq": {
-      "value": 19.91,
+      "value": 19.89,
       "dataDate": "2026-11-13",
       "source": "https://stockanalysis.com/etf/qqq/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "QQQ Forward PE 19.91，頁面資料日2026-11-13",
-      "lastVerifiedAt": "2026-11-14T10:07:23+08:00",
+      "detail": "QQQ Forward PE 19.89，頁面資料日2026-11-13",
+      "lastVerifiedAt": "2026-11-14T17:48:48+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
-        "value": 19.91,
+        "value": 19.89,
         "source_url": "https://stockanalysis.com/etf/qqq/"
       },
       "candidateChecks": [
@@ -761,29 +761,29 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-14T10:07:23+08:00",
-          "value": 19.91,
+          "checked_at": "2026-11-14T17:48:48+08:00",
+          "value": 19.89,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "retrievalTime": "2026-11-14T10:07:23+08:00",
+      "retrievalTime": "2026-11-14T17:48:48+08:00",
       "publicationDate": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11"
     },
     "m03_spy": {
-      "value": 18.81,
+      "value": 18.95,
       "dataDate": "2026-11-13",
       "source": "https://stockanalysis.com/etf/spy/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "SPY Forward PE 18.81，頁面資料日2026-11-13",
-      "lastVerifiedAt": "2026-11-14T10:07:23+08:00",
+      "detail": "SPY Forward PE 18.95，頁面資料日2026-11-13",
+      "lastVerifiedAt": "2026-11-14T17:48:48+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
-        "value": 18.81,
+        "value": 18.95,
         "source_url": "https://stockanalysis.com/etf/spy/"
       },
       "candidateChecks": [
@@ -825,29 +825,29 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-14T10:07:23+08:00",
-          "value": 18.81,
+          "checked_at": "2026-11-14T17:48:48+08:00",
+          "value": 18.95,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "retrievalTime": "2026-11-14T10:07:23+08:00",
+      "retrievalTime": "2026-11-14T17:48:48+08:00",
       "publicationDate": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11"
     },
     "m03_vt": {
-      "value": 15.07,
+      "value": 15.08,
       "dataDate": "2026-11-13",
       "source": "https://stockanalysis.com/etf/vt/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "VT Forward PE 15.07，頁面資料日2026-11-13",
-      "lastVerifiedAt": "2026-11-14T10:07:23+08:00",
+      "detail": "VT Forward PE 15.08，頁面資料日2026-11-13",
+      "lastVerifiedAt": "2026-11-14T17:48:48+08:00",
       "sourceEvidence": {
         "label": "Forward PE",
-        "value": 15.07,
+        "value": 15.08,
         "source_url": "https://stockanalysis.com/etf/vt/"
       },
       "candidateChecks": [
@@ -889,14 +889,14 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-14T10:07:23+08:00",
-          "value": 15.07,
+          "checked_at": "2026-11-14T17:48:48+08:00",
+          "value": 15.08,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
-      "retrievalTime": "2026-11-14T10:07:23+08:00",
+      "retrievalTime": "2026-11-14T17:48:48+08:00",
       "publicationDate": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11"
     },
@@ -921,7 +921,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-13T07:47:15.149015+00:00"
+      "retrieved_at": "2026-11-14T07:32:15.319646+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -932,7 +932,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-13T07:47:15.826704+00:00"
+      "retrieved_at": "2026-11-14T07:32:16.219523+00:00"
     },
     {
       "observation_date": "2026-09-01",
@@ -943,7 +943,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-13T07:47:16.921007+00:00"
+      "retrieved_at": "2026-11-14T07:32:17.219132+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -1067,13 +1067,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-11-14T10:07:32+08:00",
+  "dataUpdatedAt": "2026-11-14T17:48:59+08:00",
   "sourceSnapshot": {
-    "macro18": "89027359395c19533738ce35c0986e565b0cc088",
-    "macro8": "d270c5a07dd2ec2e6a820fc877eb36aa28a14334",
-    "officialReleaseCalendar": "5376dc332dc61ce60ca3dca65a6007a2e08fcf46",
+    "macro18": "23f8308a8023bb3d1f036c3c92f736747a1d8b09",
+    "macro8": "7804d4a6509f9dc792fbc25e39605c2736c177db",
+    "officialReleaseCalendar": "b4737f55c410a847c7ea123106a38e6ab092992c",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-11-13T15:47:19.248760+08:00",
-    "macro8GeneratedAt": "2026-11-14T10:07:23+08:00"
+    "macro18GeneratedAt": "2026-11-14T15:32:19.445195+08:00",
+    "macro8GeneratedAt": "2026-11-14T17:48:48+08:00"
   }
 }

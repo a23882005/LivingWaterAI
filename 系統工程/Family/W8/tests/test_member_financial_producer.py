@@ -131,3 +131,104 @@ def test_public_history_source_reaches_original_c7_options_without_becoming_a_fi
             'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':[{'code':'ORIGINAL_FINANCIAL_FACTS_STILL_REQUIRED'}]}}
     out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=factory,public_history_sources=sources)
     assert out['public_history_source_binding']['digest']=='c'*64 and pack is None and not out['qualified_financial_pack']
+
+
+def document_case(tmp_path):
+    from approved_target_input import build_approved_target_view
+    r,d,desc=case(tmp_path);client='fam_'+'a'*32;r['client_id']=d['client_id']=client
+    line='| SYNTHETIC_ASSET | 100% | NT$1,000 |'
+    document=tmp_path/'SYNTHETIC_APPROVED.md'
+    document.write_text('# SYNTHETIC_BROKER\n| 標的 | 權重 | 目標金額NT$ |\n'+line+'\n')
+    args={'client_id':client,'source_path':str(document),'source_reference':'SYNTHETIC_APPROVED_SOURCE',
+        'source_available_at':'2026-10-01T00:00:00Z','target_version':2,'allocation_version':'SYNTHETIC_V2',
+        'rows':[{'source_line':line,'weight':'1'}],
+        'mappings':[{'instrument_id':'SYNTHETIC_ASSET','ticker':'SYNTHETIC_ASSET','asset_type':'股票ETF'}]}
+    r['confirmed_target']=build_approved_target_view(**args)['target'];r['macro_snapshot']=None
+    r['trade_authorization']='NONE'
+    tables={'portfolio_account':[{'client_id':client,'account_key':'SYNTHETIC_ACCOUNT'}],
+        'account_ownership':[{'account_key':'SYNTHETIC_ACCOUNT','owner_client_id':client,
+            'ownership_state':'VERIFIED','created_at_utc':'2026-10-01T00:00:00Z'}],
+        'account_broker_link':[{'account_key':'SYNTHETIC_ACCOUNT','broker_key':'SYNTHETIC_BROKER',
+            'link_state':'ACTIVE','created_at_utc':'2026-10-01T00:00:00Z'}],
+        'funding_domain':[],'funding_account_domain_link':[]}
+    snapshot=r['client_snapshot']['payload'];snapshot.update(client_id=client,tables=tables,payload_digest=digest(tables))
+    source={'schema_version':'Family.W8.MemberDocumentAccountAnalysis.v1','client_id':client,
+        'asset_id':'SYNTHETIC_ASSET','source_db_sha256':'a'*64,'target_version':2,
+        'source_reference':'SYNTHETIC_RAW_ANALYSIS_INPUT','available_at':'2026-10-01T00:00:00Z',
+        'document_target':{**args,'sha256':sha256(document.read_bytes()).hexdigest()},
+        'account_category':{'account_key':'SYNTHETIC_ACCOUNT','broker':'SYNTHETIC_BROKER',
+            'broker_source_label':'SYNTHETIC_BROKER','currency':'TWD','funding_domain':'ANALYSIS_CATEGORY'},
+        'classification_source':{'source_reference':'SYNTHETIC_CLASSIFICATION_NOT_CONSUMED_WITHOUT_MACRO'}}
+    d['configuration']=None
+    def sources():
+        p=tmp_path/'SYNTHETIC_ANALYSIS_SOURCE.json';p.write_text(json.dumps(source))
+        d['document_account_analysis_source']={'local_path':str(p),'sha256':sha256(p.read_bytes()).hexdigest()}
+        return desc()
+    return r,d,source,sources
+
+
+def test_document_account_route_reaches_real_w5_before_missing_macro_without_funding(tmp_path):
+    r,d,s,sources=document_case(tmp_path);before=deepcopy(r)
+    def forbidden(**cfg):pytest.fail('Missing macro must not enter native financial production')
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',sources(),producer_factory=forbidden)
+    bound=out['account_analysis_binding']
+    assert bound['cash_verified'] is False and bound['holdings_completeness_verified'] is False
+    assert bound['owner']['broker']=='SYNTHETIC_BROKER'
+    assert out['issues'][0]['code']=='MEMBER_PRODUCER_PRECAPTURED_MACRO_REQUIRED'
+    assert 'W5.family_boundary.bind_owner:document_analysis_category' in out['call_trace']
+    assert pack is None and out['qualified_financial_pack'] is False and r==before
+
+
+@pytest.mark.parametrize('change,code',[
+    ('member','SCOPE_MISMATCH'),('db','SCOPE_MISMATCH'),('asset','SCOPE_MISMATCH'),
+    ('version','SCOPE_MISMATCH'),('future','AFTER_CUTOFF'),
+    ('account','ACCOUNT_CATEGORY_MISSING_OR_AMBIGUOUS'),
+    ('ownership','ORIGINAL_ACCOUNT_CLASSIFICATION_REQUIRED'),('target','TARGET_REPLAY_MISMATCH')])
+def test_document_analysis_source_cannot_change_owner_db_asset_approval_or_time(tmp_path,change,code):
+    r,d,s,sources=document_case(tmp_path)
+    if change=='member':s['client_id']='fam_'+'b'*32
+    elif change=='db':s['source_db_sha256']='b'*64
+    elif change=='asset':s['asset_id']='OTHER'
+    elif change=='version':s['target_version']=3
+    elif change=='future':s['available_at']='2099-01-01T00:00:00Z'
+    elif change=='account':s['account_category']['account_key']='OTHER'
+    elif change=='ownership':
+        snap=r['client_snapshot']['payload'];snap['tables']['account_ownership'][0]['ownership_state']='UNKNOWN'
+        snap['payload_digest']=digest(snap['tables'])
+    else:r['confirmed_target']['target_hash']='changed'
+    with pytest.raises((ValueError,PermissionError),match=code):
+        produce(ROOT,r,'SYNTHETIC_ASSET',sources())
+
+
+def test_document_analysis_source_and_document_bytes_are_pinned(tmp_path):
+    r,d,s,sources=document_case(tmp_path);desc=sources()
+    p=Path(d['document_account_analysis_source']['local_path']);p.write_bytes(p.read_bytes()+b' ')
+    with pytest.raises(PermissionError,match='SOURCE_BYTES_CHANGED'):
+        produce(ROOT,r,'SYNTHETIC_ASSET',desc)
+    desc=sources();Path(s['document_target']['source_path']).write_text('changed')
+    with pytest.raises(PermissionError,match='DOCUMENT_BYTES_CHANGED'):
+        produce(ROOT,r,'SYNTHETIC_ASSET',desc)
+
+
+def test_document_analysis_seed_reaches_original_dispatch_with_analysis_scope_only(tmp_path):
+    r,d,s,sources=document_case(tmp_path);r['macro_snapshot']={'synthetic':'factory-only input'}
+    seen=[]
+    def factory(**cfg):
+        seen.append(cfg)
+        assert cfg['request_seed']['owner']['account']=='SYNTHETIC_ACCOUNT'
+        assert cfg['context_seed']['approved_document_account_scope']['cash_verified'] is False
+        assert cfg['cash_policy']=={}  # No hypothetical zero-cash authorization.
+        return lambda *args:{'request':deepcopy(cfg['request_seed']),'source_production':{
+            'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':[{'code':'SYNTHETIC_REAL_FUNDING_STILL_REQUIRED'}]}}
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',sources(),producer_factory=factory)
+    assert len(seen)==1 and pack is None and not out['qualified_financial_pack']
+    assert out['issues'][0]['code']=='SYNTHETIC_REAL_FUNDING_STILL_REQUIRED'
+
+
+@pytest.mark.parametrize('change',['trade','snapshot_digest'])
+def test_document_analysis_cannot_relabel_trade_or_snapshot_integrity(tmp_path,change):
+    r,d,s,sources=document_case(tmp_path)
+    if change=='trade':r['trade_authorization']='OTHER'
+    else:r['client_snapshot']['payload']['payload_digest']='changed'
+    with pytest.raises(PermissionError,match='SCOPE_MISMATCH'):
+        produce(ROOT,r,'SYNTHETIC_ASSET',sources())

@@ -13,6 +13,64 @@ import re
 from family_input import digest
 
 
+def document_analysis_configuration(request,symbol,descriptor):
+    """Build an analysis-only seed from explicit pinned document/account inputs.
+
+    An absent deployment bootstrap need not erase an existing document account
+    category. This adapter creates no funding proof or holdings attestation.
+    """
+    from approved_target_input import build_approved_target_view,bind_document_account_scope
+    from member_market_source import time
+    from deployment_c7_sources import FAMILY_PROFILE
+    raw=Path(descriptor['local_path']).read_bytes()
+    if sha256(raw).hexdigest()!=descriptor['sha256']:
+        raise PermissionError('MEMBER_ANALYSIS_SOURCE_BYTES_CHANGED')
+    source=json.loads(raw);snapshot=request['client_snapshot']['payload']
+    if (source.get('schema_version')!='Family.W8.MemberDocumentAccountAnalysis.v1'
+        or source.get('client_id')!=request['client_id'] or source.get('asset_id')!=symbol
+        or snapshot.get('client_id')!=request['client_id']
+        or snapshot.get('payload_digest')!=digest(snapshot.get('tables'))
+        or request.get('trade_authorization')!='NONE'
+        or source.get('source_db_sha256')!=snapshot['source_sha256']
+        or source.get('target_version')!=request['confirmed_target']['target_version']
+        or not source.get('source_reference')
+        or any(k in source for k in ('native_bundle','native_result','family_scope','configuration'))):
+        raise PermissionError('MEMBER_ANALYSIS_SOURCE_SCOPE_MISMATCH')
+    if time(source['available_at'])>time(request['evaluation_at']):
+        raise PermissionError('MEMBER_ANALYSIS_SOURCE_AFTER_CUTOFF')
+    args=deepcopy(source['document_target']);expected=args.pop('sha256')
+    if sha256(Path(args['source_path']).read_bytes()).hexdigest()!=expected:
+        raise PermissionError('MEMBER_ANALYSIS_DOCUMENT_BYTES_CHANGED')
+    pack=build_approved_target_view(**args,evaluation_at=request['evaluation_at'])
+    if pack['target']!=request['confirmed_target']:
+        raise PermissionError('MEMBER_ANALYSIS_TARGET_REPLAY_MISMATCH')
+    scope=bind_document_account_scope(snapshot,pack,**source['account_category'])
+    owner=scope['owner']
+    ownership=[r for r in snapshot['tables'].get('account_ownership',[]) if r.get('account_key')==owner['account']]
+    brokers=[r for r in snapshot['tables'].get('account_broker_link',[]) if r.get('account_key')==owner['account']]
+    if (len(ownership)!=1 or ownership[0].get('owner_client_id')!=request['client_id']
+        or ownership[0].get('ownership_state')!='VERIFIED' or len(brokers)!=1
+        or brokers[0].get('broker_key')!=owner['broker'] or brokers[0].get('link_state')!='ACTIVE'
+        or any(time(r.get('as_of_utc') or r['created_at_utc'])>time(request['evaluation_at'])
+            for r in ownership+brokers)):
+        raise PermissionError('MEMBER_ANALYSIS_ORIGINAL_ACCOUNT_CLASSIFICATION_REQUIRED')
+    versions={'target':str(request['confirmed_target']['target_version']),
+        'funding':'UNAVAILABLE_NO_QUALIFIED_FUNDING_SOURCE',
+        'market':(request.get('macro_snapshot') or {}).get('digest') or 'UNAVAILABLE_NO_QUALIFIED_MACRO',
+        'policy':'ANALYSIS_ONLY_NO_NEW_FUNDS'}
+    seed={**deepcopy(request),'schema_version':'Family.W5.request.v1','request_id':request['run_id']+'-analysis',
+        'owner':deepcopy(owner),'analysis_permission':'ANALYZE_ONLY','expected_versions':versions,
+        'trade_authorization':'NONE','client_snapshot':{'payload':deepcopy(snapshot),
+            'digest':digest(snapshot),'snapshot_version':snapshot['source_sha256'],'as_of':request['evaluation_at']}}
+    context={'client_id':request['client_id'],'analysis_permission':'ANALYZE_ONLY','expected_versions':deepcopy(versions),
+        'snapshot_version':snapshot['source_sha256'],'snapshot_digest':digest(snapshot),
+        'target_hash':pack['target']['target_hash'],'approved_document_target_source':pack['trusted_approved_target_source'],
+        'approved_document_account_scope':scope,'family_c7_profile':FAMILY_PROFILE}
+    return {'request_seed':seed,'context_seed':context,'cash_policy':{},
+        'classification_source':deepcopy(source['classification_source']),
+        'source_commit':source.get('source_commit')}
+
+
 def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None):
     raw=Path(descriptor['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_PRODUCER_SOURCE_BYTES_CHANGED')
@@ -30,6 +88,9 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         'source_descriptor_digest':digest(descriptor),'qualified_financial_pack':False,
         'call_trace':['W8.member_financial_producer'],'trade_action':'NO_TRADE'}
     cfg=deepcopy(data.get('configuration'))
+    if cfg is None and data.get('document_account_analysis_source') is not None:
+        cfg=document_analysis_configuration(request,symbol,data['document_account_analysis_source'])
+        attempt['document_account_analysis_source']=deepcopy(data['document_account_analysis_source'])
     public_binding=None
     if public_history_sources is not None:
         from historical_source_qualification import bind
@@ -75,6 +136,16 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     from dated_document_target_source import is_dated,bind_producer_seed
     if is_dated(request['confirmed_target']):
         cfg,attempt['dated_target_source_binding']=bind_producer_seed(cfg,request,normalized)
+    scope=cfg['context_seed'].get('approved_document_account_scope')
+    if scope is not None:
+        # Consume the real W5 analysis-category path before unrelated macro
+        # readiness. Its False cash/completeness flags never qualify funding.
+        from family_boundary import bind_owner
+        from member_market_source import time
+        account=bind_owner(request['client_snapshot']['payload'],owner,time(request['evaluation_at']),
+            approved_account_scope=scope)
+        attempt['account_analysis_binding']=account
+        attempt['call_trace'].append('W5.family_boundary.bind_owner:document_analysis_category')
     # The Member's current approval governs this run. An older bootstrap may
     # retain a withdrawn historical money table; never calculate from it when
     # the current approved investment pool is unresolved.

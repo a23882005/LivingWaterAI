@@ -1,0 +1,28 @@
+PR59 document-account analysis source continuation
+
+Parent: cba617757354d644ac55b43f4a6a9ad089b55326.
+Writer record only; independent PM acceptance pending.
+
+When a per-asset deployment bootstrap is absent, an explicit hash-pinned
+MemberDocumentAccountAnalysis source can rebuild the existing document target
+and account-category analysis seed. The adapter checks member, DB, asset,
+target version, availability, original ownership and broker classification.
+It reuses bind_document_account_scope and the unchanged W5 bind_owner path.
+
+The producer now records the actual W5 account-analysis binding before the
+independent macro guard. Cash and holdings completeness stay unverified.
+No funding-domain row, cash-zero policy, native output or approval is created.
+Inputs without the optional source retain their previous missing-root behavior.
+
+Validation: 71 directly related tests passed; 183 authorized source/dependency
+hashes verified. Real private source continuation reaches the original macro
+guard and retains the source rejection. Full finance and execution are not
+accepted by these engineering checks. Full regression remains deferred.
+
+H32, H33 and existing scoped PASS are preserved. W5 behavior, V70 reader,
+investment rules and formal DB/ledgers are unchanged. No merge, deployment,
+schedule or broker action. Full financial PASS 0; real Cycle 0;
+Production HOLD; trade authorization NONE.
+
+Private input/output and detailed remaining source fields are delivered in
+Google Drive TEMP under the existing private handback naming convention.

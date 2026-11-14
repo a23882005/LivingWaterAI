@@ -1,0 +1,451 @@
+{
+  "schema_version": "Family.W8.CompanyIdentityCatalog.v1",
+  "items": {
+    "IBKR": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "IBKR",
+      "company_name": "Interactive Brokers Group, Inc.",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29847,
+      "source_reference": "FinancialFilings.companies_retrieve:29847",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XNAS",
+          "ticker": "IBKR",
+          "exchange_name": "Nasdaq",
+          "exch_code": "UW",
+          "security_type": "Common Stock",
+          "figi": "BBG000LV1PQ2"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "IBKR",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG000LV0BX6"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "IBKR",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG000LV08R0"
+        },
+        {
+          "mic": "XWBO",
+          "ticker": "IBKR",
+          "exchange_name": "Vienna Stock Exchange",
+          "exch_code": "AV",
+          "security_type": "Common Stock",
+          "figi": "BBG024W3F0P3"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "MSFT": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "MSFT",
+      "company_name": "MICROSOFT CORP",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29734,
+      "source_reference": "FinancialFilings.companies_retrieve:29734",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XSGO",
+          "ticker": "MSFT",
+          "exchange_name": "Bolsa de Comercio de Santiago",
+          "exch_code": "CC",
+          "security_type": "Common Stock",
+          "figi": "BBG0032FLQT5"
+        },
+        {
+          "mic": "XBSE",
+          "ticker": "MSFT",
+          "exchange_name": "Bucharest Stock Exchange",
+          "exch_code": "RO",
+          "security_type": "Common Stock",
+          "figi": "BBG002YTK8F8"
+        },
+        {
+          "mic": "XBRN",
+          "ticker": "MSFT",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG006M6ZMY4"
+        },
+        {
+          "mic": "XNAS",
+          "ticker": "MSFT",
+          "exchange_name": "Nasdaq",
+          "exch_code": "UW",
+          "security_type": "Common Stock",
+          "figi": "BBG000BPHFS9"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "MSFT",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG000BPH654"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "MSFT",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG000BPH4R5"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "MSFT",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG002JV1GY2"
+        },
+        {
+          "mic": "XWBO",
+          "ticker": "MSFT",
+          "exchange_name": "Vienna Stock Exchange",
+          "exch_code": "AV",
+          "security_type": "Common Stock",
+          "figi": "BBG00GQ6S788"
+        },
+        {
+          "mic": "XWAR",
+          "ticker": "MSFT",
+          "exchange_name": "Warsaw Stock Exchange",
+          "exch_code": "PW",
+          "security_type": "Common Stock",
+          "figi": "BBG01NX6JZV6"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "NVDA": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "NVDA",
+      "company_name": "NVIDIA CORP",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29733,
+      "source_reference": "FinancialFilings.companies_retrieve:29733",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XSGO",
+          "ticker": "NVDA",
+          "exchange_name": "Bolsa de Comercio de Santiago",
+          "exch_code": "CC",
+          "security_type": "Common Stock",
+          "figi": "BBG01QSBFNB7"
+        },
+        {
+          "mic": "XBRN",
+          "ticker": "NVDA",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG006TLSQ19"
+        },
+        {
+          "mic": "XNAS",
+          "ticker": "NVDA",
+          "exchange_name": "Nasdaq",
+          "exch_code": "UW",
+          "security_type": "Common Stock",
+          "figi": "BBG000BBK0R0"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "NVDA",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG000BBJS55"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "NVDA",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG000BBJR84"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "NVDA",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG006TLSPX6"
+        },
+        {
+          "mic": "XWBO",
+          "ticker": "NVDA",
+          "exchange_name": "Vienna Stock Exchange",
+          "exch_code": "AV",
+          "security_type": "Common Stock",
+          "figi": "BBG00GQ6S7X0"
+        },
+        {
+          "mic": "XWAR",
+          "ticker": "NVDA",
+          "exchange_name": "Warsaw Stock Exchange",
+          "exch_code": "PW",
+          "security_type": "Common Stock",
+          "figi": "BBG01NX6K372"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "AVGO": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "AVGO",
+      "company_name": "Broadcom Inc.",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29739,
+      "source_reference": "FinancialFilings.companies_retrieve:29739",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XSGO",
+          "ticker": "AVGO",
+          "exchange_name": "Bolsa de Comercio de Santiago",
+          "exch_code": "CC",
+          "security_type": "Common Stock",
+          "figi": "BBG01QVYHKD5"
+        },
+        {
+          "mic": "XBRN",
+          "ticker": "AVGO",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG00KKCRDY1"
+        },
+        {
+          "mic": "XNAS",
+          "ticker": "AVGO",
+          "exchange_name": "Nasdaq",
+          "exch_code": "UW",
+          "security_type": "Common Stock",
+          "figi": "BBG00KHY5SQ7"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "AVGO",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG00KHY5S96"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "AVGO",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG00KHY5S78"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "AVGO",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG00KKCRDT7"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "GOOG": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "GOOG",
+      "company_name": "Alphabet Inc.",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29736,
+      "source_reference": "FinancialFilings.companies_retrieve:29736",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XSGO",
+          "ticker": "GOOG",
+          "exchange_name": "Bolsa de Comercio de Santiago",
+          "exch_code": "CC",
+          "security_type": "Common Stock",
+          "figi": "BBG00YJL3ZW2"
+        },
+        {
+          "mic": "XBRN",
+          "ticker": "GOOG",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG00LVD61W6"
+        },
+        {
+          "mic": "XNAS",
+          "ticker": "GOOG",
+          "exchange_name": "Nasdaq",
+          "exch_code": "UW",
+          "security_type": "Common Stock",
+          "figi": "BBG009S4MVF2"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "GOOG",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG009S4MV08"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "GOOG",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG009S4MTX7"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "GOOG",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG00LVD61Q3"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "ZTS": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "ZTS",
+      "company_name": "Zoetis Inc.",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29945,
+      "source_reference": "FinancialFilings.companies_retrieve:29945",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XBRN",
+          "ticker": "ZTS",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG00LVGKF70"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "ZTS",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG003932MF0"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "ZTS",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG003932MB4"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "ZTS",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG00LVGKF34"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "MDT": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "MDT",
+      "company_name": "Medtronic plc",
+      "provider": "FinancialFilings",
+      "provider_company_id": 29841,
+      "source_reference": "FinancialFilings.companies_retrieve:29841",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XBRN",
+          "ticker": "MDT",
+          "exchange_name": "BX Swiss",
+          "exch_code": "BW",
+          "security_type": "Common Stock",
+          "figi": "BBG006TLRYQ6"
+        },
+        {
+          "mic": "XNYS",
+          "ticker": "MDT",
+          "exchange_name": "New York Stock Exchange",
+          "exch_code": "UN",
+          "security_type": "Common Stock",
+          "figi": "BBG000BNWJ36"
+        },
+        {
+          "mic": "XASE",
+          "ticker": "MDT",
+          "exchange_name": "NYSE American",
+          "exch_code": "UA",
+          "security_type": "Common Stock",
+          "figi": "BBG000BNWGF9"
+        },
+        {
+          "mic": "XSWX",
+          "ticker": "MDT",
+          "exchange_name": "SIX Swiss Exchange",
+          "exch_code": "SE",
+          "security_type": "Common Stock",
+          "figi": "BBG006TLRYL1"
+        },
+        {
+          "mic": "XWBO",
+          "ticker": "MDT",
+          "exchange_name": "Vienna Stock Exchange",
+          "exch_code": "AV",
+          "security_type": "Common Stock",
+          "figi": "BBG011RHZZH5"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    },
+    "ADBE": {
+      "schema_version": "Family.W8.CompanyListingIdentity.v1",
+      "symbol": "ADBE",
+      "company_name": "Adobe Inc.",
+      "provider": "SEC registered securities table",
+      "source_reference": "https://www.sec.gov/Archives/edgar/data/796343/000079634326000156/adbe-20260828.htm",
+      "verified_on": "2026-10-28",
+      "listing_status": "LISTED",
+      "listings": [
+        {
+          "mic": "XNAS",
+          "ticker": "ADBE",
+          "exchange_name": "NASDAQ",
+          "security_type": "Common Stock"
+        }
+      ],
+      "scope": "COMPANY_PRODUCT_ANALYSIS_REFERENCE__NOT_HELD_VENUE_OR_GRADE_ATTESTATION"
+    }
+  }
+}
+

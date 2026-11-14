@@ -1,6 +1,6 @@
 from copy import deepcopy
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime,timedelta
 import sys
 import pytest
 from family_boundary import prepare_input,BoundaryError
@@ -77,7 +77,10 @@ def test_bond_policy_preserves_native_existing_risk_reduction():
 def test_actual_w3_reader_move_reaches_original_v75_predicate_without_rewriting_feed():
     snapshot=read_macro_snapshot(ROOT,source_commit='32c9322c8bb3150480f6c86becf28e04592f5e8e')
     before=deepcopy(snapshot)
-    projected=project_macro(snapshot,'2026-10-21T00:00:00+08:00')
+    observed=datetime.fromisoformat(snapshot['asOf'].replace('Z','+00:00'))
+    with pytest.raises(BoundaryError,match='FUTURE_MACRO'):
+        project_macro(snapshot,(observed-timedelta(seconds=1)).isoformat())
+    projected=project_macro(snapshot,observed.isoformat())
     sys.path.insert(0,str(ROOT/V75_PATH))
     from v75_runtime.predicates import EVALUATORS
     value=projected['fields']['PRED-005.move']['value']

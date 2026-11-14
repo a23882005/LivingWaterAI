@@ -118,8 +118,18 @@ def _load_schema(path: Path) -> dict[str, Any]:
 def _validator(path: Path) -> Draft202012Validator:
     return Draft202012Validator(_load_schema(path))
 
+def _absence_contract():
+    import importlib.util
+    path=Path(__file__).resolve().parents[4]/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py'
+    spec=importlib.util.spec_from_file_location('c7_confirmed_absence_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def _schema(value: Any, path: Path, code: str) -> None:
-    errors = sorted(_validator(path).iter_errors(value), key=lambda e: list(e.absolute_path))
+    validator=_validator(path);absence=_absence_contract()
+    if absence.is_extended(value):validator=Draft202012Validator(absence.extend_schema(validator.schema))
+    errors = sorted(validator.iter_errors(value), key=lambda e: list(e.absolute_path))
     if errors:
         e = errors[0]
         loc = "/".join(str(x) for x in e.absolute_path) or "$"

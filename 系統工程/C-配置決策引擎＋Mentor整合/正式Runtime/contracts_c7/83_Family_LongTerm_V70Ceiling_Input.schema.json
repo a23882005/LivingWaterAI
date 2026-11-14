@@ -1,0 +1,664 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "C.FamilyLongTermV70CeilingInput.v1"
+    },
+    "profile": {
+      "const": "FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1"
+    },
+    "approval_contract_sha256": {
+      "const": "112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "client_id",
+        "run_id",
+        "portfolio_id"
+      ]
+    },
+    "family_owner": {
+      "$ref": "#/$defs/owner"
+    },
+    "budget_currency": {
+      "type": "string",
+      "minLength": 1
+    },
+    "account_owners": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/owner"
+      },
+      "minItems": 1
+    },
+    "source_db_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "target_version": {
+      "type": [
+        "string",
+        "integer"
+      ]
+    },
+    "approved_long_term_target": {
+      "type": "object"
+    },
+    "approved_target_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "approval_receipt": {
+      "$ref": "#/$defs/receipt"
+    },
+    "protection_coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "preference_locks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instrument_id",
+          "ticker",
+          "protected_existing_holding",
+          "client_preference_locked",
+          "final_target_locked_to_current",
+          "current_weight",
+          "preference_confirmed_at",
+          "preference_source_ids",
+          "unlock_confirmed_at",
+          "unlock_source_ids"
+        ],
+        "properties": {
+          "instrument_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ticker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "protected_existing_holding": {
+            "type": "boolean"
+          },
+          "client_preference_locked": {
+            "type": "boolean"
+          },
+          "final_target_locked_to_current": {
+            "type": "boolean"
+          },
+          "current_weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "preference_confirmed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "preference_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "unlock_confirmed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unlock_source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "current_nav": {
+      "type": "object"
+    },
+    "total_stock_ceiling": {
+      "$ref": "#/$defs/ceiling"
+    },
+    "portfolio_caps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cap"
+      }
+    },
+    "exposure_coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "exposures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/exposure"
+      }
+    },
+    "funding_buckets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/funding"
+      },
+      "minItems": 1
+    },
+    "budget_normalizations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fx"
+      }
+    },
+    "upstream_net_capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "producer_contract": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gross_input_digest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "producer_contract",
+        "gross_input_digest",
+        "amount",
+        "receipt"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile",
+    "approval_contract_sha256",
+    "identity",
+    "family_owner",
+    "account_owners",
+    "budget_currency",
+    "source_db_sha256",
+    "target_version",
+    "approved_long_term_target",
+    "approved_target_digest",
+    "approval_receipt",
+    "protection_coverage",
+    "preference_locks",
+    "current_nav",
+    "total_stock_ceiling",
+    "portfolio_caps",
+    "exposure_coverage",
+    "exposures",
+    "funding_buckets"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:livingwater:c7:family-long-term-input:v1",
+  "$defs": {
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "broker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "funding_domain": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "client_id",
+        "broker",
+        "account",
+        "currency",
+        "funding_domain"
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_reference_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "available_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualification": {
+          "const": "VERIFIED_AT_CUTOFF"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "empty_portfolio_asserted": {
+          "type": "boolean"
+        },
+        "confirmed_effects_already_applied": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "source_reference_id",
+        "source_sha256",
+        "as_of",
+        "available_at",
+        "qualification"
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_reference_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "available_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualification": {
+          "const": "VERIFIED_AT_CUTOFF"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "empty_portfolio_asserted": {
+          "type": "boolean"
+        },
+        "confirmed_effects_already_applied": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "source_reference_id",
+        "source_sha256",
+        "as_of",
+        "available_at",
+        "qualification",
+        "complete",
+        "empty_portfolio_asserted",
+        "confirmed_effects_already_applied"
+      ]
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "base_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_reference_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "base_id",
+        "amount",
+        "currency",
+        "source_reference_id"
+      ]
+    },
+    "ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cap_scope": {
+          "const": "TOTAL_PORTFOLIO_STOCK"
+        },
+        "accounting_base": {
+          "$ref": "#/$defs/base"
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "amount",
+        "currency",
+        "cap_scope",
+        "accounting_base",
+        "receipt"
+      ]
+    },
+    "cap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cap_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "applicability": {
+          "enum": [
+            "REQUIRED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN",
+            "NONE"
+          ]
+        },
+        "amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accounting_base": {
+          "$ref": "#/$defs/base"
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "cap_id",
+        "applicability",
+        "value_state"
+      ]
+    },
+    "exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "economic_effect_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "kind": {
+          "enum": [
+            "CONFIRMED_POSITION",
+            "ACTIVE_BUY_RESERVATION",
+            "OTHER_COMMITMENT",
+            "RELEASE"
+          ]
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "asset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "side": {
+          "enum": [
+            "BUY",
+            "SELL",
+            null
+          ]
+        },
+        "amount_basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lifecycle_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_confirmed": {
+          "type": "boolean"
+        },
+        "releases_event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "event_id",
+        "economic_effect_ids",
+        "kind",
+        "owner",
+        "asset_id",
+        "amount",
+        "currency",
+        "receipt"
+      ]
+    },
+    "funding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bucket_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value_state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN"
+          ]
+        },
+        "settled": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "cash_amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "reserved_amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "cash_basis": {
+          "enum": [
+            "NET_AVAILABLE",
+            "GROSS_SETTLED_CASH"
+          ]
+        },
+        "authorized_incremental_amount": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "bucket_id",
+        "owner",
+        "currency",
+        "value_state",
+        "settled",
+        "cash_amount",
+        "reserved_amount",
+        "cash_basis",
+        "authorized_incremental_amount",
+        "receipt"
+      ]
+    },
+    "fx": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "from_currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to_currency": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quote_per_base": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "accounting_base_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "const": "REPORTING_BUDGET_NORMALIZATION_NOT_EXECUTION"
+        },
+        "receipt": {
+          "$ref": "#/$defs/receipt"
+        }
+      },
+      "required": [
+        "owner",
+        "from_currency",
+        "to_currency",
+        "quote_per_base",
+        "accounting_base_id",
+        "purpose",
+        "receipt"
+      ]
+    }
+  }
+}

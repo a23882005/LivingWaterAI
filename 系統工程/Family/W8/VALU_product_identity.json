@@ -1,0 +1,22 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "VALU",
+  "fund_name": "FTSE Global All-Cap UCITS ETF USD Accumulating",
+  "source_url": "https://www.vanguard.co.uk/professional/product/etf/equity/E161/ftse-global-all-cap-ucits-etf-usd-acc.html",
+  "verified_on": "2026-10-28",
+  "source_scope": "INDEPENDENT_LONDON_ETF_REFERENCE__NOT_US_VALUE_LINE_OR_HELD_VENUE_ATTESTATION",
+  "isin": "IE000VAHT5T0",
+  "listing": {
+    "exchange": "XLON",
+    "currency": "USD",
+    "ticker": "VALU",
+    "reuters": "VAVALU.L"
+  },
+  "excerpts": [
+    "FTSE Global All Cap Index",
+    "passive management",
+    "physical acquisition",
+    "large-, mid-, and small-cap stocks",
+    "developed and emerging markets"
+  ]
+}

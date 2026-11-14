@@ -1,0 +1,11 @@
+{
+  "schema_version": "Family.W8.IssuerProductIdentity.v1",
+  "symbol": "QQQ",
+  "source_url": "https://www.invesco.com/qqq-etf/en/about.html",
+  "verified_on": "2026-10-28",
+  "excerpts": [
+    "Nasdaq-100 Index",
+    "100 largest non-financial companies listed on the Nasdaq"
+  ],
+  "scope": "ISSUER_INVESTMENT_OBJECTIVE__NOT_CURRENT_FUND_SAFETY_OR_HELD_VENUE"
+}

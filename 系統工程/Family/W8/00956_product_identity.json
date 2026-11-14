@@ -1,0 +1,22 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "00956",
+  "fund_name": "CTBC Nikkei High Dividend Yield 50 ETF",
+  "source_url": "https://www.twse.com.tw/zh/ETFortune/newsDetail/8a8216d6913637e4019158f3101b0093",
+  "benchmark": "Nikkei 225 High Dividend Yield Stock 50 Index",
+  "index_company_count": 50,
+  "is_stock_etf": true,
+  "replication": "INDEX_REPLICATION",
+  "market_scope": "JAPAN_LARGE_CAP_HIGH_DIVIDEND_SELECTION",
+  "source_as_of": "2024-08-16",
+  "retrieved_at": "2026-10-30T05:28:04.214436+00:00",
+  "evidence_kind": "OFFICIAL_EXCHANGE_ISSUER_SUPPLIED_PRODUCT_DESCRIPTION",
+  "source_artifact_sha256": "35d235b2f927acab2a357bfd7cb8e62c44534ffcb5e896a3245b93c6fde7b6f3",
+  "source_artifact_kind": "WEB_TOOL_READABLE_EXTRACT__NOT_RAW_HTTP_HTML",
+  "evidence_reference": "PRIVATE_HANDOFF:product_sources/00956_official_web_extract.txt",
+  "excerpts": [
+    "Nikkei 225 High Dividend Yield Stock 50 Index",
+    "完全複製",
+    "成分股檔數  | 50"
+  ]
+}

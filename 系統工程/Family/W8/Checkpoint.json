@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-11T00:29:12.392Z",
+  "updated_at": "2026-11-14T19:21:09.292Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6328,5 +6328,55 @@
     "next_owner": "Family PM",
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_a957847_acceptance_20261115": {
+    "commit": "a957847ad8dff92d7d7d434ee9e7494fe7918ba9",
+    "status": "PASS_SCOPED_ACCOUNT_ANALYSIS_WIRING__PROFILE_LOCK_FIX_REQUIRED",
+    "pm_independent": {
+      "tests": 71,
+      "subtests": 5,
+      "source_receipt_checks": 9,
+      "real_producer_replays": 2,
+      "embedded_artifact_hashes": 53,
+      "exact_commit_files": 4,
+      "full_menu04_rerun": false
+    },
+    "handback": {
+      "securities": 17,
+      "cash_accounts": 2,
+      "c7_inventories": 2,
+      "status": "ANALYSIS_PARTIAL"
+    },
+    "preserved": [
+      "H32 12 accepted targets and weights",
+      "H33",
+      "prior scoped PASS"
+    ],
+    "new_issue": {
+      "id": "PR59-C7-PROFILE-LOCK-A957847",
+      "error": "C_W7_LT_PROFILE_FILE_CHANGED:../../Family/W8/member_financial_producer.py",
+      "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
+      "pm_reproduced": true,
+      "writer": "Original PR59 V82 Codex",
+      "action": "Review and rebuild affected existing C7 manifest/dependency locks; keep approval hash and verification; rerun affected tests",
+      "handoff": "PREPARED_FOR_COMMANDER_RELAY_NOT_ACKNOWLEDGED"
+    },
+    "ci": {
+      "success": 4,
+      "failure": 2,
+      "profile_run": 43629493781,
+      "w5_passed": 563,
+      "w5_failed": 50,
+      "profile_related_failures": 49,
+      "macro_failures": 1
+    },
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "PR": "DRAFT_UNMERGED",
+    "private_evidence": "Google Drive root/TEMP; exact links retained in private governance",
+    "pm_next": "Source coordination, independent repair acceptance and governance",
+    "handoff_three_zips": "ACCEPTED_AND_CONTINUED"
   }
 }

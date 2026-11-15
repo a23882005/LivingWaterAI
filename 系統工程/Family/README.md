@@ -355,3 +355,8 @@ PR59-C7-PROFILE-LOCK-A957847結案。中PM固定bcafc387f37fd7472398e7d898f0bcc4
 中PM實抓17份精確上市代號Yahoo原件，固定bcafc38原read_market實跑17/17通過，觀測皆至11/13：11檔股票/ETF技術觀察、6檔V75行情輸入。共同評估時間2026-11-15T06:52:08.365699Z。四檔櫃買由2021至2026官方年度開休市表及交易規則送原日曆producer；其他市場用工程釘選exchange_calendars4.13.2，保留觀察用途與PIT限制。異常／缺日造成連續OHLC截短22至1255列，未補值。
 
 39份原件、描述、原輸出及重播程式已存私人Drive；原PR59續工契約備妥供指揮官轉交：接新market_sources回既有Menu04，實際回交17檔分析與剩餘缺項，必要漏接僅作最小修正。中PM負責來源整合與獨立驗收；H32/H33/bcafc38與既有PASS保留。此為來源與觀察PASS，完整Menu04新輪尚待整合；完整金融PASS0、真實Cycle0、PR59 Draft未合併、Production HOLD／交易NONE。
+
+
+## 2026-11-15 PM scoped acceptance
+
+PR59 `7064a47` profile-rebuild fix is PASS_SCOPED/CLOSED. PM independently passed 66 tests, all 59 profile and 183 dependency hashes, and 17 original market reader replays. The prior bcafc38 Menu04 source handoff (11 equity / 6 bond routes) is accepted within the analysis-source scope after original input/output/trace review; this is separate from the PM reader replay, not a new PM full Menu04 run. Existing PASS remains. CI: 4 success / 2 macro-readiness failures. Family PM owns remaining macro/funding/qualified-source integration; original PR59 writer retains necessary runtime work. Financial PASS 0, real Cycle 0, W8 IN_PROGRESS, Draft PR unmerged, Production HOLD / trade NONE.

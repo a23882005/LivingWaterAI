@@ -3,6 +3,28 @@ from pathlib import Path
 from hashlib import sha256
 import json
 ROOT=Path(__file__).resolve().parents[4];BASE=ROOT/'系統工程/C-配置決策引擎＋Mentor整合/正式Runtime';D=BASE/'contracts_c7'
+MANIFEST=D/'Family_LongTerm_V70Ceiling_v1.manifest.json'
+PROFILE='FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1'
+APPROVAL='112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0'
+
+def registered_manifest():
+    """Retain later registrations; the bootstrap list is not the whole profile."""
+    if not MANIFEST.exists():return None
+    existing=json.loads(MANIFEST.read_text())
+    if existing.get('profile')!=PROFILE or existing.get('approval_sha256')!=APPROVAL:
+        raise ValueError('FAMILY_PROFILE_REBUILD_APPROVAL_MISMATCH')
+    seen=set()
+    for row in existing['files']:
+        path=Path(row['path']);resolved=(BASE/path).resolve()
+        if path.is_absolute() or not resolved.is_relative_to(ROOT.resolve()) or resolved in seen:
+            raise ValueError('FAMILY_PROFILE_REBUILD_INVALID_REGISTERED_PATH:'+str(path))
+        if not resolved.is_file():
+            raise ValueError('FAMILY_PROFILE_REBUILD_REGISTERED_FILE_MISSING:'+str(path))
+        seen.add(resolved)
+    return existing
+
+# Validate existing registrations before writing any generated schema or lock.
+existing_manifest=registered_manifest()
 def obj(properties,required=None):return {'type':'object','additionalProperties':False,'properties':properties,'required':list(properties) if required is None else required}
 text={'type':'string','minLength':1};amount={'type':['number','string','null']}
 owner=obj({k:text for k in ('client_id','broker','account','currency','funding_domain')})
@@ -85,9 +107,16 @@ files=['work7/family_long_term.py','work7/asset_framework.py','C8C9_RUNTIME/C8C9
  '../../Family/W8/approved_v04_technical.py','../../Family/W5/technical_source_bridge.py','../../Family/W8/tools/rebuild_family_long_term_contract.py',
  '../../Family/W8/v70_tactical_input.py','../../Family/W8/v70_component_runtime.cjs']
 files += [p for p in ['work6/family_long_term_read.py','contracts_c7/84_Family_Existing_LongTerm_Work6_Result.schema.json','contracts_c7/85_Family_LongTerm_Work7_Result.schema.json'] if (BASE/p).exists()]
-manifest={'profile':'FAMILY_LONG_TERM_TARGET_WITH_V70_CEILING_V1','approval_sha256':'112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0',
- 'status':'APPROVED_FOR_IMPLEMENTATION__PM_GATE_NOT_RELEASED','files':[{'path':p,'sha256':sha256((BASE/p).read_bytes()).hexdigest()} for p in files]}
-(D/'Family_LongTerm_V70Ceiling_v1.manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+manifest=existing_manifest or {'profile':PROFILE,'approval_sha256':APPROVAL,
+ 'status':'APPROVED_FOR_IMPLEMENTATION__PM_GATE_NOT_RELEASED','files':[]}
+registered={str((BASE/r['path']).resolve()) for r in manifest['files']}
+for path in files:
+ if str((BASE/path).resolve()) not in registered:
+  manifest['files'].append({'path':path})
+  registered.add(str((BASE/path).resolve()))
+for row in manifest['files']:row['sha256']=sha256((BASE/row['path']).read_bytes()).hexdigest()
+files=[row['path'] for row in manifest['files']]
+MANIFEST.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 lock=ROOT/'系統工程/Family/W5/dependency_lock.json';data=json.loads(lock.read_text());rows=data['files'] if isinstance(data,dict) else data
 new=[str((BASE/p).resolve().relative_to(ROOT)) for p in files]+[str((D/'Family_LongTerm_V70Ceiling_v1.manifest.json').relative_to(ROOT))]
 for path in new:

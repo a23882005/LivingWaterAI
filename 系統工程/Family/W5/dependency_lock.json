@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "81cef2d3dbff16c8cd78a02657f0dd70142f6c99bca91bf058093c090fbe1e51"
+    "sha256": "a6a99b2328e67b3430da48a50a72122a406cfeb76c6e2b1a77c9f43e7eb0b29a"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -427,7 +427,7 @@
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
-    "sha256": "c08ed1276970cfd0f680c55866caa2745cf87694a9d013e81dd3ab1b1a122413"
+    "sha256": "4525a7b7ea1642c1c7371d315348d61120a54bea36c813812a0cc98499d2fc07"
   },
   {
     "path": "系統工程/Family/W8/same_run_market_cache.py",

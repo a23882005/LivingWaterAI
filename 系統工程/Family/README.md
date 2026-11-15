@@ -348,3 +348,10 @@ PR59-C7-PROFILE-LOCK-A957847結案。中PM固定bcafc387f37fd7472398e7d898f0bcc4
 同提交CI4成功／2失敗；[run43685320943](https://github.com/a23882005/LivingWaterAI/actions/runs/43685320943) W5段612通過／1失敗，原49項profile相關錯誤消除；剩總經MACRO_FEED_NOT_READY，post-trade run43685320951亦在總經步驟失敗。未跑部分依原CI狀態保留。既有重建工具49項／現行manifest59項差異已記錄，後續使用先比對保留清單；本輪不擴工。
 
 原V82 Codex本項補修完成，由中PM接續來源整合及驗收；上游總經沿原責任線。私人裁定與獨立證據已登錄Drive治理。PR59 Draft未合併，完整金融PASS0、真實Cycle0、W8 IN_PROGRESS、Production HOLD／交易NONE。
+
+
+## 2026/11/15｜中PM17檔新行情與原讀取實跑完成
+
+中PM實抓17份精確上市代號Yahoo原件，固定bcafc38原read_market實跑17/17通過，觀測皆至11/13：11檔股票/ETF技術觀察、6檔V75行情輸入。共同評估時間2026-11-15T06:52:08.365699Z。四檔櫃買由2021至2026官方年度開休市表及交易規則送原日曆producer；其他市場用工程釘選exchange_calendars4.13.2，保留觀察用途與PIT限制。異常／缺日造成連續OHLC截短22至1255列，未補值。
+
+39份原件、描述、原輸出及重播程式已存私人Drive；原PR59續工契約備妥供指揮官轉交：接新market_sources回既有Menu04，實際回交17檔分析與剩餘缺項，必要漏接僅作最小修正。中PM負責來源整合與獨立驗收；H32/H33/bcafc38與既有PASS保留。此為來源與觀察PASS，完整Menu04新輪尚待整合；完整金融PASS0、真實Cycle0、PR59 Draft未合併、Production HOLD／交易NONE。

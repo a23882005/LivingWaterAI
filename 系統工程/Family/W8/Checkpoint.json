@@ -6448,5 +6448,29 @@
     "Production": "HOLD",
     "trade_authorization": "NONE",
     "private_evidence": "Private Drive root/TEMP; full links in private governance"
+  },
+  "pm_7064a47_and_menu04_acceptance_20261115": {
+    "date": "2026-11-15",
+    "commit": "7064a47df12865bb19e02f5082413316e15c98c6",
+    "generator_fix": "PASS_SCOPED_CLOSED",
+    "independent_tests": 66,
+    "profile_entries": 59,
+    "dependency_hashes": 183,
+    "independent_market_replays": 17,
+    "evidence_artifact_hashes": 93,
+    "independent_evidence_checks": 16,
+    "menu04_source_handoff": "PASS_SCOPED_11_EQUITY_6_BOND",
+    "menu04_execution_commit": "bcafc387f37fd7472398e7d898f0bcc495c972b8",
+    "pm_menu04_verification": "ORIGINAL_WRITER_INPUT_OUTPUT_TRACE_REVIEW_PLUS_INDEPENDENT_READER_REPLAY",
+    "ci": {
+      "success": 4,
+      "failure": 2,
+      "remaining": "MACRO_FEED_NOT_READY"
+    },
+    "next_owner": "Family middle PM: macro, existing funding and qualified sources; original PR59 writer retains necessary runtime integration",
+    "full_financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

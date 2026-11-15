@@ -6472,5 +6472,21 @@
     "real_cycle": 0,
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_source_integration_20261115_fresh_broker": {
+    "runtime_commit": "7064a47df12865bb19e02f5082413316e15c98c6",
+    "status": "PASS_SOURCE_OBSERVATIONS_ONLY",
+    "fresh_readonly_calls": 4,
+    "original_broker_reader": "PASS",
+    "current_working_order_view": "BROKER_WORKING_EXPOSURE_VERIFIED",
+    "lifecycle_fully_resolved": true,
+    "full_nav_qualified": false,
+    "macro_original_reader": "MACRO_FEED_NOT_READY",
+    "macro_source_blob": "bf2bb6da7f48eb7e7cd53296a9d8fa8ff1e8b2e3",
+    "next_owner": "Family PM: qualified macro and existing funding facts; no new runtime work order",
+    "full_financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

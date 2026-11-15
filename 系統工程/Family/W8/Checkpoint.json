@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-15T06:33:10.625Z",
+  "updated_at": "2026-11-15T06:56:36.867Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6416,5 +6416,37 @@
     "Production": "HOLD",
     "trade_authorization": "NONE",
     "PR": "DRAFT_UNMERGED"
+  },
+  "pm_market_source_integration_20261115": {
+    "runtime_commit": "bcafc387f37fd7472398e7d898f0bcc495c972b8",
+    "status": "PASS_SCOPED_MARKET_OBSERVATIONS__MENU04_HANDOFF_PREPARED",
+    "source_acquired": 17,
+    "original_reader_passed": 17,
+    "v82_technical_observations": 11,
+    "v75_price_inputs": 6,
+    "source_artifacts": 39,
+    "evaluation_at": "2026-11-15T06:52:08.365699+00:00",
+    "latest_observation": "2026-11-13",
+    "calendar": {
+      "non_tpex": "exchange_calendars4.13.2 OBSERVATION_ONLY",
+      "tpex": "2021-2026 official annual schedules through original consumer",
+      "historical_pit_attested": false
+    },
+    "source_quality": "Preserved invalid rows and gaps; contiguous OHLC windows 22 to 1255; no imputation",
+    "full_menu04_run": false,
+    "next_writer": "Original V82 Codex PR59: bind delivered market descriptors and run original Menu04; minimal wiring only if needed",
+    "handoff_status": "PREPARED_FOR_COMMANDER_RELAY",
+    "pm_responsibility": "Remaining macro and funding source integration; independent acceptance",
+    "preserved": [
+      "H32",
+      "H33",
+      "bcafc38 CLOSED",
+      "existing PASS"
+    ],
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "private_evidence": "Private Drive root/TEMP; full links in private governance"
   }
 }

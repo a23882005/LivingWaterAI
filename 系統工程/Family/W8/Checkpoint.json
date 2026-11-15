@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-14T19:21:09.292Z",
+  "updated_at": "2026-11-15T06:33:10.625Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6359,7 +6359,9 @@
       "pm_reproduced": true,
       "writer": "Original PR59 V82 Codex",
       "action": "Review and rebuild affected existing C7 manifest/dependency locks; keep approval hash and verification; rerun affected tests",
-      "handoff": "PREPARED_FOR_COMMANDER_RELAY_NOT_ACKNOWLEDGED"
+      "handoff": "PREPARED_FOR_COMMANDER_RELAY_NOT_ACKNOWLEDGED",
+      "current_status": "CLOSED_BY_bcafc38",
+      "resolution_record": "pm_bcafc38_repair_acceptance_20261115"
     },
     "ci": {
       "success": 4,
@@ -6378,5 +6380,41 @@
     "private_evidence": "Google Drive root/TEMP; exact links retained in private governance",
     "pm_next": "Source coordination, independent repair acceptance and governance",
     "handoff_three_zips": "ACCEPTED_AND_CONTINUED"
+  },
+  "pm_bcafc38_repair_acceptance_20261115": {
+    "commit": "bcafc387f37fd7472398e7d898f0bcc495c972b8",
+    "issue": "PR59-C7-PROFILE-LOCK-A957847",
+    "status": "PASS_SCOPED_CLOSED",
+    "pm_independent": {
+      "profile": 59,
+      "dependencies": 183,
+      "tests": 170,
+      "subtests": 5,
+      "artifact_hashes": 22
+    },
+    "changes": "Two hash lines only; 59 original checks/order and approval hash preserved",
+    "preserved": [
+      "H32",
+      "H33",
+      "0050/00956 wiring",
+      "prior PASS"
+    ],
+    "ci": {
+      "success": 4,
+      "failure": 2,
+      "run": 43685320943,
+      "w5_passed": 612,
+      "w5_failed": 1,
+      "remaining_error": "MACRO_FEED_NOT_READY",
+      "profile_failures_resolved": 49,
+      "post_trade_run": 43685320951
+    },
+    "generator_note": "Existing generator lists 49; existing accepted manifest 59 retained. Compare before future use; no new tool rewrite commissioned.",
+    "next_owner": "Family PM source integration and independent acceptance; upstream macro source stays with original macro team",
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "PR": "DRAFT_UNMERGED"
   }
 }

@@ -1,0 +1,60 @@
+name: V70 D01 isolated authorized SAHMREALTIME read
+on:
+  push:
+    branches: [codex/v70-d01-controlled-runner-20261115]
+    paths:
+      - '.github/workflows/v70-d01-controlled-readonly.yml'
+      - 'experiments/v70-d01/**'
+permissions:
+  contents: read
+concurrency:
+  group: v70-d01-isolated-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  d01:
+    if: github.ref == 'refs/heads/codex/v70-d01-controlled-runner-20261115'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: experiments/v70-d01
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test isolated reader without credentials or network
+        run: python -B -m unittest discover -s experiments/v70-d01/tests -p test_d01_sahm.py -v
+      - name: Read only SAHMREALTIME with existing controlled binding
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python -B - <<'PY'
+          import sys
+          from datetime import date
+          sys.path.insert(0, 'experiments/v70-d01/candidate_code')
+          from run_d01_sahm import run
+          result=run(date(2026,11,15), 'build/v70-d01')
+          print('D01 status:', result['status'])
+          print('Credential binding present:', result['credential_present'])
+          print('HTTP statuses:', [r['http_status'] for r in result['requests']])
+          # Values, notes, raw responses and credential values never printed.
+          raise SystemExit(0 if result['status'].startswith('TECHNICAL_READ_PASS') else 2)
+          PY
+      - name: Encrypt raw result for private local review
+        if: always()
+        run: |
+          if [ -d build/v70-d01 ]; then
+            mkdir -p build/d01-transfer
+            tar -czf build/d01-transfer/result.tar.gz -C build/v70-d01 .
+            openssl cms -encrypt -binary -aes256 -in build/d01-transfer/result.tar.gz -out build/d01-transfer/result.cms -outform DER experiments/v70-d01/artifact-recipient.crt
+            rm build/d01-transfer/result.tar.gz
+          fi
+      - name: Save only encrypted result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-d01-encrypted-${{ github.run_id }}
+          path: build/d01-transfer/result.cms
+          if-no-files-found: error
+          retention-days: 3

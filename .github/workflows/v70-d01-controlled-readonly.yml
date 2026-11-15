@@ -41,6 +41,10 @@ jobs:
           # Values, notes, raw responses and credential values never printed.
           raise SystemExit(0 if result['status'].startswith('TECHNICAL_READ_PASS') else 2)
           PY
+      - name: Read exact-series release and original-vintage evidence
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python -B experiments/v70-d01/candidate_code/run_d01_provenance.py build/v70-d01
       - name: Encrypt raw result for private local review
         if: always()
         run: |

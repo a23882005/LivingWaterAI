@@ -6488,5 +6488,24 @@
     "real_cycle": 0,
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_macro_independent_continuation_20261115": {
+    "owner_ruling": "Stop pursuing missing 2025-10 CPI; preserve missing value and continue independent work. No scoring/weight/readiness changes authorized.",
+    "base_commit": "7064a47df12865bb19e02f5082413316e15c98c6",
+    "work_order": "PR59-MACRO-INDEPENDENT-SOURCE-CONTINUATION-20261115",
+    "status": "ISOLATED_CANDIDATE_TESTED__ORIGINAL_WRITER_HANDOFF_PREPARED",
+    "candidate_tests": 87,
+    "profile_entries": 59,
+    "dependency_hashes": 183,
+    "real_direct_source_assembly_fields": 20,
+    "real_direct_source_assembly_scope": "Original request with empty context; partial sources, not full Menu04 candidate execution",
+    "candidate_change": "Keep original independent C7 source assembly on missing macro; deployment guard unchanged",
+    "runtime_writer": "Original V82 Codex on PR59",
+    "next_action": "Apply minimal candidate after current-head review; run existing 17-asset Menu04 and return original outputs for PM acceptance",
+    "pr59_written_by_pm": false,
+    "full_financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trading": "NONE"
   }
 }

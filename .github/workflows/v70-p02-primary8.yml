@@ -1,0 +1,44 @@
+name: V70 P02 isolated remaining8 source read
+on:
+  push:
+    branches: [codex/v70-p02-primary8-20261116]
+    paths:
+      - '.github/workflows/v70-p02-primary8.yml'
+      - 'experiments/v70-p02/**'
+permissions:
+  contents: read
+concurrency:
+  group: v70-p02-primary8-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  sources:
+    if: github.ref == 'refs/heads/codex/v70-p02-primary8-20261116'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: experiments/v70-p02
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Normal exact-symbol source read, no credentials or retries
+        run: python -B experiments/v70-p02/capture_markets.py
+      - name: Encrypt private source evidence
+        if: always()
+        run: |
+          if [ -d build/v70-p02 ]; then
+            mkdir -p build/p02-transfer
+            tar -czf build/p02-transfer/result.tar.gz -C build/v70-p02 .
+            openssl cms -encrypt -binary -aes256 -in build/p02-transfer/result.tar.gz -out build/p02-transfer/result.cms -outform DER experiments/v70-p02/artifact-recipient.crt
+            rm build/p02-transfer/result.tar.gz
+          fi
+      - name: Preserve encrypted evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-p02-encrypted-${{ github.run_id }}
+          path: build/p02-transfer/result.cms
+          retention-days: 3
+          if-no-files-found: error

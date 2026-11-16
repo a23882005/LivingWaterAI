@@ -117,6 +117,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_v703_policy*.py' -v
           python -m unittest discover -s tests -p 'test_v703_publication.py' -v
           python -m unittest discover -s tests -p 'test_v703_cpi_data_only.py' -v
+          python -m unittest discover -s tests -p 'test_v703_cpi_carry.py' -v
           python -m unittest discover -s tests -p 'test_v703_downstream_data_only.py' -v
           python -m unittest discover -s tests -p 'test_macro_safety_daily_capture.py' -v
           python -m unittest discover -s tests -p 'test_v703_research_charts.py' -v
@@ -176,6 +177,11 @@ jobs:
           PY
       - name: Recheck policy freshness before any publication
         run: python scripts/validate_v703_publication.py build/site/V70_macro_latest.json
+      - name: Verify approved CPI carry in Chromium before publishing
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install chromium --with-deps
+          python tests/check_v703_cpi_carry_browser.py
       - name: Publish matching JSON beside official GitHub HTML
         run: |
           python - <<'PY'

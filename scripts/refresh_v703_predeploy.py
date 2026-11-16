@@ -256,7 +256,7 @@ def main():
             print('FORWARD_RETAIN_ORIGINAL_DATED_VALUE',ticker,str(exc)[:100],flush=True)
 
     # Retain original observation/check dates for any source unavailable this run.
-    # The authorized exception publishes data only, never a made-up CPI YoY.
+    # Owner 2026-11-16: builder uses the prior complete YoY with its original date; raw October remains missing.
     from v703_cpi_availability import FRED_CPI, verify_official_gap, load_archived_official_release, add_archived_notice_provenance
     cpi_csv = fetch_cpi_official_evidence(session, FRED_CPI)
     # The BLS notice is immutable dated evidence already obtained before HTTP 403.
@@ -273,7 +273,7 @@ def main():
         b['items']['m05']['official_unavailable'] = cpi_evidence
         for suffix, raw in (('series.csv.gz', cpi_csv), ('release.html.gz', cpi_release)):
             (ROOT/'data/audit'/('cpi_unavailable_20261110_'+suffix)).write_bytes(gzip.compress(raw,mtime=0))
-        print('CPI_OFFICIAL_UNAVAILABLE_DATA_ONLY', cpi_evidence['observationMonth'], flush=True)
+        print('CPI_OFFICIAL_GAP_PREVIOUS_YOY_AUTHORIZED', cpi_evidence['observationMonth'], flush=True)
 
     a['generated_at']=now
     a['as_of_taipei']=now

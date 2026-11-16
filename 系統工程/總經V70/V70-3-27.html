@@ -662,9 +662,26 @@
             while(d<today && n<=400) {d.setUTCDate(d.getUTCDate()+1);if(d.getUTCDay()!==0 && d.getUTCDay()!==6)n++;}
             return n;
         }
+        function v703CpiCarryValid(r, now=Date.now()) {
+            const c=r?.carryForward,e=c?.officialGap;
+            const verified=Date.parse(e?.verifiedAtUtc),expiry=Date.parse(e?.nextReleaseAtUtc);
+            return c?.policy==='CPI_PREVIOUS_VALID_YOY_OWNER_20261116' && r.status==='USABLE' &&
+              r.dataDate==='2026-09-01' && c.observationDate===r.dataDate &&
+              r.source==='https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL' &&
+              e?.schema==='V70.3/cpi-official-unavailability-v1' && e.reason==='CPI_YOY_BASE_PERIOD_MISSING' &&
+              e.observationMonth==='2026-10' && e.missingBaseMonth==='2025-10' && e.baseIndex===null &&
+              e.sourceUrl==='https://www.bls.gov/news.release/cpi.htm' && e.seriesUrl===r.source &&
+              e.publicationDate==='2026-11-10' && expiry===Date.parse('2026-12-10T13:30:00Z') &&
+              verified>=Date.parse('2026-11-10T13:30:00Z') && verified<=now+300000 && now-verified<26*3600000 && now<expiry &&
+              /^[0-9a-f]{64}$/.test(e.sourceSha256) && /^[0-9a-f]{64}$/.test(c.seriesSha256) && c.seriesSha256===e.seriesSha256 &&
+              Number.isFinite(c.currentIndex) && c.currentIndex>0 && Number.isFinite(c.baseIndex) && c.baseIndex>0 &&
+              Number.isFinite(r.value) && r.value===c.value && Math.abs(r.value-(c.currentIndex/c.baseIndex-1)*100)<0.00000051;
+        }
         function v703ObservationStale(id, date, today) {
             const days=Math.floor((today-date)/86400000);
             if(days<0)return true;
+            const carry=window.v703FeedDocument?.indicators?.m05;
+            if(id==='m05' && carry?.carryForward)return !(date.toISOString().slice(0,10)===carry.dataDate && v703CpiCarryValid(carry));
             if(['m03_qqq','m03_spy','m03_vt'].includes(id))return false; // PE reference age is checked against last verification time in the feed loader, not the observation month.
             if(id==='m06_rate')return false; // Policy evidence has its own bounded current check.
             if(['m06','m06_rstar','m06_output_gap'].includes(id))return days>150 || ![2,5,8,11].includes(date.getUTCMonth()) || new Date(date.getTime()+86400000).getUTCDate()!==1; // quarterly HLW/output-gap, quarter-end date
@@ -1733,6 +1750,15 @@ if (recBlack) {
                     allocation: (window.v703CanPublishFormalAllocation() && Number.isFinite(mSafe_final) && alloc && !alloc.blocked && alloc.meta && Number.isFinite(alloc.meta.S0)) ? alloc.meta : null,
                     allocationItems: alloc.items
                 });
+            }
+            if(window.v703FeedDocument?.indicators?.m05?.carryForward && v703CpiCarryValid(window.v703FeedDocument.indicators.m05)) {
+                const notice=window.v703FeedDocument.publication.notice;
+                if(allocWarning)allocWarning.textContent=notice;
+                if(coverageUI)coverageUI.textContent='22項計分輸入｜CPI沿用2026年9月有效值；原權重不變';
+                for(const parentId of ['v703-result','allocation-list']) {
+                    const parent=document.getElementById(parentId);
+                    if(parent){let n=parent.querySelector('.cpi-carry-notice');if(!n){n=document.createElement('p');n.className='cpi-carry-notice text-sm';parent.appendChild(n);}n.textContent=notice;}
+                }
             }
             if(window.v703ProvisionalSnapshot){
                 const score=window.v703ProvisionalSnapshot.mSafe_final;
@@ -4227,6 +4253,7 @@ if (recBlack) {
        const r=data[cfg.id];
        if(dataOnly&&cfg.id==='m05')continue;
        if(!r||!['OK','USABLE'].includes(r.status))throw new Error(cfg.id+' 狀態為 '+String(r?.status||'缺少狀態')+'，不接受為有效數值');
+       if(cfg.id==='m05'&&r.carryForward&&!v703CpiCarryValid(r))throw new Error('CPI沿用證據不合格');
        const peVerified=verifiedPE(cfg.id,r,doc);
        if(peIds.has(cfg.id))window.v703PEReferenceVerified[cfg.id]=peVerified;
        const dateOK=/^(19|20)\d{2}-\d{2}-\d{2}$/.test(String(r?.dataDate||''));
@@ -4271,6 +4298,10 @@ if (recBlack) {
             if(typeof calcTotal==='function')calcTotal();
      synchronize();
      sourceMode='feed';
+     if(doc.indicators.m05.carryForward){
+       const notice=doc.publication.notice;
+       for(const id of ['v703-data-state','v703-date-note-m05']){const el=document.getElementById(id);if(el)el.textContent=notice;}
+     }
      showBanner(doc,dataOnly?window.v703ProvisionalSnapshot?'CPI 官方資料不足：暫行總分（排除m05）':'僅更新資料：CPI 官方資料不足，總分暫停':snapshotOld?'歷史已驗證快照（非今日更新）':'已驗證');
      void showLastSuccessfulDeployment(doc);
      const valid=window.v703Latest;

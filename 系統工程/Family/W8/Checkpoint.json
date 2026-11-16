@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-16T23:13:05.734Z",
+  "updated_at": "2026-11-16T23:29:16.005Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6708,5 +6708,28 @@
     "real_Cycle": 0,
     "Production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_four_household_full_regression_20261117": {
+    "status": "PASS_SCOPED_REGRESSION_AND_PARTIAL_ANALYSIS",
+    "runtime_commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "unique_test_cases_passed": 2271,
+    "initial_environment_failures_resolved": 14,
+    "household_runs_completed": 4,
+    "source_scope_rows_observed": 42,
+    "source_scope_rows_expected": 42,
+    "v82_components_computed": 22,
+    "v82_assets_expected": 33,
+    "source_blocked_assets": 11,
+    "formal_runtime_modified": false,
+    "official_databases_modified": false,
+    "existing_PASS_preserved": true,
+    "owner_decision": "Use existing Drive databases; no additional household connections or screenshot requests; explicitly preserve missing values.",
+    "next_responsible": "Family中PM: integrate existing funding, protection/caps, valuation/safety/history and final report sources; original V82 Codex remains PR59 formal runtime writer.",
+    "new_runtime_dispatch": false,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "private_evidence": "Recorded in private Drive governance; no private household input included here."
   }
 }

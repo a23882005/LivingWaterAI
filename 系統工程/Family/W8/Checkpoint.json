@@ -6589,5 +6589,39 @@
     "real_Cycle": 0,
     "Production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_tw_bond_classification_candidate_20261117": {
+    "status": "PASS_SCOPED_CANDIDATE__PR59_ADOPTION_PENDING",
+    "runtime_base_commit": "3433a2454a92601ff7abdfbafa79c17c73cadd10",
+    "implemented_and_executed_by": "Family_PM_in_isolated_worktree",
+    "production_runtime_changed": false,
+    "scope": "C7 reuses original V75 Taiwan-listed bond applicability; original US advisory universe retained",
+    "changed_files": 4,
+    "validation": {
+      "targeted_tests_passed": 103,
+      "profile_locks_passed": 59,
+      "dependency_hashes_passed": 183,
+      "real_output_comparisons_passed": 120
+    },
+    "menu04": {
+      "security_results": 17,
+      "equity_components": 11,
+      "bond_routes": 6,
+      "original_asset_producer_calls": 11,
+      "c7_assemblies": 9,
+      "unique_classification_gaps_resolved": 2
+    },
+    "approved_targets_unchanged": true,
+    "DB_unchanged": true,
+    "private_contract": "Google Drive root/Family_PM_台灣債券分類承接補修與續工契約_20261117.md",
+    "private_evidence": "Google Drive root/TEMP/Family_PM_台灣債券分類補修_完整實跑證據_20261117.json",
+    "dispatch_status": "PREPARED_FOR_OWNER_RELAY__NO_ACCEPTANCE_RECEIPT",
+    "next_runtime_owner": "Original_V82_Codex_PR59",
+    "next_pm_action": "Independently verify adoption; integrate remaining source-backed holdings and funding within approved scope",
+    "existing_PASS_preserved": true,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

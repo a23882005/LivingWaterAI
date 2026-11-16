@@ -6536,5 +6536,27 @@
     "real_cycle": 0,
     "production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_ready_macro_source_replay_20261116": {
+    "status": "MACRO_READER_AND_ORIGINAL_COMPONENTS_PASS__FULL_MENU04_PENDING",
+    "runtime_commit": "3433a2454a92601ff7abdfbafa79c17c73cadd10",
+    "runtime_changed": false,
+    "feed_as_of": "2026-11-16T13:56:04.179421Z",
+    "feed_blob": "ac5a053fb6548e75d3768c3b4c53e9c6b1af5720",
+    "html_blob": "4a8c4bcf342d3c6e4c90aba426360c21af897eb3",
+    "verification": [
+      "original_P70_5_and_market_bridge_ACCEPTED",
+      "original_v70_numeric_components_executed",
+      "original_v10_macro_and_current_valuation_components_executed",
+      "future_source_cutoff_rejected",
+      "H32_targets_unchanged"
+    ],
+    "private_evidence_location": "Google Drive root/TEMP/Family_PM_總經恢復承接與原元件實跑_20261116.json",
+    "next_owner": "Family_PM",
+    "next_action": "Restore pinned private input transport and integrate current macro under a new evaluation cutoff into original Menu04; existing closed work orders remain closed.",
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

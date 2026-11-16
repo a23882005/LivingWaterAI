@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-16T23:29:16.005Z",
+  "updated_at": "2026-11-16T23:40:16.295Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6731,5 +6731,27 @@
     "Production": "HOLD",
     "trade_authorization": "NONE",
     "private_evidence": "Recorded in private Drive governance; no private household input included here."
+  },
+  "pm_eleven_market_gaps_reconnected_20261117": {
+    "status": "PASS_SCOPED_MARKET_RECONNECTION",
+    "runtime_commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "new_market_sources": 11,
+    "source_identity_crosschecks": 10,
+    "rate_limit_fallback_used": true,
+    "affected_household_runs": 2,
+    "preserved_holding_target_checks": 20,
+    "combined_same_day_household_component_results": 33,
+    "combined_expected": 33,
+    "remaining_source_blocked": 0,
+    "source_dates_preserved": true,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "official_databases_modified": false,
+    "runtime_modified": false,
+    "new_runtime_dispatch": false,
+    "next_responsible": "Family中PM: existing funding/protection/caps and safety/own-history valuation source integration",
+    "evidence_location": "Private Drive governance contains exact original evidence pointers."
   }
 }

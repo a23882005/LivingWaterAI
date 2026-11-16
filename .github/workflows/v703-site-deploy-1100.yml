@@ -578,10 +578,15 @@ jobs:
             exit 0
           fi
           git commit -m "data(V70): archive Macro Safety and institution monthly snapshots"
+          # Feed publication may retain unstaged source-refresh files after a
+          # concurrent update. Publish only the committed archive from a clean
+          # worktree; preserve the original workspace and all audit evidence.
+          archive_worktree=$(mktemp -d)
+          git worktree add --detach "$archive_worktree" HEAD
           for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main
-            if git push origin HEAD:main; then break; fi
+            git -C "$archive_worktree" fetch origin main
+            git -C "$archive_worktree" rebase origin/main
+            if git -C "$archive_worktree" push origin HEAD:main; then break; fi
             if [ "$attempt" -eq 3 ]; then echo "Daily Macro Safety archive publish failed" >&2; exit 1; fi
             sleep "$((attempt * 2))"
           done

@@ -103,6 +103,39 @@ def test_partial_sources_retain_approval_and_v70_and_name_each_missing_root(tmp_
     assert all(r['source_locators'] and r['next_responsibility'] and r['producer'] and r['consumer'] for r in out['field_inventory'])
 
 
+@pytest.mark.parametrize('symbol,expected',[
+    ('00859B','bond ETF'),('00860B','bond ETF'),('00719B','bond ETF'),
+    ('00679B','bond ETF'),('00725B','bond ETF'),('00761B','bond ETF'),
+    ('00937B','bond ETF'),('00985B','bond ETF'),('SPSB','bond ETF'),
+    ('QQQ','equity ETF'),('99999B','UNKNOWN')])
+def test_original_bond_registry_reaches_c7_without_implying_funding(tmp_path,monkeypatch,symbol,expected):
+    from types import SimpleNamespace
+    from family_c7_source_assembly import assemble_original_producers
+    import native_asset_source,v70_tactical_input
+    m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path)
+    row=req['confirmed_target']['payload']['draft']['target_lines'][0]
+    row.update(ticker=symbol,instrument_id='REGISTRY_PROBE')
+    ctx['native_target_source']=produce(req)
+    before=deepcopy(req['confirmed_target'])
+    producer=SimpleNamespace(root=ROOT,db_path=tmp_path/'original.db',class_source={},product_sources={},
+        verified_macro_feed_source=None,v70_strategic_policy={},fx_observation=None,order_confirmation=None,
+        family_c7_assembly_inputs={'schema_version':'Family.W8.C7AssemblyInputs.v1',
+            'artifact_directory':str(tmp_path/'private'),'portfolio_reconciliation_source':None})
+    def identity(value,*args):
+        if value==symbol and symbol!='QQQ':
+            return {'engine_route':'UNKNOWN','asset_type':'UNKNOWN','quote_currency':'TWD'}
+        return deepcopy(ids[value])
+    monkeypatch.setattr(native_asset_source,'classification',identity)
+    monkeypatch.setattr(v70_tactical_input,'calculate',lambda *args,**kwargs:deepcopy(t))
+    out=assemble_original_producers(producer,req,ctx,SimpleNamespace(payload={'positions':[]}),{})
+    actual=next(p for p in out['scope_candidate']['approved_long_term_target']['positions']
+        if p['instrument_id']==ctx['native_target_source']['source_to_native']['REGISTRY_PROBE'])
+    assert actual['asset_type']==expected
+    assert req['confirmed_target']==before
+    assert out['scope_candidate']['funding_buckets'] is None
+    assert out['unknown_values_defaulted_to_zero'] is False
+
+
 @pytest.mark.parametrize('change',['client','db','version','time','missing_account','native_result','unverified_binding'])
 def test_original_fact_scope_cutoff_and_kind_are_enforced(tmp_path,change):
     m,ci,req,ctx,t,ids,f,desc=original_case(tmp_path)

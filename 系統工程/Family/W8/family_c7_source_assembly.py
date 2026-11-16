@@ -602,13 +602,16 @@ def assemble_original_producers(producer,request,context,prepared,trial):
     symbols.update(r.get('ticker') for r in tables.get('portfolio_instrument',[]))
     from bond_advisory import candidates
     bond_symbols=set(candidates(producer.root))
+    from v75_runtime.work3 import TW_LISTED_ASSETS
+    bond_symbols.update(TW_LISTED_ASSETS)
     for symbol in sorted(s for s in symbols if s):
         identities[symbol]=classification(symbol,producer.class_source,producer.product_sources.get(symbol))
         units={r.get('quote_currency') for r in tables.get('portfolio_instrument',[]) if r.get('ticker')==symbol and r.get('quote_currency')}
         if len(units)==1:identities[symbol]['quote_currency']=next(iter(units))
         if symbol in bond_symbols:
+            registry='TW_LISTED_ASSETS' if symbol in TW_LISTED_ASSETS else 'US_LISTED_ASSETS'
             identities[symbol].update(engine_route='V75_PREDICATES',asset_type='BOND_ETF',
-                product_bucket_source='ORIGINAL_V75_WORK3_US_LISTED_ASSETS__NO_QUALITY_OR_BUY_CLEARANCE')
+                product_bucket_source='ORIGINAL_V75_WORK3_'+registry+'__NO_QUALITY_OR_BUY_CLEARANCE')
     from v70_tactical_input import calculate
     arguments={'feed_source':producer.verified_macro_feed_source} if producer.verified_macro_feed_source is not None else {}
     tactical=calculate(producer.root,request,producer.v70_strategic_policy,producer.fx_observation,**arguments)

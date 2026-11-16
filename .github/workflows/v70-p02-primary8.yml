@@ -23,8 +23,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Normal exact-symbol source read, no credentials or retries
-        run: python -B experiments/v70-p02/capture_markets.py
+      - name: Single original-CNN comparison read on the authorized runner
+        run: python -B experiments/v70-p02/capture_markets.py --cnn-only
       - name: Encrypt private source evidence
         if: always()
         run: |

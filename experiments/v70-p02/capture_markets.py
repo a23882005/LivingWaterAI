@@ -4,7 +4,7 @@ Only HTTP status is printed. Raw bodies remain inside the encrypted artifact.
 The separate finance history page is read only after the same symbol chart
 returns HTTP200, to bind the contract label and dated historical close.
 """
-import hashlib,json,ssl,urllib.request,urllib.error
+import hashlib,json,ssl,sys,urllib.request,urllib.error
 from datetime import datetime,timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -15,7 +15,7 @@ MAX=8*1024*1024
 class SafeRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self,req,fp,code,msg,headers,newurl):
         u=urlsplit(newurl)
-        if u.scheme!='https' or u.hostname not in {'query1.finance.yahoo.com','finance.yahoo.com'} or any(s in u.path.lower() for s in ['login','signin','consent','oauth']):
+        if u.scheme!='https' or u.hostname not in {'query1.finance.yahoo.com','finance.yahoo.com','production.dataviz.cnn.io'} or any(s in u.path.lower() for s in ['login','signin','consent','oauth']):
             raise ValueError('Login or nonapproved redirect stopped')
         return super().redirect_request(req,fp,code,msg,headers,newurl)
 
@@ -44,6 +44,10 @@ def capture(name,url):
 
 def main():
     rows=[]
+    if '--cnn-only' in sys.argv:
+        rows.append(capture('cnn_original','https://production.dataviz.cnn.io/index/fearandgreed/graphdata'))
+        (DEST/'request_index.json').write_text(json.dumps({'scope':'One original CNN read on the already authorized runner; no retry, cookie or auth; separate from prior Yahoo batch','requests':rows,'formal_state_modified':False,'public_use_permission_granted':False},indent=2))
+        return
     for name,symbol in [('dxy','DX-Y.NYB'),('wti','CL%3DF')]:
         chart=capture(name+'_chart','https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?range=1mo&interval=1d&includePrePost=false')
         rows.append(chart)

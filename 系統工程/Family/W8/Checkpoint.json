@@ -6507,5 +6507,34 @@
     "real_cycle": 0,
     "production": "HOLD",
     "trading": "NONE"
+  },
+  "pm_macro_independent_3433a24_acceptance_20261116": {
+    "commit": "3433a2454a92601ff7abdfbafa79c17c73cadd10",
+    "work_order": "PR59-MACRO-INDEPENDENT-SOURCE-CONTINUATION-20261115",
+    "status": "PASS_SCOPED_CLOSED",
+    "independent_tests": 87,
+    "profile_entries": 59,
+    "dependencies": 183,
+    "independent_evidence_checks": 68,
+    "writer_committed_menu04": {
+      "securities": 17,
+      "source_assemblies": 11,
+      "fields_each": 37,
+      "prior_market_technical_preserved": true
+    },
+    "pm_verification": "Independent tests and original evidence/digest review; no additional PM full Menu04 execution",
+    "original_artifacts_verified": 83,
+    "prior_artifacts_verified": 67,
+    "ci": {
+      "success": 4,
+      "failure": 2,
+      "cause": "MACRO_FEED_NOT_READY"
+    },
+    "cpi_missing_month_followup": "STOPPED_BY_OWNER_RULING",
+    "next_owner": "Family PM source integration; original writer completed this work order",
+    "full_financial_pass": 0,
+    "real_cycle": 0,
+    "production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

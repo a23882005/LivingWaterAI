@@ -159,7 +159,12 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
             'kind':'EXTERNAL_ROOT_FACT_REQUIRED','value_state':'UNKNOWN','historical_bootstrap_money_substituted':False}
             for i in unavailable or [None]]},None
     if request.get('macro_snapshot') is None:
-        return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','issues':[{
+        # Independent account/source qualification still runs when macro data
+        # is unavailable. The deployment producer retains its original guard.
+        return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE',
+            'family_scope_assembly':root_inventory(context),
+            'call_trace':attempt['call_trace']+['W8.family_c7_source_assembly:macro_independent'],
+            'issues':[{
             'code':'MEMBER_PRODUCER_PRECAPTURED_MACRO_REQUIRED','field_path':'request.macro_snapshot',
             'kind':'ORIGINAL_PRODUCER_SOURCE_REQUIRED'}]},None
     cfg.update(repo_root=root,focus_symbol=symbol,flow='DEPLOYMENT',observation_cache=observation_cache,run_binding={

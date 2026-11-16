@@ -232,3 +232,33 @@ def test_document_analysis_cannot_relabel_trade_or_snapshot_integrity(tmp_path,c
     else:r['client_snapshot']['payload']['payload_digest']='changed'
     with pytest.raises(PermissionError,match='SCOPE_MISMATCH'):
         produce(ROOT,r,'SYNTHETIC_ASSET',sources())
+
+
+def test_missing_macro_preserves_independent_source_work_without_deployment(tmp_path,monkeypatch):
+    import family_c7_source_assembly
+    r,d,desc=case(tmp_path);r.pop('macro_snapshot')
+    d['configuration']['context_seed']['source_only_marker']='SYNTHETIC_SOURCE_CONTEXT'
+    expected={'status':'PARTIAL_ORIGINAL_SOURCES','issues':[{'code':'SYNTHETIC_FUNDING_FACT_REQUIRED'}],
+              'unknown_values_defaulted_to_zero':False}
+    seen=[]
+    def assemble(root,request,context,*,artifact_directory):
+        assert root==ROOT and request==r
+        assert context['source_only_marker']=='SYNTHETIC_SOURCE_CONTEXT'
+        seen.append(str(artifact_directory));return deepcopy(expected)
+    monkeypatch.setattr(family_c7_source_assembly,'assemble',assemble)
+    def forbidden(**kwargs):pytest.fail('Macro-dependent deployment must remain unavailable')
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=forbidden)
+    assert len(seen)==1 and out['family_scope_assembly']==expected
+    assert pack is None and out['qualified_financial_pack'] is False
+    assert out['issues'][0]['code']=='MEMBER_PRODUCER_PRECAPTURED_MACRO_REQUIRED'
+    assert out['call_trace'][-1]=='W8.family_c7_source_assembly:macro_independent'
+    assert 'macro_snapshot' not in r
+
+
+def test_missing_macro_still_rejects_invalid_independent_sources(tmp_path,monkeypatch):
+    import family_c7_source_assembly
+    r,d,desc=case(tmp_path);r.pop('macro_snapshot')
+    def reject(*args,**kwargs):raise PermissionError('SYNTHETIC_SOURCE_BYTES_CHANGED')
+    monkeypatch.setattr(family_c7_source_assembly,'assemble',reject)
+    with pytest.raises(PermissionError,match='SYNTHETIC_SOURCE_BYTES_CHANGED'):
+        produce(ROOT,r,'SYNTHETIC_ASSET',desc())

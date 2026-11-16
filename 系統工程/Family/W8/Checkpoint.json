@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-16T23:06:21.132Z",
+  "updated_at": "2026-11-16T23:13:05.734Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6679,6 +6679,31 @@
     "next_owner": "Family_PM",
     "next_action": "Integrate source-backed account/funding-purpose mapping, settlement/reservations, protection/caps and safety/valuation/PIT; retain existing owner authorizations",
     "new_codex_dispatch": false,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE"
+  },
+  "pm_latest_broker_settlement_integration_20261117": {
+    "status": "PASS_SCOPED_BROKER_OBSERVATIONS",
+    "commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "executed_by": "Family_PM",
+    "fresh_provider_calls": 4,
+    "position_query_retry": 1,
+    "independent_checks": 16,
+    "original_readers": [
+      "broker_snapshot_source.read",
+      "member_financial_facts.broker_observations"
+    ],
+    "working_order_exposure": "BROKER_WORKING_EXPOSURE_VERIFIED",
+    "scope": "Fresh owner-authorized broker observations; capture clocks retained; no full financial-chain execution",
+    "private_report": "Google Drive root/PM_資金結算與委託接入_20261117.md",
+    "private_evidence": "Google Drive TEMP/Joseph_Settlement_Source_20261117.json",
+    "next_owner": "Family_PM",
+    "remaining": "Source-backed funding-purpose/account mapping, reserved/unsettled cash and other commitments/protection/caps; retain previously accepted sources.",
+    "new_runtime_dispatch": false,
+    "database_written": false,
+    "existing_PASS_preserved": true,
     "full_financial_PASS": 0,
     "real_Cycle": 0,
     "Production": "HOLD",

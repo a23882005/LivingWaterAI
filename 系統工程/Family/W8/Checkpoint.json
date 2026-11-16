@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-16T23:40:16.295Z",
+  "updated_at": "2026-11-16T23:49:23.546Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6753,5 +6753,33 @@
     "new_runtime_dispatch": false,
     "next_responsible": "Family中PM: existing funding/protection/caps and safety/own-history valuation source integration",
     "evidence_location": "Private Drive governance contains exact original evidence pointers."
+  },
+  "pm_unchanged_tw_holdings_candidate_20261117": {
+    "status": "PASS_SCOPED_CANDIDATE",
+    "work_order": "PR59-TW-UNCHANGED-HOLDINGS-20261117",
+    "baseline_commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "candidate_files": [
+      "系統工程/Family/W8/approved_target_input.py",
+      "系統工程/Family/W8/tests/test_official_target_input.py"
+    ],
+    "baseline_defect_reproduced": true,
+    "tests_passed": 46,
+    "subtests_passed": 12,
+    "scope": "Allow exact unchanged account position rows to retain original Owner acceptance across DB revisions; retain source/account/identity checks and reject changed/additional holdings.",
+    "complete_member_run": true,
+    "source_assemblies_before": 9,
+    "source_assemblies_after": 11,
+    "holding_target_checks": 11,
+    "existing_owner_decision_preserved": true,
+    "official_db_modified": false,
+    "latest_existing_broker_observations_integrated": true,
+    "formal_PR59_runtime_modified": false,
+    "dispatch_status": "CONTRACT_PREPARED_NOT_SENT",
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_responsible": "Original V82 Codex formal PR59 adoption; Family中PM source integration and independent acceptance.",
+    "private_evidence": "Exact contract, patch, original inputs and outputs retained in private Drive governance."
   }
 }

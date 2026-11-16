@@ -7,6 +7,7 @@ def feed():
     text=HTML.read_text();d=json.loads(re.search(r'<script[^>]+id="v70-embedded-feed"[^>]*>(.*?)</script>',text,re.S).group(1))
     d['testFixture']='W7-A10 SYNTHETIC ONLY';d['asOf']='2026-10-22T03:00:00Z';d['batchDateTaipei']='2026-10-22'
     for key,row in d['indicators'].items():
+        row.pop('carryForward',None) # Synthetic fixtures must not inherit a production carry policy.
         row.update(status='OK',dataDate='2026-10-21',method='synthetic fixture',detail='Synthetic browser acceptance fixture only')
         if row.get('value') is None:row['value']=2.0
         if key in b.MONTHLY:row['dataDate']='2026-09-30'

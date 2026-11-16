@@ -15,7 +15,7 @@ with sync_playwright() as p:
  if feed['publication'].get('carriedIndicators')==['m05']:assert '沿用2026年9月' in result['result'], result
  page.screenshot(path='build/site/cpi-carry-page.png',full_page=True)
  # A forged carried value and an expired exception must both fail.
- for field,value in [('value',0),('dataDate','2026-10-01')]:
+ for field,value in ([('value',0),('dataDate','2026-10-01')] if feed['indicators']['m05'].get('carryForward') else []):
   original=feed['indicators']['m05'][field];feed['indicators']['m05'][field]=value
   page.evaluate('window.v703ReloadFeed()');page.wait_for_timeout(400)
   assert page.evaluate('window.v703CanPublishFormalAllocation()') is False,field

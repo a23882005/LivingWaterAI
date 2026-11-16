@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-11-15T18:24:10+08:00",
-  "as_of_taipei": "2026-11-15T18:24:10+08:00",
+  "generated_at": "2026-11-16T10:03:26+08:00",
+  "as_of_taipei": "2026-11-16T10:03:26+08:00",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -11,8 +11,8 @@
       "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=5bb2ea8ecce2d90b0079310126ce28fdc3a01dbe472779f321919447453d0403，稽核檔data/audit/fed_target_evidence_20261115T102410Z.html.gz",
-      "retrieval_time": "2026-11-15T18:24:10+08:00",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=e82ae33e86b4a6102a16bd59dadc0ce2e5fd6131292c816eb1f7c17db013ea4a，稽核檔data/audit/fed_target_evidence_20261116T020203Z.html.gz",
+      "retrieval_time": "2026-11-16T10:02:03+08:00",
       "publication_date": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-10",
       "policy_schema": "fed-target-evidence-v1",
@@ -25,13 +25,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "last_verified_at": "2026-11-15T18:24:10+08:00",
+      "last_verified_at": "2026-11-16T10:02:03+08:00",
       "source_evidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-15T18:24:10+08:00",
+        "checked_at": "2026-11-16T10:02:03+08:00",
         "result": "CURRENT_CONFIRMED",
         "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
-        "response_sha256": "5bb2ea8ecce2d90b0079310126ce28fdc3a01dbe472779f321919447453d0403",
+        "response_sha256": "e82ae33e86b4a6102a16bd59dadc0ce2e5fd6131292c816eb1f7c17db013ea4a",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -50,44 +50,44 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC現行目標區間",
           "status": "FOUND",
-          "checked_at": "2026-11-15T18:24:10+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
-          "notes": "原始官方HTTP已保存並實算SHA256"
+          "notes": "原始官方HTTP已保存並實算SHA256｜本輪HTTP稽核：本輪實際HTTP 200，107260 bytes，內容SHA256=cbf6f6307f0451e9509383159ed62ba8924cb70a9502bff871c64f944bfead34；候選口徑判定=FOUND"
         },
         {
           "site": "FRED DFEDTARL",
           "url": "https://fred.stlouisfed.org/series/DFEDTARL",
           "metric_or_horizon": "目標區間下限",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 3.75,
           "unit": "%",
           "observation_date": "2026-11-10",
-          "notes": "本輪實際HTTP 200，77581 bytes，內容SHA256=14190f77e80ad17971a5115e489bbde8a297f6294165ce6fcc9e5126f7ba4d8d；直接取得成功；官方每日序列3.75%；SHA256=733e1160004cde390b1114a6135379c39a6fbbeb921eaeec809c24f4499d247c"
+          "notes": "本輪實際HTTP 200，77581 bytes，內容SHA256=14190f77e80ad17971a5115e489bbde8a297f6294165ce6fcc9e5126f7ba4d8d；直接取得成功；官方每日序列3.75%；SHA256=733e1160004cde390b1114a6135379c39a6fbbeb921eaeec809c24f4499d247c｜本輪HTTP稽核：本輪實際HTTP 200，77580 bytes，內容SHA256=147a3fa686d411e99b1dfe6004ed3e043b6817a15927d3bcf42a224541b039f0；候選口徑判定=FOUND"
         },
         {
           "site": "FRED DFEDTARU",
           "url": "https://fred.stlouisfed.org/series/DFEDTARU",
           "metric_or_horizon": "目標區間上限",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 4.0,
           "unit": "%",
           "observation_date": "2026-11-10",
-          "notes": "本輪實際HTTP 200，77674 bytes，內容SHA256=8a4b420d735b39eadf8b4a0e78dda30621e90a4b5d69adbf8d7fea1d873140f8；直接取得成功；官方每日序列4.00%；SHA256=307ecc782fb58cc63ba6ef19a623f8dc66234b8a8480e2cadbb91c59cc8e3d41"
+          "notes": "本輪實際HTTP 200，77674 bytes，內容SHA256=8a4b420d735b39eadf8b4a0e78dda30621e90a4b5d69adbf8d7fea1d873140f8；直接取得成功；官方每日序列4.00%；SHA256=307ecc782fb58cc63ba6ef19a623f8dc66234b8a8480e2cadbb91c59cc8e3d41｜本輪HTTP稽核：本輪實際HTTP 200，77673 bytes，內容SHA256=479b05b312d1ad78d6a40b9575d91d0f8e51716401c1ef9896ce23737be0a18e；候選口徑判定=FOUND"
         },
         {
           "site": "ALFRED DFEDTARU",
           "url": "https://alfred.stlouisfed.org/series?seid=DFEDTARU",
           "metric_or_horizon": "目標區間上限歷史vintage",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 4.0,
           "unit": "%",
           "observation_date": "2026-11-10",
-          "notes": "本輪實際HTTP 200，65659 bytes，內容SHA256=154d0205f1ebfe219e2bf60a8590f3b7ccec5cecd4daa01a8f5e0ecfae78535b；直接取得成功；ALFRED觀測4.00%；SHA256=b8d0bed9ae007f1374226b1d10817e841d1173e49e2e7ee77baa6c91356471df"
+          "notes": "本輪實際HTTP 200，65659 bytes，內容SHA256=154d0205f1ebfe219e2bf60a8590f3b7ccec5cecd4daa01a8f5e0ecfae78535b；直接取得成功；ALFRED觀測4.00%；SHA256=b8d0bed9ae007f1374226b1d10817e841d1173e49e2e7ee77baa6c91356471df｜本輪HTTP稽核：本輪實際HTTP 200，65656 bytes，內容SHA256=41eb14fbdce7b52ecb5339e6acc72d60678ba13d7b5eee793a8a972a8402bf03；候選口徑判定=FOUND"
         }
       ]
     },
@@ -109,44 +109,44 @@
           "url": "https://www.clevelandfed.org/indicators-and-data/inflation-expectations",
           "metric_or_horizon": "1年期模型通膨預期",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，188934 bytes，內容SHA256=2354f7bd79157d08100df24db44c0d4eb51b7f84e6660369e8b7ebe9550f6c62；直接取得成功但頁面未直接列當期1年數值；SHA256=7c791a618b27664d1d9e19f66072c083585393445cead474bca3eb7cae97c159"
+          "notes": "本輪實際HTTP 200，188934 bytes，內容SHA256=2354f7bd79157d08100df24db44c0d4eb51b7f84e6660369e8b7ebe9550f6c62；直接取得成功但頁面未直接列當期1年數值；SHA256=7c791a618b27664d1d9e19f66072c083585393445cead474bca3eb7cae97c159｜本輪HTTP稽核：本輪實際HTTP 200，188922 bytes，內容SHA256=8cecdb0752ce8d9f8739b72e2f57704ea3775472c557e5ca7e9bd9affae70fe1；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "NY Fed SCE",
           "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
           "metric_or_horizon": "消費者一年期通膨預期中位數",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 3.9,
           "unit": "%",
           "observation_date": "2026-10-31",
-          "notes": "本輪實際HTTP 200，110800 bytes，內容SHA256=ddfab1b490cb0417418a1a955ae99c273d565b553617c71cd479c9c18e5f836a；官方2026-11-09新聞稿：October 2026 one-year-ahead median inflation expectation 3.9%"
+          "notes": "本輪實際HTTP 200，110800 bytes，內容SHA256=ddfab1b490cb0417418a1a955ae99c273d565b553617c71cd479c9c18e5f836a；官方2026-11-09新聞稿：October 2026 one-year-ahead median inflation expectation 3.9%｜本輪HTTP稽核：本輪實際HTTP 200，110810 bytes，內容SHA256=66cca9a6d5c812be138c8d21ebdf1cc2491bc4494c4191a095b7a1a6877d42ad；候選口徑判定=FOUND"
         },
         {
           "site": "University of Michigan",
           "url": "https://www.sca.isr.umich.edu/",
           "metric_or_horizon": "消費者一年期通膨預期",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 4.3,
           "unit": "%",
           "observation_date": "2026-11-01",
-          "notes": "本輪實際HTTP 200，7493 bytes，內容SHA256=6c7d793d1fa27d906b12d508c2dc295e680c82edeabf703b503b62f4efe81b7f；直接取得成功；2026年10月終值4.7%，只作交叉核對；SHA256=26490d15b568363a59d1d2db1b6550887bfcbdefc2fb1f81f3a2eb2631e87d5e"
+          "notes": "本輪實際HTTP 200，7493 bytes，內容SHA256=6c7d793d1fa27d906b12d508c2dc295e680c82edeabf703b503b62f4efe81b7f；直接取得成功；2026年10月終值4.7%，只作交叉核對；SHA256=26490d15b568363a59d1d2db1b6550887bfcbdefc2fb1f81f3a2eb2631e87d5e｜本輪HTTP稽核：本輪實際HTTP 200，7493 bytes，內容SHA256=faa812cfae46922c923cfa912f5f5370cbcf8eb91499ede6272c211f369b05f5；候選口徑判定=FOUND"
         },
         {
           "site": "Philadelphia Fed SPF",
           "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/inflation-forecasts",
           "metric_or_horizon": "SPF one-year-ahead annual average inflation",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，29072 bytes，內容SHA256=f6495972c97d5fc302a305aad301c1028140bcf561619d4f53811ba88d2396b3；直接取得成功；年度平均口徑非同一滾動12個月；SHA256=69a1b60e7c64436544a4369ef1be6ed25d02db4e969d7f5eafba2e49ece30e16"
+          "notes": "本輪實際HTTP 200，29072 bytes，內容SHA256=f6495972c97d5fc302a305aad301c1028140bcf561619d4f53811ba88d2396b3；直接取得成功；年度平均口徑非同一滾動12個月；SHA256=69a1b60e7c64436544a4369ef1be6ed25d02db4e969d7f5eafba2e49ece30e16｜本輪HTTP稽核：本輪實際HTTP 200，29083 bytes，內容SHA256=45969ad53e0f59b9c22fa2d49429a54019565faf0601c02ddc6a21158c6007a7；候選口徑判定=METRIC_MISMATCH"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00"
@@ -169,44 +169,44 @@
           "url": "https://www.newyorkfed.org/research/policy/rstar",
           "metric_or_horizon": "HLW real-time定義與發布狀態",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": "2026-Q2",
-          "notes": "本輪實際HTTP 200，116213 bytes，內容SHA256=8211c53264273f78e9c4d942ee383d8333680529a3616de8b22e1890064561b9；官方頁直接取得成功；SHA256=1e5b71758c980eaf5d17d07af9bfe8ca7f3288d8774d746bc78c8075b5ffdb53"
+          "notes": "本輪實際HTTP 200，116213 bytes，內容SHA256=8211c53264273f78e9c4d942ee383d8333680529a3616de8b22e1890064561b9；官方頁直接取得成功；SHA256=1e5b71758c980eaf5d17d07af9bfe8ca7f3288d8774d746bc78c8075b5ffdb53｜本輪HTTP稽核：本輪實際HTTP 200，116219 bytes，內容SHA256=718c9f6d49b8ab4376d6d8aae2539e5b1049d495c4dd75c7514a71643e2fc40d；候選口徑判定=FOUND"
         },
         {
           "site": "NY Fed HLW real-time estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
           "metric_or_horizon": "US HLW real-time r* 2026Q2",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 1.00864835850403,
           "unit": "%",
           "observation_date": "2026-06-30",
-          "notes": "本輪實際HTTP 200，1812794 bytes，內容SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；官方XLSX直接下載並解析；SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9"
+          "notes": "本輪實際HTTP 200，1812794 bytes，內容SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；官方XLSX直接下載並解析；SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9｜本輪HTTP稽核：本輪實際HTTP 200，1812794 bytes，內容SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；候選口徑判定=FOUND"
         },
         {
           "site": "NY Fed current estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx",
           "metric_or_horizon": "HLW current estimate交叉核對",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": "2026-06-30",
-          "notes": "本輪實際HTTP 200，178850 bytes，內容SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46；官方工作簿直接取得，只作方法交叉核對；SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46"
+          "notes": "本輪實際HTTP 200，178850 bytes，內容SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46；官方工作簿直接取得，只作方法交叉核對；SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46｜本輪HTTP稽核：本輪實際HTTP 200，178850 bytes，內容SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46；候選口徑判定=FOUND"
         },
         {
           "site": "NY Fed Staff Report 1063",
           "url": "https://www.newyorkfed.org/research/staff_reports/sr1063",
           "metric_or_horizon": "HLW方法文件",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，104420 bytes，內容SHA256=8f54d2aaed90b7077c8d52d829afec606dd4a777d6f3d1cc91c247b374bb1987；方法報告非當期數值；直接取得成功；SHA256=bbb9be0fbf66af2cc18ddece90d2384c4b8c32df83b75c3aa3561ce2e138be2e"
+          "notes": "本輪實際HTTP 200，104420 bytes，內容SHA256=8f54d2aaed90b7077c8d52d829afec606dd4a777d6f3d1cc91c247b374bb1987；方法報告非當期數值；直接取得成功；SHA256=bbb9be0fbf66af2cc18ddece90d2384c4b8c32df83b75c3aa3561ce2e138be2e｜本輪HTTP稽核：本輪實際HTTP 200，104426 bytes，內容SHA256=64d256eac1374ee4b1b47c8b3259e13af9a87fadcb85cb2d7c1459dd8555f01e；候選口徑判定=METRIC_MISMATCH"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00"
@@ -229,44 +229,44 @@
           "url": "https://www.cbo.gov/system/files/2026-02/51135-2026-02-Economic-Projections.xlsx",
           "metric_or_horizon": "2026Q3實質潛在GDP（CBO 2026-02 vintage）",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 24200.4,
           "unit": "十億2017鏈價美元",
           "observation_date": "2026-Q3",
-          "notes": "本輪實際HTTP 200，1503579 bytes，內容SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；官方XLSX直接取得；SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776"
+          "notes": "本輪實際HTTP 200，1503579 bytes，內容SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；官方XLSX直接取得；SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776｜本輪HTTP稽核：本輪實際HTTP 200，1503579 bytes，內容SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；候選口徑判定=FOUND"
         },
         {
           "site": "BEA NIPA",
           "url": "https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026",
           "metric_or_horizon": "2026Q3實際實質GDP advance release",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 24611.077,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": "2026-Q3",
-          "notes": "本輪實際HTTP 200，50966 bytes，內容SHA256=e0914c6cde962c660792136bf6a89a5256b747d0491cbb1b15aaec32914d1ec9；官方頁直接取得；SHA256=b51d2f8f5bb721a5b37d17426a7512dcbfce1949aeb1e33b3ff28c823fcaaa30"
+          "notes": "本輪實際HTTP 200，50966 bytes，內容SHA256=e0914c6cde962c660792136bf6a89a5256b747d0491cbb1b15aaec32914d1ec9；官方頁直接取得；SHA256=b51d2f8f5bb721a5b37d17426a7512dcbfce1949aeb1e33b3ff28c823fcaaa30｜本輪HTTP稽核：本輪實際HTTP 200，50966 bytes，內容SHA256=e0914c6cde962c660792136bf6a89a5256b747d0491cbb1b15aaec32914d1ec9；候選口徑判定=FOUND"
         },
         {
           "site": "FRED GDPC1",
           "url": "https://fred.stlouisfed.org/series/GDPC1",
           "metric_or_horizon": "2026Q3實際實質GDP",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 24611.077,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": "2026-Q3",
-          "notes": "本輪實際HTTP 200，94740 bytes，內容SHA256=0bd8450cc315fe4f8ef48f48c4bcdb0688db4b140b26a54a9ad0710050db2c54；直接取得成功；SHA256=49666d5418f809db5159e936391f9979df97011d73e2e854c7e01a26ccbb0e0f"
+          "notes": "本輪實際HTTP 200，94740 bytes，內容SHA256=0bd8450cc315fe4f8ef48f48c4bcdb0688db4b140b26a54a9ad0710050db2c54；直接取得成功；SHA256=49666d5418f809db5159e936391f9979df97011d73e2e854c7e01a26ccbb0e0f｜本輪HTTP稽核：本輪實際HTTP 200，94681 bytes，內容SHA256=a3964c0e2e9dbaeeb765d0dc7eed8bfa79090ed7650f249f0d67078f055eed22；候選口徑判定=FOUND"
         },
         {
           "site": "ALFRED GDPC1",
           "url": "https://alfred.stlouisfed.org/series?seid=GDPC1",
           "metric_or_horizon": "GDPC1歷史發布vintage",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 24611.077,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": "2026-Q3",
-          "notes": "本輪實際HTTP 200，85791 bytes，內容SHA256=45664407f9418d214fccf591b4c1b6db392bf867d16be0822e2033ab4cf9d135；直接取得成功；SHA256=ef1667d077a37eccd3f4f4b155309068a537e654646956c91d78ea7bc5156bb6"
+          "notes": "本輪實際HTTP 200，85791 bytes，內容SHA256=45664407f9418d214fccf591b4c1b6db392bf867d16be0822e2033ab4cf9d135；直接取得成功；SHA256=ef1667d077a37eccd3f4f4b155309068a537e654646956c91d78ea7bc5156bb6｜本輪HTTP稽核：本輪實際HTTP 200，85788 bytes，內容SHA256=3f295c2af1ea82fa61da0ac1cb0a007066da52652534a10679dd8dca75cc0596；候選口徑判定=FOUND"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00"
@@ -276,11 +276,11 @@
       "value": 45.87,
       "unit": "%",
       "observation_date": "2026-11-13",
-      "source_url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+      "source_url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "NYSE MMFI 45.87%：Macroaxis頁面直接驗證觀測日2026-11-13",
-      "retrieval_time": "2026-11-15T18:24:10+08:00",
+      "detail": "INDEX/MMFI 日期2026-11-13收盤45.87%，採EOD收盤非盤中LAST；來源SHA256=65a1db374df73b9d076cf0f86910833c99169197fd8afa798b0d6a6e2d2c418e",
+      "retrieval_time": "2026-11-16T10:02:03+08:00",
       "publication_date": "2026-11-13",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10",
       "candidate_checks": [
@@ -288,59 +288,59 @@
           "site": "Macroaxis",
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "metric_or_horizon": "MMFI百分比／NYSE 50日廣度",
-          "status": "FOUND",
-          "checked_at": "2026-11-15T18:24:10+08:00",
+          "status": "BLOCKED",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 45.87,
           "unit": "%",
           "observation_date": "2026-11-13",
-          "notes": "頁面明示NYSE市場50日廣度"
+          "notes": "頁面明示NYSE市場50日廣度｜本輪HTTP稽核：本輪實際HTTP 403，1381 bytes，內容SHA256=af1f44ff00863cae24f6bed6a298744414ec2c46d55e0318a8bc15c524181b93；候選口徑判定=BLOCKED"
         },
         {
           "site": "Barchart",
           "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
           "metric_or_horizon": "$MMFI NYSE 50日廣度",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪實際HTTP 202，1997 bytes，內容SHA256=c42363bbaebad3356982a8a7ed171e3b3937665072a93b3298b3877060ba4ac9；本輪HTTP查核未取得可用正文：HTTP 202, bytes=0；未以此站刷新正式值"
+          "notes": "本輪實際HTTP 202，1997 bytes，內容SHA256=c42363bbaebad3356982a8a7ed171e3b3937665072a93b3298b3877060ba4ac9；本輪HTTP查核未取得可用正文：HTTP 202, bytes=0；未以此站刷新正式值｜本輪HTTP稽核：本輪實際HTTP 202，1997 bytes，內容SHA256=67961717fc40e2e5722937c78638b9f95a35aed58f7a38ed956460d4039fa249；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "EODData",
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日均線百分比",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:10:18+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 45.87,
           "unit": "%",
           "observation_date": "2026-11-13",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=4504e2b1fae47fb00afad54ccdde727f66a5ded80c8762867f49ba8c528b98ca"
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=65a1db374df73b9d076cf0f86910833c99169197fd8afa798b0d6a6e2d2c418e｜本輪HTTP稽核：本輪實際HTTP 200，48763 bytes，內容SHA256=19fe1837c8af6f00a14f6fdea8d74b0b07c4f6f0e4f8e7c4a9e1ea8b96c6679e；候選口徑判定=FOUND"
         },
         {
           "site": "TradingView",
           "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
           "metric_or_horizon": "Percent of Stocks Above 50-Day Average",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，327152 bytes，內容SHA256=2cd4cbebefd7ea36069ec5921182e6fbdb94f95614cc8aec80cf2f5bc751f0e2；定義可核對但靜態頁未列可驗證EOD數值；SHA256=6cd450c7d39108d0c7566b0a67f27c6bd5d54a8510347be87a6a46d5c4811058"
+          "notes": "本輪實際HTTP 200，327152 bytes，內容SHA256=2cd4cbebefd7ea36069ec5921182e6fbdb94f95614cc8aec80cf2f5bc751f0e2；定義可核對但靜態頁未列可驗證EOD數值；SHA256=6cd450c7d39108d0c7566b0a67f27c6bd5d54a8510347be87a6a46d5c4811058｜本輪HTTP稽核：本輪實際HTTP 200，327193 bytes，內容SHA256=fcdb5f48a4f63e5a50227ba5d36104d835ed30548743e535d5a4bdda37e91905；候選口徑判定=NOT_FOUND"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00"
     },
     "m03_qqq": {
       "label": "QQQ未來12個月Forward P/E",
-      "value": 19.89,
+      "value": 19.93,
       "unit": "倍 Forward",
       "observation_date": "2026-11-13",
       "source_url": "https://stockanalysis.com/etf/qqq/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "QQQ Forward PE 19.89，頁面資料日2026-11-13",
-      "retrieval_time": "2026-11-15T18:24:10+08:00",
+      "detail": "QQQ Forward PE 19.93，頁面資料日2026-11-13",
+      "retrieval_time": "2026-11-16T10:02:03+08:00",
       "publication_date": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
@@ -349,44 +349,44 @@
           "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，1317325 bytes，內容SHA256=566e77c047c98e98ec8a7832cf7150116f1df197543d7bd44a2a3d482f8c0a8b；直接頁面重新導向quote，forwardPE欄為空；SHA256=78c530ef77122b6ee00ecbaae8a3bcfb053f811f4ae9ef066fedf4262df4c565"
+          "notes": "本輪實際HTTP 200，1317325 bytes，內容SHA256=566e77c047c98e98ec8a7832cf7150116f1df197543d7bd44a2a3d482f8c0a8b；直接頁面重新導向quote，forwardPE欄為空；SHA256=78c530ef77122b6ee00ecbaae8a3bcfb053f811f4ae9ef066fedf4262df4c565｜本輪HTTP稽核：本輪實際HTTP 200，946488 bytes，內容SHA256=9545a594553de2b151893c1d225a1bdc7f56d0709e69fc2035381fc5da3d8e47；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "Invesco",
           "url": "https://www.invesco.com/qqq-etf/en/about.html",
           "metric_or_horizon": "QQQ官方Forward/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，198160 bytes，內容SHA256=9995981ec2f78ece08ab22e699eeffb66c6a9366cc7b659d47c30d20ac997cff；直接取得成功但未明示Forward/FY1；SHA256=8b5e817c0fc4fedbe93808208e58247570e537deaec30ad3cf8b2277c4fbd618"
+          "notes": "本輪實際HTTP 200，198160 bytes，內容SHA256=9995981ec2f78ece08ab22e699eeffb66c6a9366cc7b659d47c30d20ac997cff；直接取得成功但未明示Forward/FY1；SHA256=8b5e817c0fc4fedbe93808208e58247570e537deaec30ad3cf8b2277c4fbd618｜本輪HTTP稽核：本輪實際HTTP 200，198160 bytes，內容SHA256=9995981ec2f78ece08ab22e699eeffb66c6a9366cc7b659d47c30d20ac997cff；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，51054 bytes，內容SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7"
+          "notes": "本輪實際HTTP 200，51054 bytes，內容SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7｜本輪HTTP稽核：本輪實際HTTP 200，51054 bytes，內容SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；候選口徑判定=METRIC_MISMATCH"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-15T18:24:10+08:00",
-          "value": 19.89,
+          "checked_at": "2026-11-16T10:03:26+08:00",
+          "value": 19.93,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
-          "notes": "真實網頁明示Forward PE；TTM未採用"
+          "notes": "真實網頁明示Forward PE；TTM未採用｜本輪HTTP稽核：本輪實際HTTP 200，158438 bytes，內容SHA256=21a43fef3fb4e68385206a953bca08cf212c41a71cc8124d2621b455033df532；候選口徑判定=FOUND"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00",
@@ -407,7 +407,7 @@
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "SPY Forward PE 18.95，頁面資料日2026-11-13",
-      "retrieval_time": "2026-11-15T18:24:10+08:00",
+      "retrieval_time": "2026-11-16T10:02:03+08:00",
       "publication_date": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
@@ -416,44 +416,44 @@
           "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，1274887 bytes，內容SHA256=56160d5b0c018ddf7d53769401255a00e3034b6688aaa2348828974770f00aff；直接頁面重新導向quote，forwardPE欄為空；SHA256=6468fbd3f12b28640dcd1720083d3a5a1edb42c86b68d50dc35277017ddce8b1"
+          "notes": "本輪實際HTTP 200，1274887 bytes，內容SHA256=56160d5b0c018ddf7d53769401255a00e3034b6688aaa2348828974770f00aff；直接頁面重新導向quote，forwardPE欄為空；SHA256=6468fbd3f12b28640dcd1720083d3a5a1edb42c86b68d50dc35277017ddce8b1｜本輪HTTP稽核：本輪實際HTTP 200，949529 bytes，內容SHA256=5d4daf6bc8afc938c037af66ddef0d1e0fed84ab31e15e246516b9215f3ae1de；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "State Street",
           "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
           "metric_or_horizon": "Price/Earnings Ratio FY1",
           "status": "FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 19.84,
           "unit": "倍 Forward",
           "observation_date": "2026-11-07",
-          "notes": "本輪實際HTTP 200，238459 bytes，內容SHA256=d89aa13878ce43d6b4fb46fe4c8f79b3a330d92c68e5e926fb3e6086396bf603；真實網頁明示Price/Earnings Ratio FY1=19.40；TTM未採用"
+          "notes": "本輪實際HTTP 200，238459 bytes，內容SHA256=d89aa13878ce43d6b4fb46fe4c8f79b3a330d92c68e5e926fb3e6086396bf603；真實網頁明示Price/Earnings Ratio FY1=19.40；TTM未採用｜本輪HTTP稽核：本輪實際HTTP 200，238459 bytes，內容SHA256=504f83df2f9d7f3228d63a58ca4a9b18806295da30b274788b3545fb7430b3f7；候選口徑判定=FOUND"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，51054 bytes，內容SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59"
+          "notes": "本輪實際HTTP 200，51054 bytes，內容SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59｜本輪HTTP稽核：本輪實際HTTP 200，51054 bytes，內容SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；候選口徑判定=METRIC_MISMATCH"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-15T18:24:10+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": 18.95,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
-          "notes": "真實網頁明示Forward PE；TTM未採用"
+          "notes": "真實網頁明示Forward PE；TTM未採用｜本輪HTTP稽核：本輪實際HTTP 200，159887 bytes，內容SHA256=79d45db9dd3ad49efc89d638dbcaff7e31cd34fe1e84b124813e4d469cbb25b5；候選口徑判定=FOUND"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00",
@@ -467,14 +467,14 @@
     },
     "m03_vt": {
       "label": "VT未來12個月Forward P/E",
-      "value": 15.11,
+      "value": 15.1,
       "unit": "倍 Forward",
       "observation_date": "2026-11-13",
       "source_url": "https://stockanalysis.com/etf/vt/",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "VT Forward PE 15.11，頁面資料日2026-11-13",
-      "retrieval_time": "2026-11-15T18:24:10+08:00",
+      "detail": "VT Forward PE 15.1，頁面資料日2026-11-13",
+      "retrieval_time": "2026-11-16T10:02:03+08:00",
       "publication_date": "2026-11-13",
       "vintage": "2026-11-10 market/page date; freshly retrieved 2026-11-11",
       "candidate_checks": [
@@ -483,44 +483,44 @@
           "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，1210134 bytes，內容SHA256=932ea032cb1d97264691631c3c973f05f8620b71eab9a3e26f0f18bba6275dae；直接頁面重新導向quote，forwardPE欄為空；SHA256=95c8f51f55769c23b303089ca514928dc77906b28ac3ca1bfe03bd3635a879eb"
+          "notes": "本輪實際HTTP 200，1210134 bytes，內容SHA256=932ea032cb1d97264691631c3c973f05f8620b71eab9a3e26f0f18bba6275dae；直接頁面重新導向quote，forwardPE欄為空；SHA256=95c8f51f55769c23b303089ca514928dc77906b28ac3ca1bfe03bd3635a879eb｜本輪HTTP稽核：本輪實際HTTP 200，944374 bytes，內容SHA256=997780c4bfc84242487bcc6fe6260b2541d2598530a4b401251e19a4cad84ea6；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "Vanguard",
           "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
           "metric_or_horizon": "VT官方Forward/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，224376 bytes，內容SHA256=272f3ad1e3d4f977970f224571a223f14a64d4acdf56306d02f5b73eb3814f45；直接取得成功但未明示Forward/FY1；SHA256=a11f993fe166011303a9fed2c61bb817774247f414a7935bf63ab91cc67a7121"
+          "notes": "本輪實際HTTP 200，224376 bytes，內容SHA256=272f3ad1e3d4f977970f224571a223f14a64d4acdf56306d02f5b73eb3814f45；直接取得成功但未明示Forward/FY1；SHA256=a11f993fe166011303a9fed2c61bb817774247f414a7935bf63ab91cc67a7121｜本輪HTTP稽核：本輪實際HTTP 200，224300 bytes，內容SHA256=76ebf272eff7e71219fdf4209e3f504a43b2740421d4771cb02ca94de199682c；候選口徑判定=NOT_FOUND"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "METRIC_MISMATCH",
-          "checked_at": "2026-11-15T10:09:03+08:00",
+          "checked_at": "2026-11-16T10:03:26+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪實際HTTP 200，51053 bytes，內容SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a"
+          "notes": "本輪實際HTTP 200，51053 bytes，內容SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；直接取得成功；未明示Forward/FY1，TTM未採用；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a｜本輪HTTP稽核：本輪實際HTTP 200，51053 bytes，內容SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；候選口徑判定=METRIC_MISMATCH"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-15T18:24:10+08:00",
-          "value": 15.11,
+          "checked_at": "2026-11-16T10:03:26+08:00",
+          "value": 15.1,
           "unit": "倍 Forward",
           "observation_date": "2026-11-13",
-          "notes": "真實網頁明示Forward PE；TTM未採用"
+          "notes": "真實網頁明示Forward PE；TTM未採用｜本輪HTTP稽核：本輪實際HTTP 200，136031 bytes，內容SHA256=1d92c5256282942a77d700fa4eafb79db232e10a879cc07c7a55e2c4116ab1c8；候選口徑判定=FOUND"
         }
       ],
       "last_verified_at": "2026-11-15T10:09:03+08:00",

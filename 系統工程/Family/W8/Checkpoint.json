@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-15T06:56:36.867Z",
+  "updated_at": "2026-11-16T23:01:35.789Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6623,5 +6623,42 @@
     "real_Cycle": 0,
     "Production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_tw_bond_classification_adoption_acceptance_20261117": {
+    "status": "PASS_SCOPED_PR59_ADOPTED",
+    "commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "supersedes_pending_status_of": "pm_tw_bond_classification_candidate_20261117",
+    "runtime_writer": "Original_V82_Codex_PR59",
+    "independent_reviewer": "Family_PM",
+    "validation": {
+      "pm_targeted_tests": 103,
+      "pm_evidence_checks": 516,
+      "artifact_hashes": 123,
+      "profile_checks": 59,
+      "dependency_checks": 183,
+      "ci_success": 6
+    },
+    "execution_provenance": "Codex executed committed 17-security chain; PM independently reran 103 tests and verified submitted outputs, not a new full-chain PM run.",
+    "c7_assemblies": 9,
+    "taiwan_bond_gaps_resolved": 2,
+    "approved_amounts_weights_sgov_preserved": true,
+    "existing_PASS_preserved": true,
+    "main_runtime_merged": false,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "private_evidence": "Google Drive root/PM_ACCEPTANCE_20261117.md; TEMP/V82_PM_29b1925_獨立核對516項_20261117.json"
+  },
+  "pm_four_projects_tasks_progress_reconciliation_20261117": {
+    "status": "OBSERVED_OPERATIONAL_USAGE_RECORDED",
+    "scope": "Selected visible project conversations and current Tasks reports",
+    "four_household_usage": "Login, SQLite/data reads, research, allocation and report artifacts observed with evidence depth distinguished in private report.",
+    "tasks": "Latest substantive reports include V82 v1.22.1; technical and news analysis operational, complete financial source integration remains partial.",
+    "completion_percentage": null,
+    "reason": "No approved weighted denominator; historical 85/70 estimates not adopted.",
+    "next_owner": "Family_PM",
+    "next_action": "Reconcile latest approved household holdings, funding purposes and source-backed fields; retain all existing accepted work.",
+    "private_report": "Google Drive root/PM_ACCEPTANCE_20261117.md"
   }
 }

@@ -6558,5 +6558,36 @@
     "real_Cycle": 0,
     "Production": "HOLD",
     "trade_authorization": "NONE"
+  },
+  "pm_ready_macro_menu04_20261116": {
+    "status": "PASS_SCOPED__ORIGINAL_MENU04_EXECUTED_WITH_READY_MACRO",
+    "runtime_commit": "3433a2454a92601ff7abdfbafa79c17c73cadd10",
+    "runtime_changed": false,
+    "executed_by": "Family_PM",
+    "equity_native_components": 11,
+    "bond_routes": 6,
+    "asset_producer_calls": 11,
+    "source_assemblies_with_bound_v70_stock_ceiling": 9,
+    "verification": {
+      "passed": 71,
+      "total": 71
+    },
+    "H32_targets_unchanged": true,
+    "DB_unchanged": true,
+    "market_observed_date": "2026-11-13",
+    "macro_as_of": "2026-11-16T13:56:04.179421Z",
+    "calendar_provider": "exchange_calendars4.13.2_and_original_TPEx_annual_plans",
+    "source_transport_restored": true,
+    "private_evidence": "Google Drive root/TEMP/Family_PM_新總經17檔Menu04完整實跑_20261116.json",
+    "next_owner": "Family_PM",
+    "remaining": [
+      "C7 Taiwan bond bucket classification adapter",
+      "Holdings and funding qualification within approved reported scope",
+      "Formal safety, valuation and PIT inputs"
+    ],
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

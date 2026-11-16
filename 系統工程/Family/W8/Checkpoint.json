@@ -1,7 +1,7 @@
 {
   "schema": "Family-W8-Checkpoint-v1",
   "owner": "Family中PM（總PM）",
-  "updated_at": "2026-11-16T23:49:23.546Z",
+  "updated_at": "2026-11-16T23:53:03.184Z",
   "current_work": "W8 全面整合測試與 Debug",
   "status": "IN_PROGRESS",
   "upstream": {
@@ -6781,5 +6781,17 @@
     "trade_authorization": "NONE",
     "next_responsible": "Original V82 Codex formal PR59 adoption; Family中PM source integration and independent acceptance.",
     "private_evidence": "Exact contract, patch, original inputs and outputs retained in private Drive governance."
+  },
+  "pm_owner_pending_weights_decision_20261117": {
+    "status": "OWNER_CONFIRMED_WEIGHTS",
+    "decision_record": "Private Drive original Owner decision and management records",
+    "previous_pending_weight_gap_resolved": true,
+    "allocation_sum_verified": true,
+    "existing_other_weights_preserved": true,
+    "formal_database_written": false,
+    "formal_runtime_updated": false,
+    "next_responsible": "Family中PM: integrate approved weights through original target persistence and source reader",
+    "Production": "HOLD",
+    "trade_authorization": "NONE"
   }
 }

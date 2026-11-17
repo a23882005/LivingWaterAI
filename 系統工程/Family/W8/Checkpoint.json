@@ -6816,5 +6816,34 @@
     "trade_authorization": "NONE",
     "next_responsible": "Family_PM: remaining funding-purpose and safety/valuation integration",
     "private_evidence": "Original report and complete evidence recorded in private Drive governance"
+  },
+  "pm_owner_funding_base_20261117": {
+    "status": "PASS_SCOPED_OWNER_APPROVED_BASE_AND_TARGET_AMOUNTS",
+    "executed_by": "Family_PM",
+    "owner_decision_recorded": true,
+    "approved_base_method": "Existing securities plus one confirmed additional cash amount; same historical cash counted once",
+    "original_runtime_member_runs": 1,
+    "candidate_runtime_member_runs": 1,
+    "component_results": 6,
+    "expected_components": 6,
+    "exact_result_checks": 12,
+    "cash_candidate": {
+      "work_order": "PR59-CASH-TARGET-20261117",
+      "changed_files": 2,
+      "tests": 10,
+      "subtests": 8,
+      "original_real_defect_reproduced": true,
+      "formal_PR59_adopted": false,
+      "dispatch_status": "CONTRACT_PREPARED_NOT_SENT",
+      "runtime_writer": "Original_V82_Codex"
+    },
+    "official_databases_modified": false,
+    "source_documents_updated": 2,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_responsible": "Family_PM source integration and independent acceptance; Original_V82_Codex formal PR59 cash fix adoption",
+    "private_evidence": "Exact Owner approval, inputs, outputs, candidate patch and acceptance report in private Drive governance"
   }
 }

@@ -44,8 +44,11 @@ def produce(request,fx_observation=None):
     targets={};mapping={}
     for row in rows:
         original=row['instrument_id'];ticker=row.get('ticker')
-        require(isinstance(ticker,str) and bool(ticker),'TARGET_TICKER_REQUIRED','target_lines.'+original)
-        native=ticker if counts[ticker]==1 else original
+        cash_without_ticker=ticker in (None,'') and row.get('asset_type') in ('CASH','cash')
+        require(cash_without_ticker or (isinstance(ticker,str) and bool(ticker)),
+            'TARGET_TICKER_REQUIRED','target_lines.'+original)
+        # Cash is identified by its approved allocation key, not a synthetic quote symbol.
+        native=original if cash_without_ticker or counts[ticker]!=1 else ticker
         require(original not in mapping and native not in targets,
             'TARGET_NATIVE_ID_COLLISION','target_lines.'+original)
         mapping[original]=native

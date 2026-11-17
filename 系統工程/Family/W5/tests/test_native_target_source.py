@@ -57,6 +57,28 @@ def test_no_absent_holding_defaults_and_sgov_roles_stay_distinct():
     assert 'ABSENT_ASSET' not in out['targets']
 
 
+def test_approved_cash_without_ticker_keeps_its_original_identity_and_amount():
+    req,_,source=case()
+    lines=req['confirmed_target']['payload']['draft']['target_lines']
+    cash={'instrument_id':'CASH_TWD','ticker':None,'asset_type':'CASH',
+        'weight':{'value_state':'KNOWN','value':'0.05'},
+        'target_amount':{'value_state':'KNOWN','amount':'320','currency':'TWD'}}
+    lines.append(cash)
+    original=deepcopy(req['confirmed_target'])
+
+    projected=produce(req,source['fx_observation'])
+    assert req['confirmed_target']==original
+    assert projected['source_to_native']['CASH_TWD']=='CASH_TWD'
+    result=projected['targets']['CASH_TWD']
+    assert result['ticker'] is None
+    assert result['target_amount']['amount']=='10'
+    assert result['target_amount']['original_source_money']==cash['target_amount']
+
+    cash['asset_type']='EQUITY'
+    with pytest.raises(BoundaryError,match='TARGET_TICKER_REQUIRED'):
+        produce(req,source['fx_observation'])
+
+
 @pytest.mark.parametrize('kind',['amount','owner','db','run'])
 def test_rehashed_projection_cannot_change_bound_approval_or_member(kind):
     req,ctx,source=case()

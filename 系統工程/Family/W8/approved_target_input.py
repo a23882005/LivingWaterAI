@@ -329,7 +329,16 @@ def rebind_unchanged_official_holdings(snapshot,previous_snapshot,*,official_fil
             raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_POSITION_AMBIGUOUS')
     # Legacy ledger symbols already represented in the accepted sealed layer
     # can retain older quantities. A later OWNER_VERIFIED row must agree.
-    for symbol,row in ledger.items():
+    # Exact unchanged account rows already existed under the accepted snapshot.
+    # The sealed-IB projection is needed only for newly materialized ledger rows;
+    # it must not reject unchanged Taiwan rows merely because it filters to IB.
+    prior_account_rows=[r for r in previous_snapshot['tables']['portfolio_position']
+        if r.get('account_key')==account_key]
+    current_account_rows=[r for r in snapshot['tables']['portfolio_position']
+        if r.get('account_key')==account_key]
+    unchanged_account_rows=(sorted(map(_digest,prior_account_rows))==
+        sorted(map(_digest,current_account_rows)))
+    for symbol,row in ([] if unchanged_account_rows else ledger.items()):
         if symbol not in expected:
             raise PermissionError('OFFICIAL_HOLDINGS_SUCCESSOR_ADDED_POSITION')
         if row['source_row'].get('position_source_kind')=='OWNER_VERIFIED' and (

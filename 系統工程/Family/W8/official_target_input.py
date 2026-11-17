@@ -125,11 +125,11 @@ def build(snapshot, *, evaluation_at, base_source):
                    if r['instrument_key'] == row['instrument_key']]
         if (len(matches) != 1 or matches[0].get('client_id') != client
                 or matches[0].get('identity_state') != 'KNOWN'
-                or not matches[0].get('ticker')):
+                or (not matches[0].get('ticker') and matches[0].get('instrument_type') != 'CASH')):
             raise ValueError('OFFICIAL_TARGET_INSTRUMENT_AMBIGUOUS')
         instrument = matches[0]
         weight = Decimal(row['weight_units']) / Decimal(1000000)
-        lines.append({'instrument_id': row['instrument_key'], 'ticker': instrument['ticker'],
+        lines.append({'instrument_id': row['instrument_key'], 'ticker': instrument.get('ticker'),
             'asset_type': instrument['instrument_type'],
             'weight': {'value_state': 'KNOWN', 'value': str(weight)},
             'target_amount': {'value_state': 'KNOWN',

@@ -164,4 +164,70 @@ class AcceptanceSuccessorTest(unittest.TestCase):
                 self.new=saved
 
 
+class TaiwanAcceptanceSuccessorTest(AcceptanceSuccessorTest):
+    def setUp(self):
+        super().setUp()
+        for snap in (self.old,self.new):
+            snap['tables']['portfolio_account'][0]['account_key']='TW'
+            snap['tables']['portfolio_position'][0]['account_key']='TW'
+            snap['tables']['portfolio_instrument'][0]['quote_currency']='TWD'
+            snap['tables']['portfolio_snapshot_item'][0]['value_text']='[{"symbol":"AAA","quantity":"2","broker_label":"Taiwan broker","currency":"TWD"}]'
+            snap['payload_digest']=digest(snap['tables'])
+
+    def bind(self):
+        return A.bind_official_holdings(self.new,previous_snapshot=self.old,
+            official_file_id='synthetic-official-db',account_key='TW',owner_decision=self.decision,
+            evaluation_at='2026-10-28T00:00:00Z')
+
+    def test_changed_sealed_source_or_new_quantity_or_identity_rejected(self):
+        # Same safety cases as IB, with a different-currency identity mutation.
+        for kind in ('sealed','quantity','identity','added'):
+            with self.subTest(kind=kind):
+                saved=deepcopy(self.new)
+                if kind=='sealed':self.new['tables']['portfolio_snapshot_item'][0]['value_text']='[]'
+                elif kind=='identity':self.new['tables']['portfolio_instrument'][0]['quote_currency']='USD'
+                else:
+                    row=deepcopy(self.new['tables']['portfolio_position'][0])
+                    row.update(as_of_utc='2026-10-10T00:00:00Z',quantity_decimal='3',position_source_kind='OWNER_VERIFIED')
+                    if kind=='added':
+                        row['instrument_key']='Y'
+                        self.new['tables']['portfolio_instrument'].append({'instrument_key':'Y','ticker':'BBB'})
+                    self.new['tables']['portfolio_position'].append(row)
+                self.new['payload_digest']=digest(self.new['tables'])
+                with self.assertRaises(PermissionError):self.bind()
+                self.new=saved
+
+
+class CashTargetRegressionTest(unittest.TestCase):
+    setUp = OfficialTargetTest.setUp
+    rehash = OfficialTargetTest.rehash
+    build = OfficialTargetTest.build
+
+    def cash(self):
+        self.snapshot['tables']['portfolio_instrument'][1].update(ticker=None, instrument_type='CASH')
+        self.rehash()
+
+    def test_cash_without_stock_ticker_preserves_allocation_and_replays(self):
+        self.cash()
+        before=deepcopy(self.snapshot)
+        view,proof=self.build()
+        lines=view['payload']['draft']['target_lines']
+        self.assertEqual(lines[1]['ticker'],None)
+        self.assertEqual(lines[1]['asset_type'],'CASH')
+        self.assertEqual(lines[1]['target_amount']['amount'],'200.0')
+        self.assertEqual(sum(__import__('decimal').Decimal(r['target_amount']['amount']) for r in lines),1000)
+        self.assertEqual(M.validate(view,proof,self.snapshot,self.at),view)
+        self.assertEqual(before,self.snapshot)
+
+    def test_non_cash_without_ticker_still_rejected(self):
+        self.snapshot['tables']['portfolio_instrument'][1]['ticker']=None
+        self.rehash()
+        with self.assertRaisesRegex(ValueError,'INSTRUMENT_AMBIGUOUS'):self.build()
+
+    def test_cash_amount_tampering_still_rejected(self):
+        self.cash();view,proof=self.build()
+        view['payload']['draft']['target_lines'][1]['target_amount']['amount']='999'
+        with self.assertRaisesRegex(PermissionError,'REPLAY_MISMATCH'):M.validate(view,proof,self.snapshot,self.at)
+
+
 if __name__=='__main__':unittest.main()

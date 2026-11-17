@@ -375,6 +375,39 @@ def parse_mmfi_eod(raw, today, market_now=None):
 
 
 
+def refresh_manufacturing_headline(session):
+    """Use the existing publisher-distributed fallback after HTTP OR parse failure.
+
+    Exact October headline and source identity remain mandatory. No login bypass,
+    cached success, freshness extension or new indicator definition is introduced.
+    """
+    import requests
+    distributed='https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html'
+    def verified_headline(content):
+        if 'October 2026' not in content:return None
+        for pattern in (r'Manufacturing\s+PMI\s*®?\s*(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',
+                        r'Manufacturing\s+PMI.{0,30}?(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)'):
+            hit=re.search(pattern,content,re.I)
+            if hit and float(hit.group(1))==55.5:return 55.5
+        return None
+    try:
+        raw=fetch(session,ISM)
+    except requests.RequestException as exc:
+        print('ISM_PRIMARY_HTTP_UNAVAILABLE',type(exc).__name__,flush=True)
+        raw=b''
+    value=verified_headline(clean(raw))
+    if value is not None:return value,ISM
+    print('ISM_OFFICIAL_DIRECT_NOT_PARSED_OR_HTTP_FAILED',flush=True)
+    raw=fetch(session,distributed);content=clean(raw)
+    if ('News provided by Institute for Supply Management' not in content
+            or 'SOURCE Institute for Supply Management' not in content):
+        raise ValueError('ISM distributed publisher identity missing')
+    value=verified_headline(content)
+    if value is None:raise ValueError('ISM October headline not independently verified')
+    print('ISM_DISTRIBUTED_HEADLINE_PASS',hashlib.sha256(raw).hexdigest(),flush=True)
+    return value,distributed
+
+
 def main(calendar_only=False):
     import requests
 
@@ -420,23 +453,7 @@ def main(calendar_only=False):
 
     # Newly released October PMI is necessary after the Nov 2 official publication.
     if dt.datetime.now(TPE).date()>=dt.date(2026,11,3) and dt.datetime.now(TPE).date()<dt.date(2026,12,1):
-        source=clean(fetch(session,ISM))
-        report_url=ISM
-        def verified_headline(content):
-            if 'October 2026' not in content:
-                return None
-            for pattern in (r'Manufacturing\s+PMI\s*®?\s*(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)',
-                            r'Manufacturing\s+PMI.{0,30}?(?:at|registered)\s+(\d{1,2}(?:\.\d+)?)\s*(?:%|percent)'):
-                hit=re.search(pattern,content,re.I)
-                if hit and float(hit.group(1))==55.5:
-                    return 55.5
-            return None
-        pmi=verified_headline(source)
-        if pmi is None:
-            print('ISM_OFFICIAL_DIRECT_NOT_PARSED',source[:300],flush=True)
-            report_url='https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html'
-            source=clean(fetch(session,report_url))
-            pmi=verified_headline(source)
+        pmi,report_url=refresh_manufacturing_headline(session)
         cal_text=clean(fetch(session,ISM_CAL))
         if pmi!=55.5:
             raise ValueError('ISM October headline not independently verified at both official and distributed releases')

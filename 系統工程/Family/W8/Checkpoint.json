@@ -6774,7 +6774,7 @@
     "official_db_modified": false,
     "latest_existing_broker_observations_integrated": true,
     "formal_PR59_runtime_modified": false,
-    "dispatch_status": "CONTRACT_PREPARED_NOT_SENT",
+    "dispatch_status": "OWNER_REPORTED_SENT_RECEIPT_PENDING",
     "full_financial_PASS": 0,
     "real_Cycle": 0,
     "Production": "HOLD",
@@ -6834,7 +6834,7 @@
       "subtests": 8,
       "original_real_defect_reproduced": true,
       "formal_PR59_adopted": false,
-      "dispatch_status": "CONTRACT_PREPARED_NOT_SENT",
+      "dispatch_status": "OWNER_REPORTED_SENT_RECEIPT_PENDING",
       "runtime_writer": "Original_V82_Codex"
     },
     "official_databases_modified": false,
@@ -6845,5 +6845,24 @@
     "trade_authorization": "NONE",
     "next_responsible": "Family_PM source integration and independent acceptance; Original_V82_Codex formal PR59 cash fix adoption",
     "private_evidence": "Exact Owner approval, inputs, outputs, candidate patch and acceptance report in private Drive governance"
+  },
+  "pm_credit_source_delta_20261117": {
+    "status": "PASS_SCOPED_SOURCE_OBSERVATION",
+    "executed_by": "Family_PM",
+    "baseline_commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "official_series": 2,
+    "observation_date": "2026-11-13",
+    "source_checks_passed": 11,
+    "original_unit_tests_passed": 11,
+    "native_credit_logic_executed": true,
+    "credit_result": "UNKNOWN",
+    "source_trading_calendar_qualified": false,
+    "formal_runtime_modified": false,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_responsible": "Family_PM source calendar and systemic event coverage; Original_V82_Codex two previously supplied PR59 patches",
+    "private_evidence": "Report and original source CSVs, script, outputs and tests recorded in private Drive governance."
   }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 最後修改：2026/11/17（台灣時間）｜版本：D009-v3＋m14日期交集診斷（計算與12天期限不變）｜檔案：總經爬蟲18項.py
+# 最後修改：2026/11/17（台灣時間）｜版本：D009-v4＋核准m14假日未到期本金（91天與12天期限不變）｜檔案：總經爬蟲18項.py
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Eight supplementary raw inputs (four m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
@@ -21,6 +21,9 @@ import tempfile
 import hashlib
 from pathlib import Path
 from urllib.parse import urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts import m14_holiday_rrp as holiday_rrp
 
 D009_RUN_STARTED=time.monotonic()
 D009_FETCH_DEADLINE_SECONDS=18*60
@@ -212,6 +215,7 @@ class Fetcher:
         })
         self.timeout=timeout
         self.fredcache={}
+        self.m14_originals={}
         # D009: one-run HTTP cache; keep cached responses only after success.
         self._http_cache={}
         self._host_last_request={}
@@ -375,6 +379,11 @@ class Fetcher:
                     missing=[str(p) for p in required if p not in monthly.index]
                     if missing:
                         raise ValueError('Insufficient '+series+' history; missing '+','.join(missing))
+                if series in ('WALCL','WDTGAL','RRPONTSYD'):
+                    from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
+                    parts=urlsplit(url)
+                    safe_url=urlunsplit(parts._replace(query=urlencode([(k,v) for k,v in parse_qsl(parts.query) if k!='api_key'])))
+                    self.m14_originals[series]=holiday_rrp.receipt(response.content,safe_url,dt.datetime.now(dt.timezone.utc).isoformat())
                 self.fredcache[series]=out
                 self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
                 self.fredattempts[series].append({'provider':provider,'result':'OK',
@@ -727,7 +736,7 @@ def nfp(f):
 def netliq(f):
     # Units: WALCL, WDTGAL millions USD; RRPONTSYD billions USD.
     diagnostics={'schema':'V70.3/netliq-date-intersection-v1',
-                 'policy':'SAME_WEDNESDAY_EXACT_91_DAYS_NO_FILL',
+                 'policy':'SAME_WEDNESDAY_EXACT_91_DAYS_HOLIDAY_OUTSTANDING',
                  'source_units':{'WALCL':'USD million','WDTGAL':'USD million','RRPONTSYD':'USD billion'},
                  'source_latest_dates':{},'status':'FETCH_INCOMPLETE'}
     f.netliq_diagnostics=diagnostics
@@ -738,12 +747,37 @@ def netliq(f):
     fed=series['WALCL']/1000.0
     tga=series['WDTGAL']/1000.0
     rrp=series['RRPONTSYD']
+    # Preserve the raw FRED series; derived holiday balances have their own
+    # receipts and never overwrite original missing observations.
+    derived={};attempt_errors={}
+    weekly_common=fed.dropna().index.intersection(tga.dropna().index)
+    weekly_common=weekly_common[(weekly_common.dayofweek==2) &
+        (weekly_common<=pd.Timestamp(dt.datetime.now(dt.timezone.utc).date()))]
+    if len(weekly_common):
+        candidate=weekly_common[-1]
+        rrp=rrp.copy()
+        for day in (candidate,candidate-pd.Timedelta(days=91)):
+            if day not in weekly_common or (day in rrp.index and pd.notna(rrp.loc[day])):continue
+            try:
+                # No helper calls without actual original-response receipts.
+                originals=getattr(f,'m14_originals',{})
+                if set(originals)!={'WALCL','WDTGAL','RRPONTSYD'}:raise ValueError('m14 original receipts unavailable')
+                original=holiday_rrp.fred_values(originals['RRPONTSYD'],'RRPONTSYD')
+                key=str(day.date())
+                if key not in original and not min(original)<key<max(original):raise ValueError('m14 missing date outside retrieved FRED interval')
+                if original.get(key) is not None:raise ValueError('m14 FRED real value has priority')
+                component=holiday_rrp.fetch_holiday(f,day.date())
+                derived[key]=component;rrp.loc[day]=component['value_usd_bn']
+            except Exception as exc:
+                attempt_errors[str(day.date())]=str(exc)[:240]
+    diagnostics['holiday_attempt_errors']=attempt_errors
     df=pd.concat([fed.rename('fed'),tga.rename('tga'),rrp.rename('rrp')],axis=1,join='inner').dropna()
+    df=df[df.index<=pd.Timestamp(dt.datetime.now(dt.timezone.utc).date())]
     # same observation Wednesday and exactly 91 days (13 weeks) prior
     df=df[df.index.dayofweek==2]
     # Diagnose the newest Wednesday reported by either weekly source, including
-    # a missing peer. This union is diagnostic only; the calculation still uses
-    # the unchanged three-way inner join above.
+    # a missing peer. These diagnostic values always remain the original FRED
+    # values, separate from the approved holiday component above.
     weekly=series['WALCL'].index.union(series['WDTGAL'].index)
     weekly=weekly[weekly.dayofweek==2].sort_values()
     latest_weekly=weekly[-1] if len(weekly) else None
@@ -774,6 +808,14 @@ def netliq(f):
                  +','.join(diagnostics['missing_at_latest_weekly'])+'；維持同日交集，未補值')
     result=row('m14',ans,str(end.date()),' | '.join(SOURCES['m14']),
                'FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元',detail=detail)
+    selected={k:v for k,v in derived.items() if k in (str(begin.date()),str(end.date()))}
+    if selected:
+        result['method']+='；HOLIDAY_OUTSTANDING_DERIVED（NYFed官方假日存續Treasury ON RRP本金，非FRED當日發布值）'
+        result['source_url']+=' | '+holiday_rrp.HOLIDAYS+' | '+holiday_rrp.OPERATIONS
+        result['source_evidence']={'holiday_outstanding':dict(rule_version=holiday_rrp.RULE,
+            begin=str(begin.date()),end=str(end.date()),endpoints=selected,fred_originals=f.m14_originals)}
+        holiday_rrp.validate_item(result,dt.datetime.now(dt.timezone.utc))
+        diagnostics['holiday_outstanding_dates']=sorted(selected)
     result['alignment_diagnostics']=diagnostics
     return result
 
@@ -1022,6 +1064,7 @@ def run(outdir,overrides_path=None,cache_path=None):
         if k=='m14' and hasattr(f,'netliq_diagnostics'):
             r['alignment_diagnostics']=f.netliq_diagnostics
         attempts={series:list(f.fredattempts.get(series,[])) for series in sorted(f.job_series)}
+        scoped_evidence=r.get('source_evidence')
         r.update(attempted_at=started_at, attempt_result='SUCCESS' if r.get('value') is not None else 'FAILED',
                  source_attempts=attempts, cache_used=False, cache_source=None,
                  last_verified_at=None, source_evidence=None)
@@ -1029,7 +1072,7 @@ def run(outdir,overrides_path=None,cache_path=None):
         successes=[a for entries in attempts.values() for a in entries if a.get('result')=='OK']
         if r.get('value') is not None and attempts and all(any(a.get('result')=='OK' for a in entries) for entries in attempts.values()):
             r['last_verified_at']=min(a['verified_at'] for a in successes)
-            r['source_evidence']={'series':attempts}
+            r['source_evidence']={'series':attempts,**(scoped_evidence or {})}
         results[k]=r
         print(f"{k:9s} {r['status']:7s} {str(r['value']):>12s} {r['observation_date'] or '---'}",flush=True)
     # Optional dated and source-backed records; never overwrite the results automatically via HTML defaults.
@@ -1064,11 +1107,14 @@ def run(outdir,overrides_path=None,cache_path=None):
                 if k=='s03':
                     continue  # s03 僅由 m07 複製，不得從快取獨立還原
                 prior=old.get('items',{}).get(k,{})
-                if results[k]['value'] is None and prior.get('value') is not None:
+                holiday_failed=(k=='m14' and results[k].get('alignment_diagnostics',{}).get('holiday_attempt_errors')
+                    and prior.get('observation_date','')>results[k].get('observation_date',''))
+                if (results[k]['value'] is None or holiday_failed) and prior.get('value') is not None:
                     try:
                         # 快取只讀入先前 OK/STALE 且有來源的紀錄；重新驗日期、數值、單位。
                         if prior.get('status') not in ('OK','USABLE','STALE'):
                             continue
+                        if k=='m14':holiday_rrp.validate_item(prior,dt.datetime.now(dt.timezone.utc))
                         checked=validate_manual(k, {'value':prior['value'],
                             'observation_date':prior['observation_date'],
                             'source_url':prior['source_url'],
@@ -1079,7 +1125,12 @@ def run(outdir,overrides_path=None,cache_path=None):
                         # as a retained reference, never a new live-source retrieval.
                         checked['status']='USABLE' if k in ('m04','m15','m18') else 'STALE'
                         checked['detail']='歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用'
+                        if k=='m14':
+                            checked['method']=prior.get('method',checked['method'])
+                            checked['detail']+='；'+str(prior.get('detail',''))
                         failed=results[k]
+                        if holiday_failed:
+                            failed=dict(failed,error='m14 holiday retrieval failed: '+json.dumps(failed['alignment_diagnostics']['holiday_attempt_errors'],ensure_ascii=False),attempt_result='FAILED')
                         checked.update(error=failed.get('error',''), retrieval_error=failed.get('error',''),
                             attempted_at=failed.get('attempted_at'), attempt_result=failed.get('attempt_result','FAILED'),
                             source_attempts=failed.get('source_attempts',{}), cache_used=True,

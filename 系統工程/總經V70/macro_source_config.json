@@ -124,7 +124,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "holiday_outstanding_rule": {
+        "version": "V70-M14-HOLIDAY-OUTSTANDING-20261117",
+        "fallback": "NYFED_TREASURY_ON_RRP_OUTSTANDING_ON_CONFIRMED_HOLIDAY_ONLY",
+        "fred_value_priority": true,
+        "max_age_days_unchanged": 12
+      }
     },
     "m15": {
       "primary_source": "ISM_OFFICIAL",

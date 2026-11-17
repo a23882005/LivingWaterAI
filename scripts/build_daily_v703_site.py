@@ -316,6 +316,15 @@ def _validate(key, item, today, releases=None, now_utc=None):
     problems = []
     if not isinstance(item, dict):
         return [f"{key}: record not object"]
+    if key == "m14":
+        try:
+            try:
+                from m14_holiday_rrp import validate_item
+            except ModuleNotFoundError:
+                from scripts.m14_holiday_rrp import validate_item
+            validate_item(item, now_utc)
+        except (KeyError, TypeError, ValueError, OSError) as exc:
+            problems.append("m14: invalid holiday evidence: " + str(exc))
     if item.get("status") not in ACCEPTED_STATUS:
         problems.append(f"{key}: status {item.get('status')}")
     if key == "m05" and "carryForward" in item and not valid_cpi_carry(item, now_utc):
@@ -359,8 +368,8 @@ def _validate(key, item, today, releases=None, now_utc=None):
                 if age > 90:
                     problems.append(f"{key}: slow monthly data over 90 days")
             elif key in WEEKLY:
-                if age > 14:
-                    problems.append(f"{key}: weekly data over 14 days")
+                if age > 12:
+                    problems.append(f"{key}: weekly data over 12 days")
             elif key in VALUATION_REFERENCE:
                 if age > 90:
                     problems.append(f"{key}: valuation reference over 90 days")

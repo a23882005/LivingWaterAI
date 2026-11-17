@@ -6908,5 +6908,22 @@
     "remaining_responsible": "Family_PM safety, valuation and declared funding integration",
     "source_recovery": "Existing member project resolves US broker classification; exact source retained in private Drive governance.",
     "private_evidence": "Four-member report and incremental original evidence retained in private Drive governance."
+  },
+  "pm_codex_four_household_acceptance_20261117": {
+    "status": "PASS_SCOPED_CODEX_FOUR_HOUSEHOLD_DELIVERY",
+    "source_commit": "462accf3d343d1ccb913e152499ddb2c9c3b727e",
+    "manifest_files_verified": 329,
+    "consolidation_checks_rerun": 114,
+    "independent_comparisons": 111,
+    "portable_mou_replay_checks": 53,
+    "member_security_rows": 42,
+    "v82_components": 33,
+    "v75_delegated_rows": 9,
+    "production_code_changed": false,
+    "complete_financial_PASS": 0,
+    "Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_owner": "Family PM: 00956 formal mapping, safety, historical valuation, account funding sources"
   }
 }

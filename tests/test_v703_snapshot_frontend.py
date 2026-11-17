@@ -124,5 +124,81 @@ class SnapshotBrowserTests(unittest.TestCase):
                     self.assertIn('m03_qqq:ETF本益比核實時間過期（超過7天）', result['issues'])
 
 
+class SahmUsageBrowserTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.driver = sync_playwright().start()
+        cls.browser = cls.driver.chromium.launch(headless=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+        cls.driver.stop()
+
+    open_feed = SnapshotBrowserTests.open_feed
+
+    def test_fred_api_notice_and_both_terms_links_are_visible(self):
+        page = self.open_feed(feed(), NOW)
+        notice = page.locator('#v703-fred-api-notice')
+        self.assertTrue(notice.is_visible())
+        self.assertIn('not endorsed or certified by the Federal Reserve Bank of St. Louis.', notice.inner_text())
+        self.assertIn('即表示同意受', notice.inner_text())
+        self.assertEqual(set(notice.locator('a').evaluate_all('(xs)=>xs.map(x=>x.href)')), {
+            'https://fred.stlouisfed.org/docs/api/terms_of_use.html',
+            'https://fred.stlouisfed.org/legal/terms/',
+        })
+
+    def test_sahm_markdown_and_json_download_preserve_values_and_incomplete_reasons(self):
+        data = feed()
+        data['indicators']['m18'].update(value=0, unit='',
+            method='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series')
+        page = self.open_feed(data, NOW)
+        original = page.evaluate('JSON.parse(JSON.stringify(window.v703Latest))')
+        incomplete = page.evaluate('window.getLivingWaterV70Output().incompleteReasons')
+        with page.expect_download() as pending:
+            page.evaluate('window.downloadLivingWaterV70Markdown()')
+        markdown = Path(pending.value.path()).read_text()
+        self.assertIn('| m18 | Sahm Rule | 0 | pp |', markdown)
+        self.assertIn('Claudia Sahm', markdown)
+        self.assertIn('SAHMREALTIME', markdown)
+        self.assertIn('FRED', markdown)
+        self.assertIn('百分點（pp）', markdown)
+        self.assertEqual(page.evaluate('window.getLivingWaterV70Output().incompleteReasons'), incomplete)
+        with page.expect_download() as pending:
+            page.evaluate('window.v703Export()')
+        exported = json.loads(Path(pending.value.path()).read_text())
+        meta = exported.pop('sourceAttribution')['sahm']
+        exported.pop('calculatedAt'); original.pop('calculatedAt')
+        self.assertEqual(exported, original)
+        self.assertEqual(meta['series'], 'SAHMREALTIME')
+        self.assertEqual(meta['observationDate'], data['indicators']['m18']['dataDate'])
+        self.assertEqual(meta['unit'], 'pp')
+        self.assertNotIn('value', meta)
+        self.assertNotIn('m18', exported)
+
+    def test_fallback_and_missing_provenance_do_not_claim_published_realtime_series(self):
+        page = self.open_feed(feed(), NOW)
+        fallback = page.evaluate('''() => {
+            window.v703FeedDocument.indicators.m18 = {
+                method:'Sahm computed from 3-month unemployment average versus minimum over preceding 12 months',
+                source:'https://api.bls.gov/publicAPI/v2/timeseries/data/'
+            };
+            return window.v703SahmUsageMetadata();
+        }''')
+        self.assertIsNone(fallback['series'])
+        self.assertIsNone(fallback['observationDate'])
+        self.assertEqual(fallback['retrievedVia'], 'See input source')
+        self.assertNotIn('SAHMREALTIME', fallback['citationUrl'])
+        missing = page.evaluate('''() => {
+            delete window.v703FeedDocument.indicators.m18;
+            return window.v703SahmUsageMetadata();
+        }''')
+        self.assertIsNone(missing['series'])
+        self.assertIsNone(missing['observationDate'])
+        self.assertIsNone(missing['lastVerifiedAt'])
+        self.assertEqual(missing['sourceUrl'], '')
+        self.assertNotIn('value', missing)
+
+
 if __name__ == '__main__':
     unittest.main()

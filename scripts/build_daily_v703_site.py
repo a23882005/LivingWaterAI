@@ -445,6 +445,9 @@ def _normalize(item, indicator_id=None):
         "method": item.get("method", ""), "status": item.get("status", "MISSING"),
         "detail": item.get("detail", ""),
     }
+    # Make the Sahm unit explicit without changing values or existing units.
+    if indicator_id == "m18" and not normalized["unit"]:
+        normalized["unit"] = "pp"
     for source, target in (("policy_schema", "policySchema"), ("effective_date", "effectiveDate"),
                            ("lower_bound", "lowerBound"), ("upper_bound", "upperBound"),
                            ("last_verified_at", "lastVerifiedAt"), ("source_evidence", "sourceEvidence")):

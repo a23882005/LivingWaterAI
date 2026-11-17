@@ -6878,8 +6878,8 @@
     "candidate_runtime_bytes_preserved": true,
     "original_targets_and_db_preserved": true,
     "ci_observation": {
-      "success": 5,
-      "in_progress": 1
+      "success": 6,
+      "in_progress": 0
     },
     "merged": false,
     "full_financial_PASS": 0,
@@ -6888,5 +6888,25 @@
     "trade_authorization": "NONE",
     "next_responsible": "Family_PM remaining safety, valuation and declared funding source integration",
     "private_evidence": "Acceptance and evidence recorded in private Drive governance."
+  },
+  "pm_four_member_462accf_replay_20261117": {
+    "status": "PASS_SCOPED_FOUR_MEMBER_COMPONENT_REPLAY",
+    "commit": "462accf3d343d1ccb913e152499ddb2c9c3b727e",
+    "members": 4,
+    "components_completed": 33,
+    "expected_components": 33,
+    "pm_checks_passed": 24,
+    "ci_success": 6,
+    "source_dates_preserved": true,
+    "original_targets_holdings_and_db_preserved": true,
+    "frb_named_service_observations": 3,
+    "full_safety_complete": false,
+    "full_financial_PASS": 0,
+    "Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "remaining_responsible": "Family_PM safety, valuation and declared funding integration",
+    "source_recovery": "Existing member project resolves US broker classification; exact source retained in private Drive governance.",
+    "private_evidence": "Four-member report and incremental original evidence retained in private Drive governance."
   }
 }

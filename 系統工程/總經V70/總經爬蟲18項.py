@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 最後修改：2026/10/19 18:14（台灣時間）｜版本：D009-v3｜檔案：總經爬蟲18項.py
+# 最後修改：2026/11/17（台灣時間）｜版本：D009-v3＋m14日期交集診斷（計算與12天期限不變）｜檔案：總經爬蟲18項.py
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Eight supplementary raw inputs (four m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
@@ -726,22 +726,56 @@ def nfp(f):
 
 def netliq(f):
     # Units: WALCL, WDTGAL millions USD; RRPONTSYD billions USD.
-    fed=f.fred('WALCL')/1000.0
-    tga=f.fred('WDTGAL')/1000.0
-    rrp=f.fred('RRPONTSYD')
+    diagnostics={'schema':'V70.3/netliq-date-intersection-v1',
+                 'policy':'SAME_WEDNESDAY_EXACT_91_DAYS_NO_FILL',
+                 'source_units':{'WALCL':'USD million','WDTGAL':'USD million','RRPONTSYD':'USD billion'},
+                 'source_latest_dates':{},'status':'FETCH_INCOMPLETE'}
+    f.netliq_diagnostics=diagnostics
+    series={}
+    for name in ('WALCL','WDTGAL','RRPONTSYD'):
+        series[name]=f.fred(name)
+        diagnostics['source_latest_dates'][name]=str(series[name].index[-1].date())
+    fed=series['WALCL']/1000.0
+    tga=series['WDTGAL']/1000.0
+    rrp=series['RRPONTSYD']
     df=pd.concat([fed.rename('fed'),tga.rename('tga'),rrp.rename('rrp')],axis=1,join='inner').dropna()
     # same observation Wednesday and exactly 91 days (13 weeks) prior
     df=df[df.index.dayofweek==2]
+    # Diagnose the newest Wednesday reported by either weekly source, including
+    # a missing peer. This union is diagnostic only; the calculation still uses
+    # the unchanged three-way inner join above.
+    weekly=series['WALCL'].index.union(series['WDTGAL'].index)
+    weekly=weekly[weekly.dayofweek==2].sort_values()
+    latest_weekly=weekly[-1] if len(weekly) else None
+    dates=set()
+    if latest_weekly is not None:dates.update((latest_weekly,latest_weekly-pd.Timedelta(weeks=13)))
+    if not df.empty:dates.update((df.index[-1],df.index[-1]-pd.Timedelta(weeks=13)))
+    diagnostics.update(status='ALIGNED' if not df.empty else 'NO_COMMON_WEDNESDAY',
+        latest_weekly_wednesday=str(latest_weekly.date()) if latest_weekly is not None else None,
+        latest_common_wednesday=str(df.index[-1].date()) if not df.empty else None,
+        values_at_required_dates={str(day.date()):{name:float(s.loc[day])
+            if day in s.index and pd.notna(s.loc[day]) else None for name,s in series.items()}
+            for day in sorted(dates)})
+    diagnostics['missing_at_latest_weekly']=[name for name,s in series.items()
+        if latest_weekly is not None and (latest_weekly not in s.index or pd.isna(s.loc[latest_weekly]))]
     if df.empty: raise ValueError('缺少同日週三 TGA/Fed/RRP')
     end=df.index[-1];begin=end-pd.Timedelta(weeks=13)
-    if begin not in df.index: raise ValueError(f'缺少 13 週前同日值: {begin.date()}')
+    diagnostics.update(selected_begin=str(begin.date()),selected_end=str(end.date()))
+    if begin not in df.index:
+        diagnostics['status']='MISSING_EXACT_91_DAY_BASE'
+        raise ValueError(f'缺少 13 週前同日值: {begin.date()}')
     now=df.loc[end];before=df.loc[begin]
     d=(now-before);ans=d['fed']-d['tga']-d['rrp']
     detail=(f"開始={begin.date()}, 結束={end.date()}, 單位十億美元; "
             f"Fed Δ={d['fed']:.6f}, TGA Δ={d['tga']:.6f}, RRP Δ={d['rrp']:.6f}; "
             f"淨流動性 Δ={ans:.6f}")
-    return row('m14',ans,str(end.date()),' | '.join(SOURCES['m14']),
+    if diagnostics['missing_at_latest_weekly']:
+        detail+=(f"; 最新週資料日={latest_weekly.date()} 缺有效觀測="
+                 +','.join(diagnostics['missing_at_latest_weekly'])+'；維持同日交集，未補值')
+    result=row('m14',ans,str(end.date()),' | '.join(SOURCES['m14']),
                'FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元',detail=detail)
+    result['alignment_diagnostics']=diagnostics
+    return result
 
 def cnn(f):
     # Unofficial endpoint: keep timestamp validation and reject absence of asof.
@@ -985,6 +1019,8 @@ def run(outdir,overrides_path=None,cache_path=None):
             else:r=row(k,src=(SOURCES.get(k) or [''])[0],method='須人工核實或授權 API',error=reasons.get(k,'無穩定來源'))
         except Exception as ex:
             r=row(k,src=(SOURCES.get(k) or [''])[0],method='抓取失敗',error=str(ex)[:220])
+        if k=='m14' and hasattr(f,'netliq_diagnostics'):
+            r['alignment_diagnostics']=f.netliq_diagnostics
         attempts={series:list(f.fredattempts.get(series,[])) for series in sorted(f.job_series)}
         r.update(attempted_at=started_at, attempt_result='SUCCESS' if r.get('value') is not None else 'FAILED',
                  source_attempts=attempts, cache_used=False, cache_source=None,
@@ -1050,6 +1086,8 @@ def run(outdir,overrides_path=None,cache_path=None):
                             cache_source={'file':Path(cache_path).name,'sha256':hashlib.sha256(Path(cache_path).read_bytes()).hexdigest(),
                                           'generated_at':old.get('generated_at'),'observation_date':prior.get('observation_date')},
                             last_verified_at=prior.get('last_verified_at'), source_evidence=prior.get('source_evidence'))
+                        if k=='m14' and failed.get('alignment_diagnostics'):
+                            checked['alignment_diagnostics']=failed['alignment_diagnostics']
                         results[k]=checked
                     except (ValueError,TypeError,KeyError,OverflowError) as e:
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)

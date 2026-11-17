@@ -199,7 +199,8 @@ def build_report(request, config, repo_root):
     rows = []
     for asset in coverage['assets']:
         symbol = asset['symbol']; instrument = asset['instrument'] or {}
-        cls = classification(symbol, config['classification_source'], config.get('product_sources', {}).get(symbol))
+        cls = classification(symbol, config['classification_source'], config.get('product_sources', {}).get(symbol),
+            evaluation_at=request['evaluation_at'])
         # Preserve each explicit primary class's formal §32.6 metric order;
         # a global ETF's fallback order is not a QQQ/VOO/0050 waterfall.
         etf_waterfalls = {
@@ -216,7 +217,7 @@ def build_report(request, config, repo_root):
                 evaluation_at=request['evaluation_at'], repo_root=repo_root, profile=profile,
                 is_etf=False if instrument.get('instrument_type') == 'STOCK' or cls['asset_type']=='INDIVIDUAL_STOCK' else
                        True if instrument.get('instrument_type') == 'ETF' or cls['asset_type'] in
-                       ('BROAD_ETF','INDUSTRY_ETF','THEME_ETF') else None)
+                       ('BROAD_ETF','SECTOR_ETF','INDUSTRY_ETF','THEME_ETF') else None)
         except ValueError as error:
             if not str(error).startswith('MEMBER_MARKET_'):
                 raise

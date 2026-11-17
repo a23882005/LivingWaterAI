@@ -1,0 +1,33 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "2454",
+  "evidence_kind": "OFFICIAL_ISSUER_CLASSIFICATION",
+  "source_scope": "STRUCTURE_AND_INDUSTRY_ROUTING__NOT_CURRENT_VALUATION_OR_SAFETY",
+  "source_url": "https://www.mediatek.com/company/discover",
+  "sources": [
+    {
+      "source_url": "https://www.mediatek.com/company/discover",
+      "source_sha256": "b1f7234bb5a2b4225831a19e2fd8b2f6379511c982c6e657ea00beb47fdcd51e",
+      "available_at": "2026-11-17T07:46:27.971412+00:00",
+      "retrieved_at": "2026-11-17T07:46:27.971412+00:00",
+      "original_publication_at": null,
+      "publication_time_state": "NOT_DISCLOSED__CAPTURE_TIME_IS_EARLIEST_PROVEN_AVAILABILITY"
+    }
+  ],
+  "company_name": "MediaTek Incorporated",
+  "security_type": "Common Stock",
+  "listing": {
+    "exchange": "TWSE",
+    "ticker": "2454"
+  },
+  "industry": "SEMICONDUCTOR",
+  "business_model": "FABLESS",
+  "excerpts": [
+    "MediaTek Incorporated (TWSE: 2454)",
+    "fabless semiconductor company"
+  ],
+  "notes": [
+    "Industry routing alone does not establish Grade, high quality, thesis, or safety.",
+    "No SEC 10-K, USD, or us-gaap company-quality evidence is supplied."
+  ]
+}

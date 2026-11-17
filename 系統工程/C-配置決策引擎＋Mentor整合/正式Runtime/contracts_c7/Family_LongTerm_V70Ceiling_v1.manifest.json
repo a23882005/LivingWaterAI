@@ -73,7 +73,7 @@
     },
     {
       "path": "../../Family/W8/native_asset_source.py",
-      "sha256": "ac4d26415cf2bfced38b4c124fe3b5641d55bb697f96c7ce49ede46ab35c95b4"
+      "sha256": "023222fc2e03d79b82daeace594fd93fcb8f6acd53237a5ab89fd42f9e67a161"
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "0043e672ad384004cec1bc4c2d2649342bac82392e44b0d1556acf23bee3ae40"
+      "sha256": "311099878c2bc99aadfcb4198ce64ae2ccd56124c41fdeed057fc6e2ac873417"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -250,6 +250,18 @@
     {
       "path": "../../Family/W8/v82_core_source.py",
       "sha256": "343c279e39b71b0ab64cd43d04cf8bd4eacb90cfb1e5e42a47f3b9ac8274b9e9"
+    },
+    {
+      "path": "../../Family/W8/equity_product_identity.py",
+      "sha256": "4f658911dc08d1f963997d819efc43d1fdf07eb91d1003d4c1befeb010aa1ff3"
+    },
+    {
+      "path": "../../Family/W8/VDC_product_identity.json",
+      "sha256": "34e470bc699c25379ebcd139e2c6b3af14f9b553bdbff0147cd76c769d7d21b9"
+    },
+    {
+      "path": "../../Family/W8/2454_product_identity.json",
+      "sha256": "032a90a869e2dddfe753d86a3d64839f310ad106f11aedcec14f67fd3f6c9313"
     }
   ]
 }

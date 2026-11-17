@@ -1,0 +1,59 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "VDC",
+  "evidence_kind": "OFFICIAL_ISSUER_CLASSIFICATION",
+  "source_scope": "STRUCTURE_AND_INDUSTRY_ROUTING__NOT_CURRENT_VALUATION_OR_SAFETY",
+  "source_url": "https://workplace.vanguard.com/assets/corp/fund_communications/pdf_publish/us-products/fact-sheet/F0955.pdf",
+  "sources": [
+    {
+      "source_url": "https://workplace.vanguard.com/assets/corp/fund_communications/pdf_publish/us-products/fact-sheet/F0955.pdf",
+      "source_sha256": "a650174c963e6cbc79f61c507a3222dbb0c0066ad84864087b7d3994b61081e4",
+      "available_at": "2026-11-17T07:46:27.177684+00:00",
+      "retrieved_at": "2026-11-17T07:46:27.177684+00:00",
+      "original_publication_at": null,
+      "publication_time_state": "NOT_DISCLOSED__CAPTURE_TIME_IS_EARLIEST_PROVEN_AVAILABILITY"
+    }
+  ],
+  "fund_name": "Vanguard Consumer Staples ETF",
+  "is_stock_etf": true,
+  "structure_kind": "PASSIVE_SINGLE_SECTOR_EQUITY",
+  "sector": "Consumer Staples",
+  "benchmark": "MSCI US Investable Market Consumer Staples 25/50 Index",
+  "cusip": "92204A207",
+  "listing": {
+    "exchange": "NYSE Arca",
+    "ticker": "VDC"
+  },
+  "strategy": {
+    "management": "PASSIVE",
+    "replication": "FULL_REPLICATION_WHEN_POSSIBLE",
+    "current_implementation": "SAMPLING",
+    "scope": "UNLEVERAGED_NON_INVERSE_EQUITY__NOT_DERIVATIVE_DOMINATED"
+  },
+  "taxonomy_provider": "Vanguard / GICS",
+  "taxonomy_version": "F0955_092026",
+  "taxonomy_version_scope": "PROVIDER_CLASSIFICATION_SNAPSHOT__NOT_GICS_GLOBAL_RELEASE_VERSION",
+  "classification_as_of": "2026-09-30",
+  "classification_available_at": "2026-11-17T07:46:27.177684+00:00",
+  "excerpts": [
+    "Multicapitalization equity in the consumer staples sector.",
+    "Uses GICS methodology and clearly classified sectors."
+  ],
+  "supplementary_observations": {
+    "as_of": "2026-09-30",
+    "fund": {
+      "unlabelled_price_earnings": "24.6",
+      "price_book": "4.2"
+    },
+    "benchmark": {
+      "unlabelled_price_earnings": "24.5",
+      "price_book": "4.2"
+    },
+    "metric_use": "CONTEXT_ONLY__NOT_QUALIFIED_FORWARD_PE_OR_HISTORY"
+  },
+  "notes": [
+    "The taxonomy version is the dated Vanguard disclosure identifier, not an invented GICS release.",
+    "No historical availability before the capture is established.",
+    "The generic route name does not assert profitability of every constituent."
+  ]
+}

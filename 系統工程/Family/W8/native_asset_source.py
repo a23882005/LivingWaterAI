@@ -46,7 +46,7 @@ def native_error_path(error):
     return 'c7_funding_context.contexts' if getattr(error,'code',None)=='C8C9.W4.C7_DOMAIN_SET' else None
 
 
-def classification(symbol, source, product_source=None):
+def classification(symbol, source, product_source=None, *, evaluation_at=None):
     text=Path(source['local_path']).read_text(encoding='utf-8-sig')
     from hashlib import sha256
     if sha256(Path(source['local_path']).read_bytes()).hexdigest()!=source['sha256']:
@@ -66,7 +66,7 @@ def classification(symbol, source, product_source=None):
         'formal_class_count':len(FORMAL_CLASSES),'source_reference':source['source_reference'],
         'source_sha256':source['sha256'],'sot_section':'V82.md §32.2 / chapter 49' if index==0 else 'V82.md §32.2',
         'asset_type':None,'asset_grade':'UNKNOWN','grade_evidence':None}
-    if product_source is None and symbol in ('CPAI','DYNF','DRAM'):
+    if product_source is None and symbol in ('CPAI','DYNF','DRAM','VDC','2454'):
         identity_path=HERE/(symbol+'_product_identity.json')
         if identity_path.is_file():
             product_source={'local_path':str(identity_path),'sha256':sha256(identity_path.read_bytes()).hexdigest()}
@@ -97,7 +97,7 @@ def classification(symbol, source, product_source=None):
                 result['grade_evidence']['source_sha256']=product_source['sha256']
                 return result
         from equity_product_identity import classify as classify_equity_product
-        extra=classify_equity_product(symbol,product,text)
+        extra=classify_equity_product(symbol,product,text,evaluation_at=evaluation_at)
         if extra is not None:
             result.update(extra)
             result['grade_evidence']['source_sha256']=product_source['sha256']

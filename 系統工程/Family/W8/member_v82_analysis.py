@@ -18,6 +18,13 @@ from official_target_input import read_confirmed_weights
 from member_market_source import read_market, time
 
 SCHEMA = 'Family.W8.MemberV82Analysis.v1'
+V70_SAFETY_SIGNAL_NAMES = frozenset((
+    'fed_policy', 'fed_policy_bias', 'treasury_2y', 'treasury_10y', 'treasury_30y',
+    'real_yield', 'cpi', 'core_cpi', 'pce', 'core_pce', 'gdp',
+    'employment_unemployment_rate', 'employment_nonfarm_payrolls_3m_avg',
+    'hy_oas', 'ig_oas', 'bbb_oas', 'a_oas', 'sofr', 'repo', 'rrp', 'srf',
+    'fra_ois', 'sofr_ois', 'move', 'vix', 'treasury_market_liquidity',
+    'liquidity_regime', 'material_macro_events'))
 
 
 def missing(field, producer, reason, affects, *, kind='EXTERNAL_SOURCE_OR_APPROVAL_REQUIRED'):
@@ -164,6 +171,59 @@ def universe(snapshot, target, evaluation_at, repo_root):
     return result
 
 
+def read_v70_safety_snapshot(source, evaluation_at):
+    """Read approved shared evidence; the original V82 Core decides safety."""
+    raw = Path(source['local_path']).read_bytes()
+    fingerprint = sha256(raw).hexdigest()
+    if fingerprint != source['sha256']:
+        raise PermissionError('V70_SAFETY_SNAPSHOT_HASH_MISMATCH')
+    snapshot = json.loads(raw)
+    if snapshot.get('schema_version') != 'V70.3/family-macro-safety-v2':
+        raise ValueError('V70_SAFETY_SNAPSHOT_SCHEMA_MISMATCH')
+    approval = snapshot.get('approval', {})
+    if not isinstance(approval, dict) or approval.get('status') != 'APPROVED' or not approval.get('record_url'):
+        raise PermissionError('V70_SAFETY_SNAPSHOT_APPROVAL_REQUIRED')
+    if not (time(snapshot['data_cutoff']) <= time(snapshot['snapshot_timestamp'])
+            <= time(approval['approved_at']) <= time(evaluation_at)):
+        raise PermissionError('V70_SAFETY_SNAPSHOT_AFTER_EVALUATION')
+    if not source.get('source_reference') or not snapshot.get('upstream_snapshot_reference'):
+        raise ValueError('V70_SAFETY_SNAPSHOT_LINEAGE_REQUIRED')
+    signals = snapshot['signals']
+    if not isinstance(signals, dict) or set(signals) != V70_SAFETY_SIGNAL_NAMES:
+        raise ValueError('V70_SAFETY_SNAPSHOT_SIGNAL_SET_MISMATCH')
+    if (not isinstance(snapshot.get('v70_indicators'), dict)
+            or not isinstance(snapshot.get('v70_judgments'), dict)
+            or not isinstance(snapshot.get('consumer'), dict)):
+        raise ValueError('V70_SAFETY_SNAPSHOT_ORIGINAL_EVIDENCE_REQUIRED')
+    unknowns = []
+    for name, signal in signals.items():
+        if not isinstance(signal, dict) or name != signal.get('signal_name') or 'value' not in signal:
+            raise ValueError('V70_SAFETY_SNAPSHOT_SIGNAL_MISMATCH:' + name)
+        if signal['value'] is None:
+            if signal.get('data_quality') != 'UNKNOWN' or not signal.get('issue_detail'):
+                raise ValueError('V70_SAFETY_SNAPSHOT_UNKNOWN_REASON_REQUIRED:' + name)
+            unknowns.append(name)
+        elif (not signal.get('data_quality') or signal.get('data_quality') == 'UNKNOWN' or not signal.get('source')
+              or not signal.get('as_of')):
+            raise ValueError('V70_SAFETY_SNAPSHOT_SIGNAL_PROVENANCE_REQUIRED:' + name)
+        for field in ('as_of', 'published_at'):
+            value = signal.get(field)
+            if value is not None:
+                observed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+                future = (time(value) > time(snapshot['data_cutoff']) if len(value) > 10
+                          else observed.date() > time(snapshot['data_cutoff']).date())
+                if future:
+                    raise PermissionError('V70_SAFETY_SNAPSHOT_FUTURE_SIGNAL:' + name)
+    # Keep the whole approved upstream object, including original indicator
+    # IDs, judgments, caveats and dates. Nothing here becomes a Core safety
+    # assertion or a permission; the independent v3 feed remains unchanged.
+    return {**deepcopy(snapshot),
+        'source_reference': source['source_reference'], 'sha256': fingerprint,
+        'safety_assessment_status': snapshot['consumer']['safety_assessment_status'],
+        'unknown_signals': sorted(unknowns),
+    }
+
+
 def build_report(request, config, repo_root):
     from formal_mode_analysis import native
     native(repo_root)
@@ -184,6 +244,9 @@ def build_report(request, config, repo_root):
     target = target_source(snapshot, config, request['evaluation_at'])
     if request.get('confirmed_target') != target:
         raise PermissionError('MEMBER_V82_TARGET_SOURCE_REPLAY_MISMATCH')
+    safety_source = config.get('v70_safety_snapshot_source')
+    safety_snapshot = (read_v70_safety_snapshot(safety_source, request['evaluation_at'])
+                       if safety_source is not None else None)
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
     ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
         'resource_initialized':False,'financial_cycle_initialized':False}
@@ -351,6 +414,8 @@ def build_report(request, config, repo_root):
         from member_position_valuation import produce
         report['source_position_valuations']=produce(request,report['all_asset_coverage'],rows,
             config['position_valuation_inputs'])
+    if safety_snapshot is not None:
+        report['v70_safety_snapshot'] = safety_snapshot
     report['report_digest'] = digest(report)
     return report
 

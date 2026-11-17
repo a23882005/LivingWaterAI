@@ -263,6 +263,8 @@ def build_report(request, config, repo_root):
                 metrics,fundamentals=issuer_inputs(row['issuer_facts'],forward,allowed_metrics=cls.get('valuation_waterfall'))
                 row['valuation_observations']=metrics
             kwargs = {'valuation_waterfall': cls['valuation_waterfall']} if 'valuation_waterfall' in cls else {}
+            if cls.get('valuation_profile') is not None:
+                kwargs['valuation_profile']=deepcopy(cls['valuation_profile'])
             row['core_observation'] = native_core_observation(repo_root, market,
                 valuation_metrics=metrics, fundamental_fields=fundamentals,
                 broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', qualified_core_source=core_source, **kwargs)

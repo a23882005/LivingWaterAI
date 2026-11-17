@@ -836,7 +836,7 @@ class AssetSourceProducer:
         return native_core_observation(self.root, observed, **kwargs)
 
 
-def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None,qualified_core_source=None):
+def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None,qualified_core_source=None,valuation_profile=None):
     from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
     path=Path(root)/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
     if str(path) not in sys.path:sys.path.insert(0,str(path))
@@ -875,10 +875,21 @@ def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf
         bound={r['field_name']:r for r in supplied['fundamental_fields']}
         arguments['fundamental_fields']=[r for r in arguments['fundamental_fields'] if r['field_name'] not in bound]+supplied.pop('fundamental_fields')
     arguments.update(supplied)
+    japan_audit=None
+    if (qualified_core_source or {}).get('asset_id')=='00956' and valuation_profile is None:
+        raise PermissionError('JAPAN_VALUATION_APPROVED_PROFILE_REQUIRED')
+    if valuation_profile is not None:
+        if (not broad_etf or valuation_waterfall!=['FORWARD_PE','PB']
+            or qualified_core_source is not None and qualified_core_source.get('asset_id')!='00956'):
+            raise PermissionError('JAPAN_VALUATION_PROFILE_SCOPE_MISMATCH')
+        from broad_product_identity import japan_valuation_inputs
+        arguments['valuation_metrics'],japan_audit=japan_valuation_inputs(
+            arguments['valuation_metrics'],valuation_profile,
+            evaluation_at=(qualified_core_source or {}).get('evaluation_at'))
     result=evaluate_core_rule_state(**arguments)
     serialize=lambda value:json.loads(json.dumps(value,default=lambda x:
         asdict(x) if hasattr(x,'__dataclass_fields__') else str(x) if isinstance(x,Decimal) else x.value))
-    return {'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
+    output={'function':'V82.evaluate_core_rule_state','result':json.loads(json.dumps(asdict(result),
             default=lambda x:str(x) if isinstance(x,Decimal) else x.value)),
         'actual_inputs':serialize(arguments),'input_gaps':gaps,
         'valuation_path_audit':valuation_path_audit(arguments['valuation_metrics'],arguments['valuation_waterfall']),
@@ -887,3 +898,9 @@ def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf
         'scope':'ORIGINAL_CORE_OBSERVATION__NOT_DEPLOYMENT_OR_MENTOR','source_sha256':observed['source_sha256'],
         'company_thesis_scope':'INAPPLICABLE_TO_BROAD_ETF_PER_FORMAL_RULE_APPLICABILITY_MATRIX' if broad_etf else 'UNKNOWN',
         'etf_structure_safety':'UNKNOWN__RETAINED_IN_SAFETY_SUFFICIENCY'}
+    if japan_audit is not None:
+        output['product_valuation_audit']={'profile':deepcopy(valuation_profile),
+            'metrics':japan_audit,'fund_context_not_in_multiples':{
+                k:None for k in ('premium_discount','tracking_difference','fees','JPY_TWD','japan_industry_concentration')},
+            'fund_context_status':'NOT_PROVIDED','trade_authorization':'NONE'}
+    return output

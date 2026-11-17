@@ -377,6 +377,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 from v82_core_source import read as read_core_source
                 qualified=read_core_source(getattr(producer,'core_sources',{}).get(symbol),request,symbol)
                 if qualified is not None:waterfall['qualified_core_source']=qualified
+                if cls.get('valuation_profile') is not None:
+                    waterfall['valuation_profile']=deepcopy(cls['valuation_profile'])
                 row['core_observation']=producer.core_observation(observed,
                     valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,
                     broad_etf=cls['asset_type']!='INDIVIDUAL_STOCK',**waterfall)

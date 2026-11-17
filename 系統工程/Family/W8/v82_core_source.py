@@ -129,6 +129,7 @@ def read(descriptor,request,symbol):
         leaves[name]={'value':value,'proof':deepcopy(proof)}
     return {'schema_version':SCHEMA,'source_sha256':descriptor['sha256'],
         'source_reference':data['source_reference'],'leaves':leaves,
+        **({'asset_id':symbol,'evaluation_at':request['evaluation_at']} if symbol=='00956' else {}),
         **({'source_descriptor':deepcopy(descriptor)} if set(leaves)&set(LEFT_LEAVES) else {})}
 
 

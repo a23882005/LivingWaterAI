@@ -6774,13 +6774,14 @@
     "official_db_modified": false,
     "latest_existing_broker_observations_integrated": true,
     "formal_PR59_runtime_modified": false,
-    "dispatch_status": "OWNER_REPORTED_SENT_RECEIPT_PENDING",
+    "dispatch_status": "FORMAL_PR59_ADOPTED_PM_SCOPED_ACCEPTED",
     "full_financial_PASS": 0,
     "real_Cycle": 0,
     "Production": "HOLD",
     "trade_authorization": "NONE",
     "next_responsible": "Original V82 Codex formal PR59 adoption; Family中PM source integration and independent acceptance.",
-    "private_evidence": "Exact contract, patch, original inputs and outputs retained in private Drive governance."
+    "private_evidence": "Exact contract, patch, original inputs and outputs retained in private Drive governance.",
+    "adoption_commit": "462accf3d343d1ccb913e152499ddb2c9c3b727e"
   },
   "pm_owner_pending_weights_decision_20261117": {
     "status": "OWNER_CONFIRMED_WEIGHTS",
@@ -6833,8 +6834,8 @@
       "tests": 10,
       "subtests": 8,
       "original_real_defect_reproduced": true,
-      "formal_PR59_adopted": false,
-      "dispatch_status": "OWNER_REPORTED_SENT_RECEIPT_PENDING",
+      "formal_PR59_adopted": true,
+      "dispatch_status": "FORMAL_PR59_ADOPTED_PM_SCOPED_ACCEPTED",
       "runtime_writer": "Original_V82_Codex"
     },
     "official_databases_modified": false,
@@ -6864,5 +6865,28 @@
     "trade_authorization": "NONE",
     "next_responsible": "Family_PM source calendar and systemic event coverage; Original_V82_Codex two previously supplied PR59 patches",
     "private_evidence": "Report and original source CSVs, script, outputs and tests recorded in private Drive governance."
+  },
+  "pm_pr59_462accf_independent_acceptance_20261117": {
+    "status": "PASS_SCOPED_FORMAL_PR59_ADOPTION",
+    "commit": "462accf3d343d1ccb913e152499ddb2c9c3b727e",
+    "changed_files": 3,
+    "pm_tests_passed": 136,
+    "pm_subtests_passed": 24,
+    "pm_result_checks_passed": 24,
+    "complete_member_replays": 3,
+    "native_components_computed": 17,
+    "candidate_runtime_bytes_preserved": true,
+    "original_targets_and_db_preserved": true,
+    "ci_observation": {
+      "success": 5,
+      "in_progress": 1
+    },
+    "merged": false,
+    "full_financial_PASS": 0,
+    "Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_responsible": "Family_PM remaining safety, valuation and declared funding source integration",
+    "private_evidence": "Acceptance and evidence recorded in private Drive governance."
   }
 }

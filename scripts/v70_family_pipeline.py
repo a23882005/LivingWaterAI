@@ -85,6 +85,14 @@ def wait_intake(drive,parent,baseline,cutoff,wait_seconds,live=False):
                     if relevant and relevant[0]['conclusion'] in ('failure','cancelled','timed_out'):raise RuntimeError('SOURCE_INTAKE_JOB_FAILED')
                 elif not expected:return intake
         if time.monotonic()>=end:raise RuntimeError('MATCHING_SUCCESSFUL_09H_INTAKE_NOT_AVAILABLE')
+        if not live and os.environ.get('GITHUB_SHA'):
+            runs=github_get('actions/runs?head_sha='+os.environ['GITHUB_SHA']+'&per_page=100')['workflow_runs']
+            source_runs=[r for r in runs if r.get('path')=='.github/workflows/macro18-preflight.yml']
+            if source_runs:
+                latest=max(source_runs,key=lambda r:(r.get('run_attempt',1),r['id']))
+                jobs=github_get('actions/runs/'+str(latest['id'])+'/jobs')['jobs']
+                source_jobs=[j for j in jobs if j['name']=='family-source-intake']
+                if source_jobs and source_jobs[0]['conclusion'] in ('failure','cancelled','timed_out'):raise RuntimeError('SOURCE_INTAKE_JOB_FAILED')
         time.sleep(10)
 
 def read_baseline(drive):

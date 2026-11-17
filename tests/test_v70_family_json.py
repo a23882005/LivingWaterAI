@@ -32,6 +32,27 @@ class SourceParserTests(unittest.TestCase):
         raw=b'EMBARGOED UNTIL RELEASE AT 8:30 a.m. EST, Wednesday, November 18, 2026.'
         with self.assertRaisesRegex(ValueError,'RELEASE_AFTER_CUTOFF'):sources.parse_bea(raw,URL,RECORD,'pce',stamp(CUTOFF))
 
+    def test_future_bea_discovery_checks_release_time_and_excludes_late_release(self):
+        old='https://www.bea.gov/news/2026/personal-income-and-outlays-september-2026'
+        new='https://www.bea.gov/news/2026/personal-income-and-outlays-october-2026'
+        class Saved:
+            def get(self,url):
+                if url.endswith('current-releases'):raw=('<a href="'+new+'">new</a><a href="https://untrusted.invalid/news/2026/personal-income-and-outlays-x">ignore</a>').encode()
+                else:raw=('EMBARGOED UNTIL RELEASE AT 8:30 a.m. EST, '+('November 25, 2026' if url==new else 'October 29, 2026')).encode()
+                return 200,raw,RECORD
+        source={'url':old}
+        self.assertEqual(sources.discover_release(source,'pce',stamp('2026-11-25T13:29:59Z'),Saved()),old)
+        self.assertEqual(sources.discover_release(source,'pce',stamp('2026-11-25T13:30:00Z'),Saved()),new)
+
+    def test_frozen_first_round_does_not_discover_later_current_release(self):
+        class NoFetch:
+            def get(self,url):raise AssertionError('frozen snapshot must retain dated source')
+        self.assertEqual(sources.discover_release({'url':URL},'cpi',stamp(CUTOFF),NoFetch()),URL)
+
+    def test_backup_reasons_distinguish_http_error_and_basis_mismatch(self):
+        self.assertIn('404',sources.backup_qualification({'website':'www.federalreserve.gov'},'treasury_2y',{'http_status':404}))
+        self.assertIn('BASIS_MISMATCH',sources.backup_qualification({'website':'www.cmegroup.com'},'sofr',{'http_status':200}))
+
     def test_cpi_mom_does_not_replace_missing_yoy(self):
         raw=b'Transmission embargoed until 8:30 a.m. (ET) Tuesday, November 10, 2026. CONSUMER PRICE INDEX - OCTOBER 2026. CPI-U) increased 0.4 percent on a seasonally adjusted basis. BLS cannot publish 12-month percent changes. CPI-U) increased to an index level of 337.511.'
         out=sources.parse_cpi(raw,URL,RECORD,stamp(CUTOFF));self.assertIsNone(out['value']);self.assertEqual(out['supporting_observations']['published_mom_sa']['value'],.4)

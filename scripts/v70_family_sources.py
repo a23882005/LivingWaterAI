@@ -2,7 +2,7 @@
 from __future__ import annotations
 import concurrent.futures,copy,csv,datetime as dt,hashlib,io,json,re,threading,time
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse,urljoin
 from zoneinfo import ZoneInfo
 import requests
 from bs4 import BeautifulSoup
@@ -175,6 +175,48 @@ def resolve_url(url,cutoff):
     if 'daily-treasury-rates.csv/' in url:url=re.sub(r'2026',str(end.year),url)
     return url
 
+def discover_release(source,kind,cutoff,fetcher):
+    """Refresh official monthly/quarterly releases after the frozen first snapshot.
+
+    Never infer a publication time from the current-release index. Each linked
+    release must supply its own dated embargo header and pass the cutoff.
+    """
+    original=resolve_url(source['url'],cutoff)
+    if cutoff<=stamp('2026-11-17T14:43:12+08:00') or kind not in ('cpi','pce','core_pce','gdp'):return original
+    candidates=[original]
+    if kind=='cpi':candidates.insert(0,'https://www.bls.gov/news.release/cpi.nr0.htm')
+    else:
+        index='https://www.bea.gov/news/current-releases';status,raw,_=fetcher.get(index)
+        if status==200:
+            for a in BeautifulSoup(raw,'html.parser').select('a[href]'):
+                href=urljoin(index,a['href']);path=urlparse(href).path
+                allowed=urlparse(href).hostname=='www.bea.gov' and re.match(r'/news/20\d{2}/',path)
+                matches=('/personal-income-and-outlays-' in path) if kind!='gdp' else bool(re.search(r'/gdp-.*quarter-',path))
+                if allowed and matches:candidates.append(href)
+    eligible=[]
+    for url in list(dict.fromkeys(candidates))[:6]:
+        status,raw,_=fetcher.get(url)
+        if status!=200:continue
+        try:released=release_time(raw)
+        except ValueError:continue
+        if released<=cutoff:eligible.append((released,url))
+    return max(eligible)[1] if eligible else original
+
+def backup_qualification(source,key,http):
+    status=http.get('http_status',0)
+    if status!=200:return 'HTTP_NOT_USABLE: '+str(status)+'; '+http.get('error','response unavailable/challenge/not found')
+    host=source['website']
+    if 'fred.' in host:
+        return 'MIRROR_NOT_SELECTED: original publisher identified; exact historical vintage and FRED service/storage permission not established for new adoption'
+    if key in ('ig_oas','bbb_oas','a_oas'):
+        return 'RIGHTS_UNCLEARED: ICE series/provider page checked; new four-household storage/distribution permission not established'
+    if 'govinfo.gov' in host:return 'ARCHIVED_REPORT_ONLY: monthly report has not established this observation and publication-time vintage; no numeric fallback adopted'
+    if 'cmegroup.com' in host:return 'BASIS_MISMATCH: term SOFR/product methodology is not overnight SOFR or a same-tenor SOFR-OIS spread'
+    if key=='material_macro_events':return 'PARTIAL_CALENDAR: reviewed official calendar; materiality and complete event coverage not established'
+    if key in UNKNOWN_REASONS:return 'CHECKED_NOT_EQUIVALENT: '+UNKNOWN_REASONS[key]
+    if key in ('srf','rrp'):return 'BASIS_MISMATCH: weekly stock/aggregate market statistic is not the selected NYFed daily facility accepted principal'
+    return 'NOT_ADOPTED: this page did not establish a dated, same-definition, permissioned numeric fallback'
+
 UNKNOWN_REASONS={
  'fed_policy_bias':'METHODOLOGY_UNAVAILABLE: original V70 supplies policy range/deviation, not an adopted policy-bias classifier.',
  'liquidity_regime':'METHODOLOGY_UNAVAILABLE: retain original liquidity group judgment; no standalone regime mapping.',
@@ -189,6 +231,9 @@ UNKNOWN_REASONS={
 
 def collect(baseline,cutoff_string,fetcher=None):
     cutoff=stamp(cutoff_string);fetcher=fetcher or Fetcher();config=json.loads(CONFIG.read_text());registry=config['signals']
+    for variable in registry:
+        primary=variable['sources'][0]
+        primary['url']=discover_release(primary,variable['signal'],cutoff,fetcher)
     if {r['signal'] for r in registry}!=EXPECTED:raise ValueError('REGISTRY_MUST_COVER_EXACT_20')
     urls=sorted({resolve_url(s['url'],cutoff) for r in registry for s in r['sources']})
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:list(pool.map(fetcher.get,urls))
@@ -207,11 +252,10 @@ def collect(baseline,cutoff_string,fetcher=None):
         supplements[key]=row
         for source in variable['sources']:
             effective=resolve_url(source['url'],cutoff);http=fetcher.records[effective]
-            if http.get('http_status')!=200:qualification='HTTP_NOT_USABLE'
+            if http.get('http_status')!=200:qualification=backup_qualification(source,key,http)
             elif source['rank']=='primary' and row.get('value') is not None:qualification='SELECTED_NUMERIC_SOURCE'
             elif source['rank']=='primary':qualification='CHECKED_NOT_ADOPTED: '+row.get('reason','UNKNOWN')
-            elif 'fred.' in source['website'] or key in ('ig_oas','bbb_oas','a_oas'):qualification='REQUIRES_RIGHTS_AND_POINT_IN_TIME_CLEARANCE; not selected'
-            else:qualification='FETCHED_CANDIDATE_ONLY; exact dated series/permission not qualified; does not block valid primary'
+            else:qualification=backup_qualification(source,key,http)
             table.append(dict(signal=key,label=variable['label'],rank=source['rank'],website=source['website'],url=effective,original_publisher=source['original_publisher'],same_publisher_republication=source['same_publisher_republication'],definition=variable['definition'],rights=source['rights'],qualification=qualification,selected=source['rank']=='primary' and row.get('value') is not None,http_status=http.get('http_status',0),retrieved_at=http['retrieved_at'],response_sha256=http.get('sha256',''),observed_at=row.get('as_of','') if source['rank']=='primary' else '',published_at=row.get('published_at','') if source['rank']=='primary' else '',unit=row.get('unit','') if source['rank']=='primary' else '',value=row.get('value') if source['rank']=='primary' else None,publication_time_precision=row.get('publication_time_precision','exact official release time' if row.get('published_at') else 'UNKNOWN'),publication_time_basis=row.get('publication_time_basis','official release header' if row.get('published_at') else 'not adopted / unavailable'),missing_reason=row.get('reason','') if source['rank']=='primary' else qualification))
     return {'schema':'V70.3/family-source-intake-v1','cutoff':cutoff_string,'baseline_sha256':sha(canonical(baseline)),'registry_version':config['version'],'supplements':supplements,'source_registry':table,'http_records':list(fetcher.records.values()),'created_at':dt.datetime.now(UTC).isoformat()}
 

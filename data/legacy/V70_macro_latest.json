@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/macro-feed-v1",
-  "asOf": "2026-11-17T12:45:10.844683+08:00",
+  "asOf": "2026-11-17T14:12:01.701036+08:00",
   "indicators": {
     "m07": {
       "value": 19.3,
@@ -31,21 +31,21 @@
       "method": "FRED_OFFICIAL_API 官方或鏡像時間序列"
     },
     "m09": {
-      "value": 103.501999,
-      "dataDate": "2026-11-16",
+      "value": 103.445999,
+      "dataDate": "2026-11-17",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close"
     },
     "m10": {
-      "value": 85.050003,
-      "dataDate": "2026-11-16",
+      "value": 84.949997,
+      "dataDate": "2026-11-17",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close"
     },
     "m12": {
-      "value": 101.282402,
+      "value": 101.279999,
       "dataDate": "2026-11-16",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",

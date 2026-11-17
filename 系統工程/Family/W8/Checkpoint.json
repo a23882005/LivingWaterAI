@@ -6792,6 +6792,29 @@
     "formal_runtime_updated": false,
     "next_responsible": "Family中PM: integrate approved weights through original target persistence and source reader",
     "Production": "HOLD",
-    "trade_authorization": "NONE"
+    "trade_authorization": "NONE",
+    "superseded_by": "pm_lilian_target_v4_persisted_20261117"
+  },
+  "pm_lilian_target_v4_persisted_20261117": {
+    "status": "PASS_SCOPED_FORMAL_DB_PERSISTED_AND_READBACK_VERIFIED",
+    "executed_by": "Family_PM",
+    "formal_database_written": true,
+    "target_version": 4,
+    "allocation_rows": 6,
+    "allocation_sum_verified": true,
+    "original_holdings_cash_and_prior_versions_preserved": true,
+    "original_mutation_writers_used": true,
+    "remote_database_hash_verified": true,
+    "source_document_version": "1.16.5",
+    "native_analysis_components_passed": 4,
+    "native_analysis_components_expected": 4,
+    "runtime_commit": "29b19255244889b0637b1b06bf27d81ab28476c0",
+    "runtime_changed": false,
+    "full_financial_PASS": 0,
+    "real_Cycle": 0,
+    "Production": "HOLD",
+    "trade_authorization": "NONE",
+    "next_responsible": "Family_PM: remaining funding-purpose and safety/valuation integration",
+    "private_evidence": "Original report and complete evidence recorded in private Drive governance"
   }
 }

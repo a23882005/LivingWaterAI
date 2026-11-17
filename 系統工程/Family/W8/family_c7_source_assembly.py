@@ -17,6 +17,13 @@ APPROVAL_SHA='112b4ffad8d900971879f5502702bbf1252214edd709d22398a604ec070ed2e0'
 DIRECT='EXISTING_BOUND_SOURCE'
 ADAPTER='EXISTING_SOURCE_NEEDS_QUALIFICATION'
 MISSING='ORIGINAL_FACT_NOT_PROVIDED'
+# Explicit types in signed allocation documents, separate from market routing.
+APPROVED_TARGET_ASSET_KINDS={
+    '股票ETF':'equity ETF',
+    '債券ETF':'bond ETF',
+    'CASH':'cash',
+    'cash':'cash',
+}
 
 
 def asset_kind(identity):
@@ -163,7 +170,7 @@ class SourceAssembler:
         for row in draft['target_lines']:
             iid=projection['source_to_native'][row['instrument_id']];item=projection['targets'][iid]
             p=identities.get(row.get('ticker'),{})
-            kind=asset_kind(p) or ('cash' if row.get('asset_type') in ('CASH','cash') else None)
+            kind=asset_kind(p) or APPROVED_TARGET_ASSET_KINDS.get(row.get('asset_type'))
             if row.get('ticker')=='SGOV' and {'SGOV_BOND','SGOV_DRY'}<=set(projection['targets']):
                 if asset_kind(p)!='bond ETF':kind=None
                 elif iid=='SGOV_BOND':kind='bond ETF'

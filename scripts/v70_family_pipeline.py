@@ -119,12 +119,18 @@ def context_from_live_publication(baseline,feed_path,archive,site_url):
             state=page.evaluate('''() => ({asOf:window.v703FeedDocument?.asOf,canPublish:window.v703CanPublishFormalAllocation(),judgments:window.v703MacroSnapshot,risk:Object.fromEntries([...document.querySelectorAll('[id^="sc_"]')].map(e=>[e.id.slice(3),Number.parseFloat(e.textContent)]))})''')
         finally:browser.close()
     if not state['canPublish'] or state['asOf']!=feed['asOf'] or abs(state['judgments']['mSafe_final']-float(row['health_score']))>1e-6:raise ValueError('CURRENT_LIVE_DAILY_CONTEXT_MISMATCH')
-    out=copy.deepcopy(baseline);out.update(feed_asof_utc=feed['asOf'],data_cutoff=stamp(feed['asOf']).astimezone(dt.timezone(dt.timedelta(hours=8))).isoformat(),snapshot_timestamp=feed['asOf'],feed_sha256=sha(raw),health_score=float(row['health_score']),daily_record_id=row['daily_record_id'],source_commit=row['source_commit'],v70_version=row['v70_version'],run_timestamp_utc=row['run_timestamp_utc'],upstream_publication=feed['publication'],upstream_verification=feed['verification'],source_snapshot=feed['sourceSnapshot'])
+    return project_publication_context(baseline,feed,row,state,sha(raw))
+
+def project_publication_context(baseline,feed,row,state,feed_hash):
+    """Copy dated fields from the original formal producer, preserving numeric schemas."""
+    out=copy.deepcopy(baseline);out.update(feed_asof_utc=feed['asOf'],data_cutoff=stamp(feed['asOf']).astimezone(dt.timezone(dt.timedelta(hours=8))).isoformat(),snapshot_timestamp=feed['asOf'],feed_sha256=feed_hash,health_score=float(row['health_score']),daily_record_id=row['daily_record_id'],source_commit=row['source_commit'],v70_version=row['v70_version'],run_timestamp_utc=row['run_timestamp_utc'],upstream_publication=feed['publication'],upstream_verification=feed['verification'],source_snapshot=feed['sourceSnapshot'])
     out['v70_judgments']={k:state['judgments'][k] for k in baseline['v70_judgments']}
     for ident,prior in out['v70_indicators'].items():
         item=feed['indicators'].get(ident)
         if item is None:
-            if ident=='m21' and 'm21' in feed.get('derived',{}):prior['value']=feed['derived']['m21']['value']
+            if ident=='m21' and 'm21' in feed.get('derived',{}):
+                history=feed.get('leiHistory',[])
+                prior.update(value=feed['derived']['m21']['value'],as_of=max((x['observation_date'] for x in history),default=None),verification_as_of=max((x.get('retrieved_at','') for x in history),default=None))
             else:raise ValueError('ORIGINAL_INDICATOR_MISSING_FROM_NEW_FORMAL_FEED')
             continue
         prior.update(value=item['value'],unit=item.get('unit') or prior.get('unit',''),as_of=item.get('dataDate'),source=item.get('source'),method=item.get('method'),upstream_status=item.get('status'),upstream_unit=item.get('unit',''),verification_as_of=item.get('lastVerifiedAt'),detail=item.get('detail',''),v70_risk_points=state['risk'].get(ident),data_quality='FALLBACK_USED' if item.get('carryForward') or item.get('status')=='USABLE' else 'OK')
@@ -140,7 +146,9 @@ def context_from_live_publication(baseline,feed_path,archive,site_url):
         if 'observation_month' in signal:signal['observation_month']=str(signal['as_of'])[:7]
         if ident=='m06_rate':
             policy=feed['indicators'][ident]
-            signal.update(target_range={'lower':policy.get('lowerBound'),'upper':policy.get('upperBound'),'unit':'%'},effective_date=policy.get('effectiveDate'),statement_date=policy.get('statementDate'))
+            def bound(name):
+                value=policy.get(name);return value.get('value') if isinstance(value,dict) else value
+            signal.update(target_range={'lower':bound('lowerBound'),'upper':bound('upperBound'),'unit':'%'},effective_date=policy.get('effectiveDate'),statement_date=policy.get('statementDate') or policy.get('publicationDate'))
         if current.get('carry_forward'):signal['carry_forward']=current['carry_forward']
         else:signal.pop('carry_forward',None)
     out['lei_history']=feed.get('leiHistory',[])

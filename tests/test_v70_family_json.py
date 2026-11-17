@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import v70_family_sources as sources
 from v70_family_sources import stamp,canonical,sha
 from v70_family_drive import checked_update,isolation_roundtrip,Drive,BASELINE_NAME
-from v70_family_pipeline import validate_candidate,verify_formal_basis
+from v70_family_pipeline import validate_candidate,verify_formal_basis,project_publication_context
 
 CUTOFF='2026-11-17T14:43:12+08:00'
 RECORD={'sha256':'a'*64,'retrieved_at':'2026-11-17T12:00:00Z'}
@@ -96,6 +96,14 @@ class SourceParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'INCOMPLETE'):self.parse_ops([self.operation()],hasMore=True)
 
 class CandidateTests(unittest.TestCase):
+    def test_next_formal_context_preserves_numeric_policy_bounds_and_refreshes_derived_date(self):
+        base=baseline();base['v70_indicators']={'m06_rate':{},'m21':{'as_of':'2026-09-01'}};base['v70_judgments']={'score':60};base['signals']={'fed_policy':{'v70_indicator_id':'m06_rate'},**{k:{} for k in sources.EXPECTED}}
+        feed={'asOf':'2026-12-01T03:00:00Z','publication':{},'verification':{},'sourceSnapshot':{},'indicators':{'m06_rate':{'value':3.875,'dataDate':'2026-09-17','lowerBound':{'value':3.75},'upperBound':{'value':4},'publicationDate':'2026-09-16'}},'derived':{'m21':{'value':0}},'leiHistory':[{'observation_date':'2026-10-01','retrieved_at':'2026-12-01T01:00:00Z'}]}
+        row={'health_score':60,'daily_record_id':'new','source_commit':'new','v70_version':'V70','run_timestamp_utc':'2026-12-01T03:01:00Z'};state={'judgments':{'score':60},'risk':{}}
+        out=project_publication_context(base,feed,row,state,'hash')
+        self.assertEqual(out['signals']['fed_policy']['target_range'],{'lower':3.75,'upper':4,'unit':'%'})
+        self.assertEqual(out['signals']['fed_policy']['statement_date'],'2026-09-16');self.assertEqual(out['v70_indicators']['m21']['as_of'],'2026-10-01');self.assertEqual(base['v70_indicators']['m21']['as_of'],'2026-09-01')
+
     def test_preserve_original_29_judgments_8_signals_and_unknown_reasons(self):
         base=baseline();pack=intake(base);out=sources.merge_candidate(base,pack)
         self.assertEqual(out['v70_indicators'],base['v70_indicators']);self.assertEqual(out['v70_judgments'],base['v70_judgments'])

@@ -10,7 +10,7 @@
       "fetched_at_utc": "2026-11-17T01:28:45.307324+00:00",
       "response_sha256": "75e9d3ba01504952c387e2ebd3be7e2b3961e47629a3783a5af67c1e415fee29",
       "response_bytes": 264174,
-      "archive_path": "data/audit/monthly_calendar_75e9d3ba01504952c387e2ebd3be7e2b3961e47629a3783a5af67c1e415fee29.json",
+      "archive_path": "data/audit/monthly_calendar_facts_e928ff325f03c131dcdd05c7e16607d1d4c67a9912af2cf1d7a4998d994cbc03.json",
       "archive_kind": "EXTRACTED_CALENDAR_FACTS_JSON",
       "archive_sha256": "e928ff325f03c131dcdd05c7e16607d1d4c67a9912af2cf1d7a4998d994cbc03"
     },

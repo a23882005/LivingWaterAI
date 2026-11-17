@@ -218,8 +218,12 @@ def refresh_monthly_release_calendars(session, core, calendar):
                     'next_release_at_utc':upcoming.isoformat().replace('+00:00','Z'),
                     'release_time_basis':basis,'fetched_at_utc':fetched,
                     'original_response_sha256':digest,'original_response_bytes':len(raw)}
-                path = path.with_suffix('').with_suffix('.json')
-                path.write_text(json.dumps(facts,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+                fact_bytes = (json.dumps(facts,ensure_ascii=False,indent=2)+'\n').encode('utf8')
+                # The acquisition clock changes even when the HTTP body does
+                # not. Address these facts by their own bytes so another refresh
+                # cannot overwrite the original used by a frozen acceptance test.
+                path = path.parent/('monthly_calendar_facts_'+hashlib.sha256(fact_bytes).hexdigest()+'.json')
+                path.write_bytes(fact_bytes)
                 archive_kind = 'EXTRACTED_CALENDAR_FACTS_JSON'
             else:
                 path.write_bytes(gzip.compress(raw, mtime=0))

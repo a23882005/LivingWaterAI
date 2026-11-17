@@ -145,6 +145,7 @@ class CurrentMonthlyCalendarRefreshTests(unittest.TestCase):
         self.sources = copy.deepcopy(fixture['sources'])
         for row in self.sources.values():
             archive=(ROOT/row['archive_path']).read_bytes()
+            self.assertEqual(hashlib.sha256(archive).hexdigest(),row['archive_sha256'])
             if row.get('archive_kind') == 'EXTRACTED_CALENDAR_FACTS_JSON':
                 # Clearly synthetic prose built from actual archived date facts;
                 # this is not represented as the original publisher response.
@@ -314,6 +315,15 @@ class CurrentMonthlyCalendarRefreshTests(unittest.TestCase):
                         self.assertEqual(json.loads(archive)['original_response_sha256'],ev['response_sha256'])
                     else:
                         self.assertEqual(hashlib.sha256(gzip.decompress(archive)).hexdigest(),ev['response_sha256'])
+            first={ev['archive_path']:(pathlib.Path(folder)/ev['archive_path']).read_bytes()
+                   for row in new['items'].values() for ev in row.get('source_evidence',[])}
+            old_ism=new['items']['m15']['source_evidence'][0]['archive_path']
+            now+=dt.timedelta(seconds=1)
+            again=refresh.refresh_monthly_release_calendars(Session(),self.core,new)
+            self.assertNotEqual(again['items']['m15']['source_evidence'][0]['archive_path'],old_ism)
+            for path,body in first.items():
+                self.assertEqual((pathlib.Path(folder)/path).read_bytes(),body,
+                                 'A later refresh must preserve frozen originals')
 
     def test_incomplete_ISM_calendar_response_still_refreshes_other_three(self):
         incomplete=(b'Release Dates for the ISM Manufacturing and Services '

@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import v70_family_sources as sources
 from v70_family_sources import stamp,canonical,sha
 from v70_family_drive import checked_update,isolation_roundtrip,Drive,BASELINE_NAME
-from v70_family_pipeline import validate_candidate,verify_formal_basis,project_publication_context,apply_formal_authorization
+from v70_family_pipeline import validate_candidate,verify_formal_basis,project_publication_context,apply_formal_authorization,resolve_formal_enablement
 
 CUTOFF='2026-11-17T14:43:12+08:00'
 RECORD={'sha256':'a'*64,'retrieved_at':'2026-11-17T12:00:00Z'}
@@ -96,6 +96,21 @@ class SourceParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'INCOMPLETE'):self.parse_ops([self.operation()],hasMore=True)
 
 class CandidateTests(unittest.TestCase):
+    def test_versioned_activation_and_explicit_operator_disable_override(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'activation.json';path.write_text(json.dumps({'V70_FAMILY_JSON_FORMAL_ENABLED':True,'authorization_status':'PM_AUTHORIZED'}))
+            self.assertEqual(resolve_formal_enablement('',path),(True,'VERSIONED_PM_AUTHORIZED_CONFIG'))
+            self.assertEqual(resolve_formal_enablement('false',path),(False,'REPOSITORY_VARIABLE'))
+            self.assertEqual(resolve_formal_enablement('true',Path(tmp)/'absent.json'),(True,'REPOSITORY_VARIABLE'))
+
+    def test_ambiguous_or_unauthorized_activation_config_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'activation.json'
+            for config in ({'V70_FAMILY_JSON_FORMAL_ENABLED':'true','authorization_status':'PM_AUTHORIZED'},{'V70_FAMILY_JSON_FORMAL_ENABLED':True,'authorization_status':'PENDING'}):
+                path.write_text(json.dumps(config))
+                with self.assertRaisesRegex(ValueError,'INVALID_PM_AUTHORIZED'):resolve_formal_enablement('',path)
+            with self.assertRaisesRegex(ValueError,'TRUE_OR_FALSE'):resolve_formal_enablement('enabled',path)
+
     def approved(self):
         base=baseline();base['approval']={'status':'APPROVED','role':'PM','approved_at':'2026-11-17T01:00:00Z','scope':'original snapshot'}
         base['extension_approval']={'status':'APPROVED','approved_by':'PM','approved_at':'2026-11-18T01:00:00Z','scope':'accepted first-round numeric fields and UNKNOWNs','record_url':'https://example.invalid/pm-record','candidate_sha256':'accepted-original'}

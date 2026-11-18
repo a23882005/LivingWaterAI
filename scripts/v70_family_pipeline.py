@@ -8,6 +8,17 @@ from v70_family_drive import Drive,checked_update,isolation_roundtrip,BASELINE_N
 
 REPO='a23882005/LivingWaterAI'
 FIXED_CUTOFF='2026-11-17T14:43:12+08:00'
+AUTOMATION_CONFIG=Path(__file__).resolve().parents[1]/'config/v70_family_automation.json'
+
+def resolve_formal_enablement(repository_value,config_path=AUTOMATION_CONFIG):
+    """Explicit operator override wins; otherwise use the reviewed activation file."""
+    if repository_value not in (None,''):
+        if repository_value not in ('true','false'):raise ValueError('FORMAL_FLAG_MUST_BE_TRUE_OR_FALSE')
+        return repository_value=='true','REPOSITORY_VARIABLE'
+    config=json.loads(Path(config_path).read_text())
+    value=config.get('V70_FAMILY_JSON_FORMAL_ENABLED')
+    if type(value) is not bool or config.get('authorization_status')!='PM_AUTHORIZED':raise ValueError('INVALID_PM_AUTHORIZED_ACTIVATION_CONFIG')
+    return value,'VERSIONED_PM_AUTHORIZED_CONFIG'
 
 def github_get(path,raw=False):
     token=os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
@@ -191,7 +202,12 @@ def project_publication_context(baseline,feed,row,state,feed_hash):
     return out
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['intake','publish']);parser.add_argument('--cutoff');parser.add_argument('--work',type=Path,default=Path('build/private-v70-family'));parser.add_argument('--archive',type=Path,default=Path('data/macro_safety_daily.csv'));parser.add_argument('--feed',type=Path);parser.add_argument('--live-site');parser.add_argument('--wait-seconds',type=int,default=900);parser.add_argument('--formal',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('phase',choices=['intake','publish']);parser.add_argument('--cutoff');parser.add_argument('--work',type=Path,default=Path('build/private-v70-family'));parser.add_argument('--archive',type=Path,default=Path('data/macro_safety_daily.csv'));parser.add_argument('--feed',type=Path);parser.add_argument('--live-site');parser.add_argument('--wait-seconds',type=int,default=900);mode=parser.add_mutually_exclusive_group();mode.add_argument('--formal',action='store_true');mode.add_argument('--automatic',action='store_true');args=parser.parse_args()
+    enablement_source='EXPLICIT_FORMAL_FLAG' if args.formal else 'CANDIDATE_ONLY'
+    if args.automatic:
+        if args.phase!='publish' or not args.live_site or os.environ.get('GITHUB_REF')!='refs/heads/main':raise ValueError('AUTOMATIC_MODE_REQUIRES_MAIN_LIVE_PUBLICATION')
+        args.formal,enablement_source=resolve_formal_enablement(os.environ.get('V70_FAMILY_FORMAL_ENABLED'))
+        os.environ['V70_FAMILY_FORMAL_ENABLED']=str(args.formal).lower()
     args.work.mkdir(parents=True,exist_ok=True);drive=Drive();meta,parent,before,baseline=read_baseline(drive)
     if args.cutoff and stamp(args.cutoff)!=stamp(baseline['data_cutoff']):raise ValueError('FIXED_CUTOFF_MUST_MATCH_APPROVED_SNAPSHOT')
     cutoff=args.cutoff or (dt.datetime.now(dt.timezone.utc).isoformat() if args.phase=='intake' else baseline['data_cutoff'])
@@ -225,9 +241,10 @@ def main():
     result=checked_update(drive,target,parent,candidate,allow_formal=args.formal,verify=lambda raw:validate_candidate(json.loads(raw),context,intake,formal=args.formal))
     if not args.formal and drive.read(meta['id'])!=before:raise RuntimeError('FORMAL_BASELINE_CHANGED_DURING_CANDIDATE_PUBLISH')
     receipt={'schema':'V70.3/family-json-actions-receipt-v1','cutoff':cutoff,'phase':'11h_candidate_publish' if not args.formal else '11h_formal_publish','workflow_run_id':os.environ.get('GITHUB_RUN_ID'),'workflow_commit':os.environ.get('GITHUB_SHA'),'basis':basis,'intake_workflow_run_id':intake['workflow_run_id'],'isolation':probe,'write':result,'formal_baseline_file_id':meta['id'],'formal_baseline_sha256':sha(before),'formal_baseline_written':args.formal,'changes':candidate['round1_extension']['changes'],'private_source_evidence_archive':intake['private_evidence_archive']}
+    receipt['formal_enablement']={'flag_name':'V70_FAMILY_JSON_FORMAL_ENABLED','enabled':args.formal,'source':enablement_source}
     checked_update(drive,'V70_Family_JSON_Round1_Actions_Receipt_20261117.json',parent,receipt)
     (args.work/'candidate.json').write_text(json.dumps(candidate,ensure_ascii=False,indent=2));(args.work/'private-write-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2));write_registry(intake['source_registry'],args.work/'source-registry.csv')
-    print(json.dumps({'phase':receipt['phase'],'status':result['status'],'sha256':result['sha256'],'bytes':result['bytes'],'isolation':'WRITE_READBACK_ROLLBACK_PASS','formal_gate':basis['status'],'formal_baseline_written':args.formal}))
+    print(json.dumps({'phase':receipt['phase'],'status':result['status'],'sha256':result['sha256'],'bytes':result['bytes'],'isolation':'WRITE_READBACK_ROLLBACK_PASS','formal_gate':basis['status'],'formal_baseline_written':args.formal,'formal_enablement_source':enablement_source}))
 
 if __name__=='__main__':
     try:main()

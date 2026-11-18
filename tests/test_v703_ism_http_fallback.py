@@ -20,7 +20,22 @@ class ISMHTTPFallbackTests(unittest.TestCase):
     def test_unverified_publisher_remains_blocked(self):
         with patch.object(m,'fetch',side_effect=[requests.HTTPError(),b'October 2026 Manufacturing PMI at 55.5 percent']):
             with self.assertRaisesRegex(ValueError,'publisher identity'):m.refresh_manufacturing_headline(object())
-    def test_both_http_failures_propagate_without_success(self):
-        with patch.object(m,'fetch',side_effect=[requests.HTTPError(),requests.Timeout()]):
+    def test_all_three_http_failures_propagate_without_success(self):
+        with patch.object(m,'fetch',side_effect=[requests.HTTPError(),requests.HTTPError(),requests.Timeout()]):
             with self.assertRaises(requests.Timeout):m.refresh_manufacturing_headline(object())
+    def test_distributor_403_reaches_same_publisher_official_pdf(self):
+        with patch.object(m,'fetch',side_effect=[requests.HTTPError(),requests.HTTPError(),b'%PDF-synthetic']) as fetch,patch.object(m,'manufacturing_headline_from_official_pdf',return_value=55.5):
+            self.assertEqual(m.refresh_manufacturing_headline(object()),(55.5,m.ISM_MANUFACTURING_PDF));self.assertEqual(fetch.call_args.args[1],m.ISM_MANUFACTURING_PDF);self.assertEqual(fetch.call_count,3)
+    def pdf(self,text):
+        from types import SimpleNamespace
+        return SimpleNamespace(pages=[SimpleNamespace(extract_text=lambda:text)])
+    def test_pdf_headline_requires_period_publisher_and_headline_not_component(self):
+        good='Institute for Supply Management October 2026 Manufacturing PMI® 55.5 54.5 +1.0 New Orders 55.5'
+        with patch('pypdf.PdfReader',return_value=self.pdf(good)):self.assertEqual(m.manufacturing_headline_from_official_pdf(b'%PDF-synthetic'),55.5)
+        for wrong in (good.replace('October 2026','September 2026'),good.replace('Institute for Supply Management','unverified'),good.replace('PMI® 55.5','PMI® 54.5'),good.replace('Manufacturing PMI®','New Orders')):
+            with self.subTest(wrong=wrong),patch('pypdf.PdfReader',return_value=self.pdf(wrong)):
+                with self.assertRaises(ValueError):m.manufacturing_headline_from_official_pdf(b'%PDF-synthetic')
+    def test_html_login_and_oversized_document_are_not_pdf_evidence(self):
+        for raw in (b'<html>login</html>',b'%PDF-'+b'x'*(2*1024*1024)):
+            with self.assertRaises(ValueError):m.manufacturing_headline_from_official_pdf(raw)
 if __name__=='__main__':unittest.main()

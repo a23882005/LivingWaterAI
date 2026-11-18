@@ -22,6 +22,7 @@ PCAL = ROOT/'data/v703_official_monthly_release_calendar.json'
 FED = 'https://www.federalreserve.gov/monetarypolicy/openmarket.htm'
 ISM = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/october/'
 ISM_CAL = 'https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/'
+ISM_MANUFACTURING_PDF = 'https://www.ismworld.org/globalassets/pub/research-and-surveys/rob/pmi/r4in202610pmi.pdf'
 BLS_EMP_CAL = 'https://www.bls.gov/schedule/news_release/empsit.htm'
 CALENDAR_TARGETS = ('m15', 'm18', 'm19', 'm20')
 # ISM's own named release on its existing public distribution channel. The
@@ -375,11 +376,29 @@ def parse_mmfi_eod(raw, today, market_now=None):
 
 
 
+def manufacturing_headline_from_official_pdf(raw):
+    """Read only the dated headline table, not a same-valued component index."""
+    import io,logging
+    from pypdf import PdfReader
+    if not raw.startswith(b'%PDF-') or len(raw)>2*1024*1024:raise ValueError('ISM official PDF format/size invalid')
+    reader=PdfReader(io.BytesIO(raw))
+    if not 1<=len(reader.pages)<=6:raise ValueError('ISM official PDF page limit exceeded')
+    logger=logging.getLogger('pypdf');level=logger.level
+    try:
+        logger.setLevel(logging.ERROR)
+        content=re.sub(r'\s+',' ',' '.join(page.extract_text() or '' for page in reader.pages))
+    finally:logger.setLevel(level)
+    if not re.search(r'October\s+2026',content,re.I) or 'Institute for Supply Management' not in content:raise ValueError('ISM official PDF period/publisher missing')
+    headline=re.search(r'\bManufacturing\s+PMI[®\s]*(\d{1,2}(?:\.\d+)?)\s+(\d{1,2}(?:\.\d+)?)\s+[+-]\d',content)
+    if not headline or tuple(map(float,headline.groups()))!=(55.5,54.5):raise ValueError('ISM official PDF headline table mismatch')
+    return float(headline[1])
+
 def refresh_manufacturing_headline(session):
-    """Use the existing publisher-distributed fallback after HTTP OR parse failure.
+    """Use the publisher release, then its public PDF on distributor HTTP failure.
 
     Exact October headline and source identity remain mandatory. No login bypass,
     cached success, freshness extension or new indicator definition is introduced.
+    A fetched distributor content mismatch still blocks; it is not masked by PDF.
     """
     import requests
     distributed='https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html'
@@ -398,7 +417,14 @@ def refresh_manufacturing_headline(session):
     value=verified_headline(clean(raw))
     if value is not None:return value,ISM
     print('ISM_OFFICIAL_DIRECT_NOT_PARSED_OR_HTTP_FAILED',flush=True)
-    raw=fetch(session,distributed);content=clean(raw)
+    try:raw=fetch(session,distributed)
+    except requests.RequestException as exc:
+        print('ISM_DISTRIBUTED_HTTP_UNAVAILABLE',type(exc).__name__,flush=True)
+        raw=fetch(session,ISM_MANUFACTURING_PDF)
+        value=manufacturing_headline_from_official_pdf(raw)
+        print('ISM_OFFICIAL_PDF_HEADLINE_PASS',hashlib.sha256(raw).hexdigest(),flush=True)
+        return value,ISM_MANUFACTURING_PDF
+    content=clean(raw)
     if ('News provided by Institute for Supply Management' not in content
             or 'SOURCE Institute for Supply Management' not in content):
         raise ValueError('ISM distributed publisher identity missing')

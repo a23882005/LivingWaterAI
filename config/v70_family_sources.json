@@ -1,0 +1,688 @@
+{
+  "schema": "V70.3/family-source-registry-v1",
+  "version": "20261117-round1",
+  "fixed_round_cutoff": "2026-11-17T14:43:12+08:00",
+  "rights_policy": "不新增未獲具名例外的受限保存／再散布；第三網站不足不阻擋已合格主值",
+  "signals": [
+    {
+      "signal": "fed_policy_bias",
+      "label": "Fed政策傾向",
+      "definition": "分類；沿原規則，不從聲明自行推導",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fed-statement",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board / FOMC",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fed-mirror",
+          "url": "https://www.publicnow.com/view/5C28296D827E44CA1C6C14469FF0A5DCC6B9D5C3",
+          "website": "www.publicnow.com",
+          "original_publisher": "Federal Reserve Board / FOMC (Publicnow republication)",
+          "same_publisher_republication": true,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "nyfed-policy",
+          "url": "https://www.newyorkfed.org/markets/domestic-market-operations/monetary-policy-implementation",
+          "website": "www.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York / FOMC implementation",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "treasury_2y",
+      "label": "美債2Y名目殖利率",
+      "definition": "Treasury nominal par/CMT 2Y；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "treasury",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "website": "home.treasury.gov",
+          "original_publisher": "U.S. Treasury",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-2y",
+          "url": "https://fred.stlouisfed.org/series/DGS2",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Board H.15 / Treasury CMT via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "h15",
+          "url": "https://www.federalreserve.gov/releases/h15/20261116/",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board H.15",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "treasury_10y",
+      "label": "美債10Y名目殖利率",
+      "definition": "Treasury nominal par/CMT 10Y；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "treasury",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "website": "home.treasury.gov",
+          "original_publisher": "U.S. Treasury",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-10y",
+          "url": "https://fred.stlouisfed.org/series/DGS10",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Board H.15 / Treasury CMT via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "h15",
+          "url": "https://www.federalreserve.gov/releases/h15/20261116/",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board H.15",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "treasury_30y",
+      "label": "美債30Y名目殖利率",
+      "definition": "Treasury nominal par/CMT 30Y；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "treasury",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "website": "home.treasury.gov",
+          "original_publisher": "U.S. Treasury",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-30y",
+          "url": "https://fred.stlouisfed.org/series/DGS30",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Board H.15 / Treasury CMT via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "h15",
+          "url": "https://www.federalreserve.gov/releases/h15/20261116/",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board H.15",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "cpi",
+      "label": "整體CPI",
+      "definition": "CPI-U All items；YoY主欄；MoM/指數另存，不代替YoY",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "cpi",
+          "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+          "website": "www.bls.gov",
+          "original_publisher": "BLS",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-cpi",
+          "url": "https://fred.stlouisfed.org/series/CPIAUCSL",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "BLS",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "govinfo",
+          "url": "https://www.govinfo.gov/content/pkg/ECONI-2026-11/pdf/ECONI-2026-11.pdf",
+          "website": "www.govinfo.gov",
+          "original_publisher": "BLS / BEA tables republished by Joint Economic Committee / GPO",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "pce",
+      "label": "整體PCE物價",
+      "definition": "PCE price index YoY；非名目PCE支出",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "pce",
+          "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-september-2026",
+          "website": "www.bea.gov",
+          "original_publisher": "BEA",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-pce",
+          "url": "https://fred.stlouisfed.org/series/PCEPI",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "BEA",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "pce-mirror",
+          "url": "https://ebs.publicnow.com/view/AE4D2479499F55D6634CA079619E34A9415A508D",
+          "website": "ebs.publicnow.com",
+          "original_publisher": "BEA",
+          "same_publisher_republication": true,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        }
+      ]
+    },
+    {
+      "signal": "core_pce",
+      "label": "核心PCE物價",
+      "definition": "PCE price index excluding food/energy YoY",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "pce",
+          "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-september-2026",
+          "website": "www.bea.gov",
+          "original_publisher": "BEA",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-core-pce",
+          "url": "https://fred.stlouisfed.org/series/PCEPILFE",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "BEA",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "pce-mirror",
+          "url": "https://ebs.publicnow.com/view/AE4D2479499F55D6634CA079619E34A9415A508D",
+          "website": "ebs.publicnow.com",
+          "original_publisher": "BEA",
+          "same_publisher_republication": true,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        }
+      ]
+    },
+    {
+      "signal": "gdp",
+      "label": "實質GDP成長率",
+      "definition": "實質GDP qoq SAAR；明列advance/second/third vintage",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "gdp",
+          "url": "https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026",
+          "website": "www.bea.gov",
+          "original_publisher": "BEA",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-gdp",
+          "url": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "BEA",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "govinfo",
+          "url": "https://www.govinfo.gov/content/pkg/ECONI-2026-11/pdf/ECONI-2026-11.pdf",
+          "website": "www.govinfo.gov",
+          "original_publisher": "BLS / BEA tables republished by Joint Economic Committee / GPO",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "liquidity_regime",
+      "label": "整體流動性狀態",
+      "definition": "分類；沿原V70判斷，非自訂WALCL/FSI proxy",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fed-rrp",
+          "url": "https://www.federalreserve.gov/releases/h41/",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board H.4.1",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-liquidity",
+          "url": "https://fred.stlouisfed.org/series/WALCL",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Board H.4.1 via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "ofr-liquidity",
+          "url": "https://www.financialresearch.gov/financial-stress-index/",
+          "website": "www.financialresearch.gov",
+          "original_publisher": "U.S. Treasury Office of Financial Research; underlying inputs vary",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "material_macro_events",
+      "label": "重大總經事件",
+      "definition": "原要求最近1–2日；事件覆蓋不足仍UNKNOWN",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fed-calendar",
+          "url": "https://www.federalreserve.gov/newsevents/2026-november.htm",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "bls-calendar",
+          "url": "https://www.bls.gov/schedule/2026/11_sched.htm",
+          "website": "www.bls.gov",
+          "original_publisher": "BLS",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "bea-calendar",
+          "url": "https://www.bea.gov/news/schedule",
+          "website": "www.bea.gov",
+          "original_publisher": "BEA",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "ig_oas",
+      "label": "IG OAS",
+      "definition": "ICE BofA US Corporate Master OAS；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fred-ig",
+          "url": "https://fred.stlouisfed.org/series/BAMLC0A0CM",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ice",
+          "url": "https://indices.ice.com/termsAndDisclaimers",
+          "website": "indices.ice.com",
+          "original_publisher": "ICE Data Indices / ICE Benchmark Administration (product-specific)",
+          "same_publisher_republication": false,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "ycharts-ig",
+          "url": "https://ycharts.com/indicators/us_corporate_master_optionadjusted_spread",
+          "website": "ycharts.com",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        }
+      ]
+    },
+    {
+      "signal": "bbb_oas",
+      "label": "BBB OAS",
+      "definition": "ICE BofA BBB US Corporate OAS；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fred-bbb",
+          "url": "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ice",
+          "url": "https://indices.ice.com/termsAndDisclaimers",
+          "website": "indices.ice.com",
+          "original_publisher": "ICE Data Indices / ICE Benchmark Administration (product-specific)",
+          "same_publisher_republication": false,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "ycharts-bbb",
+          "url": "https://ycharts.com/indicators/us_corporate_bbb_optionadjusted_spread",
+          "website": "ycharts.com",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        }
+      ]
+    },
+    {
+      "signal": "a_oas",
+      "label": "A OAS",
+      "definition": "ICE BofA Single-A US Corporate OAS；%",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "fred-a",
+          "url": "https://fred.stlouisfed.org/series/BAMLC0A3CA",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ice",
+          "url": "https://indices.ice.com/termsAndDisclaimers",
+          "website": "indices.ice.com",
+          "original_publisher": "ICE Data Indices / ICE Benchmark Administration (product-specific)",
+          "same_publisher_republication": false,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "ycharts-a",
+          "url": "https://ycharts.com/indicators/us_corporate_a_optionadjusted_spread",
+          "website": "ycharts.com",
+          "original_publisher": "ICE Data Indices",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        }
+      ]
+    },
+    {
+      "signal": "treasury_market_liquidity",
+      "label": "美債市場流動性",
+      "definition": "缺原定metric/期限；不以MOVE或FSI替代",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "ust-liquidity",
+          "url": "https://libertystreeteconomics.newyorkfed.org/2026/04/treasury-market-liquidity-since-april-2025/",
+          "website": "libertystreeteconomics.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York researchers; historical research",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ofr-liquidity",
+          "url": "https://www.financialresearch.gov/financial-stress-index/",
+          "website": "www.financialresearch.gov",
+          "original_publisher": "U.S. Treasury Office of Financial Research; underlying inputs vary",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "fed-stability",
+          "url": "https://www.federalreserve.gov/publications/financial-stability-report.htm",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "repo",
+      "label": "Repo",
+      "definition": "未指定repo利率/成交額/期限；SRF金額另欄，不擅代",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "rp-api",
+          "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-13&endDate=2026-11-17",
+          "website": "markets.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ofr-repo",
+          "url": "https://www.financialresearch.gov/short-term-funding-monitor/",
+          "website": "www.financialresearch.gov",
+          "original_publisher": "U.S. Treasury Office of Financial Research; monitor underlying inputs vary",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "fred-repo",
+          "url": "https://fred.stlouisfed.org/series/RPONTSYD",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Bank of New York via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        }
+      ]
+    },
+    {
+      "signal": "sofr",
+      "label": "SOFR",
+      "definition": "NYFed overnight SOFR %；以次營業日發布時刻篩選",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "sofr-api",
+          "url": "https://markets.newyorkfed.org/api/rates/secured/sofr/search.json?startDate=2026-11-10&endDate=2026-11-17",
+          "website": "markets.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-sofr",
+          "url": "https://fred.stlouisfed.org/series/SOFR",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Bank of New York via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "cme-sofr",
+          "url": "https://www.cmegroup.com/market-data/cme-group-benchmark-administration/term-sofr.html",
+          "website": "www.cmegroup.com",
+          "original_publisher": "CME Group Benchmark Administration; term SOFR, not overnight SOFR",
+          "same_publisher_republication": false,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        }
+      ]
+    },
+    {
+      "signal": "sofr_ois",
+      "label": "SOFR–OIS",
+      "definition": "缺spread tenor/兩腿及quote basis；不用spot SOFR替代",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "cme-sofr",
+          "url": "https://www.cmegroup.com/market-data/cme-group-benchmark-administration/term-sofr.html",
+          "website": "www.cmegroup.com",
+          "original_publisher": "CME Group Benchmark Administration; term SOFR, not overnight SOFR",
+          "same_publisher_republication": false,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "ofr-repo",
+          "url": "https://www.financialresearch.gov/short-term-funding-monitor/",
+          "website": "www.financialresearch.gov",
+          "original_publisher": "U.S. Treasury Office of Financial Research; monitor underlying inputs vary",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "fred-sofr-ois",
+          "url": "https://fred.stlouisfed.org/series/SOFR",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Bank of New York via FRED; spot SOFR only",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        }
+      ]
+    },
+    {
+      "signal": "fra_ois",
+      "label": "FRA–OIS",
+      "definition": "缺FRA/OIS期限及benchmark，TED不可替代",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "ice",
+          "url": "https://indices.ice.com/termsAndDisclaimers",
+          "website": "indices.ice.com",
+          "original_publisher": "ICE Benchmark Administration; LIBOR cessation / commercial benchmarks",
+          "same_publisher_republication": false,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-fra",
+          "url": "https://fred.stlouisfed.org/series/TEDRATE",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Board / ICE; discontinued TEDRATE, not FRA-OIS",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "bis-fra",
+          "url": "https://www.bis.org/statistics/about_derivatives_stats.htm",
+          "website": "www.bis.org",
+          "original_publisher": "Bank for International Settlements; aggregate statistics, not a FRA-OIS quote",
+          "same_publisher_republication": false,
+          "rights": "僅候選查核；使用／快取／再分發限制未清，不新增受限數值保存"
+        }
+      ]
+    },
+    {
+      "signal": "srf",
+      "label": "SRF",
+      "definition": "NYFed domestic overnight repo operations每日承作本金，USD bn；非風險分類",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "rp-api",
+          "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-13&endDate=2026-11-17",
+          "website": "markets.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-srf",
+          "url": "https://fred.stlouisfed.org/series/RPONTSYD",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Bank of New York via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "ofr-repo",
+          "url": "https://www.financialresearch.gov/short-term-funding-monitor/",
+          "website": "www.financialresearch.gov",
+          "original_publisher": "U.S. Treasury Office of Financial Research; monitor underlying inputs vary",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    },
+    {
+      "signal": "rrp",
+      "label": "RRP",
+      "definition": "NYFed Treasury ON RRP每日承作本金，USD bn；非m14假日餘額",
+      "sources": [
+        {
+          "rank": "primary",
+          "source_id": "rp-api",
+          "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-13&endDate=2026-11-17",
+          "website": "markets.newyorkfed.org",
+          "original_publisher": "Federal Reserve Bank of New York",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        },
+        {
+          "rank": "backup_1",
+          "source_id": "fred-rrp",
+          "url": "https://fred.stlouisfed.org/series/RRPONTSYD",
+          "website": "fred.stlouisfed.org",
+          "original_publisher": "Federal Reserve Bank of New York via FRED",
+          "same_publisher_republication": true,
+          "rights": "FRED服務／API及原資料權利人條件另適用；ICE資料未有本案新增保存／四戶提供許可，不採用新值"
+        },
+        {
+          "rank": "backup_2",
+          "source_id": "fed-rrp",
+          "url": "https://www.federalreserve.gov/releases/h41/",
+          "website": "www.federalreserve.gov",
+          "original_publisher": "Federal Reserve Board H.4.1",
+          "same_publisher_republication": false,
+          "rights": "官方公開資料；保留來源，核對特殊限制／署名"
+        }
+      ]
+    }
+  ]
+}

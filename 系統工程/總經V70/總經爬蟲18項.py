@@ -307,6 +307,13 @@ class Fetcher:
         # existing providers in their previous relative fallback order.
         if series in ('VIXCLS','T10Y2Y','BAMLH0A0HYM2','T5YIE','SAHMREALTIME'):
             providers.sort(key=lambda item: 0 if item[0]=='FRED_CSV' else 1)
+        elif series=='PAYEMS' or (series=='UNRATE' and not history_request):
+            # 2026/11/19 Owner: BLS current U3 and nonfarm levels before FRED,
+            # even with a FRED key. Keep Sahm full-history and CPI routing unchanged.
+            priority={'BLS_OFFICIAL_API':0,'BLS_EMPLOYMENT_TABLE':1,
+                      'BLS_HISTORY_V2':2,'BLS_HISTORY_V1':3,
+                      'FRED_OFFICIAL_API':4,'FRED_CSV':5}
+            providers.sort(key=lambda item:priority.get(item[0],99))
         elif series=='UNRATE':
             providers.sort(key=lambda item: 0 if item[0]=='BLS_EMPLOYMENT_TABLE' else 1)
         retried=set()
@@ -422,6 +429,11 @@ class Fetcher:
                 self.fredattempts[series].append({'provider':provider,'result':'OK',
                     'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
                     'observation_date':str(out.index[-1].date())})
+                if series in ('UNRATE','PAYEMS') and provider.startswith('BLS_'):
+                    self.fredattempts[series][-1].update(
+                        source_url=url,series_id=bls_map[series],
+                        response_sha256=hashlib.sha256(response.content).hexdigest(),
+                        source_attribution='Source: U.S. Bureau of Labor Statistics')
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:

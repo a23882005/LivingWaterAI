@@ -52,12 +52,12 @@ class FreePriority(TestCase):
     def test_http_failure_continues_to_original_cboe(self):
         f,s=self.fetcher(lambda u:Response('',403) if 'fredgraph.csv' in u else Response('DATE,CLOSE\n11/17/2026,20.5\n'))
         self.assertEqual(float(f.fred('VIXCLS').iloc[-1]),20.5);self.assertEqual(len(s.calls),2)
-    def test_unrate_uses_exact_bls_total_sa_table_first(self):
+    def test_unrate_api_failure_keeps_exact_bls_total_sa_table_backup(self):
         cols=pd.MultiIndex.from_tuples([('Label','Label'),('Seasonally adjusted','Oct 2026'),('Not seasonally adjusted','Oct 2026')])
         frame=pd.DataFrame([['Unemployment rate',4.1,9.9],['Unemployment rate women',3.9,8.8]],columns=cols)
         f,s=self.fetcher(lambda u:Response('<table>fixture</table>'))
         with patch.object(m.pd,'read_html',return_value=[frame]):value=f.fred('UNRATE')
-        self.assertEqual(float(value.iloc[-1]),4.1);self.assertIn('empsit.t01.htm',s.calls[0]);self.assertEqual(len(s.calls),1)
+        self.assertEqual(float(value.iloc[-1]),4.1);self.assertIn('/publicAPI/v1/',s.calls[0]);self.assertIn('empsit.t01.htm',s.calls[1]);self.assertEqual(len(s.calls),2)
     def test_sahm_bypasses_short_current_u3_cache_for_original_history(self):
         months=pd.date_range('2025-08-01',periods=15,freq='MS')
         body=json.dumps({'observations':[{'date':str(day.date()),'value':str(4+i*.01)} for i,day in enumerate(months)]})
@@ -98,7 +98,7 @@ class FreePriority(TestCase):
         c=m.load_source_config();self.assertEqual(len(c['indicators']),18)
         self.assertEqual(c['indicators']['m04']['primary_source'],'ISM_OFFICIAL_PDF')
         self.assertIn('ISM_OFFICIAL',c['indicators']['m04']['backup_sources'])
-        self.assertEqual(c['indicators']['m19']['primary_source'],'BLS_EMPLOYMENT_TABLE')
+        self.assertEqual(c['indicators']['m19']['primary_source'],'BLS_OFFICIAL_API')
     def test_ism_preferred_official_pdf_reuses_existing_parser(self):
         real_datetime=dt.datetime
         class Clock(real_datetime):

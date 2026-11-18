@@ -273,10 +273,12 @@
       ]
     },
     "m19": {
-      "primary_source": "BLS_EMPLOYMENT_TABLE",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_EMPLOYMENT_TABLE",
         "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,
@@ -292,9 +294,11 @@
       ]
     },
     "m20": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,

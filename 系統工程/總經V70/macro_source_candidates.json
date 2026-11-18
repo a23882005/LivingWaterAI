@@ -1264,21 +1264,15 @@
         {
           "rank": 1,
           "website": "bls.gov",
-          "url": "https://www.bls.gov/news.release/empsit.t01.htm",
+          "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
           "same_website_endpoints": [
+            "https://www.bls.gov/news.release/empsit.t01.htm",
             "https://www.bls.gov/developers/"
           ],
           "origin": "EXISTING",
           "data_scope": "DIRECT_OR_MIRROR",
-          "last_http": {
-            "status": 200,
-            "checked_at": "2026-11-18T11:54:57.948321+00:00",
-            "evidence_sha256": "7cd6aa32027123004dd1b9d10cac15bf2757928f86fdbced2d7601243502dbee",
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
           "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+          "eligibility_note": "BLS original series ID validated; official API precedes original BLS alternatives and FRED; source attribution retained."
         },
         {
           "rank": 2,
@@ -1346,21 +1340,15 @@
         {
           "rank": 1,
           "website": "bls.gov",
-          "url": "https://download.bls.gov/pub/time.series/ce/ce.data.00a.TotalNonfarm.Employment",
+          "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
           "same_website_endpoints": [
+            "https://download.bls.gov/pub/time.series/ce/ce.data.00a.TotalNonfarm.Employment",
             "https://www.bls.gov/developers/"
           ],
           "origin": "EXISTING",
           "data_scope": "COMPONENT_OR_DERIVED",
-          "last_http": {
-            "status": null,
-            "checked_at": "2026-11-18T11:55:04.140149+00:00",
-            "evidence_sha256": null,
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
           "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "同次發布修訂口徑、連續三個月月增平均；單月新增不是三月平均。"
+          "eligibility_note": "BLS original series ID validated; official API precedes original BLS alternatives and FRED; source attribution retained."
         },
         {
           "rank": 2,

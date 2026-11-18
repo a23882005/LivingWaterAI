@@ -78,6 +78,33 @@ def compose(report, json_body):
     rows = _rows(report)
     stamp = report.get('generated_at') or report.get('observed_at')
     at = _date(stamp)
+    # Production sends only qualified original daily-risk observations. Keep
+    # the generic formatter for historical/tests/legacy recipients.
+    if report.get('schema') == 'LW_MARKET_NOTICE_V1' and (
+            str(report.get('event_id','')).startswith('rd-daily-action-v1:')
+            and report.get('rd_observation') == 'TRUE'
+            and report.get('monitor_status') == 'ACTIVE_OBSERVATION_NOT_BUY'
+            and isinstance(report.get('daily_session'), str)):
+        symbol = _label(report.get('symbol'))
+        day = report['daily_session']
+        subject = f'[V82-WATCH] {symbol}｜日線急跌警戒已觸發｜請檢查買單｜{_tw(stamp)}'
+        lines = [
+            f'⚠️ {symbol}：已偵測日線急跌風險（觀察級）',
+            f'已完成：{day} 收盤日線的原核准急跌公式檢查，結果成立。',
+            f'現在請做：核對{symbol}未成交買單與可用資金，依正式V82安全報告決定是否調整。',
+        ]
+        valid, reference_note = _row_status(report, at)
+        if valid:
+            lines.append('行情參考：' + reference_note)
+        lines.extend([
+            f'檢查時間：{_tw(stamp)}（台灣時間）',
+            '原始證據：' + str(report.get('run_url') or 'GitHub執行紀錄'),
+            '風險觀察由已完成日線產生；交易決定以正式V82完整評估為準。',
+            '',
+            JSON_MARKER,
+            json_body,
+        ])
+        return subject, '\n'.join(lines)
     statuses = [(_label(r.get('symbol')), *_row_status(r, at)) for r in rows]
     usable = sum(1 for _, valid, _ in statuses if valid)
     label = '／'.join(symbol for symbol, _, _ in statuses[:3])

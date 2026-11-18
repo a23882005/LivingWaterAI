@@ -9,18 +9,20 @@ R=dict(schema='LW_MARKET_NOTICE_V1',event_id='e1',symbol='TEST',source='fixture'
 class SMTP:
     count=0
     fail=False
+    last_message=None
     def __init__(self,*a,**k):pass
     def __enter__(self):return self
     def __exit__(self,*a):pass
     def login(self,*a):pass
     def send_message(self,msg):
+        SMTP.last_message=msg
         SMTP.count+=1
         if SMTP.fail:raise RuntimeError('secret text must not escape')
         return {}
 
 class Tests(unittest.TestCase):
     def setUp(self):
-        self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'outbox.sqlite';SMTP.count=0;SMTP.fail=False
+        self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'outbox.sqlite';SMTP.count=0;SMTP.fail=False;SMTP.last_message=None
         self.box=PrivateOutbox(self.path,private_storage_verified=True)
     def tearDown(self):self.box.close();self.tmp.cleanup()
     def send(self,r=None):return send_notice(r or R,outbox=self.box,sender='sender@example.invalid',recipient='recipient@example.invalid',app_password='synthetic',smtp_factory=SMTP)
@@ -36,6 +38,16 @@ class Tests(unittest.TestCase):
     def test_conflicting_event(self):
         self.send()
         with self.assertRaises(ValueError):self.send({**R,'reason':'OTHER'})
+    def test_readable_subject_and_preserved_json(self):
+        import json
+        from mail_format import JSON_MARKER
+        self.assertEqual(self.send(),'SENT_SMTP_ACCEPTED')
+        self.assertTrue(SMTP.last_message['Subject'].startswith('[V82-WATCH]'))
+        self.assertIn('非買進訊號',SMTP.last_message['Subject'])
+        body=SMTP.last_message.get_content()
+        self.assertIn('TEST：',body)
+        self.assertEqual(json.loads(body.split(JSON_MARKER+'\n',1)[1]),R)
+
     def test_no_stdout_or_stderr(self):
         stream=io.StringIO();SMTP.fail=True
         with contextlib.redirect_stdout(stream),contextlib.redirect_stderr(stream):self.send()

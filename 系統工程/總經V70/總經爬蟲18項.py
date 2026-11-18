@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # 最後修改：2026/11/17（台灣時間）｜版本：D009-v4＋核准m14假日未到期本金（91天與12天期限不變）｜檔案：總經爬蟲18項.py
+# 2026/11/18 Owner：實測免費來源優先，原來源保留備援；18項／計算／驗證不變。
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Eight supplementary raw inputs (four m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
@@ -274,6 +275,8 @@ class Fetcher:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         if series in bls_map:
             providers.insert(1,('BLS_HISTORY_V1','https://api.bls.gov/publicAPI/v1/timeseries/data/'))
+        if series=='UNRATE':
+            providers.insert(0,('BLS_EMPLOYMENT_TABLE','https://www.bls.gov/news.release/empsit.t01.htm'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -291,9 +294,15 @@ class Fetcher:
         required_vix_session = None
         if series == 'VIXCLS':
             required_vix_session = last_completed_vix_session()
-            priority = {'CBOE_OFFICIAL_VIX': 0, 'YAHOO_VIX_CHART': 1,
-                        'FRED_OFFICIAL_API': 2, 'FRED_CSV': 3}
+            priority = {'FRED_CSV': 0, 'CBOE_OFFICIAL_VIX': 1,
+                        'YAHOO_VIX_CHART': 2, 'FRED_OFFICIAL_API': 3}
             providers.sort(key=lambda item: priority.get(item[0], 99))
+        # Owner-approved tested free endpoints first; stable sort keeps all
+        # existing providers in their previous relative fallback order.
+        if series in ('VIXCLS','T10Y2Y','BAMLH0A0HYM2','T5YIE','SAHMREALTIME'):
+            providers.sort(key=lambda item: 0 if item[0]=='FRED_CSV' else 1)
+        elif series=='UNRATE':
+            providers.sort(key=lambda item: 0 if item[0]=='BLS_EMPLOYMENT_TABLE' else 1)
         retried=set()
         self.fredattempts[series]=[]
         for provider,url in providers:
@@ -309,7 +318,25 @@ class Fetcher:
                 else:
                     response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2','BLS_HISTORY_V1'):
+                if provider=='BLS_EMPLOYMENT_TABLE':
+                    table=pd.read_html(StringIO(response.text))[0]
+                    rate=table[table.iloc[:,0].eq('Unemployment rate')].iloc[0]
+                    parsed=[]
+                    for i,col in enumerate(table.columns):
+                        if not str(col[0]).startswith('Seasonally adjusted'): continue
+                        token=re.sub(r'\([^)]*\)','',str(col[1])).replace('.','').replace('Sept ','Sep ')
+                        observed=None
+                        for fmt in ('%b %Y','%B %Y'):
+                            try:
+                                observed=dt.datetime.strptime(token,fmt).date().replace(day=1)
+                                break
+                            except ValueError: pass
+                        if observed is not None:
+                            value=pd.to_numeric(rate.iloc[i],errors='coerce')
+                            if pd.notna(value): parsed.append((observed,value))
+                    if not parsed: raise ValueError('BLS table has no dated seasonally-adjusted total unemployment rate')
+                    dates=pd.to_datetime([x[0] for x in parsed]); values=[x[1] for x in parsed]
+                elif provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     obj=response.json()
                     if obj.get('status')!='REQUEST_SUCCEEDED':
                         raise ValueError('BLS response: '+str(obj.get('message'))[:130])
@@ -570,22 +597,24 @@ def core_cpi(f):
                'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def breakeven_5y(f):
-    try: return treasury_breakeven(f,'m13')
-    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
-    return latest(f,'m13','T5YIE')
+    try: return latest(f,'m13','T5YIE')
+    except Exception as exc: print('FREE_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
+    return treasury_breakeven(f,'m13')
 
 def month_delta(f):
-    try: return treasury_breakeven(f,'m17')
-    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
-    s=f.fred('T5YIE'); latest_date=s.index[-1]
-    target=latest_date-pd.DateOffset(months=1)
-    hist=s.loc[:target]
-    if hist.empty: raise ValueError('5YBE 無 1 個月以前資料')
-    # Never silently use a very old observation as the one-month baseline.
-    if (target-hist.index[-1]).days>7:
-        raise ValueError(f'5YBE 近1月基期過舊：目標 {target.date()}，實際 {hist.index[-1].date()}')
-    return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
-               '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
+    try:
+        s=f.fred('T5YIE'); latest_date=s.index[-1]
+        target=latest_date-pd.DateOffset(months=1)
+        hist=s.loc[:target]
+        if hist.empty: raise ValueError('5YBE 無 1 個月以前資料')
+        # Never silently use a very old observation as the one-month baseline.
+        if (target-hist.index[-1]).days>7:
+            raise ValueError(f'5YBE 近1月基期過舊：目標 {target.date()}，實際 {hist.index[-1].date()}')
+        return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
+                   '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
+    except Exception as exc:
+        print('FREE_BREAKEVEN_MONTH_FALLBACK',str(exc)[:180],flush=True)
+    return treasury_breakeven(f,'m17')
 
 def ism_official(f, key):
     """Official ISM monthly headline PMI only; reject wrong month and subindex."""
@@ -600,6 +629,23 @@ def ism_official(f, key):
     # Do not return last month's PMI as a newly fetched current headline.
     target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
     attempts=[]
+    if key=='m04' and str(target)=='2026-10':
+        url='https://www.ismworld.org/globalassets/pub/research-and-surveys/rob/pmi/r4in202610pmi.pdf'
+        series='ISM_'+key
+        f.job_series.add(series)
+        try:
+            from scripts.refresh_v703_predeploy import manufacturing_headline_from_official_pdf
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            value=manufacturing_headline_from_official_pdf(response.content)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL_PDF','result':'OK',
+                'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),'observation_date':'2026-10-01',
+                'response_sha256':hashlib.sha256(response.content).hexdigest()})
+            return row(key,value,'2026-10-01',url,'ISM original approved official PDF headline parser')
+        except Exception as exc:
+            attempts.append('preferred official PDF: '+str(exc)[:150])
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL_PDF','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':str(exc)[:220]})
     candidates=(target,)
     for period in candidates:
         slug=months[period.month-1]
@@ -1455,5 +1501,6 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
+
 
 

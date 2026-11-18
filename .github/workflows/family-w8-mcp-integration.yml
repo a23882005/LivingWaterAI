@@ -32,7 +32,7 @@ permissions:
   contents: read
 jobs:
   mcp-contract:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

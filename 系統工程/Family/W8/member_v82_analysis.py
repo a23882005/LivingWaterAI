@@ -29,6 +29,21 @@ V70_SAFETY_SIGNAL_NAMES = frozenset((
     'liquidity_regime', 'material_macro_events'))
 
 
+def build_v70_safety_snapshot_source(local_path, *, source_reference, standing_authority_binding):
+    """Bind a newly captured original Drive file to independent trusted config.
+
+    The caller supplies authenticated Drive-capture bytes and the PM-verified
+    authority, never authority copied from the daily JSON. Rebuild this
+    descriptor for each capture; a bound runner still rejects changed bytes.
+    """
+    if not source_reference:
+        raise ValueError('V70_SAFETY_SNAPSHOT_LINEAGE_REQUIRED')
+    path = Path(local_path)
+    return {'local_path': str(path), 'sha256': sha256(path.read_bytes()).hexdigest(),
+        'source_reference': source_reference,
+        'standing_maintenance_authorization': deepcopy(standing_authority_binding)}
+
+
 def missing(field, producer, reason, affects, *, kind='EXTERNAL_SOURCE_OR_APPROVAL_REQUIRED'):
     return {'field': field, 'producer': producer, 'reason': reason,
             'affects': affects, 'kind': kind}
@@ -186,7 +201,52 @@ def read_v70_safety_snapshot(source, evaluation_at):
     if not isinstance(approval, dict) or approval.get('status') != 'APPROVED' or not approval.get('record_url'):
         raise PermissionError('V70_SAFETY_SNAPSHOT_APPROVAL_REQUIRED')
     extension = snapshot.get('extension_approval')
-    if extension is not None:
+    standing = (isinstance(extension, dict)
+                and extension.get('approval_type') == 'STANDING_MAINTENANCE_AUTHORIZATION')
+    if standing:
+        # The PM-bound descriptor carries the accepted maintenance authority.
+        # Daily producer output cannot grant itself a wider source scope.
+        authority = source.get('standing_maintenance_authorization') or {}
+        if (not isinstance(authority, dict)
+                or authority.get('status') != 'PASS_PM_ACTIVATION_ACCEPTED'
+                or not authority.get('record_url')
+                or extension.get('status') != 'APPROVED'
+                or extension.get('record_url') != authority['record_url']
+                or approval.get('record_url') != authority['record_url']
+                or approval.get('approval_type') != extension['approval_type']
+                or extension.get('approved_at') != authority.get('approved_at')
+                or not extension.get('approved_by') or not extension.get('scope')):
+            raise PermissionError('V70_STANDING_AUTHORIZATION_REQUIRED')
+        numeric = authority.get('approved_numeric_signal_keys')
+        reserved = authority.get('unknown_signal_keys')
+        if (not isinstance(numeric, list) or not isinstance(reserved, list)
+                or len(numeric) != len(set(numeric)) or len(reserved) != len(set(reserved))
+                or set(numeric) & set(reserved)
+                or set(numeric) | set(reserved) != V70_SAFETY_SIGNAL_NAMES
+                or not isinstance(extension.get('approved_numeric_signal_keys'), list)
+                or not isinstance(extension.get('unknown_signal_keys'), list)
+                or len(extension['approved_numeric_signal_keys']) != len(numeric)
+                or len(extension['unknown_signal_keys']) != len(reserved)
+                or set(extension['approved_numeric_signal_keys']) != set(numeric)
+                or set(extension['unknown_signal_keys']) != set(reserved)
+                or any(snapshot['signals'].get(k, {}).get('value') is not None for k in reserved)):
+            raise PermissionError('V70_STANDING_AUTHORIZED_SCOPE_MISMATCH')
+        context = snapshot.get('automatic_context_validation') or {}
+        publication = snapshot.get('upstream_publication') or {}
+        if (context.get('status') != 'FORMAL_LIVE_FEED_AND_DAILY_CAPTURE_MATCH'
+                or context.get('human_per_run_approval_claimed') is not False
+                or approval.get('human_review_of_current_snapshot') is not False
+                or extension.get('human_review_of_current_snapshot') is not False
+                or publication.get('mode') != 'FORMAL'
+                or publication.get('scoringAllowed') is not True
+                or not re.fullmatch(r'[0-9a-f]{64}', snapshot.get('publication_identity', ''))):
+            raise PermissionError('V70_STANDING_FORMAL_PUBLICATION_REQUIRED')
+        ordered = (time(approval['approved_at']) <= time(authority['approved_at'])
+                   <= time(snapshot['data_cutoff']) <= time(snapshot['snapshot_timestamp'])
+                   <= time(snapshot['run_timestamp_utc']) <= time(evaluation_at)
+                   and time(authority['approved_at']) <= time(authority['activation_acceptance_at'])
+                   <= time(evaluation_at))
+    elif extension is not None:
         if (not isinstance(extension, dict) or extension.get('status') != 'APPROVED'
                 or not extension.get('record_url') or not extension.get('approved_by')
                 or not extension.get('scope')
@@ -244,6 +304,7 @@ def read_v70_safety_snapshot(source, evaluation_at):
         'source_reference': source['source_reference'], 'sha256': fingerprint,
         'safety_assessment_status': snapshot['consumer']['safety_assessment_status'],
         'unknown_signals': sorted(unknowns),
+        **({'standing_maintenance_authorization': deepcopy(authority)} if standing else {}),
     }
 
 

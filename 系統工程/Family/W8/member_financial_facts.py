@@ -221,7 +221,7 @@ def broker_observations(request, descriptor):
     return result
 
 
-def produce(request, normalized, broker_source=None, *, owner_confirmation_source=None):
+def produce(request, normalized, broker_source=None, *, owner_confirmation_source=None,current_owner_source=None):
     if (any(normalized.get(k) != request[k] for k in ('client_id', 'run_id', 'evaluation_at'))
             or normalized.get('source_db_sha256') != request['client_snapshot']['payload']['source_sha256']):
         raise PermissionError('MEMBER_FINANCIAL_FACTS_SOURCE_BINDING')
@@ -245,5 +245,9 @@ def produce(request, normalized, broker_source=None, *, owner_confirmation_sourc
         from owner_financial_confirmation import read
         accepted=read(owner_confirmation_source,request)
         if accepted is not None:out['accepted_owner_financial_facts']=accepted
+    if current_owner_source is not None:
+        from owner_current_business import read as read_current
+        current=read_current(current_owner_source,request)
+        if current is not None:out['current_owner_business_facts']=current
     out['digest'] = digest(out)
     return out

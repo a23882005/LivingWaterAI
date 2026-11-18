@@ -9,7 +9,7 @@ from family_input import digest
 from funding_guard import check_aggregate,owner_key,amount,FundingError
 
 
-def reconcile(request,positions,*,owner_confirmed_facts=None):
+def reconcile(request,positions,*,owner_confirmed_facts=None,current_business_facts=None):
     groups={};pools={};missing=[];issues=[]
     for row in positions:
         financial=row.get('financial_chain') or {}
@@ -100,4 +100,14 @@ def reconcile(request,positions,*,owner_confirmed_facts=None):
             'current_unfilled_buy_notional_by_currency':deepcopy(facts['buy_order_confirmation']['active_buy_notional_by_currency']),
             'additional_pending_buy_cash_deduction':'0','source':deepcopy(facts['source']),
             'native_complete_reconciliation_asserted':False,'cross_currency_total':None}
+    if current_business_facts is not None:
+        current=current_business_facts
+        if (any(current.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
+            or current.get('source_db_sha256')!=request['client_snapshot']['payload']['source_sha256']):
+            raise PermissionError('MEMBER_CURRENT_BUSINESS_FUNDING_SCOPE_MISMATCH')
+        out['current_business_acceptance']={'source':deepcopy(current),
+            'current_open_buy_orders':[],'current_open_sell_orders':[],
+            'unreported_other_commitments':[],'unreported_pending_receivables_or_payables':[],
+            'additional_cash_deduction':'0','historical_snapshots_rewritten':False,
+            'native_complete_reconciliation_asserted':False}
     return out

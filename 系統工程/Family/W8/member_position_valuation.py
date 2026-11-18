@@ -71,6 +71,15 @@ def produce(request,coverage,equity_rows,inputs):
         context.prec=50
         for asset in coverage['holding_and_target_rows']:
             facts=asset['source_facts'];market=markets.get(asset['symbol'])
+            if not facts and asset.get('owner_confirmed_position_absence'):
+                proof=asset['owner_confirmed_position_absence']
+                rows.append({'symbol':asset['symbol'],'account_key':None,'quantity':'0',
+                    'quantity_source':{'quantity':'0','source_kind':'OWNER_CURRENT_CONFIRMED_ABSENCE',
+                        'observed_at':proof['available_at'],'received_at':proof['available_at'],**proof},
+                    'amount':'0','currency':(market or {}).get('market_identity',{}).get('currency'),
+                    'reporting_amount_TWD':'0','observed_market_date':(market or {}).get('observed_date'),
+                    'issue':None,'zero_value_does_not_assert_market_qualification':True})
+                continue
             keys=[(f.get('account_key'),f.get('instrument_key')) for f in facts]
             for fact,key in zip(facts,keys):
                 row=dict(symbol=asset['symbol'],account_key=fact.get('account_key'),

@@ -77,8 +77,11 @@ def target_for_symbol(request,symbol,*,projection=None):
 
 def order_source(request,confirmation=None,*,broker_orders=None,buy_confirmation=None):
     from owner_financial_confirmation import bind_buy_orders
-    return bind_buy_orders(_original_order_source(request,confirmation,broker_orders=broker_orders),
+    result=bind_buy_orders(_original_order_source(request,confirmation,broker_orders=broker_orders),
         buy_confirmation,request)
+    if result.get('status')=='VERIFIED' and (result.get('source') or {}).get('current_owner_business_fact'):
+        result.update(active_sell_orders=[],sell_orders_confirmed_empty=True)
+    return result
 
 
 def _original_order_source(request,confirmation=None,*,broker_orders=None):
@@ -280,8 +283,13 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'function':'V82.calculate_position_gap','active_orders_defaulted_to_empty':False}
     if orders.get('buy_orders_confirmed_empty'):
         gap['source_bound_inputs']={'active_buy_notional_by_currency':deepcopy(orders['active_buy_notional_by_currency']),
-            'active_sell_orders':deepcopy(orders.get('active_sell_orders')),
+            'active_sell_orders':[] if orders.get('status')=='VERIFIED' and orders.get('active_orders')==[] else deepcopy(orders.get('active_sell_orders')),
             'owner_buy_confirmation':deepcopy(orders['owner_buy_confirmation'])}
+    if (orders.get('source') or {}).get('current_owner_business_fact'):
+        gap.setdefault('source_bound_inputs',{}).update(confirmed_position_quantity=row['holding'].get('quantity'),
+            active_open_buy_quantity='0',active_open_sell_quantity='0',
+            projected_position_quantity_before_new_trade=row['holding'].get('quantity'),
+            current_owner_order_confirmation=deepcopy(orders['source']))
     if not missing:
         result=dep.calculate_position_gap(project_target_position_amount=target['amount'],
             target_rate=modes['canonical_target_rate'],confirmed_position_qty=row['holding']['quantity'],

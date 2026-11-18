@@ -35,6 +35,24 @@ def asset_kind(identity):
     return None
 
 
+def original_identities(root,request,classification_source,product_sources):
+    from native_asset_source import classification
+    from bond_advisory import candidates
+    from v75_runtime.work3 import TW_LISTED_ASSETS
+    bonds=set(candidates(root))|set(TW_LISTED_ASSETS)
+    tables=request['client_snapshot']['payload']['tables'];out={}
+    symbols={r.get('ticker') for r in request['confirmed_target']['payload']['draft']['target_lines']}
+    symbols.update(r.get('ticker') for r in tables.get('portfolio_instrument',[]))
+    for symbol in sorted(s for s in symbols if s):
+        out[symbol]=classification(symbol,classification_source,(product_sources or {}).get(symbol))
+        units={r.get('quote_currency') for r in tables.get('portfolio_instrument',[])
+            if r.get('ticker')==symbol and r.get('quote_currency')}
+        if len(units)==1:out[symbol]['quote_currency']=next(iter(units))
+        if symbol in bonds:out[symbol].update(engine_route='V75_PREDICATES',asset_type='BOND_ETF',
+            product_bucket_source='ORIGINAL_V75_WORK3_ASSET_REGISTRY__NO_QUALITY_OR_BUY_CLEARANCE')
+    return out
+
+
 def number(value):
     if value is None or isinstance(value,bool):raise ValueError('C7_ASSEMBLY_EXACT_AMOUNT_REQUIRED')
     n=Decimal(str(value))
@@ -88,13 +106,68 @@ def read_facts(source,request):
 
 class SourceAssembler:
     def __init__(self,root,request,context,artifact_directory):
-        self.root=Path(root).resolve();self.request=request;self.context=context
+        self.root=Path(root).resolve();self.request=deepcopy(request);self.context=deepcopy(context)
+        self.current_normalized=None
+        if context.get('member_reconciliation_source') is not None:
+            from member_reconciliation_source import read
+            self.current_normalized=read(self.root,context['member_reconciliation_source'],request)
+            portfolio=self.current_normalized.get('owner_current_portfolio')
+            if portfolio is not None:
+                books=portfolio['logical_accounts'];selected=request.get('owner') or {}
+                matched=[b for b in books if all(b['owner'].get(k)==selected.get(k)
+                    for k in ('account','currency'))]
+                if not matched:
+                    currency=context.get('owner_current_selected_currency') or 'TWD'
+                    matched=[b for b in books if b['owner']['currency']==currency
+                        and not b.get('source_representation_alias_of')]
+                if len(matched)!=1:raise PermissionError('C7_OWNER_CURRENT_LOGICAL_CATEGORY_AMBIGUOUS')
+                self.request['owner']=deepcopy(matched[0]['owner'])
+                if self.context.get('family_c7_reporting_fx') is None:
+                    self.context['family_c7_reporting_fx']=self.current_normalized['position_values'].get('fx_observation')
+        request=self.request
         self.at=request['evaluation_at'];self.owner=request.get('owner') or {}
         self.currency=self.owner.get('currency');self.inventory={};self.references=[];self.raw=[];self.issues=[]
         self.folder=Path(artifact_directory).resolve()
         if self.folder.is_relative_to(self.root):raise PermissionError('C7_ASSEMBLY_PRIVATE_ARTIFACT_OUTSIDE_REPO_REQUIRED')
         self.folder.mkdir(parents=True,exist_ok=True)
         self.prefix=digest({'client':request['client_id'],'run':request['run_id'],'owner':self.owner})[:24]
+
+    def current_business(self,scope):
+        portfolio=(self.current_normalized or {}).get('owner_current_portfolio')
+        if portfolio is None:return
+        current=portfolio['source'];at=current['available_at']
+        proof=self.derived('owner_current_business',portfolio,as_of=at,available_at=at,
+            kind='CLIENT_PROJECT',original=current)
+        locator=self.raw[-1]
+        def replace(path,value,code=None):
+            self.issues[:]=[i for i in self.issues if i['field_path']!='family_scope.'+path]
+            scope[path]=self.field(path,value,code=code,sources=[locator],
+                producer='W8.owner_current_business:existing_logical_categories',
+                responsibility='ORIGINAL_MARKET_SOURCE_VIA_PM' if value is None else 'ORIGINAL_C_CONTRACT_VALIDATION')
+        replace('account_owners',[deepcopy(b['owner']) for b in portfolio['logical_accounts']])
+        funding=[]
+        for b in portfolio['logical_accounts']:
+            funding.append({'bucket_id':'OWNER-NET:'+b['owner']['account'],'owner':deepcopy(b['owner']),
+                'currency':b['owner']['currency'],'value_state':'KNOWN','settled':True,
+                'cash_amount':b['cash_amount'],'reserved_amount':'0','cash_basis':'NET_AVAILABLE',
+                'authorized_incremental_amount':b['cash_amount'],'receipt':deepcopy(proof)})
+        replace('funding_buckets',funding)
+        replace('exposure_coverage',dict(proof,complete=True,empty_portfolio_asserted=False,
+            confirmed_effects_already_applied=[]))
+        # The Owner confirms today's book. This does not attest old fills or
+        # qualify a dated quote as a current confirmed-position notional.
+        if scope.get('exposures') is None:
+            replace('exposures',None,'C7_CURRENT_POSITION_MARKET_NOTIONAL_REQUIRED')
+        replace('protection_coverage',dict(proof,complete=True,empty_portfolio_asserted=False,
+            confirmed_effects_already_applied=[]))
+        if not portfolio['reported_cap_records']:
+            replace('portfolio_caps',[{'cap_id':'OWNER-ADDITIONAL-CAPS','applicability':'NOT_APPLICABLE','value_state':'NONE'}])
+        if scope.get('preference_locks') is None:
+            replace('preference_locks',None,'C7_CURRENT_MARKET_WEIGHTS_FOR_PRESERVED_PREFERENCES_REQUIRED')
+        if scope.get('current_nav') is None:
+            replace('current_nav',None,'C7_CURRENT_MARKET_PRICES_AND_REPORTING_FX_REQUIRED')
+        self.observations['owner_current_business_portfolio']=deepcopy(portfolio)
+        self.observations['historical_fill_completeness_asserted']=False
 
     def field(self,path,value,*,state=None,code=None,sources=(),producer='ORIGINAL_FAMILY_SOURCE',responsibility=None,blocking=True):
         state=state or (DIRECT if value is not None else MISSING)
@@ -198,6 +271,16 @@ class SourceAssembler:
     def tactical(self,tactical,scope):
         req=self.request
         if tactical is None or not tactical.get('native_currency_amounts'):
+            draft=req['confirmed_target']['payload']['draft']
+            if self.current_normalized is not None and any(r.get('asset_type') in ('CASH','cash')
+                and r.get('weight',{}).get('value_state')=='KNOWN' and number(r['weight']['value'])>0
+                for r in draft['target_lines']):
+                return self.field('total_stock_ceiling',None,
+                    code='C7_APPROVED_CASH_WEIGHT_TO_V70_STRATEGIC_BASE_METHOD_REQUIRED',
+                    responsibility='PM_VALUATION_AND_ALLOCATION_METHOD',
+                    sources=[{'original_approved_target':deepcopy(req['confirmed_target']),
+                        'original_V70_input_rule':'stock_percent + bond_percent == 100',
+                        'cash_renormalization_or_reclassification_performed':False}])
             return self.field('total_stock_ceiling',None,state=ADAPTER,code='C7_ORIGINAL_V70_TOTAL_AMOUNT_OR_ACCOUNTING_BASE_REQUIRED')
         base=tactical['allocation_base'];original=req['confirmed_target']['payload']['draft']['denominator']
         if base!=original or tactical.get('native_execution_currency')!=self.currency:
@@ -498,7 +581,28 @@ class SourceAssembler:
         return current
 
     def build(self,*,tactical=None,identities=None,portfolio_facts_source=None):
-        req=self.request;target=req['confirmed_target'];owner=self.owner;self.identities=deepcopy(identities or {})
+        req=self.request;target=req['confirmed_target'];owner=self.owner
+        original=(self.current_normalized or {}).get('original_classification_sources')
+        if identities is None and original is not None:
+            identities=original_identities(self.root,req,original['classification_source'],original['product_sources'])
+        self.identities=deepcopy(identities or {})
+        original_policy=(self.current_normalized or {}).get('original_v70_strategic_policy')
+        if tactical is None and original_policy is not None:
+            from v70_tactical_input import calculate
+            tactical=calculate(self.root,req,original_policy['policy'],self.context.get('family_c7_reporting_fx'),
+                feed_source=(original or {}).get('macro_source'))
+        if tactical is None and original is not None and target.get('complete_allocation') is not False:
+            lines=target['payload']['draft']['target_lines'];weights={'stock':Decimal(0),'bond':Decimal(0)}
+            for line in lines:
+                kind=asset_kind(self.identities.get(line.get('ticker'),{}))
+                if kind in ('equity ETF','equity individual stock','bond ETF'):
+                    weights['bond' if kind=='bond ETF' else 'stock']+=number(line['weight']['value'])*100
+            if sum(weights.values())==100:
+                from v70_tactical_input import calculate
+                policy={'client_id':req['client_id'],'stock_percent':float(weights['stock']),
+                    'bond_percent':float(weights['bond']),'source_reference':'EXISTING_APPROVED_TARGET:'+digest(target)}
+                tactical=calculate(self.root,req,policy,self.context.get('family_c7_reporting_fx'),
+                    feed_source=original.get('macro_source'))
         scope={'schema_version':'C.FamilyLongTermV70CeilingInput.v1','profile':PROFILE,'approval_contract_sha256':APPROVAL_SHA,
             'identity':{'client_id':req['client_id'],'run_id':req['run_id'],'request_id':req.get('request_id') or req['run_id']+'-request',
                 'portfolio_id':'GLOBAL-PORTFOLIO:'+req['client_id']},
@@ -515,6 +619,7 @@ class SourceAssembler:
         scope['total_stock_ceiling']=self.tactical(tactical,scope)
         facts=read_facts(portfolio_facts_source,req)
         current=self.portfolio(facts,portfolio_facts_source,scope)
+        self.current_business(scope)
         history_binding=self.context.get('public_history_source_binding')
         if history_binding is not None:
             if (history_binding.get('client_id')!=req['client_id'] or history_binding.get('run_id')!=req['run_id']
@@ -528,7 +633,7 @@ class SourceAssembler:
         source=self.context.get('member_reconciliation_source')
         if source is not None:
             from member_reconciliation_source import read
-            normalized=read(self.root,source,req)
+            normalized=self.current_normalized if self.current_normalized is not None else read(self.root,source,req)
             self.observations['same_run_financial_sources']={'source_descriptor':deepcopy(source),
                 'source_digest':normalized['digest'],'original_observations':normalized,
                 'used_as_complete_reconciliation_facts':False}
@@ -563,8 +668,11 @@ class SourceAssembler:
                         item['amount'],sources=[locator],producer='W8.member_financial_facts',blocking=False)
                 broker=facts.get('broker_observations')
                 if broker is not None:
-                    self.field('exposure_coverage.original_order_snapshot',None,state=ADAPTER,
-                        code='BROKER_OWNER_CUTOFF_AND_REPLACEMENT_LIFECYCLE_REQUIRED',
+                    closed=normalized.get('owner_current_portfolio') is not None
+                    self.field('exposure_coverage.original_order_snapshot',
+                        {'historical_observation_only':True,'orders':deepcopy(broker['orders'])} if closed else None,
+                        state=DIRECT if closed else ADAPTER,
+                        code=None if closed else 'BROKER_OWNER_CUTOFF_AND_REPLACEMENT_LIFECYCLE_REQUIRED',
                         sources=[{'source':deepcopy(broker['source_descriptor']),
                             'original_order_observations':deepcopy(broker['orders']),
                             'source_digest':facts['digest']}],blocking=False)
@@ -670,7 +778,7 @@ def assemble_original_producers(producer,request,context,prepared,trial):
                 code='C7_CURRENT_POSITION_QUANTITY_REQUIRED',sources=[locator],producer='W5.prepare_input:accepted_original_position')
         review=out['original_observations']['w1_portfolio_review']
         from w1_portfolio_observations import MINOR_COLUMNS
-        for account in review['accounts']:
+        for account in ([] if out['original_observations'].get('owner_current_business_portfolio') is not None else review['accounts']):
             aid=account['account_key'];observations=account['cash_observations']
             selected=observations[0] if len(observations)==1 else None
             row=selected['original_row'] if selected is not None else None
@@ -695,9 +803,11 @@ def assemble_original_producers(producer,request,context,prepared,trial):
             'source':deepcopy(order['order_source'] if order else producer.order_confirmation),
             'source_sha256':digest(order['order_source'] if order else producer.order_confirmation),
             'as_of':order.get('captured_at') if order else None,'available_at':order.get('captured_at') if order else None}
-        assembler.field('exposure_coverage.original_order_snapshot',None,
-            state=ADAPTER if order or producer.order_confirmation else MISSING,
-            code='C7_ORIGINAL_ORDER_ASOF_LIFECYCLE_AND_PORTFOLIO_COVERAGE_REQUIRED',sources=[locator],
+        closed=out['original_observations'].get('owner_current_business_portfolio') is not None
+        assembler.field('exposure_coverage.original_order_snapshot',
+            {'current_open_orders':[],'historical_order_states_rewritten':False} if closed else None,
+            state=DIRECT if closed else ADAPTER if order or producer.order_confirmation else MISSING,
+            code=None if closed else 'C7_ORIGINAL_ORDER_ASOF_LIFECYCLE_AND_PORTFOLIO_COVERAGE_REQUIRED',sources=[locator],
             producer='ORIGINAL_READONLY_BROKER_OR_OWNER_ORDER_OBSERVATION')
         out['field_inventory']=list(assembler.inventory.values());out['issues']=assembler.issues
     out['call_trace']=['W8.family_c7_source_assembly.assemble_original_producers','W8.v70_tactical_input.calculate',

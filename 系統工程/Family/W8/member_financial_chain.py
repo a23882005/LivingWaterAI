@@ -173,7 +173,8 @@ def complete_report(report,request,config,root):
     financial=[r.get('financial_chain') or {} for r in out['positions']]
     from member_funding_summary import reconcile as reconcile_member_funding
     funding=reconcile_member_funding(request,out['positions'],
-        owner_confirmed_facts=out.get('accepted_owner_financial_facts'))
+        owner_confirmed_facts=out.get('accepted_owner_financial_facts'),
+        current_business_facts=out.get('current_owner_business_facts'))
     out['member_funding_summary']=funding
     if funding['issues']:
         for row in out['positions']:

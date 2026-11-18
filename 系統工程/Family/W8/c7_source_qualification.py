@@ -41,6 +41,7 @@ def annotate(assembly,request):
     scope=assembly['scope_candidate'];observations=assembly['original_observations']
     snapshot=request['client_snapshot']['payload'];tables=snapshot['tables']
     review=observations.get('w1_portfolio_review') or {}
+    current=observations.get('owner_current_business_portfolio')
     checks={}
     def check(key,available,fields,*,existing=False,locators=(),account=None):
         state=AVAILABLE if available else UNQUALIFIED if existing else MISSING
@@ -123,6 +124,22 @@ def annotate(assembly,request):
         existing=bool(tables.get('holding_policy_proposal') or tables.get('holding_policy_confirmation')))
     check('caps',scope.get('portfolio_caps') is not None,
         ['client/global cap applicability','amount/currency/accounting base or confirmed exemption'])
+    if current is not None:
+        locator={'location':'original_observations.owner_current_business_portfolio',
+            'source':deepcopy(current['source']['source_descriptor']),
+            'available_at':current['source']['available_at']}
+        for key in owner_requirements+funding_requirements:
+            if checks[key]['account_key'] not in {b['owner']['account'] for b in current['logical_accounts']}:continue
+            checks[key].update(state=AVAILABLE,next_responsibility='ORIGINAL_CONSUMER',
+                business_fields=['Owner accepted existing logical account category and net cash'],
+                source_locators=[deepcopy(locator)],real_account_number_required=False)
+        for key in ('current_nav','complete_exposure_book','protection'):
+            checks[key].update(business_fields=[
+                'qualified market prices and reporting FX for current position values and weights'],
+                next_responsibility='PM_CONSOLIDATES_MARKET_ORIGINALS',
+                current_business_facts_supplied=True,source_locators=[deepcopy(locator)])
+        checks['complete_exposure_book']['state']=AVAILABLE
+        checks['protection']['state']=AVAILABLE
     dependencies={
         'family_owner':owner_requirements,'budget_currency':owner_requirements,
         'account_owners':owner_requirements,
@@ -132,11 +149,18 @@ def annotate(assembly,request):
         'total_stock_ceiling':['approved_pool','approval_record']+owner_requirements,
         'current_nav':['current_nav']+owner_requirements,
         'exposure_coverage':['complete_exposure_book']+owner_requirements,
-        'exposures':['complete_exposure_book']+owner_requirements,
+        'exposures':['complete_exposure_book']+(['current_nav'] if current is not None else [])+owner_requirements,
         'funding_buckets':funding_requirements+owner_requirements,
         'protection_coverage':['protection'],'preference_locks':['protection','current_nav'],
         'portfolio_caps':['caps'],
     }
+    if any(f.get('reason_code')=='C7_APPROVED_CASH_WEIGHT_TO_V70_STRATEGIC_BASE_METHOD_REQUIRED'
+        for f in assembly['field_inventory']):
+        check('v70_strategic_cash_treatment',False,
+            ['approved treatment of explicit cash weight in the original V70 two-leg strategic input'],
+            existing=True,locators=[{'location':'request.confirmed_target.payload.draft.target_lines'}])
+        checks['v70_strategic_cash_treatment']['next_responsibility']='PM_ALLOCATION_METHOD'
+        dependencies['total_stock_ceiling']=['v70_strategic_cash_treatment']
     for field in assembly['field_inventory']:
         path=field['field_path'].removeprefix('family_scope.')
         root=path.split('.')[0]

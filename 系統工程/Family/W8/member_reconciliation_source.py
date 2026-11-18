@@ -18,7 +18,8 @@ INPUTS=('client_id','source_db_sha256','classification_source','product_sources'
     'v75_parameter_source','market_sources','current_broker_sources',
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
     'official_target_base_source','document_target','owner_target_decision_source',
-    'broker_observation_source','owner_financial_confirmation_source')
+    'broker_observation_source','owner_financial_confirmation_source','owner_current_business_source','macro_source',
+    'financial_producer_sources')
 
 
 def binding(request):
@@ -46,7 +47,7 @@ def binding(request):
 def source_files(config,evaluation_at):
     """Pin all recursively referenced immutable files, including manifests."""
     files={};visited=set()
-    def walk(value):
+    def walk(value,*,expand=True):
         if isinstance(value,list):
             for item in value:walk(item)
         elif isinstance(value,dict):
@@ -59,12 +60,18 @@ def source_files(config,evaluation_at):
                     if value.get(key) and time(value[key])>time(evaluation_at):
                         raise PermissionError('MEMBER_RECONCILIATION_SOURCE_AFTER_CUTOFF:'+key)
                 files[str(p.resolve())]={'local_path':str(p.resolve()),'sha256':actual,'bytes':len(raw)}
-                if actual not in visited:
+                if expand and actual not in visited:
                     visited.add(actual)
                     try:nested=json.loads(raw)
                     except (UnicodeDecodeError,json.JSONDecodeError):nested=None
                     if nested is not None:walk(nested)
-            for item in value.values():walk(item)
+            for key,item in value.items():
+                if key=='financial_producer_sources':
+                    # Only the unchanged, scoped strategic policy is reused
+                    # here. Unconsumed legacy bootstrap observations are not
+                    # new reconciliation inputs or qualified current facts.
+                    for descriptor in item.values():walk(descriptor,expand=False)
+                else:walk(item)
     walk(config)
     return [files[k] for k in sorted(files)]
 
@@ -122,6 +129,7 @@ def normalize(root,request,config):
         confirmed_target_digest=digest(request['confirmed_target']),
         original_target_sources={k:deepcopy(config[k]) for k in
             ('official_target_base_source','document_target','owner_target_decision_source') if k in config},
+        original_classification_sources={k:deepcopy(config.get(k)) for k in ('classification_source','product_sources','macro_source')},
         source_files=pinned,universe_digest=coverage['universe_digest'],
         holdings_projection_digest=coverage['holdings_projection_digest'],
         securities=deepcopy(all_assets['expected']),account_keys=deepcopy(all_assets['account_keys']),
@@ -140,7 +148,29 @@ def normalize(root,request,config):
         trade_authorization='NONE',trade_action='NO_TRADE')
     from member_financial_facts import produce as financial_facts
     out['financial_facts']=financial_facts(request,out,config.get('broker_observation_source'),
-        owner_confirmation_source=config.get('owner_financial_confirmation_source'))
+        owner_confirmation_source=config.get('owner_financial_confirmation_source'),
+        current_owner_source=config.get('owner_current_business_source'))
+    policies={};policy_sources=[]
+    for symbol,descriptor in (config.get('financial_producer_sources') or {}).items():
+        raw=Path(descriptor['local_path']).read_bytes()
+        if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_STRATEGIC_SOURCE_BYTES_CHANGED')
+        data=json.loads(raw);policy=(data.get('configuration') or {}).get('v70_strategic_policy')
+        if policy is None:continue
+        if (data.get('schema_version')!='Family.W8.MemberFinancialProducer.v1'
+            or data.get('client_id')!=request['client_id'] or data.get('asset_id')!=symbol
+            or data.get('source_db_sha256')!=snapshot['source_sha256']
+            or str(data.get('target_version'))!=str(request['confirmed_target']['target_version'])
+            or policy.get('client_id')!=request['client_id'] or not policy.get('source_reference')):
+            raise PermissionError('MEMBER_STRATEGIC_SOURCE_SCOPE_MISMATCH')
+        policies[digest(policy)]=policy;policy_sources.append(deepcopy(descriptor))
+    if len(policies)>1:raise PermissionError('MEMBER_STRATEGIC_SOURCE_CONFLICT')
+    if policies:out['original_v70_strategic_policy']={'policy':deepcopy(next(iter(policies.values()))),
+        'original_sources':policy_sources,'policy_unchanged':True}
+    current=out['financial_facts'].get('current_owner_business_facts')
+    accepted=out['financial_facts'].get('accepted_owner_financial_facts')
+    if current is not None and accepted is not None:
+        from owner_current_business import logical_portfolio
+        out['owner_current_portfolio']=logical_portfolio(request,accepted,current)
     out['digest']=digest(out)
     return out
 

@@ -333,6 +333,8 @@ def build_report(request, config, repo_root):
                        if safety_source is not None else None)
     from owner_financial_confirmation import read as read_owner_financial_confirmation
     owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
+    from owner_current_business import read as read_current_owner,holding_view,order_confirmation
+    current_owner=read_current_owner(config.get('owner_current_business_source'),request)
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
     ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
         'resource_initialized':False,'financial_cycle_initialized':False}
@@ -382,6 +384,7 @@ def build_report(request, config, repo_root):
         holding = {'quantity': quantity, 'quantity_state': 'KNOWN' if quantity is not None else 'UNKNOWN',
             'source_facts': deepcopy(facts), 'observed_at': facts[0].get('observed_at') if len(facts) == 1 else None,
             'absence_is_not_zero': True, 'account_aggregation_performed': False}
+        holding=holding_view(holding,symbol,current_owner)
         row = {'instrument_id': instrument.get('instrument_key', 'SOURCE:'+symbol), 'symbol': symbol,
             'coverage_basis': asset['coverage_basis'], 'owner': deepcopy(request['owner']),
             'holding': holding, 'target_lines': deepcopy(asset['targets']), 'market': market,
@@ -394,6 +397,8 @@ def build_report(request, config, repo_root):
         history_sources=config.get('public_history_sources',{}).get(symbol)
         if owner_facts is not None:
             row['owner_buy_confirmation']=deepcopy(owner_facts['buy_order_confirmation'])
+        if current_owner is not None:
+            row['owner_order_confirmation']=order_confirmation(current_owner,request)
         if history_sources is not None:
             from historical_source_qualification import bind
             row['history_source_qualification']=bind(history_sources,request,symbol)
@@ -517,6 +522,8 @@ def build_report(request, config, repo_root):
         report['v70_safety_snapshot'] = safety_snapshot
     if owner_facts is not None:
         report['accepted_owner_financial_facts']=deepcopy(owner_facts)
+    if current_owner is not None:
+        report['current_owner_business_facts']=deepcopy(current_owner)
     report['report_digest'] = digest(report)
     return report
 

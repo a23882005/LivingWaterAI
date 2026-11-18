@@ -122,6 +122,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         context=deepcopy(seed_context or {})
         if reconciliation_source is not None:context['member_reconciliation_source']=deepcopy(reconciliation_source)
         if public_binding is not None:context['public_history_source_binding']=deepcopy(public_binding)
+        context['owner_current_selected_currency']='TWD' if symbol.isdigit() else 'USD'
         return assemble(root,request,context,artifact_directory=Path(data['artifact_directory'])/'c7_root_inventory')
     normalized=None
     if reconciliation_source is not None:
@@ -137,12 +138,23 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         if cfg is not None and normalized.get('original_target_sources',{}).get('official_target_base_source') is not None:
             cfg['official_target_base_source']=deepcopy(normalized['original_target_sources']['official_target_base_source'])
     if cfg is None:
+        if normalized is not None and normalized.get('owner_current_portfolio') is not None:
+            assembly=root_inventory()
+            return {**attempt,'status':'SOURCE_STAGE_INCOMPLETE',
+                'family_scope_assembly':assembly,'issues':deepcopy(assembly['issues']),
+                'legacy_source_issues_retained_for_audit':deepcopy(data.get('missing_source_facts') or []),
+                'call_trace':attempt['call_trace']+['W8.family_c7_source_assembly:owner_current_logical_categories'],
+                'source_reference':data['source_reference']},None
         gaps=remaining_root_gaps(data.get('missing_source_facts') or [],normalized)
         if not gaps:raise PermissionError('MEMBER_PRODUCER_EXACT_ROOT_GAPS_REQUIRED')
         return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','known_source_inputs':deepcopy(data.get('known_source_inputs',{})),
             'family_scope_assembly':root_inventory(),
             'issues':gaps,'source_reference':data['source_reference']},None
     seed=cfg.get('request_seed') or {};context=cfg.get('context_seed') or {};owner=seed.get('owner') or {}
+    if normalized is not None and normalized.get('owner_current_portfolio') is not None:
+        from owner_current_business import order_confirmation
+        current=normalized['owner_current_portfolio']['source']
+        cfg['order_confirmation']=order_confirmation(current,{**request,'owner':owner})
     if (seed.get('client_id')!=request['client_id'] or seed.get('client_snapshot',{}).get('payload')!=request['client_snapshot']['payload']
         or owner.get('client_id')!=request['client_id']
         or any(not owner.get(k) for k in ('account','broker','currency','funding_domain'))

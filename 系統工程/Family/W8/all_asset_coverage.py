@@ -142,5 +142,15 @@ def build(request, config, coverage, repo_root, *, ledger_resource=None):
         'planning_ledger':{k:deepcopy(ledger[k]) for k in ('status','cycle_count') if k in ledger},
         'account_reconciliation':review,'coverage_complete':expected==observed,
         'financial_completeness_asserted':False,'database_written':False,'trade_action':'NO_TRADE'}
+    from owner_current_business import read as read_current_owner
+    current=read_current_owner(config.get('owner_current_business_source'),request)
+    if current is not None:
+        result['current_owner_business_facts']=current
+        result['denominators']['orders_and_commitments']='OWNER_CONFIRMED_CURRENT_BOOK__REPORTED_FACTS_PRESERVED'
+        for asset in result['holding_and_target_rows']:
+            if not asset['source_facts']:
+                asset['owner_confirmed_position_absence']={
+                    'quantity':'0','source_sha256':current['source_sha256'],
+                    'source_reference':current['source_reference'],'available_at':current['available_at']}
     result['coverage_digest'] = digest(result)
     return result

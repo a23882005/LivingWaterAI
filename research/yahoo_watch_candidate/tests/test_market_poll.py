@@ -98,5 +98,5 @@ class EndToEndBatchTests(unittest.TestCase):
             market_poll.main();market_poll.main();bar[0]='2026-11-10T01:00:00Z';market_poll.main()
         self.assertEqual(len(messages),2)
         for msg in messages:
-            payload=json.loads(msg.get_content().split('\n',1)[1]);self.assertEqual(payload['schema'],'LW_MARKET_BATCH_V1');self.assertEqual(len(payload['items']),2)
+            payload=json.loads(msg.get_content().split('\n--- LW_MARKET_JSON_V1 ---\n',1)[1]);self.assertEqual(payload['schema'],'LW_MARKET_BATCH_V1');self.assertEqual(len(payload['items']),2)
             self.assertFalse(payload['formal_v82_executed'])

@@ -11,6 +11,7 @@ import smtplib
 import sqlite3
 import stat
 from email.message import EmailMessage
+from mail_format import compose
 
 FIELDS = {'schema','event_id','symbol','source','observed_at','bar_start_utc',
           'bar_end_utc','age_seconds','session','data_status','reason',
@@ -98,10 +99,11 @@ def send_notice(report,*,outbox,sender,recipient,app_password,smtp_factory=smtpl
     if state=='SENT': return 'ALREADY_SENT'
     if state=='PENDING': return 'DELIVERY_UNKNOWN_RECONCILE_REQUIRED'
     msg=EmailMessage()
+    subject, readable_body=compose(report,body)
     msg['From']=sender;msg['To']=recipient
-    msg['Subject']='[V82-WATCH] Market observation (not a buy instruction)'
+    msg['Subject']=subject
     msg['Message-ID']='<'+hashlib.sha256(report['event_id'].encode()).hexdigest()+'@v82-watch.invalid>'
-    msg.set_content('唯讀市場觀察，非完整V82運算、買進建議或交易授權。\n'+body)
+    msg.set_content(readable_body)
     try:
         with smtp_factory('smtp.gmail.com',465,timeout=30) as smtp:
             smtp.login(sender,app_password)

@@ -534,6 +534,27 @@ class SourceAssembler:
                 'used_as_complete_reconciliation_facts':False}
             facts=normalized.get('financial_facts')
             if facts is not None:
+                accepted=facts.get('accepted_owner_financial_facts')
+                if accepted is not None:
+                    self.observations['accepted_owner_financial_facts']=deepcopy(accepted)
+                    locator={'source':deepcopy(source),'original_owner_source':deepcopy(accepted['source']),
+                        'as_of':accepted['source']['available_at'],'available_at':accepted['source']['available_at']}
+                    self.field('exposure_coverage.active_buy_notional_by_currency',
+                        accepted['buy_order_confirmation']['active_buy_notional_by_currency'],
+                        sources=[locator],producer='W8.owner_financial_confirmation',blocking=False)
+                    for currency,value in accepted['accepted_net_available_by_currency'].items():
+                        self.field('funding_buckets.owner_confirmed_net_cash.'+currency,value,
+                            sources=[locator],producer='W8.owner_financial_confirmation',blocking=False)
+                    if scope.get('funding_buckets') is None:
+                        # Cash and settlement are supplied. Do not repeat the
+                        # older generic request for those already accepted facts.
+                        item=self.inventory['funding_buckets']
+                        item.update(reason_code='C7_ACCOUNT_BINDING_FX_AND_OTHER_COMMITMENT_COVERAGE_REQUIRED',
+                            next_responsibility='ORIGINAL_ACCOUNT_FX_OR_COMMITMENT_SOURCE',
+                            accepted_owner_cash_source_digest=accepted['digest'])
+                        for issue in self.issues:
+                            if issue['field_path']=='family_scope.funding_buckets':
+                                issue.update(code=item['reason_code'],next_responsibility=item['next_responsibility'])
                 for item in facts['reported_money']['facts']:
                     locator={'source':deepcopy(source),'source_digest':normalized['digest'],
                         'original_money_fact':deepcopy(item),'as_of':item['as_of'],

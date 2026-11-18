@@ -71,7 +71,7 @@ def document_analysis_configuration(request,symbol,descriptor):
         'source_commit':source.get('source_commit')}
 
 
-def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None):
+def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None,issuer_facts_sources=None):
     raw=Path(descriptor['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_PRODUCER_SOURCE_BYTES_CHANGED')
     data=json.loads(raw)
@@ -91,6 +91,9 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
     if cfg is None and data.get('document_account_analysis_source') is not None:
         cfg=document_analysis_configuration(request,symbol,data['document_account_analysis_source'])
         attempt['document_account_analysis_source']=deepcopy(data['document_account_analysis_source'])
+    if cfg is not None and issuer_facts_sources is not None:
+        cfg['issuer_facts_sources']={**deepcopy(cfg.get('issuer_facts_sources') or {}),
+            **deepcopy(issuer_facts_sources)}
     public_binding=None
     if public_history_sources is not None:
         from historical_source_qualification import bind

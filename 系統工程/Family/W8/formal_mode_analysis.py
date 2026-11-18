@@ -75,7 +75,13 @@ def target_for_symbol(request,symbol,*,projection=None):
     return deepcopy(found[0]['target_amount'])
 
 
-def order_source(request,confirmation=None,*,broker_orders=None):
+def order_source(request,confirmation=None,*,broker_orders=None,buy_confirmation=None):
+    from owner_financial_confirmation import bind_buy_orders
+    return bind_buy_orders(_original_order_source(request,confirmation,broker_orders=broker_orders),
+        buy_confirmation,request)
+
+
+def _original_order_source(request,confirmation=None,*,broker_orders=None):
     if broker_orders is not None:
         if (broker_orders.get('schema_version')!='Family.W5.BrokerOrderExposure.v1'
             or broker_orders.get('client_id')!=request['client_id']
@@ -119,6 +125,8 @@ def native_orders(root,orders,symbol):
 
 
 def order_result_status(orders):
+    if orders.get('buy_orders_confirmed_empty') and orders.get('status')=='OWNER_CONFIRMED_BUY_SIDE_ONLY':
+        return 'OWNER_CONFIRMED_NO_UNFILLED_BUYS__SELL_SIDE_UNRESOLVED'
     if orders.get('complete_for_open_order_exposure'):
         return ('BROKER_WORKING_EXPOSURE_ACCOUNTED' if orders.get('lifecycle_fully_resolved')
             else 'BROKER_WORKING_EXPOSURE_ACCOUNTED__REPLACEMENT_LIFECYCLE_PENDING')
@@ -258,7 +266,8 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
     modes['four_modes']['Base']['entry_reasons']=['APPROVED_LONG_TERM_ALLOCATION','FUNDAMENTALS','LEGAL_VALUATION','CREDIT_SAFETY','HARD_GATE','NOT_RUNAWAY_DOWN']
-    orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source'));missing=[]
+    orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source'),
+        buy_confirmation=row.get('owner_buy_confirmation'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
     if target['value_state']=='KNOWN' and target.get('currency')!=request['owner']['currency']:missing.append('verified_same_run_target_FX')
@@ -266,9 +275,13 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     if row['holding'].get('quantity_state')!='KNOWN' or row['holding'].get('quantity') is None:
         missing.append('confirmed_position_quantity')
     if orders['status']!='VERIFIED' and not orders.get('complete_for_open_order_exposure'):
-        missing.append('active_orders_and_fill_reconciliation')
+        missing.extend(orders.get('remaining_required_fields') or ['active_orders_and_fill_reconciliation'])
     gap={'status':'NOT_RUN_REQUIRED_INPUTS_UNRESOLVED','value':None,'missing_fields':missing,
         'function':'V82.calculate_position_gap','active_orders_defaulted_to_empty':False}
+    if orders.get('buy_orders_confirmed_empty'):
+        gap['source_bound_inputs']={'active_buy_notional_by_currency':deepcopy(orders['active_buy_notional_by_currency']),
+            'active_sell_orders':deepcopy(orders.get('active_sell_orders')),
+            'owner_buy_confirmation':deepcopy(orders['owner_buy_confirmation'])}
     if not missing:
         result=dep.calculate_position_gap(project_target_position_amount=target['amount'],
             target_rate=modes['canonical_target_rate'],confirmed_position_qty=row['holding']['quantity'],
@@ -349,10 +362,12 @@ def gap_matrix(row,target,coverage,orders,*,left_audit=None):
                 target,['target','gap'],'Explicit original amount is used; no current NAV substitution or absent-row zero'),
             item('active order details/reconciliation',
                 'MAPPED_FROM_BROKER_WORKING_EXPOSURE' if orders.get('complete_for_open_order_exposure') else
-                'MAPPED_FROM_OWNER_CONFIRMATION' if orders['status']=='VERIFIED' else 'SOURCE_DETAILS_MISSING',orders,
+                'MAPPED_FROM_OWNER_CONFIRMATION' if orders['status']=='VERIFIED' else
+                'MAPPED_OWNER_BUY_ABSENCE__SELL_SIDE_UNRESOLVED' if orders.get('buy_orders_confirmed_empty') else 'SOURCE_DETAILS_MISSING',orders,
                 [] if orders['status']=='VERIFIED' or orders.get('complete_for_open_order_exposure') else ['projected position','gap','execution safety'],
                 'Working-order remaining quantities are included; provider replacement lifecycle caveats remain explicit' if orders.get('complete_for_open_order_exposure') else
-                'No open orders confirmed for this owner/account; historical fills are not asserted' if orders['status']=='VERIFIED' else 'Read original order asset/side/remaining quantity/state/fills; tab count is not a complete ledger'),
+                'No open orders confirmed for this owner/account; historical fills are not asserted' if orders['status']=='VERIFIED' else
+                'Current buy side is explicitly empty; retain sell-side/fill/other-commitment gaps separately' if orders.get('buy_orders_confirmed_empty') else 'Read original order asset/side/remaining quantity/state/fills; tab count is not a complete ledger'),
             item('lookthrough weights/limits','PRODUCER_AND_REQUIRED_SOURCES_NOT_CONNECTED','Issuer partial holdings and accepted account positions',
                 ['fund viability','exposure limits','safety'], 'Map complete dated issuer composition and existing authorized limits, preserving uncovered weights')]
     }

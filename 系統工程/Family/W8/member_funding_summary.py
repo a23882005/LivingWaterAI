@@ -9,7 +9,7 @@ from family_input import digest
 from funding_guard import check_aggregate,owner_key,amount,FundingError
 
 
-def reconcile(request,positions):
+def reconcile(request,positions,*,owner_confirmed_facts=None):
     groups={};pools={};missing=[];issues=[]
     for row in positions:
         financial=row.get('financial_chain') or {}
@@ -82,9 +82,22 @@ def reconcile(request,positions):
             'code':'MEMBER_SHARED_STOCK_CAPACITY_EXCEEDED','kind':'SHARED_PORTFOLIO_BUDGET_FAILED'})
         shared.append({k:v for k,v in pool.items() if k!='claims'}|{'new_stock_amount':str(used)})
     complete=bool(positions) and not missing and not issues
-    return {'schema_version':'Family.W8.MemberFundingSummary.v1','client_id':request['client_id'],
+    out={'schema_version':'Family.W8.MemberFundingSummary.v1','client_id':request['client_id'],
         'run_id':request['run_id'],'status':'RECONCILED' if complete else 'BLOCKED' if issues else 'SOURCE_INCOMPLETE',
         'conserved':complete,'accounts':accounts,'shared_stock_pools':shared,
         'unresolved_assets':missing,'issues':issues,'unavailable_amounts_defaulted_to_zero':False,
         'cross_currency_total':None,'source':'ORIGINAL_NATIVE_WORK6_AND_FUNDING_AGGREGATE',
         'trade_action':'NO_TRADE'}
+    if owner_confirmed_facts is not None:
+        facts=owner_confirmed_facts
+        if (any(facts.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
+            or facts.get('source_db_sha256')!=request['client_snapshot']['payload']['source_sha256']):
+            raise PermissionError('MEMBER_OWNER_FUNDING_FACTS_SCOPE_MISMATCH')
+        out['owner_source_acceptance']={
+            'status':'ACCEPTED_OWNER_NET_CASH_AND_CURRENT_BUY_ABSENCE',
+            'accepted_net_available_by_currency':deepcopy(facts['accepted_net_available_by_currency']),
+            'cash_records':deepcopy(facts['cash_records']),
+            'current_unfilled_buy_notional_by_currency':deepcopy(facts['buy_order_confirmation']['active_buy_notional_by_currency']),
+            'additional_pending_buy_cash_deduction':'0','source':deepcopy(facts['source']),
+            'native_complete_reconciliation_asserted':False,'cross_currency_total':None}
+    return out

@@ -18,7 +18,7 @@ INPUTS=('client_id','source_db_sha256','classification_source','product_sources'
     'v75_parameter_source','market_sources','current_broker_sources',
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
     'official_target_base_source','document_target','owner_target_decision_source',
-    'broker_observation_source')
+    'broker_observation_source','owner_financial_confirmation_source')
 
 
 def binding(request):
@@ -139,7 +139,8 @@ def normalize(root,request,config):
         scope='REPLAYED_ORIGINAL_OBSERVATIONS__COMPLETE_FACTS_CONTRACT_STILL_REQUIRED',
         trade_authorization='NONE',trade_action='NO_TRADE')
     from member_financial_facts import produce as financial_facts
-    out['financial_facts']=financial_facts(request,out,config.get('broker_observation_source'))
+    out['financial_facts']=financial_facts(request,out,config.get('broker_observation_source'),
+        owner_confirmation_source=config.get('owner_financial_confirmation_source'))
     out['digest']=digest(out)
     return out
 

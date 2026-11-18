@@ -331,6 +331,8 @@ def build_report(request, config, repo_root):
     safety_source = config.get('v70_safety_snapshot_source')
     safety_snapshot = (read_v70_safety_snapshot(safety_source, request['evaluation_at'])
                        if safety_source is not None else None)
+    from owner_financial_confirmation import read as read_owner_financial_confirmation
+    owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
     ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
         'resource_initialized':False,'financial_cycle_initialized':False}
@@ -390,6 +392,8 @@ def build_report(request, config, repo_root):
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
         history_sources=config.get('public_history_sources',{}).get(symbol)
+        if owner_facts is not None:
+            row['owner_buy_confirmation']=deepcopy(owner_facts['buy_order_confirmation'])
         if history_sources is not None:
             from historical_source_qualification import bind
             row['history_source_qualification']=bind(history_sources,request,symbol)
@@ -511,6 +515,8 @@ def build_report(request, config, repo_root):
             config['position_valuation_inputs'])
     if safety_snapshot is not None:
         report['v70_safety_snapshot'] = safety_snapshot
+    if owner_facts is not None:
+        report['accepted_owner_financial_facts']=deepcopy(owner_facts)
     report['report_digest'] = digest(report)
     return report
 

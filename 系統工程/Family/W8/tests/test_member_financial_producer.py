@@ -53,6 +53,19 @@ def test_same_run_macro_and_raw_settings_are_passed_to_original_producer(tmp_pat
     assert seen[0]['flow']=='DEPLOYMENT' and seen[0]['focus_symbol']=='SYNTHETIC_ASSET'
 
 
+def test_member_issuer_sources_reach_original_financial_producer_without_mutating_seed(tmp_path):
+    r,d,desc=case(tmp_path);before=deepcopy(d);seen=[]
+    sources={'SYNTHETIC_ASSET':{'local_path':str(tmp_path/'SYNTHETIC_ISSUER.json'),'sha256':'f'*64}}
+    def factory(**cfg):
+        seen.append(cfg)
+        def run(*args):
+            return {'request':deepcopy(cfg['request_seed']),'source_production':{
+                'status':'SOURCE_STAGE_INCOMPLETE','source_validation_issues':[{'code':'SYNTHETIC_OTHER_SOURCE_REQUIRED'}]}}
+        return run
+    produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=factory,issuer_facts_sources=sources)
+    assert seen[0]['issuer_facts_sources']==sources and d==before
+
+
 @pytest.mark.parametrize('field',['member','db','version','asset','pasted','bootstrap','profile'])
 def test_cross_member_changed_approval_and_pasted_outputs_are_rejected(tmp_path,field):
     r,d,desc=case(tmp_path)

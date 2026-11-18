@@ -1,6 +1,6 @@
 {
   "schema": "V70.2/24-macro-research-v1",
-  "generated_at": "2026-11-18T13:04:57.230572+08:00",
+  "generated_at": "2026-11-18T16:26:42.980609+08:00",
   "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
   "summary": {
     "OK": 13,
@@ -140,9 +140,9 @@
     "m09": {
       "id": "m09",
       "label": "DXY",
-      "value": 103.489998,
+      "value": 103.778999,
       "unit": "",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
       "status": "OK",
@@ -152,9 +152,9 @@
     "m10": {
       "id": "m10",
       "label": "WTI",
-      "value": 86.010002,
+      "value": 84.290001,
       "unit": "USD/bbl",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://finance.yahoo.com/quote/CL=F/",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
       "status": "OK",
@@ -284,9 +284,9 @@
     "s04": {
       "id": "s04",
       "label": "CNN Fear & Greed",
-      "value": 25.229746,
+      "value": 24.744031,
       "unit": "",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "method": "CNN 非官方可讀 JSON（可能變動）",
       "status": "OK",

@@ -13,6 +13,21 @@ import re
 from family_input import digest
 
 
+def remaining_root_gaps(gaps,normalized):
+    accepted=((normalized or {}).get('financial_facts') or {}).get('accepted_owner_financial_facts')
+    result=deepcopy(gaps)
+    if accepted is None:return result
+    for item in result:
+        if item.get('code')=='SAME_CUTOFF_SETTLEMENT_RESERVES_ORDERS_AND_FUNDING_DOMAIN_REQUIRED':
+            original=deepcopy(item)
+            item.update(code='ACCOUNT_BINDING_SELL_FILL_OTHER_COMMITMENT_AND_POLICY_COVERAGE_REQUIRED',
+                original_source_issue=original,owner_cash_and_settlement_accepted=True,
+                current_buy_absence_accepted=True,accepted_source_digest=accepted['digest'],
+                remaining_source_fields=['exact_account_and_funding_domain_binding','same_run_reporting_FX_if_needed',
+                    'sell_orders_fills_and_other_commitments','protection_and_cap_applicability'])
+    return result
+
+
 def document_analysis_configuration(request,symbol,descriptor):
     """Build an analysis-only seed from explicit pinned document/account inputs.
 
@@ -122,7 +137,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         if cfg is not None and normalized.get('original_target_sources',{}).get('official_target_base_source') is not None:
             cfg['official_target_base_source']=deepcopy(normalized['original_target_sources']['official_target_base_source'])
     if cfg is None:
-        gaps=deepcopy(data.get('missing_source_facts') or [])
+        gaps=remaining_root_gaps(data.get('missing_source_facts') or [],normalized)
         if not gaps:raise PermissionError('MEMBER_PRODUCER_EXACT_ROOT_GAPS_REQUIRED')
         return {**attempt,'status':'ROOT_SOURCE_FACTS_UNAVAILABLE','known_source_inputs':deepcopy(data.get('known_source_inputs',{})),
             'family_scope_assembly':root_inventory(),

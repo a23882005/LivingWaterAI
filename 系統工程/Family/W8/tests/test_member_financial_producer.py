@@ -10,6 +10,17 @@ from member_financial_producer import produce
 from family_input import digest
 
 
+def test_accepted_owner_cash_removes_only_the_resolved_part_of_legacy_compound_gap():
+    from member_financial_producer import remaining_root_gaps
+    gaps=[{'code':'SAME_CUTOFF_SETTLEMENT_RESERVES_ORDERS_AND_FUNDING_DOMAIN_REQUIRED','field_path':'account_funding'},
+        {'code':'UNRELATED_ORIGINAL_SOURCE_REQUIRED','field_path':'other'}]
+    accepted={'financial_facts':{'accepted_owner_financial_facts':{'digest':'a'*64}}}
+    out=remaining_root_gaps(gaps,accepted)
+    assert out[0]['owner_cash_and_settlement_accepted'] and out[0]['current_buy_absence_accepted']
+    assert out[0]['original_source_issue']==gaps[0] and out[1]==gaps[1]
+    assert remaining_root_gaps(gaps,None)==gaps
+
+
 def case(tmp_path):
     owner={'client_id':'SYNTHETIC_CLIENT','broker':'SYNTHETIC_BROKER','account':'SYNTHETIC_ACCOUNT','currency':'USD','funding_domain':'SYNTHETIC_DOMAIN'}
     req={'client_id':owner['client_id'],'run_id':'SYNTHETIC_RUN','evaluation_at':'2026-10-30T00:00:00Z','question':'SYNTHETIC_TEST',

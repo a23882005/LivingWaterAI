@@ -506,42 +506,58 @@ def row(key, value=None, date=None, src=None, method=None, error=None, status=No
             'method':method or '', 'status':status,'detail':detail or '', 'error':error or ''}
 
 def treasury_breakeven(f, key):
-    """5Y market breakeven from matching Treasury nominal and real yield dates."""
+    """Same-date Treasury 5Y nominal-real, preserving the original calendar-month delta."""
     from io import StringIO
+    import hashlib
     today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
-    for year in (today.year, today.year-1):
-        def load(kind):
-            url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
-                 +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
-            resp=f.s.get(url,timeout=(5,f.timeout));resp.raise_for_status()
-            df=pd.read_csv(StringIO(resp.text))
-            df.columns=[str(x).strip().lower() for x in df.columns]
-            if 'date' not in df.columns: raise ValueError('Treasury missing Date')
-            col=next((x for x in ('5-year','5 year','5 yr') if x in df.columns),None)
-            if col is None: raise ValueError('Treasury missing 5Y yield')
-            df['date']=pd.to_datetime(df['date'],errors='coerce')
-            df['yield']=pd.to_numeric(df[col],errors='coerce')
-            return df[['date','yield']].dropna().drop_duplicates('date'),url
-        try:
-            nominal,u1=load('daily_treasury_yield_curve')
-            real,u2=load('daily_treasury_real_yield_curve')
-            both=nominal.merge(real,on='date',suffixes=('_nominal','_real')).sort_values('date')
-            if both.empty: raise ValueError('Treasury nominal/real dates do not overlap')
-            both['be']=both['yield_nominal']-both['yield_real']
-            end=both.iloc[-1];asof=end['date']
-            if key=='m13': val=float(end['be']);detail='5Y nominal minus 5Y TIPS real yield on same day'
-            else:
-                target=asof-pd.DateOffset(months=1)
-                prior=both.loc[both['date']<=target]
-                if prior.empty or (target-prior.iloc[-1]['date']).days>7:
-                    raise ValueError('One-month breakeven reference unavailable or too old')
-                val=float(end['be']-prior.iloc[-1]['be'])
-                detail='5Y breakeven change from '+prior.iloc[-1]['date'].date().isoformat()
-            return row(key,val,asof.date().isoformat(),u1+' | '+u2,
-                       'Treasury derived five-year breakeven; not direct FRED T5YIE',detail=detail)
-        except (ValueError,KeyError,requests.RequestException):
-            if year==today.year-1: raise
-    raise ValueError('Treasury breakeven unavailable')
+    cache=getattr(f,'official_treasury_cache',{})
+    f.official_treasury_cache=cache
+    def load(year,kind):
+        ident=(year,kind)
+        if ident in cache:return cache[ident]
+        url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
+             +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
+        resp=f.s.get(url,timeout=(5,f.timeout));resp.raise_for_status()
+        actual=__import__('urllib.parse',fromlist=['urlparse']).urlparse(getattr(resp,'url',None) or url)
+        if actual.hostname!='home.treasury.gov' or not actual.path.endswith('/all'):
+            raise ValueError('Treasury source redirect mismatch')
+        df=pd.read_csv(StringIO(resp.text));df.columns=[str(x).strip().lower() for x in df.columns]
+        if 'date' not in df.columns:raise ValueError('Treasury missing Date')
+        col=next((x for x in ('5-year','5 year','5 yr') if x in df.columns),None)
+        if col is None:raise ValueError('Treasury missing 5Y yield')
+        df['date']=pd.to_datetime(df['date'],errors='coerce');df['yield']=pd.to_numeric(df[col],errors='coerce')
+        df=df[['date','yield']].dropna();df=df[df['date'].dt.date<=today]
+        if df['date'].duplicated().any() or not df['yield'].map(math.isfinite).all():raise ValueError('Treasury duplicate dates or nonfinite yield')
+        result=(df,{'url':url,'response_sha256':hashlib.sha256(resp.content).hexdigest(),
+                    'retrieved_at':dt.datetime.now(dt.timezone.utc).isoformat(),'response_bytes':len(resp.content)})
+        cache[ident]=result;return result
+    nominal,r1=load(today.year,'daily_treasury_yield_curve')
+    real,r2=load(today.year,'daily_treasury_real_yield_curve');receipts=[r1,r2]
+    both=nominal.merge(real,on='date',suffixes=('_nominal','_real')).sort_values('date')
+    if both.empty:raise ValueError('Treasury nominal/real dates do not overlap')
+    end=both.iloc[-1];asof=end['date'];target=asof-pd.DateOffset(months=1)
+    if key=='m17' and target.year<today.year:
+        n,rn=load(target.year,'daily_treasury_yield_curve');r,rr=load(target.year,'daily_treasury_real_yield_curve')
+        both=pd.concat([n.merge(r,on='date',suffixes=('_nominal','_real')),both]).sort_values('date');receipts+=[rn,rr]
+    both['be']=both['yield_nominal']-both['yield_real'];end=both.iloc[-1]
+    legs={'end':{'date':asof.date().isoformat(),'nominal_5y':float(end['yield_nominal']),
+                 'real_5y':float(end['yield_real']),'breakeven':float(end['be'])}}
+    if key=='m13':val=float(end['be']);detail='5Y nominal minus 5Y TIPS real yield on same day'
+    else:
+        prior=both.loc[both['date']<=target]
+        if prior.empty or (target-prior.iloc[-1]['date']).days>7:raise ValueError('One-month breakeven reference unavailable or too old')
+        base=prior.iloc[-1];val=float(end['be']-base['be']);detail='5Y breakeven change from '+base['date'].date().isoformat()
+        legs['begin']={'date':base['date'].date().isoformat(),'nominal_5y':float(base['yield_nominal']),
+                       'real_5y':float(base['yield_real']),'breakeven':float(base['be'])}
+    r=row(key,val,asof.date().isoformat(),' | '.join(x['url'] for x in receipts),
+          'Treasury derived five-year breakeven; not direct FRED T5YIE',detail=detail)
+    r['source_evidence']={'provider':'US_TREASURY_DIRECT','sources':receipts,'legs':legs,'same_date_intersection':True}
+    if not hasattr(f,'fredattempts'):f.fredattempts={}
+    if not hasattr(f,'job_series'):f.job_series=set()
+    ident='TREASURY_'+key;f.job_series.add(ident)
+    f.fredattempts[ident]=[{'provider':'US_TREASURY_DIRECT','result':'OK',
+        'verified_at':min(x['retrieved_at'] for x in receipts),'observation_date':asof.date().isoformat()}]
+    return r
 
 def treasury_latest(f, key):
     """Treasury official daily CSV fallback for nominal 10Y-2Y and real 10Y."""
@@ -603,11 +619,15 @@ def core_cpi(f):
                'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def breakeven_5y(f):
+    try: return treasury_breakeven(f,'m13')
+    except Exception as exc: print('TREASURY_PRIMARY_FAILED','m13',str(exc)[:180],flush=True)
     try: return latest(f,'m13','T5YIE')
     except Exception as exc: print('FREE_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
-    return treasury_breakeven(f,'m13')
+    raise RuntimeError('Treasury primary and original FRED breakeven sources unavailable')
 
 def month_delta(f):
+    try: return treasury_breakeven(f,'m17')
+    except Exception as exc: print('TREASURY_PRIMARY_FAILED','m17',str(exc)[:180],flush=True)
     try:
         s=f.fred('T5YIE'); latest_date=s.index[-1]
         target=latest_date-pd.DateOffset(months=1)
@@ -620,7 +640,7 @@ def month_delta(f):
                    '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
     except Exception as exc:
         print('FREE_BREAKEVEN_MONTH_FALLBACK',str(exc)[:180],flush=True)
-    return treasury_breakeven(f,'m17')
+    raise RuntimeError('Treasury primary and original FRED month baseline unavailable')
 
 def ism_official(f, key):
     """Official ISM monthly headline PMI only; reject wrong month and subindex."""
@@ -817,6 +837,27 @@ def nfp(f):
                'BLS/FRED 非農就業存量，近3個月月增平均，單位千人',detail='注意歷史值可能修訂')
 
 def netliq(f):
+    try:
+        from scripts import macro_official_direct
+        value,observed,evidence=macro_official_direct.netliq(f)
+        r=row('m14',value,observed,' | '.join(x['url'] for x in evidence['sources']),
+              'Official Fed H41 Wednesday levels + NYFed Treasury ON RRP; original 91-day and holiday rules',
+              detail='Official publishers direct; USD bn; begin='+evidence['begin']+', end='+evidence['end'])
+        r['source_evidence']={'official_direct':evidence}
+        if not hasattr(f,'fredattempts'):f.fredattempts={}
+        if not hasattr(f,'job_series'):f.job_series=set()
+        ident='NETLIQ_DIRECT';f.job_series.add(ident)
+        f.fredattempts[ident]=[{'provider':'FED_NYFED_DIRECT','result':'OK','observation_date':observed,
+             'verified_at':min(x['retrieved_at'] for x in evidence['sources'])}]
+        return r
+    except Exception as exc:
+        print('NETLIQ_DIRECT_FAILED',type(exc).__name__,str(exc)[:230],flush=True)
+        r=netliq_legacy(f)
+        r['official_source_failure']=str(exc)[:400]
+        return r
+
+
+def netliq_legacy(f):
     # Units: WALCL, WDTGAL millions USD; RRPONTSYD billions USD.
     diagnostics={'schema':'V70.3/netliq-date-intersection-v1',
                  'policy':'SAME_WEDNESDAY_EXACT_91_DAYS_HOLIDAY_OUTSTANDING',
@@ -1538,3 +1579,4 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
+

@@ -16,6 +16,7 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class Response:
     def __init__(self,text,status=200):self.text=text;self.content=text.encode();self.status_code=status;self.headers={}
+    def json(self):return json.loads(self.text)
     def raise_for_status(self):
         if self.status_code>=400:raise requests.HTTPError('fixture HTTP '+str(self.status_code))
 
@@ -57,6 +58,26 @@ class FreePriority(TestCase):
         f,s=self.fetcher(lambda u:Response('<table>fixture</table>'))
         with patch.object(m.pd,'read_html',return_value=[frame]):value=f.fred('UNRATE')
         self.assertEqual(float(value.iloc[-1]),4.1);self.assertIn('empsit.t01.htm',s.calls[0]);self.assertEqual(len(s.calls),1)
+    def test_sahm_bypasses_short_current_u3_cache_for_original_history(self):
+        months=pd.date_range('2025-08-01',periods=15,freq='MS')
+        body=json.dumps({'observations':[{'date':str(day.date()),'value':str(4+i*.01)} for i,day in enumerate(months)]})
+        f,s=self.fetcher(lambda u:Response(body))
+        f.fredcache['UNRATE']=pd.Series([4.14],index=pd.to_datetime(['2026-10-01']))
+        f.fredsources['UNRATE']=('BLS_EMPLOYMENT_TABLE','https://www.bls.gov/news.release/empsit.t01.htm')
+        result=m.sahm_from_unrate(f)
+        self.assertAlmostEqual(result['value'],.12)
+        self.assertEqual(result['observation_date'],'2026-10-01')
+        self.assertIn('api.stlouisfed.org',s.calls[0])
+        self.assertTrue(all('empsit.t01.htm' not in u for u in s.calls))
+        self.assertEqual(len(f.fredcache['UNRATE']),15)
+    def test_unrate_history_without_key_keeps_original_bls_first(self):
+        f,s=self.fetcher(lambda u:Response(''))
+        months=pd.date_range('2025-08-01',periods=15,freq='MS')
+        body={'status':'REQUEST_SUCCEEDED','Results':{'series':[{'seriesID':'LNS14000000','data':[{'year':str(d.year),'period':'M'+str(d.month).zfill(2),'value':'4.1'} for d in months]}]}}
+        with patch.dict(os.environ,{'FRED_API_KEY':''}),patch.object(s,'post',return_value=Response(json.dumps(body))) as history:
+            result=f.fred('UNRATE',require_history=True)
+        self.assertEqual(len(result),15);self.assertEqual(s.calls,[])
+        self.assertIn('/v2/timeseries/data/',history.call_args.args[0])
     def test_breakeven_uses_original_fred_result_first(self):
         with patch.object(m,'latest',return_value={'value':2.26}) as primary,patch.object(m,'treasury_breakeven') as backup:
             self.assertEqual(m.breakeven_5y(object())['value'],2.26);primary.assert_called_once();backup.assert_not_called()

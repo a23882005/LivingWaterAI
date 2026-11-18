@@ -18,7 +18,10 @@ FIELDS = {'schema','event_id','symbol','source','observed_at','bar_start_utc',
           'rule_sha256','snapshot_id','valid_until','monitor_status',
           'notice_kind','run_id','run_url','generated_at','quote_time',
           'delay_seconds','market_price','market_change_percent','formal_v82_executed',
-          'rd_observation','daily_session','activation_basis'}
+          'rd_observation','daily_session','activation_basis',
+          'daily_close','daily_previous_close','daily_low',
+          'daily_change_percent','daily_confirmed_swing_low',
+          'daily_confirmed_swing_session','rd_break_true_codes','rd_accel_true_codes'}
 
 
 def canonical(report):

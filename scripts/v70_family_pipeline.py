@@ -50,7 +50,39 @@ def verify_formal_basis(baseline,archive,feed=None):
     if row['feed_sha256']!=baseline['feed_sha256'] or row['score_status']!='FORMAL_VALID' or abs(float(row['health_score'])-baseline['health_score'])>1e-6:raise ValueError('FORMAL_DAILY_RECORD_MISMATCH')
     return {'status':'PUBLISHED_FEED_HASH_22_GATE_AND_DAILY_RECORD_PASS','feed_sha256':sha(raw),'daily_record_id':row['daily_record_id'],'source_commit':baseline['source_commit']}
 
-def validate_candidate(candidate,baseline,intake):
+def apply_formal_authorization(candidate,baseline):
+    """Reuse PM's standing scope, never claim a fresh human review of each run."""
+    prior=baseline.get('extension_approval',{})
+    original=copy.deepcopy(prior.get('original_round1_approval',prior))
+    if prior.get('status')!='APPROVED' or original.get('status')!='APPROVED':raise ValueError('PM_APPROVED_EXTENSION_REQUIRED')
+    if not original.get('approved_at') or not original.get('record_url'):raise ValueError('PM_APPROVAL_PROVENANCE_REQUIRED')
+    allowed=set(prior.get('approved_numeric_signal_keys',[k for k,s in baseline['signals'].items() if s.get('value') is not None and s.get('data_quality') in ('OK','FALLBACK_USED')]))
+    if not allowed or not allowed<=set(baseline['signals']):raise ValueError('APPROVED_SCOPE_INVALID')
+    # A formerly UNKNOWN series becoming available is a new source adoption,
+    # not permission to silently widen the accepted numeric set.
+    for key in set(candidate['signals'])-allowed:
+        if candidate['signals'][key].get('value') is not None:
+            candidate['signals'][key]=copy.deepcopy(baseline['signals'][key])
+            candidate['signals'][key].update(value=None,data_quality='UNKNOWN',issue_codes=['MISSING','SOURCE_ADOPTION_PENDING_PM'],issue_detail='SOURCE_ADOPTION_PENDING_PM: qualified intake observation is outside the approved numeric signal scope; retained UNKNOWN pending PM adoption.')
+            for change in candidate['round1_extension']['changes']:
+                if change['signal']==key:change.clear();change.update(signal=key,disposition='仍缺',reason=candidate['signals'][key]['issue_detail'])
+    candidate['extension_approval']={
+        'status':'APPROVED','approved_by':original.get('approved_by'),'approved_at':original['approved_at'],
+        'scope':'Standing maintenance of PM-approved numeric signals, original V70 judgments and documented UNKNOWN fields; no new source adoption or judgment rule.',
+        'record_url':original['record_url'],'approval_type':'STANDING_MAINTENANCE_AUTHORIZATION',
+        'approved_numeric_signal_keys':sorted(allowed),'unknown_signal_keys':sorted(set(candidate['signals'])-allowed),
+        'original_round1_approval':original,'human_review_of_current_snapshot':False,
+        'activation_acceptance':prior.get('activation_acceptance','PENDING_PM_ACTIVATION_ACCEPTANCE')}
+    root=copy.deepcopy(baseline.get('approval',{}))
+    if root.get('status')!='APPROVED':raise ValueError('PM_APPROVED_ORIGINAL_SCOPE_REQUIRED')
+    origin=copy.deepcopy(root.get('original_snapshot_approval',root))
+    root.update(scope='PM-authorized maintenance of the existing formal V70 output and the explicitly approved signal scope; current values are mechanically verified, not newly human-approved.',approval_type='STANDING_MAINTENANCE_AUTHORIZATION',human_review_of_current_snapshot=False,original_snapshot_approval=origin)
+    candidate['approval']=root
+    candidate['publication_identity']=sha(canonical({k:candidate[k] for k in ('feed_sha256','data_cutoff','signals','extension_approval')}))
+    return candidate
+
+def validate_candidate(candidate,baseline,intake,*,formal=False):
+    json.dumps(candidate,allow_nan=False)
     if candidate['v70_indicators']!=baseline['v70_indicators'] or candidate['v70_judgments']!=baseline['v70_judgments']:raise ValueError('ACCEPTED_ORIGINALS_CHANGED')
     for k in baseline['signals']:
         if k not in EXPECTED and candidate['signals'][k]!=baseline['signals'][k]:raise ValueError('APPROVED_SIGNAL_CHANGED')
@@ -64,7 +96,10 @@ def validate_candidate(candidate,baseline,intake):
         if row.get('publication_time_precision')=='DATE_ONLY':published=stamp(row['publication_eligibility_bound'])
         else:published=stamp(row['published_at'])
         if published>stamp(candidate['data_cutoff']):raise ValueError('VALUE_RELEASE_AFTER_CUTOFF')
-    if candidate['extension_approval']['status']!='PENDING_HIGHEST_PM_ACCEPTANCE':raise ValueError('DO_NOT_FORGE_PM_APPROVAL')
+    if formal:
+        expected=apply_formal_authorization(copy.deepcopy(candidate),baseline)
+        if any(candidate[k]!=expected[k] for k in ('approval','extension_approval','signals','publication_identity')):raise ValueError('FORMAL_APPROVAL_SCOPE_MISMATCH')
+    elif candidate['extension_approval']['status']!='PENDING_HIGHEST_PM_ACCEPTANCE':raise ValueError('DO_NOT_FORGE_PM_APPROVAL')
     return True
 
 def wait_intake(drive,parent,baseline,cutoff,wait_seconds,live=False):
@@ -180,11 +215,14 @@ def main():
     intake=wait_intake(drive,parent,baseline,cutoff,args.wait_seconds,live=bool(args.live_site))
     if args.live_site:
         intake=copy.deepcopy(intake);intake['intake_cutoff_before_formal_context']=intake['cutoff'];intake['cutoff']=cutoff;intake['baseline_sha256']=sha(canonical(context))
-    candidate=merge_candidate(context,intake);validate_candidate(candidate,context,intake)
+    candidate=merge_candidate(context,intake)
+    if args.formal:
+        if os.environ.get('V70_FAMILY_FORMAL_ENABLED')!='true':raise RuntimeError('PM_FORMAL_ENABLEMENT_REQUIRED')
+        apply_formal_authorization(candidate,baseline)
+    validate_candidate(candidate,context,intake,formal=args.formal)
     probe=isolation_roundtrip(drive,parent,candidate)
     target=BASELINE_NAME if args.formal else CANDIDATE_NAME
-    if args.formal and os.environ.get('V70_FAMILY_FORMAL_ENABLED')!='true':raise RuntimeError('PM_FORMAL_ENABLEMENT_REQUIRED')
-    result=checked_update(drive,target,parent,candidate,allow_formal=args.formal,verify=lambda raw:validate_candidate(json.loads(raw),context,intake))
+    result=checked_update(drive,target,parent,candidate,allow_formal=args.formal,verify=lambda raw:validate_candidate(json.loads(raw),context,intake,formal=args.formal))
     if not args.formal and drive.read(meta['id'])!=before:raise RuntimeError('FORMAL_BASELINE_CHANGED_DURING_CANDIDATE_PUBLISH')
     receipt={'schema':'V70.3/family-json-actions-receipt-v1','cutoff':cutoff,'phase':'11h_candidate_publish' if not args.formal else '11h_formal_publish','workflow_run_id':os.environ.get('GITHUB_RUN_ID'),'workflow_commit':os.environ.get('GITHUB_SHA'),'basis':basis,'intake_workflow_run_id':intake['workflow_run_id'],'isolation':probe,'write':result,'formal_baseline_file_id':meta['id'],'formal_baseline_sha256':sha(before),'formal_baseline_written':args.formal,'changes':candidate['round1_extension']['changes'],'private_source_evidence_archive':intake['private_evidence_archive']}
     checked_update(drive,'V70_Family_JSON_Round1_Actions_Receipt_20261117.json',parent,receipt)

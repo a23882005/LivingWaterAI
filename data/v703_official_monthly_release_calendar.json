@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/monthly-official-release-calendar-v1",
-  "checked_at_utc": "2026-11-17T11:29:05.414207+00:00",
+  "checked_at_utc": "2026-11-18T02:09:30.512003+00:00",
   "explanation": "Official next data publication, not observation month age. Never use a past date to certify freshness. Fail closed when record's observation month mismatches.",
   "items": {
     "m04": {
@@ -28,15 +28,15 @@
           "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
           "final_url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
           "http_status": 200,
-          "fetched_at_utc": "2026-11-17T11:29:05.414207+00:00",
-          "response_sha256": "10a5bec65b319709628d064eb37d69775e0be2e0f5435ddfbfb710b174500118",
+          "fetched_at_utc": "2026-11-18T02:09:30.512003+00:00",
+          "response_sha256": "59a75f2ad6fae0124b11598bdcb0327163b6420d8663d17fdbcbd0b643029571",
           "response_bytes": 265288,
-          "archive_path": "data/audit/monthly_calendar_facts_1554f1aaee4069e21aee167b518a7a6641d744d135cfa3a7b83ba12ec63bf365.json",
+          "archive_path": "data/audit/monthly_calendar_facts_28f33c5d31b29f8cfcc4c0b8799918e332e67887c105e8e523c7285ad4b436d7.json",
           "archive_kind": "EXTRACTED_CALENDAR_FACTS_JSON",
-          "archive_sha256": "1554f1aaee4069e21aee167b518a7a6641d744d135cfa3a7b83ba12ec63bf365"
+          "archive_sha256": "28f33c5d31b29f8cfcc4c0b8799918e332e67887c105e8e523c7285ad4b436d7"
         }
       ],
-      "last_verified_at_utc": "2026-11-17T11:29:05.414207+00:00"
+      "last_verified_at_utc": "2026-11-18T02:09:30.512003+00:00"
     },
     "m18": {
       "observation_month": "2026-10",
@@ -173,10 +173,10 @@
     }
   },
   "source_archives": {
-    "1554f1aaee4069e21aee167b518a7a6641d744d135cfa3a7b83ba12ec63bf365": {
+    "28f33c5d31b29f8cfcc4c0b8799918e332e67887c105e8e523c7285ad4b436d7": {
       "kind": "EXTRACTED_CALENDAR_FACTS_JSON",
       "bytes": 603,
-      "base64": "ewogICJzY2hlbWEiOiAiVjcwM19JU01fQ0FMRU5EQVJfRkFDVFNfMSIsCiAgInVybCI6ICJodHRwczovL3d3dy5wcm5ld3N3aXJlLmNvbS9uZXdzLXJlbGVhc2VzL3NlcnZpY2VzLXBtaS1hdC01NC01LW9jdG9iZXItMjAyNi1pc20tc2VydmljZXMtcG1pLXJlcG9ydC0zMDI5MjgxMTIuaHRtbCIsCiAgInB1Ymxpc2hlciI6ICJJbnN0aXR1dGUgZm9yIFN1cHBseSBNYW5hZ2VtZW50IiwKICAib2JzZXJ2YXRpb25fbW9udGgiOiAiMjAyNi0xMCIsCiAgInB1YmxpY2F0aW9uX2F0X3V0YyI6ICIyMDI2LTExLTA0VDE1OjAwOjAwWiIsCiAgIm5leHRfcmVsZWFzZV9hdF91dGMiOiAiMjAyNi0xMi0wM1QxNTowMDowMFoiLAogICJyZWxlYXNlX3RpbWVfYmFzaXMiOiAiSVNNX1BVQkxJU0hFUl9ESVNUUklCVVRFRF9SRUxFQVNFIiwKICAiZmV0Y2hlZF9hdF91dGMiOiAiMjAyNi0xMS0xN1QxMToyOTowNS40MTQyMDcrMDA6MDAiLAogICJvcmlnaW5hbF9yZXNwb25zZV9zaGEyNTYiOiAiMTBhNWJlYzY1YjMxOTcwOTYyOGQwNjRlYjM3ZDY5Nzc1ZTBiZTJlMGY1NDM1ZGRmYmZiNzEwYjE3NDUwMDExOCIsCiAgIm9yaWdpbmFsX3Jlc3BvbnNlX2J5dGVzIjogMjY1Mjg4Cn0K"
+      "base64": "ewogICJzY2hlbWEiOiAiVjcwM19JU01fQ0FMRU5EQVJfRkFDVFNfMSIsCiAgInVybCI6ICJodHRwczovL3d3dy5wcm5ld3N3aXJlLmNvbS9uZXdzLXJlbGVhc2VzL3NlcnZpY2VzLXBtaS1hdC01NC01LW9jdG9iZXItMjAyNi1pc20tc2VydmljZXMtcG1pLXJlcG9ydC0zMDI5MjgxMTIuaHRtbCIsCiAgInB1Ymxpc2hlciI6ICJJbnN0aXR1dGUgZm9yIFN1cHBseSBNYW5hZ2VtZW50IiwKICAib2JzZXJ2YXRpb25fbW9udGgiOiAiMjAyNi0xMCIsCiAgInB1YmxpY2F0aW9uX2F0X3V0YyI6ICIyMDI2LTExLTA0VDE1OjAwOjAwWiIsCiAgIm5leHRfcmVsZWFzZV9hdF91dGMiOiAiMjAyNi0xMi0wM1QxNTowMDowMFoiLAogICJyZWxlYXNlX3RpbWVfYmFzaXMiOiAiSVNNX1BVQkxJU0hFUl9ESVNUUklCVVRFRF9SRUxFQVNFIiwKICAiZmV0Y2hlZF9hdF91dGMiOiAiMjAyNi0xMS0xOFQwMjowOTozMC41MTIwMDMrMDA6MDAiLAogICJvcmlnaW5hbF9yZXNwb25zZV9zaGEyNTYiOiAiNTlhNzVmMmFkNmZhZTAxMjRiMTE1OThiZGNiMDMyNzE2M2I2NDIwZDg2NjNkMTdmZGJjYmQwYjY0MzAyOTU3MSIsCiAgIm9yaWdpbmFsX3Jlc3BvbnNlX2J5dGVzIjogMjY1Mjg4Cn0K"
     },
     "58df20c0296423c8c6ebf65a4bfbbb139bf5902698bb8eb8b1ce8dcc5bacfa1c": {
       "kind": "ORIGINAL_HTTP_GZIP",

@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import v70_family_sources as sources
 from v70_family_sources import stamp,canonical,sha
 from v70_family_drive import checked_update,isolation_roundtrip,Drive,BASELINE_NAME
-from v70_family_pipeline import validate_candidate,verify_formal_basis,project_publication_context
+from v70_family_pipeline import validate_candidate,verify_formal_basis,project_publication_context,apply_formal_authorization
 
 CUTOFF='2026-11-17T14:43:12+08:00'
 RECORD={'sha256':'a'*64,'retrieved_at':'2026-11-17T12:00:00Z'}
@@ -96,6 +96,36 @@ class SourceParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'INCOMPLETE'):self.parse_ops([self.operation()],hasMore=True)
 
 class CandidateTests(unittest.TestCase):
+    def approved(self):
+        base=baseline();base['approval']={'status':'APPROVED','role':'PM','approved_at':'2026-11-17T01:00:00Z','scope':'original snapshot'}
+        base['extension_approval']={'status':'APPROVED','approved_by':'PM','approved_at':'2026-11-18T01:00:00Z','scope':'accepted first-round numeric fields and UNKNOWNs','record_url':'https://example.invalid/pm-record','candidate_sha256':'accepted-original'}
+        base['signals']['sofr'].update(value=1,unit='%',as_of='2026-11-12',published_at='2026-11-13T13:00:00Z',source=URL,data_quality='OK')
+        return base
+
+    def test_formal_authorization_reuses_pm_scope_without_claiming_current_human_review(self):
+        base=self.approved();pack=intake(base);out=sources.merge_candidate(base,pack);apply_formal_authorization(out,base)
+        self.assertEqual(out['extension_approval']['status'],'APPROVED');self.assertEqual(out['extension_approval']['approved_at'],base['extension_approval']['approved_at']);self.assertFalse(out['extension_approval']['human_review_of_current_snapshot'])
+        self.assertEqual(out['extension_approval']['original_round1_approval'],base['extension_approval']);self.assertEqual(out['approval']['original_snapshot_approval'],base['approval']);validate_candidate(out,base,pack,formal=True)
+
+    def test_new_numeric_series_remains_unknown_until_pm_source_adoption(self):
+        base=self.approved();pack=intake(base);pack['supplements']['cpi']={'value':2,'unit':'%','as_of':'2026-10-01','published_at':'2026-11-10T13:30:00Z','source':URL};out=sources.merge_candidate(base,pack);apply_formal_authorization(out,base)
+        self.assertIsNone(out['signals']['cpi']['value']);self.assertEqual(out['signals']['cpi']['data_quality'],'UNKNOWN');self.assertIn('SOURCE_ADOPTION_PENDING_PM',out['signals']['cpi']['issue_codes']);validate_candidate(out,base,pack,formal=True)
+
+    def test_formal_approval_does_not_accept_unapproved_baseline_or_forged_metadata(self):
+        base=baseline();out=sources.merge_candidate(base,intake(base))
+        with self.assertRaisesRegex(ValueError,'PM_APPROVED_EXTENSION_REQUIRED'):apply_formal_authorization(out,base)
+        base=self.approved();pack=intake(base);out=sources.merge_candidate(base,pack);apply_formal_authorization(out,base);out['extension_approval']['approved_at']='2099-01-01T00:00:00Z'
+        with self.assertRaisesRegex(ValueError,'FORMAL_APPROVAL_SCOPE_MISMATCH'):validate_candidate(out,base,pack,formal=True)
+
+    def test_repeated_formal_refresh_keeps_original_approval_and_pm_activation_acceptance(self):
+        base=self.approved();out=sources.merge_candidate(base,intake(base));apply_formal_authorization(out,base);out['extension_approval']['activation_acceptance']='ACCEPTED_BY_PM'
+        second=sources.merge_candidate(out,intake(out));apply_formal_authorization(second,out)
+        self.assertEqual(second['extension_approval']['original_round1_approval'],base['extension_approval']);self.assertEqual(second['extension_approval']['activation_acceptance'],'ACCEPTED_BY_PM');self.assertEqual(second['approval']['original_snapshot_approval'],base['approval'])
+
+    def test_nonfinite_json_is_rejected_before_private_write(self):
+        base=baseline();pack=intake(base);out=sources.merge_candidate(base,pack);out['health_score']=float('nan')
+        with self.assertRaises(ValueError):validate_candidate(out,base,pack)
+
     def test_next_formal_context_preserves_numeric_policy_bounds_and_refreshes_derived_date(self):
         base=baseline();base['v70_indicators']={'m06_rate':{},'m21':{'as_of':'2026-09-01'}};base['v70_judgments']={'score':60};base['signals']={'fed_policy':{'v70_indicator_id':'m06_rate'},**{k:{} for k in sources.EXPECTED}}
         feed={'asOf':'2026-12-01T03:00:00Z','publication':{},'verification':{},'sourceSnapshot':{},'indicators':{'m06_rate':{'value':3.875,'dataDate':'2026-09-17','lowerBound':{'value':3.75},'upperBound':{'value':4},'publicationDate':'2026-09-16'}},'derived':{'m21':{'value':0}},'leiHistory':[{'observation_date':'2026-10-01','retrieved_at':'2026-12-01T01:00:00Z'}]}

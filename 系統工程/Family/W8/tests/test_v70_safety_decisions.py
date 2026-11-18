@@ -92,11 +92,14 @@ class SafetyDecisionTests(TestCase):
 
     def test_sofr_schedule_and_cpi_carry_keep_original_precision_and_policy(self):
         self.data['signals']['sofr']['publication_time_precision']='SCHEDULED_APPROXIMATE'
+        self.data['signals']['sofr']['retrieved_at']='2026-10-29T22:59:00Z'
         self.data['signals']['sofr']['source_sha256']='d'*64
         self.data['signals']['core_cpi']['carry_forward']={'policy':'SYNTHETIC_CARRY','observationDate':'2026-09-01'}
         out=V.produce(self.read(),self.at)
         self.assertEqual(out['observed']['sofr']['availability_precision'],'SCHEDULED_APPROXIMATE')
         self.assertFalse(out['observed']['sofr']['exact_publication_time_verified'])
+        self.assertEqual(out['observed']['sofr']['available_at_bound'],'2026-10-29T22:59:00Z')
+        self.assertIn('KNOWN_BY_CAPTURE',out['observed']['sofr']['availability_basis'])
         self.assertEqual(out['observed']['sofr']['source_sha256'],'d'*64)
         self.assertEqual(out['observed']['sofr']['snapshot_sha256'],out['source_sha256'])
         self.assertEqual(out['observed']['core_cpi']['carry_forward_policy']['policy'],'SYNTHETIC_CARRY')

@@ -83,6 +83,13 @@ def _observation(snapshot,name,evaluation_at):
     precision=row.get('publication_time_precision') or (
         'DATE_ONLY' if row.get('published_at') and len(row['published_at'])==10 else
         'PROVIDER_TIMESTAMP' if row.get('published_at') else 'UNKNOWN')
+    availability_basis='PROVIDER_AVAILABILITY_OR_PUBLICATION_BOUND'
+    if precision=='SCHEDULED_APPROXIMATE':
+        # A scheduled release is not a proven posting instant or upper bound.
+        # The captured original is known by retrieval, without certifying when
+        # it first became public. Keep published_at and its precision intact.
+        available=row.get('available_at') or row.get('retrieved_at')
+        availability_basis='KNOWN_BY_CAPTURE__NOT_EXACT_PUBLICATION_TIME'
     if available is None:issues.append('PUBLICATION_AVAILABILITY_UNKNOWN')
     elif _time(available)>_time(evaluation_at):issues.append('NOT_YET_AVAILABLE')
     contract=row.get('freshness_contract') or {}
@@ -100,6 +107,7 @@ def _observation(snapshot,name,evaluation_at):
     return {**row,'json_pointer':'/signals/'+name,'snapshot_sha256':snapshot['sha256'],
         'rule_reference':'V82 v1.22.2 CMR3.1 / §37.1 / §38.1 / §62',
         'snapshot_source_reference':snapshot['source_reference'],'available_at_bound':available,
+        'availability_basis':availability_basis,
         'availability_precision':precision,'exact_publication_time_verified':precision=='PROVIDER_TIMESTAMP',
         'freshness':fresh,'decision_input_eligible':eligible,'qualification_issue_codes':issues,
         'required_input_ids':[name+'.value',name+'.publication_availability',name+'.expected_release_coverage'],

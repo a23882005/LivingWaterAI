@@ -28,7 +28,7 @@
       "status": "OK"
     },
     "m05": {
-      "consecutive_failures": 16,
+      "consecutive_failures": 17,
       "last_alert_date": "2026-11-18",
       "status": "STALE"
     },

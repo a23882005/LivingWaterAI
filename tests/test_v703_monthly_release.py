@@ -347,5 +347,30 @@ class CurrentMonthlyCalendarRefreshTests(unittest.TestCase):
             self.assertEqual(new['target_refresh_results'][key]['status'],'VERIFIED')
 
 
+class SahmUnitMetadataTests(unittest.TestCase):
+    def test_sahm_empty_unit_preserves_zero_missing_values_and_provenance(self):
+        for value in (0.0, None):
+            for unit in ('', None):
+                with self.subTest(value=value, unit=unit):
+                    row = {'value': value, 'unit': unit, 'observation_date': '2026-10-01',
+                           'source_url': 'https://fred.stlouisfed.org/series/SAHMREALTIME',
+                           'method': 'published series', 'status': 'OK',
+                           'last_verified_at': '2026-11-06T15:47:00Z'}
+                    original = copy.deepcopy(row)
+                    actual = builder._normalize(row, 'm18')
+                    self.assertEqual(actual['unit'], 'pp')
+                    self.assertEqual(actual['value'], value)
+                    self.assertEqual(actual['dataDate'], row['observation_date'])
+                    self.assertEqual(actual['source'], row['source_url'])
+                    self.assertEqual(actual['lastVerifiedAt'], row['last_verified_at'])
+                    self.assertEqual(row, original)
+
+    def test_explicit_sahm_unit_and_other_indicators_are_not_rewritten(self):
+        row = {'value': 0, 'unit': 'Percentage Points'}
+        self.assertEqual(builder._normalize(row, 'm18')['unit'], 'Percentage Points')
+        for key in ('m19', 'm05', None):
+            self.assertEqual(builder._normalize({'value': 0, 'unit': ''}, key)['unit'], '')
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -919,7 +919,7 @@
           "data_scope": "COMPONENT_OR_DERIVED",
           "last_http": {
             "status": 200,
-            "checked_at": "2026-11-18T15:20:00+00:00",
+            "checked_at": "2026-11-18T15:23:15.036110+00:00",
             "evidence_sha256": "3a790961abae3bc20af182e9ec9fa4108c847bd99c0ee99aa45769ea165e253d",
             "kind": "REAL_RESPONSE_PARSED; final main run will have its own receipt"
           },

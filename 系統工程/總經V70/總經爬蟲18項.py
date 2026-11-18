@@ -726,6 +726,37 @@ def ism_official(f, key):
                 url,'Official ISM dated monthly roundup headline PMI')
         except Exception as exc:
             attempts.append('official roundup: '+str(exc)[:140])
+    if key=='m15':
+        # Only after the original official route fails, use the candidate
+        # already verified with the approved P01 sector/period/news parser.
+        from scripts.ism_services_backup import SERVICES_BACKUP_URL, parse_services_pmi
+        url=SERVICES_BACKUP_URL
+        series='ISM_'+key
+        f.job_series.add(series)
+        try:
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('ISM backup fetch deadline exceeded')
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            final=urlparse(getattr(response,'url',url))
+            if final.hostname not in ('tradingeconomics.com','www.tradingeconomics.com') or final.path.rstrip('/')!='/united-states/non-manufacturing-pmi':
+                raise ValueError('ISM backup redirected away from the registered source')
+            value,observed,published,evidence=parse_services_pmi(response.content,str(target),now)
+            stamp=dt.datetime.now(dt.timezone.utc).isoformat()
+            digest=hashlib.sha256(response.content).hexdigest()
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_TRADINGECONOMICS','result':'OK',
+                'verified_at':stamp,'observation_date':observed,'publication_date':published,
+                'response_sha256':digest,'source_url':url})
+            result=row(key,value,observed,url,'ISM services headline via original approved Trading Economics parser',
+                detail='Original official source unavailable; sector, current target month and dated release verified')
+            result['publication_date']=published
+            result['source_evidence']={'provider':'ISM_TRADINGECONOMICS','source_url':url,
+                'response_sha256':digest,'verified_at':stamp,**evidence}
+            return result
+        except Exception as exc:
+            attempts.append('Trading Economics services backup: '+str(exc)[:180])
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_TRADINGECONOMICS','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':str(exc)[:220]})
     raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
 
 def sahm_from_published(f):
@@ -1507,6 +1538,3 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
-
-
-

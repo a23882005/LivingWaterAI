@@ -87,21 +87,17 @@ def compose(report, json_body):
     summary = '測試通知' if is_test else (f'參考報價{usable}/{len(statuses)}' if usable else f'無可用行情0/{len(statuses)}')
     subject = f'[V82-WATCH] {label}｜{summary}｜{_tw(stamp)}｜非買進訊號'
     lines = [
-        '🌿 V82 行情監控通知（僅參考，非買進指令）',
-        f'產生時間：{_tw(stamp)}（台灣時間）',
-        f'監控標的：{len(statuses)}檔；寄出時有時間效期的參考價：{usable}檔。',
-        '各筆報價可能延遲或過期，閱讀當下仍須重新查核。',
-        '',
+        '🌿 V82 行情監控（非買進指令）',
+        f'台灣時間：{_tw(stamp)}｜寄出時有時效參考價 {usable}/{len(statuses)} 檔',
     ]
     for symbol, _, note in statuses[:8]:
         lines.append(f'• {symbol}：{note}')
     if len(statuses) > 8:
         lines.append(f'• 其餘{len(statuses)-8}檔：詳見下方原始JSON。')
     lines.extend([
-        '',
-        '正式V82：本通知未執行正式買進判斷；不提供交易授權。',
-        '監控執行ID：' + str(report.get('run_id') or '未提供'),
-        '執行紀錄：' + str(report.get('run_url') or '未提供'),
+        '閱讀時請重新查價；此信未執行正式V82判斷或交易授權。',
+        'GitHub執行：' + str(report.get('run_id') or '未提供'),
+        '紀錄：' + str(report.get('run_url') or '未提供'),
         '',
         JSON_MARKER,
         json_body,

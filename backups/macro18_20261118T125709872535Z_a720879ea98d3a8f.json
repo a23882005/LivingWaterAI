@@ -1,0 +1,956 @@
+{
+  "generated_at": "2026-11-18T20:57:09.102536+08:00",
+  "independent_indicators": {
+    "excluded_duplicate": "s03 (same VIX as m07)",
+    "summary": {
+      "MISSING": 0,
+      "OK": 16,
+      "STALE": 2,
+      "USABLE": 0
+    },
+    "total": 18
+  },
+  "items": {
+    "m01": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:14.084416+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "Matched observation date for nominal 10Y minus 2Y",
+      "error": "",
+      "id": "m01",
+      "label": "10Y−2Y 殖利率曲線",
+      "last_verified_at": null,
+      "method": "Treasury official daily_treasury_yield_curve daily CSV",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "status": "OK",
+      "unit": "%",
+      "value": 0.3
+    },
+    "m02": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:53.542089+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m02",
+      "label": "HY OAS",
+      "last_verified_at": "2026-11-18T12:56:53.565890+00:00",
+      "method": "FRED_CSV 官方或鏡像時間序列",
+      "observation_date": "2026-11-16",
+      "retrieval_error": "",
+      "source_attempts": {
+        "BAMLH0A0HYM2": [
+          {
+            "observation_date": "2026-11-16",
+            "provider": "FRED_CSV",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:53.565890+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "BAMLH0A0HYM2": [
+            {
+              "observation_date": "2026-11-16",
+              "provider": "FRED_CSV",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:53.565890+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+      "status": "OK",
+      "unit": "%",
+      "value": 3.34
+    },
+    "m04": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:53.566113+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m04",
+      "label": "ISM 製造業 PMI",
+      "last_verified_at": "2026-11-18T12:56:54.169932+00:00",
+      "method": "ISM original approved official PDF headline parser",
+      "observation_date": "2026-10-01",
+      "retrieval_error": "",
+      "source_attempts": {
+        "ISM_m04": [
+          {
+            "observation_date": "2026-10-01",
+            "provider": "ISM_OFFICIAL_PDF",
+            "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:54.169932+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "ISM_m04": [
+            {
+              "observation_date": "2026-10-01",
+              "provider": "ISM_OFFICIAL_PDF",
+              "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:54.169932+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://www.ismworld.org/globalassets/pub/research-and-surveys/rob/pmi/r4in202610pmi.pdf",
+      "status": "OK",
+      "unit": "",
+      "value": 55.5
+    },
+    "m05": {
+      "attempt_result": "FAILED",
+      "attempted_at": "2026-11-18T12:56:54.170255+00:00",
+      "cache_source": {
+        "file": "18_macro_verification.json",
+        "generated_at": "2026-11-18T16:31:06.449907+08:00",
+        "observation_date": "2026-09-01",
+        "sha256": "d4a96b106a3223ef1ae18f4d8aaae1072fdee1c18e565848ee97dad03ff1b11b"
+      },
+      "cache_used": true,
+      "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
+      "error": "All FRED sources failed for CPILFESL | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: Value",
+      "id": "m05",
+      "label": "Core CPI YoY",
+      "last_verified_at": "2026-11-10T01:59:39.681268+00:00",
+      "method": "人工查證輸入：既有快取再驗證",
+      "observation_date": "2026-09-01",
+      "retrieval_error": "All FRED sources failed for CPILFESL | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: Value",
+      "source_attempts": {
+        "CPILFESL": [
+          {
+            "attempted_at": "2026-11-18T12:56:54.464182+00:00",
+            "content_type": "application/json; charset=UTF-8",
+            "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "FRED_OFFICIAL_API",
+            "response_sha256": "5dbd75244f806d80592a1407bcb9eef5b284d733441c8b6b7e1669a33d2d0142",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:55.424069+00:00",
+            "content_type": "application/json; charset=UTF-8",
+            "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "FRED_OFFICIAL_API",
+            "response_sha256": "5dbd75244f806d80592a1407bcb9eef5b284d733441c8b6b7e1669a33d2d0142",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:55.697201+00:00",
+            "content_type": "application/json",
+            "error": "BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "BLS_HISTORY_V2",
+            "response_sha256": "726df79e28ccb74873200ae49c4789d101472189733385f171190ca52fffd674",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:55.847737+00:00",
+            "content_type": "application/json",
+            "error": "BLS_HISTORY_V1: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "BLS_HISTORY_V1",
+            "response_sha256": "b03b2ed98ec004ff91aea26c94d26bd8e3ccd025ee9c63bde0d5ee8f6486777c",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:56.054385+00:00",
+            "content_type": "application/json",
+            "error": "BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "BLS_OFFICIAL_API",
+            "response_sha256": "4e3370d8e4aad2bbefb598cc743d9a8e20e2f5e046b16b2a45ebbec30d8e51d8",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:56.090834+00:00",
+            "content_type": "application/csv",
+            "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "FRED_CSV",
+            "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c",
+            "result": "FAILED"
+          },
+          {
+            "attempted_at": "2026-11-18T12:56:57.076573+00:00",
+            "content_type": "application/csv",
+            "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
+            "http_status": 200,
+            "provider": "FRED_CSV",
+            "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c",
+            "result": "FAILED"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "CPILFESL": [
+            {
+              "observation_date": "2026-09-01",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-10T01:59:39.681268+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "status": "STALE",
+      "unit": "%",
+      "value": 2.565841
+    },
+    "m07": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:13.524640+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m07",
+      "label": "VIX",
+      "last_verified_at": "2026-11-18T12:56:14.084179+00:00",
+      "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {
+        "VIXCLS": [
+          {
+            "attempted_at": "2026-11-18T12:56:13.842209+00:00",
+            "content_type": "application/csv",
+            "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-17 observed=2026-11-16; try newer source",
+            "http_status": 200,
+            "provider": "FRED_CSV",
+            "response_sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+            "result": "FAILED"
+          },
+          {
+            "observation_date": "2026-11-17",
+            "provider": "CBOE_OFFICIAL_VIX",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:14.084179+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "VIXCLS": [
+            {
+              "attempted_at": "2026-11-18T12:56:13.842209+00:00",
+              "content_type": "application/csv",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-17 observed=2026-11-16; try newer source",
+              "http_status": 200,
+              "provider": "FRED_CSV",
+              "response_sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+              "result": "FAILED"
+            },
+            {
+              "observation_date": "2026-11-17",
+              "provider": "CBOE_OFFICIAL_VIX",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:14.084179+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "status": "OK",
+      "unit": "",
+      "value": 25.46
+    },
+    "m08": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:33.301324+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "10Y TIPS real yield",
+      "error": "",
+      "id": "m08",
+      "label": "10Y 實質殖利率",
+      "last_verified_at": null,
+      "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+      "status": "OK",
+      "unit": "%",
+      "value": 2.89
+    },
+    "m09": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:57.076690+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
+      "error": "",
+      "id": "m09",
+      "label": "DXY",
+      "last_verified_at": null,
+      "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
+      "observation_date": "2026-11-18",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
+      "status": "OK",
+      "unit": "",
+      "value": 103.899002
+    },
+    "m10": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:57.616011+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
+      "error": "",
+      "id": "m10",
+      "label": "WTI",
+      "last_verified_at": null,
+      "method": "yfinance Yahoo Finance CL=F 日K Close",
+      "observation_date": "2026-11-18",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://finance.yahoo.com/quote/CL=F/",
+      "status": "OK",
+      "unit": "USD/bbl",
+      "value": 84.309998
+    },
+    "m12": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:57.689365+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
+      "error": "",
+      "id": "m12",
+      "label": "MOVE",
+      "last_verified_at": null,
+      "method": "yfinance Yahoo Finance ^MOVE 日K Close",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
+      "status": "OK",
+      "unit": "",
+      "value": 101.879997
+    },
+    "m13": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:57.765145+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m13",
+      "label": "5Y Breakeven",
+      "last_verified_at": "2026-11-18T12:56:58.119118+00:00",
+      "method": "FRED_CSV 官方或鏡像時間序列",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {
+        "T5YIE": [
+          {
+            "observation_date": "2026-11-17",
+            "provider": "FRED_CSV",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:58.119118+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "T5YIE": [
+            {
+              "observation_date": "2026-11-17",
+              "provider": "FRED_CSV",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:58.119118+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+      "status": "OK",
+      "unit": "%",
+      "value": 2.26
+    },
+    "m14": {
+      "alignment_diagnostics": {
+        "holiday_attempt_errors": {},
+        "holiday_outstanding_dates": [
+          "2026-11-11"
+        ],
+        "latest_common_wednesday": "2026-11-11",
+        "latest_weekly_wednesday": "2026-11-11",
+        "missing_at_latest_weekly": [
+          "RRPONTSYD"
+        ],
+        "policy": "SAME_WEDNESDAY_EXACT_91_DAYS_HOLIDAY_OUTSTANDING",
+        "schema": "V70.3/netliq-date-intersection-v1",
+        "selected_begin": "2026-08-12",
+        "selected_end": "2026-11-11",
+        "source_latest_dates": {
+          "RRPONTSYD": "2026-11-17",
+          "WALCL": "2026-11-11",
+          "WDTGAL": "2026-11-11"
+        },
+        "source_units": {
+          "RRPONTSYD": "USD billion",
+          "WALCL": "USD million",
+          "WDTGAL": "USD million"
+        },
+        "status": "ALIGNED",
+        "values_at_required_dates": {
+          "2026-08-12": {
+            "RRPONTSYD": 0.725,
+            "WALCL": 6759955.0,
+            "WDTGAL": 959405.0
+          },
+          "2026-11-11": {
+            "RRPONTSYD": null,
+            "WALCL": 6758867.0,
+            "WDTGAL": 912134.0
+          }
+        }
+      },
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:58.119901+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "開始=2026-08-12, 結束=2026-11-11, 單位十億美元; Fed Δ=-1.088000, TGA Δ=-47.271000, RRP Δ=-0.573000; 淨流動性 Δ=46.756000; 最新週資料日=2026-11-11 缺有效觀測=RRPONTSYD；維持同日交集，未補值",
+      "error": "",
+      "id": "m14",
+      "label": "淨流動性 13週變化（$bn）",
+      "last_verified_at": "2026-11-18T12:56:58.237415+00:00",
+      "method": "FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元；HOLIDAY_OUTSTANDING_DERIVED（NYFed官方假日存續Treasury ON RRP本金，非FRED當日發布值）",
+      "observation_date": "2026-11-11",
+      "retrieval_error": "",
+      "source_attempts": {
+        "RRPONTSYD": [
+          {
+            "observation_date": "2026-11-17",
+            "provider": "FRED_OFFICIAL_API",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:57:00.627262+00:00"
+          }
+        ],
+        "WALCL": [
+          {
+            "observation_date": "2026-11-11",
+            "provider": "FRED_OFFICIAL_API",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:58.237415+00:00"
+          }
+        ],
+        "WDTGAL": [
+          {
+            "observation_date": "2026-11-11",
+            "provider": "FRED_OFFICIAL_API",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:59.332049+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "holiday_outstanding": {
+          "begin": "2026-08-12",
+          "end": "2026-11-11",
+          "endpoints": {
+            "2026-11-11": {
+              "completeness": "RANGE_EQUALS_DAILY_WITH_TWO_OPEN_DAY_ANCHOR",
+              "contracts": [
+                {
+                  "acceptedCpty": 3,
+                  "auctionStatus": "Results",
+                  "closeTime": "13:15",
+                  "details": [
+                    {
+                      "amtAccepted": 152000000,
+                      "amtSubmitted": 152000000,
+                      "percentAwardRate": 3.75,
+                      "percentOfferingRate": 3.75,
+                      "securityType": "Treasury"
+                    }
+                  ],
+                  "lastUpdated": "2026-11-10 13:15:23",
+                  "maturityDate": "2026-11-12",
+                  "note": "",
+                  "operationDate": "2026-11-10",
+                  "operationId": "RP 111026 26",
+                  "operationMethod": "Fixed Rate",
+                  "operationType": "Reverse Repo",
+                  "participatingCpty": 3,
+                  "releaseTime": "12:45",
+                  "settlementDate": "2026-11-10",
+                  "settlementType": "Same Day",
+                  "term": "Overnight",
+                  "termCalenderDays": 2,
+                  "totalAmtAccepted": 152000000,
+                  "totalAmtSubmitted": 152000000
+                }
+              ],
+              "evidence": {
+                "daily": {
+                  "2026-11-09": {
+                    "raw_gzip_b64": "H4sIAAAAAAACA+1UTW+cMBD9K5bPuxE2yybLjSaq1EOUKrs9VT24ZkKsGozM0HYV5b/XNmQDGzZJ8yH1UCQkeG88z2O/mRtCLdSGpuSGUFODFahM1bj/ryPkU+4gevmZMBat+JLwhM4IFa305BoFtk0IgKbV2Hhut/RMIHiOR3w5Z2werTzdAKKGEiqc5kuX0irc7rMsGiXfbGvohF0RQ+Ic8NqETX9stSaZ1ga92lj7bvlalEDOxNazCLY8FRqqHKyDfF2sh33oxU+wlSquQyYLGkQDG1WGNNFJysLBSG1GaBx2XZmuFv+tRYNf6txVl4+LJyE85StKZhQNCp2VuG6/lwq72GiAZ1JCvYMJzQGF0rvra0CGQ7wrc2PdblsbyhR7WTtonJC605TumC6ursCqqrjsLmNxFEXkdjalkBVQyXfMf24sFqKA+Qchf7g0byFEvvVih92+/Nfc7kzYAHnM9eo35CTU+Z6OZzxdPHQ8i/s+eJ7jQ3jKT7zja2FRSVW7cqritMati40dLvr7HEBTzcETHoVnukkG9GuaZZfmgdeG+tOei4+Ok3sy+yVsPmSe48bj/7N3wolxP2X3nbj4OycukjTmh2Zv8pi5krewVnzAWPETtnrJTGYHtNjLtZ6ez68T9d0R3ts/dVGPtboIAAA=",
+                    "response_bytes": 2234,
+                    "response_sha256": "6db4919737236ed2dbdb4eb9d4de17099f06f763f1e44c4d84a39689dcbe450d",
+                    "retrieved_at": "2026-11-18T12:57:02.100203+00:00",
+                    "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-09&endDate=2026-11-09"
+                  },
+                  "2026-11-10": {
+                    "raw_gzip_b64": "H4sIAAAAAAACA+1UXW/TMBT9K5af26l2mg7yFjYh8TANreUJ8WCcu8zCiSP7Bqim/XdsJyvJmu6DFYkHIlVK77m+J8c+x7eEWmgMzcgtoaYBK1CZ2vn/n0eVD4Uv0auPhDG24CvCUzojVLQygGsU2LrYAK7V6AK2W3ouEALG/bo5Y3O2CLADRA0V1DiNV36kVbjdQ/lo+GbbQEfsRQyBC8AbEz/6fas1ybU2GNjG3PfL16ICci62AUWw1ZnQUBdgfSno4n05tF5+B1ur8iZOsqBBONioKo5ZvMlY3BipzaiaRE216bSEdy0cfmoKr64YiyexPeMrSmYUDQqdV7huv1YKu950EZ8BmksJzQOQ0AJQKL07Sgcybui95I31X97aKFmMGXg3pAMGw/mO2e+y9Nt3eX0NVtXlVXdIyxMP3s2m2PISajnFxQ5wsT/nujAWS1HC/J2Q3/ywYwskX3riw+lY/Wvp8KZ1QB5LifoJBYk6/2ZCGM+W+wlhSZ+b5yUktmc8CQlphEUlVePl1OVZg1vfm/i66E91UJoKE0v5Y3EawK8J1G7Mvs3TpzyXnJymv8H8h7DFEHmOG0//39UTTkz6W/mhE5cvc+IyzdjbQ3f1AVu90k77NjrunXyk+U/fwy8nCm6Pv7tflTHqUroIAAA=",
+                    "response_bytes": 2234,
+                    "response_sha256": "8f551beee1ffbf7166a1c835bcdc765ced7158143a9771ad3a35bc76da9b2ebc",
+                    "retrieved_at": "2026-11-18T12:57:03.086281+00:00",
+                    "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-10&endDate=2026-11-10"
+                  },
+                  "2026-11-11": {
+                    "raw_gzip_b64": "H4sIAAAAAAACA6tWUCpKLchXslKoVlDKL0gtSizJzM8rBvKjFWIVahVqAYOdxRshAAAA",
+                    "response_bytes": 33,
+                    "response_sha256": "77f57145d776a37636271a59ddbf297e79778f26a2dd18a6b5ca2d4b2b9ca4d4",
+                    "retrieved_at": "2026-11-18T12:57:04.094767+00:00",
+                    "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-11&endDate=2026-11-11"
+                  }
+                },
+                "holiday_calendar": {
+                  "raw_gzip_b64": "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",
+                  "response_bytes": 105279,
+                  "response_sha256": "b6ff75d73d00160d5a363b6a86da94a0ac2b86f539de3fca2e00bd0df843d8bf",
+                  "retrieved_at": "2026-11-18T12:57:00.996813+00:00",
+                  "url": "https://www.newyorkfed.org/aboutthefed/holiday_schedule.html"
+                },
+                "range": {
+                  "raw_gzip_b64": "H4sIAAAAAAACA+1XXW+bMBT9KxbPSYVNSBreWKtJe6g6NdnTtAcPbimq+ZC5bIuq/vfZhmTQQNoupI2qRIqU3GPfy7XPuTo8EEtCnlkeeSBWloPkGGdpof5/b0W+hCpk3XwllFKbTQlzrRGxeBlocIEcy8IsgKIUWGhss/WSI2iMqX1jSsfU1nABiAISSLEbT1RKGeNqC2Wt5MtVDlVh1UQTuAK8y8xDfy6FIL4QGepq7drr7QueALnkK40iyOSCC0hDkCqk+2J1WC+9/gUyjaM7k0mCAF7AMk5MGvvco+ZgApG1oo7pKc2qXvRvwQv8loequ7DdPDHLPTa1yMjCDLnwE1yUP5MYq7WubT4N1A8CyJ+AxAoBeSw2V1lAYA503fJSqicvpWmZtyuwKkkFNJKzTWV1yoE6vuvbW5BxGt1UlzQ5U+DjqKuaH0EadNWiPbXo/9e6yiRGPILxJx7cq2RDN0h+1IX71TE9NnUo0hZAdqkk/gMhMX0eUiGUeZNthVCn1s3LFGKWe8zRCsm5xDiIc9VOGl3kuFJrHRXn9a02Ql1ioi7bJacGvI+gNmm2ae4+xznnbOb+A/3fXIZN5CVsnJ1mdQcTnXoqP2Xi5HVMnLgenffN6h5a7UmnbRoNO5MHyv/8HH59oZ1st+f7ORN7vpvtFd7Ldvsd2E7fzJnY87UzObH9iNg+PTa2H9pp0DdzGorxtdM4H8BpsN1Ogw3jNFiv02CHdRoVG2en2XsIp1ExUTkNh73fW6HTQyzno7wV7ldUq8N8H/8CHf99nFQRAAA=",
+                  "response_bytes": 4436,
+                  "response_sha256": "86bbf40975776c180451ad459326a33bcd05ebee642b14d7811684a7bd26a669",
+                  "retrieved_at": "2026-11-18T12:57:01.225954+00:00",
+                  "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-09&endDate=2026-11-11"
+                },
+                "rule_version": "V70-M14-HOLIDAY-OUTSTANDING-20261117"
+              },
+              "kind": "HOLIDAY_OUTSTANDING_DERIVED",
+              "observation_date": "2026-11-11",
+              "rule_version": "V70-M14-HOLIDAY-OUTSTANDING-20261117",
+              "value_usd_bn": 0.152
+            }
+          },
+          "fred_originals": {
+            "RRPONTSYD": {
+              "raw_gzip_b64": "H4sIAAAAAAACA7Wa3W7bMAyF3yXXjSCS+t2rDEORtS6QIU2GxCkwDHv3yd2A+bCXO85VYydfFeqIPKL8c3edDqf5+Do93ubDdd592mnUshfZS909/Ls7nZ/9vcvX23R9O8zHyxm/HNNe1X3gz/f7eO1F9ybj9v18nG/j4ul4Xj58n7/f58f5x/dp90kedi/H0/T33e7b7fL+kevzdH38+mNcWaOfD/M07t4u1/nx/SPj/uH2NC49Xe7nMSrJcXz55eU2jTfjz9Px9bhcjssLhjmG8/nnf4TkfSguCm+H0325GEO2tvv1wOQb8EUSmZ+AH5uS+RX4VozMb8Avic3vwK+pcvkWV/wWtAiTn/dRMD6xkvmonyKNzM8rvgRRJfML8IsZmY/6r5XNR/3XRp5fEYw/Oz6iyO+dzF/nTwtV2Py1/jVES2R+dvmNPb9r/dQRf/b8rvOnaOhCTnC6TqCaQivkCKmAgrSxfwA6iF4ymb9WUCCzMXvSsw+4Bwktk9UJ7mFkn8Lmg/pHeanUABUs7xIsKpmvkN4ynW+YPgubn7a0DwXtySi/XPtWsLyPBWDs8aO9zWx9SkT739h8tLepkPGYm1NOZD7KJzeyfATy89Cnsv/BOkGX0LSR+WhvNbPH37cqjgULu4Wumcw3iH1qZHFCayCFbGz+Wvx5WHOydsCcjPgoOTlAcbeQ2ckHWgNaAnXnUr11iFHIfLQOUjOZb1st3YpdAWXvGit2BRJ76Va0DRaMu2usaBvG0q3K5TvbkBNZO4Jd1drZfOyKaW1kPvoGyeS1C75h8JUdH+yKkUevqJ5oZLy4ySUHxzUErBYyH8XfIzn5uCOFQo8PNgWMvLZ8T0DZ4e+4pWZPL9iGUdfpfMG6zs09zbcERCuZjx1bpY8fTyy47bzmDyySdjIfV1ciD99V9l7ZfHS1ysZjbq50vrmGAxnvfAkbXx2ezW/O9rD52A0zIaceZ0yUHX/vTMj05Hp5ZDx62hTZwUFPWyM7PNUt3ULmO/GzMyfU9TJSG3X83T+JQE6dHfsNY89I59uW+ukfnqSo7PHXrfol3T+FUOjawcScjBx7cCUpVCOPH1xJZhfGjnV9MYVkvDvlItMLBMfYwveupLInt7kzNDLfVfXcyLOr/pDLyHznablnpP1Dv4E9/Lzx9KJ8WmaHxz2DkBL5B2DDQUI25pZUoncOlsl4fAQtUw9CFn52By2JzEdjm4TNr9AwMarxX/i4AIw+v25Xx6VDRyCQ2bZhp3nhu3YAW/mCyufzy2bHCAvd6YYsnA/NgErmu2aAsfnumCKTw+9sg5LpZVO6s5zU/dDC970ANt9JP5O1b7jf4lr+cQ1Keg6R+tjZwneWVtn8tGGjcOHnDc93F75LzGx8d31m5fLdIYXQ+bKVZxB/QsGeWWdJjM53ymns0NePVevLr9+7QBgoJDkAAA==",
+              "response_bytes": 14628,
+              "response_sha256": "9fcb002b3331c76d35ac30b7dd9749c16eb64e66a3e99908a43429d93b98067e",
+              "retrieved_at": "2026-11-18T12:57:00.626997+00:00",
+              "url": "https://api.stlouisfed.org/fred/series/observations?series_id=RRPONTSYD&file_type=json&observation_start=2026-04-22"
+            },
+            "WALCL": {
+              "raw_gzip_b64": "H4sIAAAAAAACA62W3YrDIBCF38XrBmb8t6+yLCFtLWRJk5KYQil99510F7bj7U7IhZlRPz3Gow81524o/SW3S+nmovZKg/YNYoNB7f6yeTzVuemw5PnWlX4aeWOwjdZVhZ/2iZ4GdWOQ0uvYl4WCQz9ulddyXUtb7tes9rhT537Iv1/qa5leVeZTntvDnSLvXZ+6kim7THNpX1Uo3y1HCh2ndaRRGaC25/OSqUzFob/0VELYHjZKGs3H4x+KvEZSiXDrhnUL+gDBYlLPnSQhvRM8qetAkuAa8HwOBHCyBDSMoKMDLUvQwAhovDXChMBVsiaKEujlKiHa5GQJyFXSzqQgTOAq0TJoK0ug/hjBeSuqUmgAuUqWEMKEWM8BkiwBHSNYAzrKEirns8EEaULiKkVMos4XaVvzOUTngywBuUqO3NsJE7hK9LOmJEvQ/HwwkFDUvVMDXCUTNFhhQqUSeNlzmq48XCXrnY2yBG2qHRekVTJQuwbd4uQICLStqzmQ9ckSkJ8PznmTZAmanw/OeNF12Aix3tNG0jUoBrZyPrTCBKxUinHz1s/nNxUDi7ePDAAA",
+              "response_bytes": 3215,
+              "response_sha256": "5b2f0ea68e087761e4c27e553dae97bca77d0f0f6dd3de8bf4e7d3dde51a88d8",
+              "retrieved_at": "2026-11-18T12:56:58.237328+00:00",
+              "url": "https://api.stlouisfed.org/fred/series/observations?series_id=WALCL&file_type=json&observation_start=2026-04-22"
+            },
+            "WDTGAL": {
+              "raw_gzip_b64": "H4sIAAAAAAACA62W22rkMAyG3yXXY5Bk+dRXWcqQdjyQJU1K4hRK6buvZnah1tyuTC4cyfZn/baEv4atjnOb3up5b+PWhqeBgKJDdJiG04+3LpdH3/qy1+1jbNO66MnAjuhhwN/5RZpDch7FfSxT28U4T8tt8NHej3Zun+91eMLTcJ3m+u9v+L2v9yHbpW7nl0+x9EtfxlbFu69bO9+HiH/cX8X0uh6L7MqDzL1e9yp96c7T2yQ9hFtTu5Td/Pr6D0XuO3kQ4WOcj5tRcAkTDd8nS0LpCCVnBFNAcBA7QI6UQrIFoO8BkJjAFiDr/QBSxpKKMSD1ETDFaBqBfEoiDonIFoCgzgAhszGgl6iEGMA4AuIeACgqWQKSA9TX1IdiDMj9NeVCzLYADD2ghJKiLUBVu+wDYzIGqGKXgNn0FmVJ5h5AxVOwBSCpPCgM1gAlkY8M0RZA8SECbxpBcaAkYpYYjAFFVVOfwDgCVBIVTJLapgDySqLkbROtOA/qVcHAlrcIQZK5P4McUva2AGQNyGQMIFRnEDBYA7J6O2KI3rLaiQ1Y1wribAtApRESeknl5+8/PYzHBHMMAAA=",
+              "response_bytes": 3187,
+              "response_sha256": "cbdb27526e803aed18b6cdfe9afa8624d735cb7532e958b558f5c4ba103ebc60",
+              "retrieved_at": "2026-11-18T12:56:59.331973+00:00",
+              "url": "https://api.stlouisfed.org/fred/series/observations?series_id=WDTGAL&file_type=json&observation_start=2026-04-22"
+            }
+          },
+          "rule_version": "V70-M14-HOLIDAY-OUTSTANDING-20261117"
+        },
+        "series": {
+          "RRPONTSYD": [
+            {
+              "observation_date": "2026-11-17",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:57:00.627262+00:00"
+            }
+          ],
+          "WALCL": [
+            {
+              "observation_date": "2026-11-11",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:58.237415+00:00"
+            }
+          ],
+          "WDTGAL": [
+            {
+              "observation_date": "2026-11-11",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:59.332049+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://fred.stlouisfed.org/series/WALCL | https://fred.stlouisfed.org/series/WDTGAL | https://fred.stlouisfed.org/series/RRPONTSYD | https://www.newyorkfed.org/aboutthefed/holiday_schedule.html | https://markets.newyorkfed.org/api/rp/results/search.json",
+      "status": "OK",
+      "unit": "USD bn",
+      "value": 46.756
+    },
+    "m15": {
+      "attempt_result": "FAILED",
+      "attempted_at": "2026-11-18T12:57:04.298518+00:00",
+      "cache_used": false,
+      "detail": "統計月份2026-09；2026-10-06官方報告；8月55.4; 距今 78 天 > 65 天",
+      "error": "",
+      "id": "m15",
+      "label": "ISM 服務業 PMI",
+      "last_verified_at": null,
+      "method": "人工查證輸入：ISM官方2026年9月Services PMI；截至2026-10-14已核對",
+      "observation_date": "2026-09-01",
+      "retrieval_error": "ISM official monthly headline source failed: october: ISM report date or sector headline mismatch",
+      "source_attempts": {
+        "ISM_m15": [
+          {
+            "attempted_at": "2026-11-18T12:57:04.442558+00:00",
+            "error": "ISM report date or sector headline mismatch",
+            "provider": "ISM_OFFICIAL",
+            "result": "FAILED"
+          }
+        ]
+      },
+      "source_evidence": null,
+      "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+      "status": "STALE",
+      "unit": "",
+      "value": 54.9
+    },
+    "m16": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:57:04.442601+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
+      "error": "",
+      "id": "m16",
+      "label": "LEI YoY",
+      "last_verified_at": null,
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "observation_date": "2026-09-01",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+      "status": "OK",
+      "unit": "%",
+      "value": -0.5
+    },
+    "m17": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:58.119334+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "起點 2026-10-16",
+      "error": "",
+      "id": "m17",
+      "label": "5Y Breakeven 近1月變化（pp）",
+      "last_verified_at": "2026-11-18T12:56:58.119118+00:00",
+      "method": "近1個月前最近交易日差值（百分點）",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {
+        "T5YIE": [
+          {
+            "observation_date": "2026-11-17",
+            "provider": "FRED_CSV",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:58.119118+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "T5YIE": [
+            {
+              "observation_date": "2026-11-17",
+              "provider": "FRED_CSV",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:58.119118+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://fred.stlouisfed.org/series/T5YIE",
+      "status": "OK",
+      "unit": "pp",
+      "value": -0.11
+    },
+    "m18": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:57:07.518835+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m18",
+      "label": "Sahm Rule",
+      "last_verified_at": "2026-11-18T12:57:07.577903+00:00",
+      "method": "Official FRED Sahm Rule Recession Indicator (real-time vintage), published series",
+      "observation_date": "2026-10-01",
+      "retrieval_error": "",
+      "source_attempts": {
+        "SAHMREALTIME": [
+          {
+            "observation_date": "2026-10-01",
+            "provider": "FRED_CSV",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:57:07.577903+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "SAHMREALTIME": [
+            {
+              "observation_date": "2026-10-01",
+              "provider": "FRED_CSV",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:57:07.577903+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SAHMREALTIME",
+      "status": "OK",
+      "unit": "",
+      "value": 0.0
+    },
+    "m19": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:57:07.578089+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "",
+      "error": "",
+      "id": "m19",
+      "label": "U3 失業率",
+      "last_verified_at": "2026-11-18T12:57:08.014711+00:00",
+      "method": "FRED_OFFICIAL_API 官方或鏡像時間序列",
+      "observation_date": "2026-10-01",
+      "retrieval_error": "",
+      "source_attempts": {
+        "UNRATE": [
+          {
+            "attempted_at": "2026-11-18T12:57:07.774282+00:00",
+            "error": "BLS_EMPLOYMENT_TABLE: HTTPError: 403 Client Error: Forbidden for url: https://www.bls.gov/news.release/empsit.t01.htm",
+            "provider": "BLS_EMPLOYMENT_TABLE",
+            "result": "FAILED"
+          },
+          {
+            "observation_date": "2026-10-01",
+            "provider": "FRED_OFFICIAL_API",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:57:08.014711+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "UNRATE": [
+            {
+              "attempted_at": "2026-11-18T12:57:07.774282+00:00",
+              "error": "BLS_EMPLOYMENT_TABLE: HTTPError: 403 Client Error: Forbidden for url: https://www.bls.gov/news.release/empsit.t01.htm",
+              "provider": "BLS_EMPLOYMENT_TABLE",
+              "result": "FAILED"
+            },
+            {
+              "observation_date": "2026-10-01",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:57:08.014711+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "status": "OK",
+      "unit": "%",
+      "value": 4.1
+    },
+    "m20": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:57:08.014920+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "注意歷史值可能修訂",
+      "error": "",
+      "id": "m20",
+      "label": "3個月平均非農新增就業（千人）",
+      "last_verified_at": "2026-11-18T12:57:08.938618+00:00",
+      "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
+      "observation_date": "2026-10-01",
+      "retrieval_error": "",
+      "source_attempts": {
+        "PAYEMS": [
+          {
+            "observation_date": "2026-10-01",
+            "provider": "FRED_OFFICIAL_API",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:57:08.938618+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "PAYEMS": [
+            {
+              "observation_date": "2026-10-01",
+              "provider": "FRED_OFFICIAL_API",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:57:08.938618+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://api.stlouisfed.org/fred/series/observations",
+      "status": "OK",
+      "unit": "千人",
+      "value": 137.0
+    },
+    "s03": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:56:13.524640+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "同一 VIX 數列",
+      "error": "",
+      "id": "s03",
+      "label": "VIX 短期",
+      "last_verified_at": "2026-11-18T12:56:14.084179+00:00",
+      "method": "與 m07 同步",
+      "observation_date": "2026-11-17",
+      "retrieval_error": "",
+      "source_attempts": {
+        "VIXCLS": [
+          {
+            "attempted_at": "2026-11-18T12:56:13.842209+00:00",
+            "content_type": "application/csv",
+            "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-17 observed=2026-11-16; try newer source",
+            "http_status": 200,
+            "provider": "FRED_CSV",
+            "response_sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+            "result": "FAILED"
+          },
+          {
+            "observation_date": "2026-11-17",
+            "provider": "CBOE_OFFICIAL_VIX",
+            "result": "OK",
+            "verified_at": "2026-11-18T12:56:14.084179+00:00"
+          }
+        ]
+      },
+      "source_evidence": {
+        "series": {
+          "VIXCLS": [
+            {
+              "attempted_at": "2026-11-18T12:56:13.842209+00:00",
+              "content_type": "application/csv",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-17 observed=2026-11-16; try newer source",
+              "http_status": 200,
+              "provider": "FRED_CSV",
+              "response_sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+              "result": "FAILED"
+            },
+            {
+              "observation_date": "2026-11-17",
+              "provider": "CBOE_OFFICIAL_VIX",
+              "result": "OK",
+              "verified_at": "2026-11-18T12:56:14.084179+00:00"
+            }
+          ]
+        }
+      },
+      "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+      "status": "OK",
+      "unit": "",
+      "value": 25.46
+    },
+    "s04": {
+      "attempt_result": "SUCCESS",
+      "attempted_at": "2026-11-18T12:57:08.939394+00:00",
+      "cache_source": null,
+      "cache_used": false,
+      "detail": "來源為 CNN 非公開保證 API",
+      "error": "",
+      "id": "s04",
+      "label": "CNN Fear & Greed",
+      "last_verified_at": null,
+      "method": "CNN 非官方可讀 JSON（可能變動）",
+      "observation_date": "2026-11-18",
+      "retrieval_error": "",
+      "source_attempts": {},
+      "source_evidence": null,
+      "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "status": "OK",
+      "unit": "",
+      "value": 24.464865
+    }
+  },
+  "lei_history": [
+    {
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "observation_date": "2026-07-01",
+      "publication_date": "2026-08-20",
+      "retrieved_at": "2026-11-18T12:57:05.958702+00:00",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
+      "status": "OK",
+      "unit": "%",
+      "value": -1.1
+    },
+    {
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "observation_date": "2026-08-01",
+      "publication_date": "2026-09-18",
+      "retrieved_at": "2026-11-18T12:57:06.539496+00:00",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf",
+      "status": "OK",
+      "unit": "%",
+      "value": -0.7
+    },
+    {
+      "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
+      "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
+      "observation_date": "2026-09-01",
+      "publication_date": "2026-10-22",
+      "retrieved_at": "2026-11-18T12:57:07.518732+00:00",
+      "source_url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+      "status": "OK",
+      "unit": "%",
+      "value": -0.5
+    }
+  ],
+  "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
+  "schema": "V70.3/18-macro-collector-v1",
+  "summary": {
+    "MISSING": 0,
+    "OK": 17,
+    "STALE": 2,
+    "USABLE": 0
+  }
+}

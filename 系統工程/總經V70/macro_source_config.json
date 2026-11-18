@@ -170,8 +170,8 @@
       },
       "unit": null,
       "candidate_websites": [
-        "stlouisfed.org",
         "treasury.gov",
+        "stlouisfed.org",
         "federalreserve.gov",
         "ycharts.com"
       ]
@@ -194,9 +194,9 @@
         "max_age_days_unchanged": 12
       },
       "candidate_websites": [
-        "stlouisfed.org",
         "federalreserve.gov",
         "newyorkfed.org",
+        "stlouisfed.org",
         "nomics.world",
         "treasury.gov"
       ],
@@ -249,8 +249,8 @@
       },
       "unit": null,
       "candidate_websites": [
-        "stlouisfed.org",
         "treasury.gov",
+        "stlouisfed.org",
         "federalreserve.gov",
         "ycharts.com"
       ]

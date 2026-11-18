@@ -254,12 +254,18 @@ class Fetcher:
         self.fredsources={}
         self.fredattempts={}
 
-    def fred(self, series):
+    def fred(self, series, *, require_history=False):
         if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
             raise TimeoutError('D009 fetch deadline: FRED request refused')
         if hasattr(self,'job_series'): self.job_series.add(series)
-        if series in self.fredcache: return self.fredcache[series]
-        if series in self.frederrors: raise RuntimeError(self.frederrors[series])
+        # Current U3 may use the short free employment table. Sahm must keep
+        # its original full-history route rather than reuse that short cache.
+        history_request = series=='UNRATE' and require_history
+        short_u3_cache = (series=='UNRATE' and
+                         self.fredsources.get(series,('', ''))[0]=='BLS_EMPLOYMENT_TABLE')
+        if series in self.fredcache and not (history_request and short_u3_cache):
+            return self.fredcache[series]
+        if series in self.frederrors and not history_request: raise RuntimeError(self.frederrors[series])
         from io import StringIO
         errors=[]
         # DBnomics series API requires provider/dataset/series; the former
@@ -275,7 +281,7 @@ class Fetcher:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         if series in bls_map:
             providers.insert(1,('BLS_HISTORY_V1','https://api.bls.gov/publicAPI/v1/timeseries/data/'))
-        if series=='UNRATE':
+        if series=='UNRATE' and not history_request:
             providers.insert(0,('BLS_EMPLOYMENT_TABLE','https://www.bls.gov/news.release/empsit.t01.htm'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
@@ -739,7 +745,7 @@ def sahm_from_published(f):
 
 def sahm_from_unrate(f):
     try:
-        s=f.fred('UNRATE').sort_index()
+        s=f.fred('UNRATE',require_history=True).sort_index()
         x=s.groupby(s.index.to_period('M')).last().sort_index()
         # The latest reported 15 calendar months must be consecutive; never bridge gaps.
         end=x.index[-1]

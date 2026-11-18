@@ -27,6 +27,7 @@ on:
       - 'scripts/v70_family_drive.py'
       - 'scripts/v70_family_pipeline.py'
       - 'config/v70_family_sources.json'
+      - 'config/v70_family_automation.json'
       - 'tests/test_v70_family_json.py'
 permissions:
   contents: write

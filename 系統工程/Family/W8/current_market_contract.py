@@ -55,6 +55,9 @@ def read(source,request):
         'expected_current_quotes':{k:deepcopy(v['selected_observation']) for k,v in observations.items()},
         'official_bank_original_result':deepcopy(bank['original_reader_result']),
         'decision':decision,'formal_NAV_or_buy_permission_created':False,'trade_authorization':'NONE'}
+    from current_nav_source import read as read_nav
+    nav=read_nav(source.get('nav_qualification_source'),request,out)
+    if nav is not None:out['nav_source_qualification']=nav
     out['digest']=digest(out);return out
 
 
@@ -91,10 +94,10 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
             symbol=row['symbol'];item=deepcopy(row);problem=row.get('issue')
             if row.get('quantity')=='0':value=Decimal(0)
             elif row.get('amount') is None:problem=problem or 'CURRENT_POSITION_AMOUNT_UNAVAILABLE';value=None
-            elif row.get('market_source_sha256')!=contract['original_quote_hashes'].get(symbol):
+            elif row.get('market_source_sha256')!=((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or {}).get('source_sha256',contract['original_quote_hashes'].get(symbol)):
                 problem='CURRENT_POSITION_QUOTE_NOT_FROM_PINNED_BATCH';value=None
             elif (row.get('observed_market_date')!=contract['expected_current_quotes'][symbol].get('session_date')
-                or Decimal(str(row.get('observed_close')))!=Decimal(contract['expected_current_quotes'][symbol]['price'])):
+                or Decimal(str(row.get('observed_close')))!=Decimal(((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or contract['expected_current_quotes'][symbol])['price'])):
                 problem='CURRENT_POSITION_PRICE_OR_SESSION_REPLAY_MISMATCH';value=None
             else:value=Decimal(row['amount'])
             reporting=to_twd(value,row.get('currency')) if value is not None else None
@@ -144,8 +147,11 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
         'formal_source_qualification_dependencies':[{'symbol':p['symbol'],
             'reason':'ORIGINAL_CURRENT_SESSION_FINAL_CLOSE_NOT_VERIFIED',
             'source_evidence':deepcopy(p['current_reference_quote']['final_close_qualification_issues'])}
-            for p in positions if p.get('current_reference_quote',{}).get('original_final_close_verified') is False],
+            for p in positions if p.get('current_reference_quote',{}).get('original_final_close_verified') is False
+            and not p.get('qualified_current_NAV_quote')],
         'SGOV_physical_value_counted_once':True,'SGOV_roles_added_to_cash':False,
         'approved_pool_and_target_amounts_rebased':False,'additional_cash_target_reserve_deducted':'0',
         'formal_NAV_or_buy_permission_created':False,'trade_action':'NO_TRADE'}
+    from current_nav_source import qualify
+    qualify(out,accepted,current_owner)
     out['digest']=digest(out);return out

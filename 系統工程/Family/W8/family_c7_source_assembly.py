@@ -184,6 +184,8 @@ class SourceAssembler:
                 ('preference_locks.source_dated_position_weights',reference['positions']),
                 ('allocation_reference_gaps',reference['allocation_reference_gaps'])):
                 self.field(path,value,sources=[locator],producer='W8.current_market_contract:original_readers',blocking=False)
+            if reference.get('formal_NAV_source_qualified') is True:
+                return self.qualified_current(scope,reference,portfolio)
             # The PM input explicitly supplies reference observations, not a
             # qualified C7 NAV. Wire every value without manufacturing that
             # separate source qualification or relaxing the original gate.
@@ -194,6 +196,77 @@ class SourceAssembler:
                     code='C7_CURRENT_REFERENCE_AVAILABLE__FORMAL_NAV_SOURCE_QUALIFICATION_REQUIRED',
                     sources=[locator],producer='W8.current_market_contract:original_readers',
                     responsibility='PM_ORIGINAL_NAV_SOURCE_QUALIFICATION')
+
+    def qualified_current(self,scope,reference,portfolio):
+        """Use the qualified project book in original C Current/NAV consumers."""
+        approval=reference['project_NAV_source_qualification'];at=approval['available_at']
+        proof=self.derived('qualified_project_nav',reference,as_of=at,available_at=at,
+            original=approval['source_descriptor'])
+        sid=proof['source_reference_id'];locator=self.raw[-1]
+        def replace(path,value,code=None):
+            self.issues[:]=[i for i in self.issues if i['field_path']!='family_scope.'+path]
+            scope[path]=self.field(path,value,code=code,sources=[locator],
+                producer='W8.current_nav_source:replayed_PM_qualified_originals')
+        fx=number(reference['reporting_FX']['quote_per_base'])
+        if self.currency not in ('TWD','USD') or fx<=0:raise PermissionError('C7_PROJECT_NAV_BUDGET_FX_REQUIRED')
+        def reporting(value):return value if self.currency=='TWD' else value/fx
+        positions=[];aggregate={};exposures=[];normalizations=[]
+        books=portfolio['logical_accounts'];ceiling=scope.get('total_stock_ceiling')
+        with localcontext() as numeric:
+            numeric.prec=50
+            nav=reporting(number(reference['positions_plus_accepted_cash_TWD']))
+            for index,row in enumerate(reference['positions']):
+                symbol=row['symbol'];value=reporting(number(row['reference_amount_TWD']))
+                kind=asset_kind(self.identities.get(symbol,{}))
+                if kind is None:
+                    self.field('current_positions.'+symbol+'.asset_type',None,state=ADAPTER,
+                        code='C7_CURRENT_PRODUCT_BUCKET_SOURCE_REQUIRED',sources=[locator])
+                entry=aggregate.setdefault(symbol,{'value':Decimal(0),'kind':kind or 'UNKNOWN','currency':row.get('currency')})
+                if entry['kind']!=(kind or 'UNKNOWN'):raise PermissionError('C7_CURRENT_POSITION_KIND_CONFLICT')
+                entry['value']+=value
+                if row['route']=='V82' and value>0:
+                    matches=[b for b in books if b['owner']['account']==row.get('account_key') and b['owner']['currency']==row['currency']]
+                    if not matches:matches=[b for b in books if b['owner']['currency']==row['currency'] and not b.get('source_representation_alias_of')]
+                    if len(matches)!=1:raise PermissionError('C7_CURRENT_POSITION_LOGICAL_CATEGORY_AMBIGUOUS')
+                    owner=deepcopy(matches[0]['owner']);effect='CURRENT-REPORTED:'+digest({'source':row['quantity_source'],'index':index})
+                    exposures.append({'event_id':effect,'economic_effect_ids':[effect],
+                        'kind':'CONFIRMED_POSITION','owner':owner,'asset_id':symbol,'amount':row['amount'],
+                        'currency':owner['currency'],'intent_id':None,'side':None,
+                        'amount_basis':'CONFIRMED_NOTIONAL','receipt':deepcopy(proof)})
+            for symbol,entry in aggregate.items():
+                positions.append({'instrument_id':symbol,'ticker':symbol,'display_name':None,
+                    'asset_type':entry['kind'],'market':None,'base_currency':entry['currency'],
+                    'value_state':'KNOWN','weight':metric(entry['value']/nav,at,[sid]),
+                    'portfolio_amount':money(entry['value'],self.currency,at,[sid]),'source_reference_ids':[sid]})
+            for book in books:
+                owner=book['owner'];amount=number(book['cash_amount'])
+                if owner['currency'] not in ('TWD','USD'):raise PermissionError('C7_CURRENT_CASH_REPORTING_FX_REQUIRED')
+                value=reporting(amount*(fx if owner['currency']=='USD' else 1))
+                positions.append({'instrument_id':'ACCOUNT_CASH:'+owner['account'],'ticker':None,'display_name':None,
+                    'asset_type':'cash','market':None,'base_currency':owner['currency'],'value_state':'KNOWN',
+                    'weight':metric(value/nav,at,[sid]),'portfolio_amount':money(value,self.currency,at,[sid]),'source_reference_ids':[sid]})
+                if owner['currency']!=self.currency and ceiling is not None:
+                    normalizations.append({'owner':deepcopy(owner),'from_currency':owner['currency'],'to_currency':self.currency,
+                        'quote_per_base':str(fx if self.currency=='TWD' else Decimal(1)/fx),
+                        'accounting_base_id':ceiling['accounting_base']['base_id'],
+                        'purpose':'REPORTING_BUDGET_NORMALIZATION_NOT_EXECUTION','receipt':deepcopy(proof)})
+            if abs(sum((number(p['portfolio_amount']['amount']) for p in positions),Decimal(0))-nav)>nav*Decimal('1e-12'):
+                raise PermissionError('C7_CURRENT_NAV_POSITIONS_AND_CASH_NOT_CONSERVED')
+            replace('current_nav',money(nav,self.currency,at,[sid]));replace('exposures',exposures)
+            scope['budget_normalizations']=normalizations
+            current={'allocation_id':'CURRENT-PM-QUALIFIED:'+digest(approval),'stage':'CURRENT','as_of':at,
+                'denominator':deepcopy(scope['current_nav']),'positions':positions,
+                'declared_total_weight':metric(1,at,[sid]),'confirmation_status':'NOT_APPLICABLE',
+                'confirmed_at':None,'confirmed_by':None,'source_reference_ids':[sid]}
+            # Existing directives require their original semantics and receipts;
+            # an empty reported set creates no protection or unlock instruction.
+            if not any(portfolio['reported_preference_records'].values()):replace('preference_locks',[])
+            else:
+                self.field('preference_locks',scope.get('preference_locks'),sources=[locator],
+                    code='C7_EXISTING_HOLDING_DIRECTIVE_MAPPING_REQUIRED')
+        self.observations['qualified_project_NAV']=deepcopy(approval)
+        self.observations['current_NAV_budget_currency']=self.currency
+        return current
 
     def field(self,path,value,*,state=None,code=None,sources=(),producer='ORIGINAL_FAMILY_SOURCE',responsibility=None,blocking=True):
         state=state or (DIRECT if value is not None else MISSING)
@@ -660,7 +733,7 @@ class SourceAssembler:
         scope['total_stock_ceiling']=self.tactical(tactical,scope)
         facts=read_facts(portfolio_facts_source,req)
         current=self.portfolio(facts,portfolio_facts_source,scope)
-        self.current_business(scope)
+        current=self.current_business(scope) or current
         history_binding=self.context.get('public_history_source_binding')
         if history_binding is not None:
             if (history_binding.get('client_id')!=req['client_id'] or history_binding.get('run_id')!=req['run_id']

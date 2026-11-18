@@ -132,9 +132,11 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                     value=_number(fact['quantity'])*_number(market['observed_close'])
                     row.update(amount=str(value),currency=currency,observed_close=str(market['observed_close']),
                         market_source_sha256=market['source_sha256'],price_basis=market['history_quality']['price_basis'])
-                    totals[currency]=totals.get(currency,Decimal(0))+value
                     if currency=='TWD':row['reporting_amount_TWD']=str(value)
                     elif currency=='USD' and fx:row['reporting_amount_TWD']=str(value*_number(fx['quote_per_base']))
+                    from current_nav_source import apply_official_quote
+                    apply_official_quote(row,current_market_contract)
+                    totals[currency]=totals.get(currency,Decimal(0))+Decimal(row['amount'])
                 rows.append(row)
     # Read the latest explicit owner report by currency. Account/source keys in
     # cash_balance_snapshot are retained separately and never added together.

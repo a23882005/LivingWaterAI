@@ -76,6 +76,9 @@ def source_files(config,evaluation_at):
                     # reader. The PM's historical local paths are provenance,
                     # not paths on this execution host.
                     walk(item,expand=False)
+                    if item.get('nav_qualification_source'):
+                        nav=item['nav_qualification_source'];walk(nav,expand=False)
+                        walk(nav['official_source'],expand=False)
                 else:walk(item)
     walk(config)
     return [files[k] for k in sorted(files)]

@@ -164,7 +164,14 @@ class V70SafetyIntakeTests(TestCase):
         before_snapshot=deepcopy(f.snapshot);base_request,_,base=run()
         f.config['v70_safety_snapshot_source']=self.descriptor()
         request,runner,result=run()
-        self.assertEqual(result['positions'],base['positions'])
+        for current,previous in zip(result['positions'],base['positions']):
+            for key in ('holding','target_lines','market','native_product_identity','valuation_observations'):
+                self.assertEqual(current[key],previous[key])
+            self.assertEqual(current['core_observation']['result'],previous['core_observation']['result'])
+            self.assertEqual(current['v3_macro_observations'],previous['macro_observations'])
+            self.assertEqual(current['macro_observations']['source_sha256'],
+                f.config['v70_safety_snapshot_source']['sha256'])
+            self.assertEqual(current['core_observation']['macro_safety_source_audit'],current['macro_observations'])
         self.assertEqual(request['macro_snapshot'],base_request['macro_snapshot'])
         self.assertEqual(request['confirmed_target'],base_request['confirmed_target'])
         self.assertEqual(f.snapshot,before_snapshot)

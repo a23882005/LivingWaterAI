@@ -11,6 +11,8 @@ from hashlib import sha256
 from pathlib import Path
 import json
 import uuid
+import calendar
+import re
 
 from family_input import digest
 from official_holdings_source import project_official_holdings
@@ -183,8 +185,22 @@ def read_v70_safety_snapshot(source, evaluation_at):
     approval = snapshot.get('approval', {})
     if not isinstance(approval, dict) or approval.get('status') != 'APPROVED' or not approval.get('record_url'):
         raise PermissionError('V70_SAFETY_SNAPSHOT_APPROVAL_REQUIRED')
-    if not (time(snapshot['data_cutoff']) <= time(snapshot['snapshot_timestamp'])
-            <= time(approval['approved_at']) <= time(evaluation_at)):
+    extension = snapshot.get('extension_approval')
+    if extension is not None:
+        if (not isinstance(extension, dict) or extension.get('status') != 'APPROVED'
+                or not extension.get('record_url') or not extension.get('approved_by')
+                or not extension.get('scope')
+                or not isinstance(extension.get('candidate_sha256'), str)
+                or len(extension['candidate_sha256']) != 64
+                or any(c not in '0123456789abcdef' for c in extension['candidate_sha256'])):
+            raise PermissionError('V70_SAFETY_SNAPSHOT_EXTENSION_APPROVAL_REQUIRED')
+        ordered = (time(snapshot['data_cutoff']) <= time(approval['approved_at'])
+                   <= time(snapshot['snapshot_timestamp']) <= time(extension['approved_at'])
+                   <= time(evaluation_at))
+    else:
+        ordered = (time(snapshot['data_cutoff']) <= time(snapshot['snapshot_timestamp'])
+                   <= time(approval['approved_at']) <= time(evaluation_at))
+    if not ordered:
         raise PermissionError('V70_SAFETY_SNAPSHOT_AFTER_EVALUATION')
     if not source.get('source_reference') or not snapshot.get('upstream_snapshot_reference'):
         raise ValueError('V70_SAFETY_SNAPSHOT_LINEAGE_REQUIRED')
@@ -209,6 +225,13 @@ def read_v70_safety_snapshot(source, evaluation_at):
         for field in ('as_of', 'published_at'):
             value = signal.get(field)
             if value is not None:
+                quarter = re.fullmatch(r'(\d{4})-Q([1-4])', value) if field == 'as_of' else None
+                if quarter:
+                    year, month = int(quarter[1]), int(quarter[2]) * 3
+                    observed = datetime(year, month, calendar.monthrange(year, month)[1])
+                    if observed.date() > time(snapshot['data_cutoff']).date():
+                        raise PermissionError('V70_SAFETY_SNAPSHOT_FUTURE_SIGNAL:' + name)
+                    continue
                 observed = datetime.fromisoformat(value.replace('Z', '+00:00'))
                 future = (time(value) > time(snapshot['data_cutoff']) if len(value) > 10
                           else observed.date() > time(snapshot['data_cutoff']).date())
@@ -314,6 +337,9 @@ def build_report(request, config, repo_root):
                 'original holding instrument and target registry rows',
                 asset['analysis_instrument_binding'],['formal target-to-holding financial join'],
                 kind='SOURCE_IDENTITY_QUALIFICATION_REQUIRED'))
+        if safety_snapshot is not None:
+            from v70_safety_decisions import produce as produce_safety_decisions
+            row['macro_observations']=produce_safety_decisions(safety_snapshot,request['evaluation_at'])
         if market:
             from v82_core_source import read as read_core_source
             core_source=read_core_source(config.get('core_sources',{}).get(symbol),request,symbol)
@@ -322,11 +348,17 @@ def build_report(request, config, repo_root):
             row['valuation_observations'] = metrics
             if request.get('macro_snapshot') is not None:
                 from v10_source_observations import macro_observations,forward_observations
-                row['macro_observations']=macro_observations(request['macro_snapshot'],request['evaluation_at'])
+                v3_observations=macro_observations(request['macro_snapshot'],request['evaluation_at'])
+                if safety_snapshot is None:
+                    row['macro_observations']=v3_observations
+                else:
+                    row['v3_macro_observations']=v3_observations
                 forward=forward_observations(request['macro_snapshot'],symbol,request['evaluation_at'])
                 metrics,fundamentals=issuer_inputs(row['issuer_facts'],forward,allowed_metrics=cls.get('valuation_waterfall'))
                 row['valuation_observations']=metrics
             kwargs = {'valuation_waterfall': cls['valuation_waterfall']} if 'valuation_waterfall' in cls else {}
+            if safety_snapshot is not None:
+                kwargs['macro_observations']=row['macro_observations']
             if cls.get('valuation_profile') is not None:
                 kwargs['valuation_profile']=deepcopy(cls['valuation_profile'])
             row['core_observation'] = native_core_observation(repo_root, market,
@@ -344,7 +376,9 @@ def build_report(request, config, repo_root):
             row['daily_slice'] = slice_cap(analysis, conclusion['approved_v10_context'],
                 permission=conclusion['buy_permission']['value'], positive_gap=None)
             row['execution_status'] = 'NATIVE_COMPONENTS_COMPUTED'
-            row['call_trace'] = (market['call_trace'] + ['V82.evaluate_core_rule_state']
+            row['call_trace'] = (market['call_trace'] +
+                                 (row['macro_observations']['call_trace'] if safety_snapshot is not None else [])+
+                                 ['V82.evaluate_core_rule_state']
                                  + analysis['call_trace'] + ['V82.approved_decision.slice_cap'])
             for item in row['core_observation']['input_gaps']:
                 row['missing_inputs'].append(missing(item['field_path'], 'W8.core_analysis_inputs',

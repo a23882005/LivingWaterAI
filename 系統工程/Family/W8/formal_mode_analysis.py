@@ -215,6 +215,15 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     from v82_approved_context import build as build_approved_context
     approved_context,decision=build_approved_context(root,row,request,fundamental=fundamental,
         price_conditions=price_conditions,left_safety=left_safety,source_descriptor=approved_source_descriptor)
+    v70=(row.get('macro_observations') or {})
+    if v70.get('schema_version')=='Family.W8.V70SafetyDecisions.v1':
+        pressure=v70['macro_pressure']['truth']
+        if pressure!='UNKNOWN' and approved_context['macro_pressure']!=pressure:
+            from livingwater_v82_runtime.approved_decision import evaluate
+            # An observed pressure cannot be relaxed by an older aggregate.
+            approved_context['macro_pressure']=('TRUE' if 'TRUE' in
+                (pressure,approved_context['macro_pressure']) else pressure)
+            decision=evaluate(approved_context,core)
     # A supplemental aggregate is a further veto, never a replacement for
     # Work41's separately sourced safety leaves. Reuse the original evaluator
     # if the existing context builder supplied a less restrictive aggregate.
@@ -297,6 +306,9 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         **modes,'approved_project_target':target,'nine_stage_reference':reference,'order_source':orders,
         'deployment_gap':gap,'buy_permission':permission,'event_coverage':coverage,
         'gap_groups':groups,'trade_action':'NO_TRADE','deployment_status':'NOT_RUN'}
+    if v70.get('schema_version')=='Family.W8.V70SafetyDecisions.v1':
+        result['macro_safety_source_audit']={k:deepcopy(v70[k]) for k in
+            ('source_sha256','source_reference','credit','macro_pressure','remaining_dependencies')}
     result['conclusion_digest']=digest(result)
     return result
 

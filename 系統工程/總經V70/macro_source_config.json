@@ -4,9 +4,9 @@
   "note": "Declared source preferences are not proof that each adapter is implemented. Never promote an unverified fallback.",
   "indicators": {
     "m07": {
-      "primary_source": "CBOE_OFFICIAL_VIX",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV",
+        "CBOE_OFFICIAL_VIX",
         "YAHOO_VIX_CHART"
       ],
       "max_age_days": 12,
@@ -16,9 +16,9 @@
       "unit": null
     },
     "m01": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "FRED_OFFICIAL_API"
       ],
       "max_age_days": 12,
       "tolerance": {
@@ -38,9 +38,9 @@
       "unit": null
     },
     "m02": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "FRED_OFFICIAL_API"
       ],
       "max_age_days": 12,
       "tolerance": {
@@ -49,8 +49,9 @@
       "unit": "%"
     },
     "m04": {
-      "primary_source": "ISM_OFFICIAL",
+      "primary_source": "ISM_OFFICIAL_PDF",
       "backup_sources": [
+        "ISM_OFFICIAL",
         "VERIFIED_OVERRIDE"
       ],
       "max_age_days": 65,
@@ -105,9 +106,9 @@
       "unit": null
     },
     "m13": {
-      "primary_source": "US_TREASURY",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "US_TREASURY"
       ],
       "max_age_days": 12,
       "tolerance": {
@@ -156,9 +157,9 @@
       "unit": null
     },
     "m17": {
-      "primary_source": "US_TREASURY",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "US_TREASURY"
       ],
       "max_age_days": 12,
       "tolerance": {
@@ -178,8 +179,9 @@
       "unit": null
     },
     "m19": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_EMPLOYMENT_TABLE",
       "backup_sources": [
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
         "FRED_CSV"
       ],

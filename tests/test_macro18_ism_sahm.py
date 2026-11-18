@@ -73,8 +73,9 @@ class SourceTests(unittest.TestCase):
             r=macro.ism_official(fake,'m04')
         self.assertEqual((r['observation_date'],r['value']),('2026-10-01',55.5))
         self.assertIn('roundup-october-2026-manufacturing',r['source_url'])
-        self.assertEqual([x['result'] for x in fake.fredattempts['ISM_m04']],['FAILED','OK'])
-        self.assertEqual(len(calls),2)
+        self.assertEqual([x['result'] for x in fake.fredattempts['ISM_m04']],['FAILED','FAILED','OK'])
+        self.assertEqual(len(calls),3)
+        self.assertTrue(calls[0].endswith('r4in202610pmi.pdf'))
 
     def test_unavailable_current_report_cannot_promote_previous_month(self):
         class NovemberDatetime(RealDatetime):
@@ -90,7 +91,8 @@ class SourceTests(unittest.TestCase):
         with patch.object(macro.dt,'datetime',NovemberDatetime):
             with self.assertRaisesRegex(RuntimeError,'ISM official monthly headline source failed'):
                 macro.ism_official(fake,'m04')
-        self.assertEqual(len(calls),2)
+        self.assertEqual(len(calls),3)
+        self.assertTrue(calls[0].endswith('r4in202610pmi.pdf'))
         self.assertTrue(all('/september/' not in url for url in calls))
 
     def test_live_month_release_gate_and_cached_source_fail_closed(self):
@@ -136,3 +138,4 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(r['observation_date'],'2026-09-01')
 
 if __name__=='__main__':unittest.main()
+

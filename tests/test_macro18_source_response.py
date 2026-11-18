@@ -64,11 +64,11 @@ class SourceResponseTests(unittest.TestCase):
             self.assertEqual(get.call_count,1)
 
     def test_api_failure_then_csv_success_keeps_attempts_and_redacts_key(self):
-        with patch.dict(macro.os.environ,{'FRED_API_KEY':'synthetic-test-secret'}), patch.object(requests.Session,'get',side_effect=[response('bad',kind='text/html'),response('bad',kind='text/html'),response(GOOD)]) as get, patch.object(macro.time,'sleep'):
-            f=macro.Fetcher();f.fred('BAMLH0A0HYM2')
+        with patch.dict(macro.os.environ,{'FRED_API_KEY':'synthetic-test-secret'}), patch.object(requests.Session,'get',side_effect=[response('bad',kind='text/html'),response('bad',kind='text/html'),response(GOOD.replace("BAMLH0A0HYM2","DFII10"))]) as get, patch.object(macro.time,'sleep'):
+            f=macro.Fetcher();f.fred('DFII10')
             self.assertEqual(get.call_count,3)
             self.assertNotIn('synthetic-test-secret',str(f.fredattempts))
-            self.assertEqual(len(f.fredattempts['BAMLH0A0HYM2']),3)
+            self.assertEqual(len(f.fredattempts['DFII10']),3)
 
     def test_valid_source_is_not_retried(self):
         with patch.dict(macro.os.environ,{'FRED_API_KEY':''}), patch.object(requests.Session,'get',return_value=response(GOOD)) as get:
@@ -77,3 +77,4 @@ class SourceResponseTests(unittest.TestCase):
             self.assertEqual(f.fredattempts['BAMLH0A0HYM2'][0]['observation_date'],'2026-10-20')
 
 if __name__=='__main__':unittest.main()
+

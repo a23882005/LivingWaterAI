@@ -160,9 +160,9 @@
       ]
     },
     "m13": {
-      "primary_source": "FRED_CSV",
+      "primary_source": "US_TREASURY_DIRECT",
       "backup_sources": [
-        "US_TREASURY"
+        "FRED_CSV"
       ],
       "max_age_days": 12,
       "tolerance": {
@@ -177,8 +177,9 @@
       ]
     },
     "m14": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FED_NYFED_DIRECT",
       "backup_sources": [
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 12,
@@ -198,7 +199,8 @@
         "newyorkfed.org",
         "nomics.world",
         "treasury.gov"
-      ]
+      ],
+      "official_direct_rule": "SAME_H41_WEDNESDAY_LEVELS_EXACT_91_DAYS_ORIGINAL_NYFED_HOLIDAY_RULE"
     },
     "m15": {
       "primary_source": "ISM_OFFICIAL",
@@ -237,9 +239,9 @@
       ]
     },
     "m17": {
-      "primary_source": "FRED_CSV",
+      "primary_source": "US_TREASURY_DIRECT",
       "backup_sources": [
-        "US_TREASURY"
+        "FRED_CSV"
       ],
       "max_age_days": 12,
       "tolerance": {

@@ -65,12 +65,14 @@ class VixFreshnessTests(unittest.TestCase):
         self.assertEqual(macro.last_completed_vix_session(clock(18,30)),
                          dt.date(2026,11,27))
 
-    def test_cboe_fresh_wins_even_with_fred_key(self):
+    def test_lagged_free_csv_then_fresh_cboe_even_with_fred_key(self):
         f = macro.Fetcher()
         calls = []
 
         def get(url, **kwargs):
             calls.append(url)
+            if 'fredgraph.csv' in url:
+                return Response('DATE,VIXCLS\n2026-11-04,16.61\n')
             if 'cdn.cboe.com' in url:
                 return Response('DATE,CLOSE\n11/04/2026,16.61\n11/05/2026,28.18\n')
             raise AssertionError('Cboe fresh: fallback should not be fetched')
@@ -83,14 +85,18 @@ class VixFreshnessTests(unittest.TestCase):
         self.assertAlmostEqual(float(observed.iloc[-1]), 28.18)
         self.assertEqual(str(observed.index[-1].date()), '2026-11-05')
         self.assertEqual(f.fredsources['VIXCLS'][0], 'CBOE_OFFICIAL_VIX')
-        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(calls), 2)
+        self.assertIn('fredgraph.csv',calls[0])
+        self.assertIn('VIX_LAGGED_SESSION',f.fredattempts['VIXCLS'][0]['error'])
 
-    def test_stale_cboe_falls_back_to_fresh_yahoo_before_fred(self):
+    def test_lagged_free_csv_and_cboe_fall_back_to_fresh_yahoo_before_api(self):
         f = macro.Fetcher()
         calls = []
 
         def get(url, **kwargs):
             calls.append(url)
+            if 'fredgraph.csv' in url:
+                return Response('DATE,VIXCLS\n2026-11-04,16.61\n')
             if 'cdn.cboe.com' in url:
                 return Response('DATE,CLOSE\n11/04/2026,16.61\n')
             if 'query1.finance.yahoo.com' in url:
@@ -106,9 +112,9 @@ class VixFreshnessTests(unittest.TestCase):
         self.assertEqual(str(observed.index[-1].date()), '2026-11-05')
         self.assertEqual(f.fredsources['VIXCLS'][0], 'YAHOO_VIX_CHART')
         self.assertEqual([x['result'] for x in f.fredattempts['VIXCLS']],
-                         ['FAILED', 'OK'])
+                         ['FAILED', 'FAILED', 'OK'])
         self.assertIn('VIX_LAGGED_SESSION', f.fredattempts['VIXCLS'][0]['error'])
-        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(calls), 3)
 
     def test_all_sources_lag_fail_closed_instead_of_old_ok(self):
         f = macro.Fetcher()
@@ -133,7 +139,7 @@ class VixFreshnessTests(unittest.TestCase):
         # An old but valid quote advances to the next source without retry.
         self.assertEqual(len(f.fredattempts['VIXCLS']), 4)
         self.assertEqual([a['provider'] for a in f.fredattempts['VIXCLS'][:2]],
-                         ['CBOE_OFFICIAL_VIX', 'YAHOO_VIX_CHART'])
+                         ['FRED_CSV', 'CBOE_OFFICIAL_VIX'])
         self.assertTrue(all(x['result'] == 'FAILED'
                             for x in f.fredattempts['VIXCLS']))
 
@@ -149,6 +155,8 @@ class VixFreshnessTests(unittest.TestCase):
             'indicators': {'quote': [{'close': [28.18, 25.1]}]},
         }]}}
         def get(url, **kwargs):
+            if 'fredgraph.csv' in url:
+                return Response('DATE,VIXCLS\n2026-11-04,16.61\n')
             if 'cdn.cboe.com' in url:
                 return Response('DATE,CLOSE\n11/04/2026,16.61\n')
             if 'query1.finance.yahoo.com' in url:

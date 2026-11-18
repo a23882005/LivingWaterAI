@@ -171,3 +171,11 @@ def test_strategy_lineage_pins_raw_bootstrap_without_qualifying_unconsumed_legac
     assert len(pinned)==1 and pinned[0]['sha256']==desc['sha256']
     producer.write_text('{}')
     with pytest.raises(PermissionError):source_files({'financial_producer_sources':{'SYN_ASSET':desc}},'2026-10-29T23:00:00Z')
+
+
+@pytest.mark.parametrize('quote_currency,required',[('TWD',False),('USD',True),(None,True)])
+def test_global_member_gap_uses_actual_quote_unit_without_inventing_fx(quote_currency,required):
+    from formal_mode_analysis import target_fx_required
+    req={'owner':{'currency':None}};market={'market_identity':{'currency':quote_currency}}
+    target={'value_state':'KNOWN','amount':'100','currency':'TWD'}
+    assert target_fx_required(req,market,target) is required

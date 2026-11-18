@@ -75,6 +75,14 @@ def target_for_symbol(request,symbol,*,projection=None):
     return deepcopy(found[0]['target_amount'])
 
 
+def target_fx_required(request,market,target):
+    # Position-gap arithmetic compares the target's money unit with the
+    # canonical quote's unit. An all-account request has no selected currency;
+    # that absence must not create a conversion between identical currencies.
+    currency=(market.get('market_identity') or {}).get('currency') or request['owner'].get('currency')
+    return target.get('value_state')=='KNOWN' and (currency is None or target.get('currency')!=currency)
+
+
 def order_source(request,confirmation=None,*,broker_orders=None,buy_confirmation=None):
     from owner_financial_confirmation import bind_buy_orders
     result=bind_buy_orders(_original_order_source(request,confirmation,broker_orders=broker_orders),
@@ -273,7 +281,7 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         buy_confirmation=row.get('owner_buy_confirmation'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
-    if target['value_state']=='KNOWN' and target.get('currency')!=request['owner']['currency']:missing.append('verified_same_run_target_FX')
+    if target_fx_required(request,market,target):missing.append('verified_same_run_target_FX')
     if not row.get('position_valuation_allowed',False):missing.append('canonical_valuation_price_identity_and_validity')
     if row['holding'].get('quantity_state')!='KNOWN' or row['holding'].get('quantity') is None:
         missing.append('confirmed_position_quantity')

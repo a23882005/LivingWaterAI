@@ -155,3 +155,30 @@ def test_qualified_nav_feeds_original_c7_capacity_current_weights_and_reporting_
         ci['v70_asset_framework']['stock_tactical_amount'].update(amount=100,currency='TWD',value_state='KNOWN')
         native=m.capacity(full_scope,ci,at);m.validate_confirmed_book(full_scope,ci,at)
         assert native['occupied']=='60' and native['incremental_capacity']=='40'
+
+
+@pytest.mark.parametrize('legacy_kind',[None,'BROAD_ETF','BOND_ETF'])
+def test_current_confirmed_holding_classification_fills_legacy_omissions_and_rejects_conflicts(tmp_path,monkeypatch,legacy_kind):
+    import family_c7_source_assembly as assembly
+    import member_reconciliation_source
+    from test_family_c7_source_assembly import original_case
+    _,_,req,ctx,tactical,ids,_,_=original_case(tmp_path)
+    # The current accepted holding may be absent from old target/registry IDs.
+    held='SYN_HELD_OUTSIDE_LEGACY_REGISTRY';ids[held]={'asset_type':legacy_kind}
+    normalized={'original_classification_sources':{'classification_source':{'sha256':'a'*64},'product_sources':{}},
+        'current_portfolio_reference':{'positions':[{'symbol':held}]},
+        'position_values':{'positions':[]},'source_db_sha256':req['client_snapshot']['payload']['source_sha256'],'digest':'b'*64}
+    monkeypatch.setattr(member_reconciliation_source,'read',lambda *a:deepcopy(normalized))
+    called=[]
+    def current_identities(root,request,source,products,reported_symbols=()):
+        called.extend(reported_symbols);return {held:{'asset_type':'BROAD_ETF','source_sha256':'a'*64}}
+    monkeypatch.setattr(assembly,'original_identities',current_identities)
+    ctx['member_reconciliation_source']={'local_path':'SYNTHETIC','sha256':'c'*64}
+    builder=assembly.SourceAssembler(ROOT,req,ctx,tmp_path/'private')
+    if legacy_kind=='BOND_ETF':
+        with pytest.raises(PermissionError,match='C7_CURRENT_AND_LEGACY_PRODUCT_BUCKET_CONFLICT'):
+            builder.build(tactical=tactical,identities=ids)
+    else:
+        builder.build(tactical=tactical,identities=ids)
+        assert assembly.asset_kind(builder.identities[held])=='equity ETF'
+    assert called==[held]

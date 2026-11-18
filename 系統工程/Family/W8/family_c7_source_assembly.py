@@ -35,7 +35,7 @@ def asset_kind(identity):
     return None
 
 
-def original_identities(root,request,classification_source,product_sources):
+def original_identities(root,request,classification_source,product_sources,reported_symbols=()):
     from native_asset_source import classification
     from bond_advisory import candidates
     from v75_runtime.work3 import TW_LISTED_ASSETS
@@ -43,6 +43,7 @@ def original_identities(root,request,classification_source,product_sources):
     tables=request['client_snapshot']['payload']['tables'];out={}
     symbols={r.get('ticker') for r in request['confirmed_target']['payload']['draft']['target_lines']}
     symbols.update(r.get('ticker') for r in tables.get('portfolio_instrument',[]))
+    symbols.update(reported_symbols)
     for symbol in sorted(s for s in symbols if s):
         out[symbol]=classification(symbol,classification_source,(product_sources or {}).get(symbol))
         units={r.get('quote_currency') for r in tables.get('portfolio_instrument',[])
@@ -682,8 +683,18 @@ class SourceAssembler:
     def build(self,*,tactical=None,identities=None,portfolio_facts_source=None):
         req=self.request;target=req['confirmed_target'];owner=self.owner
         original=(self.current_normalized or {}).get('original_classification_sources')
-        if identities is None and original is not None:
-            identities=original_identities(self.root,req,original['classification_source'],original['product_sources'])
+        if original is not None:
+            reported=(self.current_normalized or {}).get('current_portfolio_reference') or {}
+            current_ids=original_identities(self.root,req,original['classification_source'],original['product_sources'],
+                [p['symbol'] for p in reported.get('positions',[])])
+            if identities is None:identities=current_ids
+            else:
+                identities=deepcopy(identities)
+                for symbol,identity in current_ids.items():
+                    old_kind=asset_kind(identities.get(symbol,{}));current_kind=asset_kind(identity)
+                    if old_kind is not None and current_kind is not None and old_kind!=current_kind:
+                        raise PermissionError('C7_CURRENT_AND_LEGACY_PRODUCT_BUCKET_CONFLICT')
+                    if old_kind is None and current_kind is not None:identities[symbol]=identity
         self.identities=deepcopy(identities or {})
         market_contract=(self.current_normalized or {}).get('current_market_contract')
         if market_contract is not None:tactical=None

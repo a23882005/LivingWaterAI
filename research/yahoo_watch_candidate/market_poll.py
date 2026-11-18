@@ -140,6 +140,14 @@ def main():
         # A completed daily signal is one actionable event even if a 5m bar
         # changes on subsequent 10-minute runs, or a rerun has a new run_id.
         report['event_id']='rd-daily-action-v1:'+symbol+':'+observation['last_session']
+        # Carry only bounded, public completed-session risk evidence from the
+        # pinned original producer. No account, orders, cash or trade action.
+        for field in ('daily_close','daily_previous_close','daily_low',
+                      'daily_change_percent','daily_confirmed_swing_low',
+                      'daily_confirmed_swing_session','rd_break_true_codes',
+                      'rd_accel_true_codes'):
+            if field in observation:
+                report[field]=observation[field]
         reports.append(report)
     if reports:
         execution=collect_execution(repo,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_TOKEN'],os.environ.get('GITHUB_EVENT_NAME','UNKNOWN'))

@@ -13,7 +13,13 @@
       "tolerance": {
         "absolute": 1
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "cboe.com",
+        "yahoo.com",
+        "investing.com"
+      ]
     },
     "m01": {
       "primary_source": "FRED_CSV",
@@ -24,7 +30,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "gurufocus.com"
+      ]
     },
     "m08": {
       "primary_source": "FRED_OFFICIAL_API",
@@ -35,7 +47,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m02": {
       "primary_source": "FRED_CSV",
@@ -46,7 +64,13 @@
       "tolerance": {
         "absolute": 0.1
       },
-      "unit": "%"
+      "unit": "%",
+      "candidate_websites": [
+        "stlouisfed.org",
+        "gurufocus.com",
+        "ycharts.com",
+        "tradingeconomics.com"
+      ]
     },
     "m04": {
       "primary_source": "ISM_OFFICIAL_PDF",
@@ -58,7 +82,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "ismworld.org",
+        "tradingeconomics.com",
+        "investing.com",
+        "prnewswire.com"
+      ]
     },
     "m05": {
       "primary_source": "BLS_HISTORY_V2",
@@ -70,7 +100,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m09": {
       "primary_source": "YAHOO_DXY",
@@ -81,7 +117,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "gurufocus.com",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m10": {
       "primary_source": "YAHOO_WTI_FUTURES",
@@ -92,7 +134,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "cmegroup.com",
+        "investing.com",
+        "tradingview.com"
+      ]
     },
     "m12": {
       "primary_source": "YAHOO_MOVE",
@@ -103,7 +151,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "investing.com",
+        "tradingview.com",
+        "ice.com"
+      ]
     },
     "m13": {
       "primary_source": "FRED_CSV",
@@ -114,7 +168,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m14": {
       "primary_source": "FRED_OFFICIAL_API",
@@ -131,7 +191,14 @@
         "fallback": "NYFED_TREASURY_ON_RRP_OUTSTANDING_ON_CONFIRMED_HOLIDAY_ONLY",
         "fred_value_priority": true,
         "max_age_days_unchanged": 12
-      }
+      },
+      "candidate_websites": [
+        "stlouisfed.org",
+        "federalreserve.gov",
+        "newyorkfed.org",
+        "nomics.world",
+        "treasury.gov"
+      ]
     },
     "m15": {
       "primary_source": "ISM_OFFICIAL",
@@ -142,7 +209,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "ismworld.org",
+        "tradingeconomics.com",
+        "investing.com",
+        "prnewswire.com"
+      ]
     },
     "m16": {
       "primary_source": "PNC_PUBLISHED_LEI",
@@ -154,7 +227,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "pnc.com",
+        "conference-board.org",
+        "prnewswire.com",
+        "fedprimerate.com"
+      ]
     },
     "m17": {
       "primary_source": "FRED_CSV",
@@ -165,7 +244,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m18": {
       "primary_source": "FRED_CSV",
@@ -176,7 +261,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "thetrading.tools",
+        "therationalmoderate.com",
+        "economyfacts.us"
+      ]
     },
     "m19": {
       "primary_source": "BLS_EMPLOYMENT_TABLE",
@@ -189,7 +280,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m20": {
       "primary_source": "BLS_HISTORY_V2",
@@ -201,7 +298,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "s04": {
       "primary_source": "CNN_FEAR_GREED",
@@ -212,7 +315,15 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "feargreedflow.com",
+        "cnn.com",
+        "github.com",
+        "finhacker.cz"
+      ]
     }
-  }
+  },
+  "candidate_registry_file": "macro_source_candidates.json",
+  "candidate_registry_policy": "Owner-approved 4-6 distinct website options per original 18+8 variable; existing verified adapters and scoring rules unchanged."
 }

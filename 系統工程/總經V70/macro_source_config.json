@@ -203,6 +203,7 @@
     "m15": {
       "primary_source": "ISM_OFFICIAL",
       "backup_sources": [
+        "ISM_TRADINGECONOMICS",
         "VERIFIED_OVERRIDE"
       ],
       "max_age_days": 65,

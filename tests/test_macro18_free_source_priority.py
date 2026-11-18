@@ -78,22 +78,22 @@ class FreePriority(TestCase):
             result=f.fred('UNRATE',require_history=True)
         self.assertEqual(len(result),15);self.assertEqual(s.calls,[])
         self.assertIn('/v2/timeseries/data/',history.call_args.args[0])
-    def test_breakeven_uses_original_fred_result_first(self):
-        with patch.object(m,'latest',return_value={'value':2.26}) as primary,patch.object(m,'treasury_breakeven') as backup:
+    def test_breakeven_prefers_treasury_and_does_not_read_fred(self):
+        with patch.object(m,'treasury_breakeven',return_value={'value':2.26}) as primary,patch.object(m,'latest') as backup:
             self.assertEqual(m.breakeven_5y(object())['value'],2.26);primary.assert_called_once();backup.assert_not_called()
-    def test_breakeven_failure_keeps_original_treasury_fallback(self):
-        with patch.object(m,'latest',side_effect=ValueError('offline')),patch.object(m,'treasury_breakeven',return_value={'value':2.2}) as backup:
+    def test_breakeven_treasury_failure_keeps_original_fred(self):
+        with patch.object(m,'treasury_breakeven',side_effect=ValueError('offline')),patch.object(m,'latest',return_value={'value':2.2}) as backup:
             self.assertEqual(m.breakeven_5y(object())['value'],2.2);backup.assert_called_once()
-    def test_month_delta_preserves_calendar_month_formula(self):
+    def test_month_delta_preserves_calendar_month_fred_backup(self):
         class F:
             def fred(self,s):return pd.Series([2.37,2.26],index=pd.to_datetime(['2026-10-16','2026-11-17']))
-        with patch.object(m,'treasury_breakeven') as backup:
-            r=m.month_delta(F());self.assertAlmostEqual(r['value'],-.11);backup.assert_not_called()
-    def test_month_delta_rejects_old_baseline_and_tries_original_backup(self):
+        with patch.object(m,'treasury_breakeven',side_effect=ValueError('offline')):
+            r=m.month_delta(F());self.assertAlmostEqual(r['value'],-.11)
+    def test_month_delta_rejects_old_baseline_in_both_sources(self):
         class F:
             def fred(self,s):return pd.Series([2.37,2.26],index=pd.to_datetime(['2026-09-01','2026-11-17']))
-        with patch.object(m,'treasury_breakeven',return_value={'value':.02}) as backup:
-            self.assertEqual(m.month_delta(F())['value'],.02);backup.assert_called_once()
+        with patch.object(m,'treasury_breakeven',side_effect=ValueError('offline')),self.assertRaises(RuntimeError):
+            m.month_delta(F())
     def test_config_keeps_18_original_scope(self):
         c=m.load_source_config();self.assertEqual(len(c['indicators']),18)
         self.assertEqual(c['indicators']['m04']['primary_source'],'ISM_OFFICIAL_PDF')

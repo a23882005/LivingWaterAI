@@ -82,6 +82,21 @@ class MailFormatTest(unittest.TestCase):
         self.assertIn('SOXX',title)
         self.assertIn(JSON_MARKER,body)
 
+    def test_actionable_alert_uses_direct_next_step_and_preserves_evidence(self):
+        q=row('VT','UNKNOWN',None,None,None,'UNKNOWN',None)
+        q.update(event_id='rd-daily-action-v1:VT:2026-11-18',
+                 generated_at='2026-11-18T13:07:00Z',run_id='123',run_url=RUN,
+                 rd_observation='TRUE',daily_session='2026-11-18',
+                 monitor_status='ACTIVE_OBSERVATION_NOT_BUY')
+        title,body=self.compose(q)
+        self.assertIn('日線急跌警戒已觸發',title)
+        self.assertIn('請檢查買單',title)
+        self.assertIn('已完成：2026-11-18 收盤日線',body)
+        self.assertIn('現在請做：核對VT未成交買單與可用資金',body)
+        self.assertNotIn('缺價格',body.split(JSON_MARKER,1)[0])
+        self.assertNotIn('非買進訊號',title)
+        self.assertIn(RUN,body)
+
     def test_large_batch_stays_concise(self):
         title,body=self.compose(batch([row('X'+str(i)) for i in range(60)]))
         self.assertLess(len(title),130)

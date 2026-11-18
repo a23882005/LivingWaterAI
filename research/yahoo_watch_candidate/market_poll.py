@@ -57,7 +57,7 @@ def actionable_daily_risk(observation):
     return (observation.get('status')=='OBSERVED_DAILY_FORMULA'
             and observation.get('runaway_down')=='TRUE'
             and isinstance(session,str)
-            and re.fullmatch(r'\\d{4}-\\d{2}-\\d{2}',session) is not None
+            and re.fullmatch(r'\d{4}-\d{2}-\d{2}',session) is not None
             and expected==session
             and isinstance(digest,str)
             and re.fullmatch(r'[0-9a-f]{64}',digest) is not None)

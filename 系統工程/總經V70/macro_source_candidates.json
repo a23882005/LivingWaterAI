@@ -1093,8 +1093,9 @@
         {
           "rank": 1,
           "website": "pnc.com",
-          "url": "https://www.pnc.com/en/about-pnc/topics/economic-reports.html",
+          "url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
           "same_website_endpoints": [
+            "https://www.pnc.com/en/about-pnc/topics/economic-reports.html",
             "https://www.pnc.com/en/about-pnc/media/economic-reports.html",
             "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
             "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
@@ -1102,15 +1103,15 @@
           ],
           "origin": "EXISTING",
           "data_scope": "DIRECT_OR_MIRROR",
-          "last_http": {
-            "status": 404,
-            "checked_at": "2026-11-18T11:54:36.045410+00:00",
-            "evidence_sha256": "e366c117d2bf5f7fe5aa2bfdc8e38645ce9e8ac425501b5ee188474f9853c6b8",
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
+          "last_http": null,
           "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。"
+          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。",
+          "last_numeric_verification": {
+            "url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+            "value": -0.5,
+            "date": "2026-09-01",
+            "verified_at": null
+          }
         },
         {
           "rank": 2,
@@ -2327,5 +2328,6 @@
     "http_200_selected_added": 34,
     "http_202_selected_added": 2,
     "corrected_404_retained_in_evidence": true
-  }
+  },
+  "dated_link_policy": "月份與日期固定的原件均保留本次期間；後續每輪仍須按原官方發布期更新並驗證，不把舊月份當成新資料。"
 }

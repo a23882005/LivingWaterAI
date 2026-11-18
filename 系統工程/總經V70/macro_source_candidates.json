@@ -741,26 +741,6 @@
       "sources": [
         {
           "rank": 1,
-          "website": "stlouisfed.org",
-          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
-          "same_website_endpoints": [
-            "https://fred.stlouisfed.org/series/T5YIE",
-            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
-          ],
-          "origin": "ADDED_CANDIDATE",
-          "data_scope": "COMPONENT_OR_DERIVED",
-          "last_http": {
-            "status": 200,
-            "checked_at": "2026-11-18T13:16:25.127417+00:00",
-            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
-          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
-        },
-        {
-          "rank": 2,
           "website": "treasury.gov",
           "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
           "same_website_endpoints": [
@@ -774,6 +754,26 @@
             "status": 200,
             "checked_at": "2026-11-18T11:52:35.275709+00:00",
             "evidence_sha256": "d4d116eec0d400cffd49908f8a28f27977d3bb0e04b36d0119cb36d3c8cc567a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/T5YIE",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:25.127417+00:00",
+            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
             "title": null,
             "kind": "AVAILABILITY_ONLY; original numeric validation still required"
           },
@@ -825,26 +825,6 @@
       "sources": [
         {
           "rank": 1,
-          "website": "stlouisfed.org",
-          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
-          "same_website_endpoints": [
-            "https://fred.stlouisfed.org/series/T5YIE",
-            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
-          ],
-          "origin": "ADDED_CANDIDATE",
-          "data_scope": "COMPONENT_OR_DERIVED",
-          "last_http": {
-            "status": 200,
-            "checked_at": "2026-11-18T13:16:25.127417+00:00",
-            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
-          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
-        },
-        {
-          "rank": 2,
           "website": "treasury.gov",
           "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
           "same_website_endpoints": [
@@ -858,6 +838,26 @@
             "status": 200,
             "checked_at": "2026-11-18T11:52:35.275709+00:00",
             "evidence_sha256": "d4d116eec0d400cffd49908f8a28f27977d3bb0e04b36d0119cb36d3c8cc567a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/T5YIE",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:25.127417+00:00",
+            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
             "title": null,
             "kind": "AVAILABILITY_ONLY; original numeric validation still required"
           },
@@ -909,30 +909,6 @@
       "sources": [
         {
           "rank": 1,
-          "website": "stlouisfed.org",
-          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL",
-          "same_website_endpoints": [
-            "https://fred.stlouisfed.org/series/WALCL",
-            "https://fred.stlouisfed.org/graph/graph.csv?id=WALCL&cosd=2024-08-01",
-            "https://fred.stlouisfed.org/series/WDTGAL",
-            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL",
-            "https://fred.stlouisfed.org/series/RRPONTSYD",
-            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD"
-          ],
-          "origin": "EXISTING",
-          "data_scope": "COMPONENT_OR_DERIVED",
-          "last_http": {
-            "status": null,
-            "checked_at": "2026-11-18T11:54:20.462661+00:00",
-            "evidence_sha256": null,
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
-          },
-          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
-          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
-        },
-        {
-          "rank": 2,
           "website": "federalreserve.gov",
           "url": "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H41&filetype=zip",
           "same_website_endpoints": [
@@ -951,7 +927,7 @@
           "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
         },
         {
-          "rank": 3,
+          "rank": 2,
           "website": "newyorkfed.org",
           "url": "https://markets.newyorkfed.org/api/rp/reverserepo/propositions/search.json?startDate=2026-08-01&endDate=2026-11-10",
           "same_website_endpoints": [],
@@ -960,6 +936,30 @@
           "last_http": {
             "status": null,
             "checked_at": "2026-11-18T11:54:03.597902+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        },
+        {
+          "rank": 3,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/WALCL",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=WALCL&cosd=2024-08-01",
+            "https://fred.stlouisfed.org/series/WDTGAL",
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL",
+            "https://fred.stlouisfed.org/series/RRPONTSYD",
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:54:20.462661+00:00",
             "evidence_sha256": null,
             "title": null,
             "kind": "AVAILABILITY_ONLY; original numeric validation still required"

@@ -92,10 +92,46 @@ class MailFormatTest(unittest.TestCase):
         self.assertIn('日線急跌警戒已觸發',title)
         self.assertIn('請檢查買單',title)
         self.assertIn('已完成：2026-11-18 收盤日線',body)
-        self.assertIn('現在請做：核對VT未成交買單與可用資金',body)
+        self.assertIn('現在請做：核對VT未成交買單的限價、股數、GTC效期及預留資金',body)
         self.assertNotIn('缺價格',body.split(JSON_MARKER,1)[0])
         self.assertNotIn('非買進訊號',title)
         self.assertIn(RUN,body)
+
+    def test_alert_explains_actual_daily_risk_and_keeps_stale_preprice_separate(self):
+        q=row('VT','OLD_OBSERVATION_NOT_CURRENT',151.19,
+              '2026-11-18T13:50:00+00:00','2026-11-18T14:41:43+00:00','PRE',None)
+        q.update(event_id='rd-daily-action-v1:VT:2026-11-17',
+                 generated_at='2026-11-18T14:21:43+00:00',run_id='123',run_url=RUN,
+                 rd_observation='TRUE',daily_session='2026-11-17',
+                 monitor_status='ACTIVE_OBSERVATION_NOT_BUY',
+                 daily_close=150.65,daily_previous_close=152.36,
+                 daily_low=149.77,daily_change_percent=-1.1223,
+                 daily_confirmed_swing_low=151.25,
+                 daily_confirmed_swing_session='2026-11-05',
+                 rd_break_true_codes='D2',rd_accel_true_codes='A1|A3|A4|A5|A7')
+        title, body=self.compose(q)
+        self.assertIn('VT｜日線急跌警戒已觸發',title)
+        self.assertIn('前收152.36→收150.65美元（-1.71美元，-1.12%）',body)
+        self.assertIn('盤中最低149.77美元',body)
+        self.assertIn('D2收盤跌破已確認的波段低點',body)
+        self.assertIn('跌勢加速已確認5項',body)
+        self.assertIn('2026-11-05 151.25美元',body)
+        self.assertIn('先暫緩新增VT買單',body)
+        self.assertIn('舊報價 151.19，時間 11/18 21:50',body)
+        self.assertIn('這是舊值',body)
+        self.assertNotIn('前收151.19',body)
+
+    def test_missing_risk_evidence_is_explicit_and_no_intraday_substitute(self):
+        q=row('VT','UNKNOWN',151.19,'2026-11-18T13:50:00Z',
+              '2026-11-18T14:41:43Z','PRE',None)
+        q.update(event_id='rd-daily-action-v1:VT:2026-11-17',
+                 generated_at='2026-11-18T14:21:43Z',
+                 rd_observation='TRUE',daily_session='2026-11-17',
+                 monitor_status='ACTIVE_OBSERVATION_NOT_BUY')
+        _, body=self.compose(q)
+        self.assertIn('本次警戒JSON未附日線價與跌幅',body)
+        self.assertIn('尚缺D1～D3／A1～A8逐票明細',body)
+        self.assertNotIn('前收151.19',body)
 
     def test_large_batch_stays_concise(self):
         title,body=self.compose(batch([row('X'+str(i)) for i in range(60)]))

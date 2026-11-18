@@ -910,18 +910,18 @@
         {
           "rank": 1,
           "website": "federalreserve.gov",
-          "url": "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H41&filetype=zip",
+          "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
           "same_website_endpoints": [
+            "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H41&filetype=zip",
             "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H41"
           ],
           "origin": "EXISTING",
           "data_scope": "COMPONENT_OR_DERIVED",
           "last_http": {
             "status": 200,
-            "checked_at": "2026-11-18T11:54:03.175427+00:00",
+            "checked_at": "2026-11-18T15:20:00+00:00",
             "evidence_sha256": "3a790961abae3bc20af182e9ec9fa4108c847bd99c0ee99aa45769ea165e253d",
-            "title": null,
-            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+            "kind": "REAL_RESPONSE_PARSED; final main run will have its own receipt"
           },
           "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
           "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"

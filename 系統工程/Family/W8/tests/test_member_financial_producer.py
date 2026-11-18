@@ -99,6 +99,25 @@ def test_original_error_code_and_field_are_retained(tmp_path):
     assert pack is None and out['issues'][0]['code']=='SOURCE_APPROVED_TARGET_BASE_REQUIRED'
 
 
+def test_qualified_nav_inventory_survives_an_unrelated_native_history_rejection(tmp_path,monkeypatch):
+    import member_reconciliation_source,family_c7_source_assembly
+    r,_,desc=case(tmp_path);before=deepcopy(r)
+    normalized={'digest':'b'*64,'current_portfolio_reference':{'formal_NAV_source_qualified':True},
+        'client_id':r['client_id'],'run_id':r['run_id'],'source_db_sha256':'a'*64,'target_version':2}
+    monkeypatch.setattr(member_reconciliation_source,'read',lambda *a:deepcopy(normalized))
+    inventory={'status':'SYN_QUALIFIED_NAV_ORIGINAL_INVENTORY','scope_candidate':{'current_nav':'SYN_KNOWN_NAV'}}
+    monkeypatch.setattr(family_c7_source_assembly,'assemble',lambda *a,**k:deepcopy(inventory))
+    def factory(**cfg):
+        def run(*args):raise ValueError('SYN_HISTORY_RELEASE_HORIZON_REQUIRED')
+        return run
+    out,pack=produce(ROOT,r,'SYNTHETIC_ASSET',desc(),producer_factory=factory,
+        reconciliation_source={'local_path':'SYNTHETIC','sha256':'a'*64})
+    assert pack is None and not out['qualified_financial_pack'] and r==before
+    assert out['status']=='ORIGINAL_SOURCE_PRODUCER_REJECTED'
+    assert out['issues'][0]['code']=='SYN_HISTORY_RELEASE_HORIZON_REQUIRED'
+    assert out['family_scope_assembly']==inventory
+
+
 def test_old_bootstrap_money_cannot_replace_unresolved_current_approval(tmp_path):
     r,d,desc=case(tmp_path)
     r['confirmed_target']['payload']['draft']['target_lines'][0]['target_amount'].update(value_state='UNKNOWN',amount=None)

@@ -227,18 +227,20 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         from native_asset_source import native_error_path
         issues=getattr(error,'issues',None)
         if not issues and isinstance(getattr(error,'issue',None),dict):issues=[error.issue]
-        normalized=[]
+        native_issues=[]
         for issue in issues or []:
-            normalized.append(deepcopy(issue) if isinstance(issue,dict) else {
+            native_issues.append(deepcopy(issue) if isinstance(issue,dict) else {
                 'code':getattr(issue,'code',type(issue).__name__),'field_path':str(getattr(issue,'path','')),
                 'message':str(getattr(issue,'message',issue))})
         code=getattr(error,'code',None)
-        if not code and normalized:code=normalized[0].get('code')
+        if not code and native_issues:code=native_issues[0].get('code')
         if not code:
             match=re.match(r'([A-Z][A-Z0-9_.]+)(?:[: ]|$)',str(error));code=match.group(1) if match else type(error).__name__
-        return {**attempt,'status':'ORIGINAL_SOURCE_PRODUCER_REJECTED','issues':[{
+        qualified_nav=(normalized or {}).get('current_portfolio_reference',{}).get('formal_NAV_source_qualified') is True
+        source_inventory={'family_scope_assembly':root_inventory()} if qualified_nav else {}
+        return {**attempt,**source_inventory,'status':'ORIGINAL_SOURCE_PRODUCER_REJECTED','issues':[{
             'code':code,'message':str(error),
-            'field_path':(normalized[0].get('field_path') if normalized else None) or native_error_path(error) or 'AssetSourceProducer.original_inputs','original_issues':normalized,
+            'field_path':(native_issues[0].get('field_path') if native_issues else None) or native_error_path(error) or 'AssetSourceProducer.original_inputs','original_issues':native_issues,
             'kind':'ORIGINAL_SOURCE_CONTRACT_FAILURE'}],
             'call_trace':attempt['call_trace']+['W8.AssetSourceProducer']},None
     child=pack['request']

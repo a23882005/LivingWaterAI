@@ -54,3 +54,32 @@ def calculate(root,request,policy,fx_observation=None,*,feed_source=None):
         native_currency_amounts=native_amounts,fx_observation=deepcopy(fx_observation),
         native_currency_issue=None if native_amounts is not None else 'V70_TACTICAL_BUDGET_FX_REQUIRED')
     return result
+
+
+def calculate_stock_ceiling(root,request,contract,fx_observation=None,*,feed_source=None):
+    """Consume only the unchanged original V70 stock output for a three-leg target."""
+    decision=contract['decision'];weights=decision.get('approved_original_weights') or {}
+    if (contract.get('client_id')!=request['client_id']
+        or contract.get('target_version')!=request['confirmed_target']['target_version']
+        or decision.get('status')!='APPROVED_PM_STOCK_CEILING_ONLY_INTERFACE_CONTRACT'
+        or decision.get('approved_full_portfolio_base_unchanged') is not True
+        or decision.get('source_HTML_sha256')!=hashlib.sha256((Path(root)/'系統工程/總經V70/V70-3-27.html').read_bytes()).hexdigest()):
+        raise PermissionError('V70_STOCK_ONLY_CONTRACT_SCOPE_OR_ORIGINAL_HTML_MISMATCH')
+    parts=[Decimal(str(weights.get(k))) for k in ('stock','bond','cash')]
+    if any(not v.is_finite() or v<0 for v in parts) or sum(parts)!=1:
+        raise ValueError('V70_STOCK_ONLY_ORIGINAL_THREE_LEG_WEIGHTS_REQUIRED')
+    policy={'client_id':request['client_id'],'stock_percent':float(parts[0]*100),
+        'bond_percent':float((1-parts[0])*100),'source_reference':contract['source_reference']}
+    raw=calculate(root,request,policy,fx_observation,feed_source=feed_source)
+    result={k:deepcopy(raw[k]) for k in ('allocation_base','native_execution_currency','source_feed_sha256',
+        'feed_as_of','source_html_sha256','fx_observation','native_currency_issue')}
+    result.update(schema_version='Family.W8.V70StockCeilingOnly.v1',
+        approved_original_weights=deepcopy(weights),
+        internal_inputs={'stock_percent':policy['stock_percent'],
+            'INTERNAL_NON_STOCK_COMPLEMENT':policy['bond_percent']},
+        native_currency_amounts={'stock':raw['native_currency_amounts']['stock']} if raw['native_currency_amounts'] else None,
+        amounts={'stock':raw['amounts']['stock']},consumed_output_keys=['stock'],
+        original_two_input_call_for_audit_only=raw,
+        bond_and_cash_targets_changed=False,cash_target_deducted_from_available_cash=False,
+        source_contract=deepcopy(contract['source_descriptor']),trade_action='NO_TRADE')
+    return result

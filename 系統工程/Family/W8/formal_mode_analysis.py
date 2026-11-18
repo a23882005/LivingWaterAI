@@ -305,6 +305,11 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         gap={'status':'COMPUTED','value':{k:str(v) if isinstance(v,Decimal) else v for k,v in asdict(result).items()},
             'function':'V82.calculate_position_gap','missing_fields':[]}
         modes['call_trace'].append('V82.calculate_position_gap')
+    buy_scope=row.get('new_buy_scope')
+    if buy_scope is not None and buy_scope.get('additional_buy_authorized') is False:
+        gap.update(status='NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION',value=None,
+            inactive_new_buy_input_dependencies=deepcopy(gap.get('missing_fields',[])),missing_fields=[],
+            target_amount_invented=False,sell_instruction_created=False)
     reference=[]
     for stage,rate in dep.STAGE_RATE_PCT.items():
         reference.append({'stage':stage,'cumulative_rate':str(rate/100),
@@ -318,6 +323,10 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'scope':'ORIGINAL_CORE_SAFETY_PERMISSION__FULL_EXECUTION_NOT_RUN',
         'right_or_runaway_false_is_not_buy_veto':True,'gap_used_in_permission':False,
         'broker_trade_authorization':request['trade_authorization']}
+    if buy_scope is not None and buy_scope.get('additional_buy_authorized') is False:
+        permission.update(value=False,scope='PM_NO_ADDITIONAL_BUY_AUTHORIZATION__HOLDING_RISK_ANALYSIS_PRESERVED',
+            source_core_permission=bool(core['permission']['new_buy_order_permission']))
+        permission['reason_codes'].append('NO_ADDITIONAL_BUY_TARGET_AUTHORIZED')
     groups=gap_matrix(row,target,coverage,orders,left_audit=left_audit)
     result={'schema_version':'Family.W8.FormalModeConclusion.v1','status':'INCOMPLETE_REQUIRED_FACTS',
         'binding':{'client_id':request['client_id'],'run_id':request['run_id'],
@@ -338,6 +347,9 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     if v70.get('schema_version')=='Family.W8.V70SafetyDecisions.v1':
         result['macro_safety_source_audit']={k:deepcopy(v70[k]) for k in
             ('source_sha256','source_reference','credit','macro_pressure','remaining_dependencies')}
+    if buy_scope is not None:
+        result['new_buy_scope']=deepcopy(buy_scope)
+        result['deployment_status']='NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION'
     result['conclusion_digest']=digest(result)
     return result
 

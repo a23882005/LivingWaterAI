@@ -10,8 +10,15 @@ from funding_guard import check_aggregate,owner_key,amount,FundingError
 
 
 def reconcile(request,positions,*,owner_confirmed_facts=None,current_business_facts=None):
-    groups={};pools={};missing=[];issues=[]
+    groups={};pools={};missing=[];issues=[];not_applicable=[]
     for row in positions:
+        if (row.get('new_buy_scope') or {}).get('additional_buy_authorized') is False:
+            scope=row['new_buy_scope']
+            if (any(scope.get(k)!=request[k] for k in ('client_id','run_id'))
+                or scope.get('symbol')!=row['symbol']
+                or scope.get('status')!='NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION'):
+                raise PermissionError('MEMBER_NEW_BUY_EXCLUSION_SCOPE_MISMATCH')
+            not_applicable.append(row['symbol']);continue
         financial=row.get('financial_chain') or {}
         if not financial.get('full_native_pipeline_complete'):
             missing.append(row['symbol']);continue
@@ -81,13 +88,14 @@ def reconcile(request,positions,*,owner_confirmed_facts=None,current_business_fa
         if used>capacity:issues.append({'portfolio_id':pool['portfolio_id'],
             'code':'MEMBER_SHARED_STOCK_CAPACITY_EXCEEDED','kind':'SHARED_PORTFOLIO_BUDGET_FAILED'})
         shared.append({k:v for k,v in pool.items() if k!='claims'}|{'new_stock_amount':str(used)})
-    complete=bool(positions) and not missing and not issues
+    complete=bool(positions) and len(not_applicable)<len(positions) and not missing and not issues
     out={'schema_version':'Family.W8.MemberFundingSummary.v1','client_id':request['client_id'],
         'run_id':request['run_id'],'status':'RECONCILED' if complete else 'BLOCKED' if issues else 'SOURCE_INCOMPLETE',
         'conserved':complete,'accounts':accounts,'shared_stock_pools':shared,
         'unresolved_assets':missing,'issues':issues,'unavailable_amounts_defaulted_to_zero':False,
         'cross_currency_total':None,'source':'ORIGINAL_NATIVE_WORK6_AND_FUNDING_AGGREGATE',
         'trade_action':'NO_TRADE'}
+    if not_applicable:out['new_buy_not_applicable_assets']=not_applicable
     if owner_confirmed_facts is not None:
         facts=owner_confirmed_facts
         if (any(facts.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))

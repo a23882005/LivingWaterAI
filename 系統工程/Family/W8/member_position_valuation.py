@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 import re
+import json
 
 from family_input import digest
 from member_market_source import time
@@ -57,7 +58,24 @@ def read_fx(source,evaluation_at):
         basis='PUBLISHED_BANK_USD_SPOT_BUY_REFERENCE__NOT_EXECUTABLE_CASH_OR_FX_ORDER')
 
 
-def produce(request,coverage,equity_rows,inputs):
+def _reported_source_category_keys(facts):
+    """Distinct rows in one accepted book can be valued without real account IDs."""
+    if not facts or any(f.get('quantity') is None or f.get('source_kind')!='SEALED_W6' or not f.get('source_run_id')
+        or not f.get('broker_label') or (f.get('source_row') or {}).get('field_key')!='accepted_W6_broker_holdings_json'
+        for f in facts):return None
+    if len({f['source_run_id'] for f in facts})!=1:return None
+    texts={f['source_row'].get('value_text') for f in facts}
+    if len(texts)!=1 or None in texts:return None
+    original=json.loads(next(iter(texts)))
+    keys=[]
+    for fact in facts:
+        matches=[r for r in original if r.get('symbol')==fact['symbol'] and r.get('broker_label')==fact['broker_label']]
+        if len(matches)!=1 or _number(matches[0].get('quantity'))!=_number(fact.get('quantity')):return None
+        keys.append((fact['source_run_id'],fact['broker_label'],fact['symbol']))
+    return keys if len(set(keys))==len(keys) else None
+
+
+def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
     snapshot=request['client_snapshot']['payload'];client=request['client_id']
     if (snapshot['client_id']!=client or snapshot['payload_digest']!=digest(snapshot['tables'])
         or coverage.get('client_id')!=client or coverage.get('source_db_sha256')!=snapshot['source_sha256']
@@ -67,10 +85,16 @@ def produce(request,coverage,equity_rows,inputs):
     fx=read_fx(inputs.get('fx_source'),request['evaluation_at']);markets={r['symbol']:r.get('market') for r in equity_rows}
     markets.update({r['symbol']:r.get('market') for r in coverage['bonds']})
     rows=[];totals={}
+    if current_market_contract is not None and (any(current_market_contract.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
+        or current_market_contract.get('source_db_sha256')!=snapshot['source_sha256']):
+        raise PermissionError('CURRENT_POSITION_VALUATION_CONTRACT_SCOPE_MISMATCH')
     with localcontext() as context:
         context.prec=50
         for asset in coverage['holding_and_target_rows']:
             facts=asset['source_facts'];market=markets.get(asset['symbol'])
+            reference_quote=(market or {}).get('current_reference_quote') if current_market_contract is not None else None
+            if reference_quote is not None:
+                market={**market,**{k:reference_quote[k] for k in ('observed_date','observed_close','source_sha256','source_path','source_reference')}}
             if not facts and asset.get('owner_confirmed_position_absence'):
                 proof=asset['owner_confirmed_position_absence']
                 rows.append({'symbol':asset['symbol'],'account_key':None,'quantity':'0',
@@ -81,11 +105,19 @@ def produce(request,coverage,equity_rows,inputs):
                     'issue':None,'zero_value_does_not_assert_market_qualification':True})
                 continue
             keys=[(f.get('account_key'),f.get('instrument_key')) for f in facts]
+            logical_keys=(_reported_source_category_keys(facts) if current_market_contract is not None
+                and coverage.get('current_owner_business_facts') is not None else None)
+            if logical_keys is not None:keys=logical_keys
             for fact,key in zip(facts,keys):
                 row=dict(symbol=asset['symbol'],account_key=fact.get('account_key'),
                     quantity=fact.get('quantity'),quantity_source=deepcopy_fact(fact),
                     observed_market_date=(market or {}).get('observed_date'),
                     amount=None,currency=None,reporting_amount_TWD=None,issue=None)
+                if reference_quote is not None:
+                    row['current_reference_quote']=deepcopy_fact(reference_quote)
+                if logical_keys is not None:
+                    row.update(logical_holding_source_key=list(key),logical_category_is_real_account=False,
+                        original_account_binding_unchanged=True)
                 currency=fact.get('currency') or (fact.get('instrument') or {}).get('quote_currency')
                 if currency is None:
                     from official_holdings_source import holding_quote_currency

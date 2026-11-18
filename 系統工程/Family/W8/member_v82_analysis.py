@@ -335,6 +335,8 @@ def build_report(request, config, repo_root):
     owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
     from owner_current_business import read as read_current_owner,holding_view,order_confirmation
     current_owner=read_current_owner(config.get('owner_current_business_source'),request)
+    from current_market_contract import read as read_current_market,new_buy_scope,portfolio_reference
+    market_contract=read_current_market(config.get('current_market_contract_source'),request)
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
     ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
         'resource_initialized':False,'financial_cycle_initialized':False}
@@ -395,6 +397,8 @@ def build_report(request, config, repo_root):
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
         history_sources=config.get('public_history_sources',{}).get(symbol)
+        buy_scope=new_buy_scope(market_contract,symbol)
+        if buy_scope is not None:row['new_buy_scope']=buy_scope
         if owner_facts is not None:
             row['owner_buy_confirmation']=deepcopy(owner_facts['buy_order_confirmation'])
         if current_owner is not None:
@@ -485,6 +489,11 @@ def build_report(request, config, repo_root):
                 'FULL_SAME_RUN_FINANCIAL_BUNDLE_NOT_BOUND', ['final amount/caps/MIN/lot/shared cash'],
                 kind='UPSTREAM_INTEGRATION_NOT_COMPLETED'),
         ]
+        if buy_scope is not None:
+            inactive={'cycle_snapshot','work3/C7/funding/execution_constraints'}
+            row['inactive_new_buy_dependencies']=[deepcopy(m) for m in row['missing_inputs'] if m['field'] in inactive]
+            row['missing_inputs']=[m for m in row['missing_inputs'] if m['field'] not in inactive]
+            row['cycle_initialization_status']='NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION'
         for field in ('asset_type','asset_grade','primary_framework'):
             if cls[field] in (None,'UNKNOWN'):
                 row['missing_inputs'].append(missing('native_product_identity.'+field,
@@ -517,13 +526,17 @@ def build_report(request, config, repo_root):
     if config.get('position_valuation_inputs') is not None:
         from member_position_valuation import produce
         report['source_position_valuations']=produce(request,report['all_asset_coverage'],rows,
-            config['position_valuation_inputs'])
+            config['position_valuation_inputs'],current_market_contract=market_contract)
     if safety_snapshot is not None:
         report['v70_safety_snapshot'] = safety_snapshot
     if owner_facts is not None:
         report['accepted_owner_financial_facts']=deepcopy(owner_facts)
     if current_owner is not None:
         report['current_owner_business_facts']=deepcopy(current_owner)
+    if market_contract is not None:
+        report['current_market_contract']=market_contract
+        report['current_portfolio_reference']=portfolio_reference(request,report['all_asset_coverage'],
+            report['source_position_valuations'],owner_facts,current_owner,market_contract)
     report['report_digest'] = digest(report)
     return report
 

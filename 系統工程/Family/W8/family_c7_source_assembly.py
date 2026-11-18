@@ -122,8 +122,11 @@ class SourceAssembler:
                         and not b.get('source_representation_alias_of')]
                 if len(matched)!=1:raise PermissionError('C7_OWNER_CURRENT_LOGICAL_CATEGORY_AMBIGUOUS')
                 self.request['owner']=deepcopy(matched[0]['owner'])
-                if self.context.get('family_c7_reporting_fx') is None:
+                if self.context.get('family_c7_reporting_fx') is None or self.current_normalized.get('current_market_contract') is not None:
                     self.context['family_c7_reporting_fx']=self.current_normalized['position_values'].get('fx_observation')
+                if self.current_normalized.get('current_market_contract') is not None:
+                    from native_target_source import produce
+                    self.context['native_target_source']=produce(self.request,self.context['family_c7_reporting_fx'])
         request=self.request
         self.at=request['evaluation_at'];self.owner=request.get('owner') or {}
         self.currency=self.owner.get('currency');self.inventory={};self.references=[];self.raw=[];self.issues=[]
@@ -168,6 +171,29 @@ class SourceAssembler:
             replace('current_nav',None,'C7_CURRENT_MARKET_PRICES_AND_REPORTING_FX_REQUIRED')
         self.observations['owner_current_business_portfolio']=deepcopy(portfolio)
         self.observations['historical_fill_completeness_asserted']=False
+        reference=(self.current_normalized or {}).get('current_portfolio_reference')
+        if reference is not None:
+            self.observations['current_portfolio_reference']=deepcopy(reference)
+            contract=reference['contract']
+            self.derived('current_portfolio_reference',reference,as_of=contract['available_at'],
+                available_at=contract['available_at'],original=contract)
+            locator=self.raw[-1]
+            for path,value in (
+                ('current_nav.source_dated_reference_TWD',reference['positions_plus_accepted_cash_TWD']),
+                ('exposures.source_dated_reference_stock_TWD',reference['current_stock_exposure_TWD']),
+                ('preference_locks.source_dated_position_weights',reference['positions']),
+                ('allocation_reference_gaps',reference['allocation_reference_gaps'])):
+                self.field(path,value,sources=[locator],producer='W8.current_market_contract:original_readers',blocking=False)
+            # The PM input explicitly supplies reference observations, not a
+            # qualified C7 NAV. Wire every value without manufacturing that
+            # separate source qualification or relaxing the original gate.
+            for path in ('current_nav','exposures','preference_locks'):
+                if scope.get(path) is not None:continue
+                self.issues[:]=[i for i in self.issues if i['field_path']!='family_scope.'+path]
+                self.field(path,None,state=ADAPTER,
+                    code='C7_CURRENT_REFERENCE_AVAILABLE__FORMAL_NAV_SOURCE_QUALIFICATION_REQUIRED',
+                    sources=[locator],producer='W8.current_market_contract:original_readers',
+                    responsibility='PM_ORIGINAL_NAV_SOURCE_QUALIFICATION')
 
     def field(self,path,value,*,state=None,code=None,sources=(),producer='ORIGINAL_FAMILY_SOURCE',responsibility=None,blocking=True):
         state=state or (DIRECT if value is not None else MISSING)
@@ -586,6 +612,21 @@ class SourceAssembler:
         if identities is None and original is not None:
             identities=original_identities(self.root,req,original['classification_source'],original['product_sources'])
         self.identities=deepcopy(identities or {})
+        market_contract=(self.current_normalized or {}).get('current_market_contract')
+        if market_contract is not None:tactical=None
+        if (market_contract is not None and market_contract['decision'].get('status')
+            =='APPROVED_PM_STOCK_CEILING_ONLY_INTERFACE_CONTRACT'):
+            weights={'stock':Decimal(0),'bond':Decimal(0),'cash':Decimal(0)}
+            for line in target['payload']['draft']['target_lines']:
+                kind=asset_kind(self.identities.get(line.get('ticker'),{})) or APPROVED_TARGET_ASSET_KINDS.get(line.get('asset_type'))
+                key='stock' if kind and kind.startswith('equity') else 'bond' if kind=='bond ETF' else 'cash' if kind=='cash' else None
+                if key is None:raise PermissionError('C7_STOCK_ONLY_ORIGINAL_TARGET_BUCKET_REQUIRED')
+                weights[key]+=number(line['weight']['value'])
+            if weights!={k:Decimal(str(v)) for k,v in market_contract['decision']['approved_original_weights'].items()}:
+                raise PermissionError('C7_STOCK_ONLY_ORIGINAL_TARGET_WEIGHTS_CHANGED')
+            from v70_tactical_input import calculate_stock_ceiling
+            tactical=calculate_stock_ceiling(self.root,req,market_contract,
+                self.context.get('family_c7_reporting_fx'),feed_source=(original or {}).get('macro_source'))
         original_policy=(self.current_normalized or {}).get('original_v70_strategic_policy')
         if tactical is None and original_policy is not None:
             from v70_tactical_input import calculate

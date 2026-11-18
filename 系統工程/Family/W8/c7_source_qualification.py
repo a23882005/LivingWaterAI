@@ -140,6 +140,11 @@ def annotate(assembly,request):
                 current_business_facts_supplied=True,source_locators=[deepcopy(locator)])
         checks['complete_exposure_book']['state']=AVAILABLE
         checks['protection']['state']=AVAILABLE
+        if observations.get('current_portfolio_reference') is not None:
+            checks['current_nav'].update(
+                business_fields=['formal C7 NAV source qualification; current reported prices, bank reporting FX, exposure values and weights already connected'],
+                next_responsibility='PM_ORIGINAL_NAV_SOURCE_QUALIFICATION',
+                current_market_and_reporting_FX_already_connected=True)
     dependencies={
         'family_owner':owner_requirements,'budget_currency':owner_requirements,
         'account_owners':owner_requirements,

@@ -137,6 +137,16 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         # source file; it must not become a second same-run approval lineage.
         if cfg is not None and normalized.get('original_target_sources',{}).get('official_target_base_source') is not None:
             cfg['official_target_base_source']=deepcopy(normalized['original_target_sources']['official_target_base_source'])
+        from current_market_contract import new_buy_scope
+        buy_scope=new_buy_scope(normalized.get('current_market_contract'),symbol)
+        if buy_scope is not None:
+            assembly=root_inventory()
+            return {**attempt,'status':'NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION',
+                'new_buy_scope':buy_scope,'issues':[],'family_scope_assembly':assembly,
+                'independent_source_inventory_issues':deepcopy(assembly['issues']),
+                'holding_and_risk_components_preserved':True,
+                'call_trace':attempt['call_trace']+['W8.family_c7_source_assembly:holding_source_inventory',
+                    'W8.member_financial_producer:PM_no_additional_buy_scope']},None
     if cfg is None:
         if normalized is not None and normalized.get('owner_current_portfolio') is not None:
             assembly=root_inventory()

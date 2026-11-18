@@ -19,7 +19,7 @@ INPUTS=('client_id','source_db_sha256','classification_source','product_sources'
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
     'official_target_base_source','document_target','owner_target_decision_source',
     'broker_observation_source','owner_financial_confirmation_source','owner_current_business_source','macro_source',
-    'financial_producer_sources')
+    'financial_producer_sources','current_market_contract_source')
 
 
 def binding(request):
@@ -71,6 +71,11 @@ def source_files(config,evaluation_at):
                     # here. Unconsumed legacy bootstrap observations are not
                     # new reconciliation inputs or qualified current facts.
                     for descriptor in item.values():walk(descriptor,expand=False)
+                elif key=='current_market_contract_source':
+                    # Embedded PM originals are verified by their dedicated
+                    # reader. The PM's historical local paths are provenance,
+                    # not paths on this execution host.
+                    walk(item,expand=False)
                 else:walk(item)
     walk(config)
     return [files[k] for k in sorted(files)]
@@ -82,6 +87,8 @@ def normalize(root,request,config):
         or config.get('source_db_sha256')!=snapshot['source_sha256']):
         raise PermissionError('MEMBER_RECONCILIATION_CONFIG_SCOPE')
     pinned=source_files(config,at)
+    from current_market_contract import read as read_current_market,portfolio_reference
+    market_contract=read_current_market(config.get('current_market_contract_source'),request)
     from member_v82_analysis import universe,target_source
     from all_asset_coverage import build
     from member_position_valuation import produce
@@ -118,7 +125,7 @@ def normalize(root,request,config):
             if not str(error).startswith('MEMBER_MARKET_'):raise
             market=None
         rows.append({'symbol':asset['symbol'],'market':market})
-    values=produce(request,all_assets,rows,config['position_valuation_inputs'])
+    values=produce(request,all_assets,rows,config['position_valuation_inputs'],current_market_contract=market_contract)
     books=[{'owner':deepcopy(view['owner']),'captured_at':view['captured_at'],
         'cash':deepcopy(view['cash']),'positions':deepcopy(view['positions']),
         'order_source':deepcopy(view['order_source']),
@@ -171,6 +178,9 @@ def normalize(root,request,config):
     if current is not None and accepted is not None:
         from owner_current_business import logical_portfolio
         out['owner_current_portfolio']=logical_portfolio(request,accepted,current)
+    if market_contract is not None:
+        out['current_market_contract']=market_contract
+        out['current_portfolio_reference']=portfolio_reference(request,all_assets,values,accepted,current,market_contract)
     out['digest']=digest(out)
     return out
 

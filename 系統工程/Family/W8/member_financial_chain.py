@@ -113,6 +113,8 @@ def complete_report(report,request,config,root):
             or reconciliation['securities']!=report['all_asset_coverage']['expected']
             or reconciliation['coverage_digest']!=report['all_asset_coverage']['coverage_digest']):
             raise PermissionError('MEMBER_RECONCILIATION_ANALYSIS_SOURCE_VALUES_OR_COVERAGE_MISMATCH')
+        if reconciliation.get('current_portfolio_reference')!=report.get('current_portfolio_reference'):
+            raise PermissionError('MEMBER_RECONCILIATION_CURRENT_PORTFOLIO_REFERENCE_MISMATCH')
         out['same_run_financial_sources']={'source_descriptor':reconciliation_source,
             'binding_digest':digest(binding(request)),
             'source_digest':reconciliation['digest'],'securities':reconciliation['securities'],

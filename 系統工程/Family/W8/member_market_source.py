@@ -27,6 +27,51 @@ def read_json(source):
     return json.loads(raw, parse_float=Decimal)
 
 
+def _daily_rows(source,meta,quotes,stamps,by_date,cutoff,*,final_close_required=True):
+    rows = {}; close_rows = {}; excluded = []; invalid = []; seen_dates = set()
+    quote_stamp=meta.get('regularMarketTime')
+    quote_at=(datetime.fromtimestamp(quote_stamp,ZoneInfo(source['timezone']))
+        if type(quote_stamp) in (int,float) else None)
+    acquired_day=time(source['retrieved_at']).astimezone(ZoneInfo(source['timezone'])).date().isoformat()
+    for i, stamp in enumerate(stamps):
+        date = datetime.fromtimestamp(stamp, ZoneInfo(source['timezone'])).date().isoformat()
+        if date in seen_dates:
+            raise ValueError('MEMBER_MARKET_DUPLICATE_SESSION')
+        seen_dates.add(date)
+        if date not in by_date:
+            excluded.append({'date': date, 'reason': 'SESSION_NOT_COMPLETED_AT_ACQUISITION_OR_NOT_IN_CALENDAR'})
+            continue
+        if source['provider']=='YAHOO_CHART' and date==acquired_day and (quote_at is None or quote_at>cutoff or quote_at<time(by_date[date]['open_at'])
+                or final_close_required and quote_at<time(by_date[date]['close_at'])):
+            # A delayed current quote can still inhabit today's daily bar
+            # after the exchange closes. Calendar completion alone does not
+            # attest that the provider has published the final daily close.
+            excluded.append({'date':date,'reason':'PROVIDER_LATEST_BAR_FINAL_CLOSE_NOT_CONFIRMED',
+                'provider_regular_market_time':quote_at.isoformat() if quote_at else None})
+            continue
+        values = {k.title(): quotes[k][i] for k in ('open', 'high', 'low', 'close', 'volume')}
+        try:
+            close = Decimal(str(values['Close']))
+            if close.is_finite() and close > 0:
+                close_rows[date] = {'Date': date, 'Close': float(close), '_source_decimal': {'Close': str(close)}}
+        except (InvalidOperation, ValueError, TypeError):
+            pass
+        try:
+            nums = {k: Decimal(str(v)) for k, v in values.items()}
+            valid = (all(v.is_finite() for v in nums.values())
+                     and min(nums[k] for k in ('Open', 'High', 'Low', 'Close')) > 0
+                     and nums['Volume'] >= 0 and nums['Low'] <= min(nums['Open'], nums['Close'])
+                     and nums['High'] >= max(nums['Open'], nums['Close']))
+        except (InvalidOperation, ValueError, TypeError):
+            valid = False
+        if not valid:
+            invalid.append({'date': date, 'original_values': {k: str(v) for k, v in values.items()}})
+            continue
+        rows[date] = {'Date': date, **{k: float(v) for k, v in nums.items()},
+                      '_source_decimal': {k: str(v) for k, v in nums.items()}}
+    return rows,close_rows,excluded,invalid
+
+
 def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, observation_route='V82'):
     if observation_route not in ('V82', 'V75'):
         raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
@@ -85,46 +130,60 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         raise ValueError('MEMBER_MARKET_SOURCE_TIMESTAMP_ORDER')
     if any(len(quotes[k]) != len(stamps) for k in ('open', 'high', 'low', 'close', 'volume')):
         raise ValueError('MEMBER_MARKET_ARRAY_LENGTH')
-    rows = {}; close_rows = {}; excluded = []; invalid = []; seen_dates = set()
-    quote_stamp=meta.get('regularMarketTime')
-    quote_at=(datetime.fromtimestamp(quote_stamp,ZoneInfo(source['timezone']))
-        if type(quote_stamp) in (int,float) else None)
-    acquired_day=time(source['retrieved_at']).astimezone(ZoneInfo(source['timezone'])).date().isoformat()
-    for i, stamp in enumerate(stamps):
-        date = datetime.fromtimestamp(stamp, ZoneInfo(source['timezone'])).date().isoformat()
-        if date in seen_dates:
-            raise ValueError('MEMBER_MARKET_DUPLICATE_SESSION')
-        seen_dates.add(date)
-        if date not in by_date:
-            excluded.append({'date': date, 'reason': 'SESSION_NOT_COMPLETED_AT_ACQUISITION_OR_NOT_IN_CALENDAR'})
-            continue
-        if source['provider']=='YAHOO_CHART' and date==acquired_day and (quote_at is None or quote_at<time(by_date[date]['close_at']) or quote_at>cutoff):
-            # A delayed current quote can still inhabit today's daily bar
-            # after the exchange closes. Calendar completion alone does not
-            # attest that the provider has published the final daily close.
-            excluded.append({'date':date,'reason':'PROVIDER_LATEST_BAR_FINAL_CLOSE_NOT_CONFIRMED',
-                'provider_regular_market_time':quote_at.isoformat() if quote_at else None})
-            continue
-        values = {k.title(): quotes[k][i] for k in ('open', 'high', 'low', 'close', 'volume')}
-        try:
-            close = Decimal(str(values['Close']))
-            if close.is_finite() and close > 0:
-                close_rows[date] = {'Date': date, 'Close': float(close), '_source_decimal': {'Close': str(close)}}
-        except (InvalidOperation, ValueError, TypeError):
-            pass
-        try:
-            nums = {k: Decimal(str(v)) for k, v in values.items()}
-            valid = (all(v.is_finite() for v in nums.values())
-                     and min(nums[k] for k in ('Open', 'High', 'Low', 'Close')) > 0
-                     and nums['Volume'] >= 0 and nums['Low'] <= min(nums['Open'], nums['Close'])
-                     and nums['High'] >= max(nums['Open'], nums['Close']))
-        except (InvalidOperation, ValueError, TypeError):
-            valid = False
-        if not valid:
-            invalid.append({'date': date, 'original_values': {k: str(v) for k, v in values.items()}})
-            continue
-        rows[date] = {'Date': date, **{k: float(v) for k, v in nums.items()},
-                      '_source_decimal': {k: str(v) for k, v in nums.items()}}
+    rows,close_rows,excluded,invalid=_daily_rows(source,meta,quotes,stamps,by_date,cutoff)
+    latest_source=source;supplement_audit=None;reference_quote=None
+    supplement=source.get('current_observation_source')
+    if supplement is not None:
+        if source['provider']!='YAHOO_CHART' or supplement.get('provider')!='YAHOO_CHART':
+            raise PermissionError('MEMBER_CURRENT_QUOTE_PROVIDER_MISMATCH')
+        if time(supplement['retrieved_at'])>time(evaluation_at):
+            raise PermissionError('MEMBER_CURRENT_QUOTE_AFTER_CUTOFF')
+        chart=read_json(supplement)['chart']
+        if chart.get('error') or len(chart.get('result') or [])!=1:
+            raise ValueError('MEMBER_MARKET_CURRENT_PROVIDER_ERROR')
+        current_raw=chart['result'][0];current_meta=current_raw['meta']
+        if (any(current_meta.get(k)!=v for k,v in expected.items())
+            or current_meta.get('instrumentType')!=meta['instrumentType']):
+            raise PermissionError('MEMBER_CURRENT_QUOTE_IDENTITY_CURRENCY_OR_TYPE_CONFLICT')
+        current_stamps=current_raw['timestamp'];current_quotes=current_raw['indicators']['quote'][0]
+        if (current_stamps!=sorted(set(current_stamps))
+            or any(len(current_quotes[k])!=len(current_stamps) for k in ('open','high','low','close','volume'))):
+            raise ValueError('MEMBER_MARKET_CURRENT_ARRAY_OR_TIMESTAMP_ORDER')
+        current_cutoff=min(time(evaluation_at),time(supplement['retrieved_at']))
+        current_sessions={r['session_id']:r for r in sessions if time(r['close_at'])<=current_cutoff}
+        current_rows,current_closes,current_excluded,current_invalid=_daily_rows(
+            {**source,**supplement},current_meta,current_quotes,current_stamps,current_sessions,current_cutoff)
+        reference_rows,_,_,_=_daily_rows({**source,**supplement},current_meta,current_quotes,
+            current_stamps,current_sessions,current_cutoff,final_close_required=False)
+        if reference_rows:
+            reference_day=max(reference_rows)
+            reference_quote={'observed_date':reference_day,
+                'observed_close':reference_rows[reference_day]['_source_decimal']['Close'],
+                'source_sha256':supplement['sha256'],'source_path':supplement['local_path'],
+                'source_reference':supplement['source_reference'],'currency':source['currency'],
+                'original_final_close_verified':reference_day in current_rows,
+                'completed_calendar_session_close_at':current_sessions[reference_day]['close_at'],
+                'formal_price_qualification_created':False,
+                'final_close_qualification_issues':[r for r in current_excluded if r['date']==reference_day]}
+        last_original=max(set(rows)|set(close_rows),default='')
+        appended=sorted(day for day in current_rows if day>last_original)
+        required_bridge=[r['session_id'] for r in sessions if appended and last_original<r['session_id']<=appended[-1]]
+        missing_bridge=[day for day in required_bridge if day not in current_rows]
+        unappended=list(appended) if missing_bridge else []
+        if missing_bridge:appended=[]
+        for day in appended:rows[day]=current_rows[day]
+        for day,value in current_closes.items():
+            if not missing_bridge and day>last_original:close_rows[day]=value
+        if appended:latest_source={**source,**supplement}
+        completed=[r for r in sessions if time(r['close_at'])<=max(cutoff,current_cutoff)]
+        by_date={r['session_id']:r for r in completed}
+        supplement_audit={'schema_version':'Family.W8.CurrentQuoteAppend.v1',
+            'original_source_sha256':source['sha256'],'current_source_sha256':supplement['sha256'],
+            'original_last_completed_date':last_original,'appended_completed_dates':appended,
+            'missing_bridge_sessions':missing_bridge,'current_dates_kept_reference_only':unappended,
+            'overlapping_dates_retained_from_original':sorted(set(current_rows)&set(rows)-set(appended)),
+            'excluded_current_capture_rows':current_excluded,'invalid_current_capture_rows':current_invalid,
+            'history_replaced':False,'historical_PIT_or_canonical_price_qualification_created':False}
     # Do not silently concatenate samples across missing/invalid sessions.
     valid_dates = sorted(rows)
     if not valid_dates:
@@ -142,8 +201,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
             'observed_date':used[-1]['Date'],'observed_close':used[-1]['_source_decimal']['Close'],
             'latest_expected_completed_session':evaluation_completed[-1]['session_id'],
             'completed_session_close_at':by_date[used[-1]['Date']]['close_at'],
-            'source_sha256':source['sha256'],'source_path':source['local_path'],
-            'source_reference':source['source_reference'],'provider_verified_at':source['retrieved_at'],
+            'source_sha256':latest_source['sha256'],'source_path':latest_source['local_path'],
+            'source_reference':latest_source['source_reference'],'provider_verified_at':latest_source['retrieved_at'],
             'source_descriptor_digest':digest(source),
             'market_identity':{'exchange':source['exchange'],'currency':source['currency'],
                 'provider_symbol':source['provider_symbol'],'provider_type':meta['instrumentType']},
@@ -156,6 +215,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
             'calendar_scope':calendar.get('scope','IDENTIFIED_EXCHANGE_CALENDAR_SOURCE'),
             **({'provider_completion_evidence':completion} if completion else {}),
             **calendar_evidence,
+            **({'current_quote_append':supplement_audit} if supplement_audit is not None else {}),
+            **({'current_reference_quote':reference_quote} if reference_quote is not None else {}),
             'call_trace':['W8.member_market_source:original_completed_session_intake']}
     from on_demand_market_observations import evaluate_observed_history
     observed = evaluate_observed_history(used, repo_root=repo_root, evaluation_at=evaluation_at,
@@ -173,11 +234,11 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         independent = evaluate_close_history(close_used, repo_root=repo_root, approved_rule_profile=profile, is_etf=is_etf)
         independent.update(scope='SEPARATE_CLOSE_ONLY_COMPONENTS__NOT_MERGED_VOTES', rows=len(close_used),
             observed_date=close_used[-1]['Date'], observed_close=close_used[-1]['Close'],
-            source_sha256=source['sha256'], source_path=source['local_path'])
+            source_sha256=latest_source['sha256'], source_path=latest_source['local_path'])
         observed['independent_close_observation'] = independent
-    observed.update(symbol=symbol, source_path=source['local_path'], source_sha256=source['sha256'],
-        provider_verified_at=source['retrieved_at'], observed_date=used[-1]['Date'],
-        observed_close=used[-1]['Close'], rows=len(used), source_reference=source['source_reference'],
+    observed.update(symbol=symbol, source_path=latest_source['local_path'], source_sha256=latest_source['sha256'],
+        provider_verified_at=latest_source['retrieved_at'], observed_date=used[-1]['Date'],
+        observed_close=used[-1]['Close'], rows=len(used), source_reference=latest_source['source_reference'],
         market_identity={'exchange': source['exchange'], 'currency': source['currency'],
                          'provider_symbol': source['provider_symbol'], 'provider_type': meta['instrumentType']},
         completed_session_close_at=by_date[used[-1]['Date']]['close_at'],
@@ -195,6 +256,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         source_descriptor_digest=digest(source),
         **calendar_evidence,
         **({'provider_completion_evidence':completion} if completion else {}))
+    if supplement_audit is not None:observed['current_quote_append']=supplement_audit
+    if reference_quote is not None:observed['current_reference_quote']=reference_quote
     return observed
 
 

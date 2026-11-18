@@ -66,7 +66,8 @@ for k, series in {'m07':'VIXCLS','m01':'T10Y2Y','m08':'DFII10',
 for k in ('m17',): SOURCES[k]=['https://fred.stlouisfed.org/series/T5YIE']
 SOURCES['m14']=['https://fred.stlouisfed.org/series/'+s for s in ('WALCL','WDTGAL','RRPONTSYD')]
 SOURCES['m20']=['https://fred.stlouisfed.org/series/PAYEMS']
-SOURCES['m05']=['https://fred.stlouisfed.org/series/CPILFESL']
+BLS_CORE_CPI = 'https://api.bls.gov/publicAPI/v1/timeseries/data/CUSR0000SA0L1E'
+SOURCES['m05']=[BLS_CORE_CPI,'https://fred.stlouisfed.org/series/CPILFESL']
 SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
 
@@ -276,7 +277,11 @@ class Fetcher:
             providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))
         bls_map={'UNRATE':'LNS14000000','CPILFESL':'CUSR0000SA0L1E','PAYEMS':'CES0000000001'}
         if series in bls_map:
-            providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
+            bls_url='https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]
+            if series=='CPILFESL':
+                year=dt.datetime.now(dt.timezone.utc).year
+                bls_url=f'{BLS_CORE_CPI}?startyear={year-2}&endyear={year}'
+            providers.insert(0,('BLS_OFFICIAL_API',bls_url))
         if series in bls_map:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         if series in bls_map:
@@ -307,9 +312,9 @@ class Fetcher:
         # existing providers in their previous relative fallback order.
         if series in ('VIXCLS','T10Y2Y','BAMLH0A0HYM2','T5YIE','SAHMREALTIME'):
             providers.sort(key=lambda item: 0 if item[0]=='FRED_CSV' else 1)
-        elif series=='PAYEMS' or (series=='UNRATE' and not history_request):
-            # 2026/11/19 Owner: BLS current U3 and nonfarm levels before FRED,
-            # even with a FRED key. Keep Sahm full-history and CPI routing unchanged.
+        elif series in ('CPILFESL','PAYEMS') or (series=='UNRATE' and not history_request):
+            # Prefer a direct BLS source for current CPI, U3 and nonfarm data.
+            # Sahm's separate full-history U3 request retains its existing order.
             priority={'BLS_OFFICIAL_API':0,'BLS_EMPLOYMENT_TABLE':1,
                       'BLS_HISTORY_V2':2,'BLS_HISTORY_V1':3,
                       'FRED_OFFICIAL_API':4,'FRED_CSV':5}
@@ -317,6 +322,7 @@ class Fetcher:
         elif series=='UNRATE':
             providers.sort(key=lambda item: 0 if item[0]=='BLS_EMPLOYMENT_TABLE' else 1)
         retried=set()
+        latest_cpi_month=None
         self.fredattempts[series]=[]
         for provider,url in providers:
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
@@ -392,6 +398,15 @@ class Fetcher:
                     dates=pd.to_datetime(doc['period'],errors='coerce')
                     values=pd.to_numeric(doc['value'],errors='coerce')
                 data=pd.DataFrame({'date':dates,'value':values}).dropna()
+                if series=='CPILFESL':
+                    months=data['date'].dt.to_period('M')
+                    if months.duplicated().any() or not all(math.isfinite(v) and v>0 for v in data['value']):
+                        raise ValueError('CPI monthly observations must be unique, finite and positive')
+                    period=months.max()
+                    if pd.notna(period):
+                        if latest_cpi_month is not None and period<latest_cpi_month:
+                            raise ValueError(f'CPILFESL fallback precedes observed month {latest_cpi_month}')
+                        latest_cpi_month=period
                 data=data.sort_values('date').drop_duplicates('date',keep='last')
                 if data.empty: raise ValueError('No numeric observations')
                 if series == 'VIXCLS':
@@ -429,7 +444,7 @@ class Fetcher:
                 self.fredattempts[series].append({'provider':provider,'result':'OK',
                     'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
                     'observation_date':str(out.index[-1].date())})
-                if series in ('UNRATE','PAYEMS') and provider.startswith('BLS_'):
+                if series in bls_map and provider.startswith('BLS_'):
                     self.fredattempts[series][-1].update(
                         source_url=url,series_id=bls_map[series],
                         response_sha256=hashlib.sha256(response.content).hexdigest(),
@@ -627,8 +642,10 @@ def core_cpi(f):
     prior=float(prior_series.iloc[0])
     if prior<=0 or float(last)<=0: raise ValueError('CPILFESL 指數必須大於0')
     val=(last/prior-1)*100
-    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),getattr(f,'fredsources',{}).get('CPILFESL',('FRED',SOURCES['m05'][0]))[1],
-               'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
+    provider,source=getattr(f,'fredsources',{}).get('CPILFESL',('FRED',SOURCES['m05'][-1]))
+    series_label='BLS CUSR0000SA0L1E' if provider.startswith('BLS_') else 'FRED CPILFESL'
+    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),source,
+               series_label+' 同一季調序列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def breakeven_5y(f):
     try: return treasury_breakeven(f,'m13')

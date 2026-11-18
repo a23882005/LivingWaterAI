@@ -73,3 +73,42 @@ class BlsPriorityTests(TestCase):
         with patch.dict(m.os.environ,{'FRED_API_KEY':'test-unused-key'}):
             f,s=self.fetcher(lambda u:Response(json.dumps(body)));f.fred('UNRATE',require_history=True)
         self.assertIn('api.stlouisfed.org',s.calls[0])
+
+    def test_core_cpi_uses_official_same_series_yoy_before_fred(self):
+        body=payload('CUSR0000SA0L1E',[(9,338.896),(13,999)])
+        body['Results']['series'][0]['data'].append(
+            {'year':'2025','period':'M09','value':'330.418'})
+        f,session=self.fetcher(lambda _:Response(json.dumps(body)))
+        with patch.dict(m.os.environ,{'FRED_API_KEY':'test-unused-key'}):
+            result=m.core_cpi(f)
+        self.assertAlmostEqual(result['value'],2.565841,places=6)
+        self.assertEqual(result['observation_date'],'2026-09-01')
+        self.assertEqual(result['unit'],'%')
+        self.assertIn('BLS CUSR0000SA0L1E',result['method'])
+        self.assertEqual(len(session.calls),1)
+        self.assertTrue(session.calls[0].startswith(m.BLS_CORE_CPI+'?startyear='))
+        ev=f.fredattempts['CPILFESL'][0]
+        self.assertEqual(ev['series_id'],'CUSR0000SA0L1E')
+        self.assertEqual(len(ev['response_sha256']),64)
+
+    def test_core_cpi_missing_base_rejects_an_older_fred_fallback(self):
+        official=payload('CUSR0000SA0L1E',[(10,339.900),(9,338.896)])
+        official['Results']['series'][0]['data'] += [
+            {'year':'2025','period':'M10','value':'-'},
+            {'year':'2025','period':'M09','value':'330.418'}]
+        old='observation_date,CPILFESL\n2025-09-01,330.418\n2026-09-01,338.896\n'
+        f,session=self.fetcher(lambda u:Response(old if 'fredgraph.csv' in u else json.dumps(official)))
+        with patch.dict(m.os.environ,{'FRED_API_KEY':''}),patch.object(session,'post',return_value=Response(json.dumps(official))):
+            with self.assertRaisesRegex(RuntimeError,'missing 2025-10'):
+                m.core_cpi(f)
+        self.assertTrue(any('fallback precedes observed month 2026-10' in a['error']
+                            for a in f.fredattempts['CPILFESL']))
+
+    def test_core_cpi_transport_failure_keeps_fred_fallback(self):
+        data='observation_date,CPILFESL\n2025-09-01,330.418\n2026-09-01,338.896\n'
+        f,session=self.fetcher(lambda u:Response(data) if 'fredgraph.csv' in u else Response('',503))
+        with patch.dict(m.os.environ,{'FRED_API_KEY':''}),patch.object(session,'post',return_value=Response('',503)),patch.object(m.time,'sleep'):
+            result=m.core_cpi(f)
+        self.assertAlmostEqual(result['value'],2.565841,places=6)
+        self.assertEqual(f.fredsources['CPILFESL'][0],'FRED_CSV')
+        self.assertIn('FRED CPILFESL',result['method'])

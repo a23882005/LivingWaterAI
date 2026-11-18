@@ -91,9 +91,11 @@
       ]
     },
     "m05": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,

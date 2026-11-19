@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/monthly-official-release-calendar-v1",
-  "checked_at_utc": "2026-11-19T02:28:03.583582+00:00",
+  "checked_at_utc": "2026-11-19T11:08:27+00:00",
   "explanation": "Official next data publication, not observation month age. Never use a past date to certify freshness. Fail closed when record's observation month mismatches.",
   "items": {
     "m04": {
@@ -155,9 +155,8 @@
   },
   "target_refresh_results": {
     "m15": {
-      "status": "VERIFIED",
-      "observation_month": "2026-10",
-      "next_release_at_utc": "2026-12-03T15:00:00Z"
+      "status": "RETAINED_UNVERIFIED",
+      "error": "KeyError: 'ism'"
     },
     "m18": {
       "status": "RETAINED_UNVERIFIED",

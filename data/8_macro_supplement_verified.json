@@ -561,5 +561,5 @@
     }
   },
   "notes": [],
-  "refresh_method": "Official Fed full raw HTTP reverified; other values retain dated observations unless independently refreshed"
+  "refresh_method": "依 macro_source_candidates 排名查核；八項各保留4個不同網站候選。Fed現行目標以官方原始證據重新核實；其餘欄位保留真實觀測日與vintage，失敗候選不採值。"
 }

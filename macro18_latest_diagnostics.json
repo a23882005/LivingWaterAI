@@ -1,10 +1,10 @@
 {
   "schema": "macro18-latest-diagnostics-v1",
-  "report_sha256": "b622f683261a251ac14951831a3d4e2439d7ca56f335ffd727130bac237f9be2",
-  "recorded_at": "2026-11-18T23:24:15.539510+00:00",
+  "report_sha256": "3f447c7719c6daba5cfcd9cf774ba5bea503ca279c364aadbe0e40e33cfffaec",
+  "recorded_at": "2026-11-19T00:09:50.530993+00:00",
   "report": {
     "schema": "V70.3/18-macro-collector-v1",
-    "generated_at": "2026-11-19T07:24:15.295687+08:00",
+    "generated_at": "2026-11-19T08:09:50.232998+08:00",
     "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
     "summary": {
       "OK": 18,
@@ -34,7 +34,7 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:18.203209+00:00",
+        "attempted_at": "2026-11-19T00:08:52.234962+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
@@ -42,7 +42,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-              "attempted_at": "2026-11-18T23:23:18.818714+00:00",
+              "attempted_at": "2026-11-19T00:08:52.570732+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "eed5fb6b53326825a3e92ba7055749b45b29e9c79015f4263d7494e666573910"
@@ -51,7 +51,7 @@
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "FAILED",
               "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-              "attempted_at": "2026-11-18T23:23:18.973255+00:00",
+              "attempted_at": "2026-11-19T00:08:52.782327+00:00",
               "http_status": 200,
               "content_type": "text/csv",
               "response_sha256": "6a80de0d46497181c18b11ea044aff7f7070d1b900b0b339049d8713dcb5a0cd"
@@ -59,14 +59,14 @@
             {
               "provider": "YAHOO_VIX_CHART",
               "result": "OK",
-              "verified_at": "2026-11-18T23:23:19.153626+00:00",
+              "verified_at": "2026-11-19T00:08:52.873638+00:00",
               "observation_date": "2026-11-18"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:23:19.153626+00:00",
+        "last_verified_at": "2026-11-19T00:08:52.873638+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
@@ -74,7 +74,7 @@
                 "provider": "FRED_CSV",
                 "result": "FAILED",
                 "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-                "attempted_at": "2026-11-18T23:23:18.818714+00:00",
+                "attempted_at": "2026-11-19T00:08:52.570732+00:00",
                 "http_status": 200,
                 "content_type": "application/csv",
                 "response_sha256": "eed5fb6b53326825a3e92ba7055749b45b29e9c79015f4263d7494e666573910"
@@ -83,7 +83,7 @@
                 "provider": "CBOE_OFFICIAL_VIX",
                 "result": "FAILED",
                 "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-                "attempted_at": "2026-11-18T23:23:18.973255+00:00",
+                "attempted_at": "2026-11-19T00:08:52.782327+00:00",
                 "http_status": 200,
                 "content_type": "text/csv",
                 "response_sha256": "6a80de0d46497181c18b11ea044aff7f7070d1b900b0b339049d8713dcb5a0cd"
@@ -91,7 +91,7 @@
               {
                 "provider": "YAHOO_VIX_CHART",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:23:19.153626+00:00",
+                "verified_at": "2026-11-19T00:08:52.873638+00:00",
                 "observation_date": "2026-11-18"
               }
             ]
@@ -110,7 +110,7 @@
         "status": "OK",
         "detail": "Matched observation date for nominal 10Y minus 2Y",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:19.153949+00:00",
+        "attempted_at": "2026-11-19T00:08:52.873875+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -130,7 +130,7 @@
         "status": "OK",
         "detail": "10Y TIPS real yield",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:38.626156+00:00",
+        "attempted_at": "2026-11-19T00:09:11.196426+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -150,28 +150,28 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:56.893049+00:00",
+        "attempted_at": "2026-11-19T00:09:31.615371+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-18T23:23:56.955937+00:00",
+              "verified_at": "2026-11-19T00:09:31.653268+00:00",
               "observation_date": "2026-11-17"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:23:56.955937+00:00",
+        "last_verified_at": "2026-11-19T00:09:31.653268+00:00",
         "source_evidence": {
           "series": {
             "BAMLH0A0HYM2": [
               {
                 "provider": "FRED_CSV",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:23:56.955937+00:00",
+                "verified_at": "2026-11-19T00:09:31.653268+00:00",
                 "observation_date": "2026-11-17"
               }
             ]
@@ -190,14 +190,14 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:56.956134+00:00",
+        "attempted_at": "2026-11-19T00:09:31.653421+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m04": [
             {
               "provider": "ISM_OFFICIAL_PDF",
               "result": "OK",
-              "verified_at": "2026-11-18T23:23:57.876959+00:00",
+              "verified_at": "2026-11-19T00:09:32.201365+00:00",
               "observation_date": "2026-10-01",
               "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade"
             }
@@ -205,14 +205,14 @@
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:23:57.876959+00:00",
+        "last_verified_at": "2026-11-19T00:09:32.201365+00:00",
         "source_evidence": {
           "series": {
             "ISM_m04": [
               {
                 "provider": "ISM_OFFICIAL_PDF",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:23:57.876959+00:00",
+                "verified_at": "2026-11-19T00:09:32.201365+00:00",
                 "observation_date": "2026-10-01",
                 "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade"
               }
@@ -233,7 +233,7 @@
         "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
         "error": "All FRED sources failed for CPILFESL | BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V1: ValueErro",
         "retrieval_error": "All FRED sources failed for CPILFESL | BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V1: ValueErro",
-        "attempted_at": "2026-11-18T23:23:57.877334+00:00",
+        "attempted_at": "2026-11-19T00:09:32.201683+00:00",
         "attempt_result": "FAILED",
         "source_attempts": {
           "CPILFESL": [
@@ -241,52 +241,52 @@
               "provider": "BLS_OFFICIAL_API",
               "result": "FAILED",
               "error": "BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:23:58.250387+00:00",
+              "attempted_at": "2026-11-19T00:09:32.504332+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "84c0ed4c04fb3ddec613fce693dc8a56e8bbc77f8b23bf7c4085bba0faee3e83"
+              "response_sha256": "b81da7f69075cbf19f8d18fe2f653cd3cd92f6b37fc0aa790db3ca707fef3422"
             },
             {
               "provider": "BLS_HISTORY_V2",
               "result": "FAILED",
               "error": "BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:23:58.369916+00:00",
+              "attempted_at": "2026-11-19T00:09:32.892199+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "83c29c2fbb2f889dbbfb6999baf2d47b8f54e3b1f4d4c6a8ee88f0802a7bd747"
+              "response_sha256": "f0a7c92aba5e254fa304be661cc5d0e841433dc6d337bf89a68b41e5f8c7a81d"
             },
             {
               "provider": "BLS_HISTORY_V1",
               "result": "FAILED",
               "error": "BLS_HISTORY_V1: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:23:58.475971+00:00",
+              "attempted_at": "2026-11-19T00:09:33.058856+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "8d3205a8c7b653d9f2802fd40ec233c86884c1ce38389c40417c19773a1a66a8"
+              "response_sha256": "78c751bf5a45590004ea1639423f0e34c137fe376050d55b346f75e6a4f7681a"
             },
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:23:58.884072+00:00",
+              "attempted_at": "2026-11-19T00:09:33.389546+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
-              "response_sha256": "88029d5b98f443a8947056f21030af113428c4b1fb1ce9b99db6d4f8afbdc21d"
+              "response_sha256": "57f38f988b68a7eea69c606174b1565bc291ad7bb742d25dde174994cf7d1175"
             },
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:23:59.815445+00:00",
+              "attempted_at": "2026-11-19T00:09:34.215937+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
-              "response_sha256": "88029d5b98f443a8947056f21030af113428c4b1fb1ce9b99db6d4f8afbdc21d"
+              "response_sha256": "57f38f988b68a7eea69c606174b1565bc291ad7bb742d25dde174994cf7d1175"
             },
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:24:00.117956+00:00",
+              "attempted_at": "2026-11-19T00:09:34.268927+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -295,7 +295,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-18T23:24:00.869725+00:00",
+              "attempted_at": "2026-11-19T00:09:35.254461+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -305,8 +305,8 @@
         "cache_used": true,
         "cache_source": {
           "file": "18_macro_verification.json",
-          "sha256": "b03ca327faacf9f870a79383231c7d77b9a22d68bb67c2371d0917681c171a15",
-          "generated_at": "2026-11-19T00:08:21.426734+08:00",
+          "sha256": "9ef7009b9cc48fda1de48f7b71cdb5dbb840e8eda1880b92c1ac1f828de7aadb",
+          "generated_at": "2026-11-19T07:24:15.295687+08:00",
           "observation_date": "2026-09-01"
         },
         "last_verified_at": "2026-11-10T01:59:39.681268+00:00",
@@ -334,7 +334,7 @@
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:00.869937+00:00",
+        "attempted_at": "2026-11-19T00:09:35.254604+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -346,7 +346,7 @@
       "m10": {
         "id": "m10",
         "label": "WTI",
-        "value": 82.110001,
+        "value": 82.019997,
         "unit": "USD/bbl",
         "observation_date": "2026-11-18",
         "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -354,7 +354,7 @@
         "status": "OK",
         "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:01.642780+00:00",
+        "attempted_at": "2026-11-19T00:09:35.778391+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -374,7 +374,7 @@
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:01.944670+00:00",
+        "attempted_at": "2026-11-19T00:09:35.891854+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -400,7 +400,7 @@
               {
                 "provider": "US_TREASURY_DIRECT",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:02.217673+00:00",
+                "verified_at": "2026-11-19T00:09:35.980178+00:00",
                 "observation_date": "2026-11-18"
               }
             ]
@@ -410,13 +410,13 @@
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
               "response_sha256": "0707733bdc20fce9a21a1063c5b99dbfd3456acabb216f73e6d6b798f511243d",
-              "retrieved_at": "2026-11-18T23:24:02.217673+00:00",
+              "retrieved_at": "2026-11-19T00:09:35.980178+00:00",
               "response_bytes": 18011
             },
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
               "response_sha256": "7a53ecfc8e852b2cfd4fa6a42cbfc016ff2c06e5e1c613ecf8c4972150bd01c8",
-              "retrieved_at": "2026-11-18T23:24:02.220064+00:00",
+              "retrieved_at": "2026-11-19T00:09:35.981667+00:00",
               "response_bytes": 7998
             }
           ],
@@ -430,21 +430,21 @@
           },
           "same_date_intersection": true
         },
-        "attempted_at": "2026-11-18T23:24:02.214329+00:00",
+        "attempted_at": "2026-11-19T00:09:35.977865+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "TREASURY_m13": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:02.217673+00:00",
+              "verified_at": "2026-11-19T00:09:35.980178+00:00",
               "observation_date": "2026-11-18"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:02.217673+00:00",
+        "last_verified_at": "2026-11-19T00:09:35.980178+00:00",
         "retrieval_error": ""
       },
       "m17": {
@@ -464,7 +464,7 @@
               {
                 "provider": "US_TREASURY_DIRECT",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:02.217673+00:00",
+                "verified_at": "2026-11-19T00:09:35.980178+00:00",
                 "observation_date": "2026-11-18"
               }
             ]
@@ -474,13 +474,13 @@
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
               "response_sha256": "0707733bdc20fce9a21a1063c5b99dbfd3456acabb216f73e6d6b798f511243d",
-              "retrieved_at": "2026-11-18T23:24:02.217673+00:00",
+              "retrieved_at": "2026-11-19T00:09:35.980178+00:00",
               "response_bytes": 18011
             },
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
               "response_sha256": "7a53ecfc8e852b2cfd4fa6a42cbfc016ff2c06e5e1c613ecf8c4972150bd01c8",
-              "retrieved_at": "2026-11-18T23:24:02.220064+00:00",
+              "retrieved_at": "2026-11-19T00:09:35.981667+00:00",
               "response_bytes": 7998
             }
           ],
@@ -500,21 +500,21 @@
           },
           "same_date_intersection": true
         },
-        "attempted_at": "2026-11-18T23:24:02.222042+00:00",
+        "attempted_at": "2026-11-19T00:09:35.983069+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "TREASURY_m17": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:02.217673+00:00",
+              "verified_at": "2026-11-19T00:09:35.980178+00:00",
               "observation_date": "2026-11-18"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:02.217673+00:00",
+        "last_verified_at": "2026-11-19T00:09:35.980178+00:00",
         "retrieval_error": ""
       },
       "m14": {
@@ -535,7 +535,7 @@
                 "provider": "FED_NYFED_DIRECT",
                 "result": "OK",
                 "observation_date": "2026-11-11",
-                "verified_at": "2026-11-18T23:24:02.340780+00:00"
+                "verified_at": "2026-11-19T00:09:36.189679+00:00"
               }
             ]
           },
@@ -585,19 +585,19 @@
             "sources": [
               {
                 "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
-                "retrieved_at": "2026-11-18T23:24:02.340780+00:00",
+                "retrieved_at": "2026-11-19T00:09:36.189679+00:00",
                 "response_sha256": "3a790961abae3bc20af182e9ec9fa4108c847bd99c0ee99aa45769ea165e253d",
                 "response_bytes": 9105650
               },
               {
                 "url": "https://www.newyorkfed.org/aboutthefed/holiday_schedule.html",
-                "retrieved_at": "2026-11-18T23:24:05.967247+00:00",
-                "response_sha256": "2a23298c290334ecdf3ddccff6e98dbe6e861660df4daf9ea64a789c11e8ab3f",
-                "response_bytes": 105277
+                "retrieved_at": "2026-11-19T00:09:39.796148+00:00",
+                "response_sha256": "e53134c734794b577efea3185bbb2fb9fd3d37f4a065726a225a01db585766c3",
+                "response_bytes": 105264
               },
               {
                 "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-08-12&endDate=2026-08-12",
-                "retrieved_at": "2026-11-18T23:24:06.390336+00:00",
+                "retrieved_at": "2026-11-19T00:09:40.022375+00:00",
                 "response_sha256": "58524cf031210d9f7cc8170b2056a3c60dd08855204e10c51d9a41e293c82a75",
                 "response_bytes": 2410
               }
@@ -644,14 +644,14 @@
                   "rule_version": "V70-M14-HOLIDAY-OUTSTANDING-20261117",
                   "holiday_calendar": {
                     "url": "https://www.newyorkfed.org/aboutthefed/holiday_schedule.html",
-                    "retrieved_at": "2026-11-18T23:24:06.411201+00:00",
-                    "response_sha256": "2a23298c290334ecdf3ddccff6e98dbe6e861660df4daf9ea64a789c11e8ab3f",
-                    "response_bytes": 105277,
-                    "raw_gzip_b64": "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"
+                    "retrieved_at": "2026-11-19T00:09:40.037254+00:00",
+                    "response_sha256": "e53134c734794b577efea3185bbb2fb9fd3d37f4a065726a225a01db585766c3",
+                    "response_bytes": 105264,
+                    "raw_gzip_b64": "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"
                   },
                   "range": {
                     "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-09&endDate=2026-11-11",
-                    "retrieved_at": "2026-11-18T23:24:07.113176+00:00",
+                    "retrieved_at": "2026-11-19T00:09:40.885566+00:00",
                     "response_sha256": "86bbf40975776c180451ad459326a33bcd05ebee642b14d7811684a7bd26a669",
                     "response_bytes": 4436,
                     "raw_gzip_b64": "H4sIAAAAAAACA+1XXW+bMBT9KxbPSYVNSBreWKtJe6g6NdnTtAcPbimq+ZC5bIuq/vfZhmTQQNoupI2qRIqU3GPfy7XPuTo8EEtCnlkeeSBWloPkGGdpof5/b0W+hCpk3XwllFKbTQlzrRGxeBlocIEcy8IsgKIUWGhss/WSI2iMqX1jSsfU1nABiAISSLEbT1RKGeNqC2Wt5MtVDlVh1UQTuAK8y8xDfy6FIL4QGepq7drr7QueALnkK40iyOSCC0hDkCqk+2J1WC+9/gUyjaM7k0mCAF7AMk5MGvvco+ZgApG1oo7pKc2qXvRvwQv8loequ7DdPDHLPTa1yMjCDLnwE1yUP5MYq7WubT4N1A8CyJ+AxAoBeSw2V1lAYA503fJSqicvpWmZtyuwKkkFNJKzTWV1yoE6vuvbW5BxGt1UlzQ5U+DjqKuaH0EadNWiPbXo/9e6yiRGPILxJx7cq2RDN0h+1IX71TE9NnUo0hZAdqkk/gMhMX0eUiGUeZNthVCn1s3LFGKWe8zRCsm5xDiIc9VOGl3kuFJrHRXn9a02Ql1ioi7bJacGvI+gNmm2ae4+xznnbOb+A/3fXIZN5CVsnJ1mdQcTnXoqP2Xi5HVMnLgenffN6h5a7UmnbRoNO5MHyv/8HH59oZ1st+f7ORN7vpvtFd7Ldvsd2E7fzJnY87UzObH9iNg+PTa2H9pp0DdzGorxtdM4H8BpsN1Ogw3jNFiv02CHdRoVG2en2XsIp1ExUTkNh73fW6HTQyzno7wV7ldUq8N8H/8CHf99nFQRAAA="
@@ -659,21 +659,21 @@
                   "daily": {
                     "2026-11-09": {
                       "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-09&endDate=2026-11-09",
-                      "retrieved_at": "2026-11-18T23:24:08.100733+00:00",
+                      "retrieved_at": "2026-11-19T00:09:41.939606+00:00",
                       "response_sha256": "6db4919737236ed2dbdb4eb9d4de17099f06f763f1e44c4d84a39689dcbe450d",
                       "response_bytes": 2234,
                       "raw_gzip_b64": "H4sIAAAAAAACA+1UTW+cMBD9K5bPuxE2yybLjSaq1EOUKrs9VT24ZkKsGozM0HYV5b/XNmQDGzZJ8yH1UCQkeG88z2O/mRtCLdSGpuSGUFODFahM1bj/ryPkU+4gevmZMBat+JLwhM4IFa305BoFtk0IgKbV2Hhut/RMIHiOR3w5Z2werTzdAKKGEiqc5kuX0irc7rMsGiXfbGvohF0RQ+Ic8NqETX9stSaZ1ga92lj7bvlalEDOxNazCLY8FRqqHKyDfF2sh33oxU+wlSquQyYLGkQDG1WGNNFJysLBSG1GaBx2XZmuFv+tRYNf6txVl4+LJyE85StKZhQNCp2VuG6/lwq72GiAZ1JCvYMJzQGF0rvra0CGQ7wrc2PdblsbyhR7WTtonJC605TumC6ursCqqrjsLmNxFEXkdjalkBVQyXfMf24sFqKA+Qchf7g0byFEvvVih92+/Nfc7kzYAHnM9eo35CTU+Z6OZzxdPHQ8i/s+eJ7jQ3jKT7zja2FRSVW7cqritMati40dLvr7HEBTzcETHoVnukkG9GuaZZfmgdeG+tOei4+Ok3sy+yVsPmSe48bj/7N3wolxP2X3nbj4OycukjTmh2Zv8pi5krewVnzAWPETtnrJTGYHtNjLtZ6ez68T9d0R3ts/dVGPtboIAAA="
                     },
                     "2026-11-10": {
                       "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-10&endDate=2026-11-10",
-                      "retrieved_at": "2026-11-18T23:24:09.099947+00:00",
+                      "retrieved_at": "2026-11-19T00:09:42.939850+00:00",
                       "response_sha256": "8f551beee1ffbf7166a1c835bcdc765ced7158143a9771ad3a35bc76da9b2ebc",
                       "response_bytes": 2234,
                       "raw_gzip_b64": "H4sIAAAAAAACA+1UXW/TMBT9K5af26l2mg7yFjYh8TANreUJ8WCcu8zCiSP7Bqim/XdsJyvJmu6DFYkHIlVK77m+J8c+x7eEWmgMzcgtoaYBK1CZ2vn/n0eVD4Uv0auPhDG24CvCUzojVLQygGsU2LrYAK7V6AK2W3ouEALG/bo5Y3O2CLADRA0V1DiNV36kVbjdQ/lo+GbbQEfsRQyBC8AbEz/6fas1ybU2GNjG3PfL16ICci62AUWw1ZnQUBdgfSno4n05tF5+B1ur8iZOsqBBONioKo5ZvMlY3BipzaiaRE216bSEdy0cfmoKr64YiyexPeMrSmYUDQqdV7huv1YKu950EZ8BmksJzQOQ0AJQKL07Sgcybui95I31X97aKFmMGXg3pAMGw/mO2e+y9Nt3eX0NVtXlVXdIyxMP3s2m2PISajnFxQ5wsT/nujAWS1HC/J2Q3/ywYwskX3riw+lY/Wvp8KZ1QB5LifoJBYk6/2ZCGM+W+wlhSZ+b5yUktmc8CQlphEUlVePl1OVZg1vfm/i66E91UJoKE0v5Y3EawK8J1G7Mvs3TpzyXnJymv8H8h7DFEHmOG0//39UTTkz6W/mhE5cvc+IyzdjbQ3f1AVu90k77NjrunXyk+U/fwy8nCm6Pv7tflTHqUroIAAA="
                     },
                     "2026-11-11": {
                       "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-11&endDate=2026-11-11",
-                      "retrieved_at": "2026-11-18T23:24:10.151119+00:00",
+                      "retrieved_at": "2026-11-19T00:09:43.929720+00:00",
                       "response_sha256": "77f57145d776a37636271a59ddbf297e79778f26a2dd18a6b5ca2d4b2b9ca4d4",
                       "response_bytes": 33,
                       "raw_gzip_b64": "H4sIAAAAAAACA6tWUCpKLchXslKoVlDKL0gtSizJzM8rBvKjFWIVahVqAYOdxRshAAAA"
@@ -713,7 +713,7 @@
             }
           }
         },
-        "attempted_at": "2026-11-18T23:24:02.224274+00:00",
+        "attempted_at": "2026-11-19T00:09:35.984482+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "NETLIQ_DIRECT": [
@@ -721,13 +721,13 @@
               "provider": "FED_NYFED_DIRECT",
               "result": "OK",
               "observation_date": "2026-11-11",
-              "verified_at": "2026-11-18T23:24:02.340780+00:00"
+              "verified_at": "2026-11-19T00:09:36.189679+00:00"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:02.340780+00:00",
+        "last_verified_at": "2026-11-19T00:09:36.189679+00:00",
         "retrieval_error": ""
       },
       "m15": {
@@ -748,24 +748,24 @@
               {
                 "provider": "ISM_OFFICIAL",
                 "result": "FAILED",
-                "attempted_at": "2026-11-18T23:24:10.691445+00:00",
+                "attempted_at": "2026-11-19T00:09:44.615247+00:00",
                 "error": "ISM report date or sector headline mismatch"
               },
               {
                 "provider": "ISM_TRADINGECONOMICS",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:10.827044+00:00",
+                "verified_at": "2026-11-19T00:09:44.809849+00:00",
                 "observation_date": "2026-10-01",
                 "publication_date": "2026-11-04",
-                "response_sha256": "1d5b9b2b7575d88f6aab8a27dcae3bcf8d7330626a6c1c43f6fb34a44bcfe1fe",
+                "response_sha256": "9deefd2016dd911a584db74b6ea3b924dacca3340beb93907b701cc7156a0966",
                 "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi"
               }
             ]
           },
           "provider": "ISM_TRADINGECONOMICS",
           "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi",
-          "response_sha256": "1d5b9b2b7575d88f6aab8a27dcae3bcf8d7330626a6c1c43f6fb34a44bcfe1fe",
-          "verified_at": "2026-11-18T23:24:10.827044+00:00",
+          "response_sha256": "9deefd2016dd911a584db74b6ea3b924dacca3340beb93907b701cc7156a0966",
+          "verified_at": "2026-11-19T00:09:44.809849+00:00",
           "observation_period": "2026-10",
           "observation_date_normalization": "MONTH_START_OF_STATED_REFERENCE_MONTH",
           "headline_excerpt": "The ISM Services PMI decreased to 54.5 in October 2026, the lowest in three months, compared to 54.9",
@@ -775,30 +775,30 @@
           "source_origin": "Institute for Supply Management; Trading Economics distribution",
           "original_month_end": "2026-10-31"
         },
-        "attempted_at": "2026-11-18T23:24:10.223422+00:00",
+        "attempted_at": "2026-11-19T00:09:43.980046+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m15": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "FAILED",
-              "attempted_at": "2026-11-18T23:24:10.691445+00:00",
+              "attempted_at": "2026-11-19T00:09:44.615247+00:00",
               "error": "ISM report date or sector headline mismatch"
             },
             {
               "provider": "ISM_TRADINGECONOMICS",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:10.827044+00:00",
+              "verified_at": "2026-11-19T00:09:44.809849+00:00",
               "observation_date": "2026-10-01",
               "publication_date": "2026-11-04",
-              "response_sha256": "1d5b9b2b7575d88f6aab8a27dcae3bcf8d7330626a6c1c43f6fb34a44bcfe1fe",
+              "response_sha256": "9deefd2016dd911a584db74b6ea3b924dacca3340beb93907b701cc7156a0966",
               "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:10.827044+00:00",
+        "last_verified_at": "2026-11-19T00:09:44.809849+00:00",
         "retrieval_error": ""
       },
       "m16": {
@@ -812,7 +812,7 @@
         "status": "OK",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:10.827372+00:00",
+        "attempted_at": "2026-11-19T00:09:44.810135+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -832,28 +832,40 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:13.974192+00:00",
+        "sahm_bls_check": {
+          "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000?startyear=2024&endyear=2026",
+          "series_id": "LNS14000000",
+          "published_observation_date": "2026-10-01",
+          "retrieved_at_utc": "2026-11-19T00:09:48.087840+00:00",
+          "response_sha256": "edbc9d561eb50a5b0544dae51e3c249eb668e690a5780281b3b7a2b583a0bbf5",
+          "bls_observation_month": "2026-10",
+          "status": "MISSING_MONTHS",
+          "missing_months": [
+            "2025-10"
+          ]
+        },
+        "attempted_at": "2026-11-19T00:09:47.913933+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "SAHMREALTIME": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:14.054904+00:00",
+              "verified_at": "2026-11-19T00:09:47.951661+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:14.054904+00:00",
+        "last_verified_at": "2026-11-19T00:09:47.951661+00:00",
         "source_evidence": {
           "series": {
             "SAHMREALTIME": [
               {
                 "provider": "FRED_CSV",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:14.054904+00:00",
+                "verified_at": "2026-11-19T00:09:47.951661+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -872,36 +884,36 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:14.055097+00:00",
+        "attempted_at": "2026-11-19T00:09:48.088674+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "UNRATE": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:14.153669+00:00",
+              "verified_at": "2026-11-19T00:09:49.094575+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
               "series_id": "LNS14000000",
-              "response_sha256": "396299e62c57f1eed2923a8c8457b8241822153b496badce5e8468563e79abb6",
+              "response_sha256": "edbc9d561eb50a5b0544dae51e3c249eb668e690a5780281b3b7a2b583a0bbf5",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:14.153669+00:00",
+        "last_verified_at": "2026-11-19T00:09:49.094575+00:00",
         "source_evidence": {
           "series": {
             "UNRATE": [
               {
                 "provider": "BLS_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:14.153669+00:00",
+                "verified_at": "2026-11-19T00:09:49.094575+00:00",
                 "observation_date": "2026-10-01",
                 "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
                 "series_id": "LNS14000000",
-                "response_sha256": "396299e62c57f1eed2923a8c8457b8241822153b496badce5e8468563e79abb6",
+                "response_sha256": "edbc9d561eb50a5b0544dae51e3c249eb668e690a5780281b3b7a2b583a0bbf5",
                 "source_attribution": "Source: U.S. Bureau of Labor Statistics"
               }
             ]
@@ -920,36 +932,36 @@
         "status": "OK",
         "detail": "注意歷史值可能修訂",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:14.153898+00:00",
+        "attempted_at": "2026-11-19T00:09:49.094738+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "PAYEMS": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-18T23:24:15.151757+00:00",
+              "verified_at": "2026-11-19T00:09:50.113065+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
               "series_id": "CES0000000001",
-              "response_sha256": "84756ef7fd103ccaddc4b6b306843f5909405a22c19f3871dba551fd75451350",
+              "response_sha256": "77805f3acc8ac615879130716c452b25193103f63d447e55634bf3ecb2157226",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:24:15.151757+00:00",
+        "last_verified_at": "2026-11-19T00:09:50.113065+00:00",
         "source_evidence": {
           "series": {
             "PAYEMS": [
               {
                 "provider": "BLS_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:24:15.151757+00:00",
+                "verified_at": "2026-11-19T00:09:50.113065+00:00",
                 "observation_date": "2026-10-01",
                 "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
                 "series_id": "CES0000000001",
-                "response_sha256": "84756ef7fd103ccaddc4b6b306843f5909405a22c19f3871dba551fd75451350",
+                "response_sha256": "77805f3acc8ac615879130716c452b25193103f63d447e55634bf3ecb2157226",
                 "source_attribution": "Source: U.S. Bureau of Labor Statistics"
               }
             ]
@@ -968,7 +980,7 @@
         "status": "OK",
         "detail": "同一 VIX 數列",
         "error": "",
-        "attempted_at": "2026-11-18T23:23:18.203209+00:00",
+        "attempted_at": "2026-11-19T00:08:52.234962+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
@@ -976,7 +988,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-              "attempted_at": "2026-11-18T23:23:18.818714+00:00",
+              "attempted_at": "2026-11-19T00:08:52.570732+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "eed5fb6b53326825a3e92ba7055749b45b29e9c79015f4263d7494e666573910"
@@ -985,7 +997,7 @@
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "FAILED",
               "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-              "attempted_at": "2026-11-18T23:23:18.973255+00:00",
+              "attempted_at": "2026-11-19T00:08:52.782327+00:00",
               "http_status": 200,
               "content_type": "text/csv",
               "response_sha256": "6a80de0d46497181c18b11ea044aff7f7070d1b900b0b339049d8713dcb5a0cd"
@@ -993,14 +1005,14 @@
             {
               "provider": "YAHOO_VIX_CHART",
               "result": "OK",
-              "verified_at": "2026-11-18T23:23:19.153626+00:00",
+              "verified_at": "2026-11-19T00:08:52.873638+00:00",
               "observation_date": "2026-11-18"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-18T23:23:19.153626+00:00",
+        "last_verified_at": "2026-11-19T00:08:52.873638+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
@@ -1008,7 +1020,7 @@
                 "provider": "FRED_CSV",
                 "result": "FAILED",
                 "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-                "attempted_at": "2026-11-18T23:23:18.818714+00:00",
+                "attempted_at": "2026-11-19T00:08:52.570732+00:00",
                 "http_status": 200,
                 "content_type": "application/csv",
                 "response_sha256": "eed5fb6b53326825a3e92ba7055749b45b29e9c79015f4263d7494e666573910"
@@ -1017,7 +1029,7 @@
                 "provider": "CBOE_OFFICIAL_VIX",
                 "result": "FAILED",
                 "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-18 observed=2026-11-17; try newer source",
-                "attempted_at": "2026-11-18T23:23:18.973255+00:00",
+                "attempted_at": "2026-11-19T00:08:52.782327+00:00",
                 "http_status": 200,
                 "content_type": "text/csv",
                 "response_sha256": "6a80de0d46497181c18b11ea044aff7f7070d1b900b0b339049d8713dcb5a0cd"
@@ -1025,7 +1037,7 @@
               {
                 "provider": "YAHOO_VIX_CHART",
                 "result": "OK",
-                "verified_at": "2026-11-18T23:23:19.153626+00:00",
+                "verified_at": "2026-11-19T00:08:52.873638+00:00",
                 "observation_date": "2026-11-18"
               }
             ]
@@ -1044,7 +1056,7 @@
         "status": "OK",
         "detail": "來源為 CNN 非公開保證 API",
         "error": "",
-        "attempted_at": "2026-11-18T23:24:15.152488+00:00",
+        "attempted_at": "2026-11-19T00:09:50.113707+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -1064,7 +1076,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-18T23:24:12.371590+00:00"
+        "retrieved_at": "2026-11-19T00:09:45.912461+00:00"
       },
       {
         "observation_date": "2026-08-01",
@@ -1075,7 +1087,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-18T23:24:13.038072+00:00"
+        "retrieved_at": "2026-11-19T00:09:46.877330+00:00"
       },
       {
         "observation_date": "2026-09-01",
@@ -1086,7 +1098,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-18T23:24:13.974092+00:00"
+        "retrieved_at": "2026-11-19T00:09:47.913842+00:00"
       }
     ]
   }

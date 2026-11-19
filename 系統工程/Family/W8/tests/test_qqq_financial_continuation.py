@@ -110,3 +110,18 @@ def test_qualified_scope_resumes_original_joint_financial_route_with_same_source
     assert result=={'original_financial_pack':'SYNTHETIC_DISPATCH_SENTINEL'} and len(seen)==1
     assert producer.flow=='V82_FINANCIAL' and producer.req=={'before':'original'}
     assert context['equity_analysis_symbol']=='QQQ'
+
+
+def test_joint_bond_source_refusal_preserves_stock_analysis_and_original_failure():
+    producer=object.__new__(AssetSourceProducer)
+    assembly={'source_descriptor':{'local_path':'SYNTHETIC_SCOPE','sha256':'a'*64},
+        'digest':'b'*64,'call_trace':['ORIGINAL_C7']}
+    analysis={'call_trace':['V82.evaluate_core_rule_state'],'synthetic_stock_result':'retained'}
+    with patch.object(AssetSourceProducer,'__call__',side_effect=ValueError('V75_MACRO_FUTURES_HORIZON')):
+        pack=producer.continue_financial({}, {}, {}, {},analysis,assembly,[])
+    result=pack['source_production'];continuation=result['financial_continuation']
+    assert continuation['native_financial_dispatch_attempted']
+    assert continuation['original_source_issue']['code']=='V75_MACRO_FUTURES_HORIZON'
+    assert result['analysis_report']==analysis and result['family_scope_assembly']==assembly
+    assert result['source_validation_issues'][0]['code']=='V75_MACRO_FUTURES_HORIZON'
+    assert 'native_sources' not in pack and result['no_financial_engine_or_ledger_claimed']

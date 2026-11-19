@@ -390,7 +390,24 @@ class AssetSourceProducer:
         continuation.flow='DEPLOYMENT'
         # This is the existing full assembler/FamilyRunner route, including
         # the actual bond leg and shared cash checks, with the same run clock.
-        return continuation(snapshot,payload)
+        try:
+            return continuation(snapshot,payload)
+        except (ValueError,PermissionError) as error:
+            match=re.match(r'([A-Z][A-Z0-9_.]+)(?:[: ]|$)',str(error))
+            issue={'code':getattr(error,'code',None) or (match.group(1) if match else type(error).__name__),
+                'message':str(error),'field_path':native_error_path(error) or 'joint_financial.original_sources',
+                'kind':'ORIGINAL_SOURCE_CONTRACT_FAILURE'}
+            return {'request':request,'trusted_context':context,'source_production':{
+                'status':'SOURCE_STAGE_INCOMPLETE','analysis_report':analysis,
+                'family_scope_assembly':assembly,
+                'financial_continuation':{'status':'ORIGINAL_JOINT_FINANCIAL_SOURCE_REJECTED',
+                    'analysis_completed':True,'native_financial_dispatch_attempted':True,
+                    'original_source_issue':deepcopy(issue)},
+                'source_validation_issues':deepcopy(analysis_issues)+[issue],
+                'call_trace':['W8.AssetSourceProducer:V82_ANALYSIS',*analysis['call_trace'],
+                    'W8.AssetSourceProducer:financial_continuation',*assembly['call_trace'],
+                    'W8.AssetSourceProducer:DEPLOYMENT:original_source_rejected'],
+                'no_financial_engine_or_ledger_claimed':True}}
 
     def __call__(self,snapshot,payload):
         if snapshot!=self.req['client_snapshot']['payload']:

@@ -83,7 +83,14 @@ def forward_observations(snapshot,symbol,evaluated_at,*,purpose='STRICT_NATIVE_I
     raw,at=checked_payload(snapshot,evaluated_at);found=field(raw,source_key,'倍 Forward',at)
     if found is None:return []
     value,row=found;evidence=row.get('sourceEvidence',{})
-    if (evidence.get('label')!='Forward PE' or Decimal(str(evidence.get('value')))!=value
+    labels={'Forward PE',symbol+'未來12個月Forward P/E'}
+    try:
+        evidence_value=Decimal(str(evidence.get('value')))
+        matches=(not isinstance(evidence.get('value'),bool) and evidence_value.is_finite()
+            and evidence_value==value)
+    except (ArithmeticError,ValueError,TypeError):
+        matches=False
+    if (evidence.get('label') not in labels or not matches
             or evidence.get('source_url')!=row['source'] or value<=0):
         raise ValueError('V10_FORWARD_PE_DEFINITION_OR_SOURCE_MISMATCH')
     # Each independently verified product route has its own authorized range.

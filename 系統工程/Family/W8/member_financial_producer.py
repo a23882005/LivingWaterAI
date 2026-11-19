@@ -207,7 +207,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
             'issues':[{
             'code':'MEMBER_PRODUCER_PRECAPTURED_MACRO_REQUIRED','field_path':'request.macro_snapshot',
             'kind':'ORIGINAL_PRODUCER_SOURCE_REQUIRED'}]},None
-    cfg.update(repo_root=root,focus_symbol=symbol,flow='V82_ANALYSIS' if equity_only else 'DEPLOYMENT',observation_cache=observation_cache,run_binding={
+    cfg.update(repo_root=root,focus_symbol=symbol,flow='V82_FINANCIAL' if equity_only else 'DEPLOYMENT',observation_cache=observation_cache,run_binding={
         'client_id':request['client_id'],'run_id':request['run_id'],'evaluation_at':request['evaluation_at'],
         'source_db_sha256':data['source_db_sha256'],'owner':deepcopy(owner),'macro_snapshot':deepcopy(request['macro_snapshot'])})
     cfg['family_c7_assembly_inputs']={'schema_version':'Family.W8.C7AssemblyInputs.v1',
@@ -255,6 +255,7 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         file=folder/(digest({'client':request['client_id'],'run':request['run_id'],'asset':symbol})+'.source-production.json')
         file.write_text(json.dumps(pack,ensure_ascii=False,indent=2)+'\n')
         return {**attempt,'status':production.get('status','SOURCE_STAGE_INCOMPLETE'),
+            **({'financial_continuation':deepcopy(production['financial_continuation'])} if production.get('financial_continuation') else {}),
             'issues':deepcopy(production.get('source_validation_issues',[]) or
                 ([production['first_failure']] if production.get('first_failure') else [])),
             **({'family_scope_assembly':deepcopy(production['family_scope_assembly'])} if production.get('family_scope_assembly') else {}),

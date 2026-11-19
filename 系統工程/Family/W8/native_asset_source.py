@@ -3,7 +3,7 @@
 No fixture is used. Original adapter failures stop production with their code,
 field and detail. A partial result is not a native bundle or a Mentor result.
 """
-from copy import deepcopy
+from copy import copy,deepcopy
 from dataclasses import asdict
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -342,7 +342,7 @@ class AssetSourceProducer:
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
         self.product_source=deepcopy(product_source)
-        if flow not in ('HOLDINGS_ANALYSIS','V82_ANALYSIS','DEPLOYMENT'):
+        if flow not in ('HOLDINGS_ANALYSIS','V82_ANALYSIS','V82_FINANCIAL','DEPLOYMENT'):
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
         self.flow=flow;self.analyze_all=analyze_all
         self.native_funding_advice_enabled=True
@@ -365,11 +365,38 @@ class AssetSourceProducer:
         if product_source is not None:self.product_sources.setdefault('VT',deepcopy(product_source))
         if issuer_facts_source is not None:self.issuer_facts_sources.setdefault('VT',deepcopy(issuer_facts_source))
 
+    def continue_financial(self,snapshot,payload,request,context,analysis,assembly,analysis_issues):
+        """Resume the original joint financial chain after stock analysis.
+
+        A quote, an analysis result or a cash trial never substitutes for the
+        original C7 account, portfolio and shared-funding source contracts.
+        The original deployment path retains bond checks for its bond leg.
+        """
+        if assembly.get('source_descriptor') is None:
+            return {'request':request,'trusted_context':context,'source_production':{
+                'status':'SOURCE_STAGE_INCOMPLETE','analysis_report':analysis,
+                'family_scope_assembly':assembly,
+                'financial_continuation':{'status':'ORIGINAL_C7_SOURCE_REQUIRED',
+                    'analysis_completed':True,'native_financial_dispatch_attempted':False},
+                'source_validation_issues':deepcopy(analysis_issues)+deepcopy(assembly['issues']),
+                'call_trace':['W8.AssetSourceProducer:V82_ANALYSIS',*analysis['call_trace'],
+                    'W8.AssetSourceProducer:financial_continuation',*assembly['call_trace']],
+                'no_financial_engine_or_ledger_claimed':True}}
+        continuation=copy(self)
+        continuation.req=deepcopy(request);continuation.ctx=deepcopy(context)
+        continuation.ctx.pop('equity_analysis_symbol',None)
+        continuation.ctx['family_c7_scope_source']=deepcopy(assembly['source_descriptor'])
+        continuation.ctx['family_c7_source_assembly_digest']=assembly['digest']
+        continuation.flow='DEPLOYMENT'
+        # This is the existing full assembler/FamilyRunner route, including
+        # the actual bond leg and shared cash checks, with the same run clock.
+        return continuation(snapshot,payload)
+
     def __call__(self,snapshot,payload):
         if snapshot!=self.req['client_snapshot']['payload']:
             raise PermissionError('PRODUCER_APPROVAL_SNAPSHOT_CHANGED')
         req=deepcopy(self.req);ctx=deepcopy(self.ctx)
-        equity_only = self.flow == 'V82_ANALYSIS'
+        equity_only = self.flow in ('V82_ANALYSIS','V82_FINANCIAL')
         if equity_only:
             ctx['equity_analysis_symbol'] = self.symbol
         ctx['sgov_role_strategic_policy']=deepcopy(self.v70_strategic_policy)
@@ -538,6 +565,9 @@ class AssetSourceProducer:
                 'field_path':'qualified_equity_inputs.'+self.symbol,'original_source_rejection':deepcopy(rejected)})
             from family_c7_source_assembly import assemble_original_producers
             assembly=assemble_original_producers(self,req,ctx,prepared,trial)
+            if self.flow=='V82_FINANCIAL':
+                return self.continue_financial(snapshot,payload,req,ctx,analysis,assembly,
+                    source_issues+row['issues']+funding.get('issues',[]))
             return {'request':req,'trusted_context':ctx,'source_production':{
                 'status':'V82_STOCK_ANALYSIS_RETURNED',
                 'analysis_report':analysis,

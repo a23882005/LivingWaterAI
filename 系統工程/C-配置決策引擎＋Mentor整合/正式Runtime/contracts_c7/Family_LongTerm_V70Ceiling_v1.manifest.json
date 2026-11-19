@@ -73,11 +73,11 @@
     },
     {
       "path": "../../Family/W8/native_asset_source.py",
-      "sha256": "9b3ab8beccd0c701be0d060dca1708fe182c90d56fdd2b006825a9f8e02721e2"
+      "sha256": "6659257a7f74f88d4f29b59f26978094818d84bce131a127333894b25ddda44b"
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "1582c0d00cf55274d05f3cb1b6c81e4ebe4e70724330cb956934f2f31747e645"
+      "sha256": "9ccc7779a39ac0015c61ae9a5148ea5eb98a859d74be15564a96ed5a82c7987a"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",

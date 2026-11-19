@@ -237,12 +237,12 @@ def explain(row):
     return text
 
 
-def build_analysis_report(producer,request,context,prepared,holdings,observations,trial,investment=None,tactical=None,fx_observation=None):
+def build_analysis_report(producer,request,context,prepared,holdings,observations,trial,investment=None,tactical=None,fx_observation=None,*,equity_only=False):
     from native_asset_source import classification
     by_symbol={row['symbol']:row for row in observations['assets']}
     missing={row.get('symbol'):row for row in observations['missing']}
     positions=prepared.payload['positions']
-    if not producer.analyze_all:
+    if equity_only or not producer.analyze_all:
         positions=[r for r in positions if r['source_instrument'].get('ticker')==producer.symbol]
     from formal_mode_analysis import order_source
     order_confirmation=deepcopy(getattr(producer,'order_confirmation',None))
@@ -474,6 +474,7 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
             [dict(p,scope='CASH_DIAGNOSTIC__DOES_NOT_BLOCK_HOLDING_ANALYSIS') for p in trial['issues']],
         'source_refs':[s for r in rows for s in r['source_refs']], 'call_trace':trace,
         'mentor':None,'canonical_result':None,'trade_authorization':'NONE','trade_action':'NO_TRADE'}
+    if equity_only:report['analysis_result']['scope']='SELECTED_V82_EQUITY_ONLY'
     if broker_view is not None:report['broker_readonly_source']=deepcopy(broker_view)
     if context.get('native_target_source') is not None:
         report['native_target_source']=deepcopy(context['native_target_source'])
@@ -483,19 +484,21 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         report['v75_macro_inputs']=deepcopy(observations['v75_macro_inputs'])
     if observations.get('qualified_equity_inputs') is not None:
         report['qualified_equity_inputs']=deepcopy(observations['qualified_equity_inputs'])
-    from bond_policy_audit import build as audit_bond_policy
-    policy_audit=audit_bond_policy(request,context)
-    if policy_audit is not None:report['bond_policy_audit']=policy_audit
-    from sgov_role_source import produce as produce_sgov_roles
-    sgov_roles=produce_sgov_roles(request,context,report)
-    if sgov_roles is not None:report['sgov_role_source']=sgov_roles
+    if not equity_only:
+        from bond_policy_audit import build as audit_bond_policy
+        policy_audit=audit_bond_policy(request,context)
+        if policy_audit is not None:report['bond_policy_audit']=policy_audit
+        from sgov_role_source import produce as produce_sgov_roles
+        sgov_roles=produce_sgov_roles(request,context,report)
+        if sgov_roles is not None:report['sgov_role_source']=sgov_roles
     if (getattr(producer,'native_funding_advice_enabled',False) and investment
         and investment.get('total_new_investment_amount') is not None
         and request.get('macro_snapshot') and trial.get('cash_state')):
-        from native_bond_source import target_market_observations
-        report['bond_target_market_observations']=target_market_observations(request,observations,rows,root=producer.root)
-        from native_source_freshness import build as assess_native_source_freshness
-        report['native_source_freshness']=assess_native_source_freshness(producer.root,request,report)
+        if not equity_only:
+            from native_bond_source import target_market_observations
+            report['bond_target_market_observations']=target_market_observations(request,observations,rows,root=producer.root)
+            from native_source_freshness import build as assess_native_source_freshness
+            report['native_source_freshness']=assess_native_source_freshness(producer.root,request,report)
         from native_funding_advice import build as build_native_funding_advice,delivery as funding_delivery,build_shared_inputs
         shared=build_shared_inputs(producer,request,report,trial=trial,investment=investment,tactical=tactical)
         funding=build_native_funding_advice(producer,request,report,trial=trial,
@@ -512,19 +515,20 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         for row in rows:
             row['current_analysis']['native_funding_advice']=funding_delivery(funding['items'][row['instrument_id']])
             row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
-        from native_bond_source import build as build_native_bond_source,delivery as bond_delivery
-        bond=build_native_bond_source(producer.root,request,report,shared_inputs=shared,
-            fx_observation=producer.fx_observation,strategic_policy=producer.v70_strategic_policy)
-        if bond is not None:
-            report['native_bond_source']=bond
-            report['call_trace'] += [{'function':name} for name in bond['call_trace']]
-            for row in rows:
-                if row['instrument_id'] in bond['requested_instruments']:
-                    row['current_analysis']['native_bond_source']=bond_delivery(bond)
-                    row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
-        from account_funding_check import build as check_account_funding
-        report['account_funding_check']=check_account_funding(producer.root,request,report)
-        report['call_trace']+=report['account_funding_check']['call_trace']
+        if not equity_only:
+            from native_bond_source import build as build_native_bond_source,delivery as bond_delivery
+            bond=build_native_bond_source(producer.root,request,report,shared_inputs=shared,
+                fx_observation=producer.fx_observation,strategic_policy=producer.v70_strategic_policy)
+            if bond is not None:
+                report['native_bond_source']=bond
+                report['call_trace'] += [{'function':name} for name in bond['call_trace']]
+                for row in rows:
+                    if row['instrument_id'] in bond['requested_instruments']:
+                        row['current_analysis']['native_bond_source']=bond_delivery(bond)
+                        row['current_analysis']['delivery_digest']=digest({k:v for k,v in row['current_analysis'].items() if k!='delivery_digest'})
+            from account_funding_check import build as check_account_funding
+            report['account_funding_check']=check_account_funding(producer.root,request,report)
+            report['call_trace']+=report['account_funding_check']['call_trace']
     from runtime_loader import load_c_module
     from mentor_bridge import explain_holdings_recommendations
     work9=load_c_module(producer.root,9)
@@ -615,32 +619,39 @@ class HoldingsAnalysisRunner:
             raise PermissionError('READABLE_REPORT_SOURCE_RESULT_MISMATCH')
         from loop2_target_projection import validate as validate_loop2_targets
         validate_loop2_targets(root,request,self.context,report)
-        from sgov_role_source import validate as validate_sgov_roles
-        validate_sgov_roles(request,self.context,report)
+        equity_only=report['analysis_result']['scope']=='SELECTED_V82_EQUITY_ONLY'
+        if equity_only != (self.context.get('equity_analysis_symbol') is not None):
+            raise PermissionError('HOLDINGS_ANALYSIS_SCOPE_MISMATCH')
+        if not equity_only:
+            from sgov_role_source import validate as validate_sgov_roles
+            validate_sgov_roles(request,self.context,report)
         if request.get('native_target_source_digest') is not None:
             from native_target_source import bind as bind_native_targets
             if bind_native_targets(request,self.context)!=report.get('native_target_source'):
                 raise PermissionError('NATIVE_TARGET_DELIVERY_REPLAY_MISMATCH')
         from native_funding_advice import validate as validate_native_funding_advice
         validate_native_funding_advice(root,report,request)
-        from native_bond_source import validate as validate_native_bond_source
-        if report.get('native_source_freshness') is not None:
-            from native_source_freshness import validate as validate_native_source_freshness
-            validate_native_source_freshness(root,request,report)
-        from v75_market_supplement import validate as validate_bond_supplement
-        validate_bond_supplement(request,self.context,report,root)
-        from v75_macro_inputs import validate as validate_v75_macro_inputs
-        validate_v75_macro_inputs(request,self.context,report,root)
-        from v75_market_contract import validate as validate_v75_market_contract
-        validate_v75_market_contract(request,self.context,report,root)
         from qualified_equity_inputs import validate as validate_qualified_equities
         validate_qualified_equities(request,self.context,report,root,prepared_positions=prepared.payload['positions'])
-        from bond_policy_audit import validate as validate_bond_policy
-        validate_bond_policy(request,self.context,report)
-        validate_native_bond_source(root,request,report)
+        if not equity_only:
+            from native_bond_source import validate as validate_native_bond_source
+            if report.get('native_source_freshness') is not None:
+                from native_source_freshness import validate as validate_native_source_freshness
+                validate_native_source_freshness(root,request,report)
+            from v75_market_supplement import validate as validate_bond_supplement
+            validate_bond_supplement(request,self.context,report,root)
+            from v75_macro_inputs import validate as validate_v75_macro_inputs
+            validate_v75_macro_inputs(request,self.context,report,root)
+            from v75_market_contract import validate as validate_v75_market_contract
+            validate_v75_market_contract(request,self.context,report,root)
+            from bond_policy_audit import validate as validate_bond_policy
+            validate_bond_policy(request,self.context,report)
+            validate_native_bond_source(root,request,report)
         if report.get('account_funding_check') is not None:
             from account_funding_check import validate as validate_account_funding
             validate_account_funding(root,request,report)
+        if equity_only and [r['symbol'] for r in report['analysis_result']['positions']] != [self.context['equity_analysis_symbol']]:
+            raise PermissionError('HOLDINGS_EQUITY_ANALYSIS_SYMBOL_MISMATCH')
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
         seen=set()
         for row in report['analysis_result']['positions']:

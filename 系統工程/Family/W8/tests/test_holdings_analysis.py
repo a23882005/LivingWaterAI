@@ -101,6 +101,28 @@ class HoldingAnalysisTest(unittest.TestCase):
         self.assertEqual(pack['analysis_report']['deployment_status']['status'],'NOT_RUN')
         self.assertNotIn('native_bundle',pack['request']);self.assertEqual(self.snapshot,frozen)
 
+    def test_equity_analysis_uses_original_stock_rules_without_loading_bond_sources(self):
+        self.producer.flow = 'V82_ANALYSIS'
+        self.producer.v75_macro_source_manifest = {'local_path': 'unavailable'}
+        self.producer.bond_market_supplement_source = {'local_path': 'unavailable'}
+        with patch.object(M,'prepare_input',return_value=self.prepared),\
+             patch.object(H,'prepare_input',return_value=self.prepared),\
+             patch.object(M,'project_official_holdings',return_value=self.holdings),\
+             patch.object(M,'cash_trial',return_value=self.trial),\
+             patch('market_bridge.read_macro_snapshot',return_value=self.macro),\
+             patch('family_c7_source_assembly.assemble_original_producers',return_value={'issues': [], 'call_trace': []}),\
+             patch('v75_macro_inputs.read',side_effect=AssertionError('V75 macro source was read')),\
+             patch('v75_market_supplement.read',side_effect=AssertionError('V75 supplement was read')):
+            pack=self.producer(self.snapshot,{'question':'SYNTHETIC_QUESTION'})
+        stock=pack['source_production']['analysis_report']
+        rows=stock['analysis_result']['positions']
+        self.assertEqual([row['symbol'] for row in rows],['VT'])
+        self.assertIn('V82.evaluate_technical',rows[0]['call_trace'])
+        self.assertEqual(stock['deployment_status']['status'],'NOT_RUN')
+        self.assertNotIn('v75_macro_inputs',stock)
+        self.assertNotIn('native_bond_source',stock)
+        self.assertNotIn('native_sources',pack)
+
     def test_real_original_algorithms_and_raw_facts_remain_visible(self):
         row=self.report()['analysis_result']['positions'][0]
         self.assertIsNotNone(row['market']['numeric']['ma20'])

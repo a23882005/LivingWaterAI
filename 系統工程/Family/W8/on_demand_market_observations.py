@@ -67,7 +67,7 @@ def _macro_metrics(macro, evaluated_at):
 
 
 def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id,formal_rule_source=None,
-                              approved_rule_profile=None,is_etf=None):
+                              approved_rule_profile=None,is_etf=None,equity_only=False):
     """Run original routines on validated rows; return no deployment decisions."""
     import pandas as pd
     from technical_source_bridge import _originals, _aggregate, NAMES, mapped_numeric_signals
@@ -114,41 +114,40 @@ def evaluate_observed_history(rows, *, repo_root, evaluation_at, macro, asset_id
         approved=produce(rows,profile=approved_rule_profile,is_etf=is_etf)
         vectors=approved['signals']
     v82 = _aggregate(repo_root, vectors,approved.get('ma20_ok','UNKNOWN'))
-    runtime = Path(repo_root).resolve() / '系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
-    if str(runtime) not in sys.path:
-        sys.path.insert(0, str(runtime))
-    import v75_runtime
-    if Path(v75_runtime.__file__).resolve().parent != runtime / 'v75_runtime':
-        raise ValueError('OBSERVATION_V75_SOURCE_MISMATCH')
-    from v75_runtime.predicates import EVALUATORS
-    from v75_runtime.work3 import US_LISTED_ASSETS, TW_LISTED_ASSETS
-    if macro is None:
-        if asset_id in US_LISTED_ASSETS | TW_LISTED_ASSETS:
+    metrics, sources, predicates = {}, {}, {}
+    is_bond = False
+    if not equity_only:
+        runtime = Path(repo_root).resolve() / '系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
+        if str(runtime) not in sys.path:
+            sys.path.insert(0, str(runtime))
+        import v75_runtime
+        if Path(v75_runtime.__file__).resolve().parent != runtime / 'v75_runtime':
+            raise ValueError('OBSERVATION_V75_SOURCE_MISMATCH')
+        from v75_runtime.predicates import EVALUATORS
+        from v75_runtime.work3 import US_LISTED_ASSETS, TW_LISTED_ASSETS
+        is_bond = asset_id in US_LISTED_ASSETS | TW_LISTED_ASSETS
+        if macro is None and is_bond:
             raise ValueError('OBSERVATION_BOND_MACRO_SOURCE_REQUIRED')
-        metrics, sources = {}, {}
-    else:
-        metrics, sources = _macro_metrics(macro, evaluation_at)
-    # Only numeric comparisons are mapped. KD formula compatibility and the
-    # named right/trim event producers are still separate required sources.
-    mapping = {'low_td_count': 'low_td9_setup', 'high_td_count': 'high_td9_setup',
-               'rsi14': 'rsi14', 'ma20': 'ma20', 'ma50': 'ma50', 'atr14': 'atr14'}
-    technical = {key: values[name] for key, name in mapping.items() if values.get(name) is not None}
-    technical['close'] = rows[-1]['Close']
-    if len(rows) >= 20:
-        technical['rolling_20d_low'] = min(row['Low'] for row in rows[-20:])
-    metrics['PRED-009'] = technical
-    predicates = {}
-    is_bond = asset_id in US_LISTED_ASSETS | TW_LISTED_ASSETS
-    for pid, evaluator in (EVALUATORS.items() if is_bond else []):
-        result = evaluator(metrics.get(pid, {}), _time(evaluation_at),
-            ['OBSERVED_CACHE_ONLY', 'ORIGINAL_NUMERIC_FORMULAS', 'FULL_SOURCE_COVERAGE_PENDING'])
-        predicates[pid] = {'metrics': metrics.get(pid, {}),
-            'original_result': result.model_dump(mode='json'),
-            'input_coverage': 'PARTIAL' if metrics.get(pid) else 'MISSING',
-            'original_result_as_of_basis': 'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE',
-            'input_freshness_verified': False,
-            'original_default_freshness_is_not_attestation': True,
-            'deployment_input_eligible': False}
+        if macro is not None:
+            metrics, sources = _macro_metrics(macro, evaluation_at)
+        if is_bond:
+            mapping = {'low_td_count': 'low_td9_setup', 'high_td_count': 'high_td9_setup',
+                       'rsi14': 'rsi14', 'ma20': 'ma20', 'ma50': 'ma50', 'atr14': 'atr14'}
+            technical = {key: values[name] for key, name in mapping.items() if values.get(name) is not None}
+            technical['close'] = rows[-1]['Close']
+            if len(rows) >= 20:
+                technical['rolling_20d_low'] = min(row['Low'] for row in rows[-20:])
+            metrics['PRED-009'] = technical
+            for pid, evaluator in EVALUATORS.items():
+                result = evaluator(metrics.get(pid, {}), _time(evaluation_at),
+                    ['OBSERVED_CACHE_ONLY', 'ORIGINAL_NUMERIC_FORMULAS', 'FULL_SOURCE_COVERAGE_PENDING'])
+                predicates[pid] = {'metrics': metrics.get(pid, {}),
+                    'original_result': result.model_dump(mode='json'),
+                    'input_coverage': 'PARTIAL' if metrics.get(pid) else 'MISSING',
+                    'original_result_as_of_basis': 'EVALUATION_TIME__OBSERVATION_DATES_SEPARATE',
+                    'input_freshness_verified': False,
+                    'original_default_freshness_is_not_attestation': True,
+                    'deployment_input_eligible': False}
     return {'numeric': values, 'previous_numeric': previous, 'base_facts': base_facts,
         'swings':swings,'formal_analysis_signals':formal_signals,'approved_technical':approved,
         'td9': td9, 'observed_named_signals': vectors,
@@ -241,7 +240,7 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
                                      official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
                                      approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False,
-                                     approved_target=None,bond_advisory_candidates=None):
+                                     approved_target=None,bond_advisory_candidates=None,equity_symbol=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -293,6 +292,8 @@ These cache manifests attest row counts/dates, not exchange or price basis.
             instruments.append({'instrument_key':'BOND_ADVISORY:'+symbol,'ticker':symbol,
                 'identity_state':'SOURCE_SYMBOL_ONLY',
                 'advisory_candidate_scope':'BOND_RECOMMENDATIONS_ONLY'})
+    if equity_symbol is not None:
+        instruments = [item for item in instruments if item.get('ticker') == equity_symbol]
     assets, missing = [], []
     base = Path(repo_root).resolve() / 'data/market_history/global'
     manifest_path = base / 'manifest.json'
@@ -307,7 +308,7 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         if alternate.get('schema_version')!='Family.W8.AlternativeMarketHistory.v1':
             raise ValueError('ALTERNATIVE_MARKET_MANIFEST_SCHEMA')
     bond_ids=set()
-    if approved_rule_profile is not None:
+    if approved_rule_profile is not None and equity_symbol is None:
         runtime=Path(__file__).resolve().parents[3]/'系統工程/債券V75/正式Runtime/V75_Work6_RuntimeReady_2026-09-25/runtime'
         if str(runtime) not in sys.path:sys.path.insert(0,str(runtime))
         from v75_runtime.work3 import US_LISTED_ASSETS,TW_LISTED_ASSETS
@@ -424,7 +425,7 @@ These cache manifests attest row counts/dates, not exchange or price basis.
                     approved_rule_profile=routed_profile,is_etf=is_etf)
             else:result = evaluate_observed_history(rows, repo_root=repo_root, evaluation_at=evaluation_at,
                 macro=macro, asset_id=symbol,formal_rule_source=formal_rule_source,
-                approved_rule_profile=routed_profile,is_etf=is_etf)
+                approved_rule_profile=routed_profile,is_etf=is_etf,equity_only=equity_symbol is not None)
             if cache.read_bytes() != raw:
                 raise ValueError('CACHE_CHANGED_DURING_CALCULATION')
             if result.get('approved_technical'):

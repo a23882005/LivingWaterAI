@@ -342,7 +342,7 @@ class AssetSourceProducer:
                 or account_presence_policy.get('client_id')!=self.req['client_id']):
             raise PermissionError('ACCOUNT_PRESENCE_POLICY_CLIENT_MISMATCH')
         self.product_source=deepcopy(product_source)
-        if flow not in ('HOLDINGS_ANALYSIS','DEPLOYMENT'):
+        if flow not in ('HOLDINGS_ANALYSIS','V82_ANALYSIS','DEPLOYMENT'):
             raise ValueError('INVALID_MENU04_INTERNAL_FLOW')
         self.flow=flow;self.analyze_all=analyze_all
         self.native_funding_advice_enabled=True
@@ -369,12 +369,15 @@ class AssetSourceProducer:
         if snapshot!=self.req['client_snapshot']['payload']:
             raise PermissionError('PRODUCER_APPROVAL_SNAPSHOT_CHANGED')
         req=deepcopy(self.req);ctx=deepcopy(self.ctx)
+        equity_only = self.flow == 'V82_ANALYSIS'
+        if equity_only:
+            ctx['equity_analysis_symbol'] = self.symbol
         ctx['sgov_role_strategic_policy']=deepcopy(self.v70_strategic_policy)
         ctx['sgov_role_classification_source']=deepcopy(self.class_source)
         ctx['sgov_role_product_sources']=deepcopy(self.product_sources)
-        if self.bond_market_supplement_source is not None:
+        if not equity_only and self.bond_market_supplement_source is not None:
             ctx['bond_market_supplement_source']=deepcopy(self.bond_market_supplement_source)
-        if self.v75_macro_source_manifest is not None:
+        if not equity_only and self.v75_macro_source_manifest is not None:
             ctx['v75_macro_source_manifest']=deepcopy(self.v75_macro_source_manifest)
         if self.verified_macro_feed_source is not None:
             ctx['verified_macro_feed_source']=deepcopy(self.verified_macro_feed_source)
@@ -471,8 +474,10 @@ class AssetSourceProducer:
         if broker_view is not None:
             from broker_snapshot_source import project_holdings as broker_holdings
             holdings=broker_holdings(holdings,prepared.payload['positions'],broker_view)
-        from bond_advisory import policy as bond_advisory_policy,candidates as bond_candidates
-        advisory_candidates=bond_candidates(self.root) if bond_advisory_policy(req,ctx) else None
+        advisory_candidates = None
+        if not equity_only:
+            from bond_advisory import policy as bond_advisory_policy,candidates as bond_candidates
+            advisory_candidates=bond_candidates(self.root) if bond_advisory_policy(req,ctx) else None
         market_arguments=dict(snapshot=snapshot,targets=[],macro=macro,repo_root=self.root,
             evaluation_at=when,official_holdings=holdings,
             alternative_source_dir=self.alternative_source_dir,formal_rule_source=self.class_source,
@@ -484,26 +489,30 @@ class AssetSourceProducer:
             bond_advisory_candidates=advisory_candidates,
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
+        if equity_only:
+            market_arguments['equity_symbol'] = self.symbol
         cache=self.observation_cache if self.run_binding is not None else None
         if cache is not None:
             from same_run_market_cache import SameRunMarketCache
             if not isinstance(cache,SameRunMarketCache):raise TypeError('MEMBER_MARKET_CACHE_INTERNAL_INSTANCE_REQUIRED')
             observations=cache.build(market.build_member_market_observations,market_arguments)
         else:observations=market.build_member_market_observations(**market_arguments)
-        from v75_market_supplement import read as read_bond_supplement,apply as apply_bond_supplement
-        supplement=read_bond_supplement(self.bond_market_supplement_source,when)
-        from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
-        macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
-        amendment=(macro_inputs or {}).get('usd_pred007_amendment')
-        if amendment and req['owner']['currency']=='USD':
-            req['expected_versions']['v75_pred007']=ctx['expected_versions']['v75_pred007']=amendment['rule_identity']['effective_predicate_version']
-            ctx['v75_pred007_source']=deepcopy(amendment['metrics']['amendment_source'])
-            ctx['v75_pred007_legacy_candidates']=deepcopy(amendment['metrics']['legacy_candidates'])
-            req['v75_pred007_source_digest']=amendment['source_digest']
-        observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
-        observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
+        if not equity_only:
+            from v75_market_supplement import read as read_bond_supplement,apply as apply_bond_supplement
+            supplement=read_bond_supplement(self.bond_market_supplement_source,when)
+            from v75_macro_inputs import read as read_v75_macro_inputs,apply as apply_v75_macro_inputs
+            macro_inputs=read_v75_macro_inputs(self.v75_macro_source_manifest,when)
+            amendment=(macro_inputs or {}).get('usd_pred007_amendment')
+            if amendment and req['owner']['currency']=='USD':
+                req['expected_versions']['v75_pred007']=ctx['expected_versions']['v75_pred007']=amendment['rule_identity']['effective_predicate_version']
+                ctx['v75_pred007_source']=deepcopy(amendment['metrics']['amendment_source'])
+                ctx['v75_pred007_legacy_candidates']=deepcopy(amendment['metrics']['legacy_candidates'])
+                req['v75_pred007_source_digest']=amendment['source_digest']
+            observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
+            observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
         from qualified_equity_inputs import read as read_equities,apply as apply_equities
-        equities=read_equities(self.qualified_equity_source_manifest,when,self.root)
+        equities=read_equities(self.qualified_equity_source_manifest,when,self.root,
+            symbol=self.symbol if equity_only else None)
         observations=apply_equities(observations,equities,req,self.root,self.class_source,self.approved_rule_profile,
             prepared.payload['positions'])
         from new_investment_scenario import build_plan,apply_plan,wire_number
@@ -515,7 +524,24 @@ class AssetSourceProducer:
         # A branches before constructing or loading any deployment adapter.
         # It retains original source/owner checks but needs no new-money plan.
         from holdings_analysis import build_analysis_report
-        analysis=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial,investment=investment,tactical=tactical,fx_observation=self.fx_observation)
+        analysis=build_analysis_report(self,req,ctx,prepared,holdings,observations,trial,investment=investment,tactical=tactical,fx_observation=self.fx_observation,
+            equity_only=equity_only)
+        if equity_only:
+            from holdings_analysis import HoldingsAnalysisRunner
+            HoldingsAnalysisRunner(context=ctx,report=analysis).analyze(req)
+            row=analysis['analysis_result']['positions'][0]
+            funding=(analysis.get('native_funding_advice') or {}).get('items',{}).get(row['instrument_id'],{})
+            missing_equity=(equities or {}).get('missing_items',{}).get(self.symbol)
+            source_issues=[{'code':missing_equity,'field_path':'qualified_equity_inputs.'+self.symbol}] if missing_equity else []
+            from family_c7_source_assembly import assemble_original_producers
+            assembly=assemble_original_producers(self,req,ctx,prepared,trial)
+            return {'request':req,'trusted_context':ctx,'source_production':{
+                'status':'V82_STOCK_ANALYSIS_RETURNED',
+                'analysis_report':analysis,
+                'family_scope_assembly':assembly,
+                'source_validation_issues':source_issues+row['issues']+funding.get('issues',[])+assembly['issues'],
+                'call_trace':['W8.AssetSourceProducer:V82_ANALYSIS',*row['call_trace'],*funding.get('call_trace',[]),*assembly['call_trace']],
+                'no_financial_engine_or_ledger_claimed':True}}
         if self.flow=='HOLDINGS_ANALYSIS':
             report=analysis
             return {'request':req,'trusted_context':ctx,'analysis_report':report,

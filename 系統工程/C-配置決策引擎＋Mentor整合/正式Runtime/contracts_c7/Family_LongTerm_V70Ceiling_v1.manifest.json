@@ -65,7 +65,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
-      "sha256": "7e7e5520a633de9988265fb4e8cafe538b66ddfb4dc4856873c89387330ae3cf"
+      "sha256": "5451a19df1e028267df705faae04fd92f76f5044436d2e81d779cc5340e8d191"
     },
     {
       "path": "../../Family/W8/member_funding_summary.py",
@@ -73,11 +73,11 @@
     },
     {
       "path": "../../Family/W8/native_asset_source.py",
-      "sha256": "368e286ed7a500557c59bc05150ab16092950a9347d354a73b3d55c88a87f3c4"
+      "sha256": "f0573db5808fbad2b82dd5f8d057976c70fea0750d966041c7c646fcfdbf7156"
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "f14a836f6143e6f6de95402b1a7e984929c0822b605557f54b224e0cb9468460"
+      "sha256": "1582c0d00cf55274d05f3cb1b6c81e4ebe4e70724330cb956934f2f31747e645"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
@@ -245,7 +245,7 @@
     },
     {
       "path": "../../Family/W8/holdings_analysis.py",
-      "sha256": "cd4dec362f5231949cd6641f4e4dd119515c7a3ab176920ec5c8f9e2927a78a3"
+      "sha256": "6ef2cc997fd0696eb27b69303c7e483845252cfb2055021005a3fe82dcd18aaa"
     },
     {
       "path": "../../Family/W8/v82_core_source.py",

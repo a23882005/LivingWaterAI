@@ -134,15 +134,25 @@ def item(symbol,source,evaluation_at,root):
     result['digest']=digest(result);return result
 
 
-def read(source,evaluation_at,root):
+def read(source,evaluation_at,root,*,symbol=None):
     if source is None:return None
     if source.get('schema_version')!='Family.W8.QualifiedEquityManifestSource.v1':
         raise ValueError('EQUITY_MANIFEST_SOURCE_SCHEMA')
     raw=checked(source);manifest=json.loads(raw)
     if manifest.get('schema_version')!='Family.W8.EquitySourceQualificationManifest.v1':
         raise ValueError('EQUITY_MANIFEST_SCHEMA')
-    result={'schema_version':'Family.W8.QualifiedEquityInputs.v1','manifest_sha256':source['sha256'],
-        'items':{symbol:item(symbol,value,evaluation_at,root) for symbol,value in manifest['items'].items()}}
+    result={'schema_version':'Family.W8.QualifiedEquityInputs.v1','manifest_sha256':source['sha256'],'items':{}}
+    if symbol is not None:
+        result['equity_analysis_symbol']=symbol
+    for ticker,value in manifest['items'].items():
+        if symbol is not None and ticker != symbol:
+            continue
+        try:
+            result['items'][ticker]=item(ticker,value,evaluation_at,root)
+        except FileNotFoundError:
+            if symbol is None:
+                raise
+            result['missing_items']={ticker:'EQUITY_QUALIFIED_HISTORY_OR_RECEIPT_MISSING'}
     result['digest']=digest(result);return result
 
 
@@ -160,7 +170,8 @@ def updates(row,pool,request,root,class_source,profile,prepared_positions=None):
         '_source_decimal':{k:r[k] for k in ('Open','High','Low','Close','Volume')}} for r in source['rows']]
     from on_demand_market_observations import evaluate_observed_history
     result=evaluate_observed_history(rows,repo_root=root,evaluation_at=request['evaluation_at'],macro=request['macro_snapshot'],
-        asset_id=symbol,formal_rule_source=class_source,approved_rule_profile=profile,is_etf=True)
+        asset_id=symbol,formal_rule_source=class_source,approved_rule_profile=profile,is_etf=True,
+        equity_only=pool.get('equity_analysis_symbol')==symbol)
     binding={'symbol':symbol,'provider_symbol':symbol,
         'source_sha256':source['technical_source_template']['sha256'],'manifest_sha256':pool['manifest_sha256'],
         'source_db_sha256':request['client_snapshot']['payload']['source_sha256'],
@@ -202,7 +213,7 @@ def validate(request,context,report,root,*,prepared_positions=None):
     descriptor=context.get('qualified_equity_source_manifest')
     if request.get('qualified_equity_source_digest')!=(digest(descriptor) if descriptor is not None else None):
         raise PermissionError('EQUITY_REQUEST_SOURCE_BINDING_MISMATCH')
-    pool=read(descriptor,request['evaluation_at'],root)
+    pool=read(descriptor,request['evaluation_at'],root,symbol=context.get('equity_analysis_symbol'))
     if report.get('qualified_equity_inputs')!=pool:raise PermissionError('EQUITY_POOL_REPLAY_MISMATCH')
     if pool is None:return
     from approved_v04_technical import load_profile

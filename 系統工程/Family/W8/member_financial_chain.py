@@ -130,7 +130,7 @@ def complete_report(report,request,config,root):
             attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],
                 observation_cache=observation_cache,reconciliation_source=reconciliation_source,
                 public_history_sources=config.get('public_history_sources',{}).get(row['symbol']),
-                issuer_facts_sources=config.get('issuer_facts_sources'))
+                issuer_facts_sources=config.get('issuer_facts_sources'),equity_only=True)
             if row.get('history_source_qualification') is not None:
                 if attempt.get('public_history_source_binding',{}).get('digest')!=row['history_source_qualification']['digest']:
                     raise PermissionError('MEMBER_FINANCIAL_PUBLIC_HISTORY_SOURCE_REPLAY_MISMATCH')

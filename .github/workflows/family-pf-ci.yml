@@ -1,0 +1,184 @@
+name: Family PF isolated PoC verification
+on:
+  push:
+    branches: [family-pf-ci-20261012]
+    paths:
+      - '.github/workflows/family-pf-ci.yml'
+      - 'experiments/family-pf-poc-20261012/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/family-pf-ci.yml'
+      - 'experiments/family-pf-poc-20261012/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: family-pf-synthetic-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify-pf-full-suite:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/family-pf-ci-20261012'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify original source SHA-256
+        shell: bash
+        run: |
+          printf '%s  %s\n' '0049a772efb7ca86452ffafc5c319d38e69ccadeb40e8fc1a2581c3506d7214b' 'experiments/family-pf-poc-20261012/PF_Local_PoC_39Tests_Source.tar.xz' | sha256sum -c -
+      - name: Extract source
+        shell: bash
+        run: |
+          mkdir -p pf-ci-source
+          tar -xJf experiments/family-pf-poc-20261012/PF_Local_PoC_39Tests_Source.tar.xz -C pf-ci-source
+      - name: Verify OAuth extension SHA-256 and extract
+        shell: bash
+        run: |
+          printf '%s  %s\n' 'da59224eb417997494530c1ff8f851151b941dde30623682d7dc15362ee3841d' 'experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz' | sha256sum -c -
+          tar -xJf experiments/family-pf-poc-20261012/PF_OAuth_72_Extension.tar.xz -C pf-ci-source
+      - name: Apply isolated OAuth authorized-party hardening
+        shell: bash
+        run: |
+          cp experiments/family-pf-poc-20261012/hardening_azp_75.py pf-ci-source/hardening_azp_75.py
+          cd pf-ci-source
+          python hardening_azp_75.py
+      - name: Install synthetic MCP transport and tests
+        shell: bash
+        run: |
+          cp experiments/family-pf-poc-20261012/pf_mcp_protocol.py pf-ci-source/pf_mcp_protocol.py
+          cp experiments/family-pf-poc-20261012/test_mcp_protocol.py pf-ci-source/tests/test_mcp_protocol.py
+          cp experiments/family-pf-poc-20261012/test_mcp_negative_extended.py pf-ci-source/tests/test_mcp_negative_extended.py
+          cp experiments/family-pf-poc-20261012/test_mcp_request_reauthorization.py pf-ci-source/tests/test_mcp_request_reauthorization.py
+          cp experiments/family-pf-poc-20261012/test_mcp_origin_security.py pf-ci-source/tests/test_mcp_origin_security.py
+          cp experiments/family-pf-poc-20261012/test_mcp_oauth_discovery.py pf-ci-source/tests/test_mcp_oauth_discovery.py
+          cp experiments/family-pf-poc-20261012/test_mcp_live_loopback.py pf-ci-source/tests/test_mcp_live_loopback.py
+          cp experiments/family-pf-poc-20261012/pf_deployment_config.py pf-ci-source/pf_deployment_config.py
+          cp experiments/family-pf-poc-20261012/test_deployment_config.py pf-ci-source/tests/test_deployment_config.py
+          cp experiments/family-pf-poc-20261012/test_mcp_deployment_binding.py pf-ci-source/tests/test_mcp_deployment_binding.py
+          cp experiments/family-pf-poc-20261012/pf_production_bootstrap.py pf-ci-source/pf_production_bootstrap.py
+          cp experiments/family-pf-poc-20261012/test_production_bootstrap.py pf-ci-source/tests/test_production_bootstrap.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_checklist.py pf-ci-source/pf_gate_a_checklist.py
+          cp experiments/family-pf-poc-20261012/test_gate_a_checklist.py pf-ci-source/tests/test_gate_a_checklist.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_attestation.py pf-ci-source/pf_gate_a_attestation.py
+          cp experiments/family-pf-poc-20261012/test_gate_a_attestation.py pf-ci-source/tests/test_gate_a_attestation.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_trust_anchor.py pf-ci-source/pf_gate_a_trust_anchor.py
+          cp experiments/family-pf-poc-20261012/test_gate_a_trust_anchor.py pf-ci-source/tests/test_gate_a_trust_anchor.py
+          cp experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py pf-ci-source/pf_ci_evidence_receipt.py
+          cp experiments/family-pf-poc-20261012/test_pf_ci_evidence_receipt.py pf-ci-source/tests/test_pf_ci_evidence_receipt.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_external_matrix.py pf-ci-source/pf_gate_a_external_matrix.py
+          cp experiments/family-pf-poc-20261012/test_pf_gate_a_external_matrix.py pf-ci-source/tests/test_pf_gate_a_external_matrix.py
+          cp experiments/family-pf-poc-20261012/pf_external_evidence_plan.py pf-ci-source/pf_external_evidence_plan.py
+          cp experiments/family-pf-poc-20261012/test_pf_external_evidence_plan.py pf-ci-source/tests/test_pf_external_evidence_plan.py
+          cp experiments/family-pf-poc-20261012/pf_external_start_guard.py pf-ci-source/pf_external_start_guard.py
+          cp experiments/family-pf-poc-20261012/test_pf_external_start_guard.py pf-ci-source/tests/test_pf_external_start_guard.py
+          cp experiments/family-pf-poc-20261012/pf_gate_a_readiness.py pf-ci-source/pf_gate_a_readiness.py
+          cp experiments/family-pf-poc-20261012/test_gate_a_readiness.py pf-ci-source/tests/test_gate_a_readiness.py
+          cp experiments/family-pf-poc-20261012/pf_review_reconciliation.py pf-ci-source/pf_review_reconciliation.py
+          cp experiments/family-pf-poc-20261012/test_review_reconciliation.py pf-ci-source/tests/test_review_reconciliation.py
+          cp experiments/family-pf-poc-20261012/pf_review_decision_guard.py pf-ci-source/pf_review_decision_guard.py
+          cp experiments/family-pf-poc-20261012/test_review_decision_guard.py pf-ci-source/tests/test_review_decision_guard.py
+          cp experiments/family-pf-poc-20261012/pf_review_handoff.py pf-ci-source/pf_review_handoff.py
+          cp experiments/family-pf-poc-20261012/test_review_handoff.py pf-ci-source/tests/test_review_handoff.py
+          cp experiments/family-pf-poc-20261012/pf_independent_review_preflight.py pf-ci-source/pf_independent_review_preflight.py
+          cp experiments/family-pf-poc-20261012/test_independent_review_preflight.py pf-ci-source/tests/test_independent_review_preflight.py
+          cp experiments/family-pf-poc-20261012/pf_evidence_package_verify.py pf-ci-source/pf_evidence_package_verify.py
+          cp experiments/family-pf-poc-20261012/test_evidence_package_verify.py pf-ci-source/tests/test_evidence_package_verify.py
+          cp experiments/family-pf-poc-20261012/pf_evidence_digest_verify.py pf-ci-source/pf_evidence_digest_verify.py
+          cp experiments/family-pf-poc-20261012/test_evidence_digest_verify.py pf-ci-source/tests/test_evidence_digest_verify.py
+          cp experiments/family-pf-poc-20261012/pf_external_evidence_inventory.py pf-ci-source/pf_external_evidence_inventory.py
+          cp experiments/family-pf-poc-20261012/test_external_evidence_inventory.py pf-ci-source/tests/test_external_evidence_inventory.py
+          cp experiments/family-pf-poc-20261012/pf_remote_preflight.py pf-ci-source/pf_remote_preflight.py
+          cp experiments/family-pf-poc-20261012/test_remote_preflight.py pf-ci-source/tests/test_remote_preflight.py
+      - name: Install persistent audit synthetic extension
+        shell: bash
+        run: |
+          cp experiments/family-pf-poc-20261012/pf_audit_store.py pf-ci-source/pf_audit_store.py
+          cp experiments/family-pf-poc-20261012/test_audit_store.py pf-ci-source/tests/test_audit_store.py
+          cp experiments/family-pf-poc-20261012/test_audit_reopen_snapshot.py pf-ci-source/tests/test_audit_reopen_snapshot.py
+          cp experiments/family-pf-poc-20261012/test_mcp_audit_wiring.py pf-ci-source/tests/test_mcp_audit_wiring.py
+          cp experiments/family-pf-poc-20261012/test_mcp_persistent_auth_denials.py pf-ci-source/tests/test_mcp_persistent_auth_denials.py
+      - name: Install test dependencies
+        working-directory: pf-ci-source
+        run: python -m pip install -r requirements.txt 'cryptography==46.0.4' 'uvicorn>=0.30,<1'
+      - name: Verify isolated workflow security contract
+        run: python -m pytest -q experiments/family-pf-poc-20261012/test_workflow_security_contract.py
+      - name: Run full Family PF suite
+        working-directory: pf-ci-source
+        env:
+          PYTHONPATH: .:tests
+        run: python -m pytest -q tests --junitxml=ci-results.xml
+      - name: Run demo
+        working-directory: pf-ci-source
+        env:
+          PYTHONPATH: .
+        run: python run_demo.py
+      - name: Emit minimal synthetic evidence receipt
+        if: success()
+        working-directory: pf-ci-source
+        env:
+          PF_HEAD_SHA: ${{ github.sha }}
+        run: python pf_ci_evidence_receipt.py emit --junit ci-results.xml --commit "$PF_HEAD_SHA" --directory ci-evidence
+      - name: Generate offline Gate A outstanding evidence plan
+        working-directory: pf-ci-source
+        run: python pf_external_evidence_plan.py --output ci-evidence/gate-a-workplan.json
+      - name: Generate external review matrix without external requests
+        working-directory: pf-ci-source
+        run: python pf_gate_a_external_matrix.py --output ci-evidence/external-matrix.json
+      - name: Upload synthetic evidence receipt
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: family-pf-synthetic-receipt
+          path: pf-ci-source/ci-evidence/
+          retention-days: 7
+          if-no-files-found: error
+  verify-evidence-receipt:
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/family-pf-ci-20261012'
+    needs: verify-pf-full-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: family-pf-synthetic-receipt
+          path: downloaded-receipt
+      - name: Verify nine external controls remain unverified
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("downloaded-receipt/gate-a-workplan.json").read_text())
+          assert p["gate_a"] == "HOLD"
+          assert p["work13_allowed"] is False
+          assert p["remote_tests_executed"] is False
+          assert p["authorization_preflight"] == "BLOCKED"
+          assert [e["id"] for e in p["evidence_required"]] == [f"EA-{i:02d}" for i in range(1,10)]
+          assert all(e["state"] == "NOT_VERIFIED" for e in p["evidence_required"])
+          PY
+      - name: Verify external claims remain HOLD in separate job
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          doc = json.loads(Path("downloaded-receipt/external-matrix.json").read_text())
+          assert doc["gate_a"] == "HOLD" and doc["work13_allowed"] is False
+          assert doc["external_evidence_verified"] is False
+          assert [x["id"] for x in doc["controls"]] == [f"EA-{i:02d}" for i in range(1,10)]
+          assert all(x["state"] == "NOT_VERIFIED" for x in doc["controls"])
+          PY
+      - name: Verify receipt integrity and gate claim
+        env:
+          PF_EXPECTED_SHA: ${{ github.sha }}
+        run: python experiments/family-pf-poc-20261012/pf_ci_evidence_receipt.py verify --directory downloaded-receipt --expected-commit "$PF_EXPECTED_SHA"

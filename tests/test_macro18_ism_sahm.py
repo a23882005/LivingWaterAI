@@ -132,10 +132,57 @@ class SourceTests(unittest.TestCase):
     def test_sahm_published_series_preferred(self):
         fake=SimpleNamespace(fred=lambda name:pd.Series([0.21],index=pd.to_datetime(['2026-09-01'])),
                              fredsources={})
-        with patch.object(macro,'sahm_from_unrate',side_effect=AssertionError('should not use U3')):
+        gap={'status':'MISSING_MONTHS','missing_months':['2025-10']}
+        with (patch.object(macro,'sahm_from_unrate',side_effect=AssertionError('must retain published value')),
+              patch.object(macro,'sahm_bls_crosscheck',return_value=gap)):
             r=macro.sahm_from_published(fake)
         self.assertEqual(r['value'],0.21)
         self.assertEqual(r['observation_date'],'2026-09-01')
+        self.assertEqual(r['sahm_bls_check'],gap)
+
+    def sahm_bls_fixture(self, months, values, series_id='LNS14000000'):
+        points=[{'year':str(month.year),'period':f'M{month.month:02d}','value':str(value)}
+                for month,value in zip(months,values)]
+        body={'status':'REQUEST_SUCCEEDED',
+              'Results':{'series':[{'seriesID':series_id,'data':points[::-1]}]}}
+        reply=FakeResponse(json.dumps(body))
+        reply.content=reply.text.encode()
+        reply.json=lambda:body
+        return SimpleNamespace(timeout=40,s=SimpleNamespace(get=lambda *args,**kwargs:reply))
+
+    def test_sahm_bls_complete_window_matches_negative_reading(self):
+        months=pd.period_range('2024-07','2025-09',freq='M')
+        fake=self.sahm_bls_fixture(months,[4.2]*14+[4.0])
+        check=macro.sahm_bls_crosscheck(fake,{'observation_date':'2025-09-01','value':-0.07})
+        self.assertEqual(check['status'],'MATCH')
+        self.assertEqual(check['calculated_value_pp'],-0.07)
+        self.assertEqual(len(check['response_sha256']),64)
+        check=macro.sahm_bls_crosscheck(fake,{'observation_date':'2025-09-01','value':0.0})
+        self.assertEqual(check['status'],'VALUE_MISMATCH')
+
+    def test_sahm_bls_gap_and_month_mismatch_have_no_candidate_value(self):
+        months=pd.period_range('2025-07','2026-09',freq='M')
+        fake=self.sahm_bls_fixture(months,[4.2]*3+['-']+[4.2]*11)
+        published={'observation_date':'2026-09-01','value':0.0}
+        check=macro.sahm_bls_crosscheck(fake,published)
+        self.assertEqual(check['missing_months'],['2025-10'])
+        self.assertNotIn('calculated_value_pp',check)
+        check=macro.sahm_bls_crosscheck(fake,dict(published,observation_date='2026-08-01'))
+        self.assertEqual(check['status'],'MONTH_MISMATCH')
+        self.assertNotIn('calculated_value_pp',check)
+
+    def test_sahm_bls_january_window_no_longer_includes_october_gap(self):
+        months=pd.period_range('2025-10','2027-01',freq='M')
+        fake=self.sahm_bls_fixture(months,['-']+[4.2]*12+[4.5]*3)
+        with patch.object(macro.dt,'datetime',wraps=RealDatetime) as clock:
+            clock.now.side_effect=lambda tz:RealDatetime(2027,2,6,tzinfo=tz)
+            check=macro.sahm_bls_crosscheck(fake,{'observation_date':'2027-01-01','value':0.3})
+        self.assertEqual(check['status'],'MATCH')
+
+    def test_sahm_bls_rejects_wrong_series(self):
+        fake=self.sahm_bls_fixture([],[],'NOT_U3')
+        check=macro.sahm_bls_crosscheck(fake,{'observation_date':'2025-09-01','value':0.0})
+        self.assertEqual(check['status'],'SOURCE_ERROR')
 
 if __name__=='__main__':unittest.main()
 

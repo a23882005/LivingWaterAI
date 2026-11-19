@@ -1,6 +1,20 @@
 {
   "schema_version": "Family.W8.AnalysisMarketAliases.v1",
   "aliases": {
+    "0050": {
+      "provider_symbol": "0050.TW",
+      "reference_exchange": "XTAI",
+      "reference_timezone": "Asia/Taipei",
+      "quote_currency": "TWD",
+      "isin": "TW0000050004",
+      "product": "元大台灣卓越50證券投資信託基金",
+      "source_url": "https://www.yuantaetfs.com/product/detail/0050/Basic_information",
+      "source_section": "基金基本資料／ISIN",
+      "verified_on": "2026-11-18",
+      "verification_time_precision": "DAY_ONLY",
+      "history_policy": "CONTIGUOUS_VALID_SUFFIX_FOR_ANALYSIS_ONLY",
+      "scope": "ANALYSIS_REFERENCE_VENUE_ONLY__NOT_HELD_VENUE_OR_ORDER_IDENTITY"
+    },
     "VWRA": {
       "provider_symbol": "VWRA.L",
       "reference_exchange": "XLON",

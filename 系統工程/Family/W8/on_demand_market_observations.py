@@ -228,7 +228,8 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
         or instrument.get('isin') not in (None,row['isin'])):
         raise ValueError('ANALYSIS_MARKET_ALIAS_IDENTITY_MISMATCH')
     exchange=instrument.get('exchange_code')
-    if exchange not in (None,'',row['reference_exchange'],'LSE'):
+    exchange_aliases = ('LSE',) if row['reference_exchange'] == 'XLON' else ()
+    if exchange not in (None, '', row['reference_exchange'], *exchange_aliases):
         raise ValueError('ANALYSIS_MARKET_ALIAS_EXCHANGE_MISMATCH')
     if row['verified_on']>_time(evaluation_at).date().isoformat():
         raise ValueError('ANALYSIS_MARKET_ALIAS_VERIFICATION_IN_FUTURE')
@@ -336,12 +337,23 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         alternate_entry=None
         if (entry.get('status')!='OK' or not cache.is_file()) and symbol in alternate.get('items',{}):
             candidate=alternate['items'][symbol]
-            if (candidate['file_name']!=symbol+'.csv' or candidate['currency']!='USD'
-                or instrument.get('quote_currency') not in (None,candidate['currency'])
-                or instrument.get('exchange_code') not in (None,'',candidate['exchange'],'LSE')):
+            if candidate['currency'] == 'USD':
+                identity_matches = (
+                    instrument.get('quote_currency') in (None, candidate['currency'])
+                    and instrument.get('exchange_code') in (None, '', candidate['exchange'], 'LSE'))
+            else:
+                identity_matches = (
+                    identity_mapping is not None
+                    and candidate.get('formal_deployment_eligible') is False
+                    and candidate['currency'] == identity_mapping['quote_currency']
+                    and candidate['exchange'] == identity_mapping['reference_exchange']
+                    and candidate['timezone'] == identity_mapping['reference_timezone'])
+            if candidate['file_name'] != symbol + '.csv' or not identity_matches:
                 missing.append({'instrument_key':key,'symbol':symbol,'code':'ALTERNATIVE_MARKET_IDENTITY_MISMATCH'})
                 continue
-            entry=candidate;alternate_entry=candidate;provider_symbol=symbol
+            entry=candidate;alternate_entry=candidate
+            if candidate['currency'] == 'USD':
+                provider_symbol=symbol
             cache=alternate_base/candidate['file_name']
             identity_mapping={'reference_exchange':candidate['exchange'],'reference_timezone':candidate['timezone'],
                 'quote_currency':candidate['currency'],'source_url':candidate['source_url'],

@@ -111,6 +111,48 @@ class ObservationsTest(unittest.TestCase):
         self.snapshot['tables']['portfolio_instrument'][0]['quote_currency']='CHF'
         self.assertEqual(self.build()['missing'][0]['code'],'ANALYSIS_MARKET_ALIAS_IDENTITY_MISMATCH')
 
+    def test_alternative_twd_cache_requires_reviewed_listing_and_stays_analysis_only(self):
+        instrument = self.snapshot['tables']['portfolio_instrument'][0]
+        instrument.update(ticker='0050', quote_currency='TWD')
+        alternate = self.root / 'alternate'
+        alternate.mkdir()
+        raw = self.path.read_bytes()
+        (alternate / '0050.csv').write_bytes(raw)
+        manifest = alternate / 'manifest.json'
+        item = {**self.manifest['items']['SGOV'], 'file_name': '0050.csv',
+                'sha256': hashlib.sha256(raw).hexdigest(), 'currency': 'TWD',
+                'exchange': 'XTAI', 'timezone': 'Asia/Taipei',
+                'source_url': 'https://prices.example/0050.TW', 'provider': 'synthetic',
+                'formal_deployment_eligible': False}
+
+        def read_alternate():
+            manifest.write_text(json.dumps({'schema_version': 'Family.W8.AlternativeMarketHistory.v1',
+                                            'items': {'0050': item}}))
+            return M.build_member_market_observations(
+                self.snapshot, [], self.macro, repo_root=self.root,
+                evaluation_at='2026-10-02T00:00:00Z', alternative_source_dir=alternate)
+
+        self.assertEqual(read_alternate()['missing'][0]['code'], 'ALTERNATIVE_MARKET_IDENTITY_MISMATCH')
+        folder = self.root / '系統工程/Family/W8'
+        folder.mkdir(parents=True)
+        catalog = json.loads((HERE / 'market_identity_aliases.json').read_bytes())
+        catalog['aliases']['0050']['verified_on'] = '2026-10-01'
+        (folder / 'market_identity_aliases.json').write_text(json.dumps(catalog))
+        with patch.object(M, 'evaluate_observed_history', return_value={'formal_deployment_eligible': False}):
+            asset, = read_alternate()['assets']
+        self.assertEqual(asset['provider_symbol'], '0050.TW')
+        self.assertFalse(asset['formal_deployment_eligible'])
+        self.assertFalse(asset['analysis_identity_mapping']['held_exchange_inferred'])
+        for key, value in (('exchange', 'XLON'), ('timezone', 'Europe/London'),
+                           ('currency', 'USD'), ('formal_deployment_eligible', True)):
+            with self.subTest(key=key):
+                original = item[key]
+                item[key] = value
+                self.assertEqual(read_alternate()['missing'][0]['code'], 'ALTERNATIVE_MARKET_IDENTITY_MISMATCH')
+                item[key] = original
+        instrument['exchange_code'] = 'LSE'
+        self.assertEqual(read_alternate()['missing'][0]['code'], 'ANALYSIS_MARKET_ALIAS_EXCHANGE_MISMATCH')
+
     def test_approved_unheld_bond_uses_cache_without_creating_a_holding(self):
         self.manifest['items']['SPSB']=self.manifest['items'].pop('SGOV');self.write_manifest()
         self.path=self.folder/'SPSB.csv';self.write()

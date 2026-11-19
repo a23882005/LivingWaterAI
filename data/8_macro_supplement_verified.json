@@ -1,7 +1,7 @@
 {
   "schema": "V70.3/10h-eight-supplement-v3",
-  "generated_at": "2026-11-18T21:43:44.404827+08:00",
-  "as_of_taipei": "2026-11-18T21:43:44.404827+08:00",
+  "generated_at": "2026-11-19T10:04:25.374+08:00",
+  "as_of_taipei": "2026-11-19T10:04:25.374+08:00",
   "items": {
     "m06_rate": {
       "label": "Fed目前目標利率區間中點",
@@ -11,8 +11,8 @@
       "source_url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "本輪真實來源SHA256=e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6",
-      "retrieval_time": "2026-11-18T13:41:29.499399+00:00",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=0e1b914d40e49e147f72c5b0f02e775bf8a854bb338bcbecf36afc442979e1f0，稽核檔data/audit/fed_target_evidence_20261119T020206Z.html.gz",
+      "retrieval_time": "2026-11-19T10:02:06+08:00",
       "publication_date": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-10",
       "policy_schema": "fed-target-evidence-v1",
@@ -31,52 +31,52 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "FOMC現行目標區間",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:41:29.499399+00:00",
+          "checked_at": "2026-11-19T10:02:06+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
-          "notes": "本輪HTTP 200；SHA256=e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6；對應數值另按原定義解析"
+          "notes": "原始官方HTTP已保存並實算SHA256"
         },
         {
           "site": "FRED DFEDTARL",
           "url": "https://fred.stlouisfed.org/series/DFEDTARL",
           "metric_or_horizon": "目標區間下限",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:53.760098+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=7b3238182debecc563bd2e3e83a16b78157d8ae8a16c934764f514eb4dfea26a；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=f17ab0db67757d3a4faab0b81ab0570646c1a0f71d68accb3ad9b7535655d078；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "FRED DFEDTARU",
           "url": "https://fred.stlouisfed.org/series/DFEDTARU",
           "metric_or_horizon": "目標區間上限",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:59.552796+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=4974fc5184dbc37f0d99d939da0fb48fc65bb9df8135851af10697a1e58003c2；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=73357392c8070c5fb159e5ea8db30aba46cbe52357a128dcb7b958b0b8d2c414；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "ALFRED DFEDTARU",
           "url": "https://alfred.stlouisfed.org/series?seid=DFEDTARU",
           "metric_or_horizon": "目標區間上限歷史vintage",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:58.072063+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=40bc3bf89b82c061c70faf02106b09028fd9107ee043c8535eed8baf5b075229；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=0dcbb3a3a6fafcaf516ca9293ac667c6b85b025c5289909969d89c786b0d53a2；未取得同定義、單位、觀測期與vintage之可採數值"
         }
       ],
       "source_evidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-18T13:41:36.792290+00:00",
+        "checked_at": "2026-11-19T10:02:06+08:00",
         "result": "CURRENT_CONFIRMED",
-        "excerpt": "2026 current policy table September 17 3.75-4.00; fresh raw response retained",
-        "response_sha256": "e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6",
+        "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
+        "response_sha256": "0e1b914d40e49e147f72c5b0f02e775bf8a854bb338bcbecf36afc442979e1f0",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -89,7 +89,7 @@
         },
         "value": 3.875
       },
-      "last_verified_at": "2026-11-18T13:41:36.792290+00:00"
+      "last_verified_at": "2026-11-19T10:02:06+08:00"
     },
     "m06_inf": {
       "label": "未來12個月通膨預期",
@@ -109,44 +109,44 @@
           "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
           "metric_or_horizon": "消費者一年期通膨預期中位數",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:41:40.608289+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": 3.9,
           "unit": "%",
           "observation_date": "2026-10-31",
-          "notes": "本輪HTTP 200；SHA256=5aeebecac0befc257457319644df65b26d2b6d172ad57e046f7d6c928c979dcc；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=f2eff9166aeb5bb52b226101dc4b618954a926839e8eeebc930441be2ca13de1；沿既有已核實定義、單位、觀測期與vintage重新確認"
         },
         {
           "site": "Cleveland Fed",
           "url": "https://www.clevelandfed.org/indicators-and-data/inflation-expectations",
           "metric_or_horizon": "1年期模型通膨預期",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:41:41.750193+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=53fc90554ae56a35b33542c1d039d4bfd397784e10f540e31266b833b7a4cbd3；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=82efaad0d3084172117ed564477f29fc95e555873b3ee52951e57a9f8418dde3；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "University of Michigan",
           "url": "https://www.sca.isr.umich.edu/",
           "metric_or_horizon": "消費者一年期通膨預期",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:41:44.843994+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=898646305af913f9872fe341c35aa36a273c19adb6c360736d1f91e7ef9875a3；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=cdaad8839a3e05daa4a084981a805891421877b399a8d14e4e79eb171d6c8a0f；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Philadelphia Fed SPF",
           "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/inflation-forecasts",
           "metric_or_horizon": "SPF one-year-ahead annual average inflation",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:41:46.391983+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=52fb52eb90c113cb2bed0a6c1e9ff78f7482ea1c7000c5428d62efdbcc2a581a；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=68ceda9be72d9145fe7ceded5fc67ca6d2a160a502e65eaca67c4c6611441a28；未取得同定義、單位、觀測期與vintage之可採數值"
         }
       ],
       "last_verified_at": "2026-11-18T13:41:46.391838+00:00"
@@ -169,44 +169,44 @@
           "url": "https://www.newyorkfed.org/research/policy/rstar",
           "metric_or_horizon": "HLW real-time定義與發布狀態",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:59.552770+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=ae3fa790041ab29ef0a15a301b0a98f494f387e666f53ad9ccafa1215d1554ac；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=de52b8f5378221e106a81af34b84f0f47200c0697e29cdfc82e1d2a64db1d93a；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "NY Fed HLW real-time estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
           "metric_or_horizon": "US HLW real-time r* 2026Q2",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:41:50.871343+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": 1.00864835850403,
           "unit": "%",
           "observation_date": "2026-06-30",
-          "notes": "本輪HTTP 200；SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；沿既有已核實定義、單位、觀測期與vintage重新確認"
         },
         {
           "site": "NY Fed current estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx",
           "metric_or_horizon": "HLW current estimate交叉核對",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:43:05.531975+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=120f1587a5501d9623f00fb65e492df714b303559806e60f728bc3e575b5aa46；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "NY Fed Staff Report 1063",
           "url": "https://www.newyorkfed.org/research/staff_reports/sr1063",
           "metric_or_horizon": "HLW方法文件",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:43:13.138656+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=f1bb68528507dd77599d5f2802deb28d021cb3c039cd7450673656b6b8f941cf；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=45974c91a11a14abf38d618739baf6683a68c2ba31e1e3819918628ed20fd79a；未取得同定義、單位、觀測期與vintage之可採數值"
         }
       ],
       "last_verified_at": "2026-11-18T13:41:56.159629+00:00"
@@ -229,44 +229,44 @@
           "url": "https://www.cbo.gov/system/files/2026-02/51135-2026-02-Economic-Projections.xlsx",
           "metric_or_horizon": "2026Q3實質潛在GDP（CBO 2026-02 vintage）",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:00.092070+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "十億2017鏈價美元",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "BEA NIPA",
           "url": "https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026",
           "metric_or_horizon": "2026Q3實際實質GDP advance release",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:43:07.244739+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": 1.6967965324562608,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": "2026-09-30",
-          "notes": "本輪HTTP 200；SHA256=e0914c6cde962c660792136bf6a89a5256b747d0491cbb1b15aaec32914d1ec9；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=e0914c6cde962c660792136bf6a89a5256b747d0491cbb1b15aaec32914d1ec9；沿既有已核實定義、單位、觀測期與vintage重新確認"
         },
         {
           "site": "FRED GDPC1",
           "url": "https://fred.stlouisfed.org/series/GDPC1",
           "metric_or_horizon": "2026Q3實際實質GDP",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:43:12.734002+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=3c420531a09f27f5a8eaf9f34368857708d561c5429de5cfbcf4c2833f2a1bc5；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=a3cee521919ef2784ae5c50433adbb31ba9bd7d76f04a1204b1dfa855d33339b；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "ALFRED GDPC1",
           "url": "https://alfred.stlouisfed.org/series?seid=GDPC1",
           "metric_or_horizon": "GDPC1歷史發布vintage",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:43:13.138630+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "十億2017鏈價美元SAAR",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=7e1da0f6fbda757010784f32b06651ff5d84ce2751ca2b5ada2574ecf1ad5b0f；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=0a1f6ee808c1c8899c14082cb78bb622ba14f1defdc32c5615564162bbefd846；未取得同定義、單位、觀測期與vintage之可採數值"
         }
       ],
       "source_evidence": {
@@ -300,15 +300,15 @@
     },
     "s05": {
       "label": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
-      "value": 37.03,
+      "value": 37.31,
       "unit": "%",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
-      "method": "原Task NYSE/MMFI 50日廣度；原解析器核對完整交易日收盤",
+      "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "本輪真實來源SHA256=18c61c74434a3e220eabffb9886ad1c672c463adb020dc8262092347fc605741",
-      "retrieval_time": "2026-11-18T13:42:06.942991+00:00",
-      "publication_date": "2026-11-17",
+      "detail": "INDEX/MMFI 日期2026-11-18收盤37.31%，採EOD收盤非盤中LAST；來源SHA256=db4da4da6871c937ab9d27cf1b6fb48b79992bc1c4416c26f05a921010b9ad50",
+      "retrieval_time": "2026-11-19T10:02:06+08:00",
+      "publication_date": "2026-11-18",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10",
       "candidate_checks": [
         {
@@ -316,59 +316,59 @@
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "metric_or_horizon": "MMFI百分比／NYSE 50日廣度",
           "status": "BLOCKED",
-          "checked_at": "2026-11-18T13:42:08.370676+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 403；SHA256=af1f44ff00863cae24f6bed6a298744414ec2c46d55e0318a8bc15c524181b93；對應數值另按原定義解析"
+          "notes": "本輪HTTP 403或內容不足；未採值"
         },
         {
           "site": "Barchart",
           "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
           "metric_or_horizon": "$MMFI NYSE 50日廣度",
           "status": "BLOCKED",
-          "checked_at": "2026-11-18T13:42:09.612453+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 202；SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855；對應數值另按原定義解析"
+          "notes": "本輪HTTP 202或內容不足；未採值"
         },
         {
           "site": "EODData",
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日均線百分比",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:42:06.942991+00:00",
-          "value": 37.03,
+          "checked_at": "2026-11-19T10:02:06+08:00",
+          "value": 37.31,
           "unit": "%",
-          "observation_date": "2026-11-17",
-          "notes": "本輪HTTP 200；SHA256=18c61c74434a3e220eabffb9886ad1c672c463adb020dc8262092347fc605741；對應數值另按原定義解析"
+          "observation_date": "2026-11-18",
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=db4da4da6871c937ab9d27cf1b6fb48b79992bc1c4416c26f05a921010b9ad50"
         },
         {
           "site": "TradingView",
           "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
           "metric_or_horizon": "Percent of Stocks Above 50-Day Average",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:12.880169+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "%",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=e185912743e2d3f05a9c02e36d08e529394f2baaf428961dd716e7fabaad78af；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=0a68f3fa5d6df6b2eb8e757866f5179b8338949678e7104d5ce897e89b6f5f95；未取得同定義、單位、觀測期與vintage之可採數值"
         }
       ],
       "last_verified_at": "2026-11-18T13:42:13.485930+00:00"
     },
     "m03_qqq": {
       "label": "QQQ未來12個月Forward P/E",
-      "value": 18.94,
+      "value": 18.8,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://stockanalysis.com/etf/qqq/",
-      "method": "原Task StockAnalysis明示Forward PE；本輪重新讀取及核對日期",
+      "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "本輪真實來源SHA256=171503e5514a1f5c69eeba78df268bb7130b235d043275b1cfcf756e2d844c52",
-      "retrieval_time": "2026-11-18T13:42:14.870030+00:00",
-      "publication_date": "2026-11-17",
+      "detail": "QQQ Forward PE 18.8，頁面資料日2026-11-18",
+      "retrieval_time": "2026-11-19T10:02:06+08:00",
+      "publication_date": "2026-11-18",
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
@@ -376,44 +376,44 @@
           "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:17.872599+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=1fc57c64d876ec5948353cb85b0d2748af0816e37184ed39fff2d94f35936307；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=57ca21dfc57fc1eb857eb373168e5fda2d72108f999da0d0de443cc016ee7b7b；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Invesco",
           "url": "https://www.invesco.com/qqq-etf/en/about.html",
           "metric_or_horizon": "QQQ官方Forward/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:20.005176+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=fcbddac47067664acefb92e65d1e02eda220a15307518486fd886b67f3a55a46；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=cd498f5e5ddb89d43a80fd68e7edd014987f86e904ad42466980e9de73d0016b；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:20.297470+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:42:14.870030+00:00",
-          "value": 18.94,
+          "checked_at": "2026-11-19T10:02:06+08:00",
+          "value": 18.8,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-17",
-          "notes": "本輪HTTP 200；SHA256=171503e5514a1f5c69eeba78df268bb7130b235d043275b1cfcf756e2d844c52；對應數值另按原定義解析"
+          "observation_date": "2026-11-18",
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "source_evidence": {
@@ -427,15 +427,15 @@
     },
     "m03_spy": {
       "label": "SPY未來12個月Forward P/E",
-      "value": 18.14,
+      "value": 17.95,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://stockanalysis.com/etf/spy/",
-      "method": "原Task StockAnalysis明示Forward PE；本輪重新讀取及核對日期",
+      "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "本輪真實來源SHA256=60e0764f72e93d3863be6d4b2887fd033052442188a893334443bc0a26af3a57",
-      "retrieval_time": "2026-11-18T13:42:27.368967+00:00",
-      "publication_date": "2026-11-17",
+      "detail": "SPY Forward PE 17.95，頁面資料日2026-11-18",
+      "retrieval_time": "2026-11-19T10:02:06+08:00",
+      "publication_date": "2026-11-18",
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
@@ -443,44 +443,44 @@
           "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:29.576857+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=3fa27c0e99af173f6acadf005ca4e3f7f578381464af1d26c808f737e207ac98；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=13b947b256dc15e5c7216b2f5243e429a50506482177a56d0bc8f06be54216c1；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "State Street",
           "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
           "metric_or_horizon": "Price/Earnings Ratio FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:30.016600+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=208cc31f22b8234cfc8799391b8c77e948c1c6404591f1bfd01eaedc6ab27495；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=6a5c3b8a4af0aa7f68f56d66f6c16543ac41174f28b101b0736aa5abff861545；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:34.403927+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:42:27.368967+00:00",
-          "value": 18.14,
+          "checked_at": "2026-11-19T10:02:06+08:00",
+          "value": 17.95,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-17",
-          "notes": "本輪HTTP 200；SHA256=60e0764f72e93d3863be6d4b2887fd033052442188a893334443bc0a26af3a57；對應數值另按原定義解析"
+          "observation_date": "2026-11-18",
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "source_evidence": {
@@ -494,15 +494,15 @@
     },
     "m03_vt": {
       "label": "VT未來12個月Forward P/E",
-      "value": 14.31,
+      "value": 14.24,
       "unit": "倍 Forward",
-      "observation_date": "2026-11-17",
+      "observation_date": "2026-11-18",
       "source_url": "https://stockanalysis.com/etf/vt/",
-      "method": "原Task StockAnalysis明示Forward PE；本輪重新讀取及核對日期",
+      "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "本輪真實來源SHA256=b2054cdfb96eaf3ea8102459be27f9d24da4bd913850d09fc1198a5a6bc07999",
-      "retrieval_time": "2026-11-18T13:42:40.857036+00:00",
-      "publication_date": "2026-11-17",
+      "detail": "VT Forward PE 14.24，頁面資料日2026-11-18",
+      "retrieval_time": "2026-11-19T10:02:06+08:00",
+      "publication_date": "2026-11-18",
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
@@ -510,44 +510,44 @@
           "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
           "metric_or_horizon": "Forward P/E / FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:41.288327+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=e5197fd7661ab4c2277b5f1e19cf257cb3fd71de493cacc9144d2fce719e1684；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=4212e62be95b32f729c7a4639859e852478f61854793d5c0586f13d52d7a5ec8；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Vanguard",
           "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
           "metric_or_horizon": "VT官方Forward/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:41.688618+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=f5ae968a3a5bb076ef72ed1a77f1863cbec64a1134733af2b983153105e2843f；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=f5ae968a3a5bb076ef72ed1a77f1863cbec64a1134733af2b983153105e2843f；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
           "metric_or_horizon": "Forward/Projected/FY1",
           "status": "NOT_FOUND",
-          "checked_at": "2026-11-18T13:42:46.217906+00:00",
+          "checked_at": "2026-11-19T10:04:25.374+08:00",
           "value": null,
           "unit": "倍 Forward",
           "observation_date": null,
-          "notes": "本輪HTTP 200；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；對應數值另按原定義解析"
+          "notes": "本輪HTTP 200；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；未取得同定義、單位、觀測期與vintage之可採數值"
         },
         {
           "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "Forward PE",
           "status": "FOUND",
-          "checked_at": "2026-11-18T13:42:40.857036+00:00",
-          "value": 14.31,
+          "checked_at": "2026-11-19T10:02:06+08:00",
+          "value": 14.24,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-17",
-          "notes": "本輪HTTP 200；SHA256=b2054cdfb96eaf3ea8102459be27f9d24da4bd913850d09fc1198a5a6bc07999；對應數值另按原定義解析"
+          "observation_date": "2026-11-18",
+          "notes": "真實網頁明示Forward PE；TTM未採用"
         }
       ],
       "source_evidence": {
@@ -560,5 +560,6 @@
       "last_verified_at": "2026-11-18T13:42:46.217809+00:00"
     }
   },
-  "notes": []
+  "notes": [],
+  "refresh_method": "Official Fed full raw HTTP reverified; other values retain dated observations unless independently refreshed"
 }

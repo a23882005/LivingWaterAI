@@ -20,6 +20,7 @@ import sys
 import time
 import tempfile
 import hashlib
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -808,12 +809,61 @@ def ism_official(f, key):
                 'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':str(exc)[:220]})
     raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
 
+def sahm_bls_crosscheck(f, published):
+    """Check a contemporaneous BLS U-3 snapshot against the published series."""
+    now = dt.datetime.now(dt.timezone.utc)
+    series_id = 'LNS14000000'
+    url = ('https://api.bls.gov/publicAPI/v1/timeseries/data/'
+           f'{series_id}?startyear={now.year-2}&endyear={now.year}')
+    check = {'source_url':url, 'series_id':series_id,
+             'published_observation_date':published['observation_date']}
+    try:
+        response = f.s.get(url, timeout=(5, min(f.timeout, 15)))
+        response.raise_for_status()
+        check.update(retrieved_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+                     response_sha256=hashlib.sha256(response.content).hexdigest())
+        payload = response.json()
+        if payload.get('status') != 'REQUEST_SUCCEEDED':
+            raise ValueError('BLS U-3 request unsuccessful')
+        series = payload['Results']['series']
+        if len(series) != 1 or series[0].get('seriesID') != series_id:
+            raise ValueError('BLS U-3 series mismatch')
+        rates = {}
+        for item in series[0]['data']:
+            period = item['period']
+            if not re.fullmatch(r'M(?:0[1-9]|1[0-2])', period):
+                continue
+            month = pd.Period(f"{item['year']}-{period[1:]}", freq='M')
+            if month in rates:
+                raise ValueError(f'Duplicate BLS U-3 month {month}')
+            value = None if item['value'] in ('-', '') else Decimal(item['value'])
+            if value is not None and (not value.is_finite() or not 0 <= value <= 100):
+                raise ValueError(f'Invalid BLS U-3 rate for {month}')
+            rates[month] = value
+        latest_month = max(month for month, value in rates.items() if value is not None)
+        check['bls_observation_month'] = str(latest_month)
+        if latest_month >= pd.Period(now.date(), freq='M'):
+            raise ValueError('BLS U-3 observation month is not complete')
+        published_month = pd.Period(published['observation_date'], freq='M')
+        if latest_month != published_month:
+            return {**check, 'status':'MONTH_MISMATCH'}
+        window = pd.period_range(published_month-14, published_month, freq='M')
+        missing = [str(month) for month in window if rates.get(month) is None]
+        if missing:
+            return {**check, 'status':'MISSING_MONTHS', 'missing_months':missing}
+        values = [rates[month] for month in window]
+        sums = [sum(values[i:i+3]) for i in range(13)]
+        value = ((sums[-1]-min(sums[:-1])) / 3).quantize(Decimal('0.01'))
+        matches = value == Decimal(str(published['value']))
+        return {**check, 'status':'MATCH' if matches else 'VALUE_MISMATCH',
+                'calculated_value_pp':float(value)}
+    except (requests.RequestException, ValueError, KeyError, TypeError, InvalidOperation) as exc:
+        return {**check, 'status':'SOURCE_ERROR', 'error':str(exc)[:180]}
+
 def sahm_from_published(f):
-    """Read the published official Sahm Rule first; independent U3 calculation is diagnostic fallback."""
+    """Keep the published real-time value and record the independent BLS check."""
     try:
         r=latest(f,'m18','SAHMREALTIME')
-        r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
-        return r
     except Exception as published_exc:
         print('SAHM_PUBLISHED_FAILED',type(published_exc).__name__,str(published_exc)[:450],flush=True)
         try:
@@ -822,6 +872,9 @@ def sahm_from_published(f):
             raise RuntimeError(
                 'SAHMREALTIME official series failed: '+str(published_exc)[:180]+
                 ' | verified U3 calculation failed: '+str(calc_exc)[:180]) from calc_exc
+    r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
+    r['sahm_bls_check']=sahm_bls_crosscheck(f,r)
+    return r
 
 def sahm_from_unrate(f):
     try:

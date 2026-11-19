@@ -27,7 +27,7 @@
       },
       "candidate_checks": [
         {
-          "site": "federalreserve.gov",
+          "site": "Federal Reserve",
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "FOUND",
@@ -38,7 +38,7 @@
           "notes": "本輪HTTP 200；SHA256=e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "stlouisfed.org",
+          "site": "FRED DFEDTARL",
           "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFEDTARL",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "NOT_FOUND",
@@ -49,7 +49,7 @@
           "notes": "本輪HTTP 200；SHA256=b62529dea3c3a0ae7ffa48793e881d26f35126927af8419e483014de4af6feaf；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "tradingeconomics.com",
+          "site": "Trading Economics",
           "url": "https://tradingeconomics.com/united-states/interest-rate",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "NOT_FOUND",
@@ -60,7 +60,7 @@
           "notes": "本輪HTTP 200；SHA256=0dd7aa461e7a94469604d4ddb198da6cc639cb64fb6c55fbae922ae87059c8fd；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "investing.com",
+          "site": "Investing.com",
           "url": "https://www.investing.com/economic-calendar/interest-rate-decision-168",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "NOT_FOUND",
@@ -105,7 +105,7 @@
       "vintage": "October 2026 NY Fed SCE release; all four candidates freshly rechecked",
       "candidate_checks": [
         {
-          "site": "newyorkfed.org",
+          "site": "NY Fed SCE",
           "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
           "metric_or_horizon": "未來12個月通膨預期",
           "status": "FOUND",
@@ -116,7 +116,7 @@
           "notes": "本輪HTTP 200；SHA256=61d65e0e6806e68499a4ce330e77dfaade5a3e13b8ddb26f7a763fe9df274274；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "clevelandfed.org",
+          "site": "Cleveland Fed",
           "url": "https://www.clevelandfed.org/indicators-and-data/inflation-expectations",
           "metric_or_horizon": "未來12個月通膨預期",
           "status": "METRIC_MISMATCH",
@@ -127,7 +127,7 @@
           "notes": "本輪HTTP 200；SHA256=82efaad0d3084172117ed564477f29fc95e555873b3ee52951e57a9f8418dde3；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "umich.edu",
+          "site": "University of Michigan",
           "url": "https://www.sca.isr.umich.edu/",
           "metric_or_horizon": "未來12個月通膨預期",
           "status": "METRIC_MISMATCH",
@@ -138,7 +138,7 @@
           "notes": "本輪HTTP 200；SHA256=cdaad8839a3e05daa4a084981a805891421877b399a8d14e4e79eb171d6c8a0f；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "philadelphiafed.org",
+          "site": "Philadelphia Fed SPF",
           "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/inflation-forecasts",
           "metric_or_horizon": "未來12個月通膨預期",
           "status": "METRIC_MISMATCH",
@@ -165,7 +165,7 @@
       "vintage": "2026Q2 real-time US HLW",
       "candidate_checks": [
         {
-          "site": "newyorkfed.org",
+          "site": "NY Fed HLW real-time estimates",
           "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
           "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
           "status": "FOUND",
@@ -176,7 +176,7 @@
           "notes": "本輪HTTP 200；SHA256=189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "jsdelivr.net",
+          "site": "jsDelivr econdata HLW mirror",
           "url": "https://cdn.jsdelivr.net/gh/kvasilopoulos/econdata@master/docs/data/hlw2017.csv",
           "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
           "status": "METRIC_MISMATCH",
@@ -187,7 +187,7 @@
           "notes": "本輪HTTP 200；SHA256=cb3c88ed1ae92417d8614655bc0ebb1e6ae4f8de1370222fde2b1d343b215bcf；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值；共同上游為NY Fed/HLW，僅作鏡像候選；歷史hlw2017未通過real-time vintage替代條件"
         },
         {
-          "site": "github.com",
+          "site": "GitHub econdata HLW mirror",
           "url": "https://raw.githubusercontent.com/kvasilopoulos/econdata/master/docs/data/hlw2017.csv",
           "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
           "status": "METRIC_MISMATCH",
@@ -198,7 +198,7 @@
           "notes": "本輪HTTP 200；SHA256=cb3c88ed1ae92417d8614655bc0ebb1e6ae4f8de1370222fde2b1d343b215bcf；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值；共同上游為NY Fed/HLW，僅作鏡像候選；歷史hlw2017未通過real-time vintage替代條件"
         },
         {
-          "site": "github.io",
+          "site": "econdata GitHub Pages mirror",
           "url": "https://kvasilopoulos.github.io/econdata/data/hlw2017.csv",
           "metric_or_horizon": "NY Fed HLW 即時版本實質自然利率 r*",
           "status": "METRIC_MISMATCH",
@@ -225,7 +225,7 @@
       "vintage": "BEA 2026-10-29 / CBO 2026-02",
       "candidate_checks": [
         {
-          "site": "bea.gov",
+          "site": "BEA NIPA",
           "url": "https://apps.bea.gov/national/Release/XLS/Survey/Section1All_xls.xlsx",
           "metric_or_horizon": "實際GDP相對CBO潛在GDP產出缺口之原始成分／計算候選",
           "status": "FOUND",
@@ -236,7 +236,7 @@
           "notes": "本輪HTTP 200；SHA256=a920921a004910f973021dc89236f11fca5120fadefcaba4a8e1ff55f7625e2d；已核對定義、單位、觀測期與vintage，沿正式證據採用；本網站提供原公式所需成分，正式值仍依同季BEA實質GDP與CBO潛在GDP計算"
         },
         {
-          "site": "cbo.gov",
+          "site": "CBO Economic Projections",
           "url": "https://www.cbo.gov/system/files/2026-02/51135-2026-02-Economic-Projections.xlsx",
           "metric_or_horizon": "實際GDP相對CBO潛在GDP產出缺口之原始成分／計算候選",
           "status": "FOUND",
@@ -247,7 +247,7 @@
           "notes": "本輪HTTP 200；SHA256=ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776；已核對定義、單位、觀測期與vintage，沿正式證據採用；本網站提供原公式所需成分，正式值仍依同季BEA實質GDP與CBO潛在GDP計算"
         },
         {
-          "site": "stlouisfed.org",
+          "site": "FRED GDPC1",
           "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDPC1",
           "metric_or_horizon": "實際GDP相對CBO潛在GDP產出缺口之原始成分／計算候選",
           "status": "NOT_FOUND",
@@ -258,7 +258,7 @@
           "notes": "本輪HTTP 200；SHA256=1c6c6e9f59e383e20c849dd299175c7a307526c09abdc18f18da9754fc5b3343；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "github.com",
+          "site": "US-CBO GitHub mirror",
           "url": "https://raw.githubusercontent.com/US-CBO/cbo-data/main/data/economic/historical_economic/quarterly_2026-02.csv",
           "metric_or_horizon": "實際GDP相對CBO潛在GDP產出缺口之原始成分／計算候選",
           "status": "NOT_FOUND",
@@ -312,7 +312,7 @@
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10",
       "candidate_checks": [
         {
-          "site": "eoddata.com",
+          "site": "EODData",
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "FOUND",
@@ -323,7 +323,7 @@
           "notes": "本輪HTTP 200；SHA256=045a6fdbef983c783efc19fc7181d6cd3ba1db7a236d2c9931fdb8e3f4f6e6b4；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "macroaxis.com",
+          "site": "Macroaxis",
           "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "BLOCKED",
@@ -334,7 +334,7 @@
           "notes": "本輪HTTP 403或內容不足；未採值"
         },
         {
-          "site": "barchart.com",
+          "site": "Barchart",
           "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "BLOCKED",
@@ -345,7 +345,7 @@
           "notes": "本輪HTTP 202或內容不足；未採值"
         },
         {
-          "site": "tradingview.com",
+          "site": "TradingView",
           "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "NOT_FOUND",
@@ -372,7 +372,7 @@
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
-          "site": "stockanalysis.com",
+          "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "FOUND",
@@ -383,7 +383,7 @@
           "notes": "本輪HTTP 200；SHA256=10589a36d63a329c8c4a3620c0c462f7fe00240eaea337961ee2de6892b7e4ac；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "yahoo.com",
+          "site": "Yahoo Finance",
           "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -394,7 +394,7 @@
           "notes": "本輪HTTP 200；SHA256=d818e3dfeab4fe422e8a7ef248aeaf25301c798c820066baf19fbfb9dd4034c7；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "invesco.com",
+          "site": "Invesco",
           "url": "https://www.invesco.com/qqq-etf/en/about.html",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -405,7 +405,7 @@
           "notes": "本輪HTTP 200；SHA256=cd498f5e5ddb89d43a80fd68e7edd014987f86e904ad42466980e9de73d0016b；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "portfoliovisualizer.com",
+          "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -439,7 +439,7 @@
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
-          "site": "stockanalysis.com",
+          "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "FOUND",
@@ -450,7 +450,7 @@
           "notes": "本輪HTTP 200；SHA256=627e30522ec6b35f9113c5c4db93c79e79f761c39efa245d948424f177e6dcd3；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "yahoo.com",
+          "site": "Yahoo Finance",
           "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -461,7 +461,7 @@
           "notes": "本輪HTTP 200；SHA256=102fcf2a9078b61144d43f9d4eee757906612cb4812c08beb63e4e04704be789；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "ssga.com",
+          "site": "State Street",
           "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -472,7 +472,7 @@
           "notes": "本輪HTTP 200；SHA256=6a5c3b8a4af0aa7f68f56d66f6c16543ac41174f28b101b0736aa5abff861545；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "portfoliovisualizer.com",
+          "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -506,7 +506,7 @@
       "vintage": "Forward PE page observation 2026-11-17",
       "candidate_checks": [
         {
-          "site": "stockanalysis.com",
+          "site": "StockAnalysis",
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "FOUND",
@@ -517,7 +517,7 @@
           "notes": "本輪HTTP 200；SHA256=2db3e0bdd5930dbaa0d9e35ba04483491bba60cb4a183e9c89af7c70216c9375；已核對定義、單位、觀測期與vintage，沿正式證據採用"
         },
         {
-          "site": "yahoo.com",
+          "site": "Yahoo Finance",
           "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -528,7 +528,7 @@
           "notes": "本輪HTTP 200；SHA256=9d58c2d11eba6eb5db3a668957d0cdfc5169b18e9ceb6fb0ba7cf717c372c43b；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "vanguard.com",
+          "site": "Vanguard",
           "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -539,7 +539,7 @@
           "notes": "本輪HTTP 200；SHA256=f5ae968a3a5bb076ef72ed1a77f1863cbec64a1134733af2b983153105e2843f；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         },
         {
-          "site": "portfoliovisualizer.com",
+          "site": "Portfolio Visualizer",
           "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "NOT_FOUND",
@@ -561,5 +561,5 @@
     }
   },
   "notes": [],
-  "refresh_method": "依 macro_source_candidates 排名查核；八項各保留4個不同網站候選。Fed現行目標以官方原始證據重新核實；其餘欄位保留真實觀測日與vintage，失敗候選不採值。"
+  "refresh_method": "依 macro_source_candidates 排名查核；八項各保留4個不同網站候選，site欄沿正式刷新器既有標籤。Fed現行目標以官方原始證據重新核實；其餘欄位保留真實觀測日與vintage，失敗候選不採值。"
 }

@@ -533,6 +533,9 @@ class AssetSourceProducer:
             funding=(analysis.get('native_funding_advice') or {}).get('items',{}).get(row['instrument_id'],{})
             missing_equity=(equities or {}).get('missing_items',{}).get(self.symbol)
             source_issues=[{'code':missing_equity,'field_path':'qualified_equity_inputs.'+self.symbol}] if missing_equity else []
+            rejected=(row.get('market') or {}).get('qualified_equity_source_rejection')
+            if rejected:source_issues.append({'code':rejected['code'],
+                'field_path':'qualified_equity_inputs.'+self.symbol,'original_source_rejection':deepcopy(rejected)})
             from family_c7_source_assembly import assemble_original_producers
             assembly=assemble_original_producers(self,req,ctx,prepared,trial)
             return {'request':req,'trusted_context':ctx,'source_production':{

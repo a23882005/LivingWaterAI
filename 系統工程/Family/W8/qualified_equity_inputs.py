@@ -159,7 +159,17 @@ def read(source,evaluation_at,root,*,symbol=None):
 def updates(row,pool,request,root,class_source,profile,prepared_positions=None):
     if pool is None or row['symbol'] not in pool['items']:return {}
     source=pool['items'][row['symbol']];symbol=row['symbol']
-    if source['observed_date']<row['observed_date']:raise ValueError('EQUITY_QUALIFIED_SOURCE_OLDER_THAN_ANALYSIS')
+    if source['observed_date']<row['observed_date']:
+        if pool.get('equity_analysis_symbol')!=symbol:
+            raise ValueError('EQUITY_QUALIFIED_SOURCE_OLDER_THAN_ANALYSIS')
+        # Independent stock analysis retains the newer original cache. The
+        # older qualification cannot attest it or replace its dated history.
+        return {'qualified_equity_source_rejection':{
+            'code':'EQUITY_QUALIFIED_SOURCE_OLDER_THAN_ANALYSIS',
+            'qualified_observed_date':source['observed_date'],
+            'analysis_observed_date':row['observed_date'],
+            'qualified_source_digest':source['digest'],'formal_qualification_adopted':False},
+            'formal_deployment_eligible':False}
     instruments=([p['source_instrument'] for p in prepared_positions
         if p['source_instrument'].get('ticker')==symbol] if prepared_positions is not None else
         [r for r in request['client_snapshot']['payload']['tables']['portfolio_instrument'] if r.get('ticker')==symbol])

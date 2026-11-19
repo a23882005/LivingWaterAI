@@ -127,6 +127,24 @@ def test_raw_samples_are_complete_without_promoting_deployment_or_historical_pit
     assert M.read(None,'2026-10-29T04:00:00Z',ROOT) is None
 
 
+@pytest.mark.parametrize('selected',[None,'OTHER','VT'])
+def test_older_qualification_never_replaces_newer_history_or_attests_stock_analysis(selected):
+    pool={'items':{'VT':{'observed_date':'2026-10-28','digest':'a'*64}}}
+    if selected is not None:pool['equity_analysis_symbol']=selected
+    market={'symbol':'VT','observed_date':'2026-10-29','source_sha256':'b'*64,
+        'formal_deployment_eligible':False};before=deepcopy((market,pool))
+    if selected!='VT':
+        with pytest.raises(ValueError,match='EQUITY_QUALIFIED_SOURCE_OLDER_THAN_ANALYSIS'):
+            M.updates(market,pool,{},ROOT,{},None)
+    else:
+        update=M.updates(market,pool,{},ROOT,{},None)
+        assert not update['formal_deployment_eligible']
+        assert not update['qualified_equity_source_rejection']['formal_qualification_adopted']
+        assert update['qualified_equity_source_rejection']['analysis_observed_date']=='2026-10-29'
+        assert not {'observed_date','source_sha256','qualified_equity_market_digest'} & set(update)
+    assert (market,pool)==before
+
+
 @pytest.mark.parametrize('field',['auto_adjust','split_basis_verified','bar_receipts'])
 def test_rehashed_metadata_cannot_relabel_price_basis_or_session_receipts(tmp_path,field):
     q,_=fixture(tmp_path);q['technical_source_template']['metadata'][field]=[] if field=='bar_receipts' else field=='auto_adjust'

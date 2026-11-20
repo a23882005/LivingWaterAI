@@ -397,6 +397,8 @@ jobs:
                       raise ValueError(filename + ' differs after upload')
           print('工程版登入後讀回一致', json.loads(Path('build/engineering/V70_macro_latest.json').read_text())['asOf'])
           PY
+      - name: Render final education homepage before any site upload
+        run: python scripts/build_v70_education_results.py build/site education/v70-education-demo.html build/education-results
       - name: Check deployment configuration
         env:
           LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -439,7 +441,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -460,7 +462,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -481,7 +483,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -501,6 +503,48 @@ jobs:
             exit 1
           fi
 
+      - name: Stage the education homepage outside the public directory
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/education-results/index.html
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-private/education-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 2
+      - name: Activate education homepage and verify public response
+        uses: appleboy/ssh-action@v1
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+          RELEASE: education-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,BASE_URL,RELEASE
+          script: |
+            set -eu
+            cd "$LW_DIR"
+            test "$(basename "$PWD")" = public_html
+            dir="../v70-private/$RELEASE"
+            test -s "$dir/index.html"
+            grep -q 'id="education-scenarios"' "$dir/index.html"
+            cp -p index.html "$dir/previous.html"
+            cp "$dir/index.html" "$dir/next.html"
+            chmod 644 "$dir/next.html"
+            mv "$dir/next.html" index.html
+            base="${BASE_URL:-https://www.happihelp.com}"
+            if curl -fsS --max-time 30 --retry 2 "${base%/}/?release=$RELEASE" -o "$dir/live.html" && cmp -s index.html "$dir/live.html"; then
+              echo "教育版首頁已發布並讀回一致 $RELEASE"
+            else
+              mv "$dir/previous.html" index.html
+              echo '教育版讀回不符，已還原前一頁' >&2
+              exit 1
+            fi
+
       - name: Verify Hostinger homepage and live JSON
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
@@ -518,7 +562,15 @@ jobs:
                   with urllib.request.urlopen(base+"/?v="+stamp,timeout=20) as response:
                       page=response.read().decode("utf-8")
                   from scripts.validate_v703_publication import verify_live_payload
-                  verify_live_payload(expected,live,Path('build/site/index.html').read_text(encoding='utf8'),page)
+                  assert page == Path('build/education-results/index.html').read_text(encoding='utf8')
+                  assert live == expected
+                  from bs4 import BeautifulSoup
+                  public = BeautifulSoup(page, 'html.parser')
+                  assert len(public.select('#edu-indicators tbody tr')) == 13
+                  assert len(public.select('#education-sources li')) == 13
+                  assert len(json.loads(public.select_one('#education-scenarios').string)) == 40
+                  assert 'Rule Owner=V70' not in public.get_text()
+                  assert '22項計分輸入' not in public.get_text()
                   import urllib.error
                   try:
                       urllib.request.urlopen(base+'/v70-engineering.html?v='+stamp,timeout=20)
@@ -533,37 +585,7 @@ jobs:
                   assert live["verification"]["independentIndicators"]==25
                   assert live["verification"]["requiredScoringIndicatorsValidated"]==(22 if mode=="FORMAL" else 21)
                   assert len(live["indicators"])==28
-                  assert "V70_macro_latest.json" in page
-                  assert "V70-3-27" in page
-                  assert page.count('id="v703-rolling15"')==1
-                  import re
-                  from scripts.v703_rolling_history import observation_summary
-                  history=json.loads(re.search(r'<script id="v703-daily-history" type="application/json">(.*?)</script>',page,re.S)[1])
-                  qa=json.loads(Path('build/site/QA.json').read_text())
-                  assert observation_summary(history)==qa['rolling15']
-                  assert history['schema']=='V70.3/trading-observation-v2'
-                  assert qa['rolling15']['tradingDays']==15
-                  assert '休市日自動略過' in page
-                  assert 'id="r15-chart"' in page and 'id="r15-reference-rows"' in page
-                  print('HOSTINGER_ROLLING15_LIVE_PASS',json.dumps(qa['rolling15'],ensure_ascii=False))
-                  assert live['wallStreetFive']['forecasts']==expected['wallStreetFive']['forecasts']
-                  assert live['sourceSnapshot']['wallstreet5']==expected['sourceSnapshot']['wallstreet5']
-                  assert page.count('公開數字／自寫摘要／來源連結；全文未授權')==5
                   chart_names=('macro_raw.png','macro_diff.png','goldman_raw.png','goldman_diff.png','bofa_raw.png','bofa_diff.png','morgan_stanley_raw.png','morgan_stanley_diff.png','ubs_raw.png','ubs_diff.png','jpm_raw.png','jpm_diff.png','overview.png')
-                  assert page.count('id="v703-research-charts"')==1
-                  assert '完整逐季數值表（28 季）' in page
-                  research=page.split('<section id="v703-research-charts"',1)[1].split('</section>',1)[0]
-                  assert research.count('<tbody>') == 1
-                  assert '報酬成熟狀態' not in research
-                  assert '後三個月取價交易日' not in research
-                  assert '五家機構偏多／偏空與動能上修／下修家數</h3>' not in research
-                  assert research.count('position:sticky;left:0;') >= 2
-                  assert research.count('position:sticky;left:8rem;') >= 2
-                  assert 'position:sticky;left:8rem;z-index:30;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#1e293b;white-space:normal' in research
-                  assert 'position:sticky;left:8rem;z-index:20;box-sizing:border-box;width:6rem;min-width:6rem;max-width:6rem;background-color:#0f172a' in research
-                  assert '# 最後修改日期時間' not in page[:200]
-                  assert 'grid-cols-1 2xl:grid-cols-2' in research
-                  assert page.count('>NA</td>') > 0
                   for name in chart_names:
                       page_asset='v70-research-charts/'+name
                       assert page_asset in page, 'chart image missing from homepage: '+name
@@ -574,7 +596,7 @@ jobs:
                       with urllib.request.urlopen(base+'/v70-research-charts/'+urllib.parse.quote(name)+'?v='+stamp,timeout=20) as response:
                           assert response.status==200 and len(response.read())>100
                   print('HOSTINGER_RESEARCH_CHARTS_LIVE_PASS',len(chart_names))
-                  assert all(('>'+format(x,',')+'<') in page for x in (8000,7400,8100))
+
                   print('HOSTINGER_WALLSTREET5_LIVE_PASS',len(live['wallStreetFive']['forecasts']))
                   print("HOSTINGER_LIVE_PASS",base,expected["asOf"])
                   break
@@ -698,11 +720,15 @@ jobs:
         run: |
           python -m pip install 'playwright>=1.50,<2'
           python -m playwright install chromium --with-deps
-      - name: Verify data-only live page cannot produce formal scores
+      - name: Serve the matching private model for score capture
+        run: |
+          python -m http.server 8173 --bind 127.0.0.1 --directory build/site > "$RUNNER_TEMP/model-server.log" 2>&1 &
+          curl --retry 5 --retry-connrefused -fsS http://127.0.0.1:8173/ -o /dev/null
+      - name: Verify data-only model cannot produce formal scores
         if: steps.publication_gate.outputs.scoring_allowed == 'false'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
-        run: python scripts/verify_v703_data_only_live.py --feed build/site/V70_macro_latest.json --site-url "${SITE_BASE_URL:-https://www.happihelp.com}"
+        run: python scripts/verify_v703_data_only_live.py --feed build/site/V70_macro_latest.json --site-url "http://127.0.0.1:8173"
       - name: Capture daily Macro Safety score after full live verification
         if: steps.publication_gate.outputs.scoring_allowed == 'true'
         env:
@@ -711,7 +737,7 @@ jobs:
         run: |
           python scripts/capture_v703_daily_snapshot.py \
             --feed build/site/V70_macro_latest.json \
-            --site-url "${SITE_BASE_URL:-https://www.happihelp.com}" \
+            --site-url "http://127.0.0.1:8173" \
             --archive data/macro_safety_daily.csv \
             --source-commit "$SOURCE_COMMIT"
       - name: Build monthly Macro Safety series from real observations
@@ -798,67 +824,3 @@ jobs:
             sleep "$((attempt * 2))"
           done
 
-  education-results:
-    needs: build-and-deploy
-    if: github.ref == 'refs/heads/main' && needs.build-and-deploy.result == 'success'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: v70-3-27-qa-${{ github.run_id }}
-          path: build/private-education-input
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: python -m pip install 'playwright>=1.50,<2' && python -m playwright install chromium --with-deps
-      - run: python scripts/build_v70_education_results.py build/private-education-input education/v70-education-demo.html build/education-results
-      - uses: actions/upload-artifact@v4
-        with:
-          name: v70-education-results-${{ github.run_id }}
-          path: build/education-results/
-          if-no-files-found: error
-      - name: Stage the education homepage outside the public directory
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
-          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
-          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
-          port: 65002
-          source: build/education-results/index.html
-          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-private/education-${{ github.run_id }}-${{ github.run_attempt }}
-          strip_components: 2
-      - name: Activate education homepage and verify public response
-        uses: appleboy/ssh-action@v1
-        env:
-          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
-          BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
-          RELEASE: education-${{ github.run_id }}-${{ github.run_attempt }}
-        with:
-          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
-          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
-          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
-          port: 65002
-          envs: LW_DIR,BASE_URL,RELEASE
-          script: |
-            set -eu
-            cd "$LW_DIR"
-            test "$(basename "$PWD")" = public_html
-            dir="../v70-private/$RELEASE"
-            test -s "$dir/index.html"
-            grep -q 'id="education-scenarios"' "$dir/index.html"
-            cp -p index.html "$dir/previous.html"
-            cp "$dir/index.html" "$dir/next.html"
-            chmod 644 "$dir/next.html"
-            mv "$dir/next.html" index.html
-            base="${BASE_URL:-https://www.happihelp.com}"
-            if curl -fsS --max-time 30 --retry 2 "${base%/}/?release=$RELEASE" -o "$dir/live.html" && cmp -s index.html "$dir/live.html"; then
-              echo "教育版首頁已發布並讀回一致 $RELEASE"
-            else
-              mv "$dir/previous.html" index.html
-              echo '教育版讀回不符，已還原前一頁' >&2
-              exit 1
-            fi

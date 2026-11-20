@@ -20,10 +20,11 @@
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py",
       "commit": "32c9322c8bb3150480f6c86becf28e04592f5e8e",
-      "git_blob_sha": "0af7b812464bd491615466bbf9179e96edfa4d5a",
-      "sha256": "4c494b08aa820828596732828b1b4b40d4d16a36a72eb3366ddaa59231e0a546",
-      "size": 13644,
-      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py"
+      "git_blob_sha": "6649899a4a9288ee66593a7ebf4280c3167de103",
+      "sha256": "44046ee31e5858717ff4b8241594c0e65ed4b84641c8a9f61c2ceba2ace1b517",
+      "size": 14295,
+      "url": "https://github.com/a23882005/LivingWaterAI/blob/32c9322c8bb3150480f6c86becf28e04592f5e8e/%E7%B3%BB%E7%B5%B1%E5%B7%A5%E7%A8%8B/%E8%82%A1%E7%A5%A8V80/%E6%AD%A3%E5%BC%8FRuntime/v82_runtime_greenfield/src/livingwater_v82_runtime/core_rules.py",
+      "family_revision": "PV3_CURRENT_PRIMARY_QUALIFICATION_INDEPENDENT_OF_COMPARISON_HISTORY"
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/deployment.py",
@@ -453,10 +454,10 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py",
-      "sha256": "c568562d1ac7d9a96c0bdeb06de926f651ff04fd8bbe46255e57824597cd624e",
-      "git_blob_sha": "42e940963c21a0ef52378bfb441a0a3140bb8f54",
-      "size": 13362,
-      "family_revision": "OWNER_JOSEPH_QQQ_20261120_SCOPED_FUND_STRUCTURE_NOT_APPLICABLE",
+      "sha256": "00efdab287a0e183badfa0350537f31d25ba703d127d5961a77d2d2e8a1ccbb8",
+      "git_blob_sha": "9c7ab36ce047bff1e606b977d4d4cfadf2059739",
+      "size": 14115,
+      "family_revision": "PV3_CURRENT_PRIMARY_QUALIFICATION_INDEPENDENT_OF_COMPARISON_HISTORY",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",

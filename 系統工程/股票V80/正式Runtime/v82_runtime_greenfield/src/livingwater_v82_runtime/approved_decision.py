@@ -26,6 +26,12 @@ def evaluate(context, core):
     snapshot=identity['snapshot_id'];at=identity['evaluation_at'];asset=identity['asset_id']
     selected=valuation.get('primary_metric');current=context.get('current_metric_value')
     legal='TRUE' if valuation.get('formal_output_eligible') is True else 'UNKNOWN'
+    # PV3 consumes current-Primary qualification, not report completeness.
+    # Rebind its value to the actual Core selection; context flags alone do
+    # not grant source qualification or replace the original input readers.
+    current_legal=('TRUE' if valuation.get('current_primary_eligible') is True
+        and selected is not None and number(current) is not None
+        and number(current)==number(valuation.get('current_primary_value')) else 'UNKNOWN')
     qv=unknown('OWN_METRIC_COMPARABLE_PIT_HISTORY_SOURCE_UNAVAILABLE')
     qp=unknown('OWN_RAW_PRICE_CALENDAR_AND_EVENT_COVERAGE_SOURCE_UNAVAILABLE',depth=None)
     for key,fn in (('valuation_history',valuation_percentile),('price_history',price_percentile)):
@@ -122,9 +128,10 @@ def evaluate(context, core):
     if not fundamental_applicable:right['components']['fundamentals_viable']='NOT_APPLICABLE'
     mode,conflicts=select_with_entries(runaway_up=technical['runaway_up'],runaway_down=technical['runaway_down'],
         right=right['truth'],left=left)
-    pv=left_profile(price_entry=price,valuation_legal=legal,depth=qp.get('depth'),q_price=qp['value'],q_value=qv['value'],
+    pv=left_profile(price_entry=price,valuation_legal=current_legal,depth=qp.get('depth'),q_price=qp['value'],q_value=qv['value'],
         metric=selected,current=current,range_result=ranged)
     required={**context.get('stage_required_facts',{}),'fundamentals_viable':fundamental.value,'valuation_legal':legal}
+    if mode.value=='Left Overweight':required['valuation_legal']=current_legal
     if not fundamental_applicable:required.pop('fundamentals_viable',None)
     decision,stage_audit=resolve_approved_stage(mode=mode,left_result=pv,q_value=qv['value'],range_result=ranged,
         required_facts=required,restrictions=context.get('stage_restrictions',[]),snapshot_id=snapshot,
@@ -152,6 +159,8 @@ def evaluate(context, core):
             'fundamentals_long_term_viable':fundamental.value if fundamental_applicable else 'NOT_APPLICABLE',
             'left_safety_negations_absent':safety.value},
         'right_entry':right,'range_result':ranged,'qV':qv,'qP':qp,'left_stage_profile':pv,
+        'current_primary_qualification':{'metric':selected,'value':valuation.get('current_primary_value'),
+            'truth':current_legal,'scope':'PV3_CURRENT_PRIMARY__NOT_FULL_REPORT_OR_EXECUTION'},
         'selected_mode':mode.value,'formal_stage':decision.stage,
         'canonical_target_rate':str(decision.target_rate) if decision.target_rate is not None else None,
         'stage_audit':stage_audit,'reason_codes':list(decision.reason_codes),'conflicts':list(conflicts),

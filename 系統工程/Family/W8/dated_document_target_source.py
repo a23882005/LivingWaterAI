@@ -172,6 +172,8 @@ def bind_producer_seed(configuration,request,normalized=None):
     """Carry the current replayed money proof into the original producer seed."""
     from approved_target_input import build_approved_target_view
     cfg=deepcopy(configuration);ctx=cfg['context_seed'];prior=cfg['request_seed']['confirmed_target']
+    from owner_etf_constraints_source import approval_target
+    replay_target=approval_target(request['confirmed_target'],request['client_snapshot']['payload'],request['evaluation_at'])
     document=(normalized or {}).get('original_target_sources',{}).get('document_target') or {}
     if document.get('dated_pool_source') is not None:
         args=deepcopy(document);expected=args.pop('sha256')
@@ -182,9 +184,9 @@ def bind_producer_seed(configuration,request,normalized=None):
     else:
         proof=ctx.get('approved_document_target_source') or {}
         require(bool(proof.get('dated_pool_binding')),'PRODUCER_REPLAY_SOURCE_REQUIRED')
-        view,proof=replay(request['confirmed_target'],proof,evaluation_at=request['evaluation_at'],
+        view,proof=replay(replay_target,proof,evaluation_at=request['evaluation_at'],
             snapshot=request['client_snapshot']['payload'])
-    require(view==request['confirmed_target'],'PRODUCER_TARGET_REPLAY_MISMATCH')
+    require(view==replay_target,'PRODUCER_TARGET_REPLAY_MISMATCH')
     old_proof=ctx.get('approved_document_target_source') or {}
     old_signature=approval_signature(prior);current_signature=approval_signature(view)
     # A bootstrap can retain an older capture of the same document. Its

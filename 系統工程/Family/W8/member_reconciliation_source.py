@@ -17,7 +17,7 @@ SCHEMA='Family.W8.MemberReconciliationSource.v1'
 INPUTS=('client_id','source_db_sha256','classification_source','product_sources',
     'v75_parameter_source','market_sources','current_broker_sources',
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
-    'official_target_base_source','document_target','owner_target_decision_source',
+    'official_target_base_source','document_target','owner_target_decision_source','owner_etf_constraints_source',
     'broker_observation_source','owner_financial_confirmation_source','owner_current_business_source','macro_source',
     'financial_producer_sources','current_market_contract_source')
 
@@ -89,7 +89,10 @@ def normalize(root,request,config):
     if (config.get('client_id')!=request['client_id']
         or config.get('source_db_sha256')!=snapshot['source_sha256']):
         raise PermissionError('MEMBER_RECONCILIATION_CONFIG_SCOPE')
-    pinned=source_files(config,at)
+    pinned_config=deepcopy(config)
+    if not request['confirmed_target'].get('owner_etf_constraints_projection'):
+        pinned_config.pop('owner_etf_constraints_source',None)
+    pinned=source_files(pinned_config,at)
     from current_market_contract import read as read_current_market,portfolio_reference
     market_contract=read_current_market(config.get('current_market_contract_source'),request)
     from member_v82_analysis import universe,target_source

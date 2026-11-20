@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "a28287b9dbb61cdf46601a43c3ff0b79ee78a4e0870b4a98283f45b6bcc96d11"
+      "sha256": "0eacd522ba89648a83959f39d9d234f43db14f4a2d7a107bcee9dceea43e4f04"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -137,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/member_reconciliation_source.py",
-      "sha256": "0b3829eca35665dde8b8ee38cdff40f4bd81967cae25598b05468e861d2f8b23"
+      "sha256": "4744ae76f4a0f5f50539da94aa2bb63b5bea65dbce67e6088581ff82faa33ef4"
     },
     {
       "path": "../../Family/W8/sec_publication_source.py",
@@ -237,7 +237,7 @@
     },
     {
       "path": "../../Family/W8/dated_document_target_source.py",
-      "sha256": "b7b5e82cc40cc1a5cf9e835507c4cdf81ef8a19261be7cb1812389e33f394764"
+      "sha256": "4db76a91f1d00f89d6834346b79c398f939a0382b277b361303fae9740463697"
     },
     {
       "path": "../../Family/W8/broad_product_identity.py",

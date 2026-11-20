@@ -52,7 +52,9 @@ def missing(field, producer, reason, affects, *, kind='EXTERNAL_SOURCE_OR_APPROV
 def target_source(snapshot, config, evaluation_at):
     from owner_target_decision_source import project
     historical=_historical_target_source(snapshot,config,evaluation_at)
-    return project(snapshot,config,evaluation_at,historical)
+    selected=project(snapshot,config,evaluation_at,historical)
+    from owner_etf_constraints_source import project as project_etf_constraints
+    return project_etf_constraints(snapshot,config,evaluation_at,selected)
 
 
 def _historical_target_source(snapshot, config, evaluation_at):

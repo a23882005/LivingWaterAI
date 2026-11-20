@@ -527,7 +527,7 @@ def _wallstreet_five_verified(path, today):
     return forecast
 
 
-def build(macro_path, supplement_path, html_path, dest):
+def build(macro_path, supplement_path, html_path, dest, batch_time=None):
     src = _read(macro_path)
     base = src.get("items")
     if not isinstance(base, dict) or len(base) != 19 or DUPLICATE_ID not in base:
@@ -541,7 +541,10 @@ def build(macro_path, supplement_path, html_path, dest):
     if base["s03"].get("value") != base["m07"].get("value") or base["s03"].get("observation_date") != base["m07"].get("observation_date"):
         raise ValueError("s03 and m07 VIX value/date mismatch")
 
-    now = dt.datetime.now(dt.timezone.utc)
+    now = batch_time or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("Batch timestamp requires a time zone")
+    now = now.astimezone(dt.timezone.utc)
     taipei = dt.timezone(dt.timedelta(hours=8))
     today = now.astimezone(taipei).date()
     official_releases = _official_release_calendar(OFFICIAL_RELEASE_CALENDAR_PATH, today)
@@ -739,8 +742,9 @@ if __name__ == "__main__":
     parser.add_argument("--supplement", default="data/8_macro_supplement_verified.json")
     parser.add_argument("--html", default="系統工程/總經V70/V70-3-27.html")
     parser.add_argument("--out", default="build/site")
+    parser.add_argument("--batch-time", type=dt.datetime.fromisoformat)
     args = parser.parse_args()
     try:
-        build(args.macro, args.supplement, args.html, args.out)
+        build(args.macro, args.supplement, args.html, args.out, args.batch_time)
     except (ValueError, OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
         raise SystemExit(str(exc) + " | preserve existing published site")

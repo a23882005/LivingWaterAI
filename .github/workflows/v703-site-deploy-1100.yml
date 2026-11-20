@@ -49,6 +49,27 @@ concurrency:
   group: lw-v703-site-deploy-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  education-preview:
+    if: github.ref == 'refs/heads/v70/daily-dual-publication'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install playwright && python -m playwright install chromium --with-deps
+      - name: Render the education homepage from the versioned snapshot
+        run: |
+          mkdir -p build/education-preview-input
+          cp '系統工程/總經V70/V70-3-27.html' build/education-preview-input/index.html
+          cp '系統工程/總經V70/V70_macro_latest.json' build/education-preview-input/
+          python scripts/build_v70_education_results.py build/education-preview-input education/v70-education-demo.html build/education-preview
+      - uses: actions/upload-artifact@v4
+        with:
+          name: education-homepage-preview
+          path: build/education-preview/
   ism-official-pdf-check:
     if: github.ref == 'refs/heads/codex/v70-family-activation-ism-20261118'
     runs-on: ubuntu-latest

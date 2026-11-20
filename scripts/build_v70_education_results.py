@@ -88,7 +88,16 @@ def build(site, template, output):
                 return copy.innerHTML;
             }""")
             page.locator("#" + ident).evaluate("(node,html)=>node.innerHTML=html", fragment)
-        for ident in ("bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield",
+        for ident in ("family-data-status","family-news","v703-update-banner","v703-data-state"):
+            page.locator("#" + ident).evaluate("(node)=>node.textContent=''")
+        page.locator("#v703-update-banner").evaluate(
+            "(node,stamp)=>node.textContent='資料時間　'+stamp", feed["asOf"])
+        for ident in ("bond-raw","bond-slider"):
+            value = model.locator("#" + ident).input_value()
+            page.locator("#" + ident).evaluate("(node,value)=>node.setAttribute('value',value)", value)
+        width = model.locator("#macro-bar").evaluate("node=>node.style.width")
+        page.locator("#macro-bar").evaluate("(node,width)=>node.style.width=width", width)
+        for ident in ("bond-data-status","bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield",
                       "bond-score-display", "macro-safety-val", "macro-zone-text"):
             value = model.locator("#" + ident).text_content()
             page.locator("#" + ident).evaluate("(node,value)=>node.textContent=value", value)

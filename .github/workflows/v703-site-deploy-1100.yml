@@ -12,6 +12,8 @@ on:
       - '系統工程/總經V70/教育版/V70-3-27-education-candidate.html'
       - '系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html'
       - '系統工程/總經V70/V70-3-27.html'
+      - 'scripts/build_v70_education_results.py'
+      - 'education/v70-education-demo.html'
       - 'scripts/build_daily_v703_site.py'
       - 'scripts/v703_cpi_availability.py'
       - 'scripts/validate_v703_publication.py'
@@ -793,5 +795,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: v70-education-results-${{ github.run_id }}
-          path: build/education-results/education-results.json
+          path: build/education-results/
           if-no-files-found: error

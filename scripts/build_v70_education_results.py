@@ -54,7 +54,17 @@ def build(site, template, output):
                     if (v.lifeStage !== document.querySelector('#family-life').value ||
                         v.preference !== document.querySelector('#family-style').value)
                         throw Error('Scenario mismatch');
-                    return {stock:v.totals.stock,bond:v.totals.bond,cash:v.totals.dryPowder};
+                    return {
+                        stock:v.totals.stock, bond:v.totals.bond, cash:v.totals.dryPowder,
+                        strategic:{stock:v.strategic.stock,bond:v.strategic.bond},
+                        classes:Object.fromEntries(
+                            ['S1','S2','S3','B1','B2','B3','B4','C0'].map(key => {
+                                const value = v.percentages[key];
+                                if (!Number.isFinite(value)) throw Error('Missing allocation: '+key);
+                                return [key,value];
+                            })
+                        )
+                    };
                 }""")
         if len(scenarios) != 40:
             raise ValueError("Expected forty education scenarios")

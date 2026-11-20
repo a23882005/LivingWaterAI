@@ -161,6 +161,8 @@ display();"""
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)
         if page.locator("#education-sources li").count() != 13:
             raise ValueError("Expected thirteen attributions")
+        if page.locator("#edu-indicators tbody tr").count() != 13:
+            raise ValueError("Public homepage must display thirteen indicator rows")
         html = page.content()
         check = browser.new_page()
         check.route("**/*", lambda route: route.abort())

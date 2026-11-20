@@ -1,0 +1,33 @@
+name: Publish V70 education demo
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - education/v70-education-demo.html
+      - .github/workflows/v70-education-demo.yml
+permissions:
+  contents: read
+concurrency: v70-education-demo
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check education preview
+        run: grep -q '教育版完整展示｜假設資料' education/v70-education-demo.html
+      - uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: education/v70-education-demo.html
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          strip_components: 1
+      - name: Verify published page
+        env:
+          BASE: ${{ vars.SITE_BASE_URL }}
+        run: |
+          curl -fsSL --retry 3 "${BASE:-https://www.happihelp.com}/v70-education-demo.html?run=$GITHUB_RUN_ID" -o /tmp/live.html
+          cmp education/v70-education-demo.html /tmp/live.html

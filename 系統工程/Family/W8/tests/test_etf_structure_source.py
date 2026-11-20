@@ -5,6 +5,18 @@ import sys,unittest
 HERE=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
 from etf_structure_source import evaluate_etf_structure as evaluate,lookthrough_intervals,mandate_subset
+from formal_mode_analysis import etf_viability_audit
+
+ISSUER_CASES = {
+    'NATO': ('https://hanetf.com/fund/nato-future-of-defence-etf/',
+             'https://hanetf.com/wp-content/assets/upload/09-26-Factsheet-NATO-IE000OJ5TQP4-en.pdf'),
+    'PPH': ('https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph/overview/',
+            'https://www.vaneck.com/us/en/investments/pharmaceutical-etf-pph-fact-sheet.pdf'),
+    'SOXX': ('https://www.ishares.com/us/products/239705/ishares-phlx-semiconductor-etf',
+             'https://www.ishares.com/us/literature/summary-prospectus/sp-ishares-phlx-semiconductor-etf-3-31.pdf'),
+    'VWRA': ('https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating',
+             'https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-accumulating-Vanguard'),
+}
 
 class ETFStructureTest(unittest.TestCase):
     def fixture(self):
@@ -68,6 +80,73 @@ class ETFStructureTest(unittest.TestCase):
         facts,req=self.fixture();facts['source_url']='https://untrusted.example/value'
         self.assertEqual(evaluate(facts,req,'VT')['source_ready_count'],0)
         facts,req=self.fixture();del facts['source_sha256'];self.assertEqual(evaluate(facts,req,'VT')['source_ready_count'],0)
+    def test_member_and_native_routes_recognize_bound_product_without_implying_validity(self):
+        for symbol, (product_url, source) in ISSUER_CASES.items():
+            for evidence_key in ('product_evidence', 'grade_evidence'):
+                with self.subTest(symbol=symbol, evidence_key=evidence_key):
+                    facts, request = self.fixture()
+                    facts['symbol'] = symbol
+                    facts['mandate']['source_reference'] = source
+                    del facts['mandate']['valid_until']
+                    row = {'symbol': symbol, 'issuer_facts': {'symbol': symbol, 'source_sha256': facts['source_sha256'],
+                           'mandate': facts['mandate']}, 'native_product_identity': {
+                               evidence_key: {'source_url': product_url, 'source_sha256': 'b' * 64}}}
+                    audit = etf_viability_audit(row, request)
+                    leaf = audit['leaves']['current_mandate_within_client_approved_mandate']
+                    self.assertEqual(leaf['missing_fields'], [
+                        'mandate.source_validity_or_valid_until',
+                        f'approved_target.etf_constraints.{symbol}.allowed_mandate_components',
+                    ])
+                    self.assertEqual(audit['result'], 'UNKNOWN')
+                    row['issuer_facts']['mandate']['available_at'] = '2026-10-28T02:00:00Z'
+                    later = etf_viability_audit(row, request)['leaves']['current_mandate_within_client_approved_mandate']
+                    self.assertIn('mandate.available_at', later['missing_fields'])
+                    self.assertEqual(later['truth'], 'UNKNOWN')
+    def test_issuer_identity_rejects_wrong_issuer_wrong_product_and_deceptive_urls(self):
+        facts, request = self.fixture()
+        product_url, source = ISSUER_CASES['PPH']
+        product = {'source_url': product_url, 'source_sha256': 'b' * 64}
+        facts['symbol'] = 'PPH'
+        for url, identity in (
+            (source, None),
+            (source, {'source_url': product_url}),
+            (source, {**product, 'source_url': product_url.replace('pharmaceutical-etf-pph', 'semiconductor-etf-smh')}),
+            (ISSUER_CASES['SOXX'][1], product),
+            ('https://fund-docs.vanguard.com/incorrect.pdf', product),
+            (source.replace('pharmaceutical-etf-pph', 'semiconductor-etf-smh'), product),
+            (source.replace('www.vaneck.com', 'www.vaneck.com.example.test'), product),
+            (source.replace('www.vaneck.com', 'untrusted.www.vaneck.com'), product),
+            (source.replace('www.vaneck.com', 'untrusted.test@www.vaneck.com'), product),
+            (source.replace('https:', 'http:'), product),
+            ('https://[invalid', product),
+            (source.replace('-fact-sheet.pdf', '/%2e%2e/semiconductor-etf-smh'), product),
+        ):
+            with self.subTest(url=url, identity=identity):
+                facts['mandate']['source_reference'] = url
+                leaf = evaluate(facts, request, 'PPH', identity)['leaves']['current_mandate_within_client_approved_mandate']
+                self.assertIn('mandate.official_source', leaf['missing_fields'])
+                self.assertEqual(leaf['truth'], 'UNKNOWN')
+    def test_operating_evidence_still_requires_qualified_time_and_status(self):
+        for symbol, source in (
+            ('NATO', 'https://hanetf.com/wp-content/assets/upload/kiid-NATO-IE000OJ5TQP4-en-GB.pdf'),
+            ('PPH', 'https://www.sec.gov/Archives/edgar/data/synthetic'),
+            ('SOXX', 'https://www.nyse.com/synthetic'),
+            ('VWRA', 'https://fund-docs.vanguard.com/ie00bk5bqt80_priipskid_en.pdf'),
+        ):
+            with self.subTest(symbol=symbol):
+                facts, request = self.fixture()
+                facts['symbol'] = symbol
+                status = facts['fund_status']
+                status['source_reference'] = source
+                identity = {'source_url': ISSUER_CASES[symbol][0], 'source_sha256': 'b' * 64}
+                self.assertEqual(evaluate(facts, request, symbol, identity)['leaves']['fund_legally_operating']['truth'], 'TRUE')
+                status['operating_status'] = 'REGISTERED'
+                self.assertEqual(evaluate(facts, request, symbol, identity)['leaves']['fund_legally_operating']['truth'], 'UNKNOWN')
+                status['operating_status'] = 'OPERATING'
+                status['valid_until'] = '2026-10-28T00:00:00Z'
+                leaf = evaluate(facts, request, symbol, identity)['leaves']['fund_legally_operating']
+                self.assertEqual(leaf['truth'], 'UNKNOWN')
+                self.assertEqual(leaf['missing_fields'], ['fund_status.source_validity_or_valid_until'])
     def test_owner_and_symbol_are_never_borrowed(self):
         facts,req=self.fixture();req['confirmed_target']['payload']['draft']['etf_constraints']['VT']['client_id']='OTHER'
         with self.assertRaisesRegex(PermissionError,'OWNER_POLICY'):evaluate(facts,req,'VT')

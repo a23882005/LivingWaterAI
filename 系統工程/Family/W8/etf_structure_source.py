@@ -6,12 +6,35 @@ positive accounting ratio cannot stand in for current structural evidence.
 from copy import deepcopy
 from datetime import datetime
 from decimal import Decimal,InvalidOperation,localcontext
-from urllib.parse import urlparse
+import re
+from urllib.parse import unquote, urlsplit
 from approved_v04_technical import both,truth
 
 LEAVES=('fund_legally_operating','current_mandate_within_client_approved_mandate',
     'nav_reporting_and_creation_redemption_function_valid','termination_or_disqualification_absent',
     'lookthrough_disposition_allows_long_term_holding')
+
+# The named products may use issuer material on these product pages or in
+# document paths carrying the same product name, number or share-class ISIN.
+ISSUER_PRODUCT_PATHS = {
+    'NATO': {
+        'hanetf.com': r'/fund/nato-future-of-defence-etf(?:/.*)?'
+                       r'|/wp-content/assets/upload/[^/]*-IE000OJ5TQP4(?:-[^/]+)?\.pdf',
+    },
+    'PPH': {
+        'www.vaneck.com': r'/us/en/investments/pharmaceutical-etf-pph(?:/.*|-fact-sheet\.pdf)?',
+    },
+    'SOXX': {
+        'www.ishares.com': r'/us/products/239705/ishares-(?:phlx-)?semiconductor-etf(?:/.*)?'
+                            r'|/us/literature/summary-prospectus/sp-ishares-phlx-semiconductor-etf-3-31\.pdf'
+                            r'|/us/literature/fact-sheet/soxx-ishares-semiconductor-etf-fund-fact-sheet-en-us\.pdf',
+    },
+    'VWRA': {
+        'www.vanguard.co.uk': r'/professional/product/etf/equity/9679/'
+                              r'ftse-all-world-ucits-etf-(?:usd-)?accumulating(?:-vanguard)?(?:\.html)?/?',
+        'fund-docs.vanguard.com': r'/ie00bk5bqt80[_-][^/]+\.pdf',
+    },
+}
 
 
 def boolean(value):return value if type(value) is bool else None
@@ -29,13 +52,51 @@ def timestamp(value):
     except (ValueError,TypeError,AttributeError):return None
 
 
-def source_record(facts,key,at):
+def https_url(value):
+    if not isinstance(value, str) or any(char.isspace() or ord(char) < 32 for char in value):
+        return None
+    try:
+        url = urlsplit(value)
+        if (url.scheme == 'https' and url.hostname and url.username is None
+                and url.port in (None, 443) and '\\' not in value):
+            return url
+    except ValueError:
+        pass
+    return None
+
+
+def matches_product_path(url, paths):
+    pattern = paths.get(url.hostname)
+    path = unquote(url.path)
+    return (pattern is not None
+            and '\\' not in path
+            and not {'.', '..'}.intersection(path.split('/'))
+            and re.fullmatch(pattern, path, re.IGNORECASE) is not None)
+
+
+def official_source(source, symbol, product_evidence):
+    url = https_url(source)
+    if url is None:
+        return False
+    authorities = ('sec.gov', 'nyse.com')
+    product_paths = ISSUER_PRODUCT_PATHS.get(symbol)
+    if product_paths is None:
+        authorities += ('vanguard.com',)
+    if any(url.hostname == host or url.hostname.endswith('.' + host) for host in authorities):
+        return True
+    if not product_paths or not isinstance(product_evidence, dict) or not product_evidence.get('source_sha256'):
+        return False
+    identity_url = https_url(product_evidence.get('source_url'))
+    return (identity_url is not None and matches_product_path(identity_url, product_paths)
+            and matches_product_path(url, product_paths))
+
+
+def source_record(facts,key,at,product_evidence=None):
     record=facts.get(key);missing=[]
     if not isinstance(record,dict):return None,[key]
     source=record.get('source_reference',facts.get('source_url'))
-    host=urlparse(source or '').hostname or ''
-    allowed=('vanguard.com','sec.gov','nyse.com')
-    if not any(host==d or host.endswith('.'+d) for d in allowed):missing.append(key+'.official_source')
+    if not official_source(source, facts.get('symbol'), product_evidence):
+        missing.append(key+'.official_source')
     if not facts.get('source_sha256'):missing.append(key+'.bound_source_sha256')
     available=timestamp(record.get('available_at'));until=timestamp(record.get('valid_until'))
     observed=timestamp(record.get('as_of'))
@@ -114,12 +175,12 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
         leaves[name]={'truth':truth(value),'missing_fields':fields,'detail':detail,
             'applicability':applicability,'gap_kind':'SOURCE_FACT_MISSING' if fields else
                 'SOURCE_DEPENDENCY_UNRESOLVED' if value is None else 'COMPUTED_FROM_BOUND_SOURCE'}
-    status,missing=source_record(facts,'fund_status',at)
+    status,missing=source_record(facts,'fund_status',at,product_evidence)
     state=status.get('operating_status') if status else None
     value=True if state=='OPERATING' else False if state in ('CEASED','SUSPENDED','DISQUALIFIED') else None
     put(LEAVES[0],value,missing+(['fund_status.operating_status'] if status and value is None else []),state)
     trace.append('ETF_VIABLE_01.operating_status')
-    mandate,missing=source_record(facts,'mandate',at)
+    mandate,missing=source_record(facts,'mandate',at,product_evidence)
     allowed=policy.get('allowed_mandate_components')
     value=mandate_subset(mandate.get('components') if mandate else None,allowed)
     if mandate and not isinstance(mandate.get('components'),list):missing.append('mandate.components')
@@ -128,14 +189,14 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
     put(LEAVES[1],value if not missing else None,missing,
         {'issuer_components':mandate.get('components') if mandate else None,'approved_components':allowed})
     trace.append('ETF_VIABLE_01.mandate_subset')
-    nav,missing=source_record(facts,'nav_redemption_status',at)
+    nav,missing=source_record(facts,'nav_redemption_status',at,product_evidence)
     nav_ok=boolean(nav.get('nav_reporting_valid')) if nav else None
     redemption=boolean(nav.get('creation_redemption_function_valid')) if nav else None
     if nav and nav_ok is None:missing.append('nav_redemption_status.nav_reporting_valid')
     if nav and redemption is None:missing.append('nav_redemption_status.creation_redemption_function_valid')
     put(LEAVES[2],both(nav_ok,redemption),missing)
     trace.append('ETF_VIABLE_01.nav_and_creation_redemption')
-    event,missing=source_record(facts,'termination_event',at)
+    event,missing=source_record(facts,'termination_event',at,product_evidence)
     failure=boolean(event.get('confirmed_termination')) if event else None
     disqualified=boolean(event.get('permanent_disqualification')) if event else None
     required={'FUND_TERMINATION','PERMANENT_OPERATIONAL_DISQUALIFICATION'}
@@ -149,7 +210,7 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
     if policy.get('lookthrough_restrictions')=='EXPLICIT_APPROVED_NONE' and policy.get('authority_reference'):
         put(LEAVES[4],True,[],{'authority_reference':policy['authority_reference']},'NOT_APPLICABLE_EXPLICIT_APPROVED_NONE')
     else:
-        composition,missing=source_record(facts,'lookthrough',at)
+        composition,missing=source_record(facts,'lookthrough',at,product_evidence)
         audit=lookthrough_intervals(composition,policy.get('exposure_limits'))
         put(LEAVES[4],True if audit['truth']=='TRUE' else False if audit['truth']=='FALSE' else None,missing+audit['issues'],audit)
     trace.append('ETF_VIABLE_01.lookthrough_weight_intervals')

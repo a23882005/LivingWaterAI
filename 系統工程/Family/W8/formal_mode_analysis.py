@@ -366,9 +366,13 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
 
 
 def etf_viability_audit(row,request):
-    from etf_structure_source import evaluate_etf_structure
-    return evaluate_etf_structure(row.get('issuer_facts'),request,row['symbol'],
-        row['native_product_identity'].get('product_evidence'))
+    from etf_structure_source import ISSUER_PRODUCT_PATHS, evaluate_etf_structure
+    identity = row['native_product_identity']
+    product_evidence = identity.get('product_evidence')
+    if product_evidence is None and row['symbol'] in ISSUER_PRODUCT_PATHS:
+        # Member Menu04 stores the validated classification evidence directly.
+        product_evidence = identity.get('grade_evidence')
+    return evaluate_etf_structure(row.get('issuer_facts'), request, row['symbol'], product_evidence)
 
 
 def gap_matrix(row,target,coverage,orders,*,left_audit=None):

@@ -19,10 +19,13 @@ async function main(input){
  Object.defineProperty(w.HTMLElement.prototype,'innerText',{
   get(){return this.textContent;},set(v){this.textContent=v;},configurable:true});
  w.tailwind={};
- const warnings=[],reads=[];
+ const warnings=[],reads=[],blocked=[];
  w.console.warn=(...args)=>warnings.push(args.map(String).join(' '));
- w.fetch=async url=>{
-  const request=new URL(String(url),w.location);reads.push(request.pathname);
+ w.fetch=async (url,options={})=>{
+  const request=new URL(String(url),w.location);
+  if(request.origin===w.location.origin)reads.push(request.pathname);
+  else blocked.push({url:request.href,method:String(options.method||'GET').toUpperCase(),
+    reason:'EXTERNAL_NETWORK_DISABLED'});
   if(request.origin==='https://family.invalid'&&request.pathname==='/V70_macro_latest.json')
    return {ok:true,status:200,json:async()=>JSON.parse(JSON.stringify(feed))};
   // Optional website deployment badge has no calculation input in this runtime.
@@ -49,7 +52,7 @@ async function main(input){
    tactical_percentages:ready?{stock:snapshot.allocation.sTot,bond:snapshot.allocation.bTot,
      dry_powder:snapshot.allocation.cTot}:null,
    macro_snapshot:snapshot,original_latest:latest,load_issue:w.v703FeedLoadIssue||'',warnings,
-   local_reads:reads,ui_profile_defaults_are_not_client_facts:true,
+   local_reads:reads,blocked_external_requests:blocked,ui_profile_defaults_are_not_client_facts:true,
    monetary_amounts:null,trade_authorization:'NONE'};
  }finally{w.close();}
 }

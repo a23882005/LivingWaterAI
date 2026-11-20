@@ -27,7 +27,9 @@ def build(site, template, output):
             raise ValueError("Model and education data dates differ")
         page = browser.new_page()
         page.route("**/*", lambda route: route.abort())
-        page.set_content(template.read_text())
+        import re
+        layout = re.sub(r"<script>(?:(?!</script>).)*</script>", "", template.read_text(), flags=re.S)
+        page.set_content(layout)
         rows = page.locator("#edu-indicators tbody tr")
         if rows.count() != len(KEYS):
             raise ValueError("Education indicator template mismatch")
@@ -159,7 +161,21 @@ display();"""
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)
         if page.locator("#education-sources li").count() != 13:
             raise ValueError("Expected thirteen attributions")
-        (output / "index.html").write_text(page.content(), encoding="utf-8")
+        html = page.content()
+        check = browser.new_page()
+        check.route("**/*", lambda route: route.abort())
+        check.set_content(html)
+        for pair, result in scenarios.items():
+            life, style = pair.split("/")
+            check.select_option("#family-life", life)
+            check.select_option("#family-style", style)
+            shown = check.locator("#total-stock").text_content()
+            expected = "—" if result is None else f"{result['stock']:g}%"
+            if shown != expected:
+                raise ValueError(f"Education scenario {pair}: {shown} != {expected}")
+        if any(text in check.locator("body").inner_text() for text in ("Rule Owner=V70", "22項計分輸入")):
+            raise ValueError("Engineering header in education homepage")
+        (output / "index.html").write_text(html, encoding="utf-8")
         browser.close()
 
 

@@ -4849,5 +4849,27 @@ if (recBlack) {
   else start();
 })();
 </script>
+<section aria-label="累計瀏覽次數" style="text-align:center;padding:1rem;font-size:1rem">
+  <strong>累計瀏覽次數</strong>
+  <div id="v70-view-counts" aria-live="polite">全部 —　　本月 —　　本週 —　　本日 —</div>
+</section>
+<script>
+(async function showViewCounts() {
+  const output = document.getElementById('v70-view-counts');
+  try {
+    const config = await fetch('./v70-counter-config.json', {cache: 'no-store'});
+    if (!config.ok) throw Error();
+    const {endpoint} = await config.json();
+    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(endpoint)) throw Error();
+    const response = await fetch(endpoint, {method: 'POST', credentials: 'omit', body: new URLSearchParams({event: 'v70-view'})});
+    const counts = await response.json();
+    const fields = [['全部','total'],['本月','month'],['本週','week'],['本日','day']];
+    if (!response.ok || !fields.every(([, key]) => Number.isSafeInteger(counts[key]) && counts[key] >= 0)) throw Error();
+    output.textContent = fields.map(([label,key]) => label + ' ' + counts[key].toLocaleString('zh-TW')).join('　');
+  } catch {
+    output.textContent = '全部 —　　本月 —　　本週 —　　本日 —（統計暫未提供）';
+  }
+})();
+</script>
 </body>
 </html>

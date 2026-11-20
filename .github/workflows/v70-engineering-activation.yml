@@ -52,7 +52,7 @@ jobs:
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
           source: staging/engineering.htpasswd
-          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-private
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-engineering-auth
           strip_components: 1
           overwrite: true
       - name: Protect only the engineering directory
@@ -69,11 +69,11 @@ jobs:
             set -eu
             cd "$LW_DIR"
             test "$(basename "$PWD")" = public_html
-            private=$(cd ../v70-private && pwd -P)
+            private=$(cd ../v70-engineering-auth && pwd -P)
             test -s "$private/engineering.htpasswd"
-            # The web server reads only the verifier through the dedicated group.
-            ls -ld "$private" "$private/engineering.htpasswd" | awk '{print "verifier access", $1, "owner/group match", ($3 == $4)}'
-            chmod 640 "$private/engineering.htpasswd"
+            # Keep this verifier outside public_html and apart from private model files.
+            chmod 711 "$private"
+            chmod 644 "$private/engineering.htpasswd"
             mkdir -p v70-engineering
             test ! -L v70-engineering
             cd v70-engineering
@@ -81,7 +81,7 @@ jobs:
               echo "Existing directory rules require review"; exit 1
             fi
             temp=$(mktemp "$private/engineering-access.XXXXXX")
-            printf '%s\n' '# Managed V70 engineering login' 'AuthType Basic' 'AuthName "V70 Engineering"' "AuthUserFile \"$private/engineering.htpasswd\"" 'Require valid-user' 'Options -Indexes' > "$temp"
+            printf '%s\n' '# Managed V70 engineering login' 'AuthType Basic' 'AuthName "V70 Engineering"' "AuthUserFile $private/engineering.htpasswd" 'Require valid-user' 'Options -Indexes' > "$temp"
             chmod 644 "$temp"
             mv -- "$temp" .htaccess
       - name: Require password before placing either file

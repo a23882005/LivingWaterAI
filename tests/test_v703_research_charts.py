@@ -88,7 +88,8 @@ class V703ResearchChartsTests(unittest.TestCase):
         self.assertIn("HOSTINGER_RESEARCH_CHARTS_LIVE_PASS", workflow)
         self.assertIn('--html "系統工程/總經V70/教育版/V70-3-27-education-candidate.html" --out build/site', workflow)
         self.assertIn('--html "系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html" --out build/engineering', workflow)
-        self.assertIn('build/site/v70-engineering.html,build/site/v70-research-charts/*', workflow)
+        self.assertNotIn('build/site/v70-engineering.html,', workflow)
+        self.assertIn('Engineering page is publicly accessible', workflow)
 
 
 if __name__ == "__main__":

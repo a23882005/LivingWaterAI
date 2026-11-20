@@ -228,7 +228,6 @@ jobs:
           python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html" --out build/engineering
           python scripts/build_daily_v703_site.py --html "系統工程/總經V70/教育版/V70-3-27-education-candidate.html" --out build/site
-          cp build/engineering/index.html build/site/v70-engineering.html
       - name: Require formal 22 of 22 or approved CPI data-only publication
         id: publication_gate
         run: |
@@ -298,7 +297,7 @@ jobs:
               target=Path(name)
               atomic_write(target, source.read_bytes())
               assert json.loads(target.read_text(encoding='utf-8'))==data
-          atomic_write('系統工程/總經V70/V70-3-27.html',Path('build/site/v70-engineering.html').read_bytes())
+          atomic_write('系統工程/總經V70/V70-3-27.html',Path('build/engineering/index.html').read_bytes())
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -334,6 +333,25 @@ jobs:
             public_html|*/public_html|*/public_html/) ;;
             *) echo "::error::Site directory must end in public_html"; exit 1 ;;
           esac
+      - name: Withdraw engineering HTML from Hostinger public directory
+        uses: appleboy/ssh-action@v1
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR
+          script: |
+            set -eu
+            cd "$LW_DIR"
+            test "$(basename "$PWD")" = public_html
+            if test -f v70-engineering.html; then
+              umask 077
+              mkdir -p ../v70-private
+              mv -- v70-engineering.html ../v70-private/v70-engineering.html
+            fi
       - name: Deploy validated V70-3-27 HTML and JSON via Hostinger SSH (1/3)
         id: site_upload_1
         continue-on-error: true
@@ -343,7 +361,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-engineering.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -364,7 +382,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-engineering.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -385,7 +403,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-engineering.html,build/site/v70-research-charts/*
+          source: build/site/V70_macro_latest.json,build/site/index.html,build/site/v70-research-charts/*
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
           strip_components: 2
           overwrite: true
@@ -423,10 +441,13 @@ jobs:
                       page=response.read().decode("utf-8")
                   from scripts.validate_v703_publication import verify_live_payload
                   verify_live_payload(expected,live,Path('build/site/index.html').read_text(encoding='utf8'),page)
-                  with urllib.request.urlopen(base+'/v70-engineering.html?v='+stamp,timeout=20) as response:
-                      engineering=response.read().decode('utf-8')
-                  assert engineering == Path('build/site/v70-engineering.html').read_text(encoding='utf8')
-                  assert engineering != page
+                  import urllib.error
+                  try:
+                      urllib.request.urlopen(base+'/v70-engineering.html?v='+stamp,timeout=20)
+                  except urllib.error.HTTPError as exc:
+                      assert exc.code in (403,404,410), exc.code
+                  else:
+                      raise ValueError('Engineering page is publicly accessible')
                   assert live["schema"]==expected["schema"]
                   assert live["asOf"]==expected["asOf"]
                   from scripts.validate_v703_publication import validate_publication_gate
@@ -467,7 +488,7 @@ jobs:
                   assert page.count('>NA</td>') > 0
                   for name in chart_names:
                       page_asset='v70-research-charts/'+name
-                      assert page_asset in page and page_asset in engineering, 'chart image missing from homepage: '+name
+                      assert page_asset in page, 'chart image missing from homepage: '+name
                       with urllib.request.urlopen(base+'/'+page_asset+'?v='+stamp,timeout=20) as response:
                           assert response.status==200
                           assert response.read(8)==b'\x89PNG\r\n\x1a\n', 'invalid chart PNG: '+name

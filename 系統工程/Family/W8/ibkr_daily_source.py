@@ -17,14 +17,24 @@ PRICE_BASIS='SPLIT_ADJUSTED_OR_UNATTESTED_PROVIDER_OHLC__NOT_PIT_WEALTH'
 
 def load(source,evaluation_at):
     from pm_source_document import history
-    from member_market_source import time
+    from member_market_source import time,read_json
     from historical_source_qualification import pinned
     data,receipt=history(source);symbol=source['symbol'];retrieved=time(source['retrieved_at'])
+    london=source['provider_exchange']=='LSEETF'
+    timezone='Europe/London' if london else 'America/New_York'
+    venues={'NASDAQ':'XNAS','NYSE ARCA':'ARCX','NYSE':'XNYS','LSEETF':'XLON'}
     if (source.get('provider')!='IBKR_LAST_DAILY_OBSERVATION' or source.get('provider_symbol')!=symbol
-        or source.get('currency')!='USD' or source.get('timezone')!='America/New_York'
+        or source.get('currency')!='USD' or source.get('timezone')!=timezone
         or retrieved>time(evaluation_at) or not source.get('source_reference')
-        or {'NASDAQ':'XNAS','NYSE ARCA':'ARCX','NYSE':'XNYS'}.get(source['provider_exchange'])!=source['exchange']):
+        or venues.get(source['provider_exchange'])!=source['exchange']):
         raise PermissionError('MEMBER_MARKET_IBKR_IDENTITY_OR_TIME')
+    if london:
+        contract=read_json(source['contract_source'])
+        matches=[r for r in contract['results'] if r.get('symbol')==symbol
+            and r.get('exchange')=='LSEETF' and r.get('country_code')=='GB'
+            and any(s.get('security_type')=='STK' for s in r.get('sections',[]))]
+        if len(matches)!=1 or matches[0].get('underlying_contract_id')!=source['contract_id']:
+            raise PermissionError('MEMBER_MARKET_IBKR_LONDON_CONTRACT_MISMATCH')
     identity=source['identity_source']
     if not identity.get('source_reference') or time(identity['retrieved_at'])>time(evaluation_at):
         raise PermissionError('MEMBER_MARKET_IBKR_REFERENCE_TIME_REQUIRED')
@@ -43,9 +53,11 @@ def load(source,evaluation_at):
         chart=json.loads(text)['chart']
         if chart.get('error') or len(chart.get('result') or [])!=1:raise PermissionError('MEMBER_MARKET_IBKR_REFERENCE_IDENTITY')
         r=chart['result'][0]['meta'];kind=r.get('instrumentType')
-        if (r.get('symbol')!=symbol or r.get('currency')!='USD' or r.get('exchangeTimezoneName')!=source['timezone']
-            or {'NYQ':'XNYS','PCX':'ARCX','NMS':'XNAS'}.get(r.get('exchangeName'))!=source['exchange']
-            or kind not in ('ETF','EQUITY')):raise PermissionError('MEMBER_MARKET_IBKR_REFERENCE_IDENTITY')
+        if (r.get('symbol')!=(symbol+'.L' if london else symbol) or r.get('currency')!='USD'
+            or r.get('exchangeTimezoneName')!=timezone
+            or {'NYQ':'XNYS','PCX':'ARCX','NMS':'XNAS','LSE':'XLON'}.get(r.get('exchangeName'))!=source['exchange']
+            or kind not in (('ETF',) if london else ('ETF','EQUITY'))):
+            raise PermissionError('MEMBER_MARKET_IBKR_REFERENCE_IDENTITY')
     else:raise PermissionError('MEMBER_MARKET_IBKR_ORIGINAL_REFERENCE_REQUIRED')
     if data.get('source')!='Last' or type(data.get('chart_step')) is not int or data['chart_step']!=86400:
         raise ValueError('MEMBER_MARKET_IBKR_DAILY_LAST_REQUIRED')
@@ -62,9 +74,10 @@ def load(source,evaluation_at):
             if isinstance(v,bool) or v is None or not Decimal(str(v)).is_finite():
                 raise ValueError('MEMBER_MARKET_IBKR_FINITE_ORIGINAL_NUMBER_REQUIRED')
     actions=data.get('corp_actions')
-    if not isinstance(actions,list):raise ValueError('MEMBER_MARKET_IBKR_ACTION_OBSERVATIONS_REQUIRED')
+    if not isinstance(actions,list) and not (london and actions is None):
+        raise ValueError('MEMBER_MARKET_IBKR_ACTION_OBSERVATIONS_REQUIRED')
     seen=set()
-    for a in actions:
+    for a in actions or ():
         key=(a.get('type'),a.get('date'))
         if key in seen or key[0] not in ('Splits','CashDividends'):
             raise ValueError('MEMBER_MARKET_IBKR_ACTION_IDENTITY_CONFLICT')

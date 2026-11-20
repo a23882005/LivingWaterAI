@@ -6,7 +6,7 @@ publication/revision receipts, listing suspensions or complete action books.
 Missing pages and missing security bars stay visible and never become wealth,
 zero events, a source-owned completed calendar or approved native qP/qV.
 """
-from datetime import date
+from datetime import date, datetime
 from copy import deepcopy
 from decimal import Decimal
 from hashlib import sha256
@@ -22,8 +22,13 @@ PRICE_FIELDS=('日期','成交股數','成交金額','開盤價','最高價','�
 MARKET_FIELDS=('日期','成交股數','成交金額','成交筆數','發行量加權股價指數','漲跌點數')
 
 
-def _bytes(source):
-    raw=Path(source['local_path']).read_bytes()
+def _bytes(source,base=None):
+    path=Path(source['local_path'])
+    if base is not None and not path.is_absolute():
+        path=(base/path).resolve()
+        if not path.is_relative_to(base):
+            raise PermissionError('TWSE_HISTORY_PATH_OUTSIDE_CAPTURE')
+    raw=path.read_bytes()
     if sha256(raw).hexdigest()!=source['sha256']:
         raise PermissionError('TWSE_HISTORY_ORIGINAL_BYTES_CHANGED')
     return raw
@@ -55,7 +60,7 @@ def _number(value,*,integer=False):
     return result
 
 
-def _page(page,kind,stamp,symbol,known_by):
+def _page(page,kind,stamp,symbol,known_by,*,base=None):
     if page.get('status') not in ('ACQUIRED','NOT_ACQUIRED','UNAVAILABLE'):
         raise ValueError('TWSE_HISTORY_PAGE_STATUS_REQUIRED')
     if page['status']!='ACQUIRED':
@@ -63,12 +68,12 @@ def _page(page,kind,stamp,symbol,known_by):
             raise PermissionError('TWSE_HISTORY_UNAVAILABLE_PAGE_CANNOT_SUPPLY_DATA')
         failure=page.get('failure_source')
         if failure is not None:
-            record=json.loads(_bytes(failure))
+            record=json.loads(_bytes(failure,base))
             if (record.get('symbol')!=('CALENDAR' if kind=='market' else symbol)
                 or record.get('month')!=stamp or record.get('status')!='SOURCE_UNAVAILABLE'):
                 raise PermissionError('TWSE_HISTORY_FAILURE_RECEIPT_SCOPE')
         return None
-    source=page['source'];raw=_bytes(source);receipt=json.loads(_bytes(page['receipt_source']))
+    source=page['source'];raw=_bytes(source,base);receipt=json.loads(_bytes(page['receipt_source'],base))
     endpoint='FMTQIK' if kind=='market' else 'STOCK_DAY'
     params={'response':['json'],'date':[stamp]}
     if kind=='prices':params['stockNo']=[symbol]
@@ -124,11 +129,13 @@ def _page(page,kind,stamp,symbol,known_by):
     return result
 
 
-def read(descriptor,symbol,evaluation_at):
+def read(descriptor,symbol,evaluation_at,*,session_closes=None):
     manifest=json.loads(_bytes(descriptor))
+    base=Path(descriptor['local_path']).resolve().parent if session_closes is not None else None
+    symbol_pattern=r'\d{4,5}' if session_closes is not None else r'\d{4}'
     if (manifest.get('schema_version')!='Family.W8.TwseOwnHistoryIntake.v1'
         or manifest.get('provider')!='TWSE' or manifest.get('symbol')!=symbol
-        or not re.fullmatch(r'\d{4}',symbol) or manifest.get('currency')!='TWD'
+        or not re.fullmatch(symbol_pattern,symbol) or manifest.get('currency')!='TWD'
         or manifest.get('exchange')!='XTAI' or manifest.get('timezone')!='Asia/Taipei'
         or not manifest.get('source_reference') or time(manifest['known_by'])>time(evaluation_at)):
         raise PermissionError('TWSE_HISTORY_IDENTITY_OR_TIME_MISMATCH')
@@ -142,7 +149,7 @@ def read(descriptor,symbol,evaluation_at):
     for page in pages:
         stamp=page['month'];observed={}
         for kind in ('prices','market'):
-            records=_page(page[kind],kind,stamp,symbol,manifest['known_by'])
+            records=_page(page[kind],kind,stamp,symbol,manifest['known_by'],base=base)
             if records is None:
                 gaps.append(dict(month=stamp,source=kind,status=page[kind]['status']))
             else:
@@ -154,12 +161,19 @@ def read(descriptor,symbol,evaluation_at):
                 final=[]
                 for row in records:
                     local=time(row['observed_at']).astimezone(ZoneInfo('Asia/Taipei')).date().isoformat()
-                    if row['session_id']>=local:
+                    close_at=(session_closes or {}).get(row['session_id'])
+                    published_after_close=(row['session_id']==local and close_at is not None
+                        and time(row['observed_at'])>=close_at)
+                    if row['session_id']>=local and not published_after_close:
                         excluded.append(dict(source=kind,session_id=row['session_id'],reason='CURRENT_OR_FUTURE_CAPTURE_DATE_NOT_FINAL_ATTESTED'))
                     else:final.append(row)
                 records=final
             observed[kind]=records
         prices=observed['prices'];market=observed['market']
+        if session_closes is not None and prices is not None:
+            unconfirmed_days={r['session_id'] for r in excluded if r['source']=='market'
+                and r['reason']=='CURRENT_OR_FUTURE_CAPTURE_DATE_NOT_FINAL_ATTESTED'}
+            prices=[r for r in prices if r['session_id'] not in unconfirmed_days]
         if prices is not None:bars.extend(prices)
         if market is not None:sessions.extend(market)
         if prices is not None and market is not None:
@@ -189,3 +203,31 @@ def read(descriptor,symbol,evaluation_at):
         issues=issues,trade_action='NO_TRADE')
     out['digest']=digest(out)
     return out
+
+
+def load_daily(source,evaluation_at,sessions,*,is_etf):
+    """Observe published TWSE ETF bars with an independent market-day record."""
+    symbol=source['symbol']
+    identity={'provider_symbol':symbol,'exchange':'XTAI','provider_exchange':'XTAI',
+        'currency':'TWD','timezone':'Asia/Taipei'}
+    if is_etf is not True or any(source.get(k)!=v for k,v in identity.items()):
+        raise PermissionError('MEMBER_MARKET_TWSE_LISTING_IDENTITY')
+    closes={r['session_id']:time(r['close_at']) for r in sessions}
+    try:
+        observed=read(source,symbol,evaluation_at,session_closes=closes)
+    except ValueError as exc:
+        raise ValueError('MEMBER_MARKET_TWSE_'+str(exc)) from exc
+    if observed['known_by']!=source['retrieved_at']:
+        raise PermissionError('MEMBER_MARKET_TWSE_CAPTURE_TIME_MISMATCH')
+    market_days={r['session_id'] for r in observed['market_transaction_dates']}
+    rows=[r for r in observed['raw_observed_bars'] if r['session_id'] in market_days]
+    timestamps=[int(datetime.fromisoformat(r['session_id']).replace(tzinfo=ZoneInfo('Asia/Taipei')).timestamp())
+        for r in rows]
+    quotes={k:[r[k] for r in rows] for k in ('open','high','low','close','volume')}
+    meta=dict(symbol=symbol,currency='TWD',exchangeTimezoneName='Asia/Taipei',
+        exchangeName='XTAI',instrumentType='ETF')
+    evidence=dict(provider='TWSE_STOCK_DAY',qualification_digest=observed['digest'],
+        price_basis='EXCHANGE_PUBLISHED_TRANSACTION_OHLC__NOT_PIT_WEALTH',
+        historical_PIT_attested=False,corporate_action_coverage_attested=False,
+        independently_observed_market_days=True,excluded_rows=observed['excluded_rows'])
+    return meta,quotes,timestamps,evidence

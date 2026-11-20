@@ -57,10 +57,13 @@ def history(source):
             raise ValueError('PM_HISTORY_SECTION_BOUNDARY')
         started=None;retrieved=root['captured_at_utc']
     else:raise PermissionError('PM_HISTORY_PUBLIC_PRICE_DOCUMENT_REQUIRED')
-    expected={'period':'FIVE_YEARS','step':'ONE_DAY','outside_rth':False,'include_corporate_actions':True}
+    periods=('THREE_MONTHS','SIX_MONTHS','ONE_YEAR','TWO_YEARS','FIVE_YEARS') if exchange=='LSEETF' else ('FIVE_YEARS',)
+    expected={'step':'ONE_DAY','outside_rth':False,'include_corporate_actions':True}
     if (any(query.get(k)!=v or type(query.get(k)) is not type(v) for k,v in expected.items())
+        or query.get('period') not in periods or 'step_count' in query
         or query.get('security_type','STK')!='STK' or type(contract) is not int or contract<=0
         or contract!=source.get('contract_id') or exchange!=source.get('provider_exchange')
+        or exchange=='LSEETF' and (query.get('exchange')!=exchange or query.get('contract_id')!=contract)
         or retrieved!=source.get('retrieved_at') or started and time(started)>time(retrieved)):
         raise PermissionError('PM_HISTORY_QUERY_CONTRACT_OR_CAPTURE_MISMATCH')
     return data,dict(contract_id=contract,provider_exchange=exchange,query=query,

@@ -6,7 +6,7 @@ import json,sys
 import pytest
 HERE=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
-from twse_own_history_source import read,PRICE_FIELDS,MARKET_FIELDS
+from twse_own_history_source import load_daily,read,PRICE_FIELDS,MARKET_FIELDS
 from historical_source_qualification import bind
 
 AT='2026-11-04T04:00:00Z'
@@ -148,3 +148,21 @@ def test_public_history_binding_keeps_member_scope_without_formal_promotion(tmp_
     assert out['run_id']==request['run_id'] and out['source_db_sha256']=='a'*64
     assert out['qualified_qP_history'] is out['qualified_qV_history'] is None
     assert not out['financial_qualification_released']
+
+
+@pytest.mark.parametrize(('observed_at','expected_rows'),[
+    ('2026-10-02T05:29:59Z',4),('2026-10-02T05:30:01Z',5)])
+def test_daily_intake_requires_market_record_after_close(tmp_path,observed_at,expected_rows):
+    manifest,desc=case(tmp_path)
+    manifest.update(requested_end='2026-10-02',known_by='2026-10-02T06:00:00Z')
+    for page in manifest['months']:
+        change(page['prices']['receipt_source'],lambda d:d.update(
+            started_at=manifest['known_by'],retrieved_at=manifest['known_by']))
+        change(page['market']['receipt_source'],lambda d:d.update(
+            started_at=observed_at,retrieved_at=observed_at))
+    source=dict(**desc(),symbol='9001',provider_symbol='9001',currency='TWD',
+        timezone='Asia/Taipei',exchange='XTAI',provider_exchange='XTAI',retrieved_at=manifest['known_by'])
+    sessions=[dict(session_id='2026-10-02',close_at='2026-10-02T05:30:00Z')]
+    _,quotes,_,qualification=load_daily(source,AT,sessions,is_etf=True)
+    assert len(quotes['close'])==expected_rows
+    assert not qualification['historical_PIT_attested']

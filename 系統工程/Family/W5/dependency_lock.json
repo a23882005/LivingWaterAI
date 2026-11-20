@@ -493,7 +493,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
-    "sha256": "291361ab315ce6539e7765b6fdff4c8685e4d54df6660bbd5f6b67e319dbee33"
+    "sha256": "762e39dc94164180d55894c63ca4d92fb8b5059225302e7068f8553660666391"
   },
   {
     "path": "系統工程/Family/W8/all_asset_coverage.py",
@@ -545,7 +545,7 @@
   },
   {
     "path": "系統工程/Family/W8/twse_own_history_source.py",
-    "sha256": "1c990d23c5d37decc1ee07465c18fe67d2aa543151adbe8f956a7fc2cd6f1211",
+    "sha256": "cb6ea4f9f17a56b3307e9dc4a37e66ebcb965a3d653d5ef981f56982c94200ca",
     "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
   },
   {
@@ -580,12 +580,12 @@
   },
   {
     "path": "系統工程/Family/W8/pm_source_document.py",
-    "sha256": "10cff9a63903abb2625762fffa9a1b1ea150e305e1996065752e8e299abe249a",
+    "sha256": "afbfd6d1a0de0bcaf72eb1825b18895803ee37a58b4b3741e54cc3a49354a90c",
     "reason": "PR59 PM原件、IB Last日K及本人帳戶觀察接線；不改原生規則、不釋放金融資格"
   },
   {
     "path": "系統工程/Family/W8/ibkr_daily_source.py",
-    "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211",
+    "sha256": "3d29a0c7f7a91e7e5daeabe6c1ea89da3df06cfdaa5ffbcb7c51b225971566ec",
     "reason": "PR59 PM原件、IB Last日K及本人帳戶觀察接線；不改原生規則、不釋放金融資格"
   },
   {

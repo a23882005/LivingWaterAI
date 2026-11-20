@@ -56,6 +56,36 @@ def test_original_daily_spelling_action_and_split_basis_reach_existing_intake(tm
     assert not p['historical_PIT_attested'] and not p['corporate_action_coverage_attested']
 
 
+def test_london_daily_observation_uses_exact_listing_and_excludes_open_session(tmp_path):
+    source,document=fixture(tmp_path)
+    at='2026-11-02T14:00:00Z'
+    source.update(provider_exchange='LSEETF',exchange='XLON',timezone='Europe/London',retrieved_at=at)
+    document['query'].update(period='SIX_MONTHS',contract_id=123,exchange='LSEETF')
+    row=document['observations'][0]
+    row.update(exchange='LSEETF',started_at=at,retrieved_at=at)
+    row['source'].pop('corp_actions')
+    update(source,document)
+    original=Path(source['calendar_source']['local_path'])
+    cal=json.loads(original.read_bytes())
+    cal.update(exchange='XLON',timezone='Europe/London')
+    source['calendar_source']=write_document(original,cal,heading='')
+    reference={'chart':{'error':None,'result':[{'meta':dict(symbol='TEST.L',currency='USD',
+        exchangeName='LSE',exchangeTimezoneName='Europe/London',instrumentType='ETF')}]}}
+    source['identity_source']=dict(**write_document(tmp_path/'listing.json',reference,heading=''),
+        retrieved_at=at,source_reference='SYNTHETIC_LONDON_LISTING',format='YAHOO_CHART')
+    contract={'results':[dict(symbol='TEST',exchange='LSEETF',country_code='GB',
+        underlying_contract_id=123,sections=[{'security_type':'STK'}])]}
+    source['contract_source']=write_document(tmp_path/'contract.json',contract,heading='')
+    result=market(source,at=at)
+    assert result['observed_date']=='2026-10-30'
+    assert result['history_quality']['excluded_uncompleted_rows'][0]['date']=='2026-11-02'
+    assert result['provider_completion_evidence']['corporate_action_observations'] is None
+    contract['results'][0]['exchange']='NYSE'
+    source['contract_source']=write_document(tmp_path/'contract.json',contract,heading='')
+    with pytest.raises(PermissionError,match='LONDON_CONTRACT_MISMATCH'):
+        market(source,at=at)
+
+
 def test_original_bad_ohlc_is_a_gap_and_not_repaired_from_close_or_other_provider(tmp_path):
     s,d=fixture(tmp_path);d['observations'][0]['source']['high'][1]=90;update(s,d)
     out=market(s);assert len(out['completed_rows'])==2

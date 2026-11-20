@@ -77,9 +77,17 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
         raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
     if source is None:
         return None
-    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY','IBKR_LAST_DAILY_OBSERVATION') or source.get('symbol') != symbol
+    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY','IBKR_LAST_DAILY_OBSERVATION','TWSE_STOCK_DAY') or source.get('symbol') != symbol
             or not source.get('source_reference') or time(source['retrieved_at']) > time(evaluation_at)):
         raise PermissionError('MEMBER_MARKET_SOURCE_IDENTITY_OR_TIME')
+    calendar = read_json(source['calendar_source'])
+    if (calendar.get('exchange') != source['exchange'] or calendar.get('timezone') != source['timezone']
+            or not calendar.get('provider') or not calendar.get('version')
+            or time(calendar['coverage_cutoff']) < time(evaluation_at)):
+        raise ValueError('MEMBER_MARKET_CALENDAR_COVERAGE')
+    sessions = calendar['sessions']; dates = [r['session_id'] for r in sessions]
+    if dates != sorted(set(dates)) or any(time(r['open_at']) >= time(r['close_at']) for r in sessions):
+        raise ValueError('MEMBER_MARKET_CALENDAR_ORDER')
     completion=None
     if source['provider']=='NASDAQ_HISTORICAL':
         from nasdaq_daily_source import load
@@ -90,6 +98,9 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
     elif source['provider']=='IBKR_LAST_DAILY_OBSERVATION':
         from ibkr_daily_source import load
         meta,quotes,stamps,completion=load(source,evaluation_at)
+    elif source['provider']=='TWSE_STOCK_DAY':
+        from twse_own_history_source import load_daily
+        meta,quotes,stamps,completion=load_daily(source,evaluation_at,sessions,is_etf=is_etf)
     else:
         chart = read_json(source)['chart']
         if chart.get('error') or len(chart.get('result') or []) != 1:
@@ -104,14 +115,6 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
             or is_etf is True and meta['instrumentType'] != 'ETF'
             or is_etf is False and meta['instrumentType'] != 'EQUITY'):
         raise PermissionError('MEMBER_MARKET_PRODUCT_TYPE_CONFLICT')
-    calendar = read_json(source['calendar_source'])
-    if (calendar.get('exchange') != source['exchange'] or calendar.get('timezone') != source['timezone']
-            or not calendar.get('provider') or not calendar.get('version')
-            or time(calendar['coverage_cutoff']) < time(evaluation_at)):
-        raise ValueError('MEMBER_MARKET_CALENDAR_COVERAGE')
-    sessions = calendar['sessions']; dates = [r['session_id'] for r in sessions]
-    if dates != sorted(set(dates)) or any(time(r['open_at']) >= time(r['close_at']) for r in sessions):
-        raise ValueError('MEMBER_MARKET_CALENDAR_ORDER')
     # A bar must have completed before both acquisition and evaluation. A
     # current-session quote must not become a final close when replayed later.
     acquisition=(source['historical_retrieved_at'] if source['provider']=='NASDAQ_HISTORICAL' else source['retrieved_at'])

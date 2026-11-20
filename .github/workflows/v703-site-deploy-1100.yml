@@ -8,7 +8,6 @@ on:
     - cron: '0 3 * * *' # Daily 11:00 Asia/Taipei (UTC 03:00)
   workflow_dispatch:
   push:
-    branches: [main]
     paths:
       - '系統工程/總經V70/教育版/V70-3-27-education-candidate.html'
       - '系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html'

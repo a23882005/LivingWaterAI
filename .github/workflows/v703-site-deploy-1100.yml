@@ -343,6 +343,7 @@ jobs:
           path: build/site/
           if-no-files-found: warn
       - name: Verify engineering directory requires its dedicated login
+        if: vars.V70_ENGINEERING_ENABLED == 'true'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
         run: |
@@ -352,6 +353,7 @@ jobs:
           test "$status" = 401
           grep -iq '^www-authenticate: Basic ' "$RUNNER_TEMP/engineering-headers"
       - name: Upload verified engineering files to the protected directory
+        if: vars.V70_ENGINEERING_ENABLED == 'true'
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -363,6 +365,7 @@ jobs:
           strip_components: 2
           overwrite: true
       - name: Read back password-protected engineering HTML and data
+        if: vars.V70_ENGINEERING_ENABLED == 'true'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
           ENGINEERING_USER: ${{ secrets.V70_ENGINEERING_USER }}
@@ -818,3 +821,44 @@ jobs:
           name: v70-education-results-${{ github.run_id }}
           path: build/education-results/
           if-no-files-found: error
+      - name: Stage the education homepage outside the public directory
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/education-results/index.html
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-private/education-${{ github.run_id }}-${{ github.run_attempt }}
+          strip_components: 2
+      - name: Activate education homepage and verify public response
+        uses: appleboy/ssh-action@v1
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
+          RELEASE: education-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,BASE_URL,RELEASE
+          script: |
+            set -eu
+            cd "$LW_DIR"
+            test "$(basename "$PWD")" = public_html
+            dir="../v70-private/$RELEASE"
+            test -s "$dir/index.html"
+            grep -q 'id="education-scenarios"' "$dir/index.html"
+            cp -p index.html "$dir/previous.html"
+            cp "$dir/index.html" "$dir/next.html"
+            chmod 644 "$dir/next.html"
+            mv "$dir/next.html" index.html
+            base="${BASE_URL:-https://www.happihelp.com}"
+            if curl -fsS --max-time 30 --retry 2 "${base%/}/?release=$RELEASE" -o "$dir/live.html" && cmp -s index.html "$dir/live.html"; then
+              echo "教育版首頁已發布並讀回一致 $RELEASE"
+            else
+              mv "$dir/previous.html" index.html
+              echo '教育版讀回不符，已還原前一頁' >&2
+              exit 1
+            fi

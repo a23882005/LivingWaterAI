@@ -201,7 +201,7 @@
     },
     {
       "path": "../../Family/W8/twse_own_history_source.py",
-      "sha256": "1c990d23c5d37decc1ee07465c18fe67d2aa543151adbe8f956a7fc2cd6f1211"
+      "sha256": "cb6ea4f9f17a56b3307e9dc4a37e66ebcb965a3d653d5ef981f56982c94200ca"
     },
     {
       "path": "../../Family/W8/native_history_source.py",
@@ -221,11 +221,11 @@
     },
     {
       "path": "../../Family/W8/pm_source_document.py",
-      "sha256": "10cff9a63903abb2625762fffa9a1b1ea150e305e1996065752e8e299abe249a"
+      "sha256": "afbfd6d1a0de0bcaf72eb1825b18895803ee37a58b4b3741e54cc3a49354a90c"
     },
     {
       "path": "../../Family/W8/ibkr_daily_source.py",
-      "sha256": "ebcb9aadb98a181f6083ac027619cb95840bb90cff2260199d61cce907301211"
+      "sha256": "3d29a0c7f7a91e7e5daeabe6c1ea89da3df06cfdaa5ffbcb7c51b225971566ec"
     },
     {
       "path": "../../Family/W8/massive_action_source.py",

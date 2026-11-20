@@ -1,10 +1,10 @@
 {
   "schema": "macro18-latest-diagnostics-v1",
-  "report_sha256": "559e7d8519ee0ed8cbd270d60b341a0e1b4818da7ab51613c91f62f97016fa28",
-  "recorded_at": "2026-11-20T08:21:04.800168+00:00",
+  "report_sha256": "6ce9f286d041c906fddb79575e8fe728443c0c70bca6ac00565f861ad4a2d150",
+  "recorded_at": "2026-11-20T22:58:24.820318+00:00",
   "report": {
     "schema": "V70.3/18-macro-collector-v1",
-    "generated_at": "2026-11-20T16:21:04.534654+08:00",
+    "generated_at": "2026-11-21T06:58:24.607806+08:00",
     "note": "僅供研究與人工審核，非V70_live自動更新payload；未驗證項目不得進入風控計算",
     "summary": {
       "OK": 18,
@@ -26,55 +26,73 @@
       "m07": {
         "id": "m07",
         "label": "VIX",
-        "value": 28.44,
+        "value": 35.889999,
         "unit": "",
-        "observation_date": "2026-11-19",
-        "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
-        "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
+        "observation_date": "2026-11-20",
+        "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d",
+        "method": "YAHOO_VIX_CHART 官方或鏡像時間序列",
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:08.972187+00:00",
+        "attempted_at": "2026-11-20T22:57:33.557527+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
-              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-19 observed=2026-11-18; try newer source",
-              "attempted_at": "2026-11-20T08:20:09.494912+00:00",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+              "attempted_at": "2026-11-20T22:57:33.724054+00:00",
               "http_status": 200,
               "content_type": "application/csv",
-              "response_sha256": "c01d627ac148ee237379fa8bacba72890cfdf1d84516a67b2c9998a1be40fcd2"
+              "response_sha256": "5fdb14015c8fee857f1aae7ea54d799fe8e2eebc1b4dcab047cc7ac70e3a78a0"
             },
             {
               "provider": "CBOE_OFFICIAL_VIX",
+              "result": "FAILED",
+              "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+              "attempted_at": "2026-11-20T22:57:33.814878+00:00",
+              "http_status": 200,
+              "content_type": "text/csv",
+              "response_sha256": "0d9c033a1ee06d41832ef98ce17d84910c8c386d890daca5cb24bbf9cd4af8d5"
+            },
+            {
+              "provider": "YAHOO_VIX_CHART",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:09.651652+00:00",
-              "observation_date": "2026-11-19"
+              "verified_at": "2026-11-20T22:57:33.880844+00:00",
+              "observation_date": "2026-11-20"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:09.651652+00:00",
+        "last_verified_at": "2026-11-20T22:57:33.880844+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
               {
                 "provider": "FRED_CSV",
                 "result": "FAILED",
-                "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-19 observed=2026-11-18; try newer source",
-                "attempted_at": "2026-11-20T08:20:09.494912+00:00",
+                "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+                "attempted_at": "2026-11-20T22:57:33.724054+00:00",
                 "http_status": 200,
                 "content_type": "application/csv",
-                "response_sha256": "c01d627ac148ee237379fa8bacba72890cfdf1d84516a67b2c9998a1be40fcd2"
+                "response_sha256": "5fdb14015c8fee857f1aae7ea54d799fe8e2eebc1b4dcab047cc7ac70e3a78a0"
               },
               {
                 "provider": "CBOE_OFFICIAL_VIX",
+                "result": "FAILED",
+                "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+                "attempted_at": "2026-11-20T22:57:33.814878+00:00",
+                "http_status": 200,
+                "content_type": "text/csv",
+                "response_sha256": "0d9c033a1ee06d41832ef98ce17d84910c8c386d890daca5cb24bbf9cd4af8d5"
+              },
+              {
+                "provider": "YAHOO_VIX_CHART",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:09.651652+00:00",
-                "observation_date": "2026-11-19"
+                "verified_at": "2026-11-20T22:57:33.880844+00:00",
+                "observation_date": "2026-11-20"
               }
             ]
           }
@@ -84,15 +102,15 @@
       "m01": {
         "id": "m01",
         "label": "10Y−2Y 殖利率曲線",
-        "value": 0.28,
+        "value": 0.29,
         "unit": "%",
-        "observation_date": "2026-11-19",
+        "observation_date": "2026-11-20",
         "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
         "method": "Treasury official daily_treasury_yield_curve daily CSV",
         "status": "OK",
         "detail": "Matched observation date for nominal 10Y minus 2Y",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:09.651966+00:00",
+        "attempted_at": "2026-11-20T22:57:33.881040+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -104,15 +122,15 @@
       "m08": {
         "id": "m08",
         "label": "10Y 實質殖利率",
-        "value": 2.88,
+        "value": 2.77,
         "unit": "%",
-        "observation_date": "2026-11-19",
+        "observation_date": "2026-11-20",
         "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
         "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
         "status": "OK",
         "detail": "10Y TIPS real yield",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:28.056563+00:00",
+        "attempted_at": "2026-11-20T22:57:50.999176+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -124,37 +142,37 @@
       "m02": {
         "id": "m02",
         "label": "HY OAS",
-        "value": 3.47,
+        "value": 3.52,
         "unit": "%",
-        "observation_date": "2026-11-18",
+        "observation_date": "2026-11-19",
         "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
         "method": "FRED_CSV 官方或鏡像時間序列",
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:47.336840+00:00",
+        "attempted_at": "2026-11-20T22:58:09.127568+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:47.387932+00:00",
-              "observation_date": "2026-11-18"
+              "verified_at": "2026-11-20T22:58:09.143433+00:00",
+              "observation_date": "2026-11-19"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:47.387932+00:00",
+        "last_verified_at": "2026-11-20T22:58:09.143433+00:00",
         "source_evidence": {
           "series": {
             "BAMLH0A0HYM2": [
               {
                 "provider": "FRED_CSV",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:47.387932+00:00",
-                "observation_date": "2026-11-18"
+                "verified_at": "2026-11-20T22:58:09.143433+00:00",
+                "observation_date": "2026-11-19"
               }
             ]
           }
@@ -172,14 +190,14 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:47.388130+00:00",
+        "attempted_at": "2026-11-20T22:58:09.143592+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m04": [
             {
               "provider": "ISM_OFFICIAL_PDF",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:48.120639+00:00",
+              "verified_at": "2026-11-20T22:58:10.096716+00:00",
               "observation_date": "2026-10-01",
               "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade"
             }
@@ -187,14 +205,14 @@
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:48.120639+00:00",
+        "last_verified_at": "2026-11-20T22:58:10.096716+00:00",
         "source_evidence": {
           "series": {
             "ISM_m04": [
               {
                 "provider": "ISM_OFFICIAL_PDF",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:48.120639+00:00",
+                "verified_at": "2026-11-20T22:58:10.096716+00:00",
                 "observation_date": "2026-10-01",
                 "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade"
               }
@@ -215,7 +233,7 @@
         "detail": "歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用",
         "error": "All FRED sources failed for CPILFESL | BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V1: ValueErro",
         "retrieval_error": "All FRED sources failed for CPILFESL | BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10 | BLS_HISTORY_V1: ValueErro",
-        "attempted_at": "2026-11-20T08:20:48.121028+00:00",
+        "attempted_at": "2026-11-20T22:58:10.097095+00:00",
         "attempt_result": "FAILED",
         "source_attempts": {
           "CPILFESL": [
@@ -223,34 +241,34 @@
               "provider": "BLS_OFFICIAL_API",
               "result": "FAILED",
               "error": "BLS_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:48.533981+00:00",
+              "attempted_at": "2026-11-20T22:58:10.249996+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "ea6037595e8dc28073f18b98b06292cc0991d4b128ec4e18f6b6256e32ea9242"
+              "response_sha256": "b8942f7b63605b8afe3075b138d25fa693f12f6e1d56090f7086d036ca98011e"
             },
             {
               "provider": "BLS_HISTORY_V2",
               "result": "FAILED",
               "error": "BLS_HISTORY_V2: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:48.661785+00:00",
+              "attempted_at": "2026-11-20T22:58:10.416127+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "3c5f2f22e4d3b133a3f685d8e18c6b637d5da574aea0f26ae331db5b5faf6d40"
+              "response_sha256": "5c002a23f82b36a3370ea03791cfa3cb42160f1fb379bee9b9ba48b684c7bedb"
             },
             {
               "provider": "BLS_HISTORY_V1",
               "result": "FAILED",
               "error": "BLS_HISTORY_V1: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:48.785820+00:00",
+              "attempted_at": "2026-11-20T22:58:10.572460+00:00",
               "http_status": 200,
               "content_type": "application/json",
-              "response_sha256": "793e2d8058453ac1177a59eec1839680c0c2bdba98c5e1666ed17c7b4ab4f93d"
+              "response_sha256": "29aa9ae2ef625411bedde17a9c3a8c92b9fabe29748d6ce9d9afc92ea48bbf4e"
             },
             {
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:49.294994+00:00",
+              "attempted_at": "2026-11-20T22:58:10.846758+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
               "response_sha256": "5544e6555c4898d9a9c265dce767b9142a4da0dab173e0e7736942a76c3d7cc6"
@@ -259,7 +277,7 @@
               "provider": "FRED_OFFICIAL_API",
               "result": "FAILED",
               "error": "FRED_OFFICIAL_API: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:50.011452+00:00",
+              "attempted_at": "2026-11-20T22:58:11.894563+00:00",
               "http_status": 200,
               "content_type": "application/json; charset=UTF-8",
               "response_sha256": "5544e6555c4898d9a9c265dce767b9142a4da0dab173e0e7736942a76c3d7cc6"
@@ -268,7 +286,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:50.067186+00:00",
+              "attempted_at": "2026-11-20T22:58:11.969914+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -277,7 +295,7 @@
               "provider": "FRED_CSV",
               "result": "FAILED",
               "error": "FRED_CSV: ValueError: Insufficient CPILFESL history; missing 2025-10",
-              "attempted_at": "2026-11-20T08:20:51.076937+00:00",
+              "attempted_at": "2026-11-20T22:58:12.923014+00:00",
               "http_status": 200,
               "content_type": "application/csv",
               "response_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c"
@@ -287,8 +305,8 @@
         "cache_used": true,
         "cache_source": {
           "file": "18_macro_verification.json",
-          "sha256": "69f53c2e49454329e47838ca2f3b1d13707eb9c9c1b46d092ae65e78645fd9cd",
-          "generated_at": "2026-11-19T16:37:53.664907+08:00",
+          "sha256": "068a62c31bac389e0870f5d98fea16594a3de08d1622680cdaa7e605aea000bd",
+          "generated_at": "2026-11-20T16:21:04.534654+08:00",
           "observation_date": "2026-09-01"
         },
         "last_verified_at": "2026-11-10T01:59:39.681268+00:00",
@@ -308,7 +326,7 @@
       "m09": {
         "id": "m09",
         "label": "DXY",
-        "value": 103.802002,
+        "value": 103.839996,
         "unit": "",
         "observation_date": "2026-11-20",
         "source_url": "https://finance.yahoo.com/quote/DX-Y.NYB/",
@@ -316,7 +334,7 @@
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:51.077112+00:00",
+        "attempted_at": "2026-11-20T22:58:12.923157+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -328,7 +346,7 @@
       "m10": {
         "id": "m10",
         "label": "WTI",
-        "value": 82.489998,
+        "value": 83.620003,
         "unit": "USD/bbl",
         "observation_date": "2026-11-20",
         "source_url": "https://finance.yahoo.com/quote/CL=F/",
@@ -336,7 +354,7 @@
         "status": "OK",
         "detail": "CL=F 是 Yahoo WTI 近月期貨連續代號，非 WTI 現貨；換月與實際合約月份須另行核對",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:51.865234+00:00",
+        "attempted_at": "2026-11-20T22:58:13.319336+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -348,15 +366,15 @@
       "m12": {
         "id": "m12",
         "label": "MOVE",
-        "value": 96.040001,
+        "value": 106.311897,
         "unit": "",
-        "observation_date": "2026-11-19",
+        "observation_date": "2026-11-20",
         "source_url": "https://finance.yahoo.com/quote/%5EMOVE/",
         "method": "yfinance Yahoo Finance ^MOVE 日K Close",
         "status": "OK",
         "detail": "Yahoo 指數或債券波動資料；日期為報價日；標的口徑須另行核對",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:51.996602+00:00",
+        "attempted_at": "2026-11-20T22:58:13.424994+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -368,9 +386,9 @@
       "m13": {
         "id": "m13",
         "label": "5Y Breakeven",
-        "value": 2.22,
+        "value": 2.18,
         "unit": "%",
-        "observation_date": "2026-11-19",
+        "observation_date": "2026-11-20",
         "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
         "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
         "status": "OK",
@@ -382,8 +400,8 @@
               {
                 "provider": "US_TREASURY_DIRECT",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:52.135369+00:00",
-                "observation_date": "2026-11-19"
+                "verified_at": "2026-11-20T22:58:13.577415+00:00",
+                "observation_date": "2026-11-20"
               }
             ]
           },
@@ -391,54 +409,54 @@
           "sources": [
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-              "response_sha256": "86f215f227842f5d1b4a732d986c299b6b75f3b871896e4950ac63eaa1ec60bb",
-              "retrieved_at": "2026-11-20T08:20:52.135369+00:00",
-              "response_bytes": 18092
+              "response_sha256": "3a48daf1c889672fedc4643d8c2fc0a46b99eadf4af5a8780b11996eaff11df4",
+              "retrieved_at": "2026-11-20T22:58:13.577415+00:00",
+              "response_bytes": 18173
             },
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-              "response_sha256": "905210141b2e52c0e8315ed499e3ec3406ca06d742310573e31f3e89d40567e0",
-              "retrieved_at": "2026-11-20T08:20:52.137701+00:00",
-              "response_bytes": 8034
+              "response_sha256": "1282b12c4fc8d70c1a20fb9de974d6955ee83ac909ef590b34b5b939725929c9",
+              "retrieved_at": "2026-11-20T22:58:13.579271+00:00",
+              "response_bytes": 8070
             }
           ],
           "legs": {
             "end": {
-              "date": "2026-11-19",
-              "nominal_5y": 4.86,
-              "real_5y": 2.64,
-              "breakeven": 2.22
+              "date": "2026-11-20",
+              "nominal_5y": 4.71,
+              "real_5y": 2.53,
+              "breakeven": 2.18
             }
           },
           "same_date_intersection": true
         },
-        "attempted_at": "2026-11-20T08:20:52.132185+00:00",
+        "attempted_at": "2026-11-20T22:58:13.574838+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "TREASURY_m13": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:52.135369+00:00",
-              "observation_date": "2026-11-19"
+              "verified_at": "2026-11-20T22:58:13.577415+00:00",
+              "observation_date": "2026-11-20"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:52.135369+00:00",
+        "last_verified_at": "2026-11-20T22:58:13.577415+00:00",
         "retrieval_error": ""
       },
       "m17": {
         "id": "m17",
         "label": "5Y Breakeven 近1月變化（pp）",
-        "value": -0.16,
+        "value": -0.21,
         "unit": "pp",
-        "observation_date": "2026-11-19",
+        "observation_date": "2026-11-20",
         "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
         "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
         "status": "OK",
-        "detail": "5Y breakeven change from 2026-10-19",
+        "detail": "5Y breakeven change from 2026-10-20",
         "error": "",
         "source_evidence": {
           "series": {
@@ -446,8 +464,8 @@
               {
                 "provider": "US_TREASURY_DIRECT",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:52.135369+00:00",
-                "observation_date": "2026-11-19"
+                "verified_at": "2026-11-20T22:58:13.577415+00:00",
+                "observation_date": "2026-11-20"
               }
             ]
           },
@@ -455,48 +473,48 @@
           "sources": [
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-              "response_sha256": "86f215f227842f5d1b4a732d986c299b6b75f3b871896e4950ac63eaa1ec60bb",
-              "retrieved_at": "2026-11-20T08:20:52.135369+00:00",
-              "response_bytes": 18092
+              "response_sha256": "3a48daf1c889672fedc4643d8c2fc0a46b99eadf4af5a8780b11996eaff11df4",
+              "retrieved_at": "2026-11-20T22:58:13.577415+00:00",
+              "response_bytes": 18173
             },
             {
               "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-              "response_sha256": "905210141b2e52c0e8315ed499e3ec3406ca06d742310573e31f3e89d40567e0",
-              "retrieved_at": "2026-11-20T08:20:52.137701+00:00",
-              "response_bytes": 8034
+              "response_sha256": "1282b12c4fc8d70c1a20fb9de974d6955ee83ac909ef590b34b5b939725929c9",
+              "retrieved_at": "2026-11-20T22:58:13.579271+00:00",
+              "response_bytes": 8070
             }
           ],
           "legs": {
             "end": {
-              "date": "2026-11-19",
-              "nominal_5y": 4.86,
-              "real_5y": 2.64,
-              "breakeven": 2.22
+              "date": "2026-11-20",
+              "nominal_5y": 4.71,
+              "real_5y": 2.53,
+              "breakeven": 2.18
             },
             "begin": {
-              "date": "2026-10-19",
+              "date": "2026-10-20",
               "nominal_5y": 4.94,
-              "real_5y": 2.56,
-              "breakeven": 2.3800000000000003
+              "real_5y": 2.55,
+              "breakeven": 2.3900000000000006
             }
           },
           "same_date_intersection": true
         },
-        "attempted_at": "2026-11-20T08:20:52.139609+00:00",
+        "attempted_at": "2026-11-20T22:58:13.580868+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "TREASURY_m17": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:52.135369+00:00",
-              "observation_date": "2026-11-19"
+              "verified_at": "2026-11-20T22:58:13.577415+00:00",
+              "observation_date": "2026-11-20"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:52.135369+00:00",
+        "last_verified_at": "2026-11-20T22:58:13.577415+00:00",
         "retrieval_error": ""
       },
       "m14": {
@@ -517,7 +535,7 @@
                 "provider": "FED_NYFED_DIRECT",
                 "result": "OK",
                 "observation_date": "2026-11-18",
-                "verified_at": "2026-11-20T08:20:52.240929+00:00"
+                "verified_at": "2026-11-20T22:58:13.654101+00:00"
               }
             ]
           },
@@ -567,25 +585,25 @@
             "sources": [
               {
                 "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
-                "retrieved_at": "2026-11-20T08:20:52.240929+00:00",
+                "retrieved_at": "2026-11-20T22:58:13.654101+00:00",
                 "response_sha256": "df8d6303f5fcab7a8e618b6e8bb56effbf727e068fe007b07ceb61e96515a125",
                 "response_bytes": 9113202
               },
               {
                 "url": "https://www.newyorkfed.org/aboutthefed/holiday_schedule.html",
-                "retrieved_at": "2026-11-20T08:20:56.288621+00:00",
-                "response_sha256": "1442c39a0b9accb72469f2af8d4c1c94b29b43ca1912bde062174045b89e750b",
-                "response_bytes": 105278
+                "retrieved_at": "2026-11-20T22:58:16.676803+00:00",
+                "response_sha256": "6948beb4301f96f2f3effe03955b2eeb21fac82badc3b8df80042d6ee84924cd",
+                "response_bytes": 105277
               },
               {
                 "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-08-19&endDate=2026-08-19",
-                "retrieved_at": "2026-11-20T08:20:56.625743+00:00",
+                "retrieved_at": "2026-11-20T22:58:16.895628+00:00",
                 "response_sha256": "0ff2ffa58295fa705c4f10b89acab2c755bb4783172d777847f05fb5f0fd50b4",
                 "response_bytes": 2449
               },
               {
                 "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-18&endDate=2026-11-18",
-                "retrieved_at": "2026-11-20T08:20:57.413987+00:00",
+                "retrieved_at": "2026-11-20T22:58:17.796695+00:00",
                 "response_sha256": "41ee4114bebe3aeee0c2d7a7754c3946153a50383f7ed7a8fe07f1e874b1ffbd",
                 "response_bytes": 2186
               }
@@ -620,7 +638,7 @@
             }
           }
         },
-        "attempted_at": "2026-11-20T08:20:52.141804+00:00",
+        "attempted_at": "2026-11-20T22:58:13.582521+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "NETLIQ_DIRECT": [
@@ -628,13 +646,13 @@
               "provider": "FED_NYFED_DIRECT",
               "result": "OK",
               "observation_date": "2026-11-18",
-              "verified_at": "2026-11-20T08:20:52.240929+00:00"
+              "verified_at": "2026-11-20T22:58:13.654101+00:00"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:52.240929+00:00",
+        "last_verified_at": "2026-11-20T22:58:13.654101+00:00",
         "retrieval_error": ""
       },
       "m15": {
@@ -655,24 +673,24 @@
               {
                 "provider": "ISM_OFFICIAL",
                 "result": "FAILED",
-                "attempted_at": "2026-11-20T08:20:57.808187+00:00",
+                "attempted_at": "2026-11-20T22:58:18.373201+00:00",
                 "error": "ISM report date or sector headline mismatch"
               },
               {
                 "provider": "ISM_TRADINGECONOMICS",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:57.934969+00:00",
+                "verified_at": "2026-11-20T22:58:18.412673+00:00",
                 "observation_date": "2026-10-01",
                 "publication_date": "2026-11-04",
-                "response_sha256": "9d5df422f7a94605280f4257086247f4928294e126e59fa1f5f918bec216611b",
+                "response_sha256": "c4641e0f2a8fc4aea2852b84253dce50f3969ccf7b996958c31c5df4156d2427",
                 "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi"
               }
             ]
           },
           "provider": "ISM_TRADINGECONOMICS",
           "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi",
-          "response_sha256": "9d5df422f7a94605280f4257086247f4928294e126e59fa1f5f918bec216611b",
-          "verified_at": "2026-11-20T08:20:57.934969+00:00",
+          "response_sha256": "c4641e0f2a8fc4aea2852b84253dce50f3969ccf7b996958c31c5df4156d2427",
+          "verified_at": "2026-11-20T22:58:18.412673+00:00",
           "observation_period": "2026-10",
           "observation_date_normalization": "MONTH_START_OF_STATED_REFERENCE_MONTH",
           "headline_excerpt": "The ISM Services PMI decreased to 54.5 in October 2026, the lowest in three months, compared to 54.9",
@@ -682,30 +700,30 @@
           "source_origin": "Institute for Supply Management; Trading Economics distribution",
           "original_month_end": "2026-10-31"
         },
-        "attempted_at": "2026-11-20T08:20:57.428294+00:00",
+        "attempted_at": "2026-11-20T22:58:17.807612+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "ISM_m15": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "FAILED",
-              "attempted_at": "2026-11-20T08:20:57.808187+00:00",
+              "attempted_at": "2026-11-20T22:58:18.373201+00:00",
               "error": "ISM report date or sector headline mismatch"
             },
             {
               "provider": "ISM_TRADINGECONOMICS",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:57.934969+00:00",
+              "verified_at": "2026-11-20T22:58:18.412673+00:00",
               "observation_date": "2026-10-01",
               "publication_date": "2026-11-04",
-              "response_sha256": "9d5df422f7a94605280f4257086247f4928294e126e59fa1f5f918bec216611b",
+              "response_sha256": "c4641e0f2a8fc4aea2852b84253dce50f3969ccf7b996958c31c5df4156d2427",
               "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:57.934969+00:00",
+        "last_verified_at": "2026-11-20T22:58:18.412673+00:00",
         "retrieval_error": ""
       },
       "m16": {
@@ -719,7 +737,7 @@
         "status": "OK",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series; supersedes mixed-vintage 99.5/98.5 baseline",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:57.935327+00:00",
+        "attempted_at": "2026-11-20T22:58:18.412986+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -743,7 +761,7 @@
           "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000?startyear=2024&endyear=2026",
           "series_id": "LNS14000000",
           "published_observation_date": "2026-10-01",
-          "retrieved_at_utc": "2026-11-20T08:21:02.257740+00:00",
+          "retrieved_at_utc": "2026-11-20T22:58:22.580691+00:00",
           "response_sha256": "f09d40a91585378accf6c4cc10722f77ceedbfccee03af26bc1e481b571479ae",
           "bls_observation_month": "2026-10",
           "status": "MISSING_MONTHS",
@@ -751,28 +769,28 @@
             "2025-10"
           ]
         },
-        "attempted_at": "2026-11-20T08:21:02.054824+00:00",
+        "attempted_at": "2026-11-20T22:58:22.486971+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "SAHMREALTIME": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-20T08:21:02.121509+00:00",
+              "verified_at": "2026-11-20T22:58:22.502380+00:00",
               "observation_date": "2026-10-01"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:21:02.121509+00:00",
+        "last_verified_at": "2026-11-20T22:58:22.502380+00:00",
         "source_evidence": {
           "series": {
             "SAHMREALTIME": [
               {
                 "provider": "FRED_CSV",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:21:02.121509+00:00",
+                "verified_at": "2026-11-20T22:58:22.502380+00:00",
                 "observation_date": "2026-10-01"
               }
             ]
@@ -791,36 +809,36 @@
         "status": "OK",
         "detail": "",
         "error": "",
-        "attempted_at": "2026-11-20T08:21:02.258577+00:00",
+        "attempted_at": "2026-11-20T22:58:22.581428+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "UNRATE": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-20T08:21:03.219471+00:00",
+              "verified_at": "2026-11-20T22:58:23.588113+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
               "series_id": "LNS14000000",
-              "response_sha256": "f09d40a91585378accf6c4cc10722f77ceedbfccee03af26bc1e481b571479ae",
+              "response_sha256": "fef29044f4d886e93a0863e39d2d0fb62df12a0a6768d1ddd35b28347eb2ed65",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:21:03.219471+00:00",
+        "last_verified_at": "2026-11-20T22:58:23.588113+00:00",
         "source_evidence": {
           "series": {
             "UNRATE": [
               {
                 "provider": "BLS_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:21:03.219471+00:00",
+                "verified_at": "2026-11-20T22:58:23.588113+00:00",
                 "observation_date": "2026-10-01",
                 "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
                 "series_id": "LNS14000000",
-                "response_sha256": "f09d40a91585378accf6c4cc10722f77ceedbfccee03af26bc1e481b571479ae",
+                "response_sha256": "fef29044f4d886e93a0863e39d2d0fb62df12a0a6768d1ddd35b28347eb2ed65",
                 "source_attribution": "Source: U.S. Bureau of Labor Statistics"
               }
             ]
@@ -839,36 +857,36 @@
         "status": "OK",
         "detail": "注意歷史值可能修訂",
         "error": "",
-        "attempted_at": "2026-11-20T08:21:03.219718+00:00",
+        "attempted_at": "2026-11-20T22:58:23.588296+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "PAYEMS": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-20T08:21:04.238217+00:00",
+              "verified_at": "2026-11-20T22:58:24.586578+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
               "series_id": "CES0000000001",
-              "response_sha256": "318c452e3c3793ff7e0e3e56c9ae307dcedc971b925adb4fc6fa0e7ecebd33c0",
+              "response_sha256": "1a60bc8c0d0c486fc13b37ed1bdaf2dcf1096c292c20d85db368d1b8fd8d9e94",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:21:04.238217+00:00",
+        "last_verified_at": "2026-11-20T22:58:24.586578+00:00",
         "source_evidence": {
           "series": {
             "PAYEMS": [
               {
                 "provider": "BLS_OFFICIAL_API",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:21:04.238217+00:00",
+                "verified_at": "2026-11-20T22:58:24.586578+00:00",
                 "observation_date": "2026-10-01",
                 "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
                 "series_id": "CES0000000001",
-                "response_sha256": "318c452e3c3793ff7e0e3e56c9ae307dcedc971b925adb4fc6fa0e7ecebd33c0",
+                "response_sha256": "1a60bc8c0d0c486fc13b37ed1bdaf2dcf1096c292c20d85db368d1b8fd8d9e94",
                 "source_attribution": "Source: U.S. Bureau of Labor Statistics"
               }
             ]
@@ -879,55 +897,73 @@
       "s03": {
         "id": "s03",
         "label": "VIX 短期",
-        "value": 28.44,
+        "value": 35.889999,
         "unit": "",
-        "observation_date": "2026-11-19",
-        "source_url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+        "observation_date": "2026-11-20",
+        "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d",
         "method": "與 m07 同步",
         "status": "OK",
         "detail": "同一 VIX 數列",
         "error": "",
-        "attempted_at": "2026-11-20T08:20:08.972187+00:00",
+        "attempted_at": "2026-11-20T22:57:33.557527+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {
           "VIXCLS": [
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
-              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-19 observed=2026-11-18; try newer source",
-              "attempted_at": "2026-11-20T08:20:09.494912+00:00",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+              "attempted_at": "2026-11-20T22:57:33.724054+00:00",
               "http_status": 200,
               "content_type": "application/csv",
-              "response_sha256": "c01d627ac148ee237379fa8bacba72890cfdf1d84516a67b2c9998a1be40fcd2"
+              "response_sha256": "5fdb14015c8fee857f1aae7ea54d799fe8e2eebc1b4dcab047cc7ac70e3a78a0"
             },
             {
               "provider": "CBOE_OFFICIAL_VIX",
+              "result": "FAILED",
+              "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+              "attempted_at": "2026-11-20T22:57:33.814878+00:00",
+              "http_status": 200,
+              "content_type": "text/csv",
+              "response_sha256": "0d9c033a1ee06d41832ef98ce17d84910c8c386d890daca5cb24bbf9cd4af8d5"
+            },
+            {
+              "provider": "YAHOO_VIX_CHART",
               "result": "OK",
-              "verified_at": "2026-11-20T08:20:09.651652+00:00",
-              "observation_date": "2026-11-19"
+              "verified_at": "2026-11-20T22:57:33.880844+00:00",
+              "observation_date": "2026-11-20"
             }
           ]
         },
         "cache_used": false,
         "cache_source": null,
-        "last_verified_at": "2026-11-20T08:20:09.651652+00:00",
+        "last_verified_at": "2026-11-20T22:57:33.880844+00:00",
         "source_evidence": {
           "series": {
             "VIXCLS": [
               {
                 "provider": "FRED_CSV",
                 "result": "FAILED",
-                "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-19 observed=2026-11-18; try newer source",
-                "attempted_at": "2026-11-20T08:20:09.494912+00:00",
+                "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+                "attempted_at": "2026-11-20T22:57:33.724054+00:00",
                 "http_status": 200,
                 "content_type": "application/csv",
-                "response_sha256": "c01d627ac148ee237379fa8bacba72890cfdf1d84516a67b2c9998a1be40fcd2"
+                "response_sha256": "5fdb14015c8fee857f1aae7ea54d799fe8e2eebc1b4dcab047cc7ac70e3a78a0"
               },
               {
                 "provider": "CBOE_OFFICIAL_VIX",
+                "result": "FAILED",
+                "error": "CBOE_OFFICIAL_VIX: ValueError: VIX_LAGGED_SESSION: expected=2026-11-20 observed=2026-11-19; try newer source",
+                "attempted_at": "2026-11-20T22:57:33.814878+00:00",
+                "http_status": 200,
+                "content_type": "text/csv",
+                "response_sha256": "0d9c033a1ee06d41832ef98ce17d84910c8c386d890daca5cb24bbf9cd4af8d5"
+              },
+              {
+                "provider": "YAHOO_VIX_CHART",
                 "result": "OK",
-                "verified_at": "2026-11-20T08:20:09.651652+00:00",
-                "observation_date": "2026-11-19"
+                "verified_at": "2026-11-20T22:57:33.880844+00:00",
+                "observation_date": "2026-11-20"
               }
             ]
           }
@@ -937,7 +973,7 @@
       "s04": {
         "id": "s04",
         "label": "CNN Fear & Greed",
-        "value": 16.704762,
+        "value": 9.673684,
         "unit": "",
         "observation_date": "2026-11-20",
         "source_url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
@@ -945,7 +981,7 @@
         "status": "OK",
         "detail": "來源為 CNN 非公開保證 API",
         "error": "",
-        "attempted_at": "2026-11-20T08:21:04.238991+00:00",
+        "attempted_at": "2026-11-20T22:58:24.587180+00:00",
         "attempt_result": "SUCCESS",
         "source_attempts": {},
         "cache_used": false,
@@ -965,7 +1001,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-20T08:20:59.266058+00:00"
+        "retrieved_at": "2026-11-20T22:58:19.564669+00:00"
       },
       {
         "observation_date": "2026-08-01",
@@ -976,7 +1012,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-20T08:21:00.185674+00:00"
+        "retrieved_at": "2026-11-20T22:58:20.549236+00:00"
       },
       {
         "observation_date": "2026-09-01",
@@ -987,7 +1023,7 @@
         "status": "OK",
         "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
         "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-        "retrieved_at": "2026-11-20T08:21:01.084573+00:00"
+        "retrieved_at": "2026-11-20T22:58:21.463021+00:00"
       }
     ]
   }

@@ -74,6 +74,63 @@ def build(site, template, output):
             "asOf":feed["asOf"], "scenarios":scenarios,
             "indicators":rows.all_inner_texts(), "indicatorData":indicators
         },ensure_ascii=False),encoding="utf-8")
+        # Serialize the approved public layout after replacing its fixture script.
+        page.locator("script:not([src])").evaluate_all("nodes=>nodes.forEach(n=>n.remove())")
+        for ident in ("v703-rolling15", "v703-research-charts", "v703-wallstreet-observation"):
+            source = model.locator("#" + ident)
+            fragment = source.evaluate("""node => {
+                const copy = node.cloneNode(true);
+                copy.querySelectorAll('script,iframe,object,embed').forEach(n=>n.remove());
+                for (const el of [copy,...copy.querySelectorAll('*')])
+                    for (const attr of [...el.attributes])
+                        if (attr.name.startsWith('on') || attr.name.startsWith('data-'))
+                            el.removeAttribute(attr.name);
+                return copy.innerHTML;
+            }""")
+            page.locator("#" + ident).evaluate("(node,html)=>node.innerHTML=html", fragment)
+        for ident in ("bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield",
+                      "bond-score-display", "macro-safety-val", "macro-zone-text"):
+            value = model.locator("#" + ident).text_content()
+            page.locator("#" + ident).evaluate("(node,value)=>node.textContent=value", value)
+        page.locator("#edu-indicators caption").evaluate(
+            "(node,stamp)=>node.textContent='資料時間　'+stamp", feed["asOf"])
+        counter = model.locator("script").evaluate_all(
+            "nodes=>nodes.map(n=>n.textContent).find(s=>s.includes('async function showViewCounts'))")
+        if not counter:
+            raise ValueError("Missing approved view counter")
+        page.locator("#v70-view-counts").evaluate("(e)=>e.textContent='瀏覽統計載入中'")
+        page.evaluate("""([scenarios,counter]) => {
+            const data=document.createElement('script');
+            data.type='application/json';
+            data.id='education-scenarios';
+            data.textContent=JSON.stringify(scenarios);
+            document.body.append(data);
+            const counts=document.createElement('script');
+            counts.textContent=counter;
+            document.body.append(counts);
+        }""", [scenarios, counter])
+        display = """const choices=JSON.parse(document.getElementById('education-scenarios').textContent);
+const el=id=>document.getElementById(id);
+const labels={S1:'分散核心股票',S2:'成長集中股票',S3:'高風險股票',B1:'超短公債',
+ B2:'中短天期投資級公司債',B3:'長天期美國公債',B4:'信用敏感公司債',C0:'待投入資金'};
+function display(){
+ const v=choices[el('family-life').value+'/'+el('family-style').value];
+ for(const key of ['stock','bond','cash']) el('total-'+key).textContent=v?v[key]+'%':'—';
+ for(const key of ['stock','bond']) el('strategic-'+key).value=v?v.strategic[key]:'';
+ for(const id of ['allocation-list','v703-result']){
+  const target=el(id);target.replaceChildren();
+  if(!v){target.textContent='本期暫停正式配置';continue;}
+  for(const [key,label] of Object.entries(labels)){
+   const row=document.createElement('div');row.textContent=label+'　'+v.classes[key]+'%';target.append(row);
+  }
+ }
+}
+for(const id of ['family-life','family-style'])el(id).addEventListener('change',display);
+display();"""
+        page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)
+        if page.locator("#education-sources li").count() != 13:
+            raise ValueError("Expected thirteen attributions")
+        (output / "index.html").write_text(page.content(), encoding="utf-8")
         browser.close()
 
 

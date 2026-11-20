@@ -4932,10 +4932,7 @@ if (recBlack) {
 (async function showViewCounts() {
   const output = document.getElementById('v70-view-counts');
   try {
-    const config = await fetch('./v70-counter-config.json', {cache: 'no-store'});
-    if (!config.ok) throw Error();
-    const {endpoint} = await config.json();
-    if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(endpoint)) throw Error();
+    const endpoint = 'https://script.google.com/macros/s/AKfycbwSd5yYr-bUzMgSq9c8T6Q3cJW02g7nLJq_UxwpxdU9qMlwobzvxndxDGiEivsSMYd9/exec';
     const response = await fetch(endpoint, {method: 'POST', credentials: 'omit', body: new URLSearchParams({event: 'v70-view'})});
     const counts = await response.json();
     const fields = [['全部','total'],['本月','month'],['本週','week'],['本日','day']];

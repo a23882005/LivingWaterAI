@@ -719,3 +719,27 @@ jobs:
             if [ "$attempt" -eq 3 ]; then echo "Daily Macro Safety archive publish failed" >&2; exit 1; fi
             sleep "$((attempt * 2))"
           done
+
+  education-results:
+    needs: build-and-deploy
+    if: github.ref == 'refs/heads/main' && needs.build-and-deploy.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: v70-3-27-qa-${{ github.run_id }}
+          path: build/private-education-input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'playwright>=1.50,<2' && python -m playwright install chromium --with-deps
+      - run: python scripts/build_v70_education_results.py build/private-education-input education/v70-education-demo.html build/education-results
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v70-education-results-${{ github.run_id }}
+          path: build/education-results/education-results.json
+          if-no-files-found: error

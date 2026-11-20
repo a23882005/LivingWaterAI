@@ -1,0 +1,37 @@
+name: V70 counter browser acceptance
+on:
+  push:
+    branches: [codex/v70-pageviews-20261121]
+    paths: ['.github/workflows/v70-counter-acceptance.yml']
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install playwright && python -m playwright install chromium
+      - name: Open both candidate pages against the deployed service
+        shell: python
+        run: |
+          import functools, re, threading
+          from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+          from urllib.parse import quote
+          from playwright.sync_api import sync_playwright
+          server = ThreadingHTTPServer(('127.0.0.1',0), functools.partial(SimpleHTTPRequestHandler, directory='系統工程/總經V70'))
+          threading.Thread(target=server.serve_forever, daemon=True).start()
+          rows = []
+          with sync_playwright() as p:
+              for path in ['V70-3-27.html','教育版/V70-3-27-education-candidate.html']:
+                  browser = p.chromium.launch()
+                  page = browser.new_page()
+                  page.goto(f'http://127.0.0.1:{server.server_port}/'+quote(path), wait_until='commit')
+                  item = page.locator('#v70-view-counts')
+                  page.get_by_text(re.compile(r'^全部 [0-9]')).wait_for(timeout=90000)
+                  values = [int(n.replace(',','')) for n in re.findall(r'[0-9][0-9,]*',item.inner_text())]
+                  assert len(values) == 4, values
+                  print(path, values, flush=True)
+                  rows.append(values)
+                  browser.close()
+          assert rows[1][0] == rows[0][0]+1, rows

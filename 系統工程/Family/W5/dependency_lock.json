@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "20557b35fdfc0a0c54994d27a0815bae788d8a451e0f0b7c7ec3ce92622b1588"
+    "sha256": "1dcdd95498caa0f27867e259f29cb5f3aad96b1d6010f397b0793d37a59339c7"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -415,7 +415,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_chain.py",
-    "sha256": "32cd3baf3129b674131b6b8af7e125ba2221834661c43479b76fbf4713f995d3"
+    "sha256": "c903ae250b16873772fa8a463b813d564ba45ceaeaca8f7d4f0e2ccb61522e8a"
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
@@ -664,5 +664,10 @@
     "path": "系統工程/Family/W8/owner_qqq_financial.py",
     "sha256": "d1fc4ead3dfc2d2f33a77e7bd67f858b3b18a3762fc80473c04eaebafad7dd92",
     "reason": "Owner Joseph/QQQ 20261120 scoped source adapter; original native equations and aggregate guard"
+  },
+  {
+    "path": "系統工程/Family/W8/member_v82_advice.py",
+    "sha256": "5777751fba4c8d5cf177a4f68140d58cbd962b5a1b343b9ccaeab0af179dc074",
+    "reason": "Menu04 V82 allocation advice based on existing member inputs"
   }
 ]

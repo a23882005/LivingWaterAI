@@ -99,7 +99,12 @@ def complete_report(report,request,config,root):
     """Called after immutable component-source replay, once per requested run."""
     descriptors=config.get('financial_sources') or {}
     producers=config.get('financial_producer_sources') or {}
-    if not descriptors and not producers:return deepcopy(report)
+    has_advice_inputs = report.get('current_portfolio_reference') is not None
+    if not descriptors and not producers:
+        if has_advice_inputs:
+            from member_v82_advice import deliver
+            return deliver(report, root)
+        return deepcopy(report)
     symbols={r['symbol'] for r in report['positions']}
     if (set(descriptors)|set(producers))-symbols:raise PermissionError('MEMBER_FINANCIAL_ASSET_OUTSIDE_APPROVED_UNIVERSE')
     if set(descriptors)&set(producers):raise PermissionError('MEMBER_FINANCIAL_DUPLICATE_PRODUCER_PATH')
@@ -234,4 +239,7 @@ def complete_report(report,request,config,root):
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
         out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}
     out['report_digest']=digest({k:v for k,v in out.items() if k!='report_digest'})
+    if has_advice_inputs:
+        from member_v82_advice import deliver
+        return deliver(out, root)
     return out

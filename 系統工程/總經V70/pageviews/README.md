@@ -1,3 +1,5 @@
-兩頁共用同一個 Apps Script 網頁應用程式。將 Code.gs 放進專用 Apps Script 專案，以擁有者身分執行，授予匿名訪客存取網頁應用程式的權限。程式只在指令碼屬性儲存總數、當期數及日期鍵。
+V70 正式頁及教育候選頁的瀏覽統計共用一個 Apps Script 網頁應用程式，兩頁直接使用部署網址。計次服務只儲存總計、當期計數與日期鍵。台灣時間每日零點、週一及每月一日切換期間。
 
-在每個頁面的同一目錄發布 v70-counter-config.json，內容為 {"endpoint":"部署所得的完整 /exec 網址"}。測試環境請使用另一個 Apps Script 專案，以隔離計數。啟用時兩頁各用不同瀏覽器開啟，核對相同統計增加兩次。公開端點以收到的請求計次，含重新整理及執行 JavaScript 的自動瀏覽。
+部署版本 1：https://script.google.com/macros/s/AKfycbwSd5yYr-bUzMgSq9c8T6Q3cJW02g7nLJq_UxwpxdU9qMlwobzvxndxDGiEivsSMYd9/exec
+
+每次成功送達的瀏覽事件計一次，包含重新整理、自動化瀏覽和驗收。部署前的歷史訪問未匯入。修改服務請更新原部署版本以保留網址。PR 分支的瀏覽器驗收使用兩個獨立 Chromium 程序讀取兩個候選頁，並檢查總計增量。

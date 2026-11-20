@@ -65,7 +65,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
-      "sha256": "5451a19df1e028267df705faae04fd92f76f5044436d2e81d779cc5340e8d191"
+      "sha256": "32cd3baf3129b674131b6b8af7e125ba2221834661c43479b76fbf4713f995d3"
     },
     {
       "path": "../../Family/W8/member_funding_summary.py",
@@ -73,11 +73,11 @@
     },
     {
       "path": "../../Family/W8/native_asset_source.py",
-      "sha256": "c6fb9ba0ec4ddc43ea982f8eef1f8e0ee5fa74c33bbdf626ef94464497283b57"
+      "sha256": "7f9945a70edf9e263ee0b3b4a68d38c734be52932d1e5c5bda5fe461cc61a9bd"
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "9ccc7779a39ac0015c61ae9a5148ea5eb98a859d74be15564a96ed5a82c7987a"
+      "sha256": "ab75b9fdaade0edf11858e64359bc66397abb607cb71d2630f8795638200c57f"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
@@ -209,7 +209,7 @@
     },
     {
       "path": "../../Family/W8/v82_approved_context.py",
-      "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59"
+      "sha256": "a728ca5a01b3d135c0263420e3bd012b5b69f625c09a7582fefe32937a09bac8"
     },
     {
       "path": "../../Family/W8/replacement_order_source.py",

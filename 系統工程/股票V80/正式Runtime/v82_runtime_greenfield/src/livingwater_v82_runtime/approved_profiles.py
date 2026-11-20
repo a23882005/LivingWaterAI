@@ -200,9 +200,13 @@ def apply_restrictions(states, restrictions, *, snapshot_id, facts=None):
 
 
 def resolve_approved_stage(*, mode, left_result, q_value, range_result, required_facts,
-                           restrictions, snapshot_id, constraint_facts=None):
+                           restrictions, snapshot_id, constraint_facts=None,inapplicable_required_facts=()):
     mode=NormalDeploymentMode(mode)
     required={'asset_identity','primary_framework','fundamentals_viable','valuation_legal'}
+    omitted=set(inapplicable_required_facts)
+    if omitted-{'fundamentals_viable'}:raise ValueError('STAGE_INAPPLICABLE_FACT_NOT_SUPPORTED')
+    required-=omitted
+    required_facts={k:v for k,v in required_facts.items() if k not in omitted}
     unknown=sorted(required-set(required_facts))+sorted(k for k,v in required_facts.items() if truth(v) is P.UNKNOWN)
     rejected=sorted(k for k,v in required_facts.items() if truth(v) is P.FALSE)
     if mode is NormalDeploymentMode.LEFT_OVERWEIGHT:
@@ -224,9 +228,11 @@ def resolve_approved_stage(*, mode, left_result, q_value, range_result, required
     reasons=[*('STAGE_REQUIRED_UNKNOWN:'+k for k in unknown),*('STAGE_REQUIRED_FALSE:'+k for k in rejected)]
     if stage is None:reasons.append(selection['status'] if not unknown and not rejected else 'STAGE_NECESSARY_FACTS_UNRESOLVED')
     decision=DeploymentDecision(mode,stage or 'UNKNOWN',STAGE_RATE_PCT[stage]/100 if stage else None,tuple(reasons))
-    return decision,{'profile_version':VERSION,'selection':selection,'required_unknown_fields':unknown,
+    result={'profile_version':VERSION,'selection':selection,'required_unknown_fields':unknown,
         'required_false_fields':rejected,'candidate_stage_evidence':{str(k):v.value for k,v in states.items()},
         'stage_restrictions':audit,'snapshot_id':snapshot_id}
+    if omitted:result['inapplicable_required_facts']=sorted(omitted)
+    return decision,result
 
 
 def select_with_entries(*, runaway_up, runaway_down, right, left):

@@ -216,7 +216,12 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     value_level=valuation['level'];value_zone=(value_level in ('CHEAP','NORMAL')) if legal else None
     # Required ETF structural facts are distinct from the company-thesis score
     # and the sign of aggregate earnings growth. The source facts are absent.
-    viability=(etf_viability_audit(row,request) if row['native_product_identity'].get('asset_type')!='INDIVIDUAL_STOCK' else
+    from owner_qqq_scope import read as read_owner_rule
+    owner_rule=read_owner_rule(approved_source_descriptor,request,row['symbol'])
+    viability=({'leaves':{'ETF_VIABLE_01':{'truth':'NOT_APPLICABLE'}},
+        'status':'NOT_APPLICABLE_OWNER_RULE','result':'NOT_APPLICABLE','verified':False,'owner_rule':owner_rule,
+        'call_trace':['OWNER.Joseph_QQQ.ETF_VIABLE_01_NOT_APPLICABLE']} if owner_rule else
+        etf_viability_audit(row,request) if row['native_product_identity'].get('asset_type')!='INDIVIDUAL_STOCK' else
         {'leaves':{'preregistered_thesis_contract':{'truth':'UNKNOWN'}},
             'call_trace':['V82.CMR6.individual_thesis_input_required'],'scope':'INDIVIDUAL_STOCK__NOT_ETF_VIABILITY'})
     fundamental_facts={k:tri(v['truth']) for k,v in viability['leaves'].items()}
@@ -253,6 +258,7 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         decision=evaluate(approved_context,core)
     right=tri(decision['market_predicates']['right'])
     fundamental=tri(approved_context['fundamentals_viable'])
+    if owner_rule is not None:fundamental=True # omit the inapplicable term
     modes={k:deepcopy(decision[k]) for k in ('market_predicates','left_inputs','selected_mode','formal_stage','canonical_target_rate','call_trace')}
     modes.update(approved_v10_context=approved_context,approved_v10_analysis=decision,
         native_stage_result={'mode':decision['selected_mode'],'stage':decision['formal_stage'],
@@ -277,6 +283,7 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         'runaway_up':truth(up),'runaway_down':truth(down)}
     modes['four_modes']['Base']['entry_eligibility']=truth(base_entry)
     modes['four_modes']['Base']['entry_reasons']=['APPROVED_LONG_TERM_ALLOCATION','FUNDAMENTALS','LEGAL_VALUATION','CREDIT_SAFETY','HARD_GATE','NOT_RUNAWAY_DOWN']
+    if owner_rule is not None:modes['four_modes']['Base']['entry_reasons'].remove('FUNDAMENTALS')
     orders=order_source(request,row.get('owner_order_confirmation'),broker_orders=row.get('broker_order_source'),
         buy_confirmation=row.get('owner_buy_confirmation'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
@@ -328,13 +335,17 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
             source_core_permission=bool(core['permission']['new_buy_order_permission']))
         permission['reason_codes'].append('NO_ADDITIONAL_BUY_TARGET_AUTHORIZED')
     groups=gap_matrix(row,target,coverage,orders,left_audit=left_audit)
+    if owner_rule is not None:
+        for gap_item in groups.get('fundamentals_and_events',[]):
+            if gap_item['field']=='ETF viable structural facts':
+                gap_item.update(gap_kind='NOT_APPLICABLE_OWNER_RULE',affects=[],repair=None)
     result={'schema_version':'Family.W8.FormalModeConclusion.v1','status':'INCOMPLETE_REQUIRED_FACTS',
         'binding':{'client_id':request['client_id'],'run_id':request['run_id'],
             'owner':deepcopy(request['owner']),'source_db_sha256':request['client_snapshot']['payload']['source_sha256'],
             'request_digest':digest(request),'core_input_digest':digest(row['core_observation']['actual_inputs'])},
         'classification':deepcopy(row['native_product_identity']),'scenario_class':deepcopy(row['scenario_class']),
         'valuation_validity':{'native_result':deepcopy(valuation),'source_metrics':deepcopy(row['valuation_observations'])},
-        'fundamentals_viability_facts':{k:truth(v) for k,v in fundamental_facts.items()},
+        'fundamentals_viability_facts':{k:'NOT_APPLICABLE' if owner_rule else truth(v) for k,v in fundamental_facts.items()},
         'etf_viability_audit':viability if row['native_product_identity'].get('asset_type')!='INDIVIDUAL_STOCK' else None,
         'individual_thesis_audit':viability if row['native_product_identity'].get('asset_type')=='INDIVIDUAL_STOCK' else None,
         'left_safety_inputs':{'hard_gate_clear':truth(gate_clear),'not_runaway_down':truth(neg(down)),

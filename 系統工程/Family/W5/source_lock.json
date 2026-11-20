@@ -421,10 +421,10 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_profiles.py",
-      "sha256": "b8e5759f03475d022b6642e7efea6dd14744de8c3d9fe7c82b78ff4ffeb876a5",
-      "git_blob_sha": "7a3e33f85cb064b178ab5c3d79302b26cd1e4f21",
-      "size": 14288,
-      "family_revision": "OWNER_20261030_V82_COMPLETION__APPROVED_V1_0_PV2_PV3_CMR7",
+      "sha256": "3f23eb50b92b732af3f105f5f5e0cfe6873ebc2099b1cef2bf8caf6f28ac08cd",
+      "git_blob_sha": "23e3e384589d24368538b86f2a8f01c4c6dc2143",
+      "size": 14649,
+      "family_revision": "OWNER_JOSEPH_QQQ_20261120_SCOPED_FUND_STRUCTURE_NOT_APPLICABLE",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",
@@ -453,10 +453,10 @@
     },
     {
       "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/approved_decision.py",
-      "sha256": "1724f13882d30d41943eff5e3d936699a3136e54045de9dd2b9b71464cac06da",
-      "git_blob_sha": "cfa8197402a5014725ba9ba23b76117db9741719",
-      "size": 12278,
-      "family_revision": "PM_20261104_6610364592_PV2_MARKET_IDENTITY_CURRENCY",
+      "sha256": "c568562d1ac7d9a96c0bdeb06de926f651ff04fd8bbe46255e57824597cd624e",
+      "git_blob_sha": "42e940963c21a0ef52378bfb441a0a3140bb8f54",
+      "size": 13362,
+      "family_revision": "OWNER_JOSEPH_QQQ_20261120_SCOPED_FUND_STRUCTURE_NOT_APPLICABLE",
       "authorization": {
         "specification_sha256": "816adc16dc23d982a327e0c99a8cfba992a5fb3a58cfeb5ec10bcdf61cdc9a4f",
         "handoff_sha256": "93aff27cd3530ce4555e233ff7a26cc1436f79d1e8f4163943970503b7822301",

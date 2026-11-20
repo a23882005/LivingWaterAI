@@ -101,6 +101,8 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
     classes=dict(zip(FORMAL_CLASSES,CUTS))
     identity=row['native_product_identity'];core=row['core_observation']['result'];market=row['market']
     approved=market.get('approved_technical') or {};extra=read_source(source_descriptor,request,row['symbol'])
+    from owner_qqq_scope import read as read_owner_rule,runtime_rule
+    owner_rule=read_owner_rule(source_descriptor,request,row['symbol'])
     metric=core['valuation'].get('primary_metric')
     selected=[r for r in row['core_observation']['actual_inputs']['valuation_metrics'] if r.get('metric_name')==metric]
     credit=(row.get('macro_observations') or {}).get('credit',{}).get('risk_level')
@@ -166,6 +168,9 @@ def build(root,row,request,*,fundamental,price_conditions,left_safety,source_des
         # safety predicates. Those remain the original qualified input routes.
     if extra.get('native_history_source_readback') is not None:
         context['source_binding']['native_history_source_readback']=deepcopy(extra['native_history_source_readback'])
+    if owner_rule is not None:
+        context['owner_scoped_rule']=runtime_rule(owner_rule)
+        context['fundamentals_viable_applicability']='NOT_APPLICABLE'
     return context,evaluate(context,core)
 
 

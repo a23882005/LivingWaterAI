@@ -135,6 +135,22 @@ def complete_report(report,request,config,root):
                 if attempt.get('public_history_source_binding',{}).get('digest')!=row['history_source_qualification']['digest']:
                     raise PermissionError('MEMBER_FINANCIAL_PUBLIC_HISTORY_SOURCE_REPLAY_MISMATCH')
             row['financial_source_attempt']=attempt;row['call_trace']+=attempt['call_trace']
+            scoped=attempt.get('owner_scoped_financial_result')
+            if scoped is not None:
+                if any(scoped.get(k)!=request.get(k) for k in ('client_id','run_id','evaluation_at')) or scoped.get('asset_id')!=row['symbol']:
+                    raise PermissionError('OWNER_QQQ_FINANCIAL_RESULT_BINDING_MISMATCH')
+                row['owner_scoped_financial_result']=deepcopy(scoped)
+                if scoped['status']=='SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY':
+                    from owner_qqq_scope import read as read_owner_rule
+                    child={**deepcopy(request),'owner':deepcopy(scoped['owner'])}
+                    actual_rule=read_owner_rule(scoped['owner_rule']['source_descriptor'],child,row['symbol'])
+                    if (actual_rule!=scoped['owner_rule'] or scoped.get('source_db_sha256')!=request['client_snapshot']['payload']['source_sha256']
+                        or scoped.get('result_digest')!=digest({k:v for k,v in scoped.items() if k!='result_digest'})
+                        or scoped['final_amount']!={'amount':'0','currency':'USD'} or scoped['final_quantity']!='0'):
+                        raise PermissionError('OWNER_QQQ_FINANCIAL_SOURCE_REPLAY_MISMATCH')
+                    row['proposed_amount']=deepcopy(scoped['final_amount'])
+                    row['proposed_quantity']=scoped['final_quantity']
+                    out['summary']['owner_scoped_financial_completed']=out['summary'].get('owner_scoped_financial_completed',0)+1
             row['missing_inputs']=[m for m in row['missing_inputs'] if m['field']!='work3/C7/funding/execution_constraints']
             if descriptor is None:
                 for issue in attempt['issues']:

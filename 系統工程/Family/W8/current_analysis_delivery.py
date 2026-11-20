@@ -31,6 +31,8 @@ def deliver(row,request,*,repo_root,cash_trial=None,investment=None,tactical=Non
         'Left':['fundamentals_long_term_viable','left_safety_negations_absent'],
         'Right':['fundamentals_long_term_viable','credit/safety'],
         'Trend':[] if predicate.get('runaway_up')=='FALSE' else ['applicable_trend_stage_inputs']}
+    if (conclusion.get('approved_v10_context') or {}).get('fundamentals_viable_applicability')=='NOT_APPLICABLE':
+        dependencies={k:[v for v in values if v!='fundamentals_long_term_viable'] for k,values in dependencies.items()}
     for name,mode in modes.items():
         state=mode.get('market_predicate',mode.get('selection_predicate','UNKNOWN'))
         mode['unresolved_dependencies']=dependencies[name] if state=='UNKNOWN' else []

@@ -143,7 +143,17 @@ def futures(raw,at,known_by=None):
         'scope':'SAME_SIX_MONTH_CONTRACT_MONTHLY_AVERAGE_RATE__NOT_FOMC_PROBABILITY'}
 
 
-def read(source,evaluation_at):
+def read(source,evaluation_at,*,stock_owner_scope=None):
+    if stock_owner_scope is not None:
+        from owner_qqq_scope import read as read_owner_rule
+        proof=read_owner_rule(stock_owner_scope['descriptor'],stock_owner_scope['request'],'QQQ')
+        if proof is None:raise PermissionError('V75_STOCK_OWNER_RULE_REQUIRED')
+        # This stock scope neither opens the manifest nor reads any futures.
+        # StockQ tenors are yield background, never PRED-002 forecasts.
+        return {'schema_version':'Family.W8.StockInterestBackground.v1',
+            'source_reference':proof['stockq_reference'],'observations':None,
+            'interest_futures':'NOT_APPLICABLE','future_policy_rate_prediction':None,
+            'owner_rule_digest':proof['digest']}
     if source is None:return None
     raw=Path(source['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=source['sha256']:raise PermissionError('V75_MACRO_MANIFEST_CHANGED')

@@ -435,6 +435,9 @@ class AssetSourceProducer:
                 raise PermissionError('MEMBER_FINANCIAL_PRODUCER_RUN_BINDING_MISMATCH')
             when=binding['evaluation_at'];run=binding['run_id']
         req.update(run_id=run,request_id=run+'-request',evaluation_at=when)
+        from owner_qqq_scope import read as read_owner_rule
+        owner_descriptor=(ctx.get('v82_approved_sources') or {}).get(self.symbol)
+        self.owner_qqq_rule=read_owner_rule(owner_descriptor,req,self.symbol)
         req['client_snapshot']['as_of']=when
         # Refresh the actual W3 feed independently; no old result is re-labelled.
         from market_bridge import read_macro_snapshot
@@ -466,6 +469,18 @@ class AssetSourceProducer:
             req['confirmed_target']=view;ctx['approved_document_target_source']=proof;ctx['target_hash']=view['target_hash']
             if ctx.get('approved_document_account_scope'):
                 ctx['approved_document_account_scope']['source']=deepcopy(proof)
+        if self.owner_qqq_rule is not None:
+            inputs=self.family_c7_assembly_inputs or {}
+            same_run_source=inputs.get('member_reconciliation_source')
+            if same_run_source is not None:
+                from member_reconciliation_source import read as read_same_run
+                normalized=read_same_run(self.root,same_run_source,req)
+                reference=normalized.get('current_portfolio_reference') or {}
+                if reference.get('formal_NAV_source_qualified') is True:
+                    # Target units use the existing qualified bank reference;
+                    # neither account's cash is converted into the other pool.
+                    self.fx_observation=deepcopy(reference['reporting_FX'])
+                    ctx['owner_qqq_target_fx_source']=deepcopy(same_run_source)
         from native_target_source import produce as produce_native_targets
         if req.get('confirmed_target') is not None:
             native_targets=produce_native_targets(req,self.fx_observation)
@@ -582,6 +597,19 @@ class AssetSourceProducer:
                 'field_path':'qualified_equity_inputs.'+self.symbol,'original_source_rejection':deepcopy(rejected)})
             from family_c7_source_assembly import assemble_original_producers
             assembly=assemble_original_producers(self,req,ctx,prepared,trial)
+            if self.flow=='V82_FINANCIAL' and self.owner_qqq_rule is not None:
+                from v75_macro_inputs import read as interest_background
+                background=interest_background(self.v75_macro_source_manifest,when,
+                    stock_owner_scope={'descriptor':owner_descriptor,'request':req})
+                from owner_qqq_financial import calculate as scoped_financial
+                financial=scoped_financial(self.root,req,ctx,analysis,self.owner_qqq_rule)
+                return {'request':req,'trusted_context':ctx,'source_production':{
+                    'status':financial['status'],'analysis_report':analysis,'family_scope_assembly':assembly,
+                    'owner_scoped_financial_result':financial,'interest_background':background,
+                    'source_validation_issues':[{'code':'OWNER_QQQ_FINANCIAL_INPUT_REQUIRED',
+                        'field_path':item['field'],'original_issue':item} for item in financial['missing_inputs']],
+                    'call_trace':['W8.AssetSourceProducer:V82_ANALYSIS',*analysis['call_trace'],*financial['call_trace']],
+                    'full_native_family_pipeline_claimed':False}}
             if self.flow=='V82_FINANCIAL':
                 return self.continue_financial(snapshot,payload,req,ctx,analysis,assembly,
                     source_issues+row['issues']+funding.get('issues',[]))
@@ -909,10 +937,12 @@ class AssetSourceProducer:
         return contexts,cash_sources
 
     def core_observation(self, observed, **kwargs):
+        if getattr(self,'owner_qqq_rule',None) is not None and observed.get('symbol')=='QQQ':
+            kwargs['owner_qqq_rule']=self.owner_qqq_rule
         return native_core_observation(self.root, observed, **kwargs)
 
 
-def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None,qualified_core_source=None,valuation_profile=None,macro_observations=None):
+def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf=True,fundamental_fields=None,valuation_waterfall=None,qualified_core_source=None,valuation_profile=None,macro_observations=None,owner_qqq_rule=None):
     from core_analysis_inputs import GLOBAL_ETF_WATERFALL,valuation_path_audit,unresolved_core_contracts
     path=Path(root)/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
     if str(path) not in sys.path:sys.path.insert(0,str(path))
@@ -924,6 +954,10 @@ def native_core_observation(root, observed, *, valuation_metrics=None, broad_etf
     from v82_core_source import arguments as core_source_arguments
     supplied,resolved=core_source_arguments(qualified_core_source,broad_etf=broad_etf)
     gaps=unresolved_core_contracts(observed,broad_etf)
+    if owner_qqq_rule is not None:
+        if owner_qqq_rule.get('asset_id')!='QQQ' or observed.get('symbol')!='QQQ':
+            raise PermissionError('OWNER_QQQ_CORE_SCOPE_MISMATCH')
+        gaps=[g for g in gaps if g['field_path']!='safety.etf_structure']
     gaps=[g for g in gaps if g['field_path'] not in resolved]
     if valuation_waterfall==[]:
         gaps.append({'field_path':'valuation.product_specific_waterfall','kind':'DEFINITION_OR_PRODUCER_UNRESOLVED',

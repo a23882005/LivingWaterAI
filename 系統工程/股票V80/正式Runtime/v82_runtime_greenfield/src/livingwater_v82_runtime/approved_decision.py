@@ -101,6 +101,16 @@ def evaluate(context, core):
         proof=context.get('absolute_range_proof'),snapshot_id=snapshot,decision_at=at)
     price=_or(context.get('left_price_conditions',{}).values())
     fundamental=truth(context.get('fundamentals_viable'))
+    fundamental_applicable=context.get('fundamentals_viable_applicability')!='NOT_APPLICABLE'
+    if not fundamental_applicable:
+        rule=context.get('owner_scoped_rule') or {}
+        if (asset!='QQQ' or rule.get('rule_id')!='FAMILY_PM_JOSEPH_QQQ_20261120'
+            or rule.get('asset_id')!=asset or rule.get('client_id')!=identity['client_id']
+            or rule.get('owner')!=identity['owner'] or rule.get('source_db_sha256')!=snapshot
+            or rule.get('fund_structure')!='NOT_APPLICABLE' or not rule.get('directive_source')
+            or not rule.get('source_descriptor')):
+            raise ValueError('OWNER_SCOPED_FUND_STRUCTURE_RULE_MISMATCH')
+        fundamental=P.TRUE # neutral element for an omitted AND term, not a verified fact
     safety=truth(context.get('left_safety'))
     if core['permission']['hard_gate']=='TRIGGERED':safety=P.FALSE
     left=tri_and(price,fundamental,safety)
@@ -109,14 +119,17 @@ def evaluate(context, core):
         runaway_down=technical['runaway_down'],valuation_condition=tri_and(truth(legal),truth(context.get('right_valuation_condition'))),
         event_dependencies=context.get('right_event_dependencies',[]),
         dependency_scope_verified=context.get('right_event_dependency_scope_verified'))
+    if not fundamental_applicable:right['components']['fundamentals_viable']='NOT_APPLICABLE'
     mode,conflicts=select_with_entries(runaway_up=technical['runaway_up'],runaway_down=technical['runaway_down'],
         right=right['truth'],left=left)
     pv=left_profile(price_entry=price,valuation_legal=legal,depth=qp.get('depth'),q_price=qp['value'],q_value=qv['value'],
         metric=selected,current=current,range_result=ranged)
     required={**context.get('stage_required_facts',{}),'fundamentals_viable':fundamental.value,'valuation_legal':legal}
+    if not fundamental_applicable:required.pop('fundamentals_viable',None)
     decision,stage_audit=resolve_approved_stage(mode=mode,left_result=pv,q_value=qv['value'],range_result=ranged,
         required_facts=required,restrictions=context.get('stage_restrictions',[]),snapshot_id=snapshot,
-        constraint_facts=context.get('stage_constraint_facts'))
+        constraint_facts=context.get('stage_constraint_facts'),
+        inapplicable_required_facts=() if fundamental_applicable else ('fundamentals_viable',))
     if conflicts:
         decision=type(decision)(mode,'UNKNOWN',None,conflicts)
     mat=maturity(context.get('maturity_signals',[]))
@@ -136,7 +149,8 @@ def evaluate(context, core):
         'market_predicates':{'runaway_up':technical['runaway_up'],'right':right['truth'],'left':left.value},
         'left_inputs':{'price_condition_at_least_one':price.value,
             'price_conditions':deepcopy(context.get('left_price_conditions',{})),
-            'fundamentals_long_term_viable':fundamental.value,'left_safety_negations_absent':safety.value},
+            'fundamentals_long_term_viable':fundamental.value if fundamental_applicable else 'NOT_APPLICABLE',
+            'left_safety_negations_absent':safety.value},
         'right_entry':right,'range_result':ranged,'qV':qv,'qP':qp,'left_stage_profile':pv,
         'selected_mode':mode.value,'formal_stage':decision.stage,
         'canonical_target_rate':str(decision.target_rate) if decision.target_rate is not None else None,

@@ -255,6 +255,8 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         file=folder/(digest({'client':request['client_id'],'run':request['run_id'],'asset':symbol})+'.source-production.json')
         file.write_text(json.dumps(pack,ensure_ascii=False,indent=2)+'\n')
         return {**attempt,'status':production.get('status','SOURCE_STAGE_INCOMPLETE'),
+            **({'owner_scoped_financial_result':deepcopy(production['owner_scoped_financial_result'])}
+                if production.get('owner_scoped_financial_result') else {}),
             **({'financial_continuation':deepcopy(production['financial_continuation'])} if production.get('financial_continuation') else {}),
             'issues':deepcopy(production.get('source_validation_issues',[]) or
                 ([production['first_failure']] if production.get('first_failure') else [])),

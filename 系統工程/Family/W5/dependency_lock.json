@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "d4f3cd12aeec1dcf18b5a0c5437d232abae86212b506afa64ab2ae67187635b4"
+    "sha256": "20557b35fdfc0a0c54994d27a0815bae788d8a451e0f0b7c7ec3ce92622b1588"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -415,17 +415,17 @@
   },
   {
     "path": "系統工程/Family/W8/member_financial_chain.py",
-    "sha256": "5451a19df1e028267df705faae04fd92f76f5044436d2e81d779cc5340e8d191"
+    "sha256": "32cd3baf3129b674131b6b8af7e125ba2221834661c43479b76fbf4713f995d3"
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
-    "sha256": "c6fb9ba0ec4ddc43ea982f8eef1f8e0ee5fa74c33bbdf626ef94464497283b57",
-    "sha": "8a52d7f94926fd0db0e1598dc624d17564e30473"
+    "sha256": "7f9945a70edf9e263ee0b3b4a68d38c734be52932d1e5c5bda5fe461cc61a9bd",
+    "sha": "04fbf11a4f9a858dcae67a3b129aced6d95c11d5"
   },
   {
     "path": "系統工程/Family/W8/member_financial_producer.py",
-    "sha256": "9ccc7779a39ac0015c61ae9a5148ea5eb98a859d74be15564a96ed5a82c7987a",
-    "sha": "ba1abf8778c178a175dff6237fe37cabcb44ddbc"
+    "sha256": "ab75b9fdaade0edf11858e64359bc66397abb607cb71d2630f8795638200c57f",
+    "sha": "a90e7ab085eba34eb6c83e81819bd9e0f969c1e4"
   },
   {
     "path": "系統工程/Family/W8/tools/rebuild_family_long_term_contract.py",
@@ -555,7 +555,7 @@
   },
   {
     "path": "系統工程/Family/W8/v82_approved_context.py",
-    "sha256": "dab8970423523356336414a40df444322c77fed4e90ddbc8ca4dbaac7df6eb59",
+    "sha256": "a728ca5a01b3d135c0263420e3bd012b5b69f625c09a7582fefe32937a09bac8",
     "reason": "PR59 同戶同輪歷史來源原件與原生參數接線；保留正式 PIT 與金融守門"
   },
   {
@@ -635,7 +635,7 @@
   },
   {
     "path": "系統工程/Family/W8/formal_mode_analysis.py",
-    "sha256": "6a4ecacc69318ac8b1c7c2ec89e78f60d5ccc32bdd43e853abfe48d3beceb7c2"
+    "sha256": "9fde277a9f639ab1d8062ec5ae167aa2fc0bb082c2003633ae9331530d54951f"
   },
   {
     "path": "系統工程/Family/W8/owner_current_business.py",
@@ -654,5 +654,15 @@
     "sha": null,
     "sha256": "5c9ff7da5269358177892ce72ef4cfd38517867a1b4816b25024724049f24984",
     "reason": "Current Owner facts adapter; private evidence remains outside repository"
+  },
+  {
+    "path": "系統工程/Family/W8/owner_qqq_scope.py",
+    "sha256": "450e8c7eb0f3475d94ee1c470890b1f911fb4690853104613448632721f10154",
+    "reason": "Owner Joseph/QQQ 20261120 scoped source adapter; original native equations and aggregate guard"
+  },
+  {
+    "path": "系統工程/Family/W8/owner_qqq_financial.py",
+    "sha256": "d1fc4ead3dfc2d2f33a77e7bd67f858b3b18a3762fc80473c04eaebafad7dd92",
+    "reason": "Owner Joseph/QQQ 20261120 scoped source adapter; original native equations and aggregate guard"
   }
 ]

@@ -12,8 +12,15 @@ def build(site, template, output):
     with sync_playwright() as runtime:
         browser = runtime.chromium.launch()
         model = browser.new_page()
-        model.route("https://**/*", lambda route: route.abort())
-        model.goto((site / "index.html").resolve().as_uri())
+        def serve_snapshot(route):
+            from urllib.parse import urlsplit
+            url = urlsplit(route.request.url)
+            if url.netloc == "snapshot.invalid" and url.path in ("/index.html", "/V70_macro_latest.json"):
+                route.fulfill(path=site / url.path[1:])
+            else:
+                route.abort()
+        model.route("**/*", serve_snapshot)
+        model.goto("https://snapshot.invalid/index.html")
         model.wait_for_function("window.v703FeedDocument && window.v703ReloadFeed")
         model.evaluate("() => window.v703ReloadFeed()")
         if model.evaluate("window.v703FeedDocument.asOf") != feed["asOf"]:
@@ -41,6 +48,19 @@ def build(site, template, output):
                 item["dataDate"] + ("（沿用）" if item.get("carryForward") else "")
             ]):
                 cell.evaluate("(e,t)=>e.textContent=t", text)
+        bars = page.locator("#macro-inputs > div")
+        for i, key in enumerate(("m01","m08","m05")):
+            score = model.locator("#sc_" + key).text_content()
+            row = bars.nth(i)
+            row.evaluate("""(node,args)=>{
+                const [value,score]=args;
+                node.querySelector('b').nextSibling.textContent='　'+value;
+                node.lastChild.textContent=score;
+                const marker=node.querySelector('i');
+                const n=Number.parseFloat(score);
+                marker.hidden=!Number.isFinite(n);
+                if (!marker.hidden) marker.style.left=Math.max(0,Math.min(100,n*10))+'%';
+            }""",[rows.nth(i).locator("td").first.text_content(),score])
         scenarios = {}
         for life in model.locator("#family-life option").evaluate_all("xs=>xs.map(x=>x.value)"):
             model.select_option("#family-life", life)

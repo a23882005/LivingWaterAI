@@ -319,6 +319,26 @@ jobs:
           name: v70-3-27-qa-${{ github.run_id }}
           path: build/site/
           if-no-files-found: warn
+      - name: Verify engineering directory requires its dedicated login
+        env:
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+        run: |
+          set -eu
+          base="${SITE_BASE_URL:-https://www.happihelp.com}"
+          status=$(curl --silent --show-error --output /dev/null --dump-header "$RUNNER_TEMP/engineering-headers" --write-out '%{http_code}' "${base%/}/v70-engineering/index.html")
+          test "$status" = 401
+          grep -iq '^www-authenticate: Basic ' "$RUNNER_TEMP/engineering-headers"
+      - name: Upload verified engineering files to the protected directory
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: build/engineering/index.html,build/engineering/V70_macro_latest.json
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/v70-engineering
+          strip_components: 2
+          overwrite: true
       - name: Check deployment configuration
         env:
           LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}

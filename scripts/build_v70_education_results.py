@@ -24,12 +24,17 @@ def build(site, template, output):
         rows = page.locator("#edu-indicators tbody tr")
         if rows.count() != len(KEYS):
             raise ValueError("Education indicator template mismatch")
+        indicators = []
         for index, key in enumerate(KEYS):
             item = feed["indicators"][key]
             unit = {"pp": " 個百分點", "USD bn": " 十億美元"}.get(item["unit"], item["unit"])
             if key == "m01":
                 unit = " 個百分點"
             value = item.get("value")
+            indicators.append({
+                "key": key, "value": value, "unit": unit,
+                "date": item["dataDate"], "carried": bool(item.get("carryForward")),
+            })
             cells = rows.nth(index).locator("td")
             for cell, text in zip([cells.nth(0), cells.nth(1)], [
                 "待更新" if value is None else f"{value:.6f}".rstrip("0").rstrip(".") + unit,
@@ -57,7 +62,7 @@ def build(site, template, output):
         # This intermediate is consumed by the public layout renderer. It contains only outputs.
         (output / "education-results.json").write_text(json.dumps({
             "asOf":feed["asOf"], "scenarios":scenarios,
-            "indicators":rows.all_inner_texts()
+            "indicators":rows.all_inner_texts(), "indicatorData":indicators
         },ensure_ascii=False),encoding="utf-8")
         browser.close()
 

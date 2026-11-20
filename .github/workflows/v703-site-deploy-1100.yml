@@ -249,8 +249,10 @@ jobs:
           python -m unittest discover -s tests -p 'test_macro_safety_monthly.py' -v
           python -m unittest discover -s tests -p 'test_bank_macro_monthly.py' -v
           python scripts/validate_macro_supplement.py data/8_macro_supplement_verified.json
-          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html" --out build/engineering
-          python scripts/build_daily_v703_site.py --html "系統工程/總經V70/教育版/V70-3-27-education-candidate.html" --out build/site
+          batch_time=$(date -u +%Y-%m-%dT%H:%M:%S.%6N+00:00)
+          python scripts/build_daily_v703_site.py --batch-time "$batch_time" --html "系統工程/總經V70/V70-3-27_工程版_瀏覽統計候選版.html" --out build/engineering
+          python scripts/build_daily_v703_site.py --batch-time "$batch_time" --html "系統工程/總經V70/教育版/V70-3-27-education-candidate.html" --out build/site
+          cmp build/site/V70_macro_latest.json build/engineering/V70_macro_latest.json
       - name: Require formal 22 of 22 or approved CPI data-only publication
         id: publication_gate
         run: |

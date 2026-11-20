@@ -71,6 +71,9 @@ jobs:
             test "$(basename "$PWD")" = public_html
             private=$(cd ../v70-private && pwd -P)
             test -s "$private/engineering.htpasswd"
+            # The web server reads only the verifier through the dedicated group.
+            ls -ld "$private" "$private/engineering.htpasswd" | awk '{print "verifier access", $1, "owner/group match", ($3 == $4)}'
+            chmod 640 "$private/engineering.htpasswd"
             mkdir -p v70-engineering
             test ! -L v70-engineering
             cd v70-engineering
@@ -107,8 +110,8 @@ jobs:
           set -eu
           for file in index.html V70_macro_latest.json; do
             url="https://www.happihelp.com/v70-engineering/$file?verify=$GITHUB_RUN_ID"
-            test "$(curl -sS -o /dev/null -w '%{http_code}' "$url")" = 401
-            curl --fail --silent --show-error --basic --user "$WEB_USER:$WEB_PASSWORD" "$url" -o "$RUNNER_TEMP/readback"
+            test "$(curl -sS -o /dev/null -w '%{http_code}' "$url&anonymous=1")" = 401
+            curl --fail --silent --show-error --basic --user "$WEB_USER:$WEB_PASSWORD" "$url&authenticated=1" -o "$RUNNER_TEMP/readback"
             cmp "staging/$file" "$RUNNER_TEMP/readback"
             echo "LOGIN_READBACK_PASS $file"
           done

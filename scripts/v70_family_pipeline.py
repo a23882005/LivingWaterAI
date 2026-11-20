@@ -156,11 +156,25 @@ def context_from_live_publication(baseline,feed_path,archive,site_url):
     with Path(archive).open(encoding='utf-8-sig',newline='') as f:daily=[r for r in csv.DictReader(f) if r.get('feed_sha256')==sha(raw) and r.get('score_status')=='FORMAL_VALID']
     if not daily:raise ValueError('CURRENT_FORMAL_DAILY_CAPTURE_REQUIRED')
     row=max(daily,key=lambda r:r['run_timestamp_utc'])
+    receipt_url = site_url.rstrip('/') + '/v703_deployment_receipt.json'
+    response = requests.get(receipt_url, params={'run': os.environ.get('GITHUB_RUN_ID')}, timeout=(10, 30))
+    response.raise_for_status()
+    receipt = response.json()
+    if (receipt.get('status') != 'LIVE_VERIFIED' or receipt.get('asOf') != feed['asOf']
+            or str(receipt.get('githubRunId')) != os.environ.get('GITHUB_RUN_ID')):
+        raise ValueError('LIVE_RECEIPT_DOES_NOT_MATCH_FAMILY_BATCH')
+    if stamp(feed['asOf']) < stamp(baseline['data_cutoff']):
+        raise ValueError('FAMILY_BATCH_OLDER_THAN_FORMAL_BASELINE')
+    model = Path(feed_path).with_name('index.html').read_bytes()
     with sync_playwright() as p:
         browser=p.chromium.launch(headless=True)
         try:
-            page=browser.new_page();page.route('**/cdn.tailwindcss.com/**',lambda r:r.abort());page.route('**/fonts.googleapis.com/**',lambda r:r.abort())
-            page.goto(site_url.rstrip('/')+'/?family-macro-context='+sha(raw)[:16],wait_until='domcontentloaded',timeout=45000)
+            page = browser.new_page(service_workers='block')
+            origin = 'http://v70-model.invalid'
+            page.route('**/*', lambda route: route.abort())
+            page.route(origin + '/', lambda route: route.fulfill(body=model, content_type='text/html; charset=utf-8'))
+            page.route(origin + '/V70_macro_latest.json*', lambda route: route.fulfill(body=raw, content_type='application/json'))
+            page.goto(origin + '/', wait_until='domcontentloaded', timeout=45000)
             page.wait_for_function('window.v703FeedVerified===true && window.v703Latest && window.v703MacroSnapshot',timeout=45000)
             state=page.evaluate('''() => ({asOf:window.v703FeedDocument?.asOf,canPublish:window.v703CanPublishFormalAllocation(),judgments:window.v703MacroSnapshot,risk:Object.fromEntries([...document.querySelectorAll('[id^="sc_"]')].map(e=>[e.id.slice(3),Number.parseFloat(e.textContent)]))})''')
         finally:browser.close()

@@ -157,6 +157,10 @@ class FamilyMenu:
         # A locally rendered report is not a completed Drive publication.
         # The ChatGPT tool executor must upload/read back every artifact,
         # publish the manifest last and verify its remote bytes.
+        if (choice['operation']=='generate_report' and isinstance(result,dict)
+                and result.get('status') in ('REPORT_INPUTS_REQUIRED','REPORT_SOURCE_INCOMPATIBLE')):
+            return {'status':result['status'],'result':result,'pending_operation':'generate_report',
+                    'menu':render_menu(self.project_name)}
         if (choice['operation'] == 'generate_report'
             and isinstance(result, dict)
             and result.get('status') == 'STAGED_NOT_PERSISTED'):

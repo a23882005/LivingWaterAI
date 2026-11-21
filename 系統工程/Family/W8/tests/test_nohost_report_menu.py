@@ -71,6 +71,39 @@ class NoHostReportMenus(unittest.TestCase):
         self.assertEqual(out["result"]["folder_id"],"unit_approved_folder")
         self.assertEqual(out["result"]["trade_authorization"],"NONE")
 
+    def test_member_report_13_names_missing_operator_inputs(self):
+        config={"client_id":CLIENT,"source_db_sha256":self.sha,"repo_root":str(FAMILY.parent.parent)}
+        import sys
+        with patch.object(sys,"path",[str(W8),str(FAMILY/"W5"),*sys.path]):
+            menu=self.menu(member_v82_source_config=config,report_staging_dir=self.temp.name)
+        self.assertEqual(menu.select(13)["status"],"LOGIN_REQUIRED")
+        out=menu.login("testpass")
+        self.assertEqual(out["status"],"REPORT_INPUTS_REQUIRED")
+        self.assertEqual(out["result"]["missing"],["trusted_w6_current_input_producer","approved_w6_archive_or_renderer"])
+
+    def test_member_report_12_reads_and_verifies_only_own_archive(self):
+        import json
+        folder="unit_approved_folder";mid="approved_manifest";data=b"one verified artifact"
+        stem="Joseph_配置報告_20261103_081347_TW"
+        files=[{"id":ext,"name":stem+"."+ext,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest()} for ext in ("pdf","html")]
+        manifest={"schema":"Family.W8.ReportArchive.v1","state":"COMPLETE","account":"JO","client_id":CLIENT,
+                  "folder_id":folder,"created_at":"2026-11-03T08:13:47+08:00","run_id":"prior","files":files}
+        metadata={f["id"]:{"id":f["id"],"name":f["name"],"parents":[folder],"shared":False}
+                  for f in [*files,{"id":mid,"name":stem+".manifest.json"}]}
+        calls=[]
+        def read(lookup):
+            calls.append(lookup)
+            return {"manifest_file_id":mid,"manifest_bytes":json.dumps(manifest).encode(),
+                    "readbacks":{f["id"]:data for f in files},"file_metadata":metadata}
+        menu=self.menu(trusted_report_archive_reader=read)
+        self.assertEqual(menu.select(12)["status"],"LOGIN_REQUIRED")
+        self.assertEqual(calls,[])
+        result=menu.login("testpass")
+        self.assertEqual(result["result"]["status"],"REPORT_LOOKUP_REMOTE_VERIFIED")
+        self.assertEqual(calls[0]["folder_id"],folder)
+        metadata["pdf"]["parents"]=["wrong_folder"]
+        with self.assertRaisesRegex(PermissionError,"PRIVATE_PARENT"):
+            menu.select(12)
     def test_report_not_connected_is_not_false_success(self):
         menu=self.menu()
         menu.login("testpass")

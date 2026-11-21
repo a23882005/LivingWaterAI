@@ -163,6 +163,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        report_store=None, other_handlers=None,
                        completion_checks=None, official_report_folder_id=None,
                        report_staging_dir=None, mutation_staging_dir=None,
+                       trusted_report_archive_reader=None,
                        trusted_public_fetcher=None, trusted_account_change=None):
     """Return the existing W7 menu without using a permanent Python host."""
     auth=FamilyLoginAdapter(family_login,login_account,client_id)
@@ -255,10 +256,20 @@ def build_project_menu(*, family_login, project_name, login_account,
                 if not isinstance(date,str) or date_type.fromisoformat(date).isoformat()!=date:
                     raise ValueError("INVALID_REPORT_LOOKUP_DATE")
             auth.require_login()
-            return {"status":"DRIVE_LOOKUP_REQUIRED",
-                    "folder_id":official_report_folder_id,
-                    "member_alias":family_alias,
-                    "date":date,"trade_authorization":"NONE"}
+            lookup={"status":"DRIVE_LOOKUP_REQUIRED","folder_id":official_report_folder_id,
+                    "member_alias":family_alias,"date":date,"trade_authorization":"NONE",
+                    "folder_listing":"LIST_ALL_CHILDREN_AND_PAGES_IN_FIXED_FOLDER",
+                    "file_selection":"LATEST_MEMBER_MANIFEST_FOR_DATE_OR_LATEST",
+                    "readback_verifier":"on_demand_report_delivery.verify_report_lookup"}
+            if trusted_report_archive_reader is None:
+                return lookup
+            # Only an operator-installed connector may supply private bytes.
+            # User-supplied menu payloads can select a date, never a file ID.
+            archive=trusted_report_archive_reader(dict(lookup))
+            verifier=_load(ROOT/"on_demand_report_delivery.py","family_w8_report_lookup")
+            return verifier.verify_report_lookup(archive["manifest_file_id"],archive["manifest_bytes"],
+                account=login_account,client_id=client_id,folder_id=official_report_folder_id,
+                file_metadata=archive["file_metadata"],readbacks=archive["readbacks"],date=date)
         handlers["previous_report"]=previous_report_lookup
 
         if (trusted_w6_current_input_producer is not None
@@ -282,7 +293,14 @@ def build_project_menu(*, family_login, project_name, login_account,
                 snapshot=entry.current_snapshot()
                 source=source_module.build_report_source(
                     snapshot,account=login_account,expected_client_id=client_id)
-                rendered=renderer(source,payload)
+                try:
+                    rendered=renderer(source,payload)
+                except ValueError as exc:
+                    if str(exc)!="W6_MEMBER_ITEM_REVIEW_ONLY":
+                        raise
+                    return {"status":"REPORT_SOURCE_INCOMPATIBLE","source_error":str(exc),
+                            "required":"W6_SOURCE_REVIEW_RECEIVER_FOR_SCOPED_MEMBER_RESULTS",
+                            "trade_authorization":"NONE"}
                 plan=delivery_module.prepare_report_delivery(
                     rendered,account=login_account,client_id=client_id,
                     folder_id=official_report_folder_id,
@@ -299,6 +317,18 @@ def build_project_menu(*, family_login, project_name, login_account,
                 # elevate these partial HTML transfer plans to report PASS.
                 return plan
             handlers["generate_report"]=stage_latest_report
+        elif member_v82_source_config is not None and family_alias=="Joseph":
+            requirements={"trusted_w6_current_input_producer":trusted_w6_current_input_producer,
+                          "approved_w6_archive_or_renderer":approved_w6_archive or approved_w6_renderer,
+                          "report_staging_dir":report_staging_dir}
+            missing=[name for name,value in requirements.items() if value is None]
+            def registered_missing_report(payload):
+                auth.require_login()
+                if not isinstance(payload,dict) or set(payload)-{"date","language"}:
+                    raise ValueError("W6_REPORT_OPTIONS_INVALID")
+                return {"status":"REPORT_INPUTS_REQUIRED","missing":list(missing),
+                        "trade_authorization":"NONE"}
+            handlers.setdefault("generate_report",registered_missing_report)
         # Menu handlers here stage reports only; the upstream no-host W6
         # injection must not also attempt the legacy synchronous Drive store.
         trusted_w6_current_input_producer=None

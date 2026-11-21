@@ -202,7 +202,7 @@ def make_report_sources(source, request, result=None, *, c7=None, sections=None,
 
 
 def _member_zero_decision(source, request, row):
-    """Receive two named upstream zero decisions, never calculate a buy amount.
+    """Receive named zero decisions or unfinished scoped source receipts.
 
     A member review is still not Work9/canonical output. A scoped financial
     stage and a normal-buy pause have their own provenance and do not resolve
@@ -212,9 +212,11 @@ def _member_zero_decision(source, request, row):
     scoped, pause = row.get("owner_scoped_financial_result"), row.get("normal_buy_pause")
     if amount is None and quantity is None and scoped is None and pause is None:
         return None
-    require(isinstance(amount, dict) and set(amount) == {"amount", "currency"}
+    incomplete = (amount is None and quantity is None and isinstance(scoped, dict)
+                  and scoped.get("status") == "SOURCE_INCOMPLETE")
+    require(incomplete or (isinstance(amount, dict) and set(amount) == {"amount", "currency"}
             and _number(amount.get("amount")) == 0 and _number(quantity) == 0
-            and re.fullmatch(r"[A-Z]{3}", str(amount.get("currency", ""))),
+            and re.fullmatch(r"[A-Z]{3}", str(amount.get("currency", "")))),
             "W6_MEMBER_ITEM_REVIEW_ONLY")
     require((scoped is None) != (pause is None), "W6_MEMBER_ZERO_SOURCE_REQUIRED")
     conclusion = row.get("formal_conclusion")
@@ -228,25 +230,29 @@ def _member_zero_decision(source, request, row):
     same_run = {"client_id": source["client_id"], "run_id": request["run_id"],
                 "evaluation_at": request["evaluation_at"], "source_db_sha256": source["source_db_sha256"]}
     price = row.get("same_run_gap_price")
-    require(isinstance(price, dict) and all(price.get(k) == v for k, v in same_run.items()
+    require(incomplete or (isinstance(price, dict) and all(price.get(k) == v for k, v in same_run.items()
                                           if k != "source_db_sha256")
             and price.get("symbol") == row["symbol"]
             and price.get("currency") == amount["currency"]
             and price.get("currency") == row.get("market", {}).get("market_identity", {}).get("currency")
             and price.get("source_sha256") == row.get("market", {}).get("source_sha256")
-            and price.get("session") == row.get("market", {}).get("observed_date"), "W6_MEMBER_ZERO_PRICE_BINDING")
+            and price.get("session") == row.get("market", {}).get("observed_date")), "W6_MEMBER_ZERO_PRICE_BINDING")
     if scoped is not None:
         require(isinstance(scoped, dict)
                 and scoped.get("schema_version") == "Family.W8.OwnerQQQFinancial.v1"
                 and all(scoped.get(k) == v for k, v in same_run.items())
                 and scoped.get("asset_id") == row["symbol"]
-                and scoped.get("result_digest") == digest(
-                    {k: v for k, v in scoped.items() if k != "result_digest"}),
+                # Native SOURCE_INCOMPLETE returns before its own digest is
+                # created. The original row/report digests still bind it.
+                and ((incomplete and "result_digest" not in scoped)
+                     or scoped.get("result_digest") == digest(
+                         {k: v for k, v in scoped.items() if k != "result_digest"})),
                 "W6_MEMBER_ZERO_FINANCIAL_BINDING")
         owner, rule = scoped.get("owner", {}), scoped.get("owner_rule", {})
         require(isinstance(owner, dict) and isinstance(rule, dict)
                 and owner.get("client_id") == source["client_id"]
-                and owner.get("currency") == amount["currency"]
+                and re.fullmatch(r"[A-Z]{3}", str(owner.get("currency", "")))
+                and (owner.get("currency") == "USD" if incomplete else owner.get("currency") == amount["currency"])
                 and all(isinstance(owner.get(k), str) and owner[k] for k in ("broker", "account", "funding_domain"))
                 and rule.get("owner") == owner and rule.get("member") == source["member_alias"]
                 and all(rule.get(k) == v for k, v in same_run.items())
@@ -278,6 +284,28 @@ def _member_zero_decision(source, request, row):
                 and isinstance(original_account, dict) and original_account in accounts
                 and original_account.get("account_key") == owner["account"]
                 and original_account.get("client_id") == source["client_id"], "W6_MEMBER_ZERO_ACCOUNT_BINDING")
+        if incomplete:
+            missing, plan = scoped.get("missing_inputs"), scoped.get("execution_plan")
+            require(isinstance(missing, list) and bool(missing)
+                    and all(isinstance(x, dict) and isinstance(x.get("field"), str) and x["field"] for x in missing)
+                    and scoped.get("final_amount") is None and scoped.get("final_quantity") is None
+                    and scoped.get("known_zero_basis") is None
+                    and scoped.get("test_ledger") is None and scoped.get("shared_funding") is None
+                    and scoped.get("full_family_native_pipeline_complete") is False
+                    and scoped.get("formal_deployment_ready") is False
+                    and (conclusion["buy_permission"].get("value") is None
+                         or conclusion["buy_permission"]["value"] is False)
+                    and scoped.get("trade_action") == "NO_TRADE" and scoped.get("production") == "HOLD",
+                    "W6_MEMBER_SCOPED_INCOMPLETE_STATE")
+            if plan is not None:
+                require(isinstance(plan, dict) and plan.get("execution_amount") is None
+                        and plan.get("execution_quantity") is None, "W6_MEMBER_SCOPED_INCOMPLETE_PLAN")
+                order = plan.get("order_plan")
+                require(order is None or (isinstance(order, dict)
+                        and order.get("should_place_order") is False
+                        and order.get("order_intent_id") is None and order.get("quantity") is None),
+                        "W6_MEMBER_SCOPED_INCOMPLETE_PLAN")
+            return "SOURCE_INCOMPLETE"
         quote = scoped.get("canonical_quote_proof", {})
         require(quote.get("valuation") == price and quote.get("position", {}).get("owner") == owner
                 and quote["position"].get("symbol") == row["symbol"]
@@ -432,10 +460,14 @@ def member_review_sections(source, request, result, producer, *, targets=None):
         conclusion = row.get("formal_conclusion") or {}
         classification = conclusion.get("classification") or row.get("native_product_identity") or {}
         decision = _member_zero_decision(source, request, row)
+        if decision == "SOURCE_INCOMPLETE":
+            note = "。局部來源尚未完整；新增金額與股數未知，不代表零或金融決策。"
+        elif decision:
+            note = "。同輪具來源零額裁定：" + decision + "；原正式階位與其餘缺值分列，交易NONE。"
+        else:
+            note = "。資料尚不足，正式判斷待補；新增金額尚未提供。"
         payload.append({"heading": row["symbol"] + "｜" + str(classification.get("primary_class") or "UNKNOWN"),
-            "body": "原逐檔分析狀態：" + str(conclusion.get("status") or row.get("execution_status"))
-                    + ("。同輪具來源零額裁定：" + decision + "；原正式階位與其餘缺值分列，交易NONE。"
-                       if decision else "。資料尚不足，正式判斷待補；新增金額尚未提供。"),
+            "body": "原逐檔分析狀態：" + str(conclusion.get("status") or row.get("execution_status")) + note,
             "source_reference": source_id + "#" + row["symbol"] + ":" + row["result_digest"]})
     if not payload:
         return {}
@@ -537,14 +569,23 @@ def _member_zero_sections(display, source, request, original, producer):
     """Append source quotations inside existing chapters, leaving old cards intact."""
     module = _runtime("report_financial_sections", "W8")
     quotes = module._Quotes(original, request, producer)
-    decisions = {}
+    decisions, incomplete = {}, {}
     for index, row in enumerate(original["positions"]):
         decision = _member_zero_decision(source, request, row)
         if decision is None:
             continue
-        decisions[row["symbol"]] = decision
         base = f"/result/positions/{index}"
         formal = base + "/formal_conclusion"
+        if decision == "SOURCE_INCOMPLETE":
+            incomplete[row["symbol"]] = decision
+            origin = base + "/owner_scoped_financial_result"
+            quotes.add("actions", row["symbol"] + "｜局部來源未完整，新增金額與股數未知",
+                       [("局部來源原狀態", origin + "/status"), ("局部原缺項", origin + "/missing_inputs"),
+                        ("原新增金額", base + "/proposed_amount"), ("原新增股數", base + "/proposed_quantity"),
+                        ("原正式階位", formal + "/formal_stage"), ("原交易授權", base + "/trade_authorization")],
+                       note="原來源尚未得出新增金額與股數；未知不代表零，不構成金融或交易決策。")
+            continue
+        decisions[row["symbol"]] = decision
         if decision == "SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY":
             origin = base + "/owner_scoped_financial_result"
             fields = [("局部金融原狀態", origin + "/status"),
@@ -565,19 +606,23 @@ def _member_zero_sections(display, source, request, original, producer):
                    [("原新增金額", base + "/proposed_amount"), ("原新增股數", base + "/proposed_quantity"),
                     ("原交易授權", base + "/trade_authorization")],
                    note=note + "其餘缺值逐項保留UNKNOWN，沒有將缺值補成零。")
-    if not decisions:
+    if not decisions and not incomplete:
         return
     rules_sha = sha256(Path(__file__).read_bytes()).hexdigest()
     for name in ("valuation", "actions"):
+        if not quotes.rows[name]:
+            continue
         envelope = display["envelopes"][name]
         envelope["payload"].extend(quotes.rows[name])
         envelope["payload_sha256"] = digest(envelope["payload"])
         envelope.setdefault("base_display_rules_sha", envelope["rules_sha"])
         envelope["rules_sha"] = rules_sha
         display["projection"]["quoted_fields"][name].extend(quotes.field_map[name])
-    display["projection"]["scoped_zero_display"] = {
-        "rules_sha": rules_sha, "decisions": decisions,
-        "scope": "SOURCE_REVIEW", "financial_completeness_asserted": False}
+    for key, values in (("scoped_zero_display", decisions), ("scoped_incomplete_display", incomplete)):
+        if values:
+            display["projection"][key] = {
+                "rules_sha": rules_sha, "decisions": values,
+                "scope": "SOURCE_REVIEW", "financial_completeness_asserted": False}
 
 
 def _member_sources(source, market, engine, binding):

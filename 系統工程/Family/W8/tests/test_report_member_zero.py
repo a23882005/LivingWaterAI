@@ -24,7 +24,8 @@ def seal(case):
         if scoped is not None:
             rule = scoped["owner_rule"]
             rule["digest"] = F.A.digest({k: v for k, v in rule.items() if k != "digest"})
-            scoped["result_digest"] = F.A.digest({k: v for k, v in scoped.items() if k != "result_digest"})
+            if "result_digest" in scoped:
+                scoped["result_digest"] = F.A.digest({k: v for k, v in scoped.items() if k != "result_digest"})
     F.member_refresh(case)
 
 
@@ -92,6 +93,24 @@ def zero_case(kind):
     return case
 
 
+def incomplete_case():
+    """Native unfinished shape: no quote, final amount/quantity or own digest."""
+    case = zero_case("scoped")
+    row = case["result"]["positions"][0]
+    row["proposed_amount"] = None
+    row.pop("proposed_quantity")
+    row.pop("same_run_gap_price")
+    scoped = row["owner_scoped_financial_result"]
+    for key in ("canonical_quote_proof", "position_gap", "execution_plan", "selected_stage",
+                "final_amount", "final_quantity", "known_zero_basis", "test_ledger", "result_digest"):
+        scoped.pop(key)
+    scoped.update(status="SOURCE_INCOMPLETE", missing_inputs=[{
+        "field": "qualified_USD_valuation_price_and_confirmed_quantity"}])
+    row["financial_source_attempt"]["status"] = scoped["status"]
+    seal(case)
+    return case
+
+
 class SourceZeroTests(unittest.TestCase):
     def inputs(self, case):
         return F.A.make_member_review_inputs(case["source"], case["request"], case["result"],
@@ -131,6 +150,126 @@ class SourceZeroTests(unittest.TestCase):
             self.assertEqual(current["verified_sections"][name][0]["heading"], "資料狀態：PARTIAL")
             self.assertEqual(current["verified_sections"][name][1:], original["envelopes"][name]["payload"])
         self.assertNotIn("scoped_zero_display", current["report_source_lineage"]["section_projection"])
+
+    def test_unfinished_native_scoped_source_stays_unknown_without_fabricated_fields(self):
+        for explicit_quantity in (False, True):
+            with self.subTest(explicit_quantity=explicit_quantity):
+                case = incomplete_case()
+                row = case["result"]["positions"][0]
+                if explicit_quantity:
+                    row["proposed_quantity"] = None
+                    seal(case)
+                before = deepcopy(case)
+                current = self.current(case)
+                self.assertEqual(case, before)
+                self.assertEqual(current["report_source_lineage"]["member_analysis"], case["result"])
+                self.assertIsNone(row["proposed_amount"])
+                self.assertEqual("proposed_quantity" in row, explicit_quantity)
+                self.assertNotIn("result_digest", row["owner_scoped_financial_result"])
+                self.assertNotIn("same_run_gap_price", row)
+                self.assertEqual(current["report_scope"], "SOURCE_REVIEW")
+                self.assertIsNone(current["current_total_twd"])
+                projection = current["report_source_lineage"]["section_projection"]
+                self.assertNotIn("scoped_zero_display", projection)
+                self.assertEqual(projection["scoped_incomplete_display"]["decisions"], {row["symbol"]: "SOURCE_INCOMPLETE"})
+                text = "\n".join(c["heading"] + c["body"] for c in current["verified_sections"]["actions"])
+                self.assertIn("新增金額與股數未知", text)
+                self.assertIn("未知不代表零，不構成金融或交易決策", text)
+                self.assertNotIn("同輪具來源零額", text)
+                incoming = self.inputs(case)["engine"]["report_sources"]["sections"]["valuation"]["payload"]
+                self.assertIn("新增金額與股數未知", incoming[0]["body"])
+                self.assertNotIn("零額裁定", incoming[0]["body"])
+
+    def test_unfinished_source_resealed_foreign_binding_still_rejected(self):
+        for key in ("client_id", "run_id", "evaluation_at", "source_db_sha256", "asset_id"):
+            with self.subTest(key=key):
+                case = incomplete_case()
+                case["result"]["positions"][0]["owner_scoped_financial_result"][key] = "FOREIGN"
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_unfinished_source_requires_original_rule_attempt_and_account(self):
+        for attack in ("rule", "owner", "attempt", "duplicate", "status", "target", "account", "snapshot"):
+            with self.subTest(attack=attack):
+                case = incomplete_case(); row = case["result"]["positions"][0]
+                scoped = row["owner_scoped_financial_result"]; attempt = row["financial_source_attempt"]
+                if attack == "rule": scoped["owner_rule"]["run_id"] = "FOREIGN"
+                elif attack == "owner": scoped["owner"]["account"] = "FOREIGN"
+                elif attack == "attempt": row.pop("financial_source_attempt")
+                elif attack == "duplicate": attempt["owner_scoped_financial_result"] = {}
+                elif attack == "status": attempt["status"] = "COMPLETE"
+                elif attack == "target": attempt["target_version"] += 1
+                elif attack == "account":
+                    attempt["account_analysis_binding"]["approved_document_category_scope"]["original_account_row"]["account_key"] = "FOREIGN"
+                else: attempt["account_analysis_binding"]["approved_document_category_scope"]["source_snapshot_digest"] = "0" * 64
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_unfinished_source_cannot_claim_zero_completion_funding_or_trades(self):
+        for key, value in (("final_amount", {"amount": "0", "currency": "USD"}), ("final_quantity", "0"),
+                ("known_zero_basis", "NO_POSITIVE_DEPLOYMENT_GAP"), ("test_ledger", {}), ("shared_funding", {}),
+                ("full_family_native_pipeline_complete", True), ("formal_deployment_ready", True),
+                ("trade_action", "BUY"), ("production", "READY"), ("missing_inputs", []),
+                ("missing_inputs", [{"field": ""}]), ("status", "UNRECOGNIZED")):
+            with self.subTest(key=key, value=value):
+                case = incomplete_case(); case["result"]["positions"][0]["owner_scoped_financial_result"][key] = value
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_unfinished_source_does_not_turn_proposed_amounts_into_known_zero(self):
+        for amount, quantity in (({"amount": "0", "currency": "USD"}, "0"),
+                ({"amount": "1", "currency": "USD"}, "1"), (None, "0"),
+                ({"amount": "0", "currency": "USD"}, None), (None, False)):
+            with self.subTest(amount=amount, quantity=quantity):
+                case = incomplete_case(); case["result"]["positions"][0].update(proposed_amount=amount, proposed_quantity=quantity)
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_unfinished_source_cannot_grant_buy_permission_or_rebind_native_currency(self):
+        for attack in ("buy_permission", "buy_permission_zero", "buy_permission_string", "currency", "pause", "qualified_pack"):
+            with self.subTest(attack=attack):
+                case = incomplete_case(); row = case["result"]["positions"][0]
+                if attack.startswith("buy_permission"):
+                    row["formal_conclusion"]["buy_permission"]["value"] = {
+                        "buy_permission": True, "buy_permission_zero": 0, "buy_permission_string": "FALSE"}[attack]
+                elif attack == "currency":
+                    scoped = row["owner_scoped_financial_result"]
+                    scoped["owner"]["currency"] = "TWD"
+                    scoped["owner_rule"]["owner"]["currency"] = "TWD"
+                    account = row["financial_source_attempt"]["account_analysis_binding"]
+                    account["owner"]["currency"] = "TWD"
+                    account["approved_document_category_scope"]["owner"]["currency"] = "TWD"
+                elif attack == "pause": row["normal_buy_pause"] = {}
+                else: row["financial_source_attempt"]["qualified_financial_pack"] = True
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_unfinished_plan_must_have_no_execution_amount_quantity_or_intent(self):
+        case = incomplete_case(); scoped = case["result"]["positions"][0]["owner_scoped_financial_result"]
+        scoped["execution_plan"] = {"execution_amount": None, "execution_quantity": None,
+            "order_plan": {"should_place_order": False, "order_intent_id": None, "quantity": None}}
+        seal(case)
+        self.current(case)
+        for location, key, value in (("execution_plan", "execution_amount", "0"),
+                ("execution_plan", "execution_quantity", "0"), ("order_plan", "should_place_order", True),
+                ("order_plan", "order_intent_id", "INVENTED"), ("order_plan", "quantity", "1")):
+            with self.subTest(location=location, key=key):
+                attacked = deepcopy(case)
+                plan = attacked["result"]["positions"][0]["owner_scoped_financial_result"]["execution_plan"]
+                (plan if location == "execution_plan" else plan["order_plan"])[key] = value
+                seal(attacked)
+                with self.assertRaises(ValueError): self.inputs(attacked)
+
+    def test_unfinished_optional_scoped_digest_and_original_digests_are_checked(self):
+        for field in ("scoped", "row", "report"):
+            with self.subTest(field=field):
+                case = incomplete_case(); row = case["result"]["positions"][0]
+                if field == "scoped":
+                    row["owner_scoped_financial_result"]["result_digest"] = "0" * 64
+                    F.member_refresh(case)
+                elif field == "row": row["result_digest"] = "0" * 64
+                else: case["result"]["report_digest"] = "0" * 64
+                with self.assertRaises(ValueError): self.inputs(case)
 
     def test_arbitrary_zero_positive_negative_boolean_or_incomplete_values_rejected(self):
         for amount, quantity in [(0, "0"), ({"amount": "1", "currency": "USD"}, "0"),

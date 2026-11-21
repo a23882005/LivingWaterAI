@@ -1,37 +1,45 @@
-name: LivingWaterAI 14h30 IB Taiwan market history
+name: Retrieve public ETF closing records
 on:
-  schedule:
-    - cron: '30 6 * * 1-5' # 14:30 Asia/Taipei, exchange closing may be delayed
-  workflow_dispatch:
+  workflow_dispatch: {}
 permissions:
-  contents: write
-concurrency:
-  group: lw-taiwan-history
-  cancel-in-progress: false
+  contents: read
 jobs:
-  update:
+  public-close:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install 'pandas>=2.1,<3' 'yfinance>=0.2.60,<2'
-      - run: python -m py_compile scripts/ib_market_history_update.py
-      - run: python scripts/ib_market_history_update.py --region taiwan --batch-size 5
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ib-taiwan-history-${{ github.run_id }}
-          path: data/market_history/taiwan/
-      - name: Commit dated cache
+      - name: Download official TPEx and public daily prices
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/market_history/taiwan/
-          if ! git diff --cached --quiet; then
-            git commit -m "data: refresh IB Taiwan market-history watchlist"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
+          python - <<'PY'
+          import datetime as dt, json, pathlib, time, urllib.request
+          out = pathlib.Path("public-closes")
+          out.mkdir()
+          urls = {"tpex": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"}
+          for s in ["00679B.TWO", "00719B.TWO", "00859B.TWO", "00860B.TWO", "SGOV"]:
+              urls[s] = "https://query1.finance.yahoo.com/v8/finance/chart/" + s + "?period1=1793577600&period2=1795305600&interval=1d"
+          for key, url in urls.items():
+              for attempt in range(2):
+                  try:
+                      req = urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; ETF daily valuation verification)"})
+                      with urllib.request.urlopen(req,timeout=20) as resp:
+                          raw = resp.read()
+                      data = json.loads(raw)
+                      if key == "tpex":
+                          print(key, [(v.get("Date"),v.get("SecuritiesCompanyCode"),v.get("Close")) for v in data if v.get("SecuritiesCompanyCode") in ("00679B","00719B","00859B","00860B")])
+                      else:
+                          result = data["chart"]["result"][0]
+                          print(key, result["meta"]["exchangeName"], result["indicators"]["quote"][0]["close"][-1])
+                      (out/(key+".json")).write_bytes(raw)
+                      (out/(key+".receipt.json")).write_text(json.dumps({"source_reference":url,"retrieved_at":dt.datetime.now(dt.timezone.utc).isoformat()}))
+                      break
+                  except Exception as exc:
+                      print(key,attempt,str(exc))
+                      time.sleep(2+attempt)
+              time.sleep(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-close-originals
+          path: public-closes/
+          retention-days: 5

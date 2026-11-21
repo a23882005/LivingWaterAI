@@ -23,6 +23,21 @@
     const level=ids.includes('01')?'red':missing.length?'unknown':cap<=55?'orange':ids.length?'yellow':'normal';
     return {ids,cap,level,missing};
   }
+  function describeCap(caps, raw, final) {
+    const {cap, layers, reasons, missing} = caps;
+    if (cap === 100) return missing.length ? '資料不足，封頂狀態待確認。' : '未封頂';
+    const binding = Object.keys(layers).filter(layer => layers[layer] === cap);
+    const label = binding.map(layer => layer + '層').join('、') + ' CAP ' + cap + ' 已生效。';
+    let score = '本期最終分數待確認。';
+    if (Number.isFinite(raw) && Number.isFinite(final)) {
+      const result = final.toFixed(1) + ' 分。';
+      score = raw > cap
+        ? '原始 ' + raw.toFixed(1) + ' 分超過上限，最終採 ' + result
+        : '原始分數在上限內，最終仍為 ' + result;
+    }
+    const why = binding.flatMap(layer => reasons[layer]).join('；');
+    return label + score + (why ? ' 觸發原因：' + why + '。' : '');
+  }
   function render(read) {
     const values=Object.fromEntries(Object.keys(fields).map(k=>[k,read(k)]));
     if(values.m02>=50) values.m02/=100;
@@ -60,5 +75,5 @@
     }
     return {...result,layers,reasons,crisisPoints};
   }
-  window.v70Cap={evaluate,render};
+  window.v70Cap={evaluate,render,describeCap};
 })();

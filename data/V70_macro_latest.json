@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-11-21T09:27:03.245128Z",
+  "asOf": "2026-11-21T10:25:36.724187Z",
   "verification": {
     "ready": true,
     "publicationReady": true,
@@ -136,7 +136,7 @@
       "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
-      "lastVerifiedAt": "2026-11-21T17:26:54+08:00",
+      "lastVerifiedAt": "2026-11-21T18:25:28+08:00",
       "sourceEvidence": {
         "series": {
           "ISM_m04": [
@@ -159,7 +159,7 @@
       "method": "CPILFESL 2026-09 / 2025-09 同序列年增率；2026-11-16 指揮官核准沿用",
       "status": "USABLE",
       "detail": "10月同比基期缺失，沿用2026年9月核心CPI年增率 2.565841%；維持原權重。",
-      "lastVerifiedAt": "2026-11-21T09:26:56.352268+00:00",
+      "lastVerifiedAt": "2026-11-21T10:25:29.536263+00:00",
       "carryForward": {
         "policy": "CPI_PREVIOUS_VALID_YOY_OWNER_20261116",
         "observationDate": "2026-09-01",
@@ -176,7 +176,7 @@
           "baseIndex": null,
           "publicationDate": "2026-11-10",
           "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
-          "verifiedAtUtc": "2026-11-21T09:26:56.352268+00:00",
+          "verifiedAtUtc": "2026-11-21T10:25:29.536263+00:00",
           "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
           "seriesUrl": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
           "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
@@ -188,7 +188,7 @@
             "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
             "publicationDate": "2026-11-10"
           },
-          "seriesRetrievedAtUtc": "2026-11-21T09:26:56.352268+00:00"
+          "seriesRetrievedAtUtc": "2026-11-21T10:25:29.536263+00:00"
         }
       }
     },
@@ -596,7 +596,7 @@
       "unit": "%",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=c3b6bb4efd73144bd5dbff7e6b8c90053ca68f8f19bdb2bde139f8d8a105c274，稽核檔data/audit/fed_target_evidence_20261121T092654Z.html.gz",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=b9501b7f43b8cef946278e537100effefe00a8e021d3b051377f10f6c63853b4，稽核檔data/audit/fed_target_evidence_20261121T102528Z.html.gz",
       "policySchema": "fed-target-evidence-v1",
       "effectiveDate": "2026-09-17",
       "lowerBound": {
@@ -607,13 +607,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "lastVerifiedAt": "2026-11-21T17:26:54+08:00",
+      "lastVerifiedAt": "2026-11-21T18:25:28+08:00",
       "sourceEvidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-21T17:26:54+08:00",
+        "checked_at": "2026-11-21T18:25:28+08:00",
         "result": "CURRENT_CONFIRMED",
         "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
-        "response_sha256": "c3b6bb4efd73144bd5dbff7e6b8c90053ca68f8f19bdb2bde139f8d8a105c274",
+        "response_sha256": "b9501b7f43b8cef946278e537100effefe00a8e021d3b051377f10f6c63853b4",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -632,7 +632,7 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "FOUND",
-          "checked_at": "2026-11-21T17:26:54+08:00",
+          "checked_at": "2026-11-21T18:25:28+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
@@ -672,7 +672,7 @@
           "notes": "本輪HTTP 200；SHA256=e5f9963bccefed723cee454f775d80722e5e48fdfa41180cdb2a0c6fa320d0ab；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-21T17:26:54+08:00",
+      "retrievalTime": "2026-11-21T18:25:28+08:00",
       "publicationDate": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-10"
     },
@@ -887,7 +887,7 @@
       "unit": "%",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "INDEX/MMFI 日期2026-11-20收盤26.24%，採EOD收盤非盤中LAST；來源SHA256=11f61569eb7342f2b8727c056e8e5907294ff78d2116c946c50635c6f9034d57",
+      "detail": "INDEX/MMFI 日期2026-11-20收盤26.24%，採EOD收盤非盤中LAST；來源SHA256=ee3de70c9b993bf07511e319c177a0f255e7e6935978037d00ff9b1f611ea47c",
       "lastVerifiedAt": "2026-11-18T13:42:13.485930+00:00",
       "candidateChecks": [
         {
@@ -895,11 +895,11 @@
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "FOUND",
-          "checked_at": "2026-11-21T17:26:54+08:00",
+          "checked_at": "2026-11-21T18:25:28+08:00",
           "value": 26.24,
           "unit": "%",
           "observation_date": "2026-11-20",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=11f61569eb7342f2b8727c056e8e5907294ff78d2116c946c50635c6f9034d57"
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=ee3de70c9b993bf07511e319c177a0f255e7e6935978037d00ff9b1f611ea47c"
         },
         {
           "site": "Macroaxis",
@@ -935,7 +935,7 @@
           "notes": "本輪HTTP 200；SHA256=941837da48d69f05a49bfdbbf46a9e0c7cbd3d6e99ee19518482775d0251ae9c；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-21T17:26:54+08:00",
+      "retrievalTime": "2026-11-21T18:25:28+08:00",
       "publicationDate": "2026-11-20",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10"
     },
@@ -947,7 +947,7 @@
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "QQQ Forward PE 17.08，頁面資料日2026-11-20",
-      "lastVerifiedAt": "2026-11-21T17:26:54+08:00",
+      "lastVerifiedAt": "2026-11-21T18:25:28+08:00",
       "sourceEvidence": {
         "label": "QQQ未來12個月Forward P/E",
         "value": 17.08,
@@ -959,7 +959,7 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-21T17:26:54+08:00",
+          "checked_at": "2026-11-21T18:25:28+08:00",
           "value": 17.08,
           "unit": "倍 Forward",
           "observation_date": "2026-11-20",
@@ -999,7 +999,7 @@
           "notes": "本輪HTTP 200；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-21T17:26:54+08:00",
+      "retrievalTime": "2026-11-21T18:25:28+08:00",
       "publicationDate": "2026-11-20",
       "vintage": "Forward PE page observation 2026-11-17"
     },
@@ -1011,7 +1011,7 @@
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
       "detail": "SPY Forward PE 16.81，頁面資料日2026-11-20",
-      "lastVerifiedAt": "2026-11-21T17:26:54+08:00",
+      "lastVerifiedAt": "2026-11-21T18:25:28+08:00",
       "sourceEvidence": {
         "label": "SPY未來12個月Forward P/E",
         "value": 16.81,
@@ -1023,7 +1023,7 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-21T17:26:54+08:00",
+          "checked_at": "2026-11-21T18:25:28+08:00",
           "value": 16.81,
           "unit": "倍 Forward",
           "observation_date": "2026-11-20",
@@ -1063,22 +1063,22 @@
           "notes": "本輪HTTP 200；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-21T17:26:54+08:00",
+      "retrievalTime": "2026-11-21T18:25:28+08:00",
       "publicationDate": "2026-11-20",
       "vintage": "Forward PE page observation 2026-11-17"
     },
     "m03_vt": {
-      "value": 13.83,
+      "value": 13.78,
       "dataDate": "2026-11-20",
       "source": "https://stockanalysis.com/etf/vt/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "VT Forward PE 13.83，頁面資料日2026-11-20",
-      "lastVerifiedAt": "2026-11-21T17:26:54+08:00",
+      "detail": "VT Forward PE 13.78，頁面資料日2026-11-20",
+      "lastVerifiedAt": "2026-11-21T18:25:28+08:00",
       "sourceEvidence": {
         "label": "VT未來12個月Forward P/E",
-        "value": 13.83,
+        "value": 13.78,
         "source_url": "https://stockanalysis.com/etf/vt/"
       },
       "candidateChecks": [
@@ -1087,8 +1087,8 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-21T17:26:54+08:00",
-          "value": 13.83,
+          "checked_at": "2026-11-21T18:25:28+08:00",
+          "value": 13.78,
           "unit": "倍 Forward",
           "observation_date": "2026-11-20",
           "notes": "真實網頁明示Forward PE；TTM未採用"
@@ -1127,7 +1127,7 @@
           "notes": "本輪HTTP 200；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-21T17:26:54+08:00",
+      "retrievalTime": "2026-11-21T18:25:28+08:00",
       "publicationDate": "2026-11-20",
       "vintage": "Forward PE page observation 2026-11-17"
     },
@@ -1205,15 +1205,15 @@
             "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
             "final_url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
             "http_status": 200,
-            "fetched_at_utc": "2026-11-21T09:26:56.448300+00:00",
-            "response_sha256": "86f07748fdecce41047e8a5f1ce126bc5f82950a65472d71d4745f24655cb978",
+            "fetched_at_utc": "2026-11-21T10:25:29.641759+00:00",
+            "response_sha256": "1007f0c0606860692d772aacb9e0e98111fe4eeb835a077cb00d3c899a0b918a",
             "response_bytes": 273323,
-            "archive_path": "data/audit/monthly_calendar_facts_2ff71defab80cf7a828a888594d49b4835b35557234c2bfd456dd8c0c3f9ba9f.json",
+            "archive_path": "data/audit/monthly_calendar_facts_f6adce528802c47ff34cb2b19f64ccd4147a6bf8296b57b14ce0901aed60a4f6.json",
             "archive_kind": "EXTRACTED_CALENDAR_FACTS_JSON",
-            "archive_sha256": "2ff71defab80cf7a828a888594d49b4835b35557234c2bfd456dd8c0c3f9ba9f"
+            "archive_sha256": "f6adce528802c47ff34cb2b19f64ccd4147a6bf8296b57b14ce0901aed60a4f6"
           }
         ],
-        "last_verified_at_utc": "2026-11-21T09:26:56.448300+00:00"
+        "last_verified_at_utc": "2026-11-21T10:25:29.641759+00:00"
       },
       "m18": {
         "observation_month": "2026-10",
@@ -1411,13 +1411,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-11-21T17:27:03+08:00",
+  "dataUpdatedAt": "2026-11-21T18:25:36+08:00",
   "sourceSnapshot": {
-    "macro18": "af2ed9b9f5c5674cd0c5a79767750d9ba87ab521",
-    "macro8": "805e387d471f56139380125e63bbcbbad11dffdd",
-    "officialReleaseCalendar": "145fbe276ee593a16894858ccba0d82d8214421c",
+    "macro18": "31b44e896662d550a02557b6b62a2c17cf28eaa9",
+    "macro8": "4a9af99779f33da1e4468bf7ab31cf1490165ef7",
+    "officialReleaseCalendar": "b0a09575e59f2306ab1dfbee5a4a447fe15749d2",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
     "macro18GeneratedAt": "2026-11-21T16:12:03.246150+08:00",
-    "macro8GeneratedAt": "2026-11-21T17:26:54+08:00"
+    "macro8GeneratedAt": "2026-11-21T18:25:28+08:00"
   }
 }

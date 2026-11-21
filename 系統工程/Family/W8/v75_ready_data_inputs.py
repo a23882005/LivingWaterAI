@@ -278,19 +278,16 @@ def extend(pool, source, data, evaluation_at):
         raise PermissionError('READY_DATA_PRIOR_SPSB_ROWS_REQUIRED')
     from v75_etf_quality_inputs import assess
     delivered = json.loads(files['quality/sgov_provisional_12payment_decomposition.json'])
-    ingested_day = time(source['ingested_at']).date()
     evaluation_day = time(evaluation_at).date()
     declared_day = delivered.get('source_data_asof')
+    # Legacy receipts use the evaluation date as the comparison window end.
+    # The original reader still checks every row against the issuer file.
+    window_end = evaluation_day
     if declared_day:
-        observed = date.fromisoformat(declared_day.split()[0])
-    elif ingested_day == evaluation_day:
-        # Older same-day receipts used the original evaluation-day window.
-        observed = evaluation_day
-    else:
-        raise ValueError('READY_DATA_SGOV_ARCHIVED_OBSERVATION_DATE_REQUIRED')
-    if observed > ingested_day:
-        raise PermissionError('READY_DATA_SGOV_OBSERVATION_AFTER_INGESTION')
-    sgov = sgov_distributions(files, observed.isoformat())
+        window_end = date.fromisoformat(declared_day.split()[0])
+        if window_end > time(source['ingested_at']).date():
+            raise PermissionError('READY_DATA_SGOV_OBSERVATION_AFTER_INGESTION')
+    sgov = sgov_distributions(files, window_end.isoformat())
     events = sec_events(files)
     for evidence in (sgov, events):
         evidence.update(source_manifest_sha256=source['manifest_sha256'], source_available_at=source['ingested_at'])

@@ -572,6 +572,26 @@ jobs:
                   assert len(public.select('#edu-indicators tbody tr')) == 13
                   assert len(public.select('#education-sources li')) == 13
                   assert len(json.loads(public.select_one('#education-scenarios').string)) == 40
+                  assert public.select_one('#bond-score-display').get_text(strip=True)
+                  from playwright.sync_api import sync_playwright
+                  with sync_playwright() as runtime:
+                      browser = runtime.chromium.launch()
+                      check = browser.new_page(viewport={'width': 390, 'height': 844})
+                      check.goto(base+'/?v='+stamp, wait_until='domcontentloaded')
+                      charts = check.locator('#v703-research-charts img')
+                      assert charts.count() == 13
+                      charts.evaluate_all("""async nodes => {
+                          await Promise.all(nodes.map(async img => {
+                              img.loading='eager';
+                              await img.decode();
+                              if (!img.naturalWidth) throw Error(img.src);
+                          }));
+                      }""")
+                      points = check.locator('#r15-chart circle[aria-label]')
+                      if points.count():
+                          points.first.dispatch_event('click')
+                          assert check.locator('#r15-point').text_content() == points.first.get_attribute('aria-label')
+                      browser.close()
                   assert 'Rule Owner=V70' not in public.get_text()
                   assert '22項計分輸入' not in public.get_text()
                   import urllib.error

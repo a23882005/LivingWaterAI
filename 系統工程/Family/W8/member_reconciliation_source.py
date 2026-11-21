@@ -15,7 +15,7 @@ from member_market_source import time
 
 SCHEMA='Family.W8.MemberReconciliationSource.v1'
 INPUTS=('client_id','source_db_sha256','classification_source','product_sources',
-    'v75_parameter_source','market_sources','current_broker_sources',
+    'v75_parameter_source','market_sources','current_cash_corroboration','current_broker_sources',
     'position_valuation_inputs','member_db_path','member_drive_binding','ledger_source',
     'official_target_base_source','document_target','owner_target_decision_source','owner_etf_constraints_source',
     'broker_observation_source','owner_financial_confirmation_source','owner_current_business_source','macro_source',
@@ -95,7 +95,7 @@ def normalize(root,request,config):
     pinned=source_files(pinned_config,at)
     from current_market_contract import read as read_current_market,portfolio_reference
     market_contract=read_current_market(config.get('current_market_contract_source'),request)
-    from member_v82_analysis import universe,target_source
+    from member_v82_analysis import universe,target_source,assessed_holding
     from all_asset_coverage import build
     from member_position_valuation import produce
     from member_market_source import read_market
@@ -130,7 +130,10 @@ def normalize(root,request,config):
         except ValueError as error:
             if not str(error).startswith('MEMBER_MARKET_'):raise
             market=None
-        rows.append({'symbol':asset['symbol'],'market':market})
+        row = {'symbol': asset['symbol'], 'market': market}
+        if config.get('current_cash_corroboration'):
+            row['holding'] = assessed_holding(asset, asset['symbol'], all_assets.get('current_owner_business_facts'), config, request)
+        rows.append(row)
     values=produce(request,all_assets,rows,config['position_valuation_inputs'],current_market_contract=market_contract)
     books=[{'owner':deepcopy(view['owner']),'captured_at':view['captured_at'],
         'cash':deepcopy(view['cash']),'positions':deepcopy(view['positions']),

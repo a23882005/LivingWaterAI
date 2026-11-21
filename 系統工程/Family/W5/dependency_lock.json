@@ -489,7 +489,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_v82_analysis.py",
-    "sha256": "f80fee5ed0c55b133e20a0139d6ed85ff4702a654f4b67d1517d01162ce64c7f"
+    "sha256": "ed41c6de2a121c22a863181a0c3f5f1ce76bc8fa326d12a933ee7e2e34f3e2aa"
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
@@ -521,7 +521,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_reconciliation_source.py",
-    "sha256": "4744ae76f4a0f5f50539da94aa2bb63b5bea65dbce67e6088581ff82faa33ef4"
+    "sha256": "6fa217b880b27618441c17f0e0743919e253e317d13db167780ffeaa8a30ec37"
   },
   {
     "path": "系統工程/Family/W8/sec_publication_source.py",

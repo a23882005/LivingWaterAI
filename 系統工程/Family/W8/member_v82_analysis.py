@@ -310,6 +310,19 @@ def read_v70_safety_snapshot(source, evaluation_at):
     }
 
 
+def assessed_holding(asset, symbol, current_owner, config, request):
+    from owner_current_business import holding_view
+    facts = asset['holdings']
+    quantity = facts[0]['quantity'] if len(facts) == 1 and not asset['source_layer_conflict'] else None
+    holding = {'quantity': quantity, 'quantity_state': 'KNOWN' if quantity is not None else 'UNKNOWN',
+        'source_facts': deepcopy(facts), 'observed_at': facts[0].get('observed_at') if len(facts) == 1 else None,
+        'absence_is_not_zero': True, 'account_aggregation_performed': False}
+    holding=holding_view(holding,symbol,current_owner)
+    from current_market_contract import compare_broker_quantity
+    holding = compare_broker_quantity(config.get('current_cash_corroboration'), holding, symbol, request)
+    return holding
+
+
 def build_report(request, config, repo_root):
     from formal_mode_analysis import native
     native(repo_root)
@@ -383,14 +396,7 @@ def build_report(request, config, repo_root):
                 and market and market['market_identity']['provider_type'] == 'EQUITY'):
             cls.update(asset_type='INDIVIDUAL_STOCK', valuation_waterfall=[],
                 identity_basis='OFFICIAL_MEMBER_REGISTRY_AND_EXACT_PROVIDER_EQUITY_LISTING')
-        facts = asset['holdings']
-        quantity = facts[0]['quantity'] if len(facts) == 1 and not asset['source_layer_conflict'] else None
-        holding = {'quantity': quantity, 'quantity_state': 'KNOWN' if quantity is not None else 'UNKNOWN',
-            'source_facts': deepcopy(facts), 'observed_at': facts[0].get('observed_at') if len(facts) == 1 else None,
-            'absence_is_not_zero': True, 'account_aggregation_performed': False}
-        holding=holding_view(holding,symbol,current_owner)
-        from current_market_contract import compare_broker_quantity
-        holding = compare_broker_quantity(config.get('current_cash_corroboration'), holding, symbol, request)
+        holding = assessed_holding(asset, symbol, current_owner, config, request)
         row = {'instrument_id': instrument.get('instrument_key', 'SOURCE:'+symbol), 'symbol': symbol,
             'coverage_basis': asset['coverage_basis'], 'owner': deepcopy(request['owner']),
             'holding': holding, 'target_lines': deepcopy(asset['targets']), 'market': market,

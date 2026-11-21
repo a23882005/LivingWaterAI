@@ -83,3 +83,16 @@ def test_source_ingestion_cannot_be_backdated_or_changed_after_binding(tmp_path)
     with pytest.raises(PermissionError,match='SCHEMA_OR_AVAILABILITY'):H.read(source,'2026-10-29T07:00:00Z')
     (tmp_path/'PACKAGE_MANIFEST.json').write_text('[]')
     with pytest.raises(PermissionError,match='MANIFEST_HASH'):H.read(source,'2026-10-29T08:00:00Z')
+
+
+def test_missing_registered_manifest_is_a_specific_source_gap(tmp_path):
+    raw=b'[]'
+    source={'schema_version':'Family.W8.V75SourceHandoff.v1','ingested_at':'2026-11-20T13:00:00Z',
+        'root':str(tmp_path),'manifest_sha256':sha256(raw).hexdigest()}
+    with pytest.raises(ValueError,match='V75_HANDOFF_PACKAGE_MANIFEST_MISSING') as found:
+        H.read(source,'2026-11-21T00:00:00Z')
+    assert found.value.issues[0]['expected_sha256']==source['manifest_sha256']
+    assert found.value.issues[0]['source_path']==str(tmp_path/'PACKAGE_MANIFEST.json')
+    (tmp_path/'PACKAGE_MANIFEST.json').write_bytes(b'changed')
+    with pytest.raises(PermissionError,match='HANDOFF_MANIFEST_HASH'):
+        H.read(source,'2026-11-21T00:00:00Z')

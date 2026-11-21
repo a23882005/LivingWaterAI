@@ -129,7 +129,16 @@ def read(source,evaluation_at):
     if source is None:return None
     if source.get('schema_version')!='Family.W8.V75SourceHandoff.v1' or time(source['ingested_at'])>time(evaluation_at):
         raise PermissionError('HANDOFF_SOURCE_SCHEMA_OR_AVAILABILITY')
-    root=Path(source['root']).resolve();raw=(root/'PACKAGE_MANIFEST.json').read_bytes()
+    root=Path(source['root']).resolve()
+    manifest_path=root/'PACKAGE_MANIFEST.json'
+    try:
+        raw=manifest_path.read_bytes()
+    except FileNotFoundError as error:
+        missing=ValueError('V75_HANDOFF_PACKAGE_MANIFEST_MISSING:'+str(manifest_path))
+        missing.issues=[{'code':'V75_HANDOFF_PACKAGE_MANIFEST_MISSING',
+            'field_path':'v75_macro_source_manifest.source_handoff.PACKAGE_MANIFEST.json',
+            'expected_sha256':source['manifest_sha256'],'source_path':str(manifest_path)}]
+        raise missing from error
     if sha256(raw).hexdigest()!=source['manifest_sha256']:raise PermissionError('HANDOFF_MANIFEST_HASH')
     files={}
     for item in json.loads(raw):

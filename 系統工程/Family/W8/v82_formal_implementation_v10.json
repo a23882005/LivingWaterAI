@@ -1,0 +1,145 @@
+{
+  "specification_id": "V82_THREE_LAYER_QUANT_RULES",
+  "version": "1.0",
+  "status": "APPROVED_FOR_IMPLEMENTATION",
+  "spec_approved": true,
+  "effective_at": "2026-10-28T04:27:00+08:00",
+  "effective_timezone": "Asia/Taipei",
+  "approval_record": "APPROVAL_RECORD_v1.0.md",
+  "normative_specification": "specification/v82_design_content_v10.md",
+  "normative_word_document": "V82_Three_Layer_Quant_Rules_Formal_Implementation_v1.0.docx",
+  "scope": "The explicitly defined formulas, constants, windows, state machines, class/subtype routes, stage/mode mappings, risk and funding rules of the approved specification, within its declared supported domain.",
+  "approval_semantics": "The v0.4 proposal provenance does not constitute an outstanding approval gate for these approved rules. Valid inputs must be evaluated directly under v1.0; unavailable facts remain UNKNOWN with a specific reason.",
+  "implementation_status": "FORMAL_ENGINE_INTEGRATION_NOT_VERIFIED_BY_THIS_PACKAGE",
+  "production_approved": false,
+  "production_deployed": false,
+  "brokerage_authorized": false,
+  "production_state": "HOLD_NO_TRADE",
+  "canonical_field_count": 49,
+  "execution_view_field_count": 13,
+  "approved_selector_rules": {
+    "policy_id": "COMMON_OWN_HISTORY_PV_BASELINE",
+    "stage2": "formal_price_or AND legal_current_primary_valuation",
+    "stages": [
+      {
+        "stage": 3,
+        "cumulative_target": 0.3,
+        "qP_min_inclusive": 75,
+        "qV_max_exclusive": 60,
+        "absolute_range_kind": "NORMAL_UPPER_EXCLUSIVE"
+      },
+      {
+        "stage": 4,
+        "cumulative_target": 0.45,
+        "qP_min_inclusive": 75,
+        "qV_max_exclusive": 40,
+        "absolute_range_kind": "NORMAL_UPPER_EXCLUSIVE"
+      },
+      {
+        "stage": 5,
+        "cumulative_target": 0.6,
+        "qP_min_inclusive": 90,
+        "qV_max_exclusive": 40,
+        "absolute_range_kind": "NORMAL_UPPER_EXCLUSIVE"
+      },
+      {
+        "stage": 6,
+        "cumulative_target": 0.75,
+        "qP_min_inclusive": 90,
+        "qV_max_exclusive": 20,
+        "absolute_range_kind": "CHEAP_UPPER_EXCLUSIVE"
+      },
+      {
+        "stage": 7,
+        "cumulative_target": 0.85,
+        "qP_min_inclusive": 97.5,
+        "qV_max_exclusive": 20,
+        "absolute_range_kind": "CHEAP_UPPER_EXCLUSIVE"
+      }
+    ],
+    "stages3_to_7_additional_required": [
+      "stage2",
+      "drawdown_depth > 0"
+    ],
+    "range_rule": "Only legal Forward PE with verified applicable range. Applicability UNKNOWN yields UNKNOWN. Verified nonapplicable clause is omitted, not FALSE. Unknown required price or valuation never treated N/A."
+  },
+  "technical_baseline": {
+    "formula_origin": "technical_baseline_profile_v0.4",
+    "approval_status": "APPROVED_FOR_IMPLEMENTATION",
+    "parameter_changes_from_approved_v04": false,
+    "ma20_ok": {
+      "formula": "C_t >= Decimal(\"0.99\") * MA20_t",
+      "preconditions": [
+        "C_t is a valid completed raw market close",
+        "MA20_t is valid and strictly positive",
+        "all required lineage, calendar and warm-up dependencies are satisfied"
+      ],
+      "equality": "TRUE at C_t == 0.99 * MA20_t",
+      "missing_dependency_result": "UNKNOWN",
+      "accept_as_actual_implementation_predicate": true,
+      "not_atr_tolerance": true
+    },
+    "runtime_llm_threshold_changes_allowed": false,
+    "per_instrument_optimization_or_profitability_proven": false
+  },
+  "historical_reference_harness": {
+    "paths": [
+      "tests/selector",
+      "tests/independent_selector",
+      "tests/technical_numeric"
+    ],
+    "retained_byte_identical": true,
+    "research_only_label_scope": "historical harness outputs only",
+    "formal_stage_null_scope": "historical harness outputs only",
+    "candidate_stage_key_scope": "unchanged historical API for reproducibility",
+    "formal_implementation_must_not_inherit_constant_null_output": true,
+    "full_engine_implemented_by_harness": false
+  },
+  "evidence_status": {
+    "historical_selector_unit_methods": {
+      "count": 10,
+      "normal": "PASS",
+      "optimized": "PASS"
+    },
+    "historical_independent_selector_unit_methods": {
+      "count": 9,
+      "normal": "PASS",
+      "optimized": "PASS"
+    },
+    "historical_technical_numeric_unit_methods": {
+      "count": 35,
+      "normal": "PASS",
+      "optimized": "PASS"
+    },
+    "full_technical_T001_T053": {
+      "count": 53,
+      "status": "NOT_RUN"
+    },
+    "full_mode_risk_MR01_MR52": {
+      "count": 52,
+      "status": "NOT_RUN"
+    },
+    "global_acceptance_A_G": {
+      "count": 68,
+      "status": "NOT_RUN"
+    },
+    "formal_owner_T01_T42": "NOT_RUN",
+    "data_replay": "NOT_RUN",
+    "empirical_evaluation": "NOT_RUN",
+    "production_deployment": "NOT_DONE"
+  },
+  "unknown_policy": {
+    "valid_approved_rule_with_valid_inputs": "EVALUATE_DO_NOT_MASK_AS_UNKNOWN",
+    "missing_or_invalid_required_data": "UNKNOWN_WITH_REASON",
+    "unsupported_method_or_domain": "EXPLICIT_UNSUPPORTED_REASON",
+    "unconnected_producer": "UNCONNECTED_PRODUCER_NOT_UNAPPROVED_RULE",
+    "verified_legal_na": "N_A_ONLY_IF_APPLICABILITY_CONTRACT_PERMITS",
+    "market_predicate_false": "FALSE_NOT_UNKNOWN"
+  },
+  "historical_formal_snapshot": {
+    "path": "reference/V82_formal_readonly_snapshot.md",
+    "version": "1.21.0",
+    "sha256": "392e54808c33cce99e3567f0e8942650ad50b382d9fc87acbbe20f012b568372",
+    "role": "UNMODIFIED_HISTORICAL_REFERENCE_NOT_CURRENT_V10_APPROVAL_STATE"
+  }
+}

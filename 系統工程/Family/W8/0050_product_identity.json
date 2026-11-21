@@ -1,0 +1,19 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "0050",
+  "source_url": "https://www.yuantaetfs.com/product/detail/0050/Basic_information",
+  "source_artifact_sha256": "f4433ee7cb6aa8e87bde6a6561b3f6f68514ea6a8ac0073e8fd4260ef9101010",
+  "retrieved_at": "2026-10-30T05:18:06.464836+00:00",
+  "is_stock_etf": true,
+  "replication": "INDEX_REPLICATION",
+  "evidence_kind": "OFFICIAL_ISSUER_BENCHMARK_AND_OBJECTIVE",
+  "evidence_reference": "PRIVATE_HANDOFF:product_sources/0050.html#SHA256:f4433ee7cb6aa8e87bde6a6561b3f6f68514ea6a8ac0073e8fd4260ef9101010",
+  "fund_name": "Yuanta/P-shares Taiwan Top 50 ETF",
+  "benchmark": "FTSE TWSE Taiwan 50 Index",
+  "excerpts": [
+    "臺灣50指數",
+    "總市值最大的50家公司"
+  ],
+  "market_scope": "TAIWAN_LARGE_CAP_SEMICONDUCTOR_CONCENTRATED",
+  "index_company_count": 50
+}

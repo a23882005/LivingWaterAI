@@ -1,0 +1,22 @@
+{
+  "schema_version": "Family.W8.OwnerApprovedRules.v1",
+  "profile_id": "V82_COMPLETE_V04_OWNER_APPROVED",
+  "spec_version": "0.4",
+  "approval_status": "OWNER_APPROVED",
+  "owner_role": "COMMANDER",
+  "recorded_at": "2026-10-27T20:25:22.883270+00:00",
+  "owner_statement": [
+    "我批准，我是指挥官，我批准。",
+    "全部都授權都批准"
+  ],
+  "spec_sha256": "c2fa87aec822ae3f386f14cca18c41e094899182f544983e8ac95beda0b18766",
+  "docx_sha256": "1279f3024fd5e9ac94b2f93a01220cac770e0a3ae9ab4c5092dc1fbdfd321ebd",
+  "package_sha256": "83d02d60b160b32bf95ffab85775e0587e99cb851af8d6499bc4e465b7f643ed",
+  "reference_numeric_sha256": "54e80709932753ac4f59344927095f65157f0aa8a46e00fff3b313ea6d5e3d2c",
+  "numeric_producer_sha256": "1665ba47b3a3beb3395082d81a49c8afdd60de7ae385c730d7e90c21d9ea2868",
+  "implementation_scope": "HOLDINGS_ANALYSIS_TECHNICAL_SOURCE_PRODUCTION",
+  "integration_acceptance": "IN_PROGRESS",
+  "empirical_validation": "NOT_CLAIMED",
+  "order_actions": "NONE",
+  "approved_scope": "FULL_V04_RULE_SPECIFICATION"
+}

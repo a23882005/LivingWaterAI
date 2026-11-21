@@ -1,0 +1,19 @@
+## 00956 日本高股息股票ETF正式估值映射｜2026-11-17｜v1.22.2
+
+決策編號：FAMILY-00956-VALUATION-20261117。指揮官於本對話明確授權「你是金融專家由你決定吧」，中PM據此裁定本條，指揮官接續指示盡速完成。狀態RULE_APPROVED_FOR_IMPLEMENTATION；此為規則生效，不代表程式、資料或金融全鏈已驗收。
+
+適用域僅Family的00956（中國信託日經高股息50 ETF）與其已核實追蹤指數Nikkei 225 High Dividend Yield Stock 50 Index。新增具名primary_class「日本高股息股票ETF」、primary_framework「FAMILY-00956-VALUATION-20261117」；維持asset_type=BROAD_ETF與既有asset_grade=B。此為32.2／32.6／32.6A的產品專屬補充，不改其他既有類別、標的或結構等級。
+
+估值主方法使用同指數官方加權會計年度預估本益比；合法備援使用同指數官方加權股價淨值比。既有metric欄位對應FORWARD_PE、PB，方法順序為[FORWARD_PE, PB]。FORWARD_PE必須同時保留method=NIKKEI_INDEX_WEIGHTED_FISCAL_YEAR_ESTIMATE、forecast_horizon=PROVIDER_FISCAL_YEAR_ROLL及官方轉年度說明；不得標成NTM或TRAILING_PE。PB保留官方最近季度帳面價值方法。來源尚未列清適用盈餘年度時保持原未提供狀態，不由月份推算。
+
+兩個方法均使用該指數、同一計算口徑自身的合格歷史，沿既有32.4及32.5計算與分類；沿用原歷史期間、樣本／時效／PIT及方法一致性規則。不新增日本絕對倍數區間，不借用VT、VOO、0050或一般日經225的估值區間／歷史。已存在的通用歷史比例與分位規則及Extreme確認保持。
+
+按32.6A由主方法先檢查適用性、數值、方法與來源有效性；主方法不足時，才使用合格PB備援並保留原因。主方法有效但顯示昂貴時不得換PB挑便宜結論；不同方法不平均、不挑最低值。預估盈餘非正或盈利品質問題依原規則揭露，即使PB可用也不消除該風險。兩方法皆不足時保留VALUATION_DATA_INSUFFICIENT與具體缺項。
+
+底層指數資料標為INDEX_PROXY並綁定00956官方產品／追蹤指數證據；不能冒稱基金本身的實際持倉聚合值。基金折溢價、追蹤差異、費用、日圓／新臺幣匯率及日本產業集中度分欄揭露，不混入倍數。預估股息殖利率與ROE為補充指標；基金配息率不替代底層估值，也不單獨產生買進結論。
+
+保留資料日、取得時間、發布／可得時間及缺失狀態；新抓取時間不替代歷史發布時間。不以今天成分倒推當時已知資料，不把一筆當期數字當合格自身歷史。指數歷史若含回溯計算，沿原歷史資料資格規則標示與處理。
+
+本條沿用原M／R、長期配置、資金／保護限制及交易授權規則。除上述00956映射外，其餘V82全文保持原效力。施工完成前，既有程式可能仍回傳JAPAN_HIGH_DIVIDEND_PRIMARY_PROFILE_REQUIRES_FORMAL_MAPPING，屬接入待完成，不再是需Owner決定的規則缺口。
+
+方法依據：日經User's Guide（https://indexes.nikkei.co.jp/nkave/archives/file/users_guide_en.pdf）之指數加權PER／PBR定義；指數概況及月報（https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225hdy）。來源方法查核與主／備方法的PM決策分開記錄：官方文件提供計算口徑，本條的優先順序是Owner授權中PM作出的系統設計裁定。

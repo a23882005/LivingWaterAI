@@ -1,0 +1,155 @@
+{
+  "amendment_id": "V75-PRED007-20261029-01",
+  "amendment_version": "1.0",
+  "base_predicate_version": "V75_PREDICATE_PARAMS_v1.0.3",
+  "status": "AUTHORIZED_IMPLEMENTATION_SPEC",
+  "authority": "Owner expressly delegated adjudication to dot on 2026-10-29T08:47:26Z",
+  "scope": "USD PRED-007 only",
+  "activation": "Upon delivery for implementation; production activates only with explicit loader version and passed integration tests",
+  "execution": "ON_DEMAND_NO_NEW_SCHEDULE",
+  "retired_fields": {
+    "SOFR_OIS_bps": "RETIRED_UNDEFINED_NOT_AN_ALIAS",
+    "FRA_OIS_bps": "RETIRED_UNDEFINED_NOT_AN_ALIAS"
+  },
+  "signals": {
+    "R": {
+      "field": "sofr_iorb_spread_bps",
+      "left": "SOFR",
+      "right": "IORB",
+      "formula": "100*(left_pct-right_pct)",
+      "unit": "bps",
+      "left_source": "https://fred.stlouisfed.org/series/SOFR",
+      "right_source": "https://fred.stlouisfed.org/series/IORB",
+      "economic_date_matching": "SOFR observation date and IORB effective date",
+      "age_max_fed_business_days": 2,
+      "abnormal_floor_bps": "10",
+      "severe_floor_bps": "25"
+    },
+    "C": {
+      "field": "aa_financial_cp90d_tbill3m_discount_spread_bps",
+      "left": "DCPF3M",
+      "right": "DTB3",
+      "formula": "100*(left_pct-right_pct)",
+      "unit": "bps",
+      "basis": "discount / 360",
+      "left_source": "https://fred.stlouisfed.org/series/DCPF3M",
+      "right_source": "https://fred.stlouisfed.org/series/DTB3",
+      "economic_date_matching": "same observation date only",
+      "age_max_fed_business_days": 5,
+      "held_warning_if_age_gt": 1,
+      "abnormal_floor_bps": "25",
+      "severe_floor_bps": "50"
+    },
+    "S": {
+      "field": "SRF_usage_usd",
+      "unit": "USD",
+      "abnormal_gte": "5000000000",
+      "severe_gte": "20000000000",
+      "source_freshness": "UNCHANGED_CANONICAL_BASE_CONTRACT"
+    },
+    "D": {
+      "field": "treasury_market_depth_percentile_3y",
+      "unit": "percentile_0_100",
+      "abnormal_lte": "20",
+      "severe_lte": "5",
+      "source_freshness": "UNCHANGED_CANONICAL_BASE_CONTRACT"
+    }
+  },
+  "R_C_observation_policy": {
+    "eval_timezone": "America/New_York",
+    "observation_strictly_before_eval_date": true,
+    "actually_available_at_retrieval_required": true,
+    "max_date_pair_selection": "LATEST_VALID_SAME_DATE_PAIR",
+    "business_age": "count Fed business dates x with observation_date < x <= eval_date",
+    "calendar": "Federal Reserve BANKS/BRANCHES business calendar, not Board office calendar; Saturday holiday does not close preceding Friday; Sunday holiday closes following Monday; calendar_id/version required",
+    "missing_pair": "UNAVAILABLE_NOT_ZERO",
+    "asynchronous_components": "LATEST_OBSERVATION_COMPOSITE_WITH_PER_SIGNAL_DATES",
+    "current_run_evidence": "official snapshot and truthful retrieval time; do not fabricate historical available_at"
+  },
+  "R_C_history": {
+    "window": "[selected_observation_date minus 3 calendar years, selected_observation_date)",
+    "leap_day_minus_years": "Feb 28 if target Feb 29 nonexistent",
+    "unique_date_pairs_only": true,
+    "current_observation_excluded": true,
+    "forward_fill": false,
+    "min_n": 252,
+    "min_span_calendar_days": 730,
+    "quantile_method": "nearest_rank_1_based_ceiling",
+    "q_abnormal": "0.95",
+    "q_severe": "0.99",
+    "abnormal_formula": "max(floor_A,Q95)",
+    "severe_formula": "max(floor_S,Q99,A+1bps)",
+    "same_date_conflict": "REVIEW_REQUIRED within a selected vintage; explicit official revisions may be resolved upstream with version evidence",
+    "source_request_coverage": "request start <= selected observation minus3years, request end covers selected observation; distinguish unqueried vs observed missing"
+  },
+  "aggregation": {
+    "quality_veto_first": true,
+    "missing_flags": null,
+    "count_each_candidate_once": true,
+    "severe_also_abnormal": true,
+    "ordered_branches": [
+      {
+        "when": "V>=2",
+        "status": "VALID",
+        "state": "SEVERE_ABNORMAL"
+      },
+      {
+        "when": "A>=2",
+        "status": "VALID",
+        "state": "ABNORMAL"
+      },
+      {
+        "when": "N<3",
+        "status": "INSUFFICIENT_DATA",
+        "state": null
+      },
+      {
+        "when": "A==1",
+        "status": "VALID",
+        "state": "MIXED"
+      },
+      {
+        "when": "otherwise",
+        "status": "VALID",
+        "state": "NORMAL"
+      }
+    ],
+    "valid_sub_states": "[aggregate_state]",
+    "invalid_sub_states": [],
+    "partial_warning": "VALID and N<4 => PARTIAL_COVERAGE; list missing candidates and reasons",
+    "single_severe_warning": "V==1 regardless aggregate status, preserving available diagnostics",
+    "precedence_override": "Only PRED-007 unavailable-candidate generic unresolved/default handling; do not alter other predicates or quality vetoes",
+    "interpretation": "observed evidence only; candidate votes are not statistically independent",
+    "quality_veto_order": [
+      "INVALID_INPUT",
+      "REVIEW_REQUIRED"
+    ],
+    "quality_veto_aggregate_state": null
+  },
+  "limits": {
+    "new_floors_are": "new delegated policy choices, not Fed thresholds or validated investment performance",
+    "financial_crisis_backtest": "NOT_PERFORMED",
+    "current_vintage_feasibility": "performed for R and C only; not complete PRED-007",
+    "historical_replay": "label restated-current-vintage unless proper point-in-time snapshots exist",
+    "other_PREDs": "UNCHANGED",
+    "portfolio_targets": "UNCHANGED",
+    "broker_orders": "NOT_AUTHORIZED_BY_THIS_SPEC"
+  },
+  "required_output": [
+    "base_predicate_version",
+    "amendment_id",
+    "amendment_version",
+    "ruleset_sha256",
+    "eval_at_utc",
+    "eval_date_ny",
+    "assessment_status",
+    "aggregate_state",
+    "sub_states",
+    "coverage",
+    "missing_candidates",
+    "warnings",
+    "signals_with_sources_dates_units_values_thresholds_availability_reasons"
+  ],
+  "issued_at_utc": "2026-10-29T09:03:48+00:00",
+  "effective_at_utc": "2026-10-29T09:03:48+00:00"
+}

@@ -55,6 +55,7 @@ class CurrentSourcesTest(unittest.TestCase):
     def snapshot(self):
         return {'schema_version':'Family.W5.W1Snapshot.v1','client_id':CLIENT,
                 'data_provenance':'SOURCE_BACKED','tables':self.tables,
+                'payload_digest':M._module('official_holdings_source')._digest(self.tables),
                 'source_sha256':hashlib.sha256(self.db.read_bytes()).hexdigest()}
 
     def intake(self,**kwargs):
@@ -125,6 +126,21 @@ class OriginalV70RuntimeTest(unittest.TestCase):
         self.assertIsNone(out['monetary_amounts'])
         self.assertTrue(all(x in ['/V70_macro_latest.json','/v703_deployment_receipt.json'] for x in out['local_reads']))
         self.assertEqual(out['trade_authorization'],'NONE')
+
+    def test_external_display_telemetry_is_blocked_and_not_a_local_calculation_read(self):
+        original=M.run_original_v70(M.REPO,{'stock_percent':80,'bond_percent':20},evaluation_at=self.when)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);folder=root/'系統工程/總經V70';folder.mkdir(parents=True)
+            shutil.copyfile(M.REPO/'系統工程/總經V70/V70_macro_latest.json',folder/'V70_macro_latest.json')
+            html=(M.REPO/'系統工程/總經V70/V70-3-27.html').read_text()
+            html+='<script>fetch("https://telemetry.synthetic.invalid/view", {method:"POST"})</script>'
+            (folder/'V70-3-27.html').write_text(html)
+            out=M.run_original_v70(root,{'stock_percent':80,'bond_percent':20},evaluation_at=self.when)
+        self.assertIn({'url':'https://telemetry.synthetic.invalid/view','method':'POST',
+            'reason':'EXTERNAL_NETWORK_DISABLED'},out['blocked_external_requests'])
+        self.assertTrue(all(x in ['/V70_macro_latest.json','/v703_deployment_receipt.json'] for x in out['local_reads']))
+        for key in ('status','gates','tactical_percentages','macro_snapshot','original_latest','monetary_amounts'):
+            self.assertEqual(out[key],original[key])
 
     def test_original_loader_rejects_unready_feed(self):
         with tempfile.TemporaryDirectory() as tmp:

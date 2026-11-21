@@ -8,7 +8,7 @@ from family_input import digest
 from target_source_bridge import number
 
 
-def bind_bond_targets(request, prepared, binding):
+def bind_bond_targets(request, prepared, binding,*,projection=None):
     bundle=request['native_bundle']; framework=bundle['asset_framework']
     lines=request['confirmed_target']['payload']['draft']['target_lines']
     source=bundle['bond_request']['v75_source_context']
@@ -26,6 +26,11 @@ def bind_bond_targets(request, prepared, binding):
         money=line.get('target_amount',{})
         require(money.get('value_state')=='KNOWN','BOND_TARGET_AMOUNT_UNAVAILABLE',
                 'target_lines.'+key,'W2','DATA_UNAVAILABLE')
+        native_key=projection['source_to_native'][key] if projection is not None else key
+        if projection is not None:
+            money=projection['targets'][native_key]['target_amount']
+            require(money.get('value_state')=='KNOWN','BOND_TARGET_FX_SOURCE_REQUIRED',
+                    'target_lines.'+key,status='DATA_UNAVAILABLE')
         require(money.get('currency')==request['owner']['currency'],
                 'BOND_TARGET_FX_SOURCE_REQUIRED','target_lines.'+key,status='DATA_UNAVAILABLE')
         row=one([r for r in native if r['asset_id']==asset],'bond.native_target.'+asset)
@@ -38,8 +43,8 @@ def bind_bond_targets(request, prepared, binding):
         require(policy['holding_policy'] in ('HOLD_AS_IS','ADJUSTABLE'),
                 'BOND_HOLDING_POLICY_UNAVAILABLE','bond.policy.'+asset,'W1','DATA_UNAVAILABLE')
         target=one([r for r in framework['integrated_asset_framework']['instrument_targets']
-                    if r['instrument_id']==key],'bond.C7.target.'+asset)
-        drift=one([r for r in framework['drift_snapshot']['items'] if r['instrument_id']==key],
+                    if r['instrument_id']==native_key],'bond.C7.target.'+asset)
+        drift=one([r for r in framework['drift_snapshot']['items'] if r['instrument_id']==native_key],
                   'bond.C7.drift.'+asset)
         protected=policy['holding_policy']=='HOLD_AS_IS'
         require(target['protected'] is protected and drift['protected'] is protected,
@@ -50,6 +55,9 @@ def bind_bond_targets(request, prepared, binding):
             'native_target':deepcopy(row),'policy':deepcopy(policy),'c7_drift':deepcopy(drift),
             'new_buy_candidate':policy['new_buy_candidate'],
             'client_action_resolution':'SOURCE_FACTS_ONLY_PENDING_CROSS_ENGINE_PRIORITY'}
+        if projection is not None:
+            results[asset]['native_target_instrument_id']=native_key
+            results[asset]['native_target_source_digest']=digest(projection)
     result={'schema_version':'Family.W5.BondTargetSource.v1','client_id':request['client_id'],
         'run_id':request['run_id'],'owner':deepcopy(binding['native_owner']),
         'currency':request['owner']['currency'],'target_digest':digest(request['confirmed_target']),

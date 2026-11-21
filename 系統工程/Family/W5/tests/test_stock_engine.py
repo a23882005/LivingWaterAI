@@ -32,6 +32,7 @@ def stock_case():
         'technical_reduction_predicate':'FALSE','active_orders':[],'valuation_price':'10',
         'order_working_price':'10','normalized_order_price':'10','minimum_lot':'1',
         'required_known_caps':['1000'],'order_intent_id':'SYNTHETIC-INTENT-001',
+        'execution_costs':{'fee_reserve':'0','currency':'USD','source_reference':'SYNTHETIC_EXPLICIT_ZERO_FEES'},
         'core':{'valuation_metrics':[{'metric_name':'PE','current':'20','historical_median':'20',
             'data_quality':'OK','freshness':'FRESH','pit_status':'VERIFIED'}],
             'valuation_waterfall':['PE'],'fundamental_fields':[{'field_name':'growth',

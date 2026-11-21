@@ -451,7 +451,7 @@ def run_new_case(case: dict[str, Any], common: dict[str, Any]) -> dict[str, Any]
         active_orders=(),
     )
     plan = build_buy_execution_plan(
-        gap=gap, permission=core.permission, bound_equity_budget=bound,
+        canonical_valuation_price=Decimal(common["canonical_valuation_price"]), fee_reserve=Decimal('0'), gap=gap, permission=core.permission, bound_equity_budget=bound,
         order_working_price=Decimal(common["normalized_order_price"]), minimum_lot=Decimal(common["minimum_lot"]),
         normalized_order_price=Decimal(common["normalized_order_price"]), execution_currency=common["currency"],
         order_intent_id=f"OID-{case['case_id']}",

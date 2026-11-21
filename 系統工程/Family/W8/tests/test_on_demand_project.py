@@ -97,6 +97,23 @@ class ChatGPTRuntimeTest(unittest.TestCase):
         self.assertEqual(result["status"],"DATA_UNAVAILABLE")
         self.assertEqual(result["result"]["trade_authorization"],"NONE")
 
+    def test_incomplete_deployment_diagnostic_cannot_be_wired_as_menu04(self):
+        with self.assertRaisesRegex(ValueError,'INCOMPLETE_DEPLOYMENT_DIAGNOSTIC_NOT_A_PRODUCTION_ENTRY'):
+            self.menu(native_source_config={'flow':'DEPLOYMENT'})
+
+    def test_registered_sources_open_only_on_authenticated_menu04(self):
+        import sys
+        from unittest.mock import patch
+        config = {'repo_root':str(FAMILY.parents[1]), 'client_id':self.client,
+                  'source_db_sha256':self.hash}
+        missing = {'local_path':str(self.db.with_name('no-source-file.txt')), 'sha256':'0'*64}
+        with patch.object(sys, 'path', [str(ROOT),str(FAMILY/'W5'),*sys.path]):
+            menu = self.menu(member_v82_source_config=config, registered_project_sources=missing)
+            self.assertEqual(menu.select(4)['status'], 'LOGIN_REQUIRED')
+            # W7 resumes the pending 04 inside login() after the credential is accepted.
+            with self.assertRaisesRegex(FileNotFoundError, 'no-source-file'):
+                menu.login('synthetic-secret')
+
     def test_logout_invalidates_local_session(self):
         menu=self.menu()
         menu.login("synthetic-secret")

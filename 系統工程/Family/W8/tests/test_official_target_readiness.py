@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
+from copy import deepcopy
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +38,42 @@ def entry(versions, allocations, provider=None):
 
 
 class TargetReadinessTest(unittest.TestCase):
+    def test_original_configuration_review_survives_menu_boundary_without_full_mentor_claim(self):
+        request={'client_id':CLIENT,'run_id':'r1','evaluation_at':'2026-10-29T10:00:00Z',
+            'owner':{'account':'A'},'client_snapshot':{'payload':{'source_sha256':'digest'}}}
+        review={'schema_version':'Family.W5.ConfigurationReview.v1','client_id':CLIENT,
+            'run_id':'r1','evaluation_at':request['evaluation_at'],'owner':request['owner'],
+            'source_db_sha256':'digest','drift_snapshot':{'value_state':'KNOWN','items':[]},
+            'full_native_pipeline_complete':False,'full_native_mentor_reached':False,
+            'trade_action':'NO_TRADE'}
+        class Runner:
+            def context_provider(self):
+                return {'client_id':CLIENT,'native_binding':{'data_provenance':'SOURCE_BACKED'}}
+            def analyze(self,request):
+                return {'status':'DATA_UNAVAILABLE','issue_codes':[{'code':'C7_FRAMEWORK_NOT_READY'}],
+                    'configuration_review':review}
+        obj=entry([version()],[allocation()],lambda *_:(request,Runner()))
+        result=obj.deployment_pace({})
+        self.assertEqual(result['configuration_review'],review)
+        self.assertIsNot(result['configuration_review'],review)
+        self.assertIsNone(result['mentor']);self.assertIsNone(result['canonical_result'])
+        progress={'schema_version':'Family.W8.DeploymentProgressReview.v1',
+            **{k:deepcopy(review[k]) for k in ('client_id','run_id','evaluation_at','owner','source_db_sha256')},
+            'full_native_pipeline_complete':False,'full_native_mentor_reached':False,'trade_action':'NO_TRADE',
+            'account_funding_check':{'conservation_status':'BLOCKED_MISSING_NATIVE_DECISIONS'}}
+        review['deployment_progress']=progress
+        self.assertEqual(obj.deployment_pace({})['configuration_review']['deployment_progress'],progress)
+        progress['owner']['account']='OTHER'
+        with self.assertRaisesRegex(PermissionError,'DEPLOYMENT_PROGRESS_BINDING'):
+            obj.deployment_pace({})
+        review.pop('deployment_progress')
+        for key,value in [('client_id','OTHER'),('run_id','OTHER'),('source_db_sha256','OTHER'),
+                          ('full_native_mentor_reached',True)]:
+            before=deepcopy(review);review[key]=value
+            with self.subTest(key=key),self.assertRaisesRegex(PermissionError,'CONFIGURATION_REVIEW_BINDING'):
+                obj.deployment_pace({})
+            review.clear();review.update(before)
+
     def test_draft_target_blocks_engine(self):
         called = []
         obj = entry([version("DRAFT")], [allocation()],

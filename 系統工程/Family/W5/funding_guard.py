@@ -35,6 +35,7 @@ def check_aggregate(*, owner, run_id, available, equity_budget, bond_budget, cla
     avail = amount(available)
     values = []
     ids = set()
+    decisions = set()
     for claim in claims:
         if owner_key(claim['owner']) != key or claim.get('run_id') != run_id:
             raise FundingError('OWNER_OR_RUN_MISMATCH')
@@ -42,6 +43,13 @@ def check_aggregate(*, owner, run_id, available, equity_budget, bond_budget, cla
         if not isinstance(cid, str) or not cid or cid in ids:
             raise FundingError('DUPLICATE_OR_MISSING_CLAIM')
         ids.add(cid)
+        # A new label cannot duplicate the same underlying native decision.
+        if 'asset_id' in claim or 'source_engine' in claim:
+            decision=(claim.get('source_engine'),claim.get('asset_id'))
+            if any(not isinstance(v,str) or not v for v in decision):
+                raise FundingError('NATIVE_DECISION_IDENTITY_REQUIRED')
+            if decision in decisions:raise FundingError('DUPLICATE_NATIVE_DECISION')
+            decisions.add(decision)
         kind = claim.get('asset_class')
         if kind not in caps:
             raise FundingError('ASSET_CLASS_INVALID')

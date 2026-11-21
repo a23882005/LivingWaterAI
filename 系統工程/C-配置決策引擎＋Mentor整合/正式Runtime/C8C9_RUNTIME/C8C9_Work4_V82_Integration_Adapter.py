@@ -168,8 +168,19 @@ def _schema_validator(filename: str) -> Draft202012Validator:
     return validator
 
 
+def _absence_contract():
+    import importlib.util
+    path=Path(__file__).resolve().parents[4]/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py'
+    spec=importlib.util.spec_from_file_location('c7_confirmed_absence_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
+
 def _validate_schema(instance: Any, filename: str, code: str) -> None:
-    errors = sorted(_schema_validator(filename).iter_errors(instance), key=lambda e: list(e.absolute_path))
+    validator=_schema_validator(filename);absence=_absence_contract()
+    if absence.is_extended(instance):
+        validator=Draft202012Validator(absence.extend_schema(validator.schema))
+    errors = sorted(validator.iter_errors(instance), key=lambda e: list(e.absolute_path))
     if errors:
         e = errors[0]
         path = "/" + "/".join(str(x) for x in e.absolute_path) if e.absolute_path else "/"
@@ -308,7 +319,7 @@ def _validate_work3(w3: Mapping[str,Any], run_id: str) -> tuple[tuple[str,str,st
 
 
 def _validate_c7_against_work3(c7: Mapping[str,Any], w3: Mapping[str,Any], owner: tuple[str,str,str], run_id:str) -> Mapping[str,Any]:
-    if c7.get("contract_name") != C7_CONTRACT_NAME or c7.get("contract_version") != C7_CONTRACT_VERSION:
+    if c7.get("contract_name") != C7_CONTRACT_NAME or c7.get("contract_version") not in (C7_CONTRACT_VERSION,_absence_contract().VERSION):
         _fail("C8C9.W4.C7_CONTRACT", "C7 FundingContext contract/version mismatch")
     if c7.get("run_id") != run_id:
         _fail("C8C9.W4.RUN_ID_MISMATCH", "C7 run_id mismatch")
@@ -327,6 +338,9 @@ def _validate_c7_against_work3(c7: Mapping[str,Any], w3: Mapping[str,Any], owner
         if ident[0] not in FORMAL_DOMAINS:
             _fail("C8C9.W4.C7_DOMAIN_SET", "invalid C7 domain")
         domains.append(ident[0])
+        try:absent=_absence_contract().validate_absent(ctx,c7.get("contract_version"))
+        except ValueError as error:_fail("C8C9.W4.ACCOUNT_ABSENCE",str(error))
+        if absent:continue
         ba=(ident[1],ident[2])
         if ba in seen_ba: _fail("C8C9.W4.C7_DUPLICATE_ACCOUNT", "broker+account duplicated")
         seen_ba.add(ba)

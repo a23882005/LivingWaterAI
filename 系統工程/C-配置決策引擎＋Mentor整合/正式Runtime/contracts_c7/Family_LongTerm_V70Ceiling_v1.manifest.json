@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "f8fb0d580e6c0ebf3f62a60d6cf111e2223905ef9256faf4571bc639d6284c1a"
+      "sha256": "ed41c6de2a121c22a863181a0c3f5f1ce76bc8fa326d12a933ee7e2e34f3e2aa"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -129,7 +129,7 @@
     },
     {
       "path": "../../Family/W8/member_position_valuation.py",
-      "sha256": "4cfc5fc56e9d1a508a5f7610ecefe8a9dd107cba2d0beedecb904ad8e043d7e6"
+      "sha256": "3453b7732cf1e25ec8835bb13514aa8f0337602e854349747495e3de1c01bc8e"
     },
     {
       "path": "../../Family/W8/tpex_actual_sessions.py",
@@ -137,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/member_reconciliation_source.py",
-      "sha256": "4744ae76f4a0f5f50539da94aa2bb63b5bea65dbce67e6088581ff82faa33ef4"
+      "sha256": "6fa217b880b27618441c17f0e0743919e253e317d13db167780ffeaa8a30ec37"
     },
     {
       "path": "../../Family/W8/sec_publication_source.py",
@@ -277,7 +277,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "53f1847c24659e2401078a8fcc57c506db83998ee5e45d7ec4357ac4dcaea6f4"
+      "sha256": "df0ed2a53f9cdcbfa31eedfc12a7c94116ead813f5104bfe2953259a2fa6726a"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

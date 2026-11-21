@@ -36,6 +36,8 @@ jobs:
           assert receipt['status'] == 'LIVE_VERIFIED' and receipt['asOf'] == feed['asOf']
           print('VERIFIED_BATCH', receipt['githubRunId'], feed['asOf'])
           PY
+      - name: Build engineering risk panels
+        run: python scripts/v70_cap/build.py staging staging
       - name: Prepare private password verifier
         env:
           WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}

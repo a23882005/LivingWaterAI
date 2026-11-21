@@ -384,6 +384,9 @@ jobs:
           status=$(curl --silent --show-error --output /dev/null --dump-header "$RUNNER_TEMP/engineering-headers" --write-out '%{http_code}' "${base%/}/v70-engineering/index.html")
           test "$status" = 401
           grep -iq '^www-authenticate: Basic ' "$RUNNER_TEMP/engineering-headers"
+      - name: Build engineering-only risk panels
+        if: vars.V70_ENGINEERING_ENABLED == 'true'
+        run: python scripts/v70_cap/build.py build/engineering build/engineering-cap
       - name: Upload verified engineering files to the protected directory
         if: vars.V70_ENGINEERING_ENABLED == 'true'
         uses: appleboy/scp-action@v1
@@ -392,7 +395,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
           password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
           port: 65002
-          source: build/engineering/index.html,build/engineering/V70_macro_latest.json
+          source: build/engineering-cap/index.html,build/engineering-cap/V70_macro_latest.json
           target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/v70-engineering
           strip_components: 2
           overwrite: true
@@ -425,9 +428,9 @@ jobs:
                       raise
               request = urllib.request.Request(url, headers={'Authorization':'Basic ' + token})
               with opener.open(request, timeout=30) as response:
-                  if response.read() != (Path('build/engineering') / filename).read_bytes():
+                  if response.read() != (Path('build/engineering-cap') / filename).read_bytes():
                       raise ValueError(filename + ' differs after upload')
-          print('工程版登入後讀回一致', json.loads(Path('build/engineering/V70_macro_latest.json').read_text())['asOf'])
+          print('工程版登入後讀回一致', json.loads(Path('build/engineering-cap/V70_macro_latest.json').read_text())['asOf'])
           PY
       - name: Render final education homepage before any site upload
         run: python scripts/build_v70_education_results.py build/engineering education/v70-education-demo.html build/education-results

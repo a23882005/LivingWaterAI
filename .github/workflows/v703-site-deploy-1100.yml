@@ -400,7 +400,7 @@ jobs:
           print('工程版登入後讀回一致', json.loads(Path('build/engineering/V70_macro_latest.json').read_text())['asOf'])
           PY
       - name: Render final education homepage before any site upload
-        run: python scripts/build_v70_education_results.py build/site education/v70-education-demo.html build/education-results
+        run: python scripts/build_v70_education_results.py build/engineering education/v70-education-demo.html build/education-results
       - name: Check deployment configuration
         env:
           LW_HOST: ${{ secrets.HOSTINGER_SFTP_HOST }}

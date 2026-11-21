@@ -110,6 +110,15 @@ def build(site, template, output):
                 return copy.innerHTML;
             }""")
             page.locator("#" + ident).evaluate("(node,html)=>node.innerHTML=html", fragment)
+        points = model.locator("#r15-chart circle[data-r15-index]")
+        details = points.evaluate_all("""nodes => nodes.map(node => {
+            node.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+            return document.getElementById('r15-point').textContent;
+        })""")
+        page.locator("#r15-chart circle[aria-label]").evaluate_all("""(nodes, details) => {
+            if (nodes.length !== details.length) throw Error('Rolling chart point mismatch');
+            nodes.forEach((node, index) => node.setAttribute('aria-label', details[index]));
+        }""", details)
         for ident in ("family-data-status","family-news","v703-update-banner","v703-data-state"):
             page.locator("#" + ident).evaluate("(node)=>node.textContent=''")
         page.locator("#v703-update-banner").evaluate(
@@ -144,6 +153,21 @@ def build(site, template, output):
 const el=id=>document.getElementById(id);
 const labels={S1:'分散核心股票',S2:'成長集中股票',S3:'高風險股票',B1:'超短公債',
  B2:'中短天期投資級公司債',B3:'長天期美國公債',B4:'信用敏感公司債',C0:'待投入資金'};
+const chart=el('r15-chart');
+function showPoint(event){
+ let point=event.target.closest('circle[aria-label]');
+ if(!point && event.type==='click'){
+  const matrix=chart.getScreenCTM();
+  if(!matrix)return;
+  const x=new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse()).x;
+  const distance=node=>Math.abs(node.cx.baseVal.value-x);
+  for(const node of chart.querySelectorAll('circle[aria-label]'))
+   if(!point||distance(node)<distance(point))point=node;
+ }
+ if(point)el('r15-point').textContent=point.getAttribute('aria-label');
+}
+chart.addEventListener('click',showPoint);
+chart.addEventListener('focusin',showPoint);
 function display(){
  const v=choices[el('family-life').value+'/'+el('family-style').value];
  for(const key of ['stock','bond','cash']) el('total-'+key).textContent=v?v[key]+'%':'—';
@@ -167,6 +191,10 @@ display();"""
         check = browser.new_page()
         check.route("**/*", lambda route: route.abort())
         check.set_content(html)
+        for point, detail in zip(check.locator("#r15-chart circle[aria-label]").all(), details):
+            point.dispatch_event("click")
+            if check.locator("#r15-point").text_content() != detail or "體質分" not in detail:
+                raise ValueError("Published education chart point did not show its observation")
         for pair, result in scenarios.items():
             life, style = pair.split("/")
             check.select_option("#family-life", life)
@@ -175,6 +203,11 @@ display();"""
             expected = "—" if result is None else f"{result['stock']:g}%"
             if shown != expected:
                 raise ValueError(f"Education scenario {pair}: {shown} != {expected}")
+        for ident in ("bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield", "bond-score-display"):
+            if check.locator("#" + ident).text_content() != model.locator("#" + ident).text_content():
+                raise ValueError("Published education bond field differs from engineering: " + ident)
+        if model.evaluate("typeof window.v703BondInputsQualified") != "boolean":
+            raise ValueError("Education rendering requires the engineering bond calculation")
         if any(text in check.locator("body").inner_text() for text in ("Rule Owner=V70", "22項計分輸入")):
             raise ValueError("Engineering header in education homepage")
         (output / "index.html").write_text(html, encoding="utf-8")

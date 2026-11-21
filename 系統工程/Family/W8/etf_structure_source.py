@@ -162,7 +162,7 @@ def _lookthrough_intervals(composition,limits):
     return {'truth':truth(both(*votes)),'issues':[],'limits':out,'weights_renormalized':False}
 
 
-def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
+def evaluate_etf_structure(facts,request,symbol,product_evidence=None,registered_structure=None):
     facts=facts or {};at=timestamp(request['evaluation_at'])
     if at is None:raise ValueError('ETF_STRUCTURE_EVALUATION_TIME_INVALID')
     if facts and facts.get('symbol')!=symbol:raise ValueError('ETF_STRUCTURE_SYMBOL_MISMATCH')
@@ -175,12 +175,19 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
         leaves[name]={'truth':truth(value),'missing_fields':fields,'detail':detail,
             'applicability':applicability,'gap_kind':'SOURCE_FACT_MISSING' if fields else
                 'SOURCE_DEPENDENCY_UNRESOLVED' if value is None else 'COMPUTED_FROM_BOUND_SOURCE'}
-    status,missing=source_record(facts,'fund_status',at,product_evidence)
+    def structural_record(key):
+        if key in facts or not registered_structure:
+            return source_record(facts,key,at,product_evidence)
+        if registered_structure.get('symbol') != symbol:
+            raise PermissionError('REGISTERED_ISSUER_STRUCTURE_MISMATCH')
+        return source_record(registered_structure,key,at,product_evidence)
+
+    status,missing=structural_record('fund_status')
     state=status.get('operating_status') if status else None
     value=True if state=='OPERATING' else False if state in ('CEASED','SUSPENDED','DISQUALIFIED') else None
     put(LEAVES[0],value,missing+(['fund_status.operating_status'] if status and value is None else []),state)
     trace.append('ETF_VIABLE_01.operating_status')
-    mandate,missing=source_record(facts,'mandate',at,product_evidence)
+    mandate,missing=structural_record('mandate')
     allowed=policy.get('allowed_mandate_components')
     value=mandate_subset(mandate.get('components') if mandate else None,allowed)
     if mandate and not isinstance(mandate.get('components'),list):missing.append('mandate.components')
@@ -196,7 +203,7 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
             mandate_detail['unmapped_issuer_components'] = sorted(set(mandate['components'])-set(allowed))
     put(LEAVES[1],value if not missing else None,missing,mandate_detail)
     trace.append('ETF_VIABLE_01.mandate_subset')
-    nav,missing=source_record(facts,'nav_redemption_status',at,product_evidence)
+    nav,missing=structural_record('nav_redemption_status')
     nav_ok=boolean(nav.get('nav_reporting_valid')) if nav else None
     redemption=boolean(nav.get('creation_redemption_function_valid')) if nav else None
     if nav and nav_ok is None:missing.append('nav_redemption_status.nav_reporting_valid')

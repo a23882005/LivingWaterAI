@@ -372,7 +372,8 @@ def etf_viability_audit(row,request):
     if product_evidence is None and row['symbol'] in ISSUER_PRODUCT_PATHS:
         # Member Menu04 stores the validated classification evidence directly.
         product_evidence = identity.get('grade_evidence')
-    return evaluate_etf_structure(row.get('issuer_facts'), request, row['symbol'], product_evidence)
+    return evaluate_etf_structure(row.get('issuer_facts'), request, row['symbol'], product_evidence,
+                                  row.get('registered_issuer_structure'))
 
 
 def gap_matrix(row,target,coverage,orders,*,left_audit=None):

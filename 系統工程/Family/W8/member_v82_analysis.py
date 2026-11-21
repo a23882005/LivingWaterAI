@@ -398,6 +398,10 @@ def build_report(request, config, repo_root):
             'valuation_observations': [], 'issuer_facts': read_issuer_facts(
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
+        registered_structure = config.get('registered_issuer_structures', {}).get(symbol)
+        if (registered_structure and time(registered_structure['retrieved_at']) <= time(request['evaluation_at'])
+                and registered_structure['as_of'] <= time(request['evaluation_at']).date().isoformat()):
+            row['registered_issuer_structure'] = deepcopy(registered_structure)
         history_sources=config.get('public_history_sources',{}).get(symbol)
         buy_scope=new_buy_scope(market_contract,symbol)
         if buy_scope is not None:row['new_buy_scope']=buy_scope

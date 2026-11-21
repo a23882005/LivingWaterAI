@@ -257,3 +257,20 @@ def test_project_reads_registered_dated_mandate_and_checks_its_bytes(tmp_path):
     sources.write_text('different')
     with pytest.raises(PermissionError, match='SOURCES_BYTES_CHANGED'):
         register_project_mandate(config, desc, 'SyntheticMember')
+
+
+def test_registered_issuer_structure_never_overrides_primary_observation(tmp_path):
+    snapshot, config, target, original, _ = mandate_case(tmp_path)
+    at = '2026-11-21T01:00:00Z'
+    proj = apply(snapshot, config, target, at)
+    request = {'client_id':snapshot['client_id'], 'evaluation_at':at,'confirmed_target':proj}
+    issuer = {'symbol':'BBB', 'source_sha256':'b'*64, 'source_url':'https://fund-docs.vanguard.com/synthetic.pdf',
+              'mandate':{'components':['APPROVED_EQUITIES'], 'method_version':'test',
+                         'as_of':'2026-11-20T00:00:00Z','available_at':'2026-11-20T09:00:00Z',
+                         'valid_until':'2026-11-22T00:00:00Z','data_quality':'OK'}}
+    assert evaluate_etf_structure(None,request,'BBB',None,issuer)['leaves'][LEAVES[1]]['truth']=='TRUE'
+    primary={**issuer, 'mandate':{**issuer['mandate'], 'components':['OTHER']}}
+    leaf=evaluate_etf_structure(primary,request,'BBB',None,issuer)['leaves'][LEAVES[1]]
+    assert leaf['truth']=='UNKNOWN' and leaf['detail']['unmapped_issuer_components']==['OTHER']
+    with pytest.raises(PermissionError,match='REGISTERED_ISSUER_STRUCTURE_MISMATCH'):
+        evaluate_etf_structure(None,request,'BBB',None,{**issuer, 'symbol':'AAA'})

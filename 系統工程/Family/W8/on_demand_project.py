@@ -112,18 +112,41 @@ def register_project_mandate(config, project_sources, family_alias):
     if len(rows) != 1:
         raise ValueError('PROJECT_MANDATE_REGISTRATION_REQUIRED')
     registration = json.loads(rows[0])
-    filename = registration['file_name']
-    if (registration['member'] != family_alias or not re.fullmatch(r'[A-Za-z0-9_-]+\.json', filename)
-            or not re.fullmatch(r'[A-Za-z0-9_-]+', registration['drive_file_id'])):
+    if registration['member'] != family_alias:
         raise PermissionError('PROJECT_MANDATE_REGISTRATION_MISMATCH')
-    source = source_path.with_name(filename)
-    if sha256(source.read_bytes()).hexdigest() != registration['sha256']:
-        raise PermissionError('PROJECT_MANDATE_BYTES_CHANGED')
+
+    def registered_file(record):
+        filename = record['file_name']
+        if (not re.fullmatch(r'[A-Za-z0-9_-]+\.json', filename)
+                or not re.fullmatch(r'[A-Za-z0-9_-]+', record['drive_file_id'])):
+            raise PermissionError('PROJECT_MANDATE_REGISTRATION_MISMATCH')
+        source = source_path.with_name(filename)
+        raw = source.read_bytes()
+        if sha256(raw).hexdigest() != record['sha256']:
+            raise PermissionError('PROJECT_MANDATE_BYTES_CHANGED')
+        return raw, {'local_path': str(source.resolve()), 'sha256': record['sha256'],
+                     'drive_file_id': record['drive_file_id']}
+
+    _, descriptor = registered_file(registration)
+    if 'issuer_structure_source' in registration:
+        raw, issuer_source = registered_file(registration['issuer_structure_source'])
+        rows = json.loads(raw)['rows']
+        structures = {}
+        for symbol, row in rows.items():
+            facts = row['official_evidence']
+            if facts['symbol'] != symbol or facts['schema_version'] != 'Family.W8.IssuerFacts.v1':
+                raise ValueError('PROJECT_ISSUER_STRUCTURE_IDENTITY_MISMATCH')
+            # Only independent issuer observations may supplement missing ETF structure.
+            # Ignore saved conclusions, valuations and client approval fields.
+            keys = ('symbol', 'retrieved_at', 'as_of', 'source_url', 'fund_status',
+                    'mandate', 'nav_redemption_status')
+            structures[symbol] = {key: facts[key] for key in keys if key in facts}
+            structures[symbol].update(source_sha256=issuer_source['sha256'],
+                                      drive_file_id=issuer_source['drive_file_id'])
+        config['registered_issuer_structures'] = structures
     owner = config.get('owner_etf_constraints_source')
     if owner is None:
         raise ValueError('PROJECT_OWNER_ETF_CONSTRAINTS_SOURCE_REQUIRED')
-    descriptor = {'local_path': str(source.resolve()), 'sha256': registration['sha256'],
-                  'drive_file_id': registration['drive_file_id']}
     config['owner_etf_constraints_source'] = {**owner, 'mandate_source': descriptor}
 
 

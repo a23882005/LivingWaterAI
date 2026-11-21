@@ -3,6 +3,11 @@ import json
 from hashlib import sha256
 from decimal import Decimal
 from pathlib import Path
+import importlib.util
+
+_spec = importlib.util.spec_from_file_location("family03_compare", Path(__file__).with_name("family03_compare.py"))
+comparison = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(comparison)
 
 QUESTIONS = json.loads(Path(__file__).with_name("family03_questions.json").read_text())
 ROLES = {"民生消費":["XLP"], "國防":["NATO"], "醫藥":["PPH"], "半導體":["SOXX","SMH"]}
@@ -25,7 +30,7 @@ def holdings(tables):
 
 
 def guide(snapshot, answers, bookpath, calc, extra_series=None):
-    if not isinstance(answers,dict) or answers.keys()-QUESTIONS.keys():
+    if not isinstance(answers,dict) or answers.keys()-QUESTIONS.keys()-{"trial_mix"}:
         raise ValueError("無法辨識這一題")
     remaining = dict(answers)
     def ask(key, options=None, **metadata):
@@ -55,6 +60,11 @@ def guide(snapshot, answers, bookpath, calc, extra_series=None):
         mix = (c,s,100-c-s)
     else:
         mix = PRESETS[idx]
+        if "trial_mix" in answers:
+            tested = tuple(answers["trial_mix"])
+            if tested not in comparison.VARIANTS[idx]:
+                raise ValueError("FAMILY03_MIX_OUTSIDE_CHOSEN_BAND")
+            mix = tested
     if not bookpath.is_file():
         return {"status":"FAMILY03_SOURCE_REQUIRED","file_id":calc.BOOK_ID,"檔名":"標的績效基準資料.xlsx"}
     book, exposure = calc.workbook(bookpath)
@@ -67,6 +77,8 @@ def guide(snapshot, answers, bookpath, calc, extra_series=None):
         if k=="star":
             pool += ["MSFT","NVDA"]
         pool = [v for v in pool if v not in weights]
+        if k=="star" and answers.get("sat") in ROLES.get(theme, []):
+            pool = sorted(pool, key=lambda symbol: symbol in ROLES[theme])
         cards = {s:{field:book[s][field] for field in FIELDS} if s in book else
                  {"來源":"B 表以外的比較候選，績效另用市場資料試算"} for s in pool}
         q = ask(k,pool, 股票桶占比=pct, 候選資料=cards, 建議先比較=pool[0],
@@ -87,25 +99,24 @@ def guide(snapshot, answers, bookpath, calc, extra_series=None):
     missing = [s for s in weights if market[s] is None]
     if missing and extra_series:
         market.update({s:v for s,v in extra_series(tuple(missing)).items() if s in missing})
-    hist = calc.simulate(weights,market)
-    result = {"主軸衛星繁星":mix, "股票桶百分比":weights, "歷史試算":hist,
+    candidates = comparison.VARIANTS[idx] if idx < len(PRESETS) else (mix,)
+    rows, best_mix, advice = comparison.compare(
+        answers,candidates,mix,market,exposure,calc,
+        QUESTIONS["goal"][1].index(answers["goal"]),
+        QUESTIONS["returns"][1].index(answers["returns"]),
+        QUESTIONS["loss"][1].index(answers["loss"]))
+    chosen = next(row for row in rows if row["主軸衛星繁星"]==mix)
+    result = {"主軸衛星繁星":mix, "股票桶百分比":weights, "歷史試算":chosen["歷史試算"],
               "曝險":calc.exposure(weights,exposure),"資金方式":answers["fund"],
               "本人目標":answers["goal"],"本人報酬偏好":answers["returns"],"本人跌幅偏好":answers["loss"],
-              "新資金範圍":answers.get("amount"),"願意評估換出的持股":answers.get("replace")}
-    if hist["狀態"]=="歷史粗估":
-        band=QUESTIONS["returns"][1].index(answers["returns"])
-        dd=QUESTIONS["loss"][1].index(answers["loss"])
-        rr=hist["年化報酬率"]
-        ranges=[(-float("inf"),.05),(.05,.08),(.08,.12),(.12,float("inf"))]
-        result["歷史報酬符合所選區間"]=None if band==4 else ranges[band][0]<=rr<ranges[band][1]
-        result["歷史回撤超過本人上限"]=None if dd>=4 else hist["最大回撤幅度"]>(dd+1)*.10
-        result["家人版建議"]=("這次歷史跌幅超出您選的上限。建議先比較減少產業比重後的結果。"
-            if result["歷史回撤超過本人上限"] else "建議把本案和較分散的配置並排，比較年化報酬、最大跌幅及重疊成分。")
-    else:
-        result["家人版建議"]="先補齊共同幣別與行情，再判斷是否符合您的報酬及回撤目標。"
+              "新資金範圍":answers.get("amount"),"願意評估換出的持股":answers.get("replace"),
+              "歷史報酬符合所選區間":chosen.get("符合報酬區間"),
+              "歷史回撤超過本人上限":chosen.get("超過回撤上限"),
+              "同期間方案比較":rows,"建議試算比例":best_mix,"家人版建議":advice}
+    trials = {"先試 "+comparison.label(candidate):candidate for candidate in candidates if candidate!=mix}
     token=sha256(json.dumps([snapshot["client_id"],snapshot["source_sha256"],result],
         ensure_ascii=False,sort_keys=True,default=str).encode()).hexdigest()
-    return question("review", **{"方案":result,"方案識別":token})
+    return question("review",QUESTIONS["review"][1]+list(trials), **{"方案":result,"方案識別":token,"可試比例":trials})
 
 
 def menu_handler(entry, member, folder, calc, *, market_reader=None):
@@ -137,19 +148,23 @@ def menu_handler(entry, member, folder, calc, *, market_reader=None):
         answers=json.loads(history[-1]["作答後有效答案"]) if history else {}
         def before(k):
             return {key:value for key,value in answers.items()
-                    if list(QUESTIONS).index(key)<list(QUESTIONS).index(k)}
+                    if key in QUESTIONS and list(QUESTIONS).index(key)<list(QUESTIONS).index(k)}
         edit=payload.get("edit")
         if edit:
-            if edit not in answers or edit=="review":
+            if edit not in QUESTIONS or edit not in answers or edit=="review":
                 raise ValueError("FAMILY03_UNKNOWN_EARLIER_ANSWER")
             answers=before(edit)
         q=guide(snapshot,answers,bench,calc,market_reader)
         if q.get("key")=="review" and answers.get("review"):
             q["上次決定"]=answers["review"]
+            if history and history[-1]["方案識別"] != q["方案識別"]:
+                q["提醒"]="試算資料或方案已更新，請看本次數字再決定。"
+            if answers["review"] == QUESTIONS["review"][1][1]:
+                q["重選提示"]="想先換哪一項？從可重選題目選一個，其他仍適用的答案會保留。"
         if q["status"]!="FAMILY03_QUESTION": return q
         stamp=sha256(json.dumps([revision,snapshot["source_sha256"],q],
             ensure_ascii=False,sort_keys=True,default=str).encode()).hexdigest()
-        q.update(revision=revision,question_id=stamp,可重選題目={k:QUESTIONS[k][0] for k in answers if k!="review"})
+        q.update(revision=revision,question_id=stamp,可重選題目={k:QUESTIONS[k][0] for k in answers if k in QUESTIONS and k!="review"})
         if "reply" not in payload: return q
         if (payload.get("revision")!=revision or payload.get("question_id")!=stamp
                 or payload.get("key")!=q["key"] or payload["reply"] not in q["選項"]):
@@ -160,16 +175,21 @@ def menu_handler(entry, member, folder, calc, *, market_reader=None):
             invalidate={"mix":{"core_pct","sat_pct","core","sat","star"},
                         "core_pct":{"sat_pct","core","sat","star"}, "sat_pct":{"sat","star"},
                         "sector":{"sat","star"}, "sat":{"star"}, "fund":{"amount","replace"}}
-            answers={k:v for k,v in saved.items() if k not in invalidate.get(edit,set())|{"review"}}
+            answers={k:v for k,v in saved.items() if k not in invalidate.get(edit,set())|({"trial_mix"} if edit in {"mix","core_pct","sat_pct"} else set())|{"review"}}
         answers[key]=choice
         stage="本人暫選"
         if key=="review":
-            stage=["保留草案","待重選","本人確認股票配置草案"][QUESTIONS[key][1].index(choice)]
+            if choice in q["可試比例"]:
+                answers["trial_mix"]=q["可試比例"][choice]
+                answers.pop("review")
+                stage="本人選擇試算比例"
+            else:
+                stage=["保留草案","待重選","本人確認股票配置草案"][QUESTIONS[key][1].index(choice)]
         after=guide(snapshot,answers,bench,calc,market_reader)
         mix=None
         if "mix" in answers:
             idx=QUESTIONS["mix"][1].index(answers["mix"])
-            if idx<3: mix=PRESETS[idx]
+            if idx<3: mix=answers.get("trial_mix",PRESETS[idx])
             elif "sat_pct" in answers:
                 c,s=int(answers["core_pct"][:-1]),int(answers["sat_pct"][:-1])
                 mix=(c,s,100-c-s)

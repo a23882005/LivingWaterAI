@@ -79,6 +79,9 @@ def source_files(config,evaluation_at):
                     if item.get('nav_qualification_source'):
                         nav=item['nav_qualification_source'];walk(nav,expand=False)
                         walk(nav['official_source'],expand=False)
+                elif key=='current_gap_price_source':
+                    if time(item['bank_source']['retrieved_at'])<=time(evaluation_at):
+                        walk(item)
                 else:walk(item)
     walk(config)
     return [files[k] for k in sorted(files)]

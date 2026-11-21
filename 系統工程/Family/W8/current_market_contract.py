@@ -64,6 +64,20 @@ def read(source,request):
         if time(updated['as_of_time']) < time(out['official_bank_original_result']['as_of_time']):
             raise PermissionError('CURRENT_MARKET_BANK_PRECEDES_PINNED_QUOTE')
         out['official_bank_original_result'] = updated
+    gap_source = source.get('current_gap_price_source')
+    if gap_source is not None:
+        bank_source = gap_source['bank_source']
+        if time(bank_source['retrieved_at']) <= time(request['evaluation_at']):
+            from member_position_valuation import read_fx
+            fx = read_fx(bank_source, request['evaluation_at'])
+            registrations = gap_source['registrations']
+            base = source.get('gap_price_registrations') or {}
+            fields = ('instrument_key','currency','exchange','source_sha256')
+            if (not registrations or any(symbol not in base or registration.get('evaluation_day')!=fx['as_of']
+                    or any(registration.get(key)!=base[symbol].get(key) for key in fields)
+                    for symbol,registration in registrations.items())):
+                raise PermissionError('CURRENT_GAP_PRICE_CAPTURE_REGISTRATION_MISMATCH')
+            out['current_gap_price_inputs'] = {'fx_observation':fx,'registrations':deepcopy(registrations)}
     close_source = source.get('pm_bond_close_source')
     if close_source is not None:
         out['pm_bond_closes'] = _pm_bond_closes(close_source, request, out)
@@ -223,11 +237,14 @@ def gap_price(contract, market, instrument, symbol, request):
     if not contract or not market:
         return None
     market = market.get('position_valuation_observation') or market.get('independent_broker_observation', market)
-    registration = (contract['source_descriptor'].get('gap_price_registrations') or {}).get(symbol)
+    capture = contract.get('current_gap_price_inputs') or {}
+    registration = capture.get('registrations',{}).get(symbol)
+    fx = capture['fx_observation'] if registration else contract['official_bank_original_result']
+    if not registration:
+        registration = (contract['source_descriptor'].get('gap_price_registrations') or {}).get(symbol)
     if not registration:
         return None
     identity = market['market_identity']
-    fx = contract['official_bank_original_result']
     day = time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date().isoformat()
     if day != registration['evaluation_day'] or fx['as_of'] != day:
         return None

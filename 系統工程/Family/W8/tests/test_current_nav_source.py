@@ -182,3 +182,46 @@ def test_current_confirmed_holding_classification_fills_legacy_omissions_and_rej
         builder.build(tactical=tactical,identities=ids)
         assert assembly.asset_kind(builder.identities[held])=='equity ETF'
     assert called==[held]
+
+
+def test_current_position_fx_keeps_the_original_nav_approval_and_quote_lineage(tmp_path):
+    from current_market_contract import gap_price
+    from member_reconciliation_source import source_files
+
+    req,_,desc,values,coverage,cash,current=nav_case(tmp_path)
+    source=desc()
+    bank=tmp_path/'CURRENT_BANK.html'
+    bank.write_text('牌價最新掛牌時間：<span class="time">2026/10/30 06:40</span>'
+                    '<table><tr><td>美金 (USD)</td><td data-table="本行即期買入">33</td></tr></table>')
+    original_quote=values['positions'][0]['market_source_sha256']
+    registration={'evaluation_day':'2026-10-29','instrument_key':'SYN_KEY','currency':'USD',
+        'exchange':'XNAS','source_sha256':original_quote}
+    source['gap_price_registrations']={'SYN_ASSET':registration}
+    bank_source={'local_path':str(bank),'sha256':sha256(bank.read_bytes()).hexdigest(),
+        'retrieved_at':'2026-10-29T22:50:00Z','source_reference':'https://rate.bot.com.tw/xrt?Lang=zh-TW'}
+    source['current_gap_price_source']={'bank_source':bank_source,
+        'registrations':{'SYN_ASSET':{**registration,'evaluation_day':'2026-10-30'}}}
+    instrument={'client_id':req['client_id'],'ticker':'SYN_ASSET','identity_state':'KNOWN',
+        'instrument_type':'ETF','instrument_key':'SYN_KEY','quote_currency':'USD'}
+    market={'market_identity':{'provider_symbol':'SYN_ASSET','provider_type':'ETF','currency':'USD','exchange':'XNAS'},
+        'source_sha256':original_quote,'observed_close':'50','observed_date':'2026-10-29',
+        'latest_expected_completed_session':'2026-10-29','completed_session_close_at':'2026-10-29T20:00:00Z',
+        'provider_verified_at':'2026-10-29T21:00:00Z'}
+    earlier={**req,'evaluation_at':'2026-10-29T22:45:00Z'}
+    early=read(source,earlier)
+    assert 'current_gap_price_inputs' not in early and gap_price(early,market,instrument,'SYN_ASSET',earlier) is None
+    assert str(bank) not in {item['local_path'] for item in source_files({'current_market_contract_source':source},earlier['evaluation_at'])}
+
+    contract=read(source,req)
+    quote=gap_price(contract,market,instrument,'SYN_ASSET',req)
+    assert quote['source_sha256']==original_quote and quote['session']=='2026-10-29'
+    assert quote['fx_observation']['quote_per_base']=='33'
+    assert contract['official_bank_original_result']==values['fx_observation']
+    apply_official_quote(values['positions'][0],contract)
+    accepted=portfolio_reference(req,coverage,values,cash,current,contract)
+    assert accepted['formal_NAV_source_qualified'] and accepted['positions_plus_accepted_cash_TWD']=='205.00'
+    assert str(bank) in {item['local_path'] for item in source_files({'current_market_contract_source':source},req['evaluation_at'])}
+
+    source['current_gap_price_source']['registrations']['SYN_ASSET']['source_sha256']='changed'
+    with pytest.raises(PermissionError,match='CURRENT_GAP_PRICE_CAPTURE_REGISTRATION_MISMATCH'):
+        read(source,req)

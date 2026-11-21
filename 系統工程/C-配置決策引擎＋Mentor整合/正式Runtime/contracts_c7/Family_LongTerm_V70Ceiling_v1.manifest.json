@@ -137,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/member_reconciliation_source.py",
-      "sha256": "311b0731a1069e66858d8b2de3c0c47d0d67b03ce67c85e5a10cc3636d21f35a"
+      "sha256": "31c4e6b56c637502c307fa302d9a20ef302b76f3e83bfbc01e6fcefd169d5b39"
     },
     {
       "path": "../../Family/W8/sec_publication_source.py",
@@ -281,7 +281,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "db48d64529bf1c42fc15692d29a788015cf0ed20a3337adf7a10a5d70ee63deb"
+      "sha256": "b1cf4ad16deb592bb709b6c952c954adf96c22fc6fb21fff28ebe5da03ce2af9"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

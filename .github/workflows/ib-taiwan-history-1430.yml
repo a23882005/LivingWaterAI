@@ -1,45 +1,41 @@
-name: Retrieve public ETF closing records
+name: Fetch public V75 source originals
 on:
   workflow_dispatch: {}
 permissions:
   contents: read
 jobs:
-  public-close:
+  public-sources:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - name: Download official TPEx and public daily prices
-        shell: bash
+      - name: Retrieve registered public source observations
         run: |
-          python - <<'PY'
-          import datetime as dt, json, pathlib, time, urllib.request
-          out = pathlib.Path("public-closes")
-          out.mkdir()
-          urls = {"tpex": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"}
-          for s in ["00679B.TWO", "00719B.TWO", "00859B.TWO", "00860B.TWO", "SGOV"]:
-              urls[s] = "https://query1.finance.yahoo.com/v8/finance/chart/" + s + "?period1=1793577600&period2=1795305600&interval=1d"
-          for key, url in urls.items():
+          python - <<'PYTHON'
+          import datetime as dt, hashlib, json, pathlib, urllib.request, time
+          urls={'FUTURES': 'https://query1.finance.yahoo.com/v8/finance/chart/ZQK27.CBT?range=1mo&interval=1d', 'EFFR': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=EFFR&cosd=2016-10-01&coed=2026-11-20', 'PCEPILFE': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=PCEPILFE&cosd=2023-01-01&coed=2026-11-20', 'CPILFESL': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL&cosd=2023-01-01&coed=2026-11-20', 'BAMLH0A0HYM2': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2&cosd=2026-08-01&coed=2026-11-20', 'BAMLC0A0CM': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLC0A0CM&cosd=2026-08-01&coed=2026-11-20', 'BAMLC0A3CA': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLC0A3CA&cosd=2026-08-01&coed=2026-11-20', 'BAMLC0A4CBBB': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLC0A4CBBB&cosd=2026-08-01&coed=2026-11-20', 'SEP': 'https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm', 'TREASURY': 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv', 'NYFED_REPO': 'https://markets.newyorkfed.org/api/rp/repo/all/results/lastTwoWeeks.json', 'YAHOO_SGOV': 'https://query1.finance.yahoo.com/v8/finance/chart/SGOV?range=5y&interval=1d&events=div%2Csplits', 'YAHOO_SPSB': 'https://query1.finance.yahoo.com/v8/finance/chart/SPSB?range=5y&interval=1d&events=div%2Csplits', 'WPSFD49116': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=WPSFD49116&cosd=2024-01-01', 'T5YIE': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE&cosd=2026-08-01', 'DCOILWTICO': 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO&cosd=2026-08-01'}
+          folder=pathlib.Path('v75-current')
+          folder.mkdir()
+          for key,url in urls.items():
               for attempt in range(2):
                   try:
-                      req = urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; ETF daily valuation verification)"})
-                      with urllib.request.urlopen(req,timeout=20) as resp:
-                          raw = resp.read()
-                      data = json.loads(raw)
-                      if key == "tpex":
-                          print(key, [(v.get("Date"),v.get("SecuritiesCompanyCode"),v.get("Close")) for v in data if v.get("SecuritiesCompanyCode") in ("00679B","00719B","00859B","00860B")])
-                      else:
-                          result = data["chart"]["result"][0]
-                          print(key, result["meta"]["exchangeName"], result["indicators"]["quote"][0]["close"][-1])
-                      (out/(key+".json")).write_bytes(raw)
-                      (out/(key+".receipt.json")).write_text(json.dumps({"source_reference":url,"retrieved_at":dt.datetime.now(dt.timezone.utc).isoformat()}))
+                      now=lambda:dt.datetime.now(dt.timezone.utc).isoformat()
+                      start=now()
+                      request=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (public daily series verification)'})
+                      with urllib.request.urlopen(request,timeout=15) as response:
+                          raw=response.read()
+                          receipt=dict(url=url,final_url=response.geturl(),http_status=response.status,requested_at=start,
+                               available_at=now(),credential_used=False,response_headers=dict(response.headers.items()),bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+                      (folder/(key+'.raw')).write_bytes(raw)
+                      (folder/(key+'.receipt.json')).write_text(json.dumps(receipt))
+                      print(key,len(raw),flush=True)
                       break
-                  except Exception as exc:
-                      print(key,attempt,str(exc))
+                  except Exception as ex:
+                      print(key,str(ex),flush=True)
                       time.sleep(2+attempt)
-              time.sleep(1)
-          PY
+              time.sleep(.3)
+          PYTHON
       - uses: actions/upload-artifact@v4
         with:
-          name: public-close-originals
-          path: public-closes/
+          name: public-v75-originals
+          path: v75-current/
           retention-days: 5

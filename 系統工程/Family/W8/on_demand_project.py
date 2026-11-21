@@ -276,8 +276,18 @@ def build_project_menu(*, family_login, project_name, login_account,
         target_writer = handlers.get("adjust_target")
         advisor = _load(ROOT/"family03_guide.py", "family03_guide")
         equity = _load(ROOT/"equity_sleeve.py", "family03_equity")
-        guide_target = advisor.menu_handler(public_entry, family_alias,
-            Path(downloaded_db_path).resolve().parent, equity, market_reader=family03_market_reader)
+        planner = _load(ROOT/"family03_plans.py", "family03_plans")
+        prices = _load(ROOT/"family03_prices.py", "family03_prices")
+        cached = prices.reader(Path(downloaded_db_path).resolve().parent/prices.ARCHIVE)
+        def plan_prices(symbols):
+            result=cached(symbols)
+            missing=tuple(s for s in symbols if s not in result)
+            if missing and family03_market_reader:
+                result.update(family03_market_reader(missing))
+            return result
+        positions = _load(ROOT.parent/"W5"/"official_holdings_source.py","family03_positions")
+        guide_target = planner.menu_handler(public_entry, family_alias,
+            Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices)
         def adjust_target(payload):
             if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
                 return target_writer(payload)

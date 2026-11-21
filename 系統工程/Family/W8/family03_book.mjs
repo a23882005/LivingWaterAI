@@ -53,15 +53,64 @@ if (args.event) {
   const e=args.event;
   if(main.getRange('B1').values[0][0]!==member || log.getUsedRange().rowCount!==e.previous+1)
     throw Error('家人身分或選擇進度已變動');
+  const lines=e.advice?.六組比較;
+  if(lines){
+    const table=book.worksheets.items.find(s=>s.name==='六組比較')||book.worksheets.add('六組比較');
+    const titles=['時間','方案','股票配置','資料起日','資料迄日','幣別','狀態','期間報酬','年化報酬','最大回撤','年化波動','Sharpe','Sortino','Calmar','特點與取捨','共同成分或產業（已知百分點）'];
+    table.getRangeByIndexes(0,0,1,titles.length).values=[titles];
+    const data=lines.map(r=>{
+      const h=r.歷史試算;
+      return [e.time,r.名稱,Object.entries(r.股票桶百分比).map(([s,v])=>s+' '+v+'%').join('、'),h.起日,h.迄日,h.幣別,h.狀態,h.期間報酬率,h.年化報酬率,h.最大回撤幅度,h.年化波動率,h.Sharpe,h.Sortino,h.Calmar,[r.取捨,...(r.六組相對特點||[])].join('；'),r.共同曝險.共同曝險.map(x=>x.項目+' '+x.已知合計百分點).join('、')||'已知資料未列出重疊'].map(x=>x??null);
+    });
+    const start=table.getUsedRange().rowCount;
+    table.getRangeByIndexes(start,0,data.length,titles.length).values=data;
+    table.getRangeByIndexes(start,7,data.length,4).setNumberFormat('0.00%');
+    table.getRangeByIndexes(start,11,data.length,3).setNumberFormat('0.00');
+    header(table,'A1:P1');widths(table,[180,88,280,120,120,70,180,105,105,105,105,90,90,90,360,400]);
+    table.freezePanes.freezeRows(1);
+  }
+  const advice=lines ? {六組比較:lines.map(r=>({...r,共同曝險:{共幾項:r.共同曝險.共同曝險.length,明細:'見六組比較頁'}}))} : e.advice;
   log.getRangeByIndexes(e.previous+1,0,1,12).values=[[e.id,e.time,member,e.key,e.title,
-    JSON.stringify(e.options),JSON.stringify(e.advice),e.choice,e.url,e.stage,JSON.stringify(e.answers),e.token || '']];
-  main.getRange('B2:B3').values=[[e.stage],[e.next]];
+    JSON.stringify(e.options),JSON.stringify(advice),e.choice,e.url,e.stage,JSON.stringify(e.answers),e.token || '']];
+  const steps={home:'選擇工作方案',goal:'投資目標',returns:'偏好年報酬',loss:'可接受跌幅',band:'選配置範圍',exact:'確認層級比重',theme:'選產業方向',symbol:'選標的',weight:'選標的比例',fund:'資金來源',amount:'金額範圍',replace:'選擇擬換出的持股',review:'檢視完整方案',compare:'六組比較',reduce:'選減碼標的',increase:'選加碼標的',shift:'選移動比重'};
+  main.getRange('B2:B3').values=[[e.stage],[steps[e.next]||e.next]];
+  if(e.answers.schema===2){
+    const st=e.answers;
+    const roleNames=['主軸','衛星','繁星'];
+    const names=['方案一','方案二','方案三'];
+    const plan=st.plans[st.slot];
+    main.getRange('A6:F20').clear();
+    main.getRange('A6:D6').values=[['工作方案','主軸','衛星','繁星']];
+    main.getRange('A7:D9').values=st.plans.map((p,i)=>[names[i],...roleNames.map(r=>
+      Object.entries(p.layers[r]).map(([symbol,v])=>symbol+' '+v+'%').join('、')||'尚未選擇')]);
+    main.getRange('A11:B12').values=[['目前方案',names[st.slot]],['最後指定',st.final?.方案||'尚未指定']];
+    main.getRange('A14:B14').values=[['本案偏好',Object.values(plan.prefs).join('／')]];
+    header(main,'A6:D6');
+    alloc.getUsedRange().clear();
+    alloc.getRange('A1:E1').values=[['方案','角色','標的','占股票部位','版本狀態']];
+    const allocations=st.plans.flatMap((p,i)=>roleNames.flatMap(r=>
+      Object.entries(p.layers[r]).map(([symbol,v])=>[names[i],r,symbol,v/100,'目前工作稿'])));
+    if(allocations.length){
+      alloc.getRangeByIndexes(1,0,allocations.length,5).values=allocations;
+      alloc.getRangeByIndexes(1,3,allocations.length,1).setNumberFormat('0%');
+    }
+    header(alloc,'A1:E1');
+    if(['save','final'].includes(e.key)){
+      const archive=book.worksheets.items.find(s=>s.name==='方案版本')||book.worksheets.add('方案版本');
+      archive.getRange('A1:G1').values=[['日期與時間','當時方案','主軸','衛星','繁星','當時決定','版本識別']];
+      const cells=roleNames.map(r=>Object.entries(plan.layers[r]).map(([s,v])=>s+' '+v+'%').join('、')||'0%');
+      archive.getRangeByIndexes(archive.getUsedRange().rowCount,0,1,7).values=[[e.time,names[st.slot],...cells,e.stage,e.id]];
+      header(archive,'A1:G1');widths(archive,[195,100,280,280,280,180,290]);
+      archive.freezePanes.freezeRows(1);
+    }
+  } else {
   rows.forEach(([k],i)=>{main.getRange('C'+(i+7)).values=[[e.answers[k]??null]]});
   alloc.getRange('B2').values=[[e.stage]];
   for(const [i,k] of ['core','sat','star'].entries()){
     const pct=e.mix?.[i], picked=e.answers[k];
     alloc.getRange('B'+(i+5)+':E'+(i+5)).values=[[picked||null,picked && pct!=null ? pct/100 : null,
       pct!=null ? pct/100 : null,picked ? e.stage : null]];
+  }
   }
 }
 book.recalculate();

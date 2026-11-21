@@ -29,6 +29,7 @@ jobs:
           feed = json.loads(Path('staging/V70_macro_latest.json').read_bytes())
           html = Path('staging/index.html').read_text()
           embedded = re.search(r'<script id="v70-embedded-feed" type="application/json">(.*?)</script>', html, re.S)
+          assert 'id="sc_${c.id}"' in html and 'id="sl_${c.id}"' in html, 'Missing engineering score displays'
           assert embedded and json.loads(embedded[1]) == feed
           with urllib.request.urlopen('https://www.happihelp.com/v703_deployment_receipt.json?engineering=' + __import__('os').environ['GITHUB_RUN_ID'], timeout=30) as response:
               receipt = json.load(response)

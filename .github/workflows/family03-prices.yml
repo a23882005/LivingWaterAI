@@ -1,6 +1,10 @@
 name: Family 03 public adjusted prices
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "系統工程/Family/W8/family03_prices.py"
+      - ".github/workflows/family03-prices.yml"
   push:
     branches: [family03-recommendation]
     paths:
@@ -10,6 +14,7 @@ permissions:
   contents: read
 jobs:
   prices:
+    if: github.event_name != 'push' || github.ref_name == 'family03-recommendation'
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:

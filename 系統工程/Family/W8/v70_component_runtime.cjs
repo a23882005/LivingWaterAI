@@ -6,7 +6,7 @@ const hash=s=>crypto.createHash('sha256').update(s).digest('hex');if(hash(html)!
 if(!feed.verification?.ready)throw Error('V70_SOURCE_NOT_READY');
 const keep=new Set(['macroConfig','C_VALUATION_IDS','C_VALUATION_ALPHA','lifeStageLabels']);const selected=[];
 for(const s of sources){let ast;try{ast=parse(s,{ecmaVersion:'latest'})}catch{continue}for(const n of ast.body){if(n.type==='FunctionDeclaration')selected.push(s.slice(n.start,n.end));if(n.type==='VariableDeclaration'&&n.declarations.some(d=>keep.has(d.id.name)))selected.push(s.slice(n.start,n.end));if(n.type==='ExpressionStatement'&&n.expression.type==='AssignmentExpression'&&s.slice(n.expression.left.start,n.expression.left.end)==='window.v703StressModel')selected.push(s.slice(n.start,n.end));}}
-const nodes=new Map();function node(id){if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',style:{},classList:{toggle(){},add(){},remove(){}},get innerText(){return this.textContent},set innerText(v){this.textContent=v}});return nodes.get(id)}
+const nodes=new Map();function node(id){if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',querySelector(){return null},style:{},classList:{toggle(){},add(){},remove(){}},get innerText(){return this.textContent},set innerText(v){this.textContent=v}});return nodes.get(id)}
 const ctx={console,document:{getElementById:id=>id.startsWith('input-')?null:node(id),querySelector:()=>null},window:null};ctx.window=ctx;
 // A saved request reuses its evaluation clock. Original calcTotal emits
 // calculatedAt; wall time would change source hashes on an identical replay.

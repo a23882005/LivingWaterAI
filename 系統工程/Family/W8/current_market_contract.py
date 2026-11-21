@@ -338,9 +338,10 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
                 converted=to_twd(Decimal(money['amount']),money.get('currency'))
                 if converted is None:ready=False
                 else:target_twd+=converted
-            if any(p['reference_amount_TWD'] is None or p.get('issue') for p in selected):ready=False
+            valued = bool(selected) and all(p['reference_amount_TWD'] is not None and not p.get('issue') for p in selected)
+            ready = ready and valued
             status=scope['status'] if scope else 'REFERENCE_COMPUTED' if ready else 'REFERENCE_SOURCE_INCOMPLETE'
-            gaps.append({'symbol':symbol,'status':status,'current_value_TWD':str(total),
+            gaps.append({'symbol':symbol,'status':status,'current_value_TWD':str(total) if valued else None,
                 'approved_target_amount_TWD':str(target_twd) if ready and scope is None else None,
                 'reference_gap_TWD':str(target_twd-total) if ready and scope is None else None,
                 'original_target_lines':deepcopy(targets),'canonical_stage_or_order_amount_created':False})

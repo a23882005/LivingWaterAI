@@ -296,6 +296,7 @@ def test_weekend_close_registration_still_requires_latest_exchange_session(tmp_p
     out = portfolio_reference(req, assets, values, accepted, bound, contract)
     assert out['issues'] == [{'symbol':'SYN_ASSET','reason':'CURRENT_POSITION_REGISTERED_CLOSE_NOT_LATEST_COMPLETED_SESSION'}]
     assert out['positions_plus_accepted_cash_TWD'] is None
+    assert out['allocation_reference_gaps'][0]['current_value_TWD'] is None
 
 
 def test_bond_closes_follow_their_market_after_taipei_midnight(tmp_path):

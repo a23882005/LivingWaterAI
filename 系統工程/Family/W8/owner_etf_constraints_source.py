@@ -1,4 +1,4 @@
-"""Replay an explicit, account-bound owner ETF lookthrough decision.
+"""Replay account-bound ETF lookthrough and documented mandate scope.
 
 This adds source-backed analysis policy to an unchanged allocation. It does
 not approve a whole ETF, change its target or grant funding/trading authority.
@@ -87,11 +87,93 @@ def read(snapshot,config,evaluation_at):
         'member_db_path':str(db),'source_db_sha256':before,'trade_authorization':'NONE'}
 
 
+def mandate_scopes(target, decision, evaluation_at):
+    """Consume a trusted interpretation of exact approved rows, independent of issuer facts."""
+    descriptor = decision['source_descriptor'].get('mandate_source')
+    if descriptor is None or target.get('source_kind') != 'EXISTING_APPROVED_DOCUMENT':
+        return {}
+    record = target['payload']
+    draft = record['draft']
+    confirmation = record.get('confirmation_evidence') or {}
+    try:
+        data = json.loads(checked(descriptor))
+        available = time(data['available_at'])
+        approved_at = time(confirmation['confirmed_at'])
+        document = data['approved_document']
+        source_ref = document['source_reference']
+        source_sha = document['sha256']
+        if not (
+            data['schema_version'] == 'Family.W8.OwnerETFMandateSource.v1'
+            and data['trade_authorization'] == 'NONE'
+            and data['work_order_reference']
+            and data['client_id'] == decision['client_id'] == draft['identity']['client_id']
+            and data['account_key'] == decision['account_key']
+            and data['source_db_sha256'] == decision['source_db_sha256']
+            and data['target_version'] == target['target_version']
+            and data['allocation_version'] == draft['original_allocation_version']
+            and record['status'] == 'APPROVED_DOCUMENT_VIEW'
+            and confirmation['action'] == 'READ_EXISTING_APPROVAL'
+            and digest(confirmation) == record['confirmation_evidence_hash']
+            and record['source_reference_ids'] == confirmation['source_reference_ids'] == [source_ref]
+            and target['confirmation_run_id'] == 'APPROVED-DOC-' + source_sha[:24]
+            and draft['allocation_id'] == 'DOC-TARGET-' + digest({
+                'client': decision['client_id'], 'source': source_sha,
+                'version': data['allocation_version'],
+            })[:24]
+            and approved_at <= available <= time(evaluation_at)
+            and isinstance(data['items'], dict)
+        ):
+            return {}
+        document_lines = checked(document).decode('utf-8').splitlines()
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return {}
+
+    scopes = {}
+    for symbol, item in data['items'].items():
+        if symbol not in decision['symbols'] or not isinstance(item, dict):
+            continue
+        lines = [line for line in draft['target_lines'] if line.get('ticker') == symbol]
+        if len(lines) != 1:
+            continue
+        line = lines[0]
+        original = item.get('original_document_row')
+        if (not original or document_lines.count(original) != 1
+                or original != line.get('original_document_row')
+                or item.get('instrument_id') != line['instrument_id']
+                or line.get('source_reference_ids') != [source_ref]):
+            continue
+        components = item.get('allowed_mandate_components')
+        missing_clause = item.get('missing_approval_clause')
+        if components is not None:
+            if (not isinstance(components, list) or not components or missing_clause is not None
+                    or not all(isinstance(value, str) and re.fullmatch(r'[A-Z][A-Z0-9_]*', value)
+                               for value in components)
+                    or len(set(components)) != len(components)):
+                continue
+        elif not isinstance(missing_clause, str) or not missing_clause.strip():
+            continue
+        evidence = {
+            'source_reference': source_ref, 'document_sha256': source_sha,
+            'document_line_number': document_lines.index(original) + 1,
+            'original_document_row': original, 'instrument_id': line['instrument_id'],
+            'target_version': target['target_version'], 'allocation_version': data['allocation_version'],
+            'available_at': available.isoformat(), 'work_order_reference': data['work_order_reference'],
+            'scope_source_sha256': descriptor['sha256'],
+        }
+        if missing_clause is not None:
+            evidence['missing_approval_clause'] = missing_clause
+        scopes[symbol] = {'mandate_scope_source': evidence}
+        if components is not None:
+            scopes[symbol]['allowed_mandate_components'] = list(components)
+    return scopes
+
+
 def project(snapshot,config,evaluation_at,target):
     decision=read(snapshot,config,evaluation_at)
     if decision is None:return target
     if target.get('owner_etf_constraints_projection') is not None:
         raise PermissionError('OWNER_ETF_DECISION_DUPLICATE_PROJECTION')
+    mandates = mandate_scopes(target, decision, evaluation_at)
     out=deepcopy(target);draft=out['payload']['draft']
     constraints=draft.setdefault('etf_constraints',{})
     for symbol in decision['symbols']:
@@ -100,6 +182,8 @@ def project(snapshot,config,evaluation_at,target):
             'lookthrough_restrictions':'EXPLICIT_APPROVED_NONE',
             'authority_reference':decision['authority_reference'],
             'owner_decision_source':deepcopy(decision)}
+        if symbol in mandates and 'allowed_mandate_components' not in constraints[symbol]:
+            constraints[symbol].update(mandates[symbol])
     # Approval replay keeps the exact original target, including its hashes;
     # the derived analysis view gets its own coherent hash, not a new approval.
     if 'draft_hash' in draft:
@@ -108,7 +192,8 @@ def project(snapshot,config,evaluation_at,target):
         if 'target_hash' in out['payload']:out['payload']['target_hash']=draft['draft_hash']
     out['owner_etf_constraints_projection']={'original_target':deepcopy(target),
         'original_target_digest':digest(target),'decision':deepcopy(decision),
-        'scope':'LOOKTHROUGH_POLICY_ONLY__ALLOCATION_AND_APPROVAL_UNCHANGED'}
+        'scope':('ETF_CONSTRAINT_POLICY_ONLY__ALLOCATION_AND_APPROVAL_UNCHANGED' if mandates
+                 else 'LOOKTHROUGH_POLICY_ONLY__ALLOCATION_AND_APPROVAL_UNCHANGED')}
     return out
 
 

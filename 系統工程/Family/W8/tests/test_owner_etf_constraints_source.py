@@ -8,6 +8,7 @@ import pytest
 HERE=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(HERE),str(HERE.parent/'W5')]
 from family_input import digest
+from approved_target_input import build_approved_target_view
 from member_v82_analysis import target_source
 from owner_etf_constraints_source import approval_target
 from etf_structure_source import evaluate_etf_structure,LEAVES
@@ -60,6 +61,93 @@ def case(tmp_path):
 def apply(snapshot,config,target,at='2026-11-21T01:00:00Z'):
     with patch('member_v82_analysis._historical_target_source',return_value=deepcopy(target)):
         return target_source(snapshot,config,at)
+
+
+def mandate_case(tmp_path):
+    snapshot, config, decision, _, _ = case(tmp_path)
+    symbols = decision['symbols']
+    lines = [f'| {symbol} named ETF | 25% | Verified purpose {symbol} |' for symbol in symbols]
+    path = tmp_path / 'SYNTHETIC_TARGET.md'
+    path.write_text('| 標的 | 目標權重 | 用途 |\n| --- | --- | --- |\n' + '\n'.join(lines) + '\n')
+    source = 'drive:SYNTHETIC_TARGET'
+    target = build_approved_target_view(client_id=snapshot['client_id'], source_path=path,
+        source_reference=source, source_available_at='2026-11-01T12:00:00Z',
+        target_version=3, allocation_version='SYNTHETIC-v3',
+        rows=[{'source_line': line, 'weight': '0.25'} for line in lines],
+        mappings=[{'ticker': s, 'instrument_id': s, 'asset_type': 'ETF'} for s in symbols])['target']
+    items = {s: {'instrument_id': s, 'original_document_row': line,
+        'allowed_mandate_components': ['APPROVED_EQUITIES']} for s, line in zip(symbols, lines)}
+    items['AAA'].pop('allowed_mandate_components')
+    items['AAA']['missing_approval_clause'] = 'Unresolved coverage of an additional strategy.'
+    mandate = {'schema_version': 'Family.W8.OwnerETFMandateSource.v1',
+        'client_id': snapshot['client_id'], 'source_db_sha256': snapshot['source_sha256'],
+        'account_key': decision['account_scope']['account_key'], 'trade_authorization': 'NONE',
+        'allocation_version': 'SYNTHETIC-v3', 'target_version': 3, 'available_at': '2026-11-20T23:54:38Z',
+        'work_order_reference': 'SYNTHETIC_SCOPE_WORK_ORDER',
+        'approved_document': {'local_path': str(path), 'sha256': sha256(path.read_bytes()).hexdigest(),
+                              'source_reference': source}, 'items': items}
+    def save():
+        path = tmp_path / 'SYNTHETIC_MANDATE.json'
+        path.write_text(json.dumps(mandate))
+        config['owner_etf_constraints_source']['mandate_source'] = {
+            'local_path': str(path), 'sha256': sha256(path.read_bytes()).hexdigest()}
+    save()
+    return snapshot, config, target, mandate, save
+
+
+def mandate_leaf(target, snapshot, symbol, components, at='2026-11-21T01:00:00Z'):
+    facts = {'symbol': symbol, 'source_sha256': 'a' * 64,
+        'source_url': 'https://fund-docs.vanguard.com/synthetic.pdf',
+        'mandate': {'components': components, 'method_version': 'SYNTHETIC',
+            'as_of': '2026-11-19T00:00:00Z', 'available_at': '2026-11-20T00:00:00Z',
+            'valid_until': '2026-11-22T00:00:00Z', 'data_quality': 'OK'}}
+    return evaluate_etf_structure(facts, {'client_id':snapshot['client_id'],
+        'evaluation_at':at,'confirmed_target':target}, symbol)['leaves'][LEAVES[1]]
+
+
+def test_bound_owner_mandate_is_compared_without_extending_approval(tmp_path):
+    snapshot, config, base, data, _ = mandate_case(tmp_path)
+    projected = apply(snapshot, config, base)
+    assert approval_target(projected, snapshot, '2026-11-21T01:00:00Z') == base
+    assert projected['payload']['draft']['target_lines'] == base['payload']['draft']['target_lines']
+    for symbol in ('BBB', 'CCC', 'DDD'):
+        leaf = mandate_leaf(projected, snapshot, symbol, ['APPROVED_EQUITIES'])
+        assert leaf['truth'] == 'TRUE' and not leaf['missing_fields']
+        assert leaf['detail']['approved_scope_source']['original_document_row'] == data['items'][symbol]['original_document_row']
+    excess = mandate_leaf(projected, snapshot, 'BBB', ['APPROVED_EQUITIES', 'ADDED_STRATEGY'])
+    assert excess['truth'] == 'FALSE' and excess['detail']['approved_components'] == ['APPROVED_EQUITIES']
+    unresolved = mandate_leaf(projected, snapshot, 'AAA', ['ADDED_STRATEGY'])
+    assert unresolved['truth'] == 'UNKNOWN'
+    assert unresolved['detail']['approved_scope_source']['missing_approval_clause'] == data['items']['AAA']['missing_approval_clause']
+    assert all(row['lookthrough_restrictions'] == 'EXPLICIT_APPROVED_NONE'
+               for row in projected['payload']['draft']['etf_constraints'].values())
+
+
+@pytest.mark.parametrize('bad', ['client_id', 'account_key', 'source_db_sha256', 'target_version',
+    'allocation_version', 'document', 'reference', 'fund', 'row', 'missing_components', 'before_scope'])
+def test_invalid_owner_mandate_binding_preserves_unknown_and_lookthrough(tmp_path, bad):
+    snapshot, config, base, data, save = mandate_case(tmp_path)
+    at = '2026-11-21T01:00:00Z'
+    if bad == 'document':
+        data['approved_document']['sha256'] = 'b' * 64
+    elif bad == 'reference':
+        data['approved_document']['source_reference'] = 'drive:OTHER_DOC'
+    elif bad == 'fund':
+        data['items']['BBB']['instrument_id'] = 'CCC'
+    elif bad == 'row':
+        data['items']['BBB']['original_document_row'] = data['items']['CCC']['original_document_row']
+    elif bad == 'missing_components':
+        del data['items']['BBB']['allowed_mandate_components']
+    elif bad == 'before_scope':
+        at = '2026-11-20T23:54:37Z'
+    else:
+        data[bad] = 'OTHER'
+    save()
+    projected = apply(snapshot, config, base, at)
+    leaf = mandate_leaf(projected, snapshot, 'BBB', ['APPROVED_EQUITIES'], at)
+    assert leaf['truth'] == 'UNKNOWN' and leaf['detail']['approved_components'] is None
+    assert 'approved_target.etf_constraints.BBB.allowed_mandate_components' in leaf['missing_fields']
+    assert projected['payload']['draft']['etf_constraints']['BBB']['lookthrough_restrictions'] == 'EXPLICIT_APPROVED_NONE'
 
 
 def test_normal_target_entry_applies_only_explicit_symbols_and_leaves_other_leaves_unknown(tmp_path):

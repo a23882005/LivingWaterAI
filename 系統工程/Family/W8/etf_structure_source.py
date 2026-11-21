@@ -186,8 +186,10 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None):
     if mandate and not isinstance(mandate.get('components'),list):missing.append('mandate.components')
     if allowed is None:missing.append('approved_target.etf_constraints.'+symbol+'.allowed_mandate_components')
     if mandate and not mandate.get('method_version'):missing.append('mandate.method_version');value=None
-    put(LEAVES[1],value if not missing else None,missing,
-        {'issuer_components':mandate.get('components') if mandate else None,'approved_components':allowed})
+    mandate_detail = {'issuer_components':mandate.get('components') if mandate else None,'approved_components':allowed}
+    if policy.get('mandate_scope_source'):
+        mandate_detail['approved_scope_source'] = deepcopy(policy['mandate_scope_source'])
+    put(LEAVES[1],value if not missing else None,missing,mandate_detail)
     trace.append('ETF_VIABLE_01.mandate_subset')
     nav,missing=source_record(facts,'nav_redemption_status',at,product_evidence)
     nav_ok=boolean(nav.get('nav_reporting_valid')) if nav else None

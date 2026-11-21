@@ -129,7 +129,7 @@
     },
     {
       "path": "../../Family/W8/member_position_valuation.py",
-      "sha256": "e4ef8adfc6c166640eddef8473009333e1dae0f7e6b98a4c788c71e00c005ba8"
+      "sha256": "71530487ffea82db754118b416f5bfbc10a9127d61c606833448a0b3c98ce668"
     },
     {
       "path": "../../Family/W8/tpex_actual_sessions.py",
@@ -277,7 +277,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "4105053b45717dca9cc9504874667c358f67ff587e68d062e80d9d278fd19b9f"
+      "sha256": "b34bdd37fbca0c75002d7939c2c3af2965fe68dae4de526e8466061a455aa3fb"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

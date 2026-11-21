@@ -228,3 +228,21 @@ def test_incomplete_bridge_keeps_long_history_and_reports_latest_quote_separatel
  assert out['current_reference_quote']['observed_close']=='600'
  assert out['current_quote_append']['missing_bridge_sessions']==[missing]
  assert out['current_quote_append']['appended_completed_dates']==[]
+
+
+def test_registered_portfolio_close_is_bound_to_member_and_source(tmp_path):
+ req,data,source,fx=contract_case(tmp_path)
+ desc=source()
+ record={'client_id':req['client_id'],'source_db_sha256':req['client_snapshot']['payload']['source_sha256'],
+  'target_version':1,'scope':'PORTFOLIO_VALUATION_ONLY','available_at':req['evaluation_at'],
+  'session_date':'2026-10-29','closes':{'SYN_ASSET':{'source_sha256':'a'*64,'currency':'USD',
+  'price':'75','session_date':'2026-10-29'}}}
+ data['sources']['SYN_ASSET']['currency']='USD';desc=source()
+ path=tmp_path/'registration.json';path.write_text(json.dumps(record))
+ desc['portfolio_close_batch']={'local_path':str(path),'sha256':sha256(path.read_bytes()).hexdigest(),'source_reference':'SYN_TEST'}
+ result=read(desc,req)
+ assert result['expected_current_quotes']['SYN_ASSET']['price']=='75'
+ assert result['original_quote_hashes']['SYN_ASSET']=='a'*64
+ record['client_id']='another member';path.write_text(json.dumps(record))
+ desc['portfolio_close_batch']['sha256']=sha256(path.read_bytes()).hexdigest()
+ with pytest.raises(PermissionError,match='CLOSE_BATCH_SCOPE'):read(desc,req)

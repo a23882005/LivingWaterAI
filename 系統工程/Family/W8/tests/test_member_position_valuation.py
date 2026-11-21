@@ -87,3 +87,37 @@ def test_bank_reference_is_original_dated_fx_not_assumed_cash(tmp_path,issue):
     elif issue=='future_quote':source['retrieved_at']='2026-11-03T03:00:00Z'
     else:source['source_reference']='https://example.invalid/quote'
     with pytest.raises((ValueError,PermissionError)):read_fx(source,'2026-11-03T04:00:00Z')
+
+
+def test_bond_close_values_current_account_while_preserving_old_quantity(tmp_path):
+    req,cov,rows,inputs=case(tmp_path)
+    quote={'symbol':'TEST','price':'20','session_date':'2026-11-02','currency':'USD',
+           'source_sha256':'b'*64,'purpose':'PM_VERIFIED_CLOSE_FOR_POSITION_VALUE_ONLY'}
+    asset=cov['holding_and_target_rows'][0]
+    asset.update(route='V75_SEPARATE',current_broker_observations=[{
+        'owner':{'client_id':req['client_id'],'account':'TEST_ACCOUNT'},
+        'captured_at':req['evaluation_at'],
+        'position':{'symbol':'TEST','contract_id':123,'quantity':'4','currency':'USD'}}])
+    cov['coverage_digest']=digest({k:v for k,v in cov.items() if k!='coverage_digest'})
+    contract={**{k:req[k] for k in ('client_id','run_id','evaluation_at')},
+              'source_db_sha256':cov['source_db_sha256'],'pm_bond_closes':{'TEST':quote}}
+    result=produce(req,cov,rows,inputs,current_market_contract=contract)
+    assert result['current_broker_account_positions']['TEST']['account_position_amount']=='80'
+    assert result['positions'][0]['quantity'] is None
+    assert result['positions'][0]['quantity_discrepancy']['prior_reported_quantity']=='3'
+    assert result['qualified_portfolio_NAV'] is None and result['deployable_cash'] is None
+
+@pytest.mark.parametrize('change,expected', [('none',True),('other_platform',False),('extra_row',False),('wrong_contract',False),('before_old',False),('other_owner',False)])
+def test_declared_broker_replacement_requires_matching_evidence(change,expected):
+    from current_market_contract import comparable_declared_position
+    request={'client_id':'SYN','evaluation_at':'2026-01-02T03:00:00Z'}
+    rule={'account':'A','current_contracts':{'TEST':15},'owner_label':'SOURCE_PLATFORM'}
+    original={'source_kind':'SEALED_W6','symbol':'TEST','quantity':'7','broker_label':'SOURCE_PLATFORM',
+              'account_key':None,'received_at':'2026-01-01T03:00:00Z'}
+    position={'owner':{'client_id':'SYN','account':'A'},'contract_id':15,'quantity':'9','retrieved_at':'2026-01-02T03:00:00Z'}
+    if change=='other_platform':original['broker_label']='OTHER'
+    if change=='wrong_contract':position['contract_id']=12
+    if change=='before_old':position['retrieved_at']='2025-12-20T03:00:00Z'
+    if change=='other_owner':position['owner']['account']='B'
+    rows=[original,original] if change=='extra_row' else [original]
+    assert comparable_declared_position(rule,'TEST',rows,position,request) is expected

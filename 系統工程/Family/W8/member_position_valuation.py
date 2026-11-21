@@ -104,6 +104,45 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         if holding.get('household_quantity_status') == 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED':
             discrepancies[r['symbol']] = {'reason': 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED',
                 'prior_reported_quantity':holding.get('prior_reported_quantity'), 'current_broker_position':result}
+    bond_quotes = (current_market_contract or {}).get('pm_bond_closes', {})
+    for asset in coverage['holding_and_target_rows']:
+        symbol = asset['symbol']
+        quote = bond_quotes.get(symbol)
+        if not quote or asset['route'] != 'V75_SEPARATE':
+            continue
+        markets[symbol] = dict(market_identity={'currency':quote['currency']}, observed_date=quote['session_date'],
+            observed_close=quote['price'], source_sha256=quote['source_sha256'],
+            history_quality={'price_basis':quote['purpose']}, pm_bond_close=quote)
+        # Preserve the account-specific result even if the old workbook disagrees.
+        # A bond holding or its reserved role must never be counted again as available cash.
+        positions = asset.get('current_broker_observations') or []
+        if len(positions) == 1:
+            observation = positions[0]
+            position = observation['position']
+            observed = time(observation['captured_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
+            today = time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
+            if (observed == today and position['symbol'] == symbol and position['currency'] == quote['currency']
+                    and observation['owner']['client_id'] == client):
+                result = dict(symbol=symbol, contract_id=position['contract_id'], currency=quote['currency'],
+                    owner=deepcopy_fact(observation['owner']), quantity=position['quantity'], scope='AUTHORIZED_BROKER_ACCOUNT_ONLY',
+                    retrieved_at=observation['captured_at'], valuation_price=quote['price'], observed_date=quote['session_date'],
+                    valuation_source_sha256=quote['source_sha256'],
+                    account_position_amount=str(_number(position['quantity'])*_number(quote['price'])))
+                account_values[symbol] = result
+                old = asset['source_facts']
+                if len(old)==1 and old[0].get('quantity') is not None and _number(old[0]['quantity'])!=_number(position['quantity']):
+                    discrepancies[symbol] = dict(reason='OTHER_ACCOUNT_SCOPE_UNCONFIRMED', prior_reported_quantity=old[0]['quantity'],
+                        current_broker_position=result)
+    rule=(current_market_contract or {}).get('declared_position_scope')
+    from current_market_contract import comparable_declared_position
+    replaced={}
+    if rule:
+        for asset in coverage['holding_and_target_rows']:
+            symbol=asset['symbol']
+            broker=account_values.get(symbol)
+            if comparable_declared_position(rule,symbol,asset['source_facts'],broker,request):
+                replaced[symbol]=broker
+                discrepancies.pop(symbol,None)
     rows=[];totals={}
     if current_market_contract is not None and (any(current_market_contract.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
         or current_market_contract.get('source_db_sha256')!=snapshot['source_sha256']):
@@ -133,6 +172,8 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                     quantity=fact.get('quantity'),quantity_source=deepcopy_fact(fact),
                     observed_market_date=(market or {}).get('observed_date'),
                     amount=None,currency=None,reporting_amount_TWD=None,issue=None)
+                if (market or {}).get('pm_bond_close'):
+                    row['pm_bond_close']=deepcopy_fact(market['pm_bond_close'])
                 if reference_quote is not None:
                     row['current_reference_quote']=deepcopy_fact(reference_quote)
                 if logical_keys is not None:
@@ -142,6 +183,11 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                 if currency is None:
                     from official_holdings_source import holding_quote_currency
                     proof=holding_quote_currency(fact);currency=proof['currency'] if proof else None
+                replacement=replaced.get(asset['symbol'])
+                if replacement:
+                    row.update(quantity=replacement['quantity'],prior_reported_quantity=fact['quantity'],
+                            quantity_source={'source_kind':'AUTHORIZED_BROKER_CURRENT_DECLARED_ACCOUNT','original':deepcopy_fact(fact),
+                                'position':deepcopy_fact(replacement),'source_scope':current_market_contract['source_descriptor']['declared_position_scope']['sha256']})
                 if asset['symbol'] in discrepancies:
                     row.update(quantity=None, issue=discrepancies[asset['symbol']].get('reason','UNRECONCILED_MEMBER_BROKER_QUANTITY'),
                                quantity_discrepancy=discrepancies[asset['symbol']])
@@ -152,7 +198,7 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                 elif not currency or currency!=market['market_identity']['currency']:
                     row['issue']='ORIGINAL_PRICE_CURRENCY_NOT_BOUND'
                 else:
-                    value=_number(fact['quantity'])*_number(market['observed_close'])
+                    value=_number(row['quantity'])*_number(market['observed_close'])
                     row.update(amount=str(value),currency=currency,observed_close=str(market['observed_close']),
                         market_source_sha256=market['source_sha256'],price_basis=market['history_quality']['price_basis'])
                     if currency=='TWD':row['reporting_amount_TWD']=str(value)

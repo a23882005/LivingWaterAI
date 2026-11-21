@@ -63,10 +63,130 @@ def read(source,request):
         if time(updated['as_of_time']) < time(out['official_bank_original_result']['as_of_time']):
             raise PermissionError('CURRENT_MARKET_BANK_PRECEDES_PINNED_QUOTE')
         out['official_bank_original_result'] = updated
+    close_source = source.get('pm_bond_close_source')
+    if close_source is not None:
+        out['pm_bond_closes'] = _pm_bond_closes(close_source, request, out)
+    declared=declared_position_scope(source.get('declared_position_scope'),request)
+    if declared:
+        out['declared_position_scope']=declared
+    closing_batch=source.get('portfolio_close_batch')
+    if closing_batch:
+        from member_market_source import read_json
+        batch=read_json(closing_batch)
+        if (batch['client_id']!=request['client_id'] or batch['source_db_sha256']!=snapshot['source_sha256']
+                or batch.get('scope')!='PORTFOLIO_VALUATION_ONLY' or batch.get('target_version')!=out['target_version']
+                or not closing_batch.get('source_reference') or time(batch['available_at'])>time(request['evaluation_at'])):
+            raise PermissionError('CURRENT_POSITION_REGISTERED_CLOSE_BATCH_SCOPE')
+        if time(batch['available_at']).astimezone(ZoneInfo('Asia/Taipei')).date()==time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date():
+            for symbol,registered in batch['closes'].items():
+                if (symbol not in observations or registered['session_date']!=batch['session_date']
+                        or registered['currency']!=observations[symbol]['currency']
+                        or Decimal(registered['price'])<=0):
+                    raise PermissionError('CURRENT_POSITION_REGISTERED_CLOSE_BATCH_ASSET')
+                # Only the valuation projection reads these registrations. It checks the
+                # original reader's hash, currency, latest completed date and exact price.
+                out['original_quote_hashes'][symbol]=registered['source_sha256']
+                out['expected_current_quotes'][symbol]=deepcopy(registered)
     from current_nav_source import read as read_nav
     nav=read_nav(source.get('nav_qualification_source'),request,out)
     if nav is not None:out['nav_source_qualification']=nav
     out['digest']=digest(out);return out
+
+
+def _pm_bond_closes(source, request, contract):
+    """Read dated, member-bound PM close attestations for position valuation only."""
+    import re
+    from datetime import datetime
+    from urllib.parse import urlsplit
+    from member_market_source import read_json
+    facts = read_json(source)
+    if (source.get('client_id') != request['client_id'] or source.get('source_db_sha256') != contract['source_db_sha256']
+            or source.get('target_version') != contract['target_version'] or source.get('scope') != 'BOND_POSITION_VALUATION_ONLY'
+            or source.get('session_date') != facts['date'] or not source.get('source_reference') or time(facts['retrieved_at']) > time(request['evaluation_at'])):
+        raise PermissionError('BOND_CLOSE_MEMBER_DB_SCOPE_OR_TIME')
+    session = datetime.strptime(facts['date'], '%Y-%m-%d')
+    available = time(facts['retrieved_at'])
+    if time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date() != available.astimezone(ZoneInfo('Asia/Taipei')).date():
+        return {}
+    tpex = urlsplit(facts['tpex_url'])
+    roc = f'{session.year-1911:03d}/{session.month:02d}/{session.day:02d}'
+    if (facts['tpex_report_date'] != roc or (tpex.scheme,tpex.hostname) != ('https','www.tpex.org.tw')
+            or not tpex.path.endswith('/stk_wn1430_result.php') or not facts['tpex_close_twd']):
+        raise PermissionError('BOND_CLOSE_TPEX_REPORT_OR_SESSION')
+    quotes = {}
+    def register(symbol, value, currency, zone, close_hour, close_minute, sources):
+        price = Decimal(str(value))
+        close = session.replace(hour=close_hour, minute=close_minute, tzinfo=ZoneInfo(zone))
+        if close > available or not price.is_finite() or price <= 0:
+            raise PermissionError('BOND_CLOSE_PRICE_OR_AVAILABILITY')
+        quotes[symbol] = dict(symbol=symbol, price=str(price), currency=currency, session_date=facts['date'],
+            source_sha256=source['sha256'], source_reference=source['source_reference'],
+            provider_references=sources, available_at=facts['retrieved_at'], purpose='PM_VERIFIED_CLOSE_FOR_POSITION_VALUE_ONLY')
+    for symbol, value in facts['tpex_close_twd'].items():
+        if not re.fullmatch(r'[0-9]{5}B',symbol):
+            raise ValueError('BOND_CLOSE_TPEX_BOND_ETF_REQUIRED')
+        register(symbol,value,'TWD','Asia/Taipei',14,30,[facts['tpex_url']])
+    refs = [urlsplit(url) for url in facts['sgov_sources']]
+    if (any(r.scheme != 'https' for r in refs) or
+            not any(r.hostname=='stockanalysis.com' and r.path=='/etf/sgov/history/' for r in refs) or
+            not any(r.hostname=='markets.ft.markitdigital.com' and 'SGOV' in r.query for r in refs)):
+        raise PermissionError('BOND_CLOSE_SGOV_LISTING_SOURCES')
+    register('SGOV',facts['sgov_close_usd'],'USD','America/New_York',16,0,facts['sgov_sources'])
+    return quotes
+
+
+def declared_position_scope(descriptor,request):
+    if descriptor is None:
+        return None
+    from member_market_source import read_json
+    from owner_current_business import read as read_owner
+    rule=read_json(descriptor)
+    project=descriptor['project']
+    owner=read_owner(descriptor['owner'],request)
+    auth=read_json(descriptor['authorization'])
+    raw=Path(project['source_path']).read_bytes()
+    if (rule['scope']!='CURRENT_DECLARED_BROKER_HOLDINGS_ONLY' or rule['trade']!='NONE'
+            or rule['client_id']!=request['client_id'] or rule['source_db_sha256']!=request['client_snapshot']['payload']['source_sha256']
+            or rule['target_version']!=request['confirmed_target']['target_version']
+            or project['client_id']!=rule['client_id'] or project['target_version']!=rule['target_version']
+            or owner is None or not owner['unreported_positions_absent'] or owner['member']!=rule['member']
+            or owner['source_sha256']!=rule['owner_current_sha256'] or not project.get('source_reference')
+            or project['sha256']!=rule['project_document_sha256'] or sha256(raw).hexdigest()!=project['sha256']
+            or descriptor['authorization']['sha256']!=rule['broker_owner_authorization_sha256']
+            or auth['scope']!='READ_ONLY_RECONCILIATION_AND_ADVICE' or auth['trade_authorization']!='NONE'
+            or auth['owner']['client_id']!=rule['client_id'] or auth['owner']['account']!=rule['account']):
+        raise PermissionError('CURRENT_DECLARED_ACCOUNT_SCOPE_AUTHORITIES')
+    from w1_portfolio_observations import normalize
+    matching_accounts = [entry['account_key'] for entry in normalize(request)['accounts']
+        if entry['owner_candidate']['broker']==auth['owner']['broker']]
+    if matching_accounts != [rule['account']]:
+        return None
+    if time(rule['available_at'])>time(request['evaluation_at']):
+        return None
+    lines=raw.decode('utf-8-sig').splitlines()
+    cited=rule['source_project_lines']
+    if any(not (0<int(n)<=len(lines)) or lines[int(n)-1]!=line for n,line in cited.items()):
+        raise PermissionError('CURRENT_DECLARED_ACCOUNT_SCOPE_SOURCE_LINES')
+    named=cited[str(rule['named_broker_list_line'])]
+    import re
+    if (any(not re.search(r'(?<![A-Z0-9])'+re.escape(k)+r'(?![A-Z0-9])',named) for k in rule['current_contracts'])
+            or auth['owner']['broker'] not in named):
+        raise PermissionError('CURRENT_DECLARED_ACCOUNT_LISTING_NOT_IN_PROJECT')
+    return rule
+
+
+def comparable_declared_position(rule,symbol,facts,position,request):
+    if not rule or len(facts)!=1 or not position:
+        return False
+    original=facts[0]
+    account=position['owner']['account']
+    return (position['owner']['client_id']==request['client_id'] and rule['account']==account
+            and position['contract_id']==rule['current_contracts'].get(symbol)
+            and original.get('source_kind')=='SEALED_W6' and original.get('symbol')==symbol
+            and original.get('broker_label')==rule['owner_label'] and original.get('account_key') in (None,account)
+            and original.get('received_at') and time(original['received_at'])<=time(position['retrieved_at'])
+            and time(position['retrieved_at']).astimezone(ZoneInfo('Asia/Taipei')).date()==time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
+            and original.get('quantity') is not None)
 
 
 def gap_price(contract, market, instrument, symbol, request):
@@ -134,9 +254,18 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
             symbol=row['symbol'];item=deepcopy(row);problem=row.get('issue')
             if row.get('quantity')=='0':value=Decimal(0)
             elif row.get('amount') is None:problem=problem or 'CURRENT_POSITION_AMOUNT_UNAVAILABLE';value=None
+            elif row.get('pm_bond_close'):
+                quote=(contract.get('pm_bond_closes') or {}).get(symbol)
+                if (quote!=row['pm_bond_close'] or assets[symbol]['route']!='V75_SEPARATE'
+                        or row.get('market_source_sha256')!=quote['source_sha256']
+                        or row.get('currency')!=quote['currency'] or row.get('observed_market_date')!=quote['session_date']
+                        or Decimal(str(row['observed_close']))!=Decimal(quote['price'])):
+                    raise PermissionError('CURRENT_POSITION_PM_BOND_CLOSE_BINDING')
+                value=Decimal(row['amount'])
             elif row.get('market_source_sha256')!=((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or {}).get('source_sha256',contract['original_quote_hashes'].get(symbol)):
                 problem='CURRENT_POSITION_QUOTE_NOT_FROM_PINNED_BATCH';value=None
-            elif (row.get('observed_market_date')!=contract['expected_current_quotes'][symbol].get('session_date')
+            elif (contract['expected_current_quotes'][symbol].get('currency',row.get('currency'))!=row.get('currency')
+                or row.get('observed_market_date')!=contract['expected_current_quotes'][symbol].get('session_date')
                 or Decimal(str(row.get('observed_close')))!=Decimal(((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or contract['expected_current_quotes'][symbol])['price'])):
                 problem='CURRENT_POSITION_PRICE_OR_SESSION_REPLAY_MISMATCH';value=None
             else:value=Decimal(row['amount'])
@@ -265,6 +394,12 @@ def compare_broker_quantity(source, holding, symbol, request):
             if holding.get('quantity') is None or Decimal(str(holding['quantity'])) != qty:
                 updated.update(quantity=None, quantity_state='UNKNOWN', prior_reported_quantity=holding.get('quantity'),
                                household_quantity_status='OTHER_ACCOUNT_SCOPE_UNCONFIRMED')
+                rule=declared_position_scope(source.get('declared_position_scope'),request)
+                if comparable_declared_position(rule,symbol,holding.get('source_facts',[]),scoped,request):
+                    updated.update(quantity=str(qty),quantity_state='KNOWN',observed_at=scoped['retrieved_at'],
+                        household_quantity_status='CURRENT_DECLARED_ACCOUNT_CONFIRMED',
+                        quantity_basis='NEWER_AUTHORIZED_BROKER_POSITION_FOR_DECLARED_ACCOUNT',
+                        declared_scope_source_sha256=source['declared_position_scope']['sha256'])
             return updated
     evidence = read_json(source['historical_positions'])
     if (evidence['method'] != 'get_account_positions' or evidence['status'] != 'fulfilled'

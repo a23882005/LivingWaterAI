@@ -76,17 +76,7 @@ def build(site, template, output):
                     if (v.lifeStage !== document.querySelector('#family-life').value ||
                         v.preference !== document.querySelector('#family-style').value)
                         throw Error('Scenario mismatch');
-                    return {
-                        stock:v.totals.stock, bond:v.totals.bond, cash:v.totals.dryPowder,
-                        strategic:{stock:v.strategic.stock,bond:v.strategic.bond},
-                        classes:Object.fromEntries(
-                            ['S1','S2','S3','B1','B2','B3','B4','C0'].map(key => {
-                                const value = v.percentages[key];
-                                if (!Number.isFinite(value)) throw Error('Missing allocation: '+key);
-                                return [key,value];
-                            })
-                        )
-                    };
+                    return true;
                 }""")
         if len(scenarios) != 40:
             raise ValueError("Expected forty education scenarios")
@@ -146,7 +136,7 @@ function redraw(){
 redraw();
 new ResizeObserver(redraw).observe(svg.parentElement);
 """
-        for ident in ("family-data-status","family-news","v703-update-banner","v703-data-state"):
+        for ident in ("v703-update-banner",):
             page.locator("#" + ident).evaluate("(node)=>node.textContent=''")
         page.locator("#v703-update-banner").evaluate(
             "(node,stamp)=>node.textContent='資料時間　'+stamp", feed["asOf"])
@@ -178,8 +168,6 @@ new ResizeObserver(redraw).observe(svg.parentElement);
         }""", [scenarios, counter])
         display = """const choices=JSON.parse(document.getElementById('education-scenarios').textContent);
 const el=id=>document.getElementById(id);
-const labels={S1:'分散核心股票',S2:'成長集中股票',S3:'高風險股票',B1:'超短公債',
- B2:'中短天期投資級公司債',B3:'長天期美國公債',B4:'信用敏感公司債',C0:'待投入資金'};
 const chart=el('r15-chart');
 function showPoint(event){
  let point=event.target.closest('circle[aria-label]');
@@ -195,20 +183,23 @@ function showPoint(event){
 }
 chart.addEventListener('click',showPoint);
 chart.addEventListener('focusin',showPoint);
-function display(){
- const v=choices[el('family-life').value+'/'+el('family-style').value];
- for(const key of ['stock','bond','cash']) el('total-'+key).textContent=v?v[key]+'%':'—';
- for(const key of ['stock','bond']) el('strategic-'+key).value=v?v.strategic[key]:'';
- for(const id of ['allocation-list','v703-result']){
-  const target=el(id);target.replaceChildren();
-  if(!v){target.textContent='本期暫停正式配置';continue;}
-  for(const [key,label] of Object.entries(labels)){
-   const row=document.createElement('div');row.textContent=label+'　'+v.classes[key]+'%';target.append(row);
-  }
- }
+const lesson = el('learning-context');
+function showAvailability(){
+ if(!choices[el('family-life').value+'/'+el('family-style').value])
+  lesson.textContent+=' 本期市場資料待更新。';
 }
-for(const id of ['family-life','family-style'])el(id).addEventListener('change',display);
-display();"""
+for(const id of ['family-life','family-style'])el(id).addEventListener('change',showAvailability);
+showAvailability();"""
+        lesson_source = re.search(r'<script id="public-lesson-script">(.*?)</script>', template.read_text(), re.S).group(1)
+        page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}",
+                      "(() => {" + lesson_source + "})();")
+        observations = []
+        for key, label in (("m08", "美國十年期實質殖利率"), ("m05", "核心物價年增率")):
+            item = next(row for row in indicators if row["key"] == key)
+            value = item["value"]
+            reading = "待更新" if value is None else f"{value:g}{item['unit']}"
+            observations.append(f"{label} {reading}（{item['date']}{'，沿用' if item['carried'] else ''}）")
+        page.locator("#public-market-reading").evaluate("(e,t)=>e.textContent=t", "本期資料｜" + "；".join(observations))
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}",
                       "(() => {" + chart_script + "})();")
@@ -237,10 +228,11 @@ display();"""
             life, style = pair.split("/")
             check.select_option("#family-life", life)
             check.select_option("#family-style", style)
-            shown = check.locator("#total-stock").text_content()
-            expected = "—" if result is None else f"{result['stock']:g}%"
-            if shown != expected:
-                raise ValueError(f"Education scenario {pair}: {shown} != {expected}")
+            lesson = check.locator("#learning-context").inner_text()
+            if not lesson.startswith("情境練習｜") or ("本期市場資料待更新" in lesson) != (result is None):
+                raise ValueError(f"Education scenario mismatch: {pair}")
+        assert check.locator("#v703-result article").count() == 9
+        assert check.locator("#total-stock,#allocation-list,#strategic-stock").count() == 0
         for ident in ("bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield", "bond-score-display"):
             if check.locator("#" + ident).text_content() != model.locator("#" + ident).text_content():
                 raise ValueError("Published education bond field differs from engineering: " + ident)

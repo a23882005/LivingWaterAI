@@ -199,10 +199,10 @@
 
 
 
-<section id="v703-family-profile" class="max-w-7xl mx-auto px-4 mt-5 mb-5" aria-label="教育版配置條件">
+<section id="v703-family-profile" class="max-w-7xl mx-auto px-4 mt-5 mb-5" aria-label="教育版學習情境">
  <div class="rounded-2xl border border-cyan-700 bg-slate-800 p-5 shadow-lg">
   <h2 class="font-bold text-lg text-cyan-300 mb-2">🍎 教育版｜先選人生情境與投資風格</h2>
-  <p class="text-xs text-slate-300 mb-3">全頁共用同一組設定。下方總經、配置試算與總經觀察會自動連動，不需要再次選擇。</p>
+  <p class="text-xs text-slate-300 mb-3">選擇情境，從不同角度認識風險。市場資料採同一期觀測值。</p>
   <div class="grid gap-3 md:grid-cols-2">
    <label class="text-sm text-slate-200">人生情境（10種）<select id="family-life" class="mt-2 block w-full bg-slate-950 border border-slate-600 rounded-lg p-3 text-white"><option value="L1">1 小資累積</option><option value="L2" selected>2 穩定上班族</option><option value="L3">3 收入不穩自營</option><option value="L4">4 突然大額資金</option><option value="L5">5 距退休5～10年</option><option value="L6">6 已退休需生活費</option><option value="L7">7 學生</option><option value="L8">8 服兵役</option><option value="L9">9 待業求職</option><option value="L10">10 暫時／長期無法工作</option></select></label>
    <label class="text-sm text-slate-200">投資風格（4種）<select id="family-style" class="mt-2 block w-full bg-slate-950 border border-slate-600 rounded-lg p-3 text-white"><option value="conservative">保守</option><option value="balanced" selected>平衡</option><option value="growth">平衡成長</option><option value="aggressive">積極</option></select></label>
@@ -268,16 +268,16 @@
 <div class="lg:col-span-5 space-y-6">
 <div class="lg:sticky lg:top-24 space-y-6">
 <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl relative overflow-hidden">
-<div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">Macro Safety (總倉位)</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">58.4</div></div>
+<div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">總經體質分</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">58.4</div></div>
 <div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width:58.4%"></div></div>
 <div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">🟡 體質尚穩</div>
 <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/60 p-3" aria-label="Macro-SaFe 體質分四段說明">
 <div class="mb-2 text-xs font-bold text-slate-200">Macro-SaFe 體質分怎麼看（0–100 分）</div>
 <div class="grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-1.5 text-[11px] leading-relaxed">
-<div class="font-bold text-red-300">低於 40</div><div class="text-slate-300"><b class="text-red-200">體質不佳｜停車</b>：提高防守與等待資金，避免積極加碼。</div>
-<div class="font-bold text-orange-300">40–&lt;55</div><div class="text-slate-300"><b class="text-orange-200">體質偏弱｜防守</b>：提高防守比重，審慎部署。</div>
-<div class="font-bold text-yellow-300">55–&lt;70</div><div class="text-slate-300"><b class="text-yellow-200">體質尚穩｜穩健</b>：按核准的長期配置穩健部署。</div>
-<div class="font-bold text-emerald-300">70 以上</div><div class="text-slate-300"><b class="text-emerald-200">體質良好｜進攻</b>：可按核准配置正常部署，仍保留基本機動資金。</div>
+<div class="font-bold text-red-300">低於 40</div><div class="text-slate-300"><b class="text-red-200">體質不佳</b>：多項指標顯示壓力。</div>
+<div class="font-bold text-orange-300">40–&lt;55</div><div class="text-slate-300"><b class="text-orange-200">體質偏弱</b>：部分指標顯示壓力。</div>
+<div class="font-bold text-yellow-300">55–&lt;70</div><div class="text-slate-300"><b class="text-yellow-200">體質尚穩</b>：整體數據較為穩定。</div>
+<div class="font-bold text-emerald-300">70 以上</div><div class="text-slate-300"><b class="text-emerald-200">體質良好</b>：整體數據較為有利。</div>
 </div>
 
 </div>
@@ -285,57 +285,7 @@
 </div>
 
 
-<div class="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl border border-slate-600 shadow-2xl p-6">
-<h3 class="text-lg font-bold text-white mb-4 flex items-center border-b border-slate-700 pb-4"><i class="fas fa-chart-pie text-yellow-400 mr-3"></i>V70.3 戰術配置</h3>
-<div class="mb-4 bg-slate-900/40 border border-slate-700 rounded-xl p-3">
-<div class="text-[11px] text-slate-400 mb-2 font-bold">長期股債基準 S0/B0（10×4 自動計算／核准覆蓋）</div>
-<div class="grid grid-cols-2 gap-3">
-<label class="text-[10px] text-slate-400">股票 S0 (%)
-                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white font-mono" id="strategic-stock" readonly title="由10×4矩陣自動決定" max="100" min="0" step="1" type="number" value="60">
-</label>
-<label class="text-[10px] text-slate-400">債券 B0 (%)
-                                    <input class="mt-1 w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white font-mono" id="strategic-bond" readonly title="由10×4矩陣自動決定" max="100" min="0" step="1" type="number" value="40">
-</label>
-</div>
-<div class="mt-2 text-[10px] text-blue-300" id="mentor-base-note">情境股債基準</div>
-<div class="mt-1 text-[10px] text-yellow-300" id="tactical-tilt-note">配置結果如下</div>
-</div>
-<div class="mb-4">
-<label class="block text-[11px] text-slate-400 mb-1" for="life-stage-select">人生情境｜參與 S0／B0 計算</label>
-<select class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white" id="life-stage-select">
-<option value="L1">1 小資累積</option>
-<option selected value="L2">2 穩定上班族</option>
-<option value="L3">3 收入不穩自營</option>
-<option value="L4">4 突然大額資金</option>
-<option value="L5">5 距退休5～10年</option>
-<option value="L6">6 已退休需生活費</option>
-<option value="L7">7 學生</option>
-<option value="L8">8 服兵役</option>
-<option value="L9">9 待業求職</option>
-<option value="L10">10 暫時／長期無法工作</option>
-</select>
-</div>
-<div class="mt-3 rounded-lg border border-cyan-800 p-3 text-xs text-slate-200">
-<label for="v703-risk-preference" class="font-semibold">四種投資風格（大旋鈕既有分類）</label>
-<select id="v703-risk-preference" class="mt-2 w-full bg-slate-950 p-2 rounded border border-slate-600">
-<option value="conservative">保守</option><option value="balanced" selected>平衡</option><option value="growth">平衡成長</option><option value="aggressive">積極</option></select>
-<p id="v703-strategic-source" class="mt-2 text-amber-300">首次預覽採候選10×4矩陣；若載入核准矩陣，則優先採用核准數值。</p>
-</div>
-
-<div id="v703-data-state" role="status" aria-live="polite" class="text-xs text-amber-300 mt-2">教學展示配置</div>
-<div class="space-y-4" id="allocation-list"></div>
-<div class="mt-6 pt-4 border-t border-slate-700 grid grid-cols-3 text-center">
-<div><div class="text-[10px] text-slate-400 uppercase">待投入資金（極短公債）</div><div class="font-mono font-bold text-white" id="total-cash">0%</div></div>
-<div><div class="text-[10px] text-slate-400 uppercase">Bond</div><div class="font-mono font-bold text-green-400" id="total-bond">0%</div></div>
-<div><div class="text-[10px] text-slate-400 uppercase">Stock</div><div class="font-mono font-bold text-blue-400" id="total-stock">0%</div></div>
-</div>
-</div>
-
-<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl">
-<h3 class="text-xs text-slate-500 font-bold uppercase mb-3 tracking-widest"><i class="fas fa-bullhorn mr-1"></i>指揮官指令</h3>
-<div class="text-sm text-white mb-3 leading-relaxed border-l-2 border-blue-500 pl-3" id="final-stock">股票｜依所選情境分配股票部位。</div>
-<div class="text-sm text-white leading-relaxed border-l-2 border-green-500 pl-3" id="final-bond">債券｜保留債券部位與待投入資金。</div>
-</div>
+<a class="block rounded-lg border border-slate-600 p-4 text-cyan-200" href="#v703-section">閱讀股票與債券的本期觀察重點</a>
 </div>
 </div>
 </div>
@@ -366,16 +316,24 @@
 </div>
 <section class="max-w-5xl mx-auto px-4 py-8 v703-bluegold" id="v703-section">
  <div class="rounded-2xl border border-cyan-700 bg-slate-900/70 p-5 space-y-4 v703-bluegold-card">
-  <h2 class="text-2xl font-bold text-cyan-300">🍎 雲柱AI｜教育版總經觀察</h2>
-  <p class="text-sm text-slate-300">選擇人生情境與投資風格，查看各類資產的總經觀察。<strong>無須輸入持倉、金額或新增資金。</strong></p>
-  
-  <p class="text-xs text-slate-400 mb-3">人生情境與投資風格已於頁面最上方選擇；以下顯示同一組設定的計算結果。</p>
-  <div id="family-data-status" role="status" aria-live="polite" class="sr-only">假設資料已就緒</div>
-  <div id="family-news" class="text-sm text-slate-300 mb-3" aria-live="polite">市場觀察示例：通膨放緩，利率持穩。</div>
-  <div aria-live="polite" class="rounded-lg bg-slate-800 p-4 text-sm space-y-3" id="v703-result"></div>
+  <h2 class="text-2xl font-bold">各類資產｜本期觀察重點</h2>
+<p id="public-market-reading">本頁以假設資料示範如何閱讀市場。</p>
+<p id="learning-context" aria-live="polite"></p>
+<div id="v703-result">
+<h3 class="mt-5 text-xl font-bold">股票五類</h3>
+<article data-asset="S1" class="border-b py-3"><h4 class="font-bold">S1｜大盤與多元化核心型</h4><p class="mt-1 leading-relaxed">短期景氣轉弱，和企業長期獲利能力下降，是兩件不同的事。觀察大盤時，要分開看景氣變化持續多久，以及影響多少產業。</p></article>
+<article data-asset="S2" class="border-b py-3"><h4 class="font-bold">S2｜大型成長型</h4><p class="mt-1 leading-relaxed">本期關注獲利成長與實質利率。其他條件相同時，利率越高，未來才實現的獲利折算成今天的價值就越低。</p></article>
+<article data-asset="S3" class="border-b py-3"><h4 class="font-bold">S3｜產業集中與主題型</h4><p class="mt-1 leading-relaxed">多家公司若集中在同一產業，仍可能一起受到景氣、信用或利率變化影響。觀察重點是它們共同承受哪些風險。</p></article>
+<article data-asset="S4" class="border-b py-3"><h4 class="font-bold">S4｜高波動與槓桿投機型</h4><p class="mt-1 leading-relaxed">市場快速反轉時，價格波動可能放大。每日重設槓桿的商品，即使市場最後回到原點，也可能因中途的漲跌而產生損失。</p></article>
+<article data-asset="S5" class="border-b py-3"><h4 class="font-bold">S5｜防禦與民生必要型</h4><p class="mt-1 leading-relaxed">景氣放緩時，民生需求通常較穩定。「防禦」描述的是需求特性，企業獲利與股價仍會波動。</p></article>
+<h3 class="mt-5 text-xl font-bold">債券四類</h3>
+<article data-asset="B1" class="border-b py-3"><h4 class="font-bold">B1｜超短天期公債</h4><p class="mt-1 leading-relaxed">本期關注央行政策與短期利率。這類債券很快到期，到期資金再次投入時能取得的利息，也較快隨短期利率改變。</p></article>
+<article data-asset="B2" class="border-b py-3"><h4 class="font-bold">B2｜中短天期投資級公司債</h4><p class="mt-1 leading-relaxed">價格下跌可能來自整體利率上升，也可能反映市場擔心企業的還款能力。比較公司債與相近天期公債的殖利率差，有助於分辨兩者。</p></article>
+<article data-asset="B3" class="border-b py-3"><h4 class="font-bold">B3｜長天期美國公債</h4><p class="mt-1 leading-relaxed">本期關注長期利率與通膨預期。其他條件相近時，長期殖利率上升，既有長債的價格通常下跌；天期越長，價格通常越敏感。</p></article>
+<article data-asset="B4" class="border-b py-3"><h4 class="font-bold">B4｜信用敏感公司債</h4><p class="mt-1 leading-relaxed">較高的利息有時反映較高的信用風險。觀察重點包括降評、違約，以及市場要求多少額外利息來承擔這些風險。</p></article>
+<h3 class="mt-5 text-xl font-bold">資金流動性</h3><p class="mt-1 leading-relaxed">這一欄關注資金多久能動用，以及動用時價值可能波動多少。前面的超短公債是資產類別；這裡談的是資金用途。</p>
+</div>
 
-
-  <p class="text-xs text-slate-400">B1 顯示債券配置類別的觀察重點。待投入資金（極短公債）表示尚待投入的資金。</p>
  </div>
 </section>
 
@@ -466,13 +424,14 @@
 </section>
 
 <footer id="education-sources" style="max-width:60rem;margin:2rem auto;padding:1rem;color:#f1f5f9;background:#172338"><h2>總經資料來源</h2><ol style="list-style:decimal;padding-left:2em"><li style="margin:.6em 0">美國 10 年期與 2 年期公債殖利率差｜美國財政部，每日公債殖利率曲線</li><li style="margin:.6em 0">美國 10 年期實質殖利率｜美國財政部，每日實質殖利率曲線</li><li style="margin:.6em 0">核心消費者物價指數年增率｜美國勞工統計局（BLS），消費者物價指數；本期資料經聖路易聯邦準備銀行 FRED 取得</li><li style="margin:.6em 0">5 年期損益兩平通膨率｜美國財政部，名目與實質公債殖利率資料</li><li style="margin:.6em 0">5 年期損益兩平通膨率近月變化｜美國財政部，名目與實質公債殖利率歷史資料</li><li style="margin:.6em 0">美國淨流動性 13 週變化｜美國聯邦準備理事會 H.4.1 資產負債表、紐約聯邦準備銀行逆回購操作資料</li><li style="margin:.6em 0">即時 Sahm 衰退指標｜Claudia Sahm，Real-time Sahm Rule Recession Indicator（SAHMREALTIME），經聖路易聯邦準備銀行 FRED 取得</li><li style="margin:.6em 0">美國 U3 失業率｜美國勞工統計局（BLS），當期人口調查</li><li style="margin:.6em 0">近三個月平均新增非農就業人數｜美國勞工統計局（BLS），當期就業統計</li><li style="margin:.6em 0">聯邦基金目標利率區間中點｜美國聯邦準備理事會，聯邦公開市場委員會目標利率區間</li><li style="margin:.6em 0">美國一年期通膨預期｜紐約聯邦準備銀行，消費者預期調查</li><li style="margin:.6em 0">美國實質自然利率｜Holston、Laubach 與 Williams，紐約聯邦準備銀行 HLW 即時估計</li><li style="margin:.6em 0">美國實質產出缺口｜美國經濟分析局（BEA）實質 GDP、美國國會預算辦公室（CBO）實質潛在 GDP</li></ol></footer>
-<script>const el=id=>document.getElementById(id);
-function display(){const life=el('family-life').selectedIndex,style=el('family-style').selectedIndex;
-const stock=[47,50,39,45,38,30,42,32,25,22][life]+[-8,0,6,12][style],cash=10,bond=90-stock;
-el('strategic-stock').value=stock;el('strategic-bond').value=100-stock;
-for(const [k,v] of Object.entries({stock,bond,cash}))el('total-'+k).textContent=v+'%';
-const values=[['核心股票',Math.round(stock*.6)],['成長股票',Math.round(stock*.25)],['其他股票',stock-Math.round(stock*.6)-Math.round(stock*.25)],['短期債券',Math.floor(bond*.3)],['中期債券',Math.floor(bond*.4)],['長期債券',Math.floor(bond*.2)],['其他債券',bond-Math.floor(bond*.3)-Math.floor(bond*.4)-Math.floor(bond*.2)],['待投入資金',cash]];
-el('allocation-list').innerHTML=values.map(([n,v])=>'<div>'+n+'　'+v+'%</div>').join('');
-el('v703-result').innerHTML='<b>教學示例配置</b><p>股票 '+stock+'%　債券 '+bond+'%　待投入資金 '+cash+'%</p>'+values.map(([n,v])=>'<div>'+n+'　'+v+'%</div>').join('');}
-for(const k of ['family-life','family-style'])el(k).addEventListener('change',display);display();</script></body>
+<script id="public-lesson-script">const el=id=>document.getElementById(id);
+const lifeLessons={
+ L1:'資金累積需要時間，短期價格波動和長期目標要分開看。', L2:'薪資收入與市場價格可能受到同一景氣循環影響。', L3:'收入變化大時，資金多久能動用格外重要。', L4:'一次收到大筆資金時，短期用途與長期用途可能不同。', L5:'接近退休時，同樣的價格波動會因資金使用時間而有不同影響。', L6:'退休後若定期支用資金，市場漲跌的先後順序也會影響結果。', L7:'學費等有明確日期的支出，可用來理解流動性。', L8:'短期生活安排會影響何時需要動用資金。', L9:'收入中斷時，支出時間和資金可用時間的差距值得留意。', L10:'當工作收入暫停，資金能支持多久和市場報酬是不同問題。'
+};
+const styleLessons={conservative:'留意價格可能下跌的幅度。',balanced:'比較股債是否可能同時波動。',growth:'觀察獲利成長能否支持估值。',aggressive:'觀察集中風險和槓桿如何放大波動。'};
+function displayLesson(){
+ el('learning-context').textContent='情境練習｜'+lifeLessons[el('family-life').value]+styleLessons[el('family-style').value];
+}
+for(const id of ['family-life','family-style'])el(id).addEventListener('change',displayLesson);
+displayLesson();</script></body>
 </html>

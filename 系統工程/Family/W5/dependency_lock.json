@@ -489,7 +489,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_v82_analysis.py",
-    "sha256": "af1368d20483c8de4ce1a81eafd140de5e1bb68346afeab3acdf997da79d5d72"
+    "sha256": "f80fee5ed0c55b133e20a0139d6ed85ff4702a654f4b67d1517d01162ce64c7f"
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
@@ -513,7 +513,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_position_valuation.py",
-    "sha256": "4cfc5fc56e9d1a508a5f7610ecefe8a9dd107cba2d0beedecb904ad8e043d7e6"
+    "sha256": "3453b7732cf1e25ec8835bb13514aa8f0337602e854349747495e3de1c01bc8e"
   },
   {
     "path": "系統工程/Family/W8/tpex_actual_sessions.py",
@@ -646,7 +646,7 @@
   {
     "path": "系統工程/Family/W8/current_market_contract.py",
     "sha": null,
-    "sha256": "a8ec6a059f23d9e8ff0927bcd69f294d2b37f0dd2b3ea7f2c35f9bbd9719f880",
+    "sha256": "df0ed2a53f9cdcbfa31eedfc12a7c94116ead813f5104bfe2953259a2fa6726a",
     "reason": "Current Owner facts adapter; private evidence remains outside repository"
   },
   {

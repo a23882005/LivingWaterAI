@@ -225,3 +225,38 @@ def broker_cash_check(source, accepted, request):
             'working_orders_empty': originals['orders'].get('orders') == [],
             'previously_accepted_net_cash': accepted['accepted_net_available_by_currency'][currency],
             'margin_or_buying_power_added': False}
+
+
+def compare_broker_quantity(source, holding, symbol, request):
+    """Keep both original books when a sealed quantity disagrees with the broker."""
+    if not source or symbol not in source.get('contract_ids', {}):
+        return holding
+    from member_market_source import read_json
+    authorization = read_json(source['owner_authorization'])
+    if (authorization['client_id'] != request['client_id'] or source['client_id'] != request['client_id']
+            or source['source_db_sha256'] != request['client_snapshot']['payload']['source_sha256']
+            or authorization['scope'] != 'READ_ONLY_RECONCILIATION_AND_ADVICE'
+            or authorization['trade_authorization'] != 'NONE' or authorization['owner']['broker'] != 'IBKR'):
+        raise PermissionError('CURRENT_BROKER_QUANTITY_OWNER')
+    evidence = read_json(source['historical_positions'])
+    if (evidence['method'] != 'get_account_positions' or evidence['status'] != 'fulfilled'
+            or evidence['value'].get('isError') or evidence['arguments'] != {}):
+        raise PermissionError('CURRENT_BROKER_POSITION_ORIGINAL')
+    if time(evidence['retrieved_at']) > time(request['evaluation_at']):
+        return holding
+    rows = [row for row in evidence['value']['structuredContent']['positions']
+            if row['contract_id'] == source['contract_ids'][symbol]
+            and row['contract_description'].split()[0] == symbol and row['currency'] == authorization['owner']['currency']]
+    if len(rows) != 1 or holding.get('quantity') is None:
+        return holding
+    broker_qty = Decimal(str(rows[0]['position']))
+    if broker_qty == Decimal(str(holding['quantity'])):
+        return holding
+    facts = holding.get('source_facts') or []
+    proof = {'broker_source': deepcopy(source['historical_positions']), 'broker_account': authorization['owner']['account'],
+             'broker_quantity': str(broker_qty), 'broker_retrieved_at': evidence['retrieved_at'],
+             'registered_quantity': holding['quantity'], 'registered_observed_at': holding.get('observed_at'),
+             'registered_source_rows': [{k: row.get(k) for k in ('source_kind','received_at','account_key','broker_label')} for row in facts],
+             'same_account_verified': bool(facts) and all(row.get('account_key') == authorization['owner']['account'] for row in facts),
+             'reason': 'UNRECONCILED_MEMBER_BROKER_QUANTITY'}
+    return {**holding, 'quantity': None, 'quantity_state': 'UNKNOWN', 'quantity_discrepancy': proof}

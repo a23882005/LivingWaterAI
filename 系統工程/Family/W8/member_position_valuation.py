@@ -84,6 +84,8 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         raise PermissionError('POSITION_VALUATION_MEMBER_SNAPSHOT_COVERAGE_BINDING')
     fx=read_fx(inputs.get('fx_source'),request['evaluation_at']);markets={r['symbol']:r.get('market') for r in equity_rows}
     markets.update({r['symbol']:r.get('market') for r in coverage['bonds']})
+    discrepancies = {r['symbol']: r['holding']['quantity_discrepancy'] for r in equity_rows
+                     if (r.get('holding') or {}).get('quantity_discrepancy')}
     rows=[];totals={}
     if current_market_contract is not None and (any(current_market_contract.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
         or current_market_contract.get('source_db_sha256')!=snapshot['source_sha256']):
@@ -122,7 +124,10 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                 if currency is None:
                     from official_holdings_source import holding_quote_currency
                     proof=holding_quote_currency(fact);currency=proof['currency'] if proof else None
-                if keys.count(key)>1 or len(facts)>1 and None in key:
+                if asset['symbol'] in discrepancies:
+                    row.update(quantity=None, issue='UNRECONCILED_MEMBER_BROKER_QUANTITY',
+                               quantity_discrepancy=discrepancies[asset['symbol']])
+                elif keys.count(key)>1 or len(facts)>1 and None in key:
                     row['issue']='UNRESOLVED_ACCOUNT_OR_DUPLICATE_HOLDING_REPRESENTATION'
                 elif fact.get('quantity') is None:row['issue']='ORIGINAL_QUANTITY_NOT_PROVIDED'
                 elif not market:row['issue']='DATED_MARKET_OBSERVATION_NOT_PROVIDED'

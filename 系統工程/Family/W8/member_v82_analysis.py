@@ -389,6 +389,8 @@ def build_report(request, config, repo_root):
             'source_facts': deepcopy(facts), 'observed_at': facts[0].get('observed_at') if len(facts) == 1 else None,
             'absence_is_not_zero': True, 'account_aggregation_performed': False}
         holding=holding_view(holding,symbol,current_owner)
+        from current_market_contract import compare_broker_quantity
+        holding = compare_broker_quantity(config.get('current_cash_corroboration'), holding, symbol, request)
         row = {'instrument_id': instrument.get('instrument_key', 'SOURCE:'+symbol), 'symbol': symbol,
             'coverage_basis': asset['coverage_basis'], 'owner': deepcopy(request['owner']),
             'holding': holding, 'target_lines': deepcopy(asset['targets']), 'market': market,

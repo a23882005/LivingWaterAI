@@ -87,6 +87,11 @@ def build(source, destination):
             const sahm=getRaw('m18'), lei_yoy=getRaw('m16'), u3=getRaw('m19'), nfp_3m_avg=getRaw('m20');
             const lei_neg_3m=getRaw('m21')>=1;
 '''+html[end:]
+    start = html.index('            let capNote = "未封頂";', start)
+    end = html.index('            // --- CAP', start)
+    html = html[:start] + '            const capNote = window.v70Cap.describeCap(caps, mSafe_raw, mSafe_final);\n\n' + html[end:]
+    html = once(html, "mSafe_final < mSafe_raw ? 'text-yellow-300'", "caps.cap < 100 ? 'text-yellow-300'")
+    html = once(html, '${capNote === "未封頂" ? "未封頂" : capNote}', '${capNote}')
     start=html.index('            // 是否進入',html.index("const zEl = document.getElementById('macro-zone-text')"))
     end=html.index('            // Allocation / Orders',start)
     html=html[:start]+'''            const isEmerg = caps.level==='red';

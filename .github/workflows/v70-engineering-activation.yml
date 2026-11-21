@@ -38,6 +38,10 @@ jobs:
           PY
       - name: Build engineering risk panels
         run: python scripts/v70_cap/build.py staging staging
+      - name: Verify the cap note on the protected engineering build
+        run: |
+          python -m pip install --quiet 'playwright>=1.50,<2'
+          python tests/check_v70_engineering_cap_note.py staging
       - name: Prepare private password verifier
         env:
           WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}

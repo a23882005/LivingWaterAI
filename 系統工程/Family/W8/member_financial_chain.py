@@ -238,6 +238,11 @@ def complete_report(report,request,config,root):
         out['status']='FINANCIAL_ANALYSIS_COMPLETE_PENDING_ORIGINAL_GATES'
         out['canonical_result']={r['symbol']:r['financial_chain']['canonical_v82_output'] for r in out['positions']}
         out['mentor']={r['symbol']:r['financial_chain']['mentor'] for r in out['positions']}
+    for row in out['positions']:
+        pause = row.get('normal_buy_pause')
+        if pause:
+            row.update(proposed_amount=deepcopy(pause['amount']),proposed_quantity=pause['quantity'])
+            row['result_digest']=digest({k:v for k,v in row.items() if k!='result_digest'})
     out['report_digest']=digest({k:v for k,v in out.items() if k!='report_digest'})
     if has_advice_inputs:
         from member_v82_advice import deliver

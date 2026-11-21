@@ -102,6 +102,11 @@ def deliver(report, root):
                 'estimate_amount': scoped['final_amount']['amount'],
                 'estimate_shares': scoped['final_quantity'],
             }
+        pause = row.get('normal_buy_pause')
+        if pause:
+            advice['selected_estimate'] = {'stage': conclusion.get('formal_stage'), 'gap_amount': None,
+                'estimate_amount': pause['amount']['amount'], 'estimate_shares': pause['quantity'],
+                'basis': pause['rule'], 'scope': 'NORMAL_NEW_BUYS_ONLY'}
         row['allocation_advice'] = advice
         row['result_digest'] = digest({k: v for k, v in row.items() if k != 'result_digest'})
 

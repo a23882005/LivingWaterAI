@@ -238,6 +238,33 @@ def compare_broker_quantity(source, holding, symbol, request):
             or authorization['scope'] != 'READ_ONLY_RECONCILIATION_AND_ADVICE'
             or authorization['trade_authorization'] != 'NONE' or authorization['owner']['broker'] != 'IBKR'):
         raise PermissionError('CURRENT_BROKER_QUANTITY_OWNER')
+    current = source.get('current_positions')
+    if current:
+        record = read_json(current)
+        captured = time(record['retrieval_recorded_at'])
+        evaluated = time(request['evaluation_at'])
+        if (record['tool'] != 'interactive_brokers_ibkr_get_account_positions' or record['arguments'] != {}
+                or current.get('owner_authorization_sha256') != source['owner_authorization']['sha256']
+                or time(authorization['recorded_at']) > captured):
+            raise PermissionError('CURRENT_BROKER_CONNECTED_OWNER_OR_ORIGINAL')
+        if captured <= evaluated and captured.astimezone(ZoneInfo('Asia/Taipei')).date() == evaluated.astimezone(ZoneInfo('Asia/Taipei')).date():
+            positions = record['response']['positions']
+            matches = [row for row in positions if row.get('contract_id') == source['contract_ids'][symbol]]
+            if len(matches) != 1:
+                raise PermissionError('CURRENT_BROKER_CONTRACT_NOT_UNIQUE')
+            pos = matches[0]
+            qty = Decimal(str(pos['position']))
+            if (pos['contract_description'].split()[0] != symbol or pos['currency'] != authorization['owner']['currency']
+                    or pos['asset_class'] != 'STK' or not qty.is_finite() or qty < 0):
+                raise PermissionError('CURRENT_BROKER_LISTING_MISMATCH')
+            scoped = {'owner': deepcopy(authorization['owner']), 'symbol': symbol, 'contract_id': pos['contract_id'],
+                      'quantity': str(qty), 'currency': pos['currency'], 'source_sha256': current['sha256'],
+                      'retrieved_at': record['retrieval_recorded_at'], 'scope': 'AUTHORIZED_BROKER_ACCOUNT_ONLY'}
+            updated = {**holding, 'current_broker_position': scoped}
+            if holding.get('quantity') is None or Decimal(str(holding['quantity'])) != qty:
+                updated.update(quantity=None, quantity_state='UNKNOWN', prior_reported_quantity=holding.get('quantity'),
+                               household_quantity_status='OTHER_ACCOUNT_SCOPE_UNCONFIRMED')
+            return updated
     evidence = read_json(source['historical_positions'])
     if (evidence['method'] != 'get_account_positions' or evidence['status'] != 'fulfilled'
             or evidence['value'].get('isError') or evidence['arguments'] != {}):

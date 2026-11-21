@@ -476,7 +476,12 @@ class AssetSourceProducer:
                 from member_reconciliation_source import read as read_same_run
                 normalized=read_same_run(self.root,same_run_source,req)
                 reference=normalized.get('current_portfolio_reference') or {}
-                if reference.get('formal_NAV_source_qualified') is True:
+                current_quote = normalized.get('registered_broker_valuations', {}).get('QQQ')
+                if current_quote and current_quote['position']['owner'] == req['owner']:
+                    ctx['owner_qqq_account_valuation'] = deepcopy(current_quote)
+                    self.fx_observation = deepcopy(current_quote['valuation']['fx_observation'])
+                    ctx['owner_qqq_target_fx_source'] = deepcopy(same_run_source)
+                elif reference.get('formal_NAV_source_qualified') is True:
                     # Target units use the existing qualified bank reference;
                     # neither account's cash is converted into the other pool.
                     self.fx_observation=deepcopy(reference['reporting_FX'])

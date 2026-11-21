@@ -86,6 +86,23 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
     markets.update({r['symbol']:r.get('market') for r in coverage['bonds']})
     discrepancies = {r['symbol']: r['holding']['quantity_discrepancy'] for r in equity_rows
                      if (r.get('holding') or {}).get('quantity_discrepancy')}
+    account_values = {}
+    for r in equity_rows:
+        holding = r.get('holding') or {}
+        position = holding.get('current_broker_position')
+        if not position:
+            continue
+        result = deepcopy_fact(position)
+        market = markets.get(r['symbol']) or {}
+        if (market.get('observed_date') and market['observed_date'] == market.get('latest_expected_completed_session')
+                and market['market_identity']['currency'] == position['currency']):
+            result.update(valuation_price=str(market['observed_close']),
+                          valuation_source_sha256=market['source_sha256'], observed_date=market['observed_date'],
+                          account_position_amount=str(_number(position['quantity']) * _number(market['observed_close'])))
+        account_values[r['symbol']] = result
+        if holding.get('household_quantity_status') == 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED':
+            discrepancies[r['symbol']] = {'reason': 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED',
+                'prior_reported_quantity':holding.get('prior_reported_quantity'), 'current_broker_position':result}
     rows=[];totals={}
     if current_market_contract is not None and (any(current_market_contract.get(k)!=request[k] for k in ('client_id','run_id','evaluation_at'))
         or current_market_contract.get('source_db_sha256')!=snapshot['source_sha256']):
@@ -125,7 +142,7 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                     from official_holdings_source import holding_quote_currency
                     proof=holding_quote_currency(fact);currency=proof['currency'] if proof else None
                 if asset['symbol'] in discrepancies:
-                    row.update(quantity=None, issue='UNRECONCILED_MEMBER_BROKER_QUANTITY',
+                    row.update(quantity=None, issue=discrepancies[asset['symbol']].get('reason','UNRECONCILED_MEMBER_BROKER_QUANTITY'),
                                quantity_discrepancy=discrepancies[asset['symbol']])
                 elif keys.count(key)>1 or len(facts)>1 and None in key:
                     row['issue']='UNRESOLVED_ACCOUNT_OR_DUPLICATE_HOLDING_REPRESENTATION'
@@ -170,6 +187,8 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         cash_account_sources=deepcopy_fact(coverage['cash_accounts']),cash_sources_assumed_independent=False,
         qualified_portfolio_NAV=None,deployable_cash=None,new_buy_amount=None,
         scope='DATED_PARTIAL_POSITION_OBSERVATIONS__NOT_COMPLETE_NAV_OR_DEPLOYMENT_INPUT',trade_action='NO_TRADE')
+    if account_values:
+        out['current_broker_account_positions'] = account_values
     out['digest']=digest(out);return out
 
 

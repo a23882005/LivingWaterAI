@@ -118,6 +118,7 @@ def normalize(root,request,config):
     all_assets=build(request,config,coverage,root,ledger_resource=ledger)
     profile=load_profile(Path(__file__).with_name('owner_approved_v10.json'))
     rows=[]
+    account_quotes = {}
     for asset in coverage['assets']:
         identity=classification(asset['symbol'],config['classification_source'],config.get('product_sources',{}).get(asset['symbol']))
         instrument=asset.get('instrument') or {}
@@ -133,6 +134,11 @@ def normalize(root,request,config):
         row = {'symbol': asset['symbol'], 'market': market}
         if config.get('current_cash_corroboration'):
             row['holding'] = assessed_holding(asset, asset['symbol'], all_assets.get('current_owner_business_facts'), config, request)
+            from current_market_contract import gap_price
+            quote = gap_price(market_contract, market, instrument, asset['symbol'], request)
+            position = row['holding'].get('current_broker_position')
+            if position and quote:
+                account_quotes[asset['symbol']] = {'position': position, 'valuation': quote}
         rows.append(row)
     values=produce(request,all_assets,rows,config['position_valuation_inputs'],current_market_contract=market_contract)
     books=[{'owner':deepcopy(view['owner']),'captured_at':view['captured_at'],
@@ -190,6 +196,8 @@ def normalize(root,request,config):
     if market_contract is not None:
         out['current_market_contract']=market_contract
         out['current_portfolio_reference']=portfolio_reference(request,all_assets,values,accepted,current,market_contract)
+    if account_quotes:
+        out['registered_broker_valuations'] = account_quotes
     out['digest']=digest(out)
     return out
 

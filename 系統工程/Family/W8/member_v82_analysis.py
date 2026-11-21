@@ -310,6 +310,26 @@ def read_v70_safety_snapshot(source, evaluation_at):
     }
 
 
+def normal_buy_pause(row):
+    quote = row.get('same_run_gap_price')
+    core = row.get('core_observation') or {}
+    market = row.get('market') or {}
+    if (not quote or not row.get('holding', {}).get('current_broker_position')
+            or core.get('source_sha256') != quote['source_sha256']
+            or core.get('result', {}).get('technical', {}).get('runaway_down') != 'TRUE'):
+        return None
+    approved = (market.get('approved_technical') or {}).get('signals', {})
+    votes = {group: [v['name'] for v in approved.get(group, ()) if v['truth'] == 'TRUE'
+                     and v.get('reason') == 'APPROVED_V10_COMPUTED'] for group in ('down_break','down_accel')}
+    if len(set(votes['down_break'])) < 1 or len(set(votes['down_accel'])) < 2:
+        return None
+    return {'status': 'NORMAL_NEW_BUYS_PAUSED', 'rule': 'V82 CMR7 / 44-A / 44-E',
+            'run_id': quote['run_id'], 'evaluation_at': quote['evaluation_at'], 'symbol': row['symbol'],
+            'source_sha256': quote['source_sha256'], 'session': quote['session'], 'votes': votes,
+            'amount': {'amount':'0','currency':quote['currency']}, 'quantity':'0',
+            'sell_intent_created': False, 'target_and_gap_preserved': True}
+
+
 def assessed_holding(asset, symbol, current_owner, config, request):
     from owner_current_business import holding_view
     facts = asset['holdings']
@@ -520,6 +540,9 @@ def build_report(request, config, repo_root):
                     kind='SOURCE_OR_FRAMEWORK_MAPPING_UNRESOLVED'))
         row.update(proposed_amount=None, trade_action='NO_TRADE', trade_authorization='NONE',
             full_native_pipeline_complete=False, data_complete=not row['missing_inputs'])
+        pause = normal_buy_pause(row)
+        if pause:
+            row.update(normal_buy_pause=pause, proposed_amount=deepcopy(pause['amount']), proposed_quantity=pause['quantity'])
         row['result_digest'] = digest(row)
         rows.append(row)
     report = {'schema_version': SCHEMA, 'status': 'ANALYSIS_PARTIAL',

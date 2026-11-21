@@ -42,6 +42,19 @@ def calculate(root,request,context,analysis,proof):
         out['missing_inputs']=[{'field':'native_target_source.targets.QQQ.target_amount.USD'}];return out
     market=row['market'];identity=market.get('market_identity') or {}
     price_allowed=row.get('position_valuation_allowed') and identity.get('currency')=='USD'
+    quantity = row['holding'].get('quantity') if row['holding'].get('quantity_state') == 'KNOWN' else None
+    valuation_price = market.get('observed_close')
+    scoped = context.get('owner_qqq_account_valuation')
+    if scoped:
+        from member_reconciliation_source import read as read_same_run
+        verified = read_same_run(root, context['owner_qqq_target_fx_source'], request)
+        if (scoped != verified.get('registered_broker_valuations', {}).get('QQQ')
+                or scoped['position']['owner'] != request['owner'] or scoped['valuation']['currency'] != 'USD'):
+            raise PermissionError('OWNER_QQQ_CURRENT_ACCOUNT_VALUATION_MISMATCH')
+        quantity = scoped['position']['quantity']
+        valuation_price = scoped['valuation']['observed_close']
+        price_allowed = True
+        out['canonical_quote_proof'] = deepcopy(scoped)
     if not price_allowed and context.get('qualified_equity_source_manifest') is not None:
         from qualified_equity_inputs import read as read_equities
         pool=read_equities(context['qualified_equity_source_manifest'],request['evaluation_at'],root,symbol='QQQ')
@@ -63,7 +76,7 @@ def calculate(root,request,context,analysis,proof):
                 'observed_date':equity['observed_date'],'contract_id':broker_position['contract_id'],
                 'currency':'USD','held_account':holding['account_key'],
                 'historical_PIT_or_execution_price_qualification_added':False}
-    if not price_allowed or row['holding'].get('quantity_state')!='KNOWN':
+    if not price_allowed or quantity is None:
         out['missing_inputs']=[{'field':'qualified_USD_valuation_price_and_confirmed_quantity'}];return out
     orders=conclusion['order_source']
     if not (orders.get('status')=='VERIFIED' or orders.get('complete_for_open_order_exposure')):
@@ -74,7 +87,7 @@ def calculate(root,request,context,analysis,proof):
     from livingwater_v82_runtime.enums import FundingDomain,CashBasis,HardGateState
     from livingwater_v82_runtime.core_rules import PermissionResult
     gap=calculate_position_gap(project_target_position_amount=target['amount'],target_rate=stage,
-        confirmed_position_qty=row['holding']['quantity'],canonical_valuation_price=market['observed_close'],
+        confirmed_position_qty=quantity,canonical_valuation_price=valuation_price,
         active_orders=native_orders(root,orders,'QQQ'))
     permission=row['core_observation']['result']['permission'];cash=Decimal(proof['cash_by_currency']['USD'])
     bound=BoundEquityBudgetView(FundingDomain.US_BROKER,request['owner']['broker'],request['owner']['account'],

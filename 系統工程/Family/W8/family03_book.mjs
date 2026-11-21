@@ -56,23 +56,23 @@ if (args.event) {
   const lines=e.advice?.六組比較;
   if(lines){
     const table=book.worksheets.items.find(s=>s.name==='六組比較')||book.worksheets.add('六組比較');
-    const titles=['時間','方案','股票配置','資料起日','資料迄日','幣別','狀態','期間報酬','年化報酬','最大回撤','年化波動','Sharpe','Sortino','Calmar','特點與取捨','共同成分或產業（已知百分點）'];
+    const titles=['時間','方案','股票配置','資料起日','資料迄日','幣別','狀態','期間報酬','年化報酬','最大回撤','年化波動','Sharpe','Sortino','Calmar','特點與取捨','共同成分或產業（已知百分點）','相對全 VT 的優點','相對全 VT 的代價'];
     table.getRangeByIndexes(0,0,1,titles.length).values=[titles];
     const data=lines.map(r=>{
       const h=r.歷史試算;
-      return [e.time,r.名稱,Object.entries(r.股票桶百分比).map(([s,v])=>s+' '+v+'%').join('、'),h.起日,h.迄日,h.幣別,h.狀態,h.期間報酬率,h.年化報酬率,h.最大回撤幅度,h.年化波動率,h.Sharpe,h.Sortino,h.Calmar,[r.取捨,...(r.六組相對特點||[])].join('；'),r.共同曝險.共同曝險.map(x=>x.項目+' '+x.已知合計百分點).join('、')||'已知資料未列出重疊'].map(x=>x??null);
+      return [e.time,r.名稱,Object.entries(r.股票桶百分比).map(([s,v])=>s+' '+v+'%').join('、'),h.起日,h.迄日,h.幣別,h.狀態,h.期間報酬率,h.年化報酬率,h.最大回撤幅度,h.年化波動率,h.Sharpe,h.Sortino,h.Calmar,[r.取捨,...(r.六組相對特點||[])].join('；'),r.共同曝險.共同曝險.map(x=>x.項目+' '+x.已知合計百分點).join('、')||'已知資料未列出重疊',r.相對優點.join('、'),r.相對代價.join('、')].map(x=>x??null);
     });
     const start=table.getUsedRange().rowCount;
     table.getRangeByIndexes(start,0,data.length,titles.length).values=data;
     table.getRangeByIndexes(start,7,data.length,4).setNumberFormat('0.00%');
     table.getRangeByIndexes(start,11,data.length,3).setNumberFormat('0.00');
-    header(table,'A1:P1');widths(table,[180,88,280,120,120,70,180,105,105,105,105,90,90,90,360,400]);
+    header(table,'A1:R1');widths(table,[180,88,280,120,120,70,180,105,105,105,105,90,90,90,360,400,330,330]);
     table.freezePanes.freezeRows(1);
   }
   const advice=lines ? {六組比較:lines.map(r=>({...r,共同曝險:{共幾項:r.共同曝險.共同曝險.length,明細:'見六組比較頁'}}))} : e.advice;
   log.getRangeByIndexes(e.previous+1,0,1,12).values=[[e.id,e.time,member,e.key,e.title,
     JSON.stringify(e.options),JSON.stringify(advice),e.choice,e.url,e.stage,JSON.stringify(e.answers),e.token || '']];
-  const steps={home:'選擇工作方案',goal:'投資目標',returns:'偏好年報酬',loss:'可接受跌幅',band:'選配置範圍',exact:'確認層級比重',theme:'選產業方向',symbol:'選標的',weight:'選標的比例',fund:'資金來源',amount:'金額範圍',replace:'選擇擬換出的持股',review:'檢視完整方案',compare:'六組比較',reduce:'選減碼標的',increase:'選加碼標的',shift:'選移動比重'};
+  const steps={home:'選擇工作方案',goal:'投資目標',returns:'偏好年報酬',loss:'可接受跌幅',band:'選配置範圍',exact:'確認層級比重',theme:'選產業方向',symbol:'選標的',weight_band:'選標的比重範圍',weight:'選標的比例',fund:'資金來源',amount:'金額範圍',replace:'選擇擬換出的持股',review:'檢視完整方案',compare:'六組比較',reduce:'選減碼標的',increase:'選加碼標的',shift:'選移動比重'};
   main.getRange('B2:B3').values=[[e.stage],[steps[e.next]||e.next]];
   if(e.answers.schema===2){
     const st=e.answers;

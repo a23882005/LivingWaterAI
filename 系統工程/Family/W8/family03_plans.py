@@ -160,6 +160,22 @@ def six(plans, prices, exposures, calc, single_stocks=()):
             for r in rows:
                 if r["歷史試算"][key]==extreme:
                     r.setdefault("六組相對特點",[]).append(lab)
+    reference=rows[3]["歷史試算"]
+    for r in rows:
+        h=r["歷史試算"]
+        pros,cons=[],[]
+        for key,title,sign in (("年化報酬率","年化報酬",1),("期間報酬率","期間報酬",1),
+                               ("最大回撤幅度","最大跌幅",-1),("年化波動率","年化波動",-1)):
+            if key not in h or key not in reference:
+                continue
+            gap=h[key]-reference[key]
+            if abs(gap)<.00005:
+                continue
+            note=f"比 VT {'高' if gap>0 else '低'} {abs(gap)*100:.2f} 個百分點（{title}）"
+            (pros if sign*gap>0 else cons).append(note)
+        r["相對優點"]=pros
+        r["相對代價"]=cons
+        r["比較基準"]="同期間全 VT；只描述歷史差異"
     return rows
 
 
@@ -279,11 +295,16 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                     card["B 基準資料"]={k:(v.isoformat() if hasattr(v,"isoformat") else v) for k in guide.FIELDS if (v:=meta[s].get(k)) is not None} if s in meta else {}
                     card["單檔歷史"]=calc.simulate({s:100},{s:prices[s]})
                 lesson={"主軸":"core","衛星":"sat","繁星":"star"}[role]
+            elif key=="weight_band":
+                left=p["targets"][role]-sum(p["layers"][role].values())
+                title=f"{st['symbol']} 想占整個股票部位的哪個範圍？"
+                options=[f"全數 {left}%"]+[f"{lo}–{min(lo+9,left-1)}%" for lo in range(1,left,10)]
             elif key=="weight":
                 left=p["targets"][role]-sum(p["layers"][role].values())
                 title=f"{st['symbol']} 要占整個股票部位多少？這層還有 {left}%。"
                 more=len(catalog[role])>len(p["layers"][role])+1
-                options=[f"{v}%" for v in range(1 if more else left,left+1)]
+                low,high=st.get("weight_range",(1 if more else left,left))
+                options=[f"{v}%" for v in range(low,high+1)]
             elif key in ("reduce","increase","shift"):
                 if key=="reduce":
                     title,options="想從哪一檔移出一些比例？",list(weights(p))
@@ -332,7 +353,7 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                 return run({"action":"history"})
             if choice=="暫存並回三方案":
                 st.setdefault("resume",{})[str(st["slot"])]={
-                    k:st[k] for k in ("step","role","band","theme","symbol","from","to") if k in st}
+                    k:st[k] for k in ("step","role","band","theme","symbol","weight_range","from","to") if k in st}
                 st["step"]="home"
             elif key=="home":
                 if choice==COMPARE:
@@ -340,7 +361,9 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                 else:
                     st["slot"]=SLOTS.index(choice)
                     resumed=st.get("resume",{}).pop(str(st["slot"]),{})
-                    if resumed: st.update(resumed)
+                    if resumed:
+                        st.pop("weight_range",None)
+                        st.update(resumed)
                     else: st["step"]="review" if complete(st["plans"][st["slot"]]) else "goal"
             elif key in ("goal","returns","loss"):
                 p["prefs"][key]=choice
@@ -360,7 +383,16 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
             elif key=="theme":
                 st.update(theme=choice,step="symbol")
             elif key=="symbol":
-                st.update(symbol=choice,step="weight")
+                st.pop("weight_range",None)
+                left=p["targets"][role]-sum(p["layers"][role].values())
+                more=len(catalog[role])>len(p["layers"][role])+1
+                st.update(symbol=choice,step="weight_band" if left>10 and more else "weight")
+            elif key=="weight_band":
+                if choice.startswith("全數"):
+                    p["layers"][role][st["symbol"]]=int(choice.split()[1][:-1])
+                    next_layer(st)
+                else:
+                    st.update(weight_range=list(map(int,choice[:-1].split("–"))),step="weight")
             elif key=="weight":
                 p["layers"][role][st["symbol"]]=int(choice[:-1])
                 next_layer(st)

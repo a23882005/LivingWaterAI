@@ -616,9 +616,21 @@ def treasury_latest(f, key):
             data=data.dropna(subset=['date','computed']).sort_values('date')
             if data.empty: raise ValueError('Treasury CSV no numeric dated rows')
             last=data.iloc[-1]
-            return row(key,float(last['computed']),last['date'].date().isoformat(),
+            result = row(key,float(last['computed']),last['date'].date().isoformat(),
                        url,'Treasury official '+kind+' daily CSV',
                        detail='Matched observation date for nominal 10Y minus 2Y' if key=='m01' else '10Y TIPS real yield')
+            if key == 'm01':
+                observed = result['observation_date']
+                verified = dt.datetime.now(dt.timezone.utc).isoformat()
+                result['source_evidence'] = {
+                    'provider': 'US_TREASURY_DIRECT', 'date': observed, 'url': url,
+                    'nominal_10y': float(y10.loc[last.name]), 'nominal_2y': float(y2.loc[last.name]),
+                    'response_sha256': hashlib.sha256(resp.content).hexdigest(),
+                }
+                f.job_series.add('TREASURY_m01')
+                f.fredattempts['TREASURY_m01'] = [{'provider': 'US_TREASURY_DIRECT', 'result': 'OK',
+                    'verified_at': verified, 'observation_date': observed}]
+            return result
         except Exception as exc: last_error=str(exc)[:230]
     raise RuntimeError('Treasury direct fallback failed: '+str(last_error))
 

@@ -108,11 +108,37 @@
       "error": "",
       "attempted_at": "2026-11-20T22:57:33.881040+00:00",
       "attempt_result": "SUCCESS",
-      "source_attempts": {},
+      "source_attempts": {
+        "TREASURY_m01": [
+          {
+            "provider": "US_TREASURY_DIRECT",
+            "result": "OK",
+            "observation_date": "2026-11-20",
+            "verified_at": "2026-11-21T03:35:01.146Z"
+          }
+        ]
+      },
       "cache_used": false,
       "cache_source": null,
-      "last_verified_at": null,
-      "source_evidence": null,
+      "last_verified_at": "2026-11-21T03:35:01.146Z",
+      "source_evidence": {
+        "provider": "US_TREASURY_DIRECT",
+        "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+        "date": "2026-11-20",
+        "nominal_10y": 4.92,
+        "nominal_2y": 4.63,
+        "response_sha256": "3a48daf1c889672fedc4643d8c2fc0a46b99eadf4af5a8780b11996eaff11df4",
+        "series": {
+          "TREASURY_m01": [
+            {
+              "provider": "US_TREASURY_DIRECT",
+              "result": "OK",
+              "observation_date": "2026-11-20",
+              "verified_at": "2026-11-21T03:35:01.146Z"
+            }
+          ]
+        }
+      },
       "retrieval_error": ""
     },
     "m08": {
@@ -571,13 +597,13 @@
           "end": "2026-11-18",
           "endpoints": {
             "2026-08-19": {
-              "WALCL": 6745699.0,
-              "WDTGAL": 936406.0,
+              "WALCL": 6745699,
+              "WDTGAL": 936406,
               "RRPONTSYD": 0.317
             },
             "2026-11-18": {
-              "WALCL": 6741452.0,
-              "WDTGAL": 892310.0,
+              "WALCL": 6741452,
+              "WDTGAL": 892310,
               "RRPONTSYD": 0.331
             }
           },
@@ -652,13 +678,13 @@
         "holiday_outstanding_dates": [],
         "values_at_required_dates": {
           "2026-08-19": {
-            "WALCL": 6745699.0,
-            "WDTGAL": 936406.0,
+            "WALCL": 6745699,
+            "WDTGAL": 936406,
             "RRPONTSYD": 0.317
           },
           "2026-11-18": {
-            "WALCL": 6741452.0,
-            "WDTGAL": 892310.0,
+            "WALCL": 6741452,
+            "WDTGAL": 892310,
             "RRPONTSYD": 0.331
           }
         }
@@ -774,7 +800,7 @@
     "m18": {
       "id": "m18",
       "label": "Sahm Rule",
-      "value": 0.0,
+      "value": 0,
       "unit": "",
       "observation_date": "2026-10-01",
       "source_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SAHMREALTIME",
@@ -874,7 +900,7 @@
     "m20": {
       "id": "m20",
       "label": "3個月平均非農新增就業（千人）",
-      "value": 137.0,
+      "value": 137,
       "unit": "千人",
       "observation_date": "2026-10-01",
       "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",

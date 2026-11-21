@@ -579,21 +579,27 @@
         }
 
 
-        // The current verified feed contains TIPS (m08), not nominal DGS10.
-        // Never substitute m08 or a hard-coded nominal yield for this formula.
         function v703SyncBondCard(data = null) {
-            window.v703BondInputsQualified = false;
+            const curve = data?.m01;
+            const ev = curve?.sourceEvidence;
             const cpi = data?.m05;
-            const ok = cpi && ['OK','USABLE'].includes(cpi.status) &&
-                cpi.value !== null && String(cpi.value).trim() !== '' && Number.isFinite(Number(cpi.value));
-            document.getElementById('bond-cpi-yoy').textContent = ok ? ': '+cpi.value+'%（'+cpi.dataDate+'）' : ': NA';
-            document.getElementById('bond-nominal-yield').textContent = ': NA';
-            document.getElementById('bond-real-yield').textContent = 'NA';
-            document.getElementById('bond-raw').value = '';
-            document.getElementById('bond-data-status').textContent = ok
-                ? '核心 CPI 已驗證；本批未提供合格名目 10Y，實質收益率與 bScore 為 NA。TIPS 不代替名目 10Y。'
-                : '核心 CPI 年增率未取得合格資料；本批亦無合格名目 10Y，實質收益率與 bScore 為 NA。';
-            updateBond('');
+            const accepted = row => row && ['OK', 'USABLE'].includes(row.status) && Number.isFinite(row.value);
+            const hasCpi = accepted(cpi);
+            const hasYield = accepted(curve) && ev?.provider === 'US_TREASURY_DIRECT' &&
+                ev.date === curve.dataDate && ev.url === curve.source &&
+                String(ev.url).startsWith('https://home.treasury.gov/') &&
+                /^[a-f0-9]{64}$/.test(ev.response_sha256) &&
+                Number.isFinite(ev.nominal_10y) && Number.isFinite(ev.nominal_2y) &&
+                Math.abs(ev.nominal_10y - ev.nominal_2y - curve.value) < 0.000001;
+            window.v703BondInputsQualified = Boolean(hasYield && hasCpi);
+            const real = window.v703BondInputsQualified ? (ev.nominal_10y - cpi.value).toFixed(6) : '';
+            document.getElementById('bond-cpi-yoy').textContent = hasCpi ? ': '+cpi.value+'%（'+cpi.dataDate+'）' : ': NA';
+            document.getElementById('bond-nominal-yield').textContent = hasYield ? ': '+ev.nominal_10y+'%（'+ev.date+'）' : ': NA';
+            document.getElementById('bond-real-yield').textContent = real ? real+'%' : 'NA';
+            document.getElementById('bond-raw').value = real;
+            document.getElementById('bond-data-status').textContent = real ? '依同批美國財政部名目 10Y 與核心 CPI 年增率計算。' :
+                (hasYield ? '本批缺少合格核心 CPI。' : '本批缺少合格名目 10Y。')+'實質收益率與 bScore 為 NA。';
+            updateBond(real);
         }
 
         // Metadata: a user's manual entry date is NOT automatically today's observation date.

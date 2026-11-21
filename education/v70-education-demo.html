@@ -132,6 +132,15 @@
  .bond-formula > span:last-child{grid-column:2 / 4; grid-row:2}
 }
 </style><style>section[id]{scroll-margin-top:5rem} #v703-legacy-shell .grid>*{min-width:0} #v703-research-charts th{white-space:normal;min-width:7rem} #edu-indicators{overflow-x:auto}</style>
+<style>
+#education-alert{margin:1rem 0;line-height:1.5}
+#education-alert h3{font-size:.9rem;font-weight:700;margin:0 0 .35rem}
+#education-alert p{margin:0}
+#education-alert .alert-card{display:flex;align-items:center;gap:.6rem;padding:.85rem 1rem;border-radius:.65rem;font-weight:700;color:#171717}
+#education-alert[data-level="yellow"] .alert-card{background:#ffeb00}
+#education-alert[data-level="orange"] .alert-card{background:#ffa143}
+#education-alert[data-level="red"] .alert-card{background:#af1829;color:#fff}
+</style>
 </head>
 <body class="min-h-screen pb-32">
 
@@ -268,7 +277,10 @@
 <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl relative overflow-hidden">
 <div class="flex justify-between items-center mb-4"><h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest">總經體質分</h3><div class="text-3xl font-mono font-bold text-purple-400" id="macro-safety-val">58.4</div></div>
 <div class="w-full bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-700 relative mb-2"><div class="h-full bg-purple-500 transition-all duration-300 relative" id="macro-bar" style="width:58.4%"></div></div>
-<div class="text-center mt-3 font-bold text-lg text-white" id="macro-zone-text">🟡 體質尚穩</div>
+<section id="education-alert" aria-labelledby="education-alert-title" data-level="normal">
+<h3 id="education-alert-title">活水 AI 市場觀察</h3>
+<p id="education-alert-message">本期無特別警示。</p>
+</section>
 <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/60 p-3" aria-label="Macro-SaFe 體質分四段說明">
 <div class="mb-2 text-xs font-bold text-slate-200">體質分怎麼看（0–100 分）</div>
 <div class="grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-1.5 text-[11px] leading-relaxed">

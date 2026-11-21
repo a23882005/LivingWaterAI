@@ -4,7 +4,7 @@ import json
 import re
 from pathlib import Path
 
-from rules import FIELDS, RULES, TESTS, evaluate
+from rules import FIELDS, RULES, TESTS, evaluate, snapshot_inputs
 
 PANEL = '''<section id="engineering-cap" hidden aria-live="polite" style="margin-top:1rem;padding:1rem;border-radius:.75rem;color:white;line-height:1.65">
 <header class="cap-yellow-sign" aria-label="黃牌警示">
@@ -48,10 +48,7 @@ def once(html, old, new):
 def build(source, destination):
     html=(source/'index.html').read_text()
     feed=json.loads((source/'V70_macro_latest.json').read_text())
-    values={key:feed['indicators'].get(key,{}).get('value') for key in FIELDS}
-    values['m21'] = feed.get('derived', {}).get('m21', {}).get('value')
-    if isinstance(values['m02'],(int,float)) and values['m02']>=50:
-        values['m02']/=100
+    values = snapshot_inputs(feed)
     feed['engineeringCap']={**evaluate(values),'asOf':feed['asOf'],'inputs':values,
                             'dates':{k:feed['indicators'].get(k,{}).get('dataDate') for k in FIELDS}}
     data=json.dumps(feed,ensure_ascii=False,indent=2,allow_nan=False)

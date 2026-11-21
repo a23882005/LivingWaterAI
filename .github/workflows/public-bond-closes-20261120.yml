@@ -1,0 +1,47 @@
+name: Retrieve public ETF closing records
+on:
+  push:
+    branches: [qa/public-bond-closes-20261120]
+    paths: [.github/workflows/public-bond-closes-20261120.yml]
+permissions:
+  contents: read
+jobs:
+  public-close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download official TPEx and public daily prices
+        shell: bash
+        run: |
+          python - <<'PY'
+          import datetime as dt, json, pathlib, time, urllib.request
+          out = pathlib.Path("public-closes")
+          out.mkdir()
+          urls = {"tpex": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"}
+          for s in ["00679B.TWO", "00719B.TWO", "00859B.TWO", "00860B.TWO", "SGOV"]:
+              urls[s] = "https://query1.finance.yahoo.com/v8/finance/chart/" + s + "?period1=1793577600&period2=1795305600&interval=1d"
+          for key, url in urls.items():
+              for attempt in range(2):
+                  try:
+                      req = urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; ETF daily valuation verification)"})
+                      with urllib.request.urlopen(req,timeout=12) as resp:
+                          raw = resp.read()
+                      data = json.loads(raw)
+                      if key == "tpex":
+                          print(key, [(v.get("Date"),v.get("SecuritiesCompanyCode"),v.get("Close")) for v in data if v.get("SecuritiesCompanyCode") in ("00679B","00719B","00859B","00860B")])
+                      else:
+                          result = data["chart"]["result"][0]
+                          print(key, result["meta"]["exchangeName"], result["indicators"]["quote"][0]["close"][-1])
+                      (out/(key+".json")).write_bytes(raw)
+                      (out/(key+".receipt.json")).write_text(json.dumps({"source_reference":url,"retrieved_at":dt.datetime.now(dt.timezone.utc).isoformat()}))
+                      break
+                  except Exception as exc:
+                      print(key,attempt,str(exc))
+                      time.sleep(2+attempt)
+              time.sleep(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-close-originals
+          path: public-closes/
+          retention-days: 5

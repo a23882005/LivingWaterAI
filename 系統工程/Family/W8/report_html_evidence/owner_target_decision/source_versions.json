@@ -1,0 +1,73 @@
+{
+  "work_order": "FAMILY-REPORT-OWNER-DECISION-20261103-r1",
+  "public_PM_comment": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6592917746",
+  "remote_base": "661c8acef3c544bee0d5c144258f5d843e79463b",
+  "local_equivalent_base": "bdb2dbe60fd486cbb15ff12bbe4d9de568b7f954",
+  "same_base_tree": "ecfa6d160a47dd7be76ae78e9ee070601166a284",
+  "accepted_phase2_business": "81a1bdf28aacc7555b7e0091b567ebb2a9058a90",
+  "approved_archive_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "code": [
+    {
+      "path": "系統工程/Family/W8/formal_report_source.py",
+      "bytes": 19838,
+      "sha256": "5e7f4920bef8c31540b82529bf1b181e7850499fe70dcecb69497a066c45923c"
+    },
+    {
+      "path": "系統工程/Family/W8/report_canonical_adapter.py",
+      "bytes": 46956,
+      "sha256": "c2c802d65c3d326a62c88ee6d9d5e5e0f037a222c5af10ca90ef173386b89606"
+    },
+    {
+      "path": "系統工程/Family/W8/w6_current_data.py",
+      "bytes": 15813,
+      "sha256": "bed567713a55cfb8d844d7cf0213244b8ec4b4b3d805c30f447237ce1b9af85e"
+    },
+    {
+      "path": "系統工程/Family/W8/w6_member_render.py",
+      "bytes": 25372,
+      "sha256": "7df70abced214c3828e85b47d601970f3a0cf4e23ecfb611b12fbf3b63c9314e"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/fixtures/report_html/synthetic.py",
+      "bytes": 32440,
+      "sha256": "d8677dd5141400bc91e3c7b42a244fb999ee4140d1e317a271505731e41823e7"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/test_report_owner_decision.py",
+      "bytes": 7161,
+      "sha256": "d66ff8d67e1ee8df01b7d5896ba89ea57e4b4248ad03ccf8e01e66b72689567e"
+    },
+    {
+      "path": "系統工程/Family/W8/tests/test_report_rendered_html.py",
+      "bytes": 32960,
+      "sha256": "4cb724ada066732d63a17a2e614a50a624fca3c711042e769a560730a8c2587f"
+    }
+  ],
+  "unchanged": [
+    {
+      "path": "系統工程/Family/README.md",
+      "sha256": "f184df8d94d60e6bd7590db10e01fe961ad3cd5d9d6d45afe7d28673ede2501c",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W8/Checkpoint.json",
+      "sha256": "beb5928f68d08fb76fe88c30897b7b5419e34a6727aa71200d5fd1e655f17722",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W6/runtime/report_receiver.py",
+      "sha256": "040408ee5114e66faa5b1698b58e562cc68b005822a28124f26a2afc473761fa",
+      "equal_base": true
+    },
+    {
+      "path": "系統工程/Family/W5/family_input.py",
+      "sha256": "d385031ee22e937bf7f9890142734d1fc8989af6981c9b0c84d7718ceed42810",
+      "equal_base": true
+    }
+  ],
+  "renderer_change_boundary": "_build_blocks target summary/chapter5 and dependent drift message only; every other AST node unchanged",
+  "renderer_prior_sha256": "d202e7f6454d42c8ab34e1ec67cf8945f323a13fe41ab9a701aafd5ec80c5021",
+  "renderer_new_sha256": "7df70abced214c3828e85b47d601970f3a0cf4e23ecfb611b12fbf3b63c9314e",
+  "same_input_without_decision_all_original_blocks_equal": "PASS_PRIVATE_LEGACY_REPLAY",
+  "private_raw_rows_DB_SHA_report_values": "NOT_PUBLIC"
+}

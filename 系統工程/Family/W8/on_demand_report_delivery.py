@@ -96,6 +96,7 @@ def prepare_report_delivery(rendered, *, account, client_id, folder_id,
         "run_id": rendered["run_id"], "data_as_of": rendered["data_as_of"],
         "analysis_version": rendered["analysis_version"],
         "created_at": when.astimezone(TAIPEI).isoformat(),
+        **{key:rendered[key] for key in ("report_scope","content_state") if rendered.get(key) is not None},
         "uploads": [{key:value for key,value in row.items() if key!="path"} for row in upload],
     }
     return {
@@ -298,3 +299,49 @@ def verify_published_manifest(manifest_plan, receipt, freshly_fetched_bytes):
         "folder_id": manifest_plan["folder_id"],
         "trade_authorization": "NONE",
     }
+
+
+def verify_report_lookup(manifest_file_id, manifest_bytes, *, account, client_id,
+                         folder_id, file_metadata, readbacks, date=None,
+                         expected_run_id=None, expected_source_db_sha256=None):
+    """Menu12 executor readback after the existing authenticated folder lookup.
+
+    Metadata and bytes must be newly fetched through Drive. This verifies the
+    no-host archive format; it neither supplies a login nor declares financial
+    completeness. Legacy synchronous ReportArchive remains unchanged.
+    """
+    if account not in ALIASES or not isinstance(manifest_bytes,bytes):
+        raise PermissionError("REPORT_LOOKUP_MEMBER_REQUIRED")
+    manifest=json.loads(manifest_bytes)
+    if (manifest.get("schema")!="Family.W8.ReportArchive.v1"
+            or manifest.get("state")!="COMPLETE" or manifest.get("account")!=account
+            or manifest.get("client_id")!=client_id or manifest.get("folder_id")!=folder_id):
+        raise PermissionError("REPORT_LOOKUP_IDENTITY_MISMATCH")
+    if (expected_run_id is not None and manifest.get("run_id")!=expected_run_id
+            or expected_source_db_sha256 is not None and manifest.get("source_db_sha256")!=expected_source_db_sha256):
+        raise PermissionError("REPORT_LOOKUP_RUN_OR_DB_MISMATCH")
+    when=datetime.fromisoformat(manifest["created_at"])
+    if when.utcoffset() is None or (date is not None and when.astimezone(TAIPEI).date().isoformat()!=date):
+        raise ValueError("REPORT_LOOKUP_DATE_MISMATCH")
+    def metadata(ident,name):
+        row=file_metadata.get(ident,{})
+        if (row.get("id")!=ident or row.get("title",row.get("name"))!=name
+                or (row.get("parent_ids",row.get("parents")) or [])!=[folder_id]
+                or row.get("shared") is not False or row.get("trashed") is True):
+            raise PermissionError("REPORT_LOOKUP_PRIVATE_PARENT_MISMATCH")
+    metadata(manifest_file_id,ALIASES[account]+"_配置報告_"+when.astimezone(TAIPEI).strftime("%Y%m%d_%H%M%S_TW")+".manifest.json")
+    files=manifest.get("files",[])
+    stem=ALIASES[account]+"_配置報告_"+when.astimezone(TAIPEI).strftime("%Y%m%d_%H%M%S_TW")
+    if (not isinstance(files,list) or not files or len({f["id"] for f in files})!=len(files)
+            or manifest_file_id in {f["id"] for f in files}
+            or not {stem+ARTIFACT_SUFFIX[k] for k in REQUIRED}.issubset({f["name"] for f in files})):
+        raise ValueError("REPORT_LOOKUP_ARTIFACTS_REQUIRED")
+    for row in files:
+        metadata(row["id"],row["name"])
+        raw=readbacks.get(row["id"])
+        if not isinstance(raw,bytes) or len(raw)!=row["bytes"] or _digest(raw)!=row["sha256"]:
+            raise RuntimeError("REPORT_LOOKUP_ARTIFACT_READBACK_FAILED")
+    return {"status":"REPORT_LOOKUP_REMOTE_VERIFIED","manifest_file_id":manifest_file_id,
+            "manifest_sha256":_digest(manifest_bytes),"account":account,"client_id":client_id,
+            "folder_id":folder_id,"run_id":manifest["run_id"],"files":files,
+            "financial_acceptance":"NOT_ASSERTED","trade_authorization":"NONE"}

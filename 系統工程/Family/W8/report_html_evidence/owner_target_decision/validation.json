@@ -1,0 +1,32 @@
+{
+  "scope": "SYNTHETIC_TESTS_AND_DEIDENTIFIED_QA",
+  "main_cases": 291,
+  "subtests": 162,
+  "junit_total": 453,
+  "actual_Chromium_tests": 17,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "duration_seconds": 84.516,
+  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=<jsdom-node_modules> PYTHONPATH=<pytest-subtests-path>:<repo>/系統工程/Family/W8:<repo>/系統工程/Family/W5:<repo>/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=<approved.zip> REPORT_HTML_EVIDENCE_DIR=<evidence-dir> python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --tb=short --junitxml=<evidence-dir>/junit.xml",
+  "new_cases": "8 provenance/selection/legacy tests including 13 negative subcases; 2 real Chromium pending-selection/PDF/PNG tests",
+  "verified": "exact readonly DB row, operator-pinned PM evidence digest, same client/DB/snapshot/cutoff, immutable source, null pending weights, unchanged other percentages, no fabricated pie or cash/NAV, old-result mismatch rejection, original renderer path unchanged",
+  "actual_private_report": "source/decision review artifacts, PDF/source geometry, all PNG and ZIP bytes, narrow offline reader and fresh archive/lookup PASS; independent PM pending",
+  "public_JUnit_identity_redaction": {
+    "unique_tokens": 6,
+    "original": "private acceptance package tests/junit.original.xml"
+  },
+  "protected_W5_receiver_shared_governance": "UNCHANGED",
+  "scope_remains": "SOURCE_REVIEW",
+  "complete_financial_PASS": 0,
+  "real_financial_cycle": 0,
+  "DB_writes": 0,
+  "broker_actions": 0,
+  "limits": {
+    "direct_file_url": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "exact_saved_bytes_offline_load": "PASS",
+    "Project_login": "NOT_RUN",
+    "Android_iOS_physical_UAT": "DEFERRED_BY_OWNER"
+  },
+  "remote_CI": "Separate final publication receipt; existing workflow excludes the new owner-decision/browser cases"
+}

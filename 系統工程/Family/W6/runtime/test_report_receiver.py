@@ -1,6 +1,6 @@
 import unittest
 from copy import deepcopy
-from report_receiver import assemble, render_review, ReportError, digest
+from report_receiver import assemble, render_review, ReportError, digest, input_digest, receive_action
 
 
 def fixture(member='a'):
@@ -67,5 +67,65 @@ class ReceiverTests(unittest.TestCase):
     def test_empty_member(self):
         s,q,r=fixture();s['tables']['portfolio_position']=[];q['client_snapshot']['payload']=s
         self.assertEqual(self.build(s,q,r)['holdings'],[])
+
+
+def action_fixture(advice=False):
+    _, q, r = fixture()
+    owner = {'broker': 'SYNTH_BROKER', 'account': 'broker1', 'funding_domain': 'SYNTH_POOL'}
+    q['native_bundle'] = {'stock_request': {'work3_handoff': {'owner': deepcopy(owner)}}}
+    canonical = {'items': [{'item_id': 'SYNTH_ITEM', 'account_owner': owner,
+                            'data_lineage': ['SYNTHETIC'], 'rule_lineage': ['SYNTHETIC'],
+                            'canonical_action': 'WAIT', 'deployment_amount': '0'}]}
+    mentor = {'client_id': q['client_id'], 'run_id': q['run_id'], 'owner': owner,
+              'execution_advice_allowed': advice, 'canonical_deployment_result': canonical,
+              'canonical_deployment_result_sha256': digest(canonical)}
+    if advice is True:
+        mentor.update(contract_name='Family.W5.mentor.v1', recommendations_allowed=True,
+                      broker_execution_allowed=False, production='HOLD', trade_action='NO_TRADE')
+    r.update(status='OK', client_id=q['client_id'], input_digest=input_digest(q),
+             data_provenance='SYNTHETIC', mentor=mentor)
+    return q, r
+
+
+class MentorScopeTests(unittest.TestCase):
+    def test_legacy_false_needs_no_new_fields_and_source_stays_immutable(self):
+        q, r = action_fixture()
+        before = deepcopy((q, r))
+        out = receive_action(r, q)
+        self.assertIs(out['source_execution_advice_allowed'], False)
+        self.assertIs(out['broker_execution_allowed'], False)
+        self.assertEqual(out['items'], r['mentor']['canonical_deployment_result']['items'])
+        self.assertEqual((q, r), before)
+
+    def test_both_routes_reject_explicit_broker_permission_and_wrong_flag_types(self):
+        for advice in (False, True):
+            for key, bad in [('broker_execution_allowed', True), ('broker_execution_allowed', 'False'),
+                             ('broker_execution_allowed', 0), ('broker_execution_allowed', None),
+                             ('recommendations_allowed', 'True'), ('recommendations_allowed', 1),
+                             ('recommendations_allowed', None)]:
+                with self.subTest(advice=advice, flag=key, value=bad):
+                    q, r = action_fixture(advice)
+                    r['mentor'][key] = bad
+                    with self.assertRaises(ReportError): receive_action(r, q)
+
+    def test_unknown_advice_values_rejected_instead_of_truthiness_coercion(self):
+        for value in (None, 0, 1, 'False', 'True', '', [], {}):
+            with self.subTest(value=value):
+                q, r = action_fixture()
+                r['mentor']['execution_advice_allowed'] = value
+                with self.assertRaisesRegex(ReportError, 'MENTOR_EXECUTION_SCOPE'): receive_action(r, q)
+
+    def test_failure_receipts_never_supply_advice_or_canonical_items(self):
+        for status in ('DATA_UNAVAILABLE', 'REJECTED', 'BLOCKED', 'INVALID_INPUT', 'ERROR'):
+            with self.subTest(status=status):
+                _, q, r = fixture()
+                r['status'] = status
+                out = receive_action(r, q)
+                self.assertEqual(out['items'], [])
+                self.assertIs(out['execution_advice_allowed'], False)
+                self.assertIs(out['broker_execution_allowed'], False)
+                for key, value in (('mentor', action_fixture(True)[1]['mentor']), ('canonical_result', {})):
+                    bad = deepcopy(r); bad[key] = value
+                    with self.assertRaisesRegex(ReportError, 'FAILED_RESULT_HAS_ADVICE'): receive_action(bad, q)
 
 if __name__=='__main__':unittest.main()

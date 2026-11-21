@@ -241,7 +241,7 @@ def resolve_analysis_market(instrument, repo_root, evaluation_at):
 def build_member_market_observations(snapshot, targets, macro, *, repo_root, evaluation_at,
                                      official_holdings=None,alternative_source_dir=None,formal_rule_source=None,
                                      approved_rule_profile=None,verified_asset_types=None,allow_independent_close_analysis=False,
-                                     approved_target=None,bond_advisory_candidates=None,equity_symbol=None):
+                                     approved_target=None,bond_advisory_candidates=None,equity_symbol=None,registered_market=None):
     """Read only exact-symbol caches referenced by this verified member snapshot.
 
 The caller has validated snapshot bytes/client against the fixed member DB.
@@ -326,6 +326,9 @@ These cache manifests attest row counts/dates, not exchange or price basis.
         if (instrument.get('identity_state') not in ('KNOWN', 'SOURCE_SYMBOL_ONLY') or not isinstance(symbol, str)
                 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.-]{0,31}', symbol)):
             missing.append({'instrument_key': key, 'code': 'KNOWN_EXACT_SYMBOL_REQUIRED'})
+            continue
+        if registered_market is not None and symbol == equity_symbol == registered_market['symbol']:
+            assets.append({'instrument_key':key,**deepcopy(registered_market)})
             continue
         try:
             provider_symbol,identity_mapping=resolve_analysis_market(instrument,repo_root,evaluation_at)

@@ -25,12 +25,12 @@ STATES=('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')
 CATALOG_BLOB='4cd333be719252034b6b9d6e8a787c838db816c4'
 
 
-def validate_market_time(market,symbol,evaluation_at,qualified_equities=None):
+def validate_market_time(market,symbol,evaluation_at,qualified_equities=None,*,verified_current_history=False):
     """Use completed-session proofs only after the original source replay."""
     evaluation=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
     verified=datetime.fromisoformat(market['provider_verified_at'].replace('Z','+00:00'))
     bond=market.get('qualified_bond_market') or {}
-    completed=(bond.get('eligible') is True and bond.get('observed_date')==market['observed_date']
+    completed=verified_current_history or (bond.get('eligible') is True and bond.get('observed_date')==market['observed_date']
         and datetime.fromisoformat(bond['session_close_at'].replace('Z','+00:00'))<=verified)
     equity=(qualified_equities or {}).get('items',{}).get(symbol)
     if equity is not None:
@@ -673,9 +673,20 @@ class HoldingsAnalysisRunner:
                 or row['holding']['quantity']!=source['quantity']):
                 raise PermissionError('HOLDINGS_ANALYSIS_POSITION_BINDING_MISMATCH')
             seen.add(row['instrument_id'])
+            current_history = self.context.get('current_technical_history_source')
+            if current_history is not None:
+                from approved_v04_technical import load_profile
+                from historical_source_qualification import read_market,technical_market
+                history = read_market(current_history,row['symbol'],request['evaluation_at'])
+                expected = technical_market(history,evaluation_at=request['evaluation_at'],repo_root=root,
+                    profile=load_profile(Path(__file__).with_name('owner_approved_v10.json')),
+                    is_etf=source['source_instrument'].get('instrument_type')=='ETF',
+                    formal_rule_source=self.context['sgov_role_classification_source'])
+                if expected is None or any((row.get('market') or {}).get(k)!=v for k,v in expected.items()):
+                    raise PermissionError('MEMBER_CURRENT_HISTORY_TECHNICAL_REPLAY_MISMATCH')
             if row.get('market'):
                 validate_market_time(row['market'],row['symbol'],request['evaluation_at'],
-                    report.get('qualified_equity_inputs'))
+                    report.get('qualified_equity_inputs'),verified_current_history=current_history is not None)
             from v82_approved_context import validate as validate_approved_context
             validate_approved_context(root,row,request,self.context,
                 target_projection=report.get('loop2_target_projection'))

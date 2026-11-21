@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "4a837f109a09693b8f0d7fd9892705c418a39ba086f7474bf414dc5a5a7a88a9"
+    "sha256": "5fd2af083b7f665aa0a2b1ce19f6f117d7b480ef7685cccf8dc2ae677a25bad7"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -419,7 +419,7 @@
   },
   {
     "path": "系統工程/Family/W8/native_asset_source.py",
-    "sha256": "adba3987424d12581c1576157276c8116418dc0379ed2f6a28d571609a2bd2de",
+    "sha256": "e32723d43e40c1cd9f181ce9a433659b62f15b4c7de97340101516142f9cf1fb",
     "sha": "04fbf11a4f9a858dcae67a3b129aced6d95c11d5"
   },
   {
@@ -489,7 +489,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_v82_analysis.py",
-    "sha256": "814ee14ea8267d6726989dd026f64248cbf8f02c331d2275f14206e04a63159c"
+    "sha256": "c994cc5126bc20e734086c365e935275f41f648d7c7c3bf91143578b54c4b112"
   },
   {
     "path": "系統工程/Family/W8/member_market_source.py",
@@ -513,7 +513,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_position_valuation.py",
-    "sha256": "5f02a8fde6ec145ec3d4385ec0711fab5ec42fc13fad718466caf84bf53ee435"
+    "sha256": "c542274cad2b89cb4667ad9d500b3b458a699af061ae505b6a40c97f28e7ba8d"
   },
   {
     "path": "系統工程/Family/W8/tpex_actual_sessions.py",
@@ -529,7 +529,7 @@
   },
   {
     "path": "系統工程/Family/W8/historical_source_qualification.py",
-    "sha256": "61bd9ba12edf698e68d9abeb91adbc0aab4126fa512362324e79d03a5e8dfda4"
+    "sha256": "e146ba96e107117c69b8b66515b68a02f0e8bec9afa9faf898b40fb7648849cc"
   },
   {
     "path": "系統工程/Family/W8/massive_daily_source.py",
@@ -611,7 +611,7 @@
   },
   {
     "path": "系統工程/Family/W8/holdings_analysis.py",
-    "sha256": "12ae334cadb2e68f1b1e286ecfb653903bc7481f6775f0802365e717ad75beab"
+    "sha256": "e66c2f51afe6f5ad35086a1d3ee16587a6992bb632af5006157b93aa02bf2bc7"
   },
   {
     "path": "系統工程/Family/W8/v82_core_source.py",

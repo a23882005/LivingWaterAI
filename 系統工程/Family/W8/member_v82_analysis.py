@@ -448,8 +448,25 @@ def build_report(request, config, repo_root):
         if current_owner is not None:
             row['owner_order_confirmation']=order_confirmation(current_owner,request)
         if history_sources is not None:
-            from historical_source_qualification import bind
-            row['history_source_qualification']=bind(history_sources,request,symbol)
+            from historical_source_qualification import bind,technical_market
+            qualification = bind(history_sources,request,symbol)
+            row['history_source_qualification'] = qualification
+            history = qualification['sources'].get('market_acquisition',{})
+            if history.get('current_history'):
+                if market is None or instrument.get('quote_currency') != history['current_history']['currency']:
+                    raise PermissionError('MEMBER_CURRENT_HISTORY_APPROVED_LISTING_REQUIRED')
+                technical = technical_market(history,evaluation_at=request['evaluation_at'],
+                    repo_root=repo_root,profile=profile,is_etf=market['market_identity']['provider_type']=='ETF')
+                if (technical['market_identity']!=market['market_identity']
+                        or technical['observed_date']!=market['observed_date']
+                        or Decimal(str(technical['observed_close']))!=Decimal(str(market['observed_close']))):
+                    raise PermissionError('MEMBER_CURRENT_HISTORY_POSITION_QUOTE_CONFLICT')
+                technical['position_valuation_observation'] = market.get('independent_broker_observation',market)
+                technical['independent_history_comparison'] = {
+                    'technical_source_sha256':technical['source_sha256'],
+                    'position_valuation_source_sha256':market['source_sha256'],
+                    'same_completed_quote':True,'volume_or_ohlc_spliced':False}
+                market = row['market'] = technical
         if asset.get('analysis_instrument_binding'):
             row['missing_inputs'].append(missing('target.listing_identity',
                 'original holding instrument and target registry rows',

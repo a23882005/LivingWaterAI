@@ -553,8 +553,25 @@ class AssetSourceProducer:
             bond_advisory_candidates=advisory_candidates,
             verified_asset_types={symbol:classification(symbol,self.class_source,proof)['asset_type']
                 for symbol,proof in self.product_sources.items()})
+        registered_market = None
         if equity_only:
             market_arguments['equity_symbol'] = self.symbol
+            binding = (self.family_c7_assembly_inputs or {}).get('public_history_source_binding') or {}
+            source = binding.get('source_descriptors',{}).get('market_acquisition')
+            if source is not None:
+                from historical_source_qualification import read_market,technical_market
+                history = read_market(source,self.symbol,when)
+                if history.get('current_history'):
+                    instrument = found[0]['source_instrument']
+                    if instrument.get('quote_currency') != history['current_history']['currency']:
+                        raise PermissionError('MEMBER_CURRENT_HISTORY_PREPARED_CURRENCY_MISMATCH')
+                    registered_market = technical_market(history,evaluation_at=when,repo_root=self.root,
+                        profile=self.approved_rule_profile,is_etf=instrument.get('instrument_type')=='ETF',
+                        formal_rule_source=self.class_source)
+                    market_arguments['registered_market'] = registered_market
+                    ctx['current_technical_history_source'] = deepcopy(source)
+                    ctx.pop('qualified_equity_source_manifest',None)
+                    req.pop('qualified_equity_source_digest',None)
         cache=self.observation_cache if self.run_binding is not None else None
         if cache is not None:
             from same_run_market_cache import SameRunMarketCache
@@ -575,7 +592,7 @@ class AssetSourceProducer:
             observations=apply_v75_macro_inputs(observations,macro_inputs,evaluation_at=when,repo_root=self.root,macro=req['macro_snapshot'])
             observations=apply_bond_supplement(observations,supplement,evaluation_at=when,repo_root=self.root)
         from qualified_equity_inputs import read as read_equities,apply as apply_equities
-        equities=read_equities(self.qualified_equity_source_manifest,when,self.root,
+        equities=read_equities(None if registered_market is not None else self.qualified_equity_source_manifest,when,self.root,
             symbol=self.symbol if equity_only else None)
         observations=apply_equities(observations,equities,req,self.root,self.class_source,self.approved_rule_profile,
             prepared.payload['positions'])

@@ -112,3 +112,65 @@ def test_original_c7_consumer_rejects_other_member_run_db_or_pasted_history_dige
     binding[field]='OTHER';context['public_history_source_binding']=binding
     monkeypatch.setattr(historical_source_qualification,'bind',lambda *args:{'digest':'b'*64})
     with pytest.raises(PermissionError):assemble(ROOT,request,context,artifact_directory=tmp_path/'private',tactical=tactical,identities=identities)
+
+
+def current_case(tmp_path):
+    manifest, _ = case(tmp_path)
+    captured = '2021-11-03T20:30:00Z'
+    manifest.update(capture_format='MASSIVE_PROVIDER_RESPONSE_V1',exchange='XNAS',known_by=captured,
+        first_covered_session='2021-11-01')
+
+    def pin(name, value):
+        path = tmp_path/name
+        path.write_text(json.dumps(value))
+        return {'local_path':str(path),'sha256':sha256(path.read_bytes()).hexdigest()}
+
+    manifest['calendar_check'] = pin('calendar.json',
+        {'XNAS':{'sessions':3,'missing':[],'extra':[],'calendar_version':'4.13.2'}})
+    for name in ('prices','dividends','splits'):
+        item = manifest[name]
+        receipt = {**item.pop('query'),'started_at':'2021-11-03T20:25:00Z','retrieved_at':captured,
+            'provider_response':Path(item['source']['local_path']).read_text()}
+        if name == 'prices':
+            receipt['params']['adjusted'] = 'false'
+            manifest['adjusted_prices'] = pin('adjusted.json',
+                {**receipt,'params':{**receipt['params'],'adjusted':'true'},
+                 'provider_response':receipt['provider_response'].replace('100,10,11,12,9,','400,2.5,2.75,3,2.25,',1)})
+        elif name == 'splits':
+            receipt['params']['execution_date.gte'] = '2021-11-02'
+        item['source'] = pin(name+'.json',receipt)
+    return pin('current.json',manifest)
+
+
+def test_current_archive_segments_on_split_without_adjusted_or_partial_periods(tmp_path,monkeypatch):
+    import on_demand_market_observations
+    from historical_source_qualification import technical_market
+
+    at = '2021-11-03T20:31:00Z'
+    desc = current_case(tmp_path)
+    history = read_market(desc,'SYN',at)
+    assert history['current_history']['continuous_completed_session_count'] == 3
+    assert history['current_history']['adjusted_price_evidence']['returned_bar_count'] == 3
+    assert history['corporate_action_observations']['splits']['requested_start'] == '2021-11-02'
+    assert history['corporate_action_observations']['dividends']['records'][0]['original_cash_amount'] == '1.00'
+
+    def evaluate(rows, **options):
+        assert [row['Date'] for row in rows] == ['2021-11-02','2021-11-03']
+        assert [row['_source_decimal']['Volume'] for row in rows] == ['100','100']
+        return {'approved_technical':{'timeframes':{}},'call_trace':[]}
+
+    monkeypatch.setattr(on_demand_market_observations,'evaluate_observed_history',evaluate)
+    obs = technical_market(history,evaluation_at=at,repo_root=ROOT,profile={},is_etf=True)
+    assert obs['rows'] == 2 and obs['observed_close'] == 11
+    assert obs['approved_technical']['timeframes']['weekly']['completed_period_count'] == 0
+    assert obs['history_quality']['discarded_before_latest_observed_split'] == 1
+    assert not obs['history_quality']['adjusted_prices_used']
+    assert not history['qP_history_qualified']
+
+
+def test_current_archive_rejects_future_capture_and_stale_completed_session(tmp_path):
+    desc = current_case(tmp_path)
+    with pytest.raises(PermissionError,match='TIME_MISMATCH'):
+        read_market(desc,'SYN','2021-11-03T20:29:59Z')
+    with pytest.raises(ValueError,match='CURRENT_CLOSE_STALE'):
+        read_market(desc,'SYN','2021-11-04T20:31:00Z')

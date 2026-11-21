@@ -1,4 +1,6 @@
 """Render the fifteen-day chart, public indicators and scenario outputs in private CI."""
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import argparse
 import json
 from pathlib import Path
@@ -99,11 +101,27 @@ def build(site, template, output):
                             el.removeAttribute(attr.name);
                 return copy.innerHTML;
             }""")
+            target = page.locator("#" + ident)
+            # The education template owns the public headings and learning notes.
+            copy_selectors = {
+                "v703-rolling15": ["h3 + p", "p.r15-notice:not([id])"],
+                "v703-wallstreet-observation": ["h3", "h3 + p"],
+                "v703-research-charts": ["h2", "h2 + p"],
+            }[ident]
+            notes = [(selector, target.locator(selector).inner_text()) for selector in copy_selectors]
             page.locator("#" + ident).evaluate("(node,html)=>node.innerHTML=html", fragment)
+            for selector, note in notes:
+                target.locator(selector).evaluate("(e,t)=>e.textContent=t", note)
+        research = page.locator("#v703-research-charts")
+        research.locator("figcaption, th").evaluate_all("""nodes => nodes.forEach(n => {
+            n.textContent = n.textContent.replaceAll('季度微分','較上季變化').replaceAll('微分','變化')
+                .replaceAll('_pct','（%）').replaceAll('SP500','標普 500').replaceAll('_','｜');
+        })""")
         points = model.locator("#r15-chart circle[data-r15-index]")
         details = points.evaluate_all("""nodes => nodes.map(node => {
             node.dispatchEvent(new MouseEvent('click', {bubbles:true}));
-            return document.getElementById('r15-point').textContent;
+            return document.getElementById('r15-point').textContent
+                .replace('較前一交易日 NA｜NA｜缺前一交易日合格分數','缺少前一交易日分數，無法比較');
         })""")
         # Ship the engineering chart's drawing functions with public observations only.
         source = model.locator("script").evaluate_all(
@@ -136,10 +154,12 @@ function redraw(){
 redraw();
 new ResizeObserver(redraw).observe(svg.parentElement);
 """
-        for ident in ("v703-update-banner",):
-            page.locator("#" + ident).evaluate("(node)=>node.textContent=''")
+        stamp = datetime.fromisoformat(feed["asOf"].replace("Z", "+00:00"))
+        if stamp.tzinfo is None:
+            raise ValueError("Missing time zone for education snapshot")
+        local_time = stamp.astimezone(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
         page.locator("#v703-update-banner").evaluate(
-            "(node,stamp)=>node.textContent='資料時間　'+stamp", feed["asOf"])
+            "(node,stamp)=>node.textContent='資料更新（台灣時間）　'+stamp", local_time)
         for ident in ("bond-raw","bond-slider"):
             value = model.locator("#" + ident).input_value()
             page.locator("#" + ident).evaluate("(node,value)=>node.setAttribute('value',value)", value)
@@ -150,7 +170,7 @@ new ResizeObserver(redraw).observe(svg.parentElement);
             value = model.locator("#" + ident).text_content()
             page.locator("#" + ident).evaluate("(node,value)=>node.textContent=value", value)
         page.locator("#edu-indicators caption").evaluate(
-            "(node,stamp)=>node.textContent='資料時間　'+stamp", feed["asOf"])
+            "(node,stamp)=>node.textContent='資料更新（台灣時間）　'+stamp", local_time)
         counter = model.locator("script").evaluate_all(
             "nodes=>nodes.map(n=>n.textContent).find(s=>s.includes('async function showViewCounts'))")
         if not counter:
@@ -197,7 +217,7 @@ showAvailability();"""
         for key, label in (("m08", "美國十年期實質殖利率"), ("m05", "核心物價年增率")):
             item = next(row for row in indicators if row["key"] == key)
             value = item["value"]
-            reading = "待更新" if value is None else f"{value:g}{item['unit']}"
+            reading = "待更新" if value is None else f"{value:.6f}".rstrip("0").rstrip(".") + item["unit"]
             observations.append(f"{label} {reading}（{item['date']}{'，沿用' if item['carried'] else ''}）")
         page.locator("#public-market-reading").evaluate("(e,t)=>e.textContent=t", "本期資料｜" + "；".join(observations))
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)

@@ -74,6 +74,27 @@ def test_reference_cash_counts_once_and_new_buy_absence_is_not_a_zero_target(tmp
  gap=out['allocation_reference_gaps'][0];assert gap['status']==scope['status'] and gap['approved_target_amount_TWD'] is None
  assert out['issues']==[] and not out['formal_NAV_or_buy_permission_created']
  assert (accepted,values,coverage)==before
+ # Official TPEx registration supersedes the PM close and the older pinned session.
+ from current_nav_source import apply_official_quote
+ row=values['positions'][0]
+ row.update(currency='TWD',observed_market_date='2026-10-30',pm_bond_close={'source_sha256':'c'*64})
+ quote={'source_sha256':'d'*64,'session_date':'2026-10-30','price':'51'}
+ contract['nav_source_qualification']={'official_quotes':{'SYN_ASSET':quote}}
+ row['quantity_source']={'provider':'SYN'}
+ accepted['source']={'source_sha256':'e'*64}
+ common['source_sha256']='f'*64
+ contract['nav_source_qualification']['approved_member_sources']={
+  'positions':[{'source_representation_index':0,'symbol':'SYN_ASSET','quantity':'2',
+   'original_position_source':row['quantity_source'],'security_value_TWD':'102','currency':'TWD',
+   'observed_market_date':'2026-10-30','price':'51','price_source_sha256':'d'*64,'security_value_native':'102'}],
+  'owner_current_confirmation_source_sha256':'f'*64,'accepted_funding_source_sha256':'e'*64,
+  'accepted_net_cash_by_currency':accepted['accepted_net_available_by_currency'],
+  'current_project_portfolio_NAV_TWD':'205','cash_reporting_TWD':'103'}
+ apply_official_quote(row,contract)
+ assert portfolio_reference(req,coverage,values,accepted,common,contract)['current_stock_exposure_TWD']=='102'
+ row['market_source_sha256']='c'*64
+ with pytest.raises(PermissionError,match='CURRENT_NAV_OFFICIAL_POSITION_REPLAY_MISMATCH'):
+  portfolio_reference(req,coverage,values,accepted,common,contract)
  accepted['client_id']='OTHER'
  with pytest.raises(PermissionError):portfolio_reference(req,coverage,values,accepted,common,contract)
 

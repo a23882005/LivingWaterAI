@@ -252,8 +252,16 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
         numeric.prec=50
         for row in values['positions']:
             symbol=row['symbol'];item=deepcopy(row);problem=row.get('issue')
+            official_quote=(contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol)
             if row.get('quantity')=='0':value=Decimal(0)
             elif row.get('amount') is None:problem=problem or 'CURRENT_POSITION_AMOUNT_UNAVAILABLE';value=None
+            elif official_quote:
+                if (row.get('qualified_current_NAV_quote')!=official_quote or row.get('currency')!='TWD'
+                        or row.get('market_source_sha256')!=official_quote['source_sha256']
+                        or row.get('observed_market_date')!=official_quote['session_date']
+                        or Decimal(str(row['observed_close']))!=Decimal(official_quote['price'])):
+                    raise PermissionError('CURRENT_NAV_OFFICIAL_POSITION_REPLAY_MISMATCH')
+                value=Decimal(row['amount'])
             elif row.get('pm_bond_close'):
                 quote=(contract.get('pm_bond_closes') or {}).get(symbol)
                 if (quote!=row['pm_bond_close'] or assets[symbol]['route']!='V75_SEPARATE'
@@ -262,11 +270,11 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
                         or Decimal(str(row['observed_close']))!=Decimal(quote['price'])):
                     raise PermissionError('CURRENT_POSITION_PM_BOND_CLOSE_BINDING')
                 value=Decimal(row['amount'])
-            elif row.get('market_source_sha256')!=((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or {}).get('source_sha256',contract['original_quote_hashes'].get(symbol)):
+            elif row.get('market_source_sha256')!=contract['original_quote_hashes'].get(symbol):
                 problem='CURRENT_POSITION_QUOTE_NOT_FROM_PINNED_BATCH';value=None
             elif (contract['expected_current_quotes'][symbol].get('currency',row.get('currency'))!=row.get('currency')
                 or row.get('observed_market_date')!=contract['expected_current_quotes'][symbol].get('session_date')
-                or Decimal(str(row.get('observed_close')))!=Decimal(((contract.get('nav_source_qualification') or {}).get('official_quotes',{}).get(symbol) or contract['expected_current_quotes'][symbol])['price'])):
+                or Decimal(str(row.get('observed_close')))!=Decimal(contract['expected_current_quotes'][symbol]['price'])):
                 problem='CURRENT_POSITION_PRICE_OR_SESSION_REPLAY_MISMATCH';value=None
             else:value=Decimal(row['amount'])
             reporting=to_twd(value,row.get('currency')) if value is not None else None

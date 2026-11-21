@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "ac79505db5a449ac5f9b71c55889d0ca976b1fe914b8a67c3378b941cb37f04b"
+    "sha256": "3e663bdcfd12877dc0ea3c3f980fef6874e6ba3ac1d46f1903d95224fb5bc868"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -646,7 +646,7 @@
   {
     "path": "系統工程/Family/W8/current_market_contract.py",
     "sha": null,
-    "sha256": "b34bdd37fbca0c75002d7939c2c3af2965fe68dae4de526e8466061a455aa3fb",
+    "sha256": "ec3933e2c1cedd06b902c1fdc6f09110d245886399195b090aa7ea5819141df5",
     "reason": "Current Owner facts adapter; private evidence remains outside repository"
   },
   {

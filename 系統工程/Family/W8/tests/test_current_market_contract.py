@@ -320,3 +320,68 @@ def test_bond_closes_follow_their_market_after_taipei_midnight(tmp_path):
     assert set(_pm_bond_closes(source, req, source)) == {'SGOV'}
     req['evaluation_at'] = '2026-11-23T22:00:00Z'
     assert _pm_bond_closes(source, req, source) == {}
+
+
+def _cash_capture_case(tmp_path, *, orders_arguments=None, completion_at=None):
+    def write(name, obj):
+        path = tmp_path/(name+'.json')
+        path.write_text(json.dumps(obj),encoding='utf-8')
+        return {'local_path':str(path),'sha256':sha256(path.read_bytes()).hexdigest()}
+
+    owner = {'client_id':'SYN','broker':'IBKR','account':'BROKER-A','currency':'USD'}
+    authorization = write('owner', {'client_id':'SYN','owner':owner,
+        'scope':'READ_ONLY_RECONCILIATION_AND_ADVICE','trade_authorization':'NONE',
+        'recorded_at':'2026-11-20T17:00:00Z'})
+    retrieved = {'balances':'2026-11-21T16:57:24Z','orders':'2026-11-21T16:57:25Z'}
+    originals = {'balances':{'balances':[{'currency':'USD','cash_balance':'12.50',
+                                        'settled_cash':'12.50','buying_power':'500'}]},
+                 'orders':{'orders':[]}}
+    capture = {'schema_version':'Family.W5.ReadonlyBrokerSnapshot.v1','client_id':'SYN',
+        'source_db_sha256':'db-sha','owner':owner,'owner_authorization':authorization,
+        'captured_at':retrieved['orders'],'original_call_capture_times':retrieved}
+    for key in ('balances','orders'):
+        query = (orders_arguments if orders_arguments is not None else {'show_completed':False}) if key=='orders' else {}
+        method = 'get_account_'+key
+        original = {'method':method,'arguments':query,'status':'fulfilled','retrieved_at':retrieved[key],
+            'call_started_at_utc':'2026-11-21T16:57:23Z',
+            'call_completed_at_utc':completion_at if key=='orders' and completion_at else retrieved[key],
+            'value':{'isError':False,'structuredContent':originals[key]}}
+        capture[key] = {**write(key,original),'arguments':query,'tool_name':method,'retrieved_at':retrieved[key]}
+    descriptor = write('capture', capture)
+    source = {'client_id':'SYN','source_db_sha256':'db-sha','member':'Synthetic',
+        'owner_authorization':authorization,'current_broker_snapshot':descriptor,
+        'orders':capture['orders'],'balances':capture['balances']}
+    request = {'client_id':'SYN','client_snapshot':{'payload':{'source_sha256':'db-sha'}},
+        'evaluation_at':'2026-11-21T17:00:00Z','trade_authorization':'NONE'}
+    accepted = {'member':'Synthetic','accepted_net_available_by_currency':{'USD':'12.50'}}
+    return source, accepted, request, descriptor
+
+
+def test_cash_corroboration_uses_the_current_registered_calls_and_working_query(tmp_path):
+    from current_market_contract import broker_cash_check
+
+    source, accepted, req, capture = _cash_capture_case(tmp_path)
+    result = broker_cash_check(source, accepted, req, broker_sources=[capture])
+    assert result['matches_accepted_cash'] and result['account_observations_current']
+    assert result['query_arguments']=={'balances':{},'orders':{'show_completed':False}}
+    assert result['observations_retrieved_at']=={
+        'balances':'2026-11-21T16:57:24Z','orders':'2026-11-21T16:57:25Z'}
+    assert result['working_orders_empty'] and not result['margin_or_buying_power_added']
+    with pytest.raises(PermissionError,match='UNREGISTERED_SNAPSHOT'):
+        broker_cash_check(source, accepted, req)
+    source['orders']={**source['orders'],'sha256':'other'}
+    with pytest.raises(PermissionError,match='CALL_BINDING'):
+        broker_cash_check(source, accepted, req, broker_sources=[capture])
+
+
+@pytest.mark.parametrize('case', [
+    {'orders_arguments':{'show_completed':True}},
+    {'orders_arguments':{'show_completed':0}},
+    {'completion_at':'2026-11-21T16:57:26Z'},
+])
+def test_cash_corroboration_rejects_order_history_and_malformed_time(tmp_path, case):
+    from current_market_contract import broker_cash_check
+
+    source, accepted, req, capture = _cash_capture_case(tmp_path, **case)
+    with pytest.raises(PermissionError,match='CURRENT_CASH_CORROBORATION_(CALL_BINDING|RESPONSE)'):
+        broker_cash_check(source, accepted, req, broker_sources=[capture])

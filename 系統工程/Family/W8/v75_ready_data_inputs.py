@@ -6,7 +6,7 @@ none supplies an approval, a full weekly history or historical NBBO quotes.
 """
 from collections import Counter
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from hashlib import sha256
 from html.parser import HTMLParser
@@ -269,33 +269,53 @@ def extend(pool, source, data, evaluation_at):
     if not pool.get('formal_parameters') or not pool.get('source_handoff'):
         raise PermissionError('READY_DATA_PRIOR_FORMAL_HANDOFF_REQUIRED')
     files = manifest_files(source, evaluation_at)
-    previous = {symbol: issuer['facts'].get('distribution_source_observation')
-        for symbol, issuer in pool.get('issuer_observations', {}).items()}
-    if not previous.get('SPSB'): raise PermissionError('READY_DATA_PRIOR_SPSB_ROWS_REQUIRED')
+    # Ready Data reconciles its SPSB source rows to the first handoff,
+    # even when that handoff has been retained as historical evidence.
+    history = pool['source_handoff'].get('historical_distributions', {})
+    issuer_spsb = pool.get('issuer_observations', {}).get('SPSB', {})
+    prior_spsb = history.get('SPSB') or issuer_spsb.get('facts', {}).get('distribution_source_observation')
+    if not prior_spsb:
+        raise PermissionError('READY_DATA_PRIOR_SPSB_ROWS_REQUIRED')
     from v75_etf_quality_inputs import assess
-    sgov = sgov_distributions(files, time(evaluation_at).date().isoformat())
+    delivered = json.loads(files['quality/sgov_provisional_12payment_decomposition.json'])
+    ingested_day = time(source['ingested_at']).date()
+    evaluation_day = time(evaluation_at).date()
+    declared_day = delivered.get('source_data_asof')
+    if declared_day:
+        observed = date.fromisoformat(declared_day.split()[0])
+    elif ingested_day == evaluation_day:
+        # Older same-day receipts used the original evaluation-day window.
+        observed = evaluation_day
+    else:
+        raise ValueError('READY_DATA_SGOV_ARCHIVED_OBSERVATION_DATE_REQUIRED')
+    if observed > ingested_day:
+        raise PermissionError('READY_DATA_SGOV_OBSERVATION_AFTER_INGESTION')
+    sgov = sgov_distributions(files, observed.isoformat())
     events = sec_events(files)
     for evidence in (sgov, events):
         evidence.update(source_manifest_sha256=source['manifest_sha256'], source_available_at=source['ingested_at'])
     sparse = sparse_yields(files, evaluation_at)
-    auxiliary = spsb_auxiliary(files, previous['SPSB']['rows'])
+    auxiliary = spsb_auxiliary(files, prior_spsb['rows'])
     receipt = {'schema_version': 'Family.W8.VerifiedV75ReadyData.v1',
         'manifest_sha256': source['manifest_sha256'], 'source_available_at': source['ingested_at'],
         'source_reference': 'OWNER_ATTACHED_V75_READY_DATA_20261029', 'raw_files_verified': len(files),
         'prior_sources_preserved': True, 'trade_action': 'NO_TRADE'}
     pool['ready_data_handoff'] = {**receipt, 'bounded_event_coverage': events,
-        'sparse_yield_evidence': sparse, 'spsb_distribution_and_qii': auxiliary}
+        'sparse_yield_evidence': sparse, 'spsb_distribution_and_qii': auxiliary,
+        'sgov_archived_distribution_window': deepcopy(sgov)}
     pool['source_proofs']['READY_DATA_HANDOFF'] = {'source_sha256': source['manifest_sha256'],
         'available_at': source['ingested_at'], 'source_reference': receipt['source_reference']}
     pool['available_at'] = max(pool['available_at'], source['ingested_at'], key=time)
-    pool.setdefault('distribution_source_observations', {})['SGOV'] = deepcopy(sgov)
     issuer = pool.get('issuer_observations', {}).get('SGOV')
     if issuer:
-        issuer['facts']['distribution_source_observation'] = deepcopy(sgov)
+        market = pool.get('qualified_bond_markets', {}).get('SGOV')
+        expected_session = market['observed_date'] if market else evaluation_day.isoformat()
+        if not declared_day or expected_session == sgov['period_end_inclusive']:
+            pool.setdefault('distribution_source_observations', {})['SGOV'] = deepcopy(sgov)
+            issuer['facts']['distribution_source_observation'] = deepcopy(sgov)
         issuer['facts']['bounded_event_coverage'] = deepcopy(events)
         old = pool['etf_quality_assessments']['SGOV']
-        assessment = assess(issuer, pool.get('qualified_bond_markets', {}).get('SGOV'),
-            data.get('YAHOO_SGOV'), pool['formal_parameters'], evaluation_at,
+        assessment = assess(issuer, market, data.get('YAHOO_SGOV'), pool['formal_parameters'], evaluation_at,
             authorized_universe=old['normalized_facts']['authorized_universe'])
         pool['etf_quality_assessments']['SGOV'] = assessment
         pool['asset_metrics']['SGOV']['PRED-010'] = assessment['metrics']

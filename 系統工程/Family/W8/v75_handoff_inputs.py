@@ -291,6 +291,7 @@ def extend_current_distributions(pool, source, data, evaluation_at):
                       source_manifest_sha256=receipt['source'][symbol]['sha256'])
         _apply_distribution(pool,symbol,window,data,evaluation_at)
         pool.setdefault('current_distributions',{})[symbol] = deepcopy(window)
+        pool.setdefault('distribution_source_observations', {})[symbol] = deepcopy(window)
         pool['source_proofs']['CURRENT_DISTRIBUTIONS_'+symbol] = {
             'source_reference':url,'source_sha256':receipt['source'][symbol]['sha256'],
             'receipt_sha256':source['sha256'],'available_at':known[symbol]}

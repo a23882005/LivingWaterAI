@@ -209,3 +209,32 @@ def test_report_names_sparse_evidence_and_does_not_call_qii_roc():
     text = ''.join(ready_data_evidence_notes(ready, 'SPSB'))
     assert '12筆組合YTM' in text and '12筆30-Day SEC Yield' in text
     assert '未冒充五年完整週序列' in text and 'QII不是ROC' in text
+
+
+def test_ready_data_uses_original_archived_inputs_after_their_current_window(monkeypatch):
+    import json
+    import v75_ready_data_inputs as ready
+
+    filed = {'quality/sgov_provisional_12payment_decomposition.json':
+             json.dumps({'source_data_asof':'2026-10-28 (issuer market-data date)'}).encode()}
+    expected_rows = [{'ex_date':'2026-10-01'}]
+    def historical_sgov(files, day):
+        assert files==filed and day=='2026-10-28'
+        return {'period_end_inclusive':day}
+    def original_spsb(files, rows):
+        assert files==filed and rows==expected_rows
+        return {'dividends':{'rows':rows}}
+    monkeypatch.setattr(ready,'manifest_files',lambda *_:filed)
+    monkeypatch.setattr(ready,'sgov_distributions',historical_sgov)
+    monkeypatch.setattr(ready,'spsb_auxiliary',original_spsb)
+    monkeypatch.setattr(ready,'sec_events',lambda *_:{})
+    monkeypatch.setattr(ready,'sparse_yields',lambda *_:{})
+    pool={'formal_parameters':{'version':'test'},'source_proofs':{},
+          'source_handoff':{'historical_distributions':{'SPSB':{'rows':expected_rows}}},
+          'available_at':'2026-11-21T16:00:00Z',
+          'issuer_observations':{'SPSB':{'facts':{}}}}
+    out=ready.extend(pool,{'manifest_sha256':'a'*64,'ingested_at':'2026-10-29T16:39:57Z'},
+                     {},'2026-11-21T17:00:00Z')
+    assert out['ready_data_handoff']['sgov_archived_distribution_window']['period_end_inclusive']=='2026-10-28'
+    assert out['ready_data_handoff']['spsb_distribution_and_qii']['dividends']['rows']==expected_rows
+    assert 'distribution_source_observations' not in out

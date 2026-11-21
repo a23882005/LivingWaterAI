@@ -367,7 +367,52 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
     out['digest']=digest(out);return out
 
 
-def broker_cash_check(source, accepted, request):
+def _cash_capture(source, request, authorization, broker_sources):
+    registered = source.get('current_broker_snapshot')
+    if registered is None:
+        return None
+    from member_market_source import read_json
+
+    if registered not in broker_sources:
+        raise PermissionError('CURRENT_CASH_CORROBORATION_UNREGISTERED_SNAPSHOT')
+    manifest = read_json(registered)
+    if (manifest.get('schema_version') != 'Family.W5.ReadonlyBrokerSnapshot.v1'
+            or manifest.get('client_id') != request['client_id']
+            or manifest.get('source_db_sha256') != source['source_db_sha256']
+            or manifest.get('owner') != authorization['owner']
+            or manifest.get('owner_authorization') != source['owner_authorization']):
+        raise PermissionError('CURRENT_CASH_CORROBORATION_SNAPSHOT_BINDING')
+    capture_at = time(manifest['captured_at'])
+    if not time(authorization['recorded_at']) <= capture_at <= time(request['evaluation_at']):
+        raise PermissionError('CURRENT_CASH_CORROBORATION_SNAPSHOT_TIME')
+    return manifest
+
+
+def _cash_capture_response(source, key, capture, authorization):
+    from member_market_source import read_json
+
+    item = source[key]
+    method = 'get_account_' + key
+    arguments = {'show_completed': False} if key == 'orders' else {}
+    if item != capture.get(key) or item.get('tool_name') != method or item.get('arguments') != arguments:
+        raise PermissionError('CURRENT_CASH_CORROBORATION_CALL_BINDING')
+    original = read_json(item)
+    query = original.get('arguments')
+    value = original.get('value') or {}
+    retrieved = original.get('retrieved_at')
+    if (original.get('method') != method or query != arguments
+            or (key == 'orders' and query['show_completed'] is not False)
+            or original.get('status') != 'fulfilled' or value.get('isError') is not False
+            or not isinstance(value.get('structuredContent'), dict)
+            or retrieved != item.get('retrieved_at')
+            or retrieved != capture.get('original_call_capture_times', {}).get(key)
+            or not time(authorization['recorded_at']) <= time(original['call_started_at_utc'])
+                <= time(original['call_completed_at_utc']) <= time(retrieved) <= time(capture['captured_at'])):
+        raise PermissionError('CURRENT_CASH_CORROBORATION_RESPONSE')
+    return value['structuredContent'], retrieved, query
+
+
+def broker_cash_check(source, accepted, request, *, broker_sources=()):
     """Compare settled cash to the existing owner's accepted same-currency amount."""
     if not source:
         return None
@@ -383,13 +428,20 @@ def broker_cash_check(source, accepted, request):
         raise PermissionError('CURRENT_CASH_CORROBORATION_BROKER')
     originals = {}
     observed_at = {}
+    queries = {}
+    capture = _cash_capture(source, request, authorization, broker_sources)
     for key in ('balances', 'orders'):
+        if capture is not None:
+            originals[key], observed_at[key], queries[key] = _cash_capture_response(
+                source, key, capture, authorization)
+            continue
         evidence = read_json(source[key])
         if (evidence['isError'] or evidence['args'] or evidence['method'] != 'get_account_' + key
                 or not time(authorization['recorded_at']) <= time(evidence['started_at']) <= time(evidence['retrieved_at']) <= time(request['evaluation_at'])):
             raise PermissionError('CURRENT_CASH_CORROBORATION_RESPONSE')
         originals[key] = evidence['original']
         observed_at[key] = evidence['retrieved_at']
+        queries[key] = evidence['args']
     currency = authorization['owner']['currency']
     records = [v for v in originals['balances']['balances'] if v['currency'] == currency]
     matches = (len(records) == 1 and Decimal(str(records[0]['cash_balance']))
@@ -397,6 +449,7 @@ def broker_cash_check(source, accepted, request):
     return {'source': deepcopy(source), 'currency': currency, 'matches_accepted_cash': matches,
             'working_orders_empty': originals['orders'].get('orders') == [],
             'observations_retrieved_at': observed_at,
+            'query_arguments': queries,
             'account_observations_current': all(current_account_observation(at, request['evaluation_at'])
                                                 for at in observed_at.values()),
             'previously_accepted_net_cash': accepted['accepted_net_available_by_currency'][currency],

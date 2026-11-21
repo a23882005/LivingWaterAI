@@ -576,7 +576,9 @@ def build_report(request, config, repo_root):
             config['position_valuation_inputs'],current_market_contract=market_contract)
     if config.get('current_cash_corroboration'):
         from current_market_contract import broker_cash_check
-        report['broker_cash_corroboration'] = broker_cash_check(config['current_cash_corroboration'], owner_facts, request)
+        report['broker_cash_corroboration'] = broker_cash_check(
+            config['current_cash_corroboration'], owner_facts, request,
+            broker_sources=config.get('current_broker_sources', ()))
     if safety_snapshot is not None:
         report['v70_safety_snapshot'] = safety_snapshot
     if owner_facts is not None:

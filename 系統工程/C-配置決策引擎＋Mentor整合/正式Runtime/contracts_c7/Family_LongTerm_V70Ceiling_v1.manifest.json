@@ -101,7 +101,7 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "4c3eec15622731bf3f07e571ab2ce38d826715f9801e5b0eb2bb2a0b73671790"
+      "sha256": "814ee14ea8267d6726989dd026f64248cbf8f02c331d2275f14206e04a63159c"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
@@ -281,7 +281,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "efd23531ebc976928d8c53e3e93a300b572f36830dd6f098ffc78c4966c0035b"
+      "sha256": "b649d32c8c494c06b1ce03eb504ddf29b7eb98c736853b68bae9190a9aadedd8"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

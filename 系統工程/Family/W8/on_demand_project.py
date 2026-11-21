@@ -6,6 +6,7 @@ of the B06 snapshot interface. It never deploys Python to a website, handles
 no API credentials and never persists anything by itself. For menu writes,
 reuse the separately approved on_demand_drive_io staged/backup/readback flow.
 """
+from copy import deepcopy
 from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
@@ -32,16 +33,22 @@ def _load(path, name):
 
 class FamilyLoginAdapter:
     """Use the approved Sources FamilyLogin, adapting W7's two-arg login API."""
-    def __init__(self, family_login, login_account, client_id):
+    def __init__(self, family_login, login_account, client_id, *, clear_report_run=None):
         if (login_account not in FAMILY_NAMES
                 or getattr(family_login,"user_id",None)!=login_account
                 or getattr(family_login,"client_id",None)!=client_id):
             raise PermissionError("FAMILY_LOGIN_OWNER_MISMATCH")
         self.family_login=family_login
         self.account=login_account
+        self.clear_report_run=clear_report_run
 
     def require_login(self):
-        authenticated=self.family_login.require_login()
+        try:
+            authenticated=self.family_login.require_login()
+        except PermissionError:
+            if self.clear_report_run is not None:
+                self.clear_report_run()
+            raise
         if authenticated!=self.account:
             raise PermissionError("FAMILY_ACCOUNT_MISMATCH")
         return authenticated
@@ -49,11 +56,15 @@ class FamilyLoginAdapter:
     def login(self, login_account, password):
         if login_account!=self.account:
             raise PermissionError("FAMILY_ACCOUNT_MISMATCH")
+        if self.clear_report_run is not None:
+            self.clear_report_run()
         return self.family_login.login(password)
 
     def logout(self):
         self.require_login()
         self.family_login.logout()
+        if self.clear_report_run is not None:
+            self.clear_report_run()
         return {"status":"LOGGED_OUT"}
 
 
@@ -164,9 +175,26 @@ def build_project_menu(*, family_login, project_name, login_account,
                        completion_checks=None, official_report_folder_id=None,
                        report_staging_dir=None, mutation_staging_dir=None,
                        trusted_report_archive_reader=None,
+                       trusted_member_w6_receiver=None,
                        trusted_public_fetcher=None, trusted_account_change=None):
     """Return the existing W7 menu without using a permanent Python host."""
-    auth=FamilyLoginAdapter(family_login,login_account,client_id)
+    if trusted_member_w6_receiver is not None and (
+            not callable(trusted_member_w6_receiver)
+            or trusted_w6_current_input_producer is not None
+            or member_v82_source_config is None or report_store is not None
+            or official_report_folder_id is None):
+        raise ValueError("W6_MEMBER_REPORT_RECEIVER_CONFIGURATION")
+    if trusted_member_w6_receiver is not None and approved_w6_archive is not None and approved_w6_renderer is not None:
+        raise ValueError("W6_RENDERER_SOURCE_CONFLICT")
+
+    last_member_run = None
+
+    def remember_member_run(request, result):
+        nonlocal last_member_run
+        last_member_run = None if request is None else (deepcopy(request), deepcopy(result))
+
+    auth=FamilyLoginAdapter(family_login,login_account,client_id, clear_report_run=(
+        lambda: remember_member_run(None, None)) if trusted_member_w6_receiver is not None else None)
     coordinator=OnDemandReadCoordinator(
         auth,login_account=login_account,client_id=client_id,
         family_alias=family_alias,db_path=downloaded_db_path,
@@ -272,7 +300,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                 file_metadata=archive["file_metadata"],readbacks=archive["readbacks"],date=date)
         handlers["previous_report"]=previous_report_lookup
 
-        if (trusted_w6_current_input_producer is not None
+        if ((trusted_w6_current_input_producer is not None or trusted_member_w6_receiver is not None)
                 and (approved_w6_archive is not None
                      or approved_w6_renderer is not None)
                 and report_staging_dir is not None):
@@ -285,7 +313,25 @@ def build_project_menu(*, family_login, project_name, login_account,
                                 "family_w8_nohost_current_report")
             delivery_module=_load(ROOT/"on_demand_report_delivery.py",
                                   "family_w8_nohost_report_delivery")
-            renderer=report_module.OnDemandW6Renderer(
+            receiver_archive = approved_w6_archive
+            receiver_renderer = approved_w6_renderer
+
+            def render_member_run(formal_source, payload):
+                if last_member_run is None:
+                    return None
+                request, result = deepcopy(last_member_run)
+                rendered = trusted_member_w6_receiver(
+                    formal_source, payload, request=request, result=result,
+                    approved_w6_archive=receiver_archive, approved_w6_renderer=receiver_renderer)
+                if not isinstance(rendered, dict) or (
+                        rendered.get('source_db_sha256') != formal_source['source_db_sha256']
+                        or rendered.get('source_digest') != formal_source['digest']
+                        or rendered.get('run_id') != request['run_id']
+                        or rendered.get('data_as_of') != request['evaluation_at']):
+                    raise PermissionError("W6_MEMBER_RECEIVER_OUTPUT_BINDING")
+                return rendered
+
+            renderer = render_member_run if trusted_member_w6_receiver is not None else report_module.OnDemandW6Renderer(
                 trusted_w6_current_input_producer, approved_w6_renderer,
                 approved_w6_archive=approved_w6_archive)
 
@@ -293,13 +339,21 @@ def build_project_menu(*, family_login, project_name, login_account,
                 snapshot=entry.current_snapshot()
                 source=source_module.build_report_source(
                     snapshot,account=login_account,expected_client_id=client_id)
+                if not isinstance(payload,dict) or set(payload)-{"date","language"}:
+                    raise ValueError("W6_REPORT_OPTIONS_INVALID")
                 try:
                     rendered=renderer(source,payload)
                 except ValueError as exc:
-                    if str(exc)!="W6_MEMBER_ITEM_REVIEW_ONLY":
+                    gaps = {"W6_MEMBER_ITEM_REVIEW_ONLY": "W6_SOURCE_REVIEW_RECEIVER_FOR_SCOPED_MEMBER_RESULTS"}
+                    if trusted_member_w6_receiver is not None:
+                        gaps["W6_FINANCIAL_SOURCE_TIME"] = "W6_SOURCE_REVIEW_RECEIVER_FOR_PERIOD_LABEL_AND_PUBLICATION_TIME"
+                    if str(exc) not in gaps:
                         raise
                     return {"status":"REPORT_SOURCE_INCOMPATIBLE","source_error":str(exc),
-                            "required":"W6_SOURCE_REVIEW_RECEIVER_FOR_SCOPED_MEMBER_RESULTS",
+                            "required":gaps[str(exc)],"trade_authorization":"NONE"}
+                if rendered is None and trusted_member_w6_receiver is not None:
+                    return {"status":"REPORT_INPUTS_REQUIRED",
+                            "missing":["same_session_verified_menu04_run"],
                             "trade_authorization":"NONE"}
                 plan=delivery_module.prepare_report_delivery(
                     rendered,account=login_account,client_id=client_id,
@@ -318,7 +372,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                 return plan
             handlers["generate_report"]=stage_latest_report
         elif member_v82_source_config is not None and family_alias=="Joseph":
-            requirements={"trusted_w6_current_input_producer":trusted_w6_current_input_producer,
+            requirements={"trusted_w6_current_input_producer":trusted_w6_current_input_producer or trusted_member_w6_receiver,
                           "approved_w6_archive_or_renderer":approved_w6_archive or approved_w6_renderer,
                           "report_staging_dir":report_staging_dir}
             missing=[name for name,value in requirements.items() if value is None]
@@ -347,5 +401,6 @@ def build_project_menu(*, family_login, project_name, login_account,
         approved_w6_renderer=approved_w6_renderer,
         report_store=report_store,
         current_source_provider=current_source_provider,
+        member_report_run_observer=remember_member_run if trusted_member_w6_receiver is not None else None,
         other_handlers=handlers,
         completion_checks=completion_checks)

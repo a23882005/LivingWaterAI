@@ -57,7 +57,14 @@ def read(request,source):
     captured=time(manifest['captured_at'])
     if time(authorization['recorded_at'])>captured or captured>at:
         raise PermissionError('BROKER_SOURCE_FUTURE_CAPTURE')
-    positions=response(manifest['positions'],'get_account_positions').get('positions')
+    position_source = manifest['positions']
+    positions = response(position_source, 'get_account_positions').get('positions')
+    positions_at = position_source.get('retrieved_at')
+    if positions_at is not None:
+        original = pinned(position_source)
+        if (positions_at != original.get('retrieved_at')
+                or not time(authorization['recorded_at']) <= time(positions_at) <= captured):
+            raise PermissionError('BROKER_POSITION_OBSERVATION_TIME_MISMATCH')
     if not isinstance(positions,list):raise ValueError('BROKER_COMPLETE_POSITIONS_REQUIRED')
     rows=[];ids=set();symbols=set()
     for raw in positions:
@@ -148,6 +155,7 @@ def read(request,source):
         'source_descriptor_digest':digest(source),'captured_at':manifest['captured_at'],
         'positions':rows,'cash':cash,'order_source':order_source,
         'owner_authorization':authorization,'database_written':False,'trade_action':'NO_TRADE',
+        **({'positions_retrieved_at': positions_at} if positions_at is not None else {}),
         **({'reconciliation_quality':quality} if quality else {})}
 
 

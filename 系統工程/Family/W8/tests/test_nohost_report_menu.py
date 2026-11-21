@@ -81,6 +81,17 @@ class NoHostReportMenus(unittest.TestCase):
         self.assertEqual(out["status"],"REPORT_INPUTS_REQUIRED")
         self.assertEqual(out["result"]["missing"],["trusted_w6_current_input_producer","approved_w6_archive_or_renderer"])
 
+    def test_member_report_receiver_requires_a_verified_run_in_this_login(self):
+        config={"client_id":CLIENT,"source_db_sha256":self.sha,"repo_root":str(FAMILY.parent.parent)}
+        def receiver(*args, **kwargs):
+            self.fail("Menu13 invoked its receiver without a verified Menu04")
+        menu=self.menu(member_v82_source_config=config,report_staging_dir=self.temp.name,
+                       trusted_member_w6_receiver=receiver,approved_w6_renderer=lambda _:None)
+        self.assertEqual(menu.select(13)["status"],"LOGIN_REQUIRED")
+        out=menu.login("testpass")
+        self.assertEqual(out["status"],"REPORT_INPUTS_REQUIRED")
+        self.assertEqual(out["result"]["missing"],["same_session_verified_menu04_run"])
+
     def test_member_report_12_reads_and_verifies_only_own_archive(self):
         import json
         folder="unit_approved_folder";mid="approved_manifest";data=b"one verified artifact"

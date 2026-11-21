@@ -351,7 +351,7 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/contracts_c7/Family_LongTerm_V70Ceiling_v1.manifest.json",
-    "sha256": "3e663bdcfd12877dc0ea3c3f980fef6874e6ba3ac1d46f1903d95224fb5bc868"
+    "sha256": "23eb20d3d72966441bd300f3ea9902f94fccaab12ecbcda607ba446458c66828"
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work6/family_long_term_read.py",
@@ -497,7 +497,7 @@
   },
   {
     "path": "系統工程/Family/W8/all_asset_coverage.py",
-    "sha256": "07a8638e177a4124caad85aee349e50bf27b2ab29baf869644ee2d94db425974"
+    "sha256": "4bb81146e9f4bf4d5448969d10d0869c1d78b82c2abf7fbfaa5600efa9038aff"
   },
   {
     "path": "系統工程/Family/W8/tpex_calendar_source.py",
@@ -513,7 +513,7 @@
   },
   {
     "path": "系統工程/Family/W8/member_position_valuation.py",
-    "sha256": "71530487ffea82db754118b416f5bfbc10a9127d61c606833448a0b3c98ce668"
+    "sha256": "5f02a8fde6ec145ec3d4385ec0711fab5ec42fc13fad718466caf84bf53ee435"
   },
   {
     "path": "系統工程/Family/W8/tpex_actual_sessions.py",
@@ -646,13 +646,13 @@
   {
     "path": "系統工程/Family/W8/current_market_contract.py",
     "sha": null,
-    "sha256": "ec3933e2c1cedd06b902c1fdc6f09110d245886399195b090aa7ea5819141df5",
+    "sha256": "ac2c607540af4f46b6a9bdb358d960c417e7a6078e76aea28cfa3e7897a6afb6",
     "reason": "Current Owner facts adapter; private evidence remains outside repository"
   },
   {
     "path": "系統工程/Family/W8/current_nav_source.py",
     "sha": null,
-    "sha256": "5c9ff7da5269358177892ce72ef4cfd38517867a1b4816b25024724049f24984",
+    "sha256": "c3a98d78a4b0af13f7dbefdda0def71d7709978202696853ddc4bf2d0fd755c2",
     "reason": "Current Owner facts adapter; private evidence remains outside repository"
   },
   {

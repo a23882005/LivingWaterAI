@@ -18,6 +18,11 @@ async function main(input){
  // jsdom has no visual layout. These are DOM compatibility properties only.
  Object.defineProperty(w.HTMLElement.prototype,'innerText',{
   get(){return this.textContent;},set(v){this.textContent=v;},configurable:true});
+ // The page's responsive chart label uses ResizeObserver. With no layout
+ // there are no resize events to deliver in this one-shot calculation.
+ if(!w.ResizeObserver)w.ResizeObserver=class{observe(){} unobserve(){} disconnect(){}};
+ if(!w.document.fonts)Object.defineProperty(w.document,'fonts',{value:{ready:Promise.resolve()}});
+ if(!w.Range.prototype.getClientRects)w.Range.prototype.getClientRects=()=>[];
  w.tailwind={};
  const warnings=[],reads=[],blocked=[];
  w.console.warn=(...args)=>warnings.push(args.map(String).join(' '));

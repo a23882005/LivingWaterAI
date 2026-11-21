@@ -4,6 +4,7 @@ Current reported values do not manufacture historical/PIT qualification,
 canonical valuation prices, trade authority or a new portfolio confirmation.
 """
 from copy import deepcopy
+from datetime import timedelta
 from decimal import Decimal,localcontext
 from hashlib import sha256
 from pathlib import Path
@@ -77,16 +78,17 @@ def read(source,request):
                 or batch.get('scope')!='PORTFOLIO_VALUATION_ONLY' or batch.get('target_version')!=out['target_version']
                 or not closing_batch.get('source_reference') or time(batch['available_at'])>time(request['evaluation_at'])):
             raise PermissionError('CURRENT_POSITION_REGISTERED_CLOSE_BATCH_SCOPE')
-        if time(batch['available_at']).astimezone(ZoneInfo('Asia/Taipei')).date()==time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date():
-            for symbol,registered in batch['closes'].items():
-                if (symbol not in observations or registered['session_date']!=batch['session_date']
-                        or registered['currency']!=observations[symbol]['currency']
-                        or Decimal(registered['price'])<=0):
-                    raise PermissionError('CURRENT_POSITION_REGISTERED_CLOSE_BATCH_ASSET')
-                # Only the valuation projection reads these registrations. It checks the
-                # original reader's hash, currency, latest completed date and exact price.
-                out['original_quote_hashes'][symbol]=registered['source_sha256']
-                out['expected_current_quotes'][symbol]=deepcopy(registered)
+        # Batch registration binds original values, not the evaluation's civil
+        # date. Each holding must still match its market's latest completed
+        # session at evaluation before the registered close contributes to NAV.
+        out['registered_close_symbols'] = sorted(batch['closes'])
+        for symbol, registered in batch['closes'].items():
+            if (symbol not in observations or registered['session_date'] != batch['session_date']
+                    or registered['currency'] != observations[symbol]['currency']
+                    or not Decimal(registered['price']).is_finite() or Decimal(registered['price']) <= 0):
+                raise PermissionError('CURRENT_POSITION_REGISTERED_CLOSE_BATCH_ASSET')
+            out['original_quote_hashes'][symbol] = registered['source_sha256']
+            out['expected_current_quotes'][symbol] = deepcopy(registered)
     from current_nav_source import read as read_nav
     nav=read_nav(source.get('nav_qualification_source'),request,out)
     if nav is not None:out['nav_source_qualification']=nav
@@ -106,19 +108,36 @@ def _pm_bond_closes(source, request, contract):
         raise PermissionError('BOND_CLOSE_MEMBER_DB_SCOPE_OR_TIME')
     session = datetime.strptime(facts['date'], '%Y-%m-%d')
     available = time(facts['retrieved_at'])
-    if time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date() != available.astimezone(ZoneInfo('Asia/Taipei')).date():
-        return {}
     tpex = urlsplit(facts['tpex_url'])
     roc = f'{session.year-1911:03d}/{session.month:02d}/{session.day:02d}'
     if (facts['tpex_report_date'] != roc or (tpex.scheme,tpex.hostname) != ('https','www.tpex.org.tw')
             or not tpex.path.endswith('/stk_wn1430_result.php') or not facts['tpex_close_twd']):
         raise PermissionError('BOND_CLOSE_TPEX_REPORT_OR_SESSION')
+    evaluated = time(request['evaluation_at'])
+
+    def latest_completed(exchange, zone):
+        import exchange_calendars as calendars
+
+        day = evaluated.astimezone(ZoneInfo(zone)).date()
+        calendar = calendars.get_calendar(exchange, start=day - timedelta(days=14),
+                                          end=day + timedelta(days=7))
+        candidate = calendar.date_to_session(day, direction='previous')
+        if calendar.session_close(candidate) > evaluated:
+            candidate = calendar.previous_session(candidate)
+        return candidate.date()
+
+    # TPEx and TWSE follow the Taiwan exchange trading days. SGOV uses the
+    # US exchange calendar already used by the V75 close readers.
+    latest = {'TWD': latest_completed('XTAI', 'Asia/Taipei'),
+              'USD': latest_completed('XNYS', 'America/New_York')}
     quotes = {}
     def register(symbol, value, currency, zone, close_hour, close_minute, sources):
         price = Decimal(str(value))
         close = session.replace(hour=close_hour, minute=close_minute, tzinfo=ZoneInfo(zone))
         if close > available or not price.is_finite() or price <= 0:
             raise PermissionError('BOND_CLOSE_PRICE_OR_AVAILABILITY')
+        if session.date() != latest[currency]:
+            return
         quotes[symbol] = dict(symbol=symbol, price=str(price), currency=currency, session_date=facts['date'],
             source_sha256=source['sha256'], source_reference=source['source_reference'],
             provider_references=sources, available_at=facts['retrieved_at'], purpose='PM_VERIFIED_CLOSE_FOR_POSITION_VALUE_ONLY')
@@ -175,7 +194,7 @@ def declared_position_scope(descriptor,request):
     return rule
 
 
-def comparable_declared_position(rule,symbol,facts,position,request):
+def matching_declared_position(rule,symbol,facts,position,request):
     if not rule or len(facts)!=1 or not position:
         return False
     original=facts[0]
@@ -185,8 +204,18 @@ def comparable_declared_position(rule,symbol,facts,position,request):
             and original.get('source_kind')=='SEALED_W6' and original.get('symbol')==symbol
             and original.get('broker_label')==rule['owner_label'] and original.get('account_key') in (None,account)
             and original.get('received_at') and time(original['received_at'])<=time(position['retrieved_at'])
-            and time(position['retrieved_at']).astimezone(ZoneInfo('Asia/Taipei')).date()==time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
             and original.get('quantity') is not None)
+
+
+def current_account_observation(observed_at, evaluation_at):
+    observed, evaluated = time(observed_at), time(evaluation_at)
+    zone = ZoneInfo('Asia/Taipei')
+    return observed <= evaluated and observed.astimezone(zone).date() == evaluated.astimezone(zone).date()
+
+
+def comparable_declared_position(rule, symbol, facts, position, request):
+    return (matching_declared_position(rule, symbol, facts, position, request)
+            and current_account_observation(position['retrieved_at'], request['evaluation_at']))
 
 
 def gap_price(contract, market, instrument, symbol, request):
@@ -272,6 +301,9 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
                 value=Decimal(row['amount'])
             elif row.get('market_source_sha256')!=contract['original_quote_hashes'].get(symbol):
                 problem='CURRENT_POSITION_QUOTE_NOT_FROM_PINNED_BATCH';value=None
+            elif (symbol in contract.get('registered_close_symbols', ())
+                    and row.get('latest_expected_completed_session') != row.get('observed_market_date')):
+                problem='CURRENT_POSITION_REGISTERED_CLOSE_NOT_LATEST_COMPLETED_SESSION';value=None
             elif (contract['expected_current_quotes'][symbol].get('currency',row.get('currency'))!=row.get('currency')
                 or row.get('observed_market_date')!=contract['expected_current_quotes'][symbol].get('session_date')
                 or Decimal(str(row.get('observed_close')))!=Decimal(contract['expected_current_quotes'][symbol]['price'])):
@@ -349,18 +381,23 @@ def broker_cash_check(source, accepted, request):
             or authorization['trade_authorization'] != 'NONE'):
         raise PermissionError('CURRENT_CASH_CORROBORATION_BROKER')
     originals = {}
+    observed_at = {}
     for key in ('balances', 'orders'):
         evidence = read_json(source[key])
         if (evidence['isError'] or evidence['args'] or evidence['method'] != 'get_account_' + key
                 or not time(authorization['recorded_at']) <= time(evidence['started_at']) <= time(evidence['retrieved_at']) <= time(request['evaluation_at'])):
             raise PermissionError('CURRENT_CASH_CORROBORATION_RESPONSE')
         originals[key] = evidence['original']
+        observed_at[key] = evidence['retrieved_at']
     currency = authorization['owner']['currency']
     records = [v for v in originals['balances']['balances'] if v['currency'] == currency]
     matches = (len(records) == 1 and Decimal(str(records[0]['cash_balance']))
                == Decimal(str(records[0]['settled_cash'])) == Decimal(accepted['accepted_net_available_by_currency'][currency]))
     return {'source': deepcopy(source), 'currency': currency, 'matches_accepted_cash': matches,
             'working_orders_empty': originals['orders'].get('orders') == [],
+            'observations_retrieved_at': observed_at,
+            'account_observations_current': all(current_account_observation(at, request['evaluation_at'])
+                                                for at in observed_at.values()),
             'previously_accepted_net_cash': accepted['accepted_net_available_by_currency'][currency],
             'margin_or_buying_power_added': False}
 
@@ -385,7 +422,7 @@ def compare_broker_quantity(source, holding, symbol, request):
                 or current.get('owner_authorization_sha256') != source['owner_authorization']['sha256']
                 or time(authorization['recorded_at']) > captured):
             raise PermissionError('CURRENT_BROKER_CONNECTED_OWNER_OR_ORIGINAL')
-        if captured <= evaluated and captured.astimezone(ZoneInfo('Asia/Taipei')).date() == evaluated.astimezone(ZoneInfo('Asia/Taipei')).date():
+        if captured <= evaluated:
             positions = record['response']['positions']
             matches = [row for row in positions if row.get('contract_id') == source['contract_ids'][symbol]]
             if len(matches) != 1:
@@ -398,8 +435,18 @@ def compare_broker_quantity(source, holding, symbol, request):
             scoped = {'owner': deepcopy(authorization['owner']), 'symbol': symbol, 'contract_id': pos['contract_id'],
                       'quantity': str(qty), 'currency': pos['currency'], 'source_sha256': current['sha256'],
                       'retrieved_at': record['retrieval_recorded_at'], 'scope': 'AUTHORIZED_BROKER_ACCOUNT_ONLY'}
+            quantity_changed = holding.get('quantity') is None or Decimal(str(holding['quantity'])) != qty
+            if not current_account_observation(scoped['retrieved_at'], request['evaluation_at']):
+                # The newer authenticated snapshot supersedes the older
+                # discrepancy as evidence, but cannot refresh the account.
+                updated = {**holding, 'dated_broker_position': scoped}
+                if quantity_changed:
+                    updated.update(quantity=None, quantity_state='UNKNOWN',
+                        quantity_discrepancy={'reason':'CURRENT_ACCOUNT_POSITION_REFRESH_REQUIRED',
+                            'prior_reported_quantity':holding.get('quantity'), 'dated_broker_position':scoped})
+                return updated
             updated = {**holding, 'current_broker_position': scoped}
-            if holding.get('quantity') is None or Decimal(str(holding['quantity'])) != qty:
+            if quantity_changed:
                 updated.update(quantity=None, quantity_state='UNKNOWN', prior_reported_quantity=holding.get('quantity'),
                                household_quantity_status='OTHER_ACCOUNT_SCOPE_UNCONFIRMED')
                 rule=declared_position_scope(source.get('declared_position_scope'),request)

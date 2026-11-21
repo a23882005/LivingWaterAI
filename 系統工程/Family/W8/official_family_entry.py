@@ -38,7 +38,8 @@ class OfficialFamilyEntry:
     """Operator-bound, real Drive personal resource; always account-scoped."""
 
     def __init__(self, *, auth, login_account, client_id, coordinator,
-                 principal_provider, analysis_provider=None, current_source_provider=None):
+                 principal_provider, analysis_provider=None, current_source_provider=None,
+                 member_report_run_observer=None):
         if (not isinstance(login_account, str)
             or login_account not in RESOURCE_BY_ACCOUNT
             or not isinstance(client_id, str) or not client_id.startswith("fam_")
@@ -54,6 +55,7 @@ class OfficialFamilyEntry:
         self.principal_provider = principal_provider
         self.analysis_provider = analysis_provider
         self.current_source_provider = current_source_provider
+        self.member_report_run_observer = member_report_run_observer
 
     def _principal(self):
         user = self.auth.require_login()
@@ -129,6 +131,8 @@ class OfficialFamilyEntry:
         request and existing FamilyRunner, both bound to the same DB SHA.
         """
         current = self.read_portfolio(payload)
+        if self.member_report_run_observer is not None:
+            self.member_report_run_observer(None, None)
         missing = [
             name for name in ("final_target_allocation", "cash_balance_snapshot",
                               "funding_evaluation")
@@ -216,7 +220,10 @@ class OfficialFamilyEntry:
                 or complete!=(decision.get('canonical_result') is not None)
                 or decision.get('trade_action')!='NO_TRADE' or decision.get('trade_authorization')!='NONE'):
                 raise PermissionError('OFFICIAL_MEMBER_V82_RESULT_MISMATCH')
-            return {**decision,'source_sha256':current['source_sha256']}
+            result = {**decision, 'source_sha256':current['source_sha256']}
+            if self.member_report_run_observer is not None:
+                self.member_report_run_observer(request, result)
+            return result
         analysis_binding=context.get('holdings_analysis_binding',{})
         if analysis_binding:
             if (analysis_binding.get('schema_version')!='Family.W8.HoldingsAnalysisBinding.v1'
@@ -308,7 +315,8 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
                                official_holdings_decision=None, official_drive_file_id=None,
                                official_holdings_previous_snapshot=None,
                                trusted_w6_current_input_producer=None, approved_w6_renderer=None,
-                               approved_w6_archive=None, current_source_provider=None):
+                               approved_w6_archive=None, current_source_provider=None,
+                               member_report_run_observer=None):
     """Wire official 02/04 handlers into the existing fourteen-item W7 menu."""
     path = FAMILY / "W7" / "family_menu.py"
     spec = importlib.util.spec_from_file_location("official_family_menu", path)
@@ -334,7 +342,8 @@ def build_official_family_menu(*, auth, project_name, login_account, client_id,
     official = OfficialFamilyEntry(
         auth=auth, login_account=login_account, client_id=client_id,
         coordinator=coordinator, principal_provider=principal_provider,
-        analysis_provider=analysis_provider, current_source_provider=current_source_provider)
+        analysis_provider=analysis_provider, current_source_provider=current_source_provider,
+        member_report_run_observer=member_report_run_observer)
     handlers = dict(other_handlers or {})
     if (trusted_w6_current_input_producer is not None
             or approved_w6_renderer is not None or approved_w6_archive is not None):

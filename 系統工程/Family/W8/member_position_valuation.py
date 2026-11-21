@@ -104,6 +104,7 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         if holding.get('household_quantity_status') == 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED':
             discrepancies[r['symbol']] = {'reason': 'OTHER_ACCOUNT_SCOPE_UNCONFIRMED',
                 'prior_reported_quantity':holding.get('prior_reported_quantity'), 'current_broker_position':result}
+    from current_market_contract import comparable_declared_position, current_account_observation
     bond_quotes = (current_market_contract or {}).get('pm_bond_closes', {})
     for asset in coverage['holding_and_target_rows']:
         symbol = asset['symbol']
@@ -119,22 +120,27 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         if len(positions) == 1:
             observation = positions[0]
             position = observation['position']
-            observed = time(observation['captured_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
-            today = time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date()
-            if (observed == today and position['symbol'] == symbol and position['currency'] == quote['currency']
+            observed_at = observation.get('positions_retrieved_at') or observation['captured_at']
+            if (position['symbol'] == symbol and position['currency'] == quote['currency']
                     and observation['owner']['client_id'] == client):
                 result = dict(symbol=symbol, contract_id=position['contract_id'], currency=quote['currency'],
                     owner=deepcopy_fact(observation['owner']), quantity=position['quantity'], scope='AUTHORIZED_BROKER_ACCOUNT_ONLY',
                     retrieved_at=observation['captured_at'], valuation_price=quote['price'], observed_date=quote['session_date'],
                     valuation_source_sha256=quote['source_sha256'],
                     account_position_amount=str(_number(position['quantity'])*_number(quote['price'])))
-                account_values[symbol] = result
+                current = current_account_observation(observed_at, request['evaluation_at'])
+                if current:
+                    account_values[symbol] = result
                 old = asset['source_facts']
                 if len(old)==1 and old[0].get('quantity') is not None and _number(old[0]['quantity'])!=_number(position['quantity']):
-                    discrepancies[symbol] = dict(reason='OTHER_ACCOUNT_SCOPE_UNCONFIRMED', prior_reported_quantity=old[0]['quantity'],
-                        current_broker_position=result)
+                    if current:
+                        discrepancies[symbol] = dict(reason='OTHER_ACCOUNT_SCOPE_UNCONFIRMED',
+                            prior_reported_quantity=old[0]['quantity'], current_broker_position=result)
+                    else:
+                        discrepancies[symbol] = dict(reason='CURRENT_ACCOUNT_POSITION_REFRESH_REQUIRED',
+                            prior_reported_quantity=old[0]['quantity'],
+                            dated_broker_position={**result, 'positions_retrieved_at':observed_at})
     rule=(current_market_contract or {}).get('declared_position_scope')
-    from current_market_contract import comparable_declared_position
     replaced={}
     if rule:
         for asset in coverage['holding_and_target_rows']:
@@ -174,6 +180,8 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
                     amount=None,currency=None,reporting_amount_TWD=None,issue=None)
                 if (market or {}).get('pm_bond_close'):
                     row['pm_bond_close']=deepcopy_fact(market['pm_bond_close'])
+                if market and market.get('latest_expected_completed_session') is not None:
+                    row['latest_expected_completed_session'] = market['latest_expected_completed_session']
                 if reference_quote is not None:
                     row['current_reference_quote']=deepcopy_fact(reference_quote)
                 if logical_keys is not None:

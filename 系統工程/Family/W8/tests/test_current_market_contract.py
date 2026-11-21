@@ -267,3 +267,55 @@ def test_registered_portfolio_close_is_bound_to_member_and_source(tmp_path):
  record['client_id']='another member';path.write_text(json.dumps(record))
  desc['portfolio_close_batch']['sha256']=sha256(path.read_bytes()).hexdigest()
  with pytest.raises(PermissionError,match='CLOSE_BATCH_SCOPE'):read(desc,req)
+
+
+def test_weekend_close_registration_still_requires_latest_exchange_session(tmp_path):
+    req, data, source, fx = contract_case(tmp_path)
+    data['sources']['SYN_ASSET']['currency'] = 'USD'
+    desc = source()
+    record = {'client_id': req['client_id'], 'source_db_sha256': 'a'*64,
+        'target_version': 1, 'scope': 'PORTFOLIO_VALUATION_ONLY',
+        'available_at': '2026-10-31T12:00:00Z', 'session_date': '2026-10-30',
+        'closes': {'SYN_ASSET': {'source_sha256': 'a'*64, 'currency': 'USD',
+                                    'price': '75', 'session_date': '2026-10-30'}}}
+    path = tmp_path/'registered.json'
+    path.write_text(json.dumps(record))
+    desc['portfolio_close_batch'] = {'local_path': str(path), 'sha256': sha256(path.read_bytes()).hexdigest(),
+                                     'source_reference': 'SYN_REGISTERED_CLOSE'}
+    req['evaluation_at'] = '2026-10-31T16:00:00Z'
+    contract = read(desc, req)
+    bound = {**{k:req[k] for k in ('client_id','run_id','evaluation_at')}, 'source_db_sha256': 'a'*64}
+    assets = {'holding_and_target_rows':[{'symbol':'SYN_ASSET','route':'V82','target_lines':[]}]}
+    accepted = {**bound, 'accepted_net_available_by_currency': {}}
+    row = {'symbol': 'SYN_ASSET', 'quantity': '2', 'amount': '150', 'currency': 'USD',
+           'market_source_sha256': 'a'*64, 'observed_market_date': '2026-10-30',
+           'observed_close': '75', 'latest_expected_completed_session': '2026-10-30'}
+    values = {**bound, 'fx_observation': fx, 'positions': [row]}
+    assert portfolio_reference(req, assets, values, accepted, bound, contract)['issues'] == []
+    row['latest_expected_completed_session'] = '2026-11-02'
+    out = portfolio_reference(req, assets, values, accepted, bound, contract)
+    assert out['issues'] == [{'symbol':'SYN_ASSET','reason':'CURRENT_POSITION_REGISTERED_CLOSE_NOT_LATEST_COMPLETED_SESSION'}]
+    assert out['positions_plus_accepted_cash_TWD'] is None
+
+
+def test_bond_closes_follow_their_market_after_taipei_midnight(tmp_path):
+    from current_market_contract import _pm_bond_closes
+
+    path = tmp_path/'bond_closes.json'
+    path.write_text(json.dumps({'date': '2026-11-20', 'retrieved_at': '2026-11-21T12:00:00Z',
+        'tpex_report_date': '115/11/20',
+        'tpex_url': 'https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_wn1430_result.php',
+        'tpex_close_twd': {'00679B': '31'}, 'sgov_close_usd': '100',
+        'sgov_sources': ['https://stockanalysis.com/etf/sgov/history/',
+                         'https://markets.ft.markitdigital.com/data/etfs/tearsheet/historical?s=SGOV']}),
+        encoding='utf-8')
+    source = {'client_id': 'SYN', 'source_db_sha256': 'a'*64, 'target_version': 1,
+              'scope': 'BOND_POSITION_VALUATION_ONLY', 'session_date': '2026-11-20',
+              'local_path': str(path), 'sha256': sha256(path.read_bytes()).hexdigest(),
+              'source_reference': 'SYN_BOND_CLOSE_REGISTER'}
+    req = {'client_id': 'SYN', 'evaluation_at': '2026-11-21T16:23:46Z'}
+    assert set(_pm_bond_closes(source, req, source)) == {'00679B', 'SGOV'}
+    req['evaluation_at'] = '2026-11-23T07:00:00Z'
+    assert set(_pm_bond_closes(source, req, source)) == {'SGOV'}
+    req['evaluation_at'] = '2026-11-23T22:00:00Z'
+    assert _pm_bond_closes(source, req, source) == {}

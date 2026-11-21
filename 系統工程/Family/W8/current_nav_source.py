@@ -92,11 +92,18 @@ def qualify(reference,accepted,current):
     contract=reference['contract'];approval=contract.get('nav_source_qualification')
     if approval is None:return
     selected=approval['approved_member_sources'];rows=reference['positions'];originals=selected['positions']
-    if (reference['issues'] or len(rows)!=len(originals)
+    if (len(rows)!=len(originals)
         or selected['owner_current_confirmation_source_sha256']!=current['source_sha256']
         or selected['accepted_funding_source_sha256']!=accepted['source']['source_sha256']
         or selected['accepted_net_cash_by_currency']!=reference['accepted_net_cash_by_currency']):
         raise PermissionError('CURRENT_NAV_ORIGINAL_OWNER_CASH_OR_COVERAGE_MISMATCH')
+    if [(i, row['symbol']) for i, row in enumerate(rows)] != [
+            (row['source_representation_index'], row['symbol']) for row in originals]:
+        raise PermissionError('CURRENT_NAV_ORIGINAL_POSITION_OR_VALUE_MISMATCH')
+    if reference['issues']:
+        reference.update(formal_NAV_source_qualified=False,
+            nav_qualification_status='CURRENT_MARKET_OR_ACCOUNT_INPUTS_REQUIRED')
+        return
     with localcontext() as numeric:
         numeric.prec=50
         for i,(row,original) in enumerate(zip(rows,originals)):

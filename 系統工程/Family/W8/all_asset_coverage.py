@@ -137,7 +137,9 @@ def build(request, config, coverage, repo_root, *, ledger_resource=None):
             'coverage_basis':a['coverage_basis'],'account_keys':sorted({str(h.get('account_key')) for h in a['holdings']}),
             'source_facts':deepcopy(a['holdings']),'target_lines':deepcopy(a['targets']),
             'current_broker_observations':[{'owner':deepcopy(v['owner']),'captured_at':v['captured_at'],
-                'position':deepcopy(p)} for v in broker_views for p in v['positions'] if p['symbol']==a['symbol']]}
+                'position':deepcopy(p),
+                **({'positions_retrieved_at': v['positions_retrieved_at']} if 'positions_retrieved_at' in v else {})}
+                for v in broker_views for p in v['positions'] if p['symbol']==a['symbol']]}
             for a in security_rows],
         'planning_ledger':{k:deepcopy(ledger[k]) for k in ('status','cycle_count') if k in ledger},
         'account_reconciliation':review,'coverage_complete':expected==observed,

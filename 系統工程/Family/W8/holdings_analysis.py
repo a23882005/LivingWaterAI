@@ -149,6 +149,13 @@ def read_issuer_facts(source,symbol,evaluation_at):
     when=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
     retrieved=datetime.fromisoformat(facts['retrieved_at'].replace('Z','+00:00'))
     if retrieved>when or facts['as_of']>when.date().isoformat():raise ValueError('ISSUER_FACTS_IN_FUTURE')
+    if source.get('soxx_reported_forward_pe') is not None:
+        if symbol!='SOXX':
+            raise PermissionError('V82_SOXX_FORWARD_PE_ASSET_MISMATCH')
+        from v10_source_observations import read_soxx_reported_forward_pe
+        observed=read_soxx_reported_forward_pe(source['soxx_reported_forward_pe'],evaluation_at)
+        if observed is not None:
+            facts['independent_forward_pe_observation']=observed
     return {**facts,'source_sha256':source['sha256'],
             **({'issuer_nav_table':workbook} if workbook is not None else {})}
 
@@ -267,6 +274,10 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
         [p['source_instrument'].get('ticker') for p in positions if p['source_instrument'].get('ticker')])
     rows=[];trace=['W8.menu04.holdings_analysis','W5.prepare_input','W5.project_official_holdings']
     dated_valuation=vt_valuation_observations(context) if any(r['source_instrument'].get('ticker')=='VT' for r in positions) else []
+    safety = None
+    if context.get('v70_safety_sources') is not None:
+        from member_v82_analysis import read_v70_safety_evidence
+        _, safety = read_v70_safety_evidence(context['v70_safety_sources'],request)
     for position in positions:
         instrument=position['source_instrument'];symbol=instrument.get('ticker');source=position['source_position']
         cls=classification(symbol,producer.class_source,producer.product_sources.get(symbol))
@@ -295,6 +306,9 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 {'source_kind':'FORMAL_CLASSIFICATION','sha256':producer.class_source['sha256'],
                     'source_reference':producer.class_source['source_reference'],'scenario_blob':CATALOG_BLOB}],
             'call_trace':[]}
+        if safety is not None:
+            row['v3_macro_observations'] = row['macro_observations']
+            row['macro_observations'] = deepcopy(safety)
         if broker_view is not None:
             row['broker_order_source']=deepcopy(orders)
             row['source_refs'][0]['source_reference']=deepcopy(position['original_db_position']['source_position']['source_row'])
@@ -391,6 +405,8 @@ def build_analysis_report(producer,request,context,prepared,holdings,observation
                 if qualified is not None:waterfall['qualified_core_source']=qualified
                 if cls.get('valuation_profile') is not None:
                     waterfall['valuation_profile']=deepcopy(cls['valuation_profile'])
+                if safety is not None:
+                    waterfall['macro_observations']=safety
                 row['core_observation']=producer.core_observation(observed,
                     valuation_metrics=current_metrics,fundamental_fields=fundamental_fields,
                     broad_etf=cls['asset_type']!='INDIVIDUAL_STOCK',**waterfall)
@@ -665,6 +681,10 @@ class HoldingsAnalysisRunner:
         if equity_only and [r['symbol'] for r in report['analysis_result']['positions']] != [self.context['equity_analysis_symbol']]:
             raise PermissionError('HOLDINGS_EQUITY_ANALYSIS_SYMBOL_MISMATCH')
         source_positions={p['instrument_key']:p for p in prepared.payload['positions']}
+        safety = None
+        if self.context.get('v70_safety_sources') is not None:
+            from member_v82_analysis import read_v70_safety_evidence
+            _, safety = read_v70_safety_evidence(self.context['v70_safety_sources'],request)
         seen=set()
         for row in report['analysis_result']['positions']:
             source=source_positions.get(row['instrument_id'])
@@ -673,6 +693,9 @@ class HoldingsAnalysisRunner:
                 or row['holding']['quantity']!=source['quantity']):
                 raise PermissionError('HOLDINGS_ANALYSIS_POSITION_BINDING_MISMATCH')
             seen.add(row['instrument_id'])
+            if safety is not None and (row.get('macro_observations')!=safety
+                    or row.get('core_observation') and row['core_observation'].get('macro_safety_source_audit')!=safety):
+                raise PermissionError('HOLDINGS_ANALYSIS_V70_SAFETY_SOURCE_REPLAY_MISMATCH')
             current_history = self.context.get('current_technical_history_source')
             if current_history is not None:
                 from approved_v04_technical import load_profile

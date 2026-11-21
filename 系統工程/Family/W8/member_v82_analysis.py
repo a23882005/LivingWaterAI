@@ -346,6 +346,18 @@ def assessed_holding(asset, symbol, current_owner, config, request):
     return holding
 
 
+def read_v70_safety_evidence(config, request):
+    source = config.get('v70_safety_snapshot_source')
+    if source is None:
+        return None, None
+    from v70_safety_decisions import read_source_window,produce
+
+    at = request['evaluation_at']
+    snapshot = read_v70_safety_snapshot(source,at)
+    window = read_source_window(config.get('v70_safety_window_source'),snapshot,request)
+    return snapshot,produce(snapshot,at,window)
+
+
 def build_report(request, config, repo_root):
     from formal_mode_analysis import native
     native(repo_root)
@@ -366,12 +378,9 @@ def build_report(request, config, repo_root):
     target = target_source(snapshot, config, request['evaluation_at'])
     if request.get('confirmed_target') != target:
         raise PermissionError('MEMBER_V82_TARGET_SOURCE_REPLAY_MISMATCH')
-    safety_source = config.get('v70_safety_snapshot_source')
-    safety_snapshot = (read_v70_safety_snapshot(safety_source, request['evaluation_at'])
-                       if safety_source is not None else None)
-    from v70_safety_decisions import read_source_window,produce as produce_safety_decisions
-    safety_window = read_source_window(config.get('v70_safety_window_source'), safety_snapshot, request)
-    safety_decisions = produce_safety_decisions(safety_snapshot,request['evaluation_at'],safety_window) if safety_snapshot else None
+    safety_snapshot,safety_decisions = read_v70_safety_evidence(config,request)
+    from etf_structure_source import read_periodic_fund_flows
+    periodic_flows = read_periodic_fund_flows(config.get('v82_fund_flow_source'),request)
     from owner_financial_confirmation import read as read_owner_financial_confirmation
     owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
     from owner_current_business import read as read_current_owner,holding_view,order_confirmation
@@ -432,6 +441,8 @@ def build_report(request, config, repo_root):
             'valuation_observations': [], 'issuer_facts': read_issuer_facts(
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
+        if symbol in periodic_flows:
+            row['periodic_fund_flows'] = periodic_flows[symbol]
         price = gap_price(market_contract, market, instrument, symbol, request)
         if price:
             row['position_valuation_allowed'] = True

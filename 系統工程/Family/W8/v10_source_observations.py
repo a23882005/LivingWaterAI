@@ -192,3 +192,46 @@ def macro_observations(snapshot,evaluated_at):
         'remaining_inputs':['HY comparable prior/5/20 sessions','Treasury spread/depth basket history',
             'Repo benchmark and comparable official corridor','official systemic-event assertion/coverage'],
         'full_safety_contract_complete':False}
+
+
+def read_soxx_reported_forward_pe(source, evaluation_at):
+    """Read the provider's dated aggregate with its coverage and method."""
+    import re
+    from html import unescape
+    from hashlib import sha256
+    from pathlib import Path
+    from member_market_source import time
+
+    retrieved=time(source['retrieved_at'])
+    if retrieved>time(evaluation_at):
+        return None
+    raw=Path(source['local_path']).read_bytes()
+    if (sha256(raw).hexdigest()!=source['sha256']
+            or source['source_url']!='https://www.trefis.com/data/companies/SOXX'):
+        raise PermissionError('V82_SOXX_FORWARD_PE_ORIGINAL_SOURCE_MISMATCH')
+    day=date.fromisoformat(source['observed_date'])
+    if day>retrieved.date():
+        raise PermissionError('V82_SOXX_FORWARD_PE_OBSERVATION_IN_FUTURE')
+    label='>'+day.strftime('%m/%d/%y')+'</th>'
+    text=raw.decode()
+    start=text.find(label)
+    if start<0 or text.count(label)!=1:
+        raise ValueError('V82_SOXX_FORWARD_PE_EXACT_DATE_ROW_REQUIRED')
+    table=text[text.rfind('<table',0,start):text.find('</table>',start)]
+    rows=re.findall(r'<tr\b[^>]*>(.*?)</tr>',table,re.DOTALL|re.IGNORECASE)
+    spans=[attrs for row in rows if 'P/E (Non-GAAP)' in row
+        for attrs in re.findall(r"<span\b([^>]*data-h='Forward P/E \(ETF aggregate\)'[^>]*)>",row)]
+    if len(spans)!=1:
+        raise ValueError('V82_SOXX_FORWARD_PE_EXACT_DATE_ROW_REQUIRED')
+    attrs={key:unescape(value) for key,value in re.findall(r"data-([a-z]+)='([^']*)'",spans[0])}
+    multiple=re.fullmatch(r'Forward P/E = .+ = ([0-9]+\.[0-9]+)x',attrs['result'])
+    if (not multiple or not attrs.get('calc') or not attrs.get('align')
+            or attrs.get('src')!='Analyst consensus · current ETF weights & market caps'):
+        raise ValueError('V82_SOXX_FORWARD_PE_METHOD_OR_COVERAGE_REQUIRED')
+    return {'metric_name':'FORWARD_PE','current':multiple[1],'unit':'multiple',
+        'source_reference':source['source_url'],'source_sha256':source['sha256'],
+        'as_of':str(day),'observed_date_text':str(day),'retrieved_at':source['retrieved_at'],
+        'methodology':attrs['calc'],'estimate_coverage':attrs['align'],'constituent_weight_basis':attrs['src'],
+        'historical_median':None,'historical_pit_eligible':False,
+        'data_quality':'OK','freshness':'UNKNOWN','pit_status':'UNVERIFIABLE',
+        'scope':'PROVIDER_REPORTED_CURRENT_FORWARD_MULTIPLE__CURRENT_WEIGHTS'}

@@ -196,3 +196,58 @@ def test_publication_bound_and_current_snapshot_scope(tmp_path):
     request={'client_id':'member','client_snapshot':{'payload':{'source_sha256':'db'}},'evaluation_at':'2026-11-21T11:29:59Z'}
     assert read_source_window(source,snapshot,request) is None
     assert read_source_window(source,{**snapshot,'sha256':'previous'},request) is None
+
+
+def test_live_window_uses_its_taipei_day_at_the_real_evaluation_cutoff(tmp_path):
+    data={'captured_at':'2026-11-21T16:20:00Z','series':{}}
+    file=tmp_path/'window.json';file.write_text(json.dumps(data))
+    source={'local_path':str(file),'sha256':sha256(file.read_bytes()).hexdigest(),
+        'client_id':'member','source_db_sha256':'db','snapshot_sha256':'pair'}
+    snapshot={'sha256':'pair','data_cutoff':'2026-11-21T23:50:00+08:00',
+        'signals':{'hy_oas':{},'real_yield':{}}}
+    request={'client_id':'member','client_snapshot':{'payload':{'source_sha256':'db'}},
+        'evaluation_at':'2026-11-21T16:30:00Z'}
+    result=V.read_source_window(source,snapshot,request)
+    assert result['execution_day_taipei']=='2026-11-22'
+    assert result['economic_cutoff']==snapshot['data_cutoff']
+    assert result['available_for_this_run_at']==data['captured_at']
+    assert V.read_source_window({**source,'evaluation_day':'2026-11-21'},snapshot,request) is None
+    assert V.read_source_window(source,snapshot,{**request,'evaluation_at':'2026-11-21T16:19:00Z'}) is None
+    assert V.read_source_window(source,snapshot,{**request,'evaluation_at':'2026-11-22T16:00:00Z'}) is None
+
+
+def test_decisive_pressure_and_only_fully_determined_credit_reach_original_core():
+    from native_asset_source import native_core_observation
+
+    test=SafetyDecisionTests()
+    test.setUp()
+    case=C.CoreSourceTests()
+    case.setUp()
+    try:
+        snapshot=test.read()
+        window={'snapshot_sha256':snapshot['sha256'],'captured_at':test.at,'hy_bp':'352.00',
+            'differences':{'BAMLH0A0HYM2':{'1':{'difference_bp':'5'},'5':{'difference_bp':'32'},'20':{'difference_bp':'12'}},
+                'TREASURY_REAL_10Y':{'20':{'difference_bp':'13'}},'T5YIE':{'20':{'difference_bp':'-27'}}}}
+        p=V.produce(snapshot,test.at,window)
+        assert p['macro_pressure']['truth']=='FALSE' and p['credit']['C1']=='TRUE'
+        core=native_core_observation(ROOT,case.observed,macro_observations=p)
+        facts={f['name']:f for f in core['actual_inputs']['safety_facts']}
+        assert facts['safety.macro']['value']=='FALSE' and facts['safety.macro']['pit_status']=='VERIFIED'
+        assert facts['safety.credit_liquidity']['value']=='UNKNOWN'
+        assert facts['safety.material_events']['value']=='UNKNOWN'
+        assert 'safety.macro' not in {g['field_path'] for g in core['input_gaps']}
+        assert core['result']['permission']['hard_gate']=='UNKNOWN'
+
+        exact=V._credit_nodes({'hy_oas':D('352'),'vix':D('24'),'move':D('105'),'hy_rapid_widening':False,
+            'hy_direction_widening':True,'treasury_function_deterioration':False,
+            'repo_function_deterioration':False,'official_systemic_interruption':False})
+        p['core_safety_dependencies']['safety.credit_liquidity'].update(
+            value=exact['risk_level'],decision_relevant_unknown_ids=exact['decision_relevant_unknown_ids'])
+        core=native_core_observation(ROOT,case.observed,macro_observations=p)
+        facts={f['name']:f for f in core['actual_inputs']['safety_facts']}
+        assert facts['safety.credit_liquidity']['value']==1 and facts['safety.credit_liquidity']['data_quality']=='OK'
+        assert 'safety.credit_liquidity' not in {g['field_path'] for g in core['input_gaps']}
+        assert core['result']['permission']['hard_gate']=='UNKNOWN'
+    finally:
+        case.doCleanups()
+        test.doCleanups()

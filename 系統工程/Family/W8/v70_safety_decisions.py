@@ -170,8 +170,13 @@ def read_source_window(source, snapshot, request):
     captured = _time(data['captured_at'])
     evaluated = _time(request['evaluation_at'])
     cutoff = _time(snapshot['data_cutoff'])
-    if captured > evaluated or cutoff > evaluated or evaluated.astimezone(ZoneInfo('Asia/Taipei')).date().isoformat() != source['evaluation_day']:
+    taipei = ZoneInfo('Asia/Taipei')
+    execution_day = evaluated.astimezone(taipei).date().isoformat()
+    registered_day = source.get('evaluation_day', captured.astimezone(taipei).date().isoformat())
+    if captured > evaluated or cutoff > evaluated or execution_day != registered_day:
         return None
+    fred_day = cutoff.astimezone(ZoneInfo('America/Chicago')).date()
+    treasury_day = cutoff.astimezone(ZoneInfo('America/New_York')).date()
     series = data['series']
     items = {}
     releases = {}
@@ -179,7 +184,7 @@ def read_source_window(source, snapshot, request):
         items[key], releases[key] = _window_series(series,key,'https://fred.stlouisfed.org/data/'+key,min(cutoff,captured))
     treasury_key = 'TREASURY_REAL_10Y'
     treasury_url = ('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView'
-                    '?type=daily_treasury_real_yield_curve&field_tdr_date_value=' + str(cutoff.year))
+                    '?type=daily_treasury_real_yield_curve&field_tdr_date_value=' + str(treasury_day.year))
     items[treasury_key], releases[treasury_key] = _window_series(series,treasury_key,treasury_url,captured)
     # A cross-published no-observation day on both FRED rate series and the original
     # Treasury curve is outside the rate observation windows. Uncorroborated holes stay unknown.
@@ -187,22 +192,22 @@ def read_source_window(source, snapshot, request):
               and items['DFII10'][d] is None and d not in items[treasury_key] and items[treasury_key]}
     diffs = {}
     anchors = {}
-    def aligned(key, signal, series_id):
+    def aligned(key, signal, series_id, source_day):
         row = snapshot['signals'][signal]
         days = items[key]
         if not days or row.get('series_id') != series_id or row.get('unit') != '%':
             return None
         end = next(reversed(days))
-        if (end.isoformat() != row.get('as_of') or end > cutoff.date()
+        if (end.isoformat() != row.get('as_of') or end > source_day
                 or days[end] is None or days[end] != _number(row.get('value'))):
             return None
         return end
-    hy = aligned('BAMLH0A0HYM2','hy_oas','BAMLH0A0HYM2')
-    real = aligned(treasury_key,'real_yield','U.S. Treasury 10-Year Real CMT')
+    hy = aligned('BAMLH0A0HYM2','hy_oas','BAMLH0A0HYM2',fred_day)
+    real = aligned(treasury_key,'real_yield','U.S. Treasury 10-Year Real CMT',treasury_day)
     be = next(reversed(items['T5YIE']), None)
     # The supplement is tied to the latest completed rate session of this V70 capture.
     expected_rate_day = snapshot['signals']['real_yield'].get('as_of')
-    if be and (be.isoformat() != expected_rate_day or be > cutoff.date()):
+    if be and (be.isoformat() != expected_rate_day or be > fred_day):
         be = None
     for key, end, periods in [('BAMLH0A0HYM2',hy,(1,5,20)), (treasury_key,real,(20,)), ('T5YIE',be,(20,))]:
         anchors[key] = end.isoformat() if end is not None else None
@@ -210,6 +215,7 @@ def read_source_window(source, snapshot, request):
                       if end is not None else None for n in periods}
     return {'source_sha256':source['sha256'], 'snapshot_sha256':snapshot['sha256'], 'captured_at':data['captured_at'],
             'economic_cutoff':snapshot['data_cutoff'], 'available_for_this_run_at':data['captured_at'],
+            'execution_day_taipei':execution_day,
             'source_urls':{k:s.get('source_url') for k,s in series.items()}, 'provider_release_as_displayed':releases,
             'anchors':anchors, 'differences':diffs, 'hy_bp':str(items['BAMLH0A0HYM2'][hy]*100) if hy else None,
             'corroborated_non_observation_days':sorted(str(d) for d in closed),
@@ -290,36 +296,52 @@ def produce(snapshot,evaluation_at,window=None):
         **({'published_source_window':window,'credit_window_inputs':{k:truth(qualified[k]) for k in ('hy_direction_widening','hy_rapid_widening')}} if window else {}),
         'remaining_dependencies':reasons,'raw_unknown_signal_ids':list(snapshot['unknown_signals']),
         'core_safety_dependencies':{
-            'safety.macro':{'required_input_ids':macro['required_input_ids'],
+            'safety.macro':{'value':macro['truth'],'required_input_ids':macro['required_input_ids'],
                 'decision_relevant_unknown_ids':macro['decision_relevant_unknown_ids'],
-                'reason':'MACRO_SAFETY_AGGREGATION_NOT_ASSERTED; '+ '; '.join(macro['missing_dependencies'].values())},
-            'safety.credit_liquidity':{'required_input_ids':credit['required_input_ids'],
+                'reason':'MACRO_PRESSURE_INPUTS_UNRESOLVED; '+ '; '.join(macro['missing_dependencies'].values())},
+            'safety.credit_liquidity':{'value':credit['risk_level'],'required_input_ids':credit['required_input_ids'],
                 'decision_relevant_unknown_ids':unknown,'reason':'; '.join(k+': '+v for k,v in reasons.items())}},
         'call_trace':['W8.v70_safety_decisions.produce','W8.v10_source_observations.credit_logic'],
         'full_safety_contract_complete':False,'score_used_as_safety':False}
 
 
 def bind_core(arguments,gaps,projection):
-    """Bind source-specific UNKNOWN to the original sufficiency arbiter.
-
-    Independent qualified Core-source assertions retain their original owner;
-    this partial snapshot cannot erase them or claim their qualification.
-    """
+    """Bind qualified domain conclusions to the existing Core sufficiency check."""
     from livingwater_v82_runtime.core_rules import EvidenceFact
     from livingwater_v82_runtime.enums import RequirementLevel,DataQuality,Freshness,PitStatus
-    owned=projection['core_safety_dependencies'];result=[];bound=set()
+
+    owned=projection['core_safety_dependencies']
+    result=[];handled=set();resolved=set()
+    reference=projection['source_reference']+'#'+projection['source_sha256']
     for fact in arguments['safety_facts']:
         if fact.name not in owned or fact.data_quality not in (DataQuality.UNKNOWN,DataQuality.INSUFFICIENT):
-            result.append(fact);continue
-        dep=owned[fact.name];bound.add(fact.name)
-        result.append(EvidenceFact(name=fact.name,value='UNKNOWN',requirement=RequirementLevel.SAFETY_REQUIRED,
-            data_quality=DataQuality.UNKNOWN,freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
-            source_reference=projection['source_reference']+'#'+projection['source_sha256'],
-            issue_codes=tuple(dep['decision_relevant_unknown_ids']) or ('METHODOLOGY_UNAVAILABLE',)))
+            result.append(fact)
+            continue
+        dep=owned[fact.name]
+        handled.add(fact.name)
+        value=dep['value']
+        valid_value=(value in ('TRUE','FALSE') if fact.name=='safety.macro'
+            else type(value) is int and 0<=value<=3)
+        known=valid_value and not dep['decision_relevant_unknown_ids']
+        if known:
+            resolved.add(fact.name)
+            result.append(EvidenceFact(name=fact.name,value=value,requirement=RequirementLevel.SAFETY_REQUIRED,
+                data_quality=DataQuality.OK,freshness=Freshness.FRESH,pit_status=PitStatus.VERIFIED,
+                source_reference=reference))
+        else:
+            result.append(EvidenceFact(name=fact.name,value='UNKNOWN',requirement=RequirementLevel.SAFETY_REQUIRED,
+                data_quality=DataQuality.UNKNOWN,freshness=Freshness.UNKNOWN,pit_status=PitStatus.UNVERIFIABLE,
+                source_reference=reference,
+                issue_codes=tuple(dep['decision_relevant_unknown_ids']) or ('METHODOLOGY_UNAVAILABLE',)))
     arguments['safety_facts']=result
+    remaining=[]
     for gap in gaps:
-        if gap['field_path'] in bound:
-            dep=owned[gap['field_path']]
+        name=gap['field_path']
+        if name in resolved:
+            continue
+        if name in handled:
+            dep=owned[name]
             gap.update(reason=dep['reason'],required_input_ids=dep['required_input_ids'],
                 decision_relevant_unknown_ids=dep['decision_relevant_unknown_ids'],source_sha256=projection['source_sha256'])
-    return arguments,gaps
+        remaining.append(gap)
+    return arguments,remaining

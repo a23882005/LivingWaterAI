@@ -236,3 +236,73 @@ def evaluate_etf_structure(facts,request,symbol,product_evidence=None,registered
             'issuer_date':facts.get('as_of'),'available_fields':sorted(facts),
             'target_allocation_version':draft.get('original_allocation_version')},
         'call_trace':trace,'existing_metrics_are_not_viability_assertions':True}
+
+
+def read_periodic_fund_flows(source, request):
+    """Read historical two-way flows for the reported fund or series."""
+    if source is None:
+        return {}
+    from datetime import date
+    from hashlib import sha256
+    from pathlib import Path
+    from xml.etree import ElementTree
+    from member_market_source import read_json, time
+
+    if (source['client_id']!=request['client_id']
+            or source['source_db_sha256']!=request['client_snapshot']['payload']['source_sha256']):
+        raise PermissionError('V82_FUND_FLOW_MEMBER_MISMATCH')
+    rows=read_json(source)
+    originals=source['originals']
+    series_ids={'PPH':('1137360','S000034409'),'SOXX':('1100663','S000004354')}
+    annual_scope={
+        'VWRA':('Vanguard FTSE All-World UCITS ETF, all share classes, not specific to USD accumulating',
+                 'PM_VERIFIED_ANNUAL_REPORT__ALL_SHARE_CLASSES'),
+        'NATO':('HANetf ICAV Future of Defence UCITS ETF sub-fund',
+                 'PM_VERIFIED_ANNUAL_REPORT__SUB_FUND'),
+    }
+    if set(rows)!=set(originals) or set(rows)-series_ids.keys()-annual_scope.keys():
+        raise PermissionError('V82_FUND_FLOW_ORIGINAL_SCOPE_MISMATCH')
+    at=time(request['evaluation_at'])
+    result={}
+    for symbol,row in rows.items():
+        document=originals[symbol]['document']
+        capture=originals[symbol]['capture']
+        metadata=read_json(capture)
+        retrieved=time(metadata['retrieved_at'])
+        if retrieved>at:
+            continue
+        raw=Path(document['local_path']).read_bytes()
+        if (sha256(raw).hexdigest()!=document['sha256'] or document['sha256']!=metadata['sha256']
+                or len(raw)!=metadata['size'] or row['source']!=metadata['url']
+                or date.fromisoformat(row['period_end'])>retrieved.date()):
+            raise PermissionError('V82_FUND_FLOW_ORIGINAL_BYTES_PERIOD_OR_SOURCE_MISMATCH')
+        if symbol in series_ids:
+            cik,series_id=series_ids[symbol]
+            prefix=f'https://www.sec.gov/Archives/edgar/data/{cik}/'
+            if not re.fullmatch(r'[0-9]{18}/primary_doc\.xml',row['source'].removeprefix(prefix)) or not row['source'].startswith(prefix):
+                raise PermissionError('V82_FUND_FLOW_SEC_REPORT_SOURCE_MISMATCH')
+            tree=ElementTree.fromstring(raw)
+            ns={'n':'http://www.sec.gov/edgar/nport'}
+            original_flows=[tree.find(f'.//n:mon{i}Flow',ns) for i in (1,2,3)]
+            if (tree.findtext('./n:headerData/n:submissionType',namespaces=ns)!='NPORT-P'
+                    or tree.findtext('.//n:genInfo/n:seriesId',namespaces=ns)!=series_id
+                    or row['series_id']!=series_id
+                    or tree.findtext('.//n:genInfo/n:seriesName',namespaces=ns)!=row['series_name']
+                    or tree.findtext('.//n:genInfo/n:repPdDate',namespaces=ns)!=row['period_end']
+                    or any(item is None for item in original_flows)
+                    or [item.attrib for item in original_flows]!=row['flows_in_report_order']):
+                raise PermissionError('V82_FUND_FLOW_SEC_REPORT_SERIES_OR_AMOUNTS_MISMATCH')
+            scope='NPORT_FUND_SERIES__THREE_MONTHS_IN_REPORT_ORDER'
+        else:
+            expected_scope,scope=annual_scope[symbol]
+            annual_original=(row['source']=='https://fund-docs.vanguard.com/etf-annual-report.pdf' if symbol=='VWRA'
+                else re.fullmatch(r'https://drive\.google\.com/file/d/[A-Za-z0-9_-]+/view',row['source']) is not None)
+            if (not annual_original or not raw.startswith(b'%PDF-') or row['period']!='year'
+                    or row['scope']!=expected_scope or type(row['pdf_page']) is not int or row['pdf_page']<=0
+                    or any(type(row[key]) is not int or row[key]<0 for key in ('subscriptions_usd','redemptions_usd'))):
+                raise PermissionError('V82_FUND_FLOW_ANNUAL_REPORT_SCOPE_MISMATCH')
+        result[symbol]={**deepcopy(row),'scope_basis':scope,'acquired_at':metadata['retrieved_at'],
+            'original_sha256':document['sha256'],'capture_sha256':capture['sha256'],
+            'observation_sha256':source['sha256'],'current_creation_redemption_function_attested':False,
+            'current_material_event_coverage_attested':False,'current_nav_status_attested':False}
+    return result

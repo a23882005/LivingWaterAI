@@ -128,6 +128,7 @@ def complete_report(report,request,config,root):
         out['same_run_financial_facts']=deepcopy(reconciliation.get('financial_facts'))
     from same_run_market_cache import SameRunMarketCache
     observation_cache=SameRunMarketCache()
+    safety_sources={key:config[key] for key in ('v70_safety_snapshot_source','v70_safety_window_source') if key in config}
     for row in out['positions']:
         descriptor=descriptors.get(row['symbol'])
         if row['symbol'] in producers:
@@ -135,6 +136,8 @@ def complete_report(report,request,config,root):
             london_source = config.get('market_sources',{}).get(row['symbol']) or {}
             market_options = ({'london_market_source':london_source}
                 if (row.get('market') or {}).get('london_current_history') else {})
+            if (row.get('macro_observations') or {}).get('published_source_window') is not None:
+                market_options['v70_safety_sources'] = safety_sources
             attempt,descriptor=produce(root,request,row['symbol'],producers[row['symbol']],
                 observation_cache=observation_cache,reconciliation_source=reconciliation_source,
                 public_history_sources=config.get('public_history_sources',{}).get(row['symbol']),

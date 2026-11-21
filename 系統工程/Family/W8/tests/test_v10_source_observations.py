@@ -102,3 +102,26 @@ class FormalSourceTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'FUTURE'):macro_observations(s,'2026-10-27T21:00:00Z')
 
 if __name__=='__main__':unittest.main()
+
+
+def test_reported_forward_pe_uses_dated_table_with_separate_forecast_column(tmp_path):
+    from hashlib import sha256
+    from core_analysis_inputs import issuer_inputs
+    from v10_source_observations import read_soxx_reported_forward_pe
+
+    table = b"""<table><tr><th></th><th>11/30/27</th><th>11/21/26</th></tr>
+    <tr><td>P/E (Non-GAAP)</td><td><span data-h='Forward P/E (ETF aggregate)'
+    data-calc='Weighted earnings yield' data-result='Forward P/E = reciprocal = 16.80x'
+    data-align='Provider coverage 21/22' data-src='Analyst consensus &middot; current ETF weights &amp; market caps'>16.80</span></td></tr></table>"""
+    path=tmp_path/'trefis.html'
+    path.write_bytes(table)
+    source={'local_path':str(path),'sha256':sha256(table).hexdigest(),
+        'retrieved_at':'2026-11-21T22:00:00Z','observed_date':'2026-11-21',
+        'source_url':'https://www.trefis.com/data/companies/SOXX'}
+    assert read_soxx_reported_forward_pe(source,'2026-11-21T21:59:59Z') is None
+    value=read_soxx_reported_forward_pe(source,'2026-11-21T22:00:00Z')
+    assert value['current']=='16.80' and value['historical_median'] is None
+    assert not value['historical_pit_eligible'] and value['pit_status']=='UNVERIFIABLE'
+    facts={'metrics':{},'independent_forward_pe_observation':value}
+    assert issuer_inputs(facts,allowed_metrics=['FORWARD_PE'])[0]==[value]
+    assert issuer_inputs(facts,allowed_metrics=['TRAILING_PE'])[0]==[]

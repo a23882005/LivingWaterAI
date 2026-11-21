@@ -28,6 +28,10 @@ def issuer_inputs(facts, dated_metrics=(), *, allowed_metrics=None):
     # the same metric name in the native resolver's map.
     names={r['metric_name'] for r in metrics}
     metrics.extend(deepcopy(r) for r in dated_metrics if r['metric_name'] not in names)
+    observed=(facts or {}).get('independent_forward_pe_observation')
+    if (observed and observed['metric_name'] in allowed
+            and all(r['metric_name']!=observed['metric_name'] for r in metrics)):
+        metrics.append(deepcopy(observed))
     present={r['field_name'] for r in fundamentals}
     for name in ('ROE','EARNINGS_GROWTH'):
         if name not in present:

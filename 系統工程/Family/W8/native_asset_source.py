@@ -559,6 +559,8 @@ class AssetSourceProducer:
             source_inputs = self.family_c7_assembly_inputs or {}
             binding = source_inputs.get('public_history_source_binding') or {}
             london_source = source_inputs.get('current_london_daily_source')
+            if source_inputs.get('v70_safety_sources') is not None:
+                ctx['v70_safety_sources'] = deepcopy(source_inputs['v70_safety_sources'])
             source = binding.get('source_descriptors',{}).get('market_acquisition')
             if source is not None:
                 from historical_source_qualification import read_market,technical_market

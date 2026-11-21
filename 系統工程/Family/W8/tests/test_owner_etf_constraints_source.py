@@ -115,7 +115,13 @@ def test_bound_owner_mandate_is_compared_without_extending_approval(tmp_path):
         assert leaf['truth'] == 'TRUE' and not leaf['missing_fields']
         assert leaf['detail']['approved_scope_source']['original_document_row'] == data['items'][symbol]['original_document_row']
     excess = mandate_leaf(projected, snapshot, 'BBB', ['APPROVED_EQUITIES', 'ADDED_STRATEGY'])
-    assert excess['truth'] == 'FALSE' and excess['detail']['approved_components'] == ['APPROVED_EQUITIES']
+    assert excess['truth'] == 'UNKNOWN'
+    assert excess['detail']['approved_components'] == ['APPROVED_EQUITIES']
+    assert excess['detail']['unmapped_issuer_components'] == ['ADDED_STRATEGY']
+    assert excess['missing_fields'] == ['approved_target.etf_constraints.BBB.changed_mandate_scope_review']
+    explicit_policy = deepcopy(projected)
+    explicit_policy['payload']['draft']['etf_constraints']['BBB'].pop('mandate_scope_source')
+    assert mandate_leaf(explicit_policy, snapshot, 'BBB', ['ADDED_STRATEGY'])['truth'] == 'FALSE'
     unresolved = mandate_leaf(projected, snapshot, 'AAA', ['ADDED_STRATEGY'])
     assert unresolved['truth'] == 'UNKNOWN'
     assert unresolved['detail']['approved_scope_source']['missing_approval_clause'] == data['items']['AAA']['missing_approval_clause']

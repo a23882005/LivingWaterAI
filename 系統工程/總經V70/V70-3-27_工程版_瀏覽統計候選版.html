@@ -2657,6 +2657,21 @@ if (recBlack) {
   ['S4','高波動與槓桿投機型','TQQQ、SOXL、UPRO、SQQQ、TRUP（寵物保險）'],
   ['S5','防禦與民生必要型','PPH、XLV、XLP、XLU、WMT、COST、KR、PG、KO（可口可樂）']
  ];
+ const assetLessons={
+  S1:"短期景氣轉弱，和企業長期獲利能力下降，是兩件不同的事。觀察大盤時，要分開看景氣變化持續多久，以及影響多少產業。",
+  S2:"本期關注獲利成長與實質利率。其他條件相同時，利率越高，未來才實現的獲利折算成今天的價值就越低。",
+  S3:"多家公司若集中在同一產業，仍可能一起受到景氣、信用或利率變化影響。觀察重點是它們共同承受哪些風險。",
+  S4:"市場快速反轉時，價格波動可能放大。每日重設槓桿的商品，即使市場最後回到原點，也可能因中途的漲跌而產生損失。",
+  S5:"景氣放緩時，民生需求通常較穩定。「防禦」描述的是需求特性，企業獲利與股價仍會波動。",
+  B1:"本期關注央行政策與短期利率。這類債券很快到期，到期資金再次投入時能取得的利息，也較快隨短期利率改變。",
+  B2:"價格下跌可能來自整體利率上升，也可能反映市場擔心企業的還款能力。比較公司債與相近天期公債的殖利率差，有助於分辨兩者。",
+  B3:"本期關注長期利率與通膨預期。其他條件相近時，長期殖利率上升，既有長債的價格通常下跌；天期越長，價格通常越敏感。",
+  B4:"較高的利息有時反映較高的信用風險。觀察重點包括降評、違約，以及市場要求多少額外利息來承擔這些風險。",
+  C0:"這一欄關注資金多久能動用，以及動用時價值可能波動多少。前面的超短公債是資產類別；這裡談的是資金用途。",
+ };
+ function renderAssetLesson(id){
+  return `<p data-family-lesson="${id}" style="margin-top:.45rem;line-height:1.7"><strong>觀察重點</strong>｜${assetLessons[id]}</p>`;
+ }
  function fiveClassAdvice(snap,rule){
   if(!snap||!rule||!rule.stress||!window.v703CanPublishFormalAllocation()||!Number.isFinite(snap.mSafe_final))return null;
   const z=rule.stress.strengths||{};
@@ -2781,9 +2796,9 @@ if (recBlack) {
    box.innerHTML=(window.v703DemoMode?'<div class="text-xs text-slate-400 mb-2">測試預覽</div>':'')+`<div class="rounded border border-amber-700 p-2 mb-2 text-amber-200">${window.v703StrategyKind==='APPROVED_MATRIX'?'已載入核准10×4矩陣':'⚠ 10×4採候選示範配置，非正式核准值'}｜人生：${document.getElementById('life-stage-select')?.selectedOptions[0]?.textContent||''}；風格：${document.getElementById('v703-risk-preference')?.selectedOptions[0]?.textContent||''}</div>`+
     `<div><strong>總經安全分數：</strong>${snap.mSafe_final.toFixed(1)}／100 <strong>風險模式：</strong>${rule.summary||"一般市場"}</div>`+
     `<div class="text-xs text-slate-300">S0/B0：${a.S0.toFixed(1)}%／${a.B0.toFixed(1)}%；總經 T：${a.T>0?'+':''}${a.T} 點；子彈池 C：${c.toFixed(1)}%</div>`+
-    `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%｜五大股票類別總經方向</div>`+(fiveAdvice?fiveAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-semibold">${x.id}｜${x.name}：<span class="text-cyan-300">${x.advice}</span></div><div class="text-xs text-slate-300 mt-1">代表標的：${x.examples}</div><div class="text-xs text-slate-400">總經依據：${x.reason}</div></div>`).join(''):'<div class="text-amber-200">資料不足，暫不判斷。</div>')+
-    `<div class="font-bold mt-2" style="color:#14532d">債券四類｜總經文字建議</div>`+bondAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-bold" style="color:#14532d;font-weight:800">${x[0]}｜${labels[x[0]]}：${x[1]}</div><div class="text-xs text-slate-400">總經依據：${x[2]}</div></div>`).join('')+
-    `<div class="font-bold text-yellow-300 mt-2">${labels.C0} ${c.toFixed(1)}%</div>`+
+    `<div class="font-bold text-blue-300 mt-2">股票池 ${s.toFixed(1)}%｜五大股票類別總經方向</div>`+(fiveAdvice?fiveAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-semibold">${x.id}｜${x.name}：<span class="text-cyan-300">${x.advice}</span></div><div class="text-xs text-slate-300 mt-1">代表標的：${x.examples}</div><div class="text-xs text-slate-400">總經依據：${x.reason}</div>${renderAssetLesson(x.id)}</div>`).join(''):'<div class="text-amber-200">資料不足，暫不判斷。</div>')+
+    `<div class="font-bold mt-2" style="color:#14532d">債券四類｜總經文字建議</div>`+bondAdvice.map(x=>`<div class="border-b border-slate-700/60 py-2"><div class="font-bold" style="color:#14532d;font-weight:800">${x[0]}｜${labels[x[0]]}：${x[1]}</div><div class="text-xs text-slate-400">總經依據：${x[2]}</div>${renderAssetLesson(x[0])}</div>`).join('')+
+    `<div class="font-bold text-yellow-300 mt-2">${labels.C0} ${c.toFixed(1)}%</div>${renderAssetLesson('C0')}`+
     `<div class="border-t border-slate-600 pt-3 font-bold">整體配置合計 ${total.toFixed(1)}%</div>`+
     `<div class="text-xs text-slate-300 mt-2">股票五類與債券四類均顯示總經文字方向，不是交易指令；內部百分比仍供原配置對帳，逐檔股票交V82、逐檔債券交債券V75。</div>`+
     `<div class="text-xs text-amber-200">多風險連續加權之八類比例，屬待歷史驗證的候選規則；並非已驗證的交易指令。</div>`;

@@ -87,3 +87,18 @@ def test_scoped_broker_quantity_preserves_unmapped_book_and_rejects_wrong_connec
     source['current_positions']['owner_authorization_sha256']='foreign'
     with pytest.raises(PermissionError):
         compare_broker_quantity(source,{'quantity':'17'},'TEST',request)
+
+
+def test_london_alternate_failure_keeps_verified_base_and_its_original_volume(monkeypatch):
+    import member_market_source as m
+    raw={'provider':'IBKR_LAST_DAILY_OBSERVATION','sha256':'ib','contract_id':111,'calendar_source':{}}
+    alt={'provider':'ALPHA_VANTAGE_LONDON_ETF_DAILY','base_history_sha256':'ib','contract_id':222,
+         'calendar_source':{},'sha256':'av','retrieved_at':'2026-11-21T11:34:11Z'}
+    original={'rows':27,'source_sha256':'ib'}
+    monkeypatch.setattr(m,'_read_market',lambda *args,**kwargs:deepcopy(original))
+    opts={'symbol':'TEST','repo_root':None,'profile':None,'is_etf':True}
+    source={**raw,'independent_daily_ohlc_source':alt}
+    assert m.read_market(source,evaluation_at='2026-11-21T11:34:10Z',**opts)==original
+    result=m.read_market(source,evaluation_at='2026-11-21T11:35:00Z',**opts)
+    assert result['source_sha256']=='ib' and result['rows']==27
+    assert result['independent_history_candidate_error']['reason']=='MEMBER_MARKET_INDEPENDENT_SOURCE_BINDING'

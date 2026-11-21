@@ -72,12 +72,97 @@ def _daily_rows(source,meta,quotes,stamps,by_date,cutoff,*,final_close_required=
     return rows,close_rows,excluded,invalid
 
 
+def _london_daily(source, calendar):
+    data = read_json(source)
+    listing = source['symbol']+'.LON'
+    identity = read_json(source['identity_source'])
+    matches = [row for row in identity['bestMatches'] if row['1. symbol'] == listing]
+    if (len(matches) != 1 or source['provider_symbol'] != source['symbol']
+            or source['exchange'] != 'XLON' or source['provider_exchange'] != 'LSEETF'
+            or source['timezone'] != 'Europe/London' or source['currency'] != 'USD'
+            or matches[0]['2. name'] != source['expected_listing_name']
+            or matches[0]['3. type'] != 'ETF' or matches[0]['4. region'] != 'United Kingdom'
+            or matches[0]['8. currency'] != 'USD'
+            or source['source_reference'] != 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+listing+'&outputsize=compact'):
+        raise PermissionError('MEMBER_MARKET_LONDON_ETF_LISTING')
+    meta = data['Meta Data']
+    series = data['Time Series (Daily)']
+    days = sorted(series)
+    if (not days or meta['2. Symbol'] != listing or meta['3. Last Refreshed'] != days[-1]
+            or meta['4. Output Size'].lower() != 'compact' or 'Daily Prices' not in meta['1. Information']):
+        raise PermissionError('MEMBER_MARKET_LONDON_DAILY_METADATA')
+    sessions = {row['session_id']:row for row in calendar['sessions'] if days[0]<=row['session_id']<=days[-1]}
+    if list(sessions) != days or time(sessions[days[-1]]['close_at']) > time(source['retrieved_at']):
+        raise ValueError('MEMBER_MARKET_LONDON_DAILY_SESSION_COVERAGE')
+    actions = read_json(source['actions_source'])
+    if time(actions['retrieved_at']) > time(source['retrieved_at']):
+        raise PermissionError('MEMBER_MARKET_LONDON_ACTIONS_AFTER_CAPTURE')
+    if any(actions[name]['symbol'] != listing or actions[name]['data'] != [] for name in ('splits','dividends')):
+        raise ValueError('MEMBER_MARKET_LONDON_ACTION_HISTORY_REQUIRES_QUALIFICATION')
+    fields = {'open':'1. open','high':'2. high','low':'3. low','close':'4. close','volume':'5. volume'}
+    quotes = {key:[series[d][field] for d in days] for key,field in fields.items()}
+    # The API supplies trading dates only; use the identified London sessions for
+    # the common daily-bars adapter, without claiming a provider timestamp.
+    stamps = [int(time(sessions[d]['close_at']).timestamp()) for d in days]
+    identity = {'symbol':source['symbol'], 'currency':'USD','exchangeName':'LSEETF',
+                'exchangeTimezoneName':'Europe/London','instrumentType':'ETF'}
+    evidence={'provider':source['provider'],'provider_listing':listing,'returned_rows':len(days),
+              'provider_metadata_timezone':meta['5. Time Zone'],'session_date_source':'XLON_CALENDAR',
+              'price_basis':'PROVIDER_DAILY_OHLC__SINGLE_SOURCE','actions_source_sha256':source['actions_source']['sha256'],
+              'provider_reported_actions':{'splits':[],'dividends':[]},'historical_PIT_attested':False}
+    return identity,quotes,stamps,evidence
+
+
 def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, observation_route='V82'):
+    options = dict(symbol=symbol, evaluation_at=evaluation_at, repo_root=repo_root, profile=profile,
+                   is_etf=is_etf, observation_route=observation_route)
+    original = _read_market(source, **options)
+    alternate = (source or {}).get('independent_daily_ohlc_source')
+    if not alternate or time(alternate['retrieved_at']) > time(evaluation_at):
+        return original
+    try:
+        return _compare_independent_history(source, alternate, original, options, observation_route)
+    except (ValueError, PermissionError, KeyError, ArithmeticError) as error:
+        # A failed alternate source cannot erase the already verified original.
+        original['independent_history_candidate_error'] = {'source_sha256':alternate.get('sha256'),
+            'reason':str(error), 'retained_source_sha256':source['sha256']}
+        return original
+
+
+def _compare_independent_history(source, alternate, original, options, observation_route):
+    if (source['provider'] != 'IBKR_LAST_DAILY_OBSERVATION' or alternate['provider'] != 'ALPHA_VANTAGE_LONDON_ETF_DAILY'
+            or alternate['base_history_sha256'] != source['sha256'] or alternate['contract_id'] != source['contract_id']
+            or alternate['calendar_source'] != source['calendar_source'] or observation_route != 'V82'):
+        raise PermissionError('MEMBER_MARKET_INDEPENDENT_SOURCE_BINDING')
+    second = _read_market(alternate, **options)
+    if (second['market_identity'] != original['market_identity'] or second['observed_date'] != original['observed_date']
+            or Decimal(str(second['observed_close'])) != Decimal(str(original['observed_close']))):
+        raise PermissionError('MEMBER_MARKET_INDEPENDENT_SOURCE_CURRENT_QUOTE_CONFLICT')
+    if second['history_quality']['invalid_source_rows'] or second['rows'] != second['provider_completion_evidence']['returned_rows']:
+        raise ValueError('MEMBER_MARKET_INDEPENDENT_SOURCE_INVALID_DAILY_BARS')
+    from pm_source_document import history
+    raw, _ = history(source)
+    ib = {time(t).astimezone(ZoneInfo(source['timezone'])).date().isoformat(): Decimal(str(price))
+          for t,price in zip(raw['time'],raw['close'])}
+    av = read_json(alternate)['Time Series (Daily)']
+    if set(av) - set(ib):
+        raise ValueError('MEMBER_MARKET_INDEPENDENT_SOURCE_SESSION_CONFLICT')
+    if second['rows'] <= original['rows']:
+        return original
+    second['independent_broker_observation'] = original
+    second['independent_history_comparison'] = {'same_completed_session_count':len(av),
+        'maximum_absolute_close_difference':str(max(abs(ib[d]-Decimal(av[d]['4. close'])) for d in av)),
+        'volume_or_ohlc_spliced':False,'technical_source_sha256':alternate['sha256'],
+        'position_valuation_source_sha256':source['sha256'],'original_contract_id':source['contract_id']}
+    return second
+
+
+def _read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, observation_route='V82'):
     if observation_route not in ('V82', 'V75'):
         raise ValueError('MEMBER_MARKET_UNKNOWN_OBSERVATION_ROUTE')
     if source is None:
         return None
-    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY','IBKR_LAST_DAILY_OBSERVATION','TWSE_STOCK_DAY') or source.get('symbol') != symbol
+    if (source.get('provider') not in ('YAHOO_CHART','NASDAQ_HISTORICAL','MASSIVE_RAW_DAILY','IBKR_LAST_DAILY_OBSERVATION','TWSE_STOCK_DAY','ALPHA_VANTAGE_LONDON_ETF_DAILY') or source.get('symbol') != symbol
             or not source.get('source_reference') or time(source['retrieved_at']) > time(evaluation_at)):
         raise PermissionError('MEMBER_MARKET_SOURCE_IDENTITY_OR_TIME')
     calendar = read_json(source['calendar_source'])
@@ -98,6 +183,8 @@ def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, ob
     elif source['provider']=='IBKR_LAST_DAILY_OBSERVATION':
         from ibkr_daily_source import load
         meta,quotes,stamps,completion=load(source,evaluation_at)
+    elif source['provider']=='ALPHA_VANTAGE_LONDON_ETF_DAILY':
+        meta,quotes,stamps,completion=_london_daily(source,calendar)
     elif source['provider']=='TWSE_STOCK_DAY':
         from twse_own_history_source import load_daily
         meta,quotes,stamps,completion=load_daily(source,evaluation_at,sessions,is_etf=is_etf)

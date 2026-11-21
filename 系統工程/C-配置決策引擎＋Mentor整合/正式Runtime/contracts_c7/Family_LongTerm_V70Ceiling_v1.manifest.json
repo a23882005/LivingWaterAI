@@ -101,11 +101,11 @@
     },
     {
       "path": "../../Family/W8/member_v82_analysis.py",
-      "sha256": "46a02e0863833156ca43f085a65c4e34919f009e18dfc989143b3ffcecbe496f"
+      "sha256": "4c3eec15622731bf3f07e571ab2ce38d826715f9801e5b0eb2bb2a0b73671790"
     },
     {
       "path": "../../Family/W8/member_market_source.py",
-      "sha256": "762e39dc94164180d55894c63ca4d92fb8b5059225302e7068f8553660666391"
+      "sha256": "853947987466484d4015e9c3d4719207b62a26ac7473bd924882308fe1a2a585"
     },
     {
       "path": "../../Family/W8/all_asset_coverage.py",
@@ -129,7 +129,7 @@
     },
     {
       "path": "../../Family/W8/member_position_valuation.py",
-      "sha256": "72f45ac13d5761b6cff621d39ce25e4b2fd79e5b6e64136f11826db17acbfbec"
+      "sha256": "e4ef8adfc6c166640eddef8473009333e1dae0f7e6b98a4c788c71e00c005ba8"
     },
     {
       "path": "../../Family/W8/tpex_actual_sessions.py",
@@ -165,7 +165,7 @@
     },
     {
       "path": "../../Family/W8/approved_v04_technical.py",
-      "sha256": "4a4a38aceaac5291a4200346f357b14e12bf0f70fb9a3da4932d76f8b789da0a"
+      "sha256": "3a1ad18685e8db71cd5200ba488f1ec3f5609d92512c2582178adfa5a0fd0fab"
     },
     {
       "path": "../../Family/W5/technical_source_bridge.py",
@@ -265,7 +265,7 @@
     },
     {
       "path": "../../Family/W8/v70_safety_decisions.py",
-      "sha256": "e4efeb747af63f616299300cdd0c15d7e5734dab0998dab2da95c078e2abb1bd"
+      "sha256": "604c307ec81fe28511cf15740f5f3950d8512663d7d5764dfae899f7d25c3f05"
     },
     {
       "path": "../../Family/W8/owner_financial_confirmation.py",
@@ -277,7 +277,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "f5cc18437ef3d6322e242d2108e8f9a75441ceac20542c723da42bddf8ed4efb"
+      "sha256": "4105053b45717dca9cc9504874667c358f67ff587e68d062e80d9d278fd19b9f"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

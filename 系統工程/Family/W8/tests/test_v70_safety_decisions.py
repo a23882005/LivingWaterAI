@@ -160,3 +160,39 @@ class SafetyDecisionTests(TestCase):
         self.assertEqual(out['result'],baseline['result'])
         self.assertEqual(qualified,before)
         self.assertTrue(out['result']['permission']['new_buy_order_permission'])
+
+
+def test_source_session_differences_keep_holes_and_independent_short_windows():
+    from datetime import date,timedelta
+    from decimal import Decimal
+    from v70_safety_decisions import _source_difference, _window_test
+    end=date(2026,11,20)
+    days=[end-timedelta(days=i) for i in reversed(range(36)) if (end-timedelta(days=i)).weekday()<5]
+    data={d:Decimal('3') for d in days}
+    data[end]=Decimal('3.50')
+    data[days[-12]]=None
+    five=_source_difference(data,end,5,set())
+    twenty=_source_difference(data,end,20,set())
+    assert five['difference_bp']=='50.00' and twenty is None
+    window={'differences':{'HY':{'5':five,'20':twenty}}}
+    from approved_v04_technical import either
+    assert either(_window_test(window,'HY',5,50,'ge'), _window_test(window,'HY',20,100,'ge')) is True
+    one=_source_difference(data,end,1,set())
+    assert one['latest_day']=='2026-11-20' and one['prior_day']=='2026-11-19'
+
+
+def test_publication_bound_and_current_snapshot_scope(tmp_path):
+    import json
+    from hashlib import sha256
+    from v70_safety_decisions import read_source_window, _window_series, _time
+    row={'unit':'percent','source_url':'https://fred.stlouisfed.org/data/T5YIE','published_as_displayed':'2026-11-20 4:03 PM CST',
+         'observations':[['2026-11-20','2.18']]}
+    assert not _window_series({'T5YIE':row},'T5YIE',row['source_url'],_time('2026-11-20T21:00:00Z'))[0]
+    raw=json.dumps({'captured_at':'2026-11-21T11:30:00Z','series':{}}).encode()
+    file=tmp_path/'window.json';file.write_bytes(raw)
+    source={'local_path':str(file),'sha256':sha256(raw).hexdigest(),'client_id':'member','source_db_sha256':'db',
+            'snapshot_sha256':'snapshot','evaluation_day':'2026-11-21'}
+    snapshot={'sha256':'snapshot','data_cutoff':'2026-11-21T08:22:00Z'}
+    request={'client_id':'member','client_snapshot':{'payload':{'source_sha256':'db'}},'evaluation_at':'2026-11-21T11:29:59Z'}
+    assert read_source_window(source,snapshot,request) is None
+    assert read_source_window(source,{**snapshot,'sha256':'previous'},request) is None

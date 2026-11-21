@@ -28,6 +28,19 @@ class ApprovedTechnicalTest(unittest.TestCase):
             p=Path(tmp)/'profile.json';receipt=json.loads((HERE/'owner_approved_v10.json').read_text())
             receipt['approval_status']='CANDIDATE';p.write_text(json.dumps(receipt))
             with self.assertRaisesRegex(ValueError,'APPROVAL'):A.load_profile(p)
+    def test_a8_dual_pivot_only_confounds_the_required_pair_range(self):
+        rows=history(100)
+        for i in range(100):
+            rows[i].update(High=str(110+i),Low='98')
+        highs=[20,43,54,70,90]
+        lows=[20,48,61,82]
+        def run(low_indices):
+            fake={'confirmed_swing_highs':lambda xs:[SimpleNamespace(index=i) for i in highs],
+                  'confirmed_swing_lows':lambda xs:[SimpleNamespace(index=i) for i in low_indices]}
+            with patch.object(A,'_originals',return_value=(fake,None)):
+                return slot(self.produce(rows),'down_accel','rebounds_weaker')
+        self.assertEqual(run(lows)['truth'],'FALSE')
+        self.assertEqual(run(lows+[70])['reason'],'AMBIGUOUS_INTRABAR_PIVOT_ORDER')
     def test_manifest_contains_all32_slots_and_no_fabricated_guidance(self):
         out=self.produce(is_etf=None)
         self.assertEqual({g:[r['name'] for r in rs] for g,rs in out['signals'].items()},NAMES)

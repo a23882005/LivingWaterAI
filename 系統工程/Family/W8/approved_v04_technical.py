@@ -121,16 +121,34 @@ def _produce(rows,*,profile,is_etf,close_only):
         result=both(cmp(at(c,i-1),level,'le' if side=='highs' else 'ge'),
                     cmp(at(c,i),level,'gt' if side=='highs' else 'lt'))
         return result,pivot
-    def normalized(w):
+    def normalized(w, *, completed_rebounds=False):
         ps=sorted([(p.index,'H',p.value) for p in pivots['highs'] if t-w<=p.index<=t-2]+
                   [(p.index,'L',p.value) for p in pivots['lows'] if t-w<=p.index<=t-2])
-        if len({x[0] for x in ps})!=len(ps):return None
-        out=[]
-        for p in ps:
-            if out and p[1]==out[-1][1]:
-                if (p[1]=='H' and p[2]>=out[-1][2]) or (p[1]=='L' and p[2]<=out[-1][2]):out[-1]=p
-            else:out.append(p)
-        return out
+        double_dates = [left[0] for left,right in zip(ps,ps[1:]) if left[0]==right[0]]
+        def alternate(points):
+            out=[]
+            for point in points:
+                if out and point[1]==out[-1][1]:
+                    if (point[1]=='H' and point[2]>=out[-1][2]) or (point[1]=='L' and point[2]<=out[-1][2]):
+                        out[-1]=point
+                else:out.append(point)
+            return out
+        if not double_dates:
+            return alternate(ps)
+        if not completed_rebounds:
+            return None
+        # After the last dual bar, its final pivot is exactly its own high or
+        # low. Test both orders. Earlier bars cannot change either starting pivot.
+        boundary=double_dates[-1]
+        after=[point for point in ps if point[0]>boundary]
+        tails=[]
+        for last in (point for point in ps if point[0]==boundary):
+            seq=alternate([last,*after])
+            complete=seq[:-1] if seq[-1][1]=='L' else seq
+            tails.append(complete[-6:])
+        if tails[0]!=tails[1] or len(tails[0])<6 or tails[0][0][0]<=boundary:
+            return None
+        return tails[0]
     raw_lows=pivots['lows']
     higher_low=None
     if len(raw_lows)>=2:
@@ -262,7 +280,7 @@ def _produce(rows,*,profile,is_etf,close_only):
     new=at(c)/at(c,t-5)-1 if at(c) is not None and at(c,t-5) not in (None,D(0)) else None
     accel=both(cmp(old,D(0),'lt'),cmp(new,D(0),'lt'),cmp(new,old-D('.02') if old is not None else None,'le'))
     put('down_accel','decline_accelerating',accel,['nonoverlapping 5+5-session Close returns','.02'],'A7')
-    ps=normalized(90);weaker=None
+    ps=normalized(90,completed_rebounds=True);weaker=None
     if ps is not None:
         if ps and ps[-1][1]=='L':ps=ps[:-1]
         tail=ps[-6:]

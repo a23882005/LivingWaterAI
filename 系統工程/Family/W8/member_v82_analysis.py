@@ -314,8 +314,10 @@ def normal_buy_pause(row):
     quote = row.get('same_run_gap_price')
     core = row.get('core_observation') or {}
     market = row.get('market') or {}
+    comparison = market.get('independent_history_comparison') or {}
+    technical_hash = comparison.get('technical_source_sha256') if quote and comparison.get('position_valuation_source_sha256') == quote['source_sha256'] else (quote or {}).get('source_sha256')
     if (not quote or not row.get('holding', {}).get('current_broker_position')
-            or core.get('source_sha256') != quote['source_sha256']
+            or core.get('source_sha256') != technical_hash
             or core.get('result', {}).get('technical', {}).get('runaway_down') != 'TRUE'):
         return None
     approved = (market.get('approved_technical') or {}).get('signals', {})
@@ -325,7 +327,8 @@ def normal_buy_pause(row):
         return None
     return {'status': 'NORMAL_NEW_BUYS_PAUSED', 'rule': 'V82 CMR7 / 44-A / 44-E',
             'run_id': quote['run_id'], 'evaluation_at': quote['evaluation_at'], 'symbol': row['symbol'],
-            'source_sha256': quote['source_sha256'], 'session': quote['session'], 'votes': votes,
+            'source_sha256': technical_hash, 'position_valuation_source_sha256':quote['source_sha256'],
+            'session': quote['session'], 'votes': votes,
             'amount': {'amount':'0','currency':quote['currency']}, 'quantity':'0',
             'sell_intent_created': False, 'target_and_gap_preserved': True}
 
@@ -366,6 +369,9 @@ def build_report(request, config, repo_root):
     safety_source = config.get('v70_safety_snapshot_source')
     safety_snapshot = (read_v70_safety_snapshot(safety_source, request['evaluation_at'])
                        if safety_source is not None else None)
+    from v70_safety_decisions import read_source_window,produce as produce_safety_decisions
+    safety_window = read_source_window(config.get('v70_safety_window_source'), safety_snapshot, request)
+    safety_decisions = produce_safety_decisions(safety_snapshot,request['evaluation_at'],safety_window) if safety_snapshot else None
     from owner_financial_confirmation import read as read_owner_financial_confirmation
     owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
     from owner_current_business import read as read_current_owner,holding_view,order_confirmation
@@ -450,8 +456,7 @@ def build_report(request, config, repo_root):
                 asset['analysis_instrument_binding'],['formal target-to-holding financial join'],
                 kind='SOURCE_IDENTITY_QUALIFICATION_REQUIRED'))
         if safety_snapshot is not None:
-            from v70_safety_decisions import produce as produce_safety_decisions
-            row['macro_observations']=produce_safety_decisions(safety_snapshot,request['evaluation_at'])
+            row['macro_observations']=deepcopy(safety_decisions)
         if market:
             from v82_core_source import read as read_core_source
             core_source=read_core_source(config.get('core_sources',{}).get(symbol),request,symbol)
@@ -477,8 +482,9 @@ def build_report(request, config, repo_root):
                 valuation_metrics=metrics, fundamental_fields=fundamentals,
                 broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', qualified_core_source=core_source, **kwargs)
             row['valuation_observations']=deepcopy(row['core_observation']['actual_inputs']['valuation_metrics'])
-            if market.get('independent_close_observation'):
-                close = {**market, **market['independent_close_observation']}
+            close_source = market.get('independent_broker_observation', market)
+            if close_source.get('independent_close_observation'):
+                close = {**close_source, **close_source['independent_close_observation']}
                 row['independent_close_core_observation'] = native_core_observation(repo_root, close,
                     valuation_metrics=metrics, fundamental_fields=fundamentals,
                     broad_etf=cls['asset_type'] != 'INDIVIDUAL_STOCK', qualified_core_source=core_source, **kwargs)

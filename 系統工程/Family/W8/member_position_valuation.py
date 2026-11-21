@@ -84,6 +84,7 @@ def produce(request,coverage,equity_rows,inputs,*,current_market_contract=None):
         raise PermissionError('POSITION_VALUATION_MEMBER_SNAPSHOT_COVERAGE_BINDING')
     fx=read_fx(inputs.get('fx_source'),request['evaluation_at']);markets={r['symbol']:r.get('market') for r in equity_rows}
     markets.update({r['symbol']:r.get('market') for r in coverage['bonds']})
+    markets={k:(v.get('independent_broker_observation',v) if v else v) for k,v in markets.items()}
     discrepancies = {r['symbol']: r['holding']['quantity_discrepancy'] for r in equity_rows
                      if (r.get('holding') or {}).get('quantity_discrepancy')}
     account_values = {}

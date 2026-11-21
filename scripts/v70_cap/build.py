@@ -7,8 +7,38 @@ from pathlib import Path
 from rules import FIELDS, RULES, TESTS, evaluate
 
 PANEL = '''<section id="engineering-cap" hidden aria-live="polite" style="margin-top:1rem;padding:1rem;border-radius:.75rem;color:white;line-height:1.65">
-<strong style="font-size:1.35rem"></strong><div style="white-space:pre-line"></div><p></p>
+<header class="cap-yellow-sign" aria-label="黃牌警示">
+<span class="cap-warning-symbol" aria-hidden="true">!</span>
+<b>黃牌警示</b><span>股市波動升高</span><span class="cap-yellow-limit"></span>
+</header><section class="cap-explanation"><strong style="font-size:1.35rem"></strong>
+<h3 class="cap-yellow-heading">觸發原因</h3><div class="cap-reasons" style="white-space:pre-line"></div>
+<h3 class="cap-yellow-heading">怎麼看、怎麼做</h3><p class="cap-guidance"></p></section>
 <small>歷史比較｜2002年11月至2026年11月，原合併警報共42回，其中41回有亮燈後30天資料。此統計包含單獨 VIX 警報。30天是比較期間，暫停期間依本期燈號決定。</small></section>'''
+
+PANEL_STYLE = """<style>
+#engineering-cap .cap-yellow-sign,#engineering-cap .cap-yellow-heading {display:none}
+#engineering-cap[data-level="yellow"] {padding:0!important;background:transparent!important}
+#engineering-cap[data-level="yellow"] .cap-yellow-sign {
+  display:grid;justify-items:center;gap:.4rem;text-align:center;padding:1.3rem .65rem;
+  background:#ffeb00;color:#151515;border-radius:.8rem;border:.22rem solid #151515;
+  box-shadow:0 0 0 2px #ffeb00;line-height:1.25;font-size:1.15rem;font-weight:700;
+}
+#engineering-cap .cap-warning-symbol {
+  display:grid;place-items:center;box-sizing:border-box;width:3.9rem;height:3.5rem;padding-top:.55rem;
+  background:#151515;color:#ffeb00;clip-path:polygon(50% 0,100% 100%,0 100%);
+  font:900 2.6rem/1 system-ui,sans-serif;
+}
+#engineering-cap .cap-yellow-sign b {font-size:clamp(2rem,9vw,3rem);font-weight:900}
+#engineering-cap .cap-yellow-limit {font-size:1rem}
+#engineering-cap[data-level="yellow"] .cap-explanation {
+  margin:.85rem 0;padding:1rem;background:#172235;color:#f1f5f9;border:1px solid #53627a;
+  border-radius:.75rem;text-align:left;overflow-wrap:anywhere;line-height:1.7;
+}
+#engineering-cap[data-level="yellow"] .cap-explanation strong {display:none}
+#engineering-cap[data-level="yellow"] .cap-yellow-heading {display:block;color:#ffeb00;font-size:1rem;font-weight:700;margin:0 0 .25rem}
+#engineering-cap[data-level="yellow"] .cap-reasons + h3 {margin-top:.85rem}
+</style>"""
+
 
 def once(html, old, new):
     if html.count(old) != 1:
@@ -44,7 +74,7 @@ def build(source, destination):
     catalog = '<details><summary>查看全部 34 項封頂條件</summary><ul>' + ''.join(catalog) + '</ul></details>'
     js=Path(__file__).with_name('panel.js').read_text().replace('__V70_CAP_RULES__',
         json.dumps(dict(fields=FIELDS,tests=TESTS,rules=RULES),ensure_ascii=False))
-    html=once(html,'</head>','<script>'+js+'</script></head>')
+    html=once(html,'</head>',PANEL_STYLE+'<script>'+js+'</script></head>')
     start=html.index('<div class="hidden absolute inset-0',html.index('id="macro-zone-text"'))
     end=html.index('</div>\n</div>\n</div>',start)+len('</div>\n</div>')
     assert 'circuit-breaker-overlay' in html[start:end]

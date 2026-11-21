@@ -1,6 +1,6 @@
 (() => {
   const {fields, tests, rules} = __V70_CAP_RULES__;
-  const colors = {red:'#7f1d1d',orange:'#7c2d12',yellow:'#674c09',unknown:'#334155'};
+  const colors = {red:'#7f1d1d',orange:'#7c2d12',unknown:'#334155'};
   const titles = {red:'系統熔斷',orange:'橘牌｜危機或衰退風險加重',yellow:'黃牌｜股市波動升高',unknown:'資料待確認'};
   const notes = {
     yellow:'市場預期股市短期波動升高。CAP 限制本期總經分數；例如原始分數 53、上限 60，最後仍採 53 分。整戶配置已計入本期風險，已有部位依長期計畫持有。股票買點依 V82，債券買點依 V75 評估。',
@@ -46,9 +46,11 @@
       lines.push(id+'｜'+r.layer+'層 CAP '+r.cap+'｜'+details.join('，'));
     }
     const summary=level==='normal'?'':titles[level]+(level==='unknown'?'':'｜本期封頂 '+cap+' 分');
+    panel.dataset.level=level;
+    panel.querySelector('.cap-yellow-limit').textContent=level==='yellow'?'本期總經分數上限 '+cap+' 分':'';
     panel.style.backgroundColor=colors[level]||'';
     panel.querySelector('strong').textContent=summary;
-    panel.querySelector('div').textContent=lines.join('\n');
+    panel.querySelector('.cap-reasons').textContent=lines.join('\n');
     panel.querySelector('p').textContent=(notes[level]||'')+(missing.length?' 待確認：'+missing.map(k=>fields[k]).join('、'):'');
     panel.querySelector('small').hidden=level!=='red';
     for(const id of ['cap-allocation-note','cap-family-note']) {

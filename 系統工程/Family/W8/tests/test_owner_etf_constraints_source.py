@@ -223,3 +223,37 @@ def test_registered_revision_time_cannot_be_backdated_to_the_date_only_header(tm
     p=Path(d['registration_receipt']['local_path']);r=json.loads(p.read_bytes());r['modified_at']='2026-11-20T16:00:00Z'
     p.write_text(json.dumps(r));d['registration_receipt']['sha256']=sha256(p.read_bytes()).hexdigest();save()
     with pytest.raises(PermissionError,match='REGISTRATION_TIME'):apply(s,c,base)
+
+
+def test_project_reads_registered_dated_mandate_and_checks_its_bytes(tmp_path):
+    from on_demand_project import register_project_mandate
+
+    snapshot, config, target, first, _ = mandate_case(tmp_path)
+    del config['owner_etf_constraints_source']['mandate_source']
+    second = deepcopy(first)
+    second['available_at'] = '2026-11-21T02:00:00Z'
+    item = second['items']['AAA']
+    del item['missing_approval_clause']
+    item['allowed_mandate_components'] = ['APPROVED_EQUITIES']
+    item['product_basis'] = {'source_reference': 'SYNTHETIC_SECTION_6'}
+    file = tmp_path / 'registered.json'
+    file.write_text(json.dumps({'schema_version': 'Family.W8.RegisteredMandateRevisions.v1',
+        'approved_document_utf8': Path(first['approved_document']['local_path']).read_text(),
+        'revisions': [second, first]}))
+    registration = {'member': 'SyntheticMember', 'file_name': file.name, 'drive_file_id': 'TEST',
+                    'sha256': sha256(file.read_bytes()).hexdigest()}
+    sources = tmp_path / 'Sources.txt'
+    sources.write_text('MENU04_REGISTERED_MANDATE=' + json.dumps(registration))
+    desc = {'local_path': str(sources), 'sha256': sha256(sources.read_bytes()).hexdigest()}
+    register_project_mandate(config, desc, 'SyntheticMember')
+    for at, expected in [('2026-11-21T01:59:59Z', 'UNKNOWN'), (second['available_at'], 'TRUE')]:
+        result = apply(snapshot, config, target, at)
+        assert mandate_leaf(result, snapshot, 'AAA', ['APPROVED_EQUITIES'], at)['truth'] == expected
+    with pytest.raises(PermissionError, match='REGISTRATION_MISMATCH'):
+        register_project_mandate(config, desc, 'OtherMember')
+    file.write_bytes(file.read_bytes() + b' ')
+    with pytest.raises(PermissionError, match='MANDATE_BYTES_CHANGED'):
+        register_project_mandate(config, desc, 'SyntheticMember')
+    sources.write_text('different')
+    with pytest.raises(PermissionError, match='SOURCES_BYTES_CHANGED'):
+        register_project_mandate(config, desc, 'SyntheticMember')

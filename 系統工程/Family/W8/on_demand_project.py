@@ -10,6 +10,7 @@ from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
 import importlib.util
+import json
 import re
 import sqlite3
 
@@ -99,12 +100,39 @@ class OnDemandReadCoordinator:
                 "source":"OFFICIAL_GOOGLE_DRIVE_DOWNLOADED_ON_DEMAND"}
 
 
+def register_project_mandate(config, project_sources, family_alias):
+    """Resolve the authenticated Project's persistent settings alongside its staged files."""
+    source_path = Path(project_sources['local_path'])
+    source_bytes = source_path.read_bytes()
+    if sha256(source_bytes).hexdigest() != project_sources['sha256']:
+        raise PermissionError('PROJECT_SOURCES_BYTES_CHANGED')
+    prefix = 'MENU04_REGISTERED_MANDATE='
+    rows = [line[len(prefix):] for line in source_bytes.decode('utf-8-sig').splitlines()
+            if line.startswith(prefix)]
+    if len(rows) != 1:
+        raise ValueError('PROJECT_MANDATE_REGISTRATION_REQUIRED')
+    registration = json.loads(rows[0])
+    filename = registration['file_name']
+    if (registration['member'] != family_alias or not re.fullmatch(r'[A-Za-z0-9_-]+\.json', filename)
+            or not re.fullmatch(r'[A-Za-z0-9_-]+', registration['drive_file_id'])):
+        raise PermissionError('PROJECT_MANDATE_REGISTRATION_MISMATCH')
+    source = source_path.with_name(filename)
+    if sha256(source.read_bytes()).hexdigest() != registration['sha256']:
+        raise PermissionError('PROJECT_MANDATE_BYTES_CHANGED')
+    owner = config.get('owner_etf_constraints_source')
+    if owner is None:
+        raise ValueError('PROJECT_OWNER_ETF_CONSTRAINTS_SOURCE_REQUIRED')
+    descriptor = {'local_path': str(source.resolve()), 'sha256': registration['sha256'],
+                  'drive_file_id': registration['drive_file_id']}
+    config['owner_etf_constraints_source'] = {**owner, 'mandate_source': descriptor}
+
+
 def build_project_menu(*, family_login, project_name, login_account,
                        client_id, family_alias, downloaded_db_path,
                        official_drive_file_id, verified_drive_sha256,
                        trusted_analysis_source_producer=None,
                        native_source_config=None,
-                       member_v82_source_config=None,
+                       member_v82_source_config=None, registered_project_sources=None,
                        official_holdings_decision=None,
                        official_holdings_previous_snapshot=None,
                        trusted_w6_current_input_producer=None,
@@ -122,6 +150,8 @@ def build_project_menu(*, family_login, project_name, login_account,
         verified_drive_sha256=verified_drive_sha256)
     official=_load(ROOT/"official_family_entry.py","family_w8_on_demand_entry")
     source_module=_load(ROOT/"on_demand_current_sources.py","family_w8_current_sources")
+    if registered_project_sources is not None and member_v82_source_config is None:
+        raise ValueError('PROJECT_MEMBER_V82_CONFIG_REQUIRED')
     if member_v82_source_config is not None:
         if trusted_analysis_source_producer is not None or native_source_config is not None:
             raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')
@@ -133,6 +163,8 @@ def build_project_menu(*, family_login, project_name, login_account,
         config['member_db_path']=str(Path(downloaded_db_path).resolve())
         config['member_drive_binding']={'account':login_account,'client_id':client_id,
             'file_id':official_drive_file_id,'family_alias':family_alias}
+        if registered_project_sources is not None:
+            register_project_mandate(config, registered_project_sources, family_alias)
         member=_load(ROOT/'member_v82_analysis.py','family_w8_member_v82_source')
         trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
     if native_source_config is not None:

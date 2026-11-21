@@ -672,7 +672,7 @@
   },
   {
     "path": "系統工程/Family/W8/owner_etf_constraints_source.py",
-    "sha256": "ad0049164ae18c6b11941a42cccdd86cceb76be835c2aad0eb53b17e33a3be3a",
+    "sha256": "91704121814538dc11da1f2b35813758d9e3b4af929f10d24ca8c51cfbbabb45",
     "reason": "Bound owner ETF lookthrough decision reader; no allocation or risk-rule replacement"
   }
 ]

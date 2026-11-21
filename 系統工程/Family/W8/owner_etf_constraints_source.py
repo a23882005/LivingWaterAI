@@ -87,6 +87,25 @@ def read(snapshot,config,evaluation_at):
         'member_db_path':str(db),'source_db_sha256':before,'trade_authorization':'NONE'}
 
 
+def read_mandate_source(descriptor, evaluation_at):
+    source = json.loads(checked(descriptor))
+    if source.get('schema_version') != 'Family.W8.RegisteredMandateRevisions.v1':
+        return source, None
+    # A single pinned private source carries the unchanged approved document and
+    # its dated interpretations. Replays see only revisions known at the cutoff.
+    raw = source['approved_document_utf8'].encode('utf-8')
+    available = {}
+    for revision in source['revisions']:
+        date = time(revision['available_at'])
+        if date in available or sha256(raw).hexdigest() != revision['approved_document']['sha256']:
+            raise ValueError('INVALID_REGISTERED_MANDATE_REVISION')
+        available[date] = revision
+    eligible = [date for date in available if date <= time(evaluation_at)]
+    if not eligible:
+        raise ValueError('NO_AVAILABLE_MANDATE_REVISION')
+    return available[max(eligible)], raw
+
+
 def mandate_scopes(target, decision, evaluation_at):
     """Consume a trusted interpretation of exact approved rows, independent of issuer facts."""
     descriptor = decision['source_descriptor'].get('mandate_source')
@@ -96,7 +115,7 @@ def mandate_scopes(target, decision, evaluation_at):
     draft = record['draft']
     confirmation = record.get('confirmation_evidence') or {}
     try:
-        data = json.loads(checked(descriptor))
+        data, original_bytes = read_mandate_source(descriptor, evaluation_at)
         available = time(data['available_at'])
         approved_at = time(confirmation['confirmed_at'])
         document = data['approved_document']
@@ -124,7 +143,9 @@ def mandate_scopes(target, decision, evaluation_at):
             and isinstance(data['items'], dict)
         ):
             return {}
-        document_lines = checked(document).decode('utf-8').splitlines()
+        if original_bytes is None:
+            original_bytes = checked(document)
+        document_lines = original_bytes.decode('utf-8').splitlines()
     except (OSError, ValueError, TypeError, KeyError, AttributeError):
         return {}
 
@@ -160,6 +181,8 @@ def mandate_scopes(target, decision, evaluation_at):
             'available_at': available.isoformat(), 'work_order_reference': data['work_order_reference'],
             'scope_source_sha256': descriptor['sha256'],
         }
+        if 'product_basis' in item:
+            evidence['product_basis'] = deepcopy(item['product_basis'])
         if missing_clause is not None:
             evidence['missing_approval_clause'] = missing_clause
         scopes[symbol] = {'mandate_scope_source': evidence}

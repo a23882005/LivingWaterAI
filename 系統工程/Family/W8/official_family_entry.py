@@ -37,6 +37,8 @@ def _read_existing_w5(db_path, expected_client_id):
 class OfficialFamilyEntry:
     """Operator-bound, real Drive personal resource; always account-scoped."""
 
+    member_report_run_observer = None
+
     def __init__(self, *, auth, login_account, client_id, coordinator,
                  principal_provider, analysis_provider=None, current_source_provider=None,
                  member_report_run_observer=None):

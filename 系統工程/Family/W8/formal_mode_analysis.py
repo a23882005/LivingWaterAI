@@ -288,7 +288,18 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
         buy_confirmation=row.get('owner_buy_confirmation'));missing=[]
     if modes['canonical_target_rate'] is None:missing.append('canonical_target_rate')
     if target['value_state']!='KNOWN':missing.append('approved_project_target_amount')
-    if target_fx_required(request,market,target):missing.append('verified_same_run_target_FX')
+    gap_price_value = market.get('observed_close')
+    if target_fx_required(request,market,target):
+        proof = row.get('same_run_gap_price')
+        converted = None
+        if proof:
+            from fx_conversion import convert
+            if proof['currency'] == 'USD' and target['currency'] == 'TWD':
+                converted = convert(gap_price_value, 'USD', 'TWD', proof['fx_observation'])
+        if converted is None:
+            missing.append('verified_same_run_target_FX')
+        else:
+            gap_price_value = converted
     if not row.get('position_valuation_allowed',False):missing.append('canonical_valuation_price_identity_and_validity')
     if row['holding'].get('quantity_state')!='KNOWN' or row['holding'].get('quantity') is None:
         missing.append('confirmed_position_quantity')
@@ -308,10 +319,14 @@ def build_formal_conclusion(root,row,request,*,target_projection=None,approved_s
     if not missing:
         result=dep.calculate_position_gap(project_target_position_amount=target['amount'],
             target_rate=modes['canonical_target_rate'],confirmed_position_qty=row['holding']['quantity'],
-            canonical_valuation_price=market['observed_close'],active_orders=native_orders(root,orders,row['symbol']))
+            canonical_valuation_price=gap_price_value,active_orders=native_orders(root,orders,row['symbol']))
         gap={'status':'COMPUTED','value':{k:str(v) if isinstance(v,Decimal) else v for k,v in asdict(result).items()},
             'function':'V82.calculate_position_gap','missing_fields':[]}
         modes['call_trace'].append('V82.calculate_position_gap')
+    if row.get('same_run_gap_price'):
+        gap['source_bound_target'] = deepcopy(target)
+        gap['common_valuation_price'] = {'amount': str(gap_price_value), 'currency': target.get('currency')}
+        gap['same_run_gap_price'] = deepcopy(row['same_run_gap_price'])
     buy_scope=row.get('new_buy_scope')
     if buy_scope is not None and buy_scope.get('additional_buy_authorized') is False:
         gap.update(status='NOT_APPLICABLE_NO_ADDITIONAL_BUY_AUTHORIZATION',value=None,

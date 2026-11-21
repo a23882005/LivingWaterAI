@@ -337,7 +337,7 @@ def build_report(request, config, repo_root):
     owner_facts = read_owner_financial_confirmation(config.get('owner_financial_confirmation_source'),request)
     from owner_current_business import read as read_current_owner,holding_view,order_confirmation
     current_owner=read_current_owner(config.get('owner_current_business_source'),request)
-    from current_market_contract import read as read_current_market,new_buy_scope,portfolio_reference
+    from current_market_contract import read as read_current_market,new_buy_scope,portfolio_reference,gap_price
     market_contract=read_current_market(config.get('current_market_contract_source'),request)
     coverage = universe(snapshot, target, request['evaluation_at'], repo_root)
     ledger_resource={'status':'MEMBER_LEDGER_NOT_REGISTERED','cycle_count':None,
@@ -398,6 +398,10 @@ def build_report(request, config, repo_root):
             'valuation_observations': [], 'issuer_facts': read_issuer_facts(
                 config.get('issuer_facts_sources', {}).get(symbol), symbol, request['evaluation_at']),
             'call_trace': [], 'missing_inputs': [], 'execution_status': 'SOURCE_BLOCKED'}
+        price = gap_price(market_contract, market, instrument, symbol, request)
+        if price:
+            row['position_valuation_allowed'] = True
+            row['same_run_gap_price'] = price
         registered_structure = config.get('registered_issuer_structures', {}).get(symbol)
         if (registered_structure and time(registered_structure['retrieved_at']) <= time(request['evaluation_at'])
                 and registered_structure['as_of'] <= time(request['evaluation_at']).date().isoformat()):
@@ -533,6 +537,9 @@ def build_report(request, config, repo_root):
         from member_position_valuation import produce
         report['source_position_valuations']=produce(request,report['all_asset_coverage'],rows,
             config['position_valuation_inputs'],current_market_contract=market_contract)
+    if config.get('current_cash_corroboration'):
+        from current_market_contract import broker_cash_check
+        report['broker_cash_corroboration'] = broker_cash_check(config['current_cash_corroboration'], owner_facts, request)
     if safety_snapshot is not None:
         report['v70_safety_snapshot'] = safety_snapshot
     if owner_facts is not None:

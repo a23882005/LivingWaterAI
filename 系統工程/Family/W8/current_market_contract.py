@@ -7,6 +7,7 @@ from copy import deepcopy
 from decimal import Decimal,localcontext
 from hashlib import sha256
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import json
 from family_input import digest
 from member_market_source import time
@@ -55,10 +56,48 @@ def read(source,request):
         'expected_current_quotes':{k:deepcopy(v['selected_observation']) for k,v in observations.items()},
         'official_bank_original_result':deepcopy(bank['original_reader_result']),
         'decision':decision,'formal_NAV_or_buy_permission_created':False,'trade_authorization':'NONE'}
+    current_bank = source.get('updated_bank_source')
+    if current_bank:
+        from member_position_valuation import read_fx
+        updated = read_fx(current_bank, request['evaluation_at'])
+        if time(updated['as_of_time']) < time(out['official_bank_original_result']['as_of_time']):
+            raise PermissionError('CURRENT_MARKET_BANK_PRECEDES_PINNED_QUOTE')
+        out['official_bank_original_result'] = updated
     from current_nav_source import read as read_nav
     nav=read_nav(source.get('nav_qualification_source'),request,out)
     if nav is not None:out['nav_source_qualification']=nav
     out['digest']=digest(out);return out
+
+
+def gap_price(contract, market, instrument, symbol, request):
+    """Qualify one latest completed quote for same-run exposure math only."""
+    if not contract or not market:
+        return None
+    registration = (contract['source_descriptor'].get('gap_price_registrations') or {}).get(symbol)
+    if not registration:
+        return None
+    identity = market['market_identity']
+    fx = contract['official_bank_original_result']
+    day = time(request['evaluation_at']).astimezone(ZoneInfo('Asia/Taipei')).date().isoformat()
+    if day != registration['evaluation_day'] or fx['as_of'] != day:
+        return None
+    if (instrument.get('client_id') != request['client_id'] or instrument.get('ticker') != symbol
+            or instrument.get('identity_state') != 'KNOWN' or instrument.get('instrument_type') != 'ETF'
+            or instrument.get('instrument_key') != registration['instrument_key']
+            or identity['provider_symbol'] != symbol or identity['provider_type'] != 'ETF'
+            or instrument.get('quote_currency') != identity['currency']
+            or identity['currency'] != registration['currency'] or identity['exchange'] != registration['exchange']
+            or market['source_sha256'] != registration['source_sha256']):
+        raise PermissionError('CURRENT_GAP_PRICE_INSTRUMENT_OR_ORIGINAL_MISMATCH')
+    if (market.get('observed_date') != market.get('latest_expected_completed_session')
+            or not market.get('completed_session_close_at') or not market.get('provider_verified_at')
+            or not time(market['completed_session_close_at']) <= time(market['provider_verified_at']) <= time(request['evaluation_at'])
+            or Decimal(str(market['observed_close'])) <= 0):
+        return None
+    return {'client_id': request['client_id'], 'run_id': request['run_id'], 'evaluation_at': request['evaluation_at'],
+            'symbol': symbol, 'source_sha256': market['source_sha256'], 'observed_close': market['observed_close'],
+            'session': market['observed_date'], 'currency': identity['currency'], 'exchange': identity['exchange'],
+            'scope': 'CURRENT_POSITION_EXPOSURE_ONLY', 'fx_observation': deepcopy(fx)}
 
 
 def new_buy_scope(contract,symbol):
@@ -155,3 +194,34 @@ def portfolio_reference(request,coverage,values,accepted,current_owner,contract)
     from current_nav_source import qualify
     qualify(out,accepted,current_owner)
     out['digest']=digest(out);return out
+
+
+def broker_cash_check(source, accepted, request):
+    """Compare settled cash to the existing owner's accepted same-currency amount."""
+    if not source:
+        return None
+    if (accepted is None or source['client_id'] != request['client_id']
+            or source['source_db_sha256'] != request['client_snapshot']['payload']['source_sha256']
+            or accepted['member'] != source['member'] or request['trade_authorization'] != 'NONE'):
+        raise PermissionError('CURRENT_CASH_CORROBORATION_OWNER')
+    from member_market_source import read_json
+    authorization = read_json(source['owner_authorization'])
+    if (authorization['client_id'] != request['client_id'] or authorization['owner']['broker'] != 'IBKR'
+            or authorization['scope'] != 'READ_ONLY_RECONCILIATION_AND_ADVICE'
+            or authorization['trade_authorization'] != 'NONE'):
+        raise PermissionError('CURRENT_CASH_CORROBORATION_BROKER')
+    originals = {}
+    for key in ('balances', 'orders'):
+        evidence = read_json(source[key])
+        if (evidence['isError'] or evidence['args'] or evidence['method'] != 'get_account_' + key
+                or not time(authorization['recorded_at']) <= time(evidence['started_at']) <= time(evidence['retrieved_at']) <= time(request['evaluation_at'])):
+            raise PermissionError('CURRENT_CASH_CORROBORATION_RESPONSE')
+        originals[key] = evidence['original']
+    currency = authorization['owner']['currency']
+    records = [v for v in originals['balances']['balances'] if v['currency'] == currency]
+    matches = (len(records) == 1 and Decimal(str(records[0]['cash_balance']))
+               == Decimal(str(records[0]['settled_cash'])) == Decimal(accepted['accepted_net_available_by_currency'][currency]))
+    return {'source': deepcopy(source), 'currency': currency, 'matches_accepted_cash': matches,
+            'working_orders_empty': originals['orders'].get('orders') == [],
+            'previously_accepted_net_cash': accepted['accepted_net_available_by_currency'][currency],
+            'margin_or_buying_power_added': False}

@@ -96,3 +96,24 @@ def test_missing_registered_manifest_is_a_specific_source_gap(tmp_path):
     (tmp_path/'PACKAGE_MANIFEST.json').write_bytes(b'changed')
     with pytest.raises(PermissionError,match='HANDOFF_MANIFEST_HASH'):
         H.read(source,'2026-11-21T00:00:00Z')
+
+
+def test_past_handoff_window_does_not_replace_current_issuer_assessment(monkeypatch):
+    rows = [{'ex_date':f'2026-{m:02d}-01','total':'1','roc':'0',
+             'characterization':'PROVISIONAL_ISSUER_DISPLAY','final_tax_characterization':False}
+            for m in range(1,11)]
+    rows += [{**rows[0],'ex_date':f'2025-{m:02d}-01'} for m in (11,12)]
+    delivered = {k:None for k in ('schema_version','manifest_sha256','contracts','raw_files_verified',
+                                  'distribution_retrieval_time_exact','distribution_retrieval_window_utc')}
+    delivered.update(source_reference='ORIGINAL', source_available_at='2026-10-29T07:00:00Z',
+        treasury={'metadata':{'last':'2026-10-28'}},distributions={'SPSB':rows})
+    monkeypatch.setattr(H,'read',lambda *_:delivered)
+    issuer = {'facts':{'distribution_source_observation':{'provider':'CURRENT'}}}
+    pool = {'formal_parameters':{'version':'test'},'source_proofs':{},
+            'available_at':'2026-11-20T17:00:00Z','issuer_observations':{'SPSB':issuer},
+            'qualified_bond_markets':{'SPSB':{'observed_date':'2026-11-20'}}}
+    out = H.extend(pool,{'manifest_sha256':'a'*64},{},'2026-11-21T17:00:00Z')
+    assert issuer['facts']['distribution_source_observation']=={'provider':'CURRENT'}
+    history = out['source_handoff']['historical_distributions']['SPSB']
+    assert history['period_end_inclusive']=='2026-10-28' and history['periods']==12
+    assert out['source_handoff']['current_distribution_gaps']['SPSB']['required_through']=='2026-11-20'

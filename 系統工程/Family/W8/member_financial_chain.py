@@ -144,7 +144,6 @@ def complete_report(report,request,config,root):
             if scoped is not None:
                 if any(scoped.get(k)!=request.get(k) for k in ('client_id','run_id','evaluation_at')) or scoped.get('asset_id')!=row['symbol']:
                     raise PermissionError('OWNER_QQQ_FINANCIAL_RESULT_BINDING_MISMATCH')
-                row['owner_scoped_financial_result']=deepcopy(scoped)
                 if scoped['status']=='SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY':
                     from owner_qqq_scope import read as read_owner_rule
                     child={**deepcopy(request),'owner':deepcopy(scoped['owner'])}
@@ -153,6 +152,7 @@ def complete_report(report,request,config,root):
                         or scoped.get('result_digest')!=digest({k:v for k,v in scoped.items() if k!='result_digest'})
                         or scoped['final_amount']!={'amount':'0','currency':'USD'} or scoped['final_quantity']!='0'):
                         raise PermissionError('OWNER_QQQ_FINANCIAL_SOURCE_REPLAY_MISMATCH')
+                    row['owner_scoped_financial_result']=deepcopy(scoped)
                     row['proposed_amount']=deepcopy(scoped['final_amount'])
                     row['proposed_quantity']=scoped['final_quantity']
                     out['summary']['owner_scoped_financial_completed']=out['summary'].get('owner_scoped_financial_completed',0)+1

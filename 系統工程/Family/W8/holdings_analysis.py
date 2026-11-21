@@ -130,6 +130,17 @@ def vt_valuation_observations(context):
 
 def read_issuer_facts(source,symbol,evaluation_at):
     if source is None:return None
+    workbook = None
+    if source.get('nav_workbook') is not None:
+        from issuer_nav_workbook import read as read_workbook
+        workbook = read_workbook(source['nav_workbook'],symbol,evaluation_at)
+        if 'local_path' not in source:
+            if workbook is None:
+                return None
+            return {'schema_version':'Family.W8.IssuerFacts.v1','symbol':symbol,'metrics':{},
+                    'as_of':workbook['latest_observed_date'],'retrieved_at':workbook['available_at'],
+                    'source_url':workbook['source_url'],'source_sha256':workbook['source_sha256'],
+                    'issuer_nav_table':workbook}
     raw=Path(source['local_path']).read_bytes()
     if hashlib.sha256(raw).hexdigest()!=source['sha256']:raise PermissionError('ISSUER_FACTS_SOURCE_CHANGED')
     facts=json.loads(raw)
@@ -138,7 +149,8 @@ def read_issuer_facts(source,symbol,evaluation_at):
     when=datetime.fromisoformat(evaluation_at.replace('Z','+00:00'))
     retrieved=datetime.fromisoformat(facts['retrieved_at'].replace('Z','+00:00'))
     if retrieved>when or facts['as_of']>when.date().isoformat():raise ValueError('ISSUER_FACTS_IN_FUTURE')
-    return {**facts,'source_sha256':source['sha256']}
+    return {**facts,'source_sha256':source['sha256'],
+            **({'issuer_nav_table':workbook} if workbook is not None else {})}
 
 
 def signal_gaps(observed):

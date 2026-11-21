@@ -220,11 +220,90 @@ def distribution_window(rows,observed_date):
         'missing_components_not_filled_zero':True}
 
 
+def _apply_distribution(pool, symbol, window, data, evaluation_at):
+    from v75_etf_quality_inputs import assess
+
+    issuer = pool['issuer_observations'][symbol]
+    issuer['facts']['distribution_source_observation'] = window
+    assessment = assess(issuer, pool.get('qualified_bond_markets', {}).get(symbol),
+        data.get('YAHOO_'+symbol), pool['formal_parameters'], evaluation_at,
+        authorized_universe=pool['etf_quality_assessments'][symbol]['normalized_facts']['authorized_universe'])
+    pool['etf_quality_assessments'][symbol] = assessment
+    pool['asset_metrics'][symbol]['PRED-010'] = assessment['metrics']
+    pool['calculations'][symbol+'.PRED-010'] = assessment
+    pool['asset_unprovided_inputs'][symbol]['PRED-010'] = assessment['unprovided_inputs']
+
+
+def extend_current_distributions(pool, source, data, evaluation_at):
+    if source is None:
+        return pool
+    if not pool.get('source_handoff') or not pool.get('formal_parameters'):
+        raise PermissionError('V75_CURRENT_DISTRIBUTION_ORIGINAL_HANDOFF_REQUIRED')
+    path = Path(source['local_path'])
+    raw = path.read_bytes()
+    if sha256(raw).hexdigest() != source['sha256']:
+        raise PermissionError('V75_CURRENT_DISTRIBUTION_RECEIPT_HASH')
+    receipt = json.loads(raw)
+    observed = date.fromisoformat(receipt['as_of_session'])
+    if receipt['window_left_excluded'] != _year_ago(observed).isoformat():
+        raise ValueError('V75_CURRENT_DISTRIBUTION_WINDOW')
+    original_files = {
+        'SGOV': ('sgov_data.xls', 'https://www.blackrock.com/varnish-api/blk-one01-product-data/'
+            'product-data/api/v1/get-fund-document?appSubType=ISHARES&appType=PRODUCT_PAGE&'
+            'component=fundDownload&locale=en_US&portfolioId=314116&targetSite=us-ishares&userType=individual'),
+        'SPSB': ('spsb_distributions.xlsx', 'https://www.ssga.com/library-content/products/fund-data/'
+            'etfs/us/spdr-etf-historical-distributions.xlsx'),
+    }
+    known = {}
+    for symbol,(filename,url) in original_files.items():
+        meta = receipt['source'][symbol]
+        stamp = time(meta['browser_download_recorded_at'])
+        if (meta['url'] != url or stamp.date() < observed
+                or stamp < time(pool['source_handoff']['source_available_at'])):
+            raise PermissionError('V75_CURRENT_DISTRIBUTION_IDENTITY_OR_TIME')
+        known[symbol] = meta['browser_download_recorded_at']
+    if max(map(time,known.values())) > time(evaluation_at):
+        return pool
+    names = ['sgov_12_distributions.csv','sgov_data.xls','spsb_12_distributions.csv',
+             'spsb_2025_tax_rows.csv','spsb_distributions.xlsx','spsb_tax.xlsx']
+    files = {}
+    for name in names:
+        rel = 'etf_quality/'+name
+        raw = (path.parent/rel).read_bytes()
+        if sha256(raw).hexdigest() != receipt['source_hashes'][rel]:
+            raise PermissionError('V75_CURRENT_DISTRIBUTION_ORIGINAL_HASH')
+        files[rel] = raw
+    for symbol,(name,_) in original_files.items():
+        rel = 'etf_quality/'+name
+        meta = receipt['source'][symbol]
+        if meta['sha256'] != receipt['source_hashes'][rel] or meta['original_byte_count'] != len(files[rel]):
+            raise PermissionError('V75_CURRENT_DISTRIBUTION_RAW_RECEIPT')
+    rows = distributions(files, observed.isoformat())
+    if rows != receipt['result']:
+        raise PermissionError('V75_CURRENT_DISTRIBUTION_ROW_REPLAY')
+    clocks = [pool['available_at']]
+    for symbol,(_,url) in original_files.items():
+        contract = pool.get('qualified_bond_markets', {}).get(symbol) or {}
+        if symbol not in pool.get('issuer_observations',{}) or contract.get('observed_date') != observed.isoformat():
+            continue
+        window = distribution_window(rows[symbol], observed.isoformat())
+        window.update(source_receipt_sha256=source['sha256'], source_available_at=known[symbol],
+                      source_manifest_sha256=receipt['source'][symbol]['sha256'])
+        _apply_distribution(pool,symbol,window,data,evaluation_at)
+        pool.setdefault('current_distributions',{})[symbol] = deepcopy(window)
+        pool['source_proofs']['CURRENT_DISTRIBUTIONS_'+symbol] = {
+            'source_reference':url,'source_sha256':receipt['source'][symbol]['sha256'],
+            'receipt_sha256':source['sha256'],'available_at':known[symbol]}
+        clocks.append(known[symbol])
+    pool['available_at'] = max(clocks,key=time)
+    return pool
+
+
 def extend(pool,source,data,evaluation_at):
     if source is None:return pool
     if not pool.get('formal_parameters'):raise PermissionError('HANDOFF_FORMAL_PARAMETERS_REQUIRED')
     delivered=read(source,evaluation_at);rates=delivered['treasury']
-    from v75_etf_quality_inputs import assess,daily_freshness
+    from v75_etf_quality_inputs import daily_freshness
     pool['source_handoff']={k:deepcopy(delivered[k]) for k in
         ('schema_version','manifest_sha256','source_reference','source_available_at','contracts','raw_files_verified',
          'distribution_retrieval_time_exact','distribution_retrieval_window_utc')}
@@ -235,15 +314,19 @@ def extend(pool,source,data,evaluation_at):
         if symbol not in delivered['distributions']:continue
         contract=pool.get('qualified_bond_markets',{}).get(symbol)
         observed=contract['observed_date'] if contract else rates['metadata']['last']
-        window=distribution_window(delivered['distributions'][symbol],observed)
-        window['source_manifest_sha256']=source['manifest_sha256']
-        issuer['facts']['distribution_source_observation']=window
-        assessment=assess(issuer,contract,data.get('YAHOO_'+symbol),pool['formal_parameters'],evaluation_at,
-            authorized_universe=pool['etf_quality_assessments'][symbol]['normalized_facts']['authorized_universe'])
-        pool['etf_quality_assessments'][symbol]=assessment
-        pool['asset_metrics'][symbol]['PRED-010']=assessment['metrics']
-        pool['calculations'][symbol+'.PRED-010']=assessment
-        pool['asset_unprovided_inputs'][symbol]['PRED-010']=assessment['unprovided_inputs']
+        covered_through = rates['metadata']['last']
+        window = distribution_window(delivered['distributions'][symbol], min(observed, covered_through))
+        window['source_manifest_sha256'] = source['manifest_sha256']
+        if observed > covered_through:
+            # A verified first handoff can still be historical for the new
+            # market session. Preserve its evidence outside the current
+            # predicate, and continue independent sources and predicates.
+            pool['source_handoff'].setdefault('historical_distributions', {})[symbol] = window
+            pool['source_handoff'].setdefault('current_distribution_gaps', {})[symbol] = {
+                'code': 'HANDOFF_CURRENT_DISTRIBUTION_WINDOW_UNAVAILABLE',
+                'covered_through': covered_through, 'required_through': observed}
+            continue
+        _apply_distribution(pool,symbol,window,data,evaluation_at)
     issuer=pool.get('issuer_observations',{}).get('SGOV');duration=(issuer or {}).get('facts',{}).get('effective_duration')
     if issuer and duration and duration.get('value') is not None:
         metrics,proof=weekly_benchmark(rates['observations'],duration['value'])

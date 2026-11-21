@@ -66,3 +66,27 @@ class W6AdapterTest(unittest.TestCase):
         self.assertEqual(calls,[])
 
 if __name__=="__main__":unittest.main()
+
+
+def test_pr60_receiver_passes_the_original_run_and_approved_archive():
+    from types import SimpleNamespace
+    from family_input import digest
+
+    request = {'run_id':'same-run'}
+    result = {'trade_authorization':'NONE'}
+    archive = Path('approved.zip')
+    def inputs(receipt, **options):
+        assert receipt=={'request':request,'result':result}
+        assert options['expected_request_digest']==digest(request)
+        assert options['expected_result_digest']==digest(result)
+        assert options['source_id']=='registered-menu04'
+        return 'upstream-current-inputs'
+    def renderer(current_inputs, supplied_renderer, *, approved_w6_archive):
+        assert current_inputs=='upstream-current-inputs' and supplied_renderer is None
+        assert approved_w6_archive==archive
+        return lambda formal_source, payload: (formal_source,payload)
+    upstream = SimpleNamespace(MemberAnalysisReportProducer=SimpleNamespace(from_menu04=inputs),
+                               OnDemandW6Renderer=renderer)
+    receiver = mod.bind_member_report_receiver(upstream,source_id='registered-menu04',rules_sha='1'*64)
+    assert receiver({'formal':True},{},request=request,result=result,
+        approved_w6_archive=archive,approved_w6_renderer=None)==({'formal':True},{})

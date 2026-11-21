@@ -143,6 +143,31 @@ def futures(raw,at,known_by=None):
         'scope':'SAME_SIX_MONTH_CONTRACT_MONTHLY_AVERAGE_RATE__NOT_FOMC_PROBABILITY'}
 
 
+def _extend_available_evidence(pool, manifest, field, extend, *args, requires=()):
+    source = manifest.get(field)
+    if source is None:
+        return pool
+    absent = [key for key in requires if not pool.get(key)]
+    if absent:
+        pool.setdefault('registered_source_gaps', []).append({
+            'code': 'V75_REGISTERED_SUPPLEMENT_PREREQUISITE_MISSING',
+            'field_path': 'v75_macro_source_manifest.' + field,
+            'requires': absent
+        })
+        return pool
+    # Supplement readers may update a pool before reaching a missing file.
+    # Commit their output only after the entire registered source is read.
+    try:
+        return extend(deepcopy(pool), source, *args)
+    except FileNotFoundError as error:
+        pool.setdefault('registered_source_gaps', []).append({
+            'code': 'V75_REGISTERED_SUPPLEMENT_BYTES_MISSING',
+            'field_path': 'v75_macro_source_manifest.' + field,
+            'source_path': error.filename
+        })
+        return pool
+
+
 def read(source,evaluation_at,*,stock_owner_scope=None):
     if stock_owner_scope is not None:
         from owner_qqq_scope import read as read_owner_rule
@@ -312,20 +337,21 @@ def read(source,evaluation_at,*,stock_owner_scope=None):
     out=qualify_releases(out,evaluation_at)
     from v75_sofr_horizon_inputs import extend as extend_sofr
     out=extend_sofr(out,manifest.get('sofr_horizon_source'),evaluation_at)
-    from v75_handoff_inputs import extend as extend_handoff
+    from v75_handoff_inputs import extend as extend_handoff, extend_current_distributions
     out=extend_handoff(out,manifest.get('source_handoff'),data,evaluation_at)
     from v75_ready_data_inputs import extend as extend_ready_data
-    out=extend_ready_data(out,manifest.get('ready_data_source'),data,evaluation_at)
+    out=_extend_available_evidence(out,manifest,'ready_data_source',extend_ready_data,data,evaluation_at)
     from v75_additional_delta_inputs import extend as extend_additional_delta
-    out=extend_additional_delta(out,manifest.get('additional_delta_source'),data,evaluation_at,manifest.get('source_handoff'))
+    out=_extend_available_evidence(out,manifest,'additional_delta_source',extend_additional_delta,data,evaluation_at,manifest.get('source_handoff'),requires=('source_handoff','ready_data_handoff'))
     from v75_plugin_data_inputs import extend as extend_plugin_data
-    out=extend_plugin_data(out,manifest.get('plugin_data_source'),data,evaluation_at)
+    out=_extend_available_evidence(out,manifest,'plugin_data_source',extend_plugin_data,data,evaluation_at,requires=('ready_data_handoff','additional_delta_handoff'))
     from v75_ib_qa_inputs import extend as extend_ib_qa
-    out=extend_ib_qa(out,manifest.get('ib_qa_additional_source'),data,evaluation_at)
+    out=_extend_available_evidence(out,manifest,'ib_qa_additional_source',extend_ib_qa,data,evaluation_at,requires=('plugin_data_cross_checks','additional_delta_handoff'))
     from v75_official_reply_inputs import extend as extend_official_reply
-    out=extend_official_reply(out,manifest.get('official_reply_source'),evaluation_at)
+    out=_extend_available_evidence(out,manifest,'official_reply_source',extend_official_reply,evaluation_at)
+    out=extend_current_distributions(out,manifest.get('current_distribution_source'),data,evaluation_at)
     from v75_pred007_inputs import extend as extend_pred007
-    return extend_pred007(out,manifest.get('pred007_amendment_source'),evaluation_at)
+    return _extend_available_evidence(out,manifest,'pred007_amendment_source',extend_pred007,evaluation_at)
 
 
 def slot(pool,pid,asset,previous,evaluation_at):

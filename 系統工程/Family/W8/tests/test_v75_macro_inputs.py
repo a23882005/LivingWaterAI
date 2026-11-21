@@ -124,3 +124,21 @@ class MacroInputsTest(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+def test_missing_supplement_cannot_discard_independent_metrics_or_leave_partial_mutation(tmp_path):
+    import pytest
+
+    pool = {'shared_metrics':{'PRED-004':{'hy_oas_bps':'352'}}}
+    missing = tmp_path/'PACKAGE_MANIFEST.json'
+    def extend(staged, descriptor):
+        staged['shared_metrics'].clear()
+        missing.read_bytes()
+    out = M._extend_available_evidence(pool,{'ready_data_source':{'root':str(tmp_path)}},
+                                         'ready_data_source',extend)
+    assert out['shared_metrics']=={'PRED-004':{'hy_oas_bps':'352'}}
+    assert out['registered_source_gaps'][0]['source_path']==str(missing)
+    def reject(*args):
+        raise PermissionError('MANIFEST_HASH')
+    with pytest.raises(PermissionError,match='MANIFEST_HASH'):
+        M._extend_available_evidence(pool,{'ready_data_source':{}},'ready_data_source',reject)

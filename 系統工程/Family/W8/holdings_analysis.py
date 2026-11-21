@@ -684,9 +684,19 @@ class HoldingsAnalysisRunner:
                     formal_rule_source=self.context['sgov_role_classification_source'])
                 if expected is None or any((row.get('market') or {}).get(k)!=v for k,v in expected.items()):
                     raise PermissionError('MEMBER_CURRENT_HISTORY_TECHNICAL_REPLAY_MISMATCH')
+            london_source = self.context.get('current_london_daily_source')
+            if london_source is not None:
+                from approved_v04_technical import load_profile
+                from member_market_source import read_market
+                expected = read_market(london_source,symbol=row['symbol'],evaluation_at=request['evaluation_at'],
+                    repo_root=root,profile=load_profile(Path(__file__).with_name('owner_approved_v10.json')),
+                    is_etf=source['source_instrument'].get('instrument_type')=='ETF')
+                if not expected.get('london_current_history') or any((row.get('market') or {}).get(k)!=v for k,v in expected.items()):
+                    raise PermissionError('MEMBER_CURRENT_LONDON_TECHNICAL_REPLAY_MISMATCH')
             if row.get('market'):
                 validate_market_time(row['market'],row['symbol'],request['evaluation_at'],
-                    report.get('qualified_equity_inputs'),verified_current_history=current_history is not None)
+                    report.get('qualified_equity_inputs'),
+                    verified_current_history=current_history is not None or london_source is not None)
             from v82_approved_context import validate as validate_approved_context
             validate_approved_context(root,row,request,self.context,
                 target_projection=report.get('loop2_target_projection'))

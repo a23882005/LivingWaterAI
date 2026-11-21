@@ -102,3 +102,25 @@ def test_london_alternate_failure_keeps_verified_base_and_its_original_volume(mo
     result=m.read_market(source,evaluation_at='2026-11-21T11:35:00Z',**opts)
     assert result['source_sha256']=='ib' and result['rows']==27
     assert result['independent_history_candidate_error']['reason']=='MEMBER_MARKET_INDEPENDENT_SOURCE_BINDING'
+
+
+def test_london_current_capture_is_additive_and_must_keep_the_original_listing(monkeypatch):
+    import member_market_source as m
+
+    original_source = {'provider':'IBKR_LAST_DAILY_OBSERVATION','provider_exchange':'LSEETF',
+        'symbol':'TEST','provider_symbol':'TEST','exchange':'XLON','timezone':'Europe/London','currency':'USD',
+        'contract_id':111,'contract_source':{},'identity_source':{},'calendar_source':{},
+        'sha256':'old','retrieved_at':'2026-11-21T09:00:00Z'}
+    current = {**original_source,'prior_source_sha256':'old','sha256':'new',
+        'retrieved_at':'2026-11-21T20:00:00Z','available_at':'2026-11-21T20:01:00Z'}
+    old = {'source_sha256':'old'}
+    new = {'source_sha256':'new','position_valuation_observation':old}
+    source = {**original_source,'current_london_daily_source':current}
+    monkeypatch.setattr(m,'_read_market',lambda *args,**kwargs: deepcopy(old))
+    monkeypatch.setattr(m,'_read_current_london',lambda *args: deepcopy(new))
+    opts = {'symbol':'TEST','repo_root':None,'profile':None,'is_etf':True}
+    assert m.read_market(source,evaluation_at='2026-11-21T20:00:59Z',**opts) == old
+    assert m.read_market(source,evaluation_at='2026-11-21T20:01:00Z',**opts) == new
+    current['contract_id'] = 222
+    with pytest.raises(PermissionError,match='CURRENT_SOURCE_BINDING'):
+        m.read_market(source,evaluation_at='2026-11-21T20:01:00Z',**opts)

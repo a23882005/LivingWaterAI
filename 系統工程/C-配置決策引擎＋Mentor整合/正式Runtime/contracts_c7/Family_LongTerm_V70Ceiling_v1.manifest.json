@@ -65,7 +65,7 @@
     },
     {
       "path": "../../Family/W8/member_financial_chain.py",
-      "sha256": "d302050681497899c5d974a74f7d9df4494b87af0fdfd1f189336a42cef6b0f2"
+      "sha256": "c8bef5a9852b0c57b0a0a12da31c8bb84c81fd6e8a8d11ef3869f4fe41eabb85"
     },
     {
       "path": "../../Family/W8/member_funding_summary.py",
@@ -73,11 +73,11 @@
     },
     {
       "path": "../../Family/W8/native_asset_source.py",
-      "sha256": "e32723d43e40c1cd9f181ce9a433659b62f15b4c7de97340101516142f9cf1fb"
+      "sha256": "425adf37ebdf8f371484d2993e753531a921960cf5fe6367a03c30433de4130f"
     },
     {
       "path": "../../Family/W8/member_financial_producer.py",
-      "sha256": "ab75b9fdaade0edf11858e64359bc66397abb607cb71d2630f8795638200c57f"
+      "sha256": "429efd3cc4929e1ae28945329935ac8605d751a647ff7e4169b81964f9f8aeb2"
     },
     {
       "path": "../../Family/W8/family_c7_source_assembly.py",
@@ -105,7 +105,7 @@
     },
     {
       "path": "../../Family/W8/member_market_source.py",
-      "sha256": "853947987466484d4015e9c3d4719207b62a26ac7473bd924882308fe1a2a585"
+      "sha256": "2f495a5fb602362c8c0ecf47ab0159d1e07321ee3d1c480375ce5076f75c150c"
     },
     {
       "path": "../../Family/W8/all_asset_coverage.py",
@@ -137,7 +137,7 @@
     },
     {
       "path": "../../Family/W8/member_reconciliation_source.py",
-      "sha256": "f08f8f197ae29841642d93ce77891c398ac4bb52bb32dd1a2c84c2b8bbbe69d4"
+      "sha256": "311b0731a1069e66858d8b2de3c0c47d0d67b03ce67c85e5a10cc3636d21f35a"
     },
     {
       "path": "../../Family/W8/sec_publication_source.py",
@@ -145,7 +145,7 @@
     },
     {
       "path": "../../Family/W8/historical_source_qualification.py",
-      "sha256": "b3977eadfd7fded8f7b73b6bd33a36f16b5e6664ae3bb96e98fcfedadd333564"
+      "sha256": "e146ba96e107117c69b8b66515b68a02f0e8bec9afa9faf898b40fb7648849cc"
     },
     {
       "path": "../../Family/W5/mentor_bridge.py",
@@ -221,7 +221,7 @@
     },
     {
       "path": "../../Family/W8/pm_source_document.py",
-      "sha256": "afbfd6d1a0de0bcaf72eb1825b18895803ee37a58b4b3741e54cc3a49354a90c"
+      "sha256": "44eb82be2956084d73e084c0e1db94bba281e73dfebcc92fa11926188f2672a9"
     },
     {
       "path": "../../Family/W8/ibkr_daily_source.py",
@@ -249,7 +249,7 @@
     },
     {
       "path": "../../Family/W8/holdings_analysis.py",
-      "sha256": "014e81e6fa5f916bc5c0ca423f3fb21ea6640a9479332eadf5e4e5f517b28319"
+      "sha256": "e314948d9811cc2aea442690b0e296312f4d046d2600394c727ff15dbb5bdb97"
     },
     {
       "path": "../../Family/W8/v82_core_source.py",
@@ -281,7 +281,7 @@
     },
     {
       "path": "../../Family/W8/current_market_contract.py",
-      "sha256": "b649d32c8c494c06b1ce03eb504ddf29b7eb98c736853b68bae9190a9aadedd8"
+      "sha256": "db48d64529bf1c42fc15692d29a788015cf0ed20a3337adf7a10a5d70ee63deb"
     },
     {
       "path": "../../Family/W8/current_nav_source.py",

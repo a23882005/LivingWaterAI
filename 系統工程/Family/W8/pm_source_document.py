@@ -56,6 +56,15 @@ def history(source):
         if not section[end:].lstrip().startswith('## Massive daily original returned CSV'):
             raise ValueError('PM_HISTORY_SECTION_BOUNDARY')
         started=None;retrieved=root['captured_at_utc']
+    elif (not tail.strip() and root.get('provider') == 'Interactive Brokers'
+            and root.get('symbol') == symbol and source.get('provider_exchange') == 'LSEETF'
+            and set(root) == {'symbol','provider','request','retrieved_at_utc','response'}):
+        query = root['request']
+        contract = query['contract_id']
+        exchange = query['exchange']
+        data = root['response']
+        started = None
+        retrieved = root['retrieved_at_utc']
     else:raise PermissionError('PM_HISTORY_PUBLIC_PRICE_DOCUMENT_REQUIRED')
     periods=('THREE_MONTHS','SIX_MONTHS','ONE_YEAR','TWO_YEARS','FIVE_YEARS') if exchange=='LSEETF' else ('FIVE_YEARS',)
     expected={'step':'ONE_DAY','outside_rth':False,'include_corporate_actions':True}

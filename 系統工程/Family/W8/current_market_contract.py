@@ -222,7 +222,7 @@ def gap_price(contract, market, instrument, symbol, request):
     """Qualify one latest completed quote for same-run exposure math only."""
     if not contract or not market:
         return None
-    market = market.get('independent_broker_observation', market)
+    market = market.get('position_valuation_observation') or market.get('independent_broker_observation', market)
     registration = (contract['source_descriptor'].get('gap_price_registrations') or {}).get(symbol)
     if not registration:
         return None

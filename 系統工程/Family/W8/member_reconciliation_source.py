@@ -207,6 +207,10 @@ def persist(root,request,config,directory):
     if folder.is_relative_to(Path(root).resolve()):
         raise PermissionError('MEMBER_RECONCILIATION_PRIVATE_ARTIFACT_OUTSIDE_REPO_REQUIRED')
     inputs={k:deepcopy(config[k]) for k in INPUTS if k in config}
+    for market_source in (inputs.get('market_sources') or {}).values():
+        london_source = (market_source or {}).get('current_london_daily_source')
+        if london_source and time(london_source['available_at'])>time(request['evaluation_at']):
+            market_source.pop('current_london_daily_source')
     result=normalize(root,request,inputs)
     envelope=dict(schema_version=SCHEMA,request=deepcopy(request),configuration=inputs,
         binding=binding(request),normalized=result,derived_after_cutoff_is_not_new_source_knowledge=True)

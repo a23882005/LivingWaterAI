@@ -556,7 +556,9 @@ class AssetSourceProducer:
         registered_market = None
         if equity_only:
             market_arguments['equity_symbol'] = self.symbol
-            binding = (self.family_c7_assembly_inputs or {}).get('public_history_source_binding') or {}
+            source_inputs = self.family_c7_assembly_inputs or {}
+            binding = source_inputs.get('public_history_source_binding') or {}
+            london_source = source_inputs.get('current_london_daily_source')
             source = binding.get('source_descriptors',{}).get('market_acquisition')
             if source is not None:
                 from historical_source_qualification import read_market,technical_market
@@ -568,10 +570,21 @@ class AssetSourceProducer:
                     registered_market = technical_market(history,evaluation_at=when,repo_root=self.root,
                         profile=self.approved_rule_profile,is_etf=instrument.get('instrument_type')=='ETF',
                         formal_rule_source=self.class_source)
-                    market_arguments['registered_market'] = registered_market
                     ctx['current_technical_history_source'] = deepcopy(source)
-                    ctx.pop('qualified_equity_source_manifest',None)
-                    req.pop('qualified_equity_source_digest',None)
+            if london_source is not None:
+                from member_market_source import read_market as read_member_market
+                instrument = found[0]['source_instrument']
+                if registered_market is not None or instrument.get('quote_currency') != london_source['currency']:
+                    raise PermissionError('MEMBER_CURRENT_LONDON_TECHNICAL_SOURCE_SCOPE')
+                registered_market = read_member_market(london_source,symbol=self.symbol,evaluation_at=when,
+                    repo_root=self.root,profile=self.approved_rule_profile,is_etf=instrument.get('instrument_type')=='ETF')
+                if not registered_market.get('london_current_history'):
+                    raise PermissionError('MEMBER_CURRENT_LONDON_TECHNICAL_SOURCE_REQUIRED')
+                ctx['current_london_daily_source'] = deepcopy(london_source)
+            if registered_market is not None:
+                market_arguments['registered_market'] = registered_market
+                ctx.pop('qualified_equity_source_manifest',None)
+                req.pop('qualified_equity_source_digest',None)
         cache=self.observation_cache if self.run_binding is not None else None
         if cache is not None:
             from same_run_market_cache import SameRunMarketCache

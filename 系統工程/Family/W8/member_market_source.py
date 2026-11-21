@@ -72,8 +72,22 @@ def _daily_rows(source,meta,quotes,stamps,by_date,cutoff,*,final_close_required=
     return rows,close_rows,excluded,invalid
 
 
-def _london_daily(source, calendar):
+def _london_alpha_data(source, symbol, available_at, *, require_receipt=False):
     data = read_json(source)
+    listing = symbol+'.LON'
+    if set(data) == {'request','response','retrieved_at_utc'}:
+        if (data['request'] != {'symbol':listing,'outputsize':'compact','datatype':'json','return_full_data':True}
+                or time(data['retrieved_at_utc']) > time(available_at)
+                or source.get('retrieved_at',data['retrieved_at_utc']) != data['retrieved_at_utc']):
+            raise PermissionError('MEMBER_MARKET_LONDON_AV_QUERY_OR_TIME')
+        return data['response'], data['retrieved_at_utc']
+    if require_receipt:
+        raise PermissionError('MEMBER_MARKET_LONDON_AV_ORIGINAL_RECEIPT_REQUIRED')
+    return data, source['retrieved_at']
+
+
+def _london_daily(source, calendar):
+    data,_ = _london_alpha_data(source,source['symbol'],source['retrieved_at'])
     listing = source['symbol']+'.LON'
     identity = read_json(source['identity_source'])
     matches = [row for row in identity['bestMatches'] if row['1. symbol'] == listing]
@@ -116,17 +130,98 @@ def _london_daily(source, calendar):
 def read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, observation_route='V82'):
     options = dict(symbol=symbol, evaluation_at=evaluation_at, repo_root=repo_root, profile=profile,
                    is_etf=is_etf, observation_route=observation_route)
-    original = _read_market(source, **options)
-    alternate = (source or {}).get('independent_daily_ohlc_source')
+    prior = source
+    if (source or {}).get('current_london_daily_source') is not None:
+        prior = {key:value for key,value in source.items() if key!='current_london_daily_source'}
+    original = _read_market(prior, **options)
+    alternate = (prior or {}).get('independent_daily_ohlc_source')
     if not alternate or time(alternate['retrieved_at']) > time(evaluation_at):
-        return original
+        return _select_current_london(source, original, options)
     try:
-        return _compare_independent_history(source, alternate, original, options, observation_route)
+        base = _compare_independent_history(prior, alternate, original, options, observation_route)
     except (ValueError, PermissionError, KeyError, ArithmeticError) as error:
         # A failed alternate source cannot erase the already verified original.
         original['independent_history_candidate_error'] = {'source_sha256':alternate.get('sha256'),
             'reason':str(error), 'retained_source_sha256':source['sha256']}
+        base = original
+    return _select_current_london(source, base, options)
+
+
+def _select_current_london(source, original, options):
+    current = (source or {}).get('current_london_daily_source')
+    if current is None or options['observation_route'] != 'V82':
         return original
+    cutoff = options['evaluation_at']
+    if time(current['available_at']) > time(cutoff):
+        return original
+    if (source['provider'] != 'IBKR_LAST_DAILY_OBSERVATION' or source['provider_exchange'] != 'LSEETF'
+            or current.get('prior_source_sha256') != source['sha256']
+            or current.get('calendar_source') != source['calendar_source']
+            or any(current.get(key) != source[key] for key in ('provider','provider_exchange','symbol',
+                'provider_symbol','currency','exchange','timezone','contract_id','contract_source','identity_source'))
+            or 'current_london_daily_source' in current
+            or not time(source['retrieved_at']) < time(current['retrieved_at']) <= time(current['available_at'])):
+        raise PermissionError('MEMBER_MARKET_LONDON_CURRENT_SOURCE_BINDING')
+    return _read_current_london(current, original, options)
+
+
+def _read_current_london(current, original, options):
+    from pm_source_document import history
+    source = current.get('london_close_crosscheck_source')
+    raw, _ = history(current)
+    independent, retrieved = _london_alpha_data(source,current['symbol'],current['available_at'],require_receipt=True)
+    listing = current['symbol']+'.LON'
+    metadata = independent['Meta Data']
+    series = independent['Time Series (Daily)']
+    closes = {time(t).astimezone(ZoneInfo('Europe/London')).date().isoformat():Decimal(str(price))
+        for t,price in zip(raw['time'],raw['close'])}
+    if (metadata['2. Symbol'] != listing or metadata['4. Output Size'].lower() != 'compact'
+            or not series or max(series) != metadata['3. Last Refreshed']
+            or max(series) != max(closes) or set(series) - set(closes)):
+        raise PermissionError('MEMBER_MARKET_LONDON_CROSSCHECK_IDENTITY_OR_SESSION_MISMATCH')
+    diffs = [abs(closes[day]-Decimal(series[day]['4. close'])) for day in series]
+    if any(not value.is_finite() for value in diffs):
+        raise ValueError('MEMBER_MARKET_LONDON_CROSSCHECK_NONFINITE_CLOSE')
+    alternate = current.get('independent_daily_ohlc_source')
+    if alternate and (alternate['sha256'] != source['sha256']
+            or alternate['local_path'] != source['local_path'] or alternate['retrieved_at'] != retrieved):
+        raise PermissionError('MEMBER_MARKET_LONDON_CROSSCHECK_ALTERNATE_RECEIPT_MISMATCH')
+    result = read_market(current, **options)
+    valuation = original.get('independent_broker_observation', original)
+    if (result['market_identity'] != valuation['market_identity']
+            or result['observed_date'] != valuation['observed_date']
+            or Decimal(str(result['observed_close'])) != Decimal(str(valuation['observed_close']))):
+        raise PermissionError('MEMBER_MARKET_LONDON_REGISTERED_POSITION_QUOTE_CONFLICT')
+    primary = result.get('independent_broker_observation',result)
+    proof = primary['provider_completion_evidence']
+    sessions = read_json(current['calendar_source'])['sessions']
+    missing = [row['session_id'] for row in sessions
+        if proof['returned_start'] <= row['session_id'] <= proof['returned_end'] and row['session_id'] not in closes]
+    result['position_valuation_observation'] = valuation
+    result['independent_history_comparison'] = {**result.get('independent_history_comparison',{}),
+        'technical_source_sha256':result['source_sha256'],'position_valuation_source_sha256':valuation['source_sha256'],
+        'same_completed_quote':True,'volume_or_ohlc_spliced':False}
+    result['london_current_history'] = {
+        'known_by':current['available_at'],'contract_id':current['contract_id'],'exchange':'XLON',
+        'currency':'USD','regular_hours_only':proof['query']['outside_rth'] is False,
+        'source_start':proof['returned_start'],'source_end':proof['returned_end'],
+        'raw_bar_count':proof['returned_rows'],'IBKR_valid_contiguous_OHLC_rows':primary['rows'],
+        'IBKR_independent_close_rows':(primary.get('independent_close_observation') or primary)['rows'],
+        'invalid_ohlc_rows':primary['history_quality']['invalid_source_rows'],
+        'missing_calendar_sessions':missing,'original_IBKR_sha256':current['sha256'],
+        'original_IBKR_retrieved_at':current['retrieved_at'],'original_AV_sha256':source['sha256'],
+        'original_AV_retrieved_at':retrieved,'AV_close_overlap_sessions':len(series),
+        'AV_max_absolute_close_difference':str(max(diffs)),
+        'AV_latest_close_matches':closes[max(series)] == Decimal(series[max(series)]['4. close']),
+        'source_values_mixed':False,'full_corporate_action_coverage_attested':False}
+    if result.get('independent_broker_observation'):
+        result['history_quality'].update(used_rows=result['rows'],analysis_start=min(series),analysis_end=max(series))
+    result.update(provider_symbol=current['symbol'],provider=(
+        alternate['provider'] if result.get('independent_broker_observation') else current['provider']),
+        cache_validation='PINNED_LONDON_HISTORY_AND_COMPLETED_SESSION_CALENDAR',
+        formal_identity_verified=False,
+        source_gaps=['PRICE_BASIS_AND_SPLITS','HISTORICAL_PUBLICATION_AND_REVISION','CORPORATE_ACTION_PIT_COVERAGE'])
+    return result
 
 
 def _compare_independent_history(source, alternate, original, options, observation_route):
@@ -144,7 +239,8 @@ def _compare_independent_history(source, alternate, original, options, observati
     raw, _ = history(source)
     ib = {time(t).astimezone(ZoneInfo(source['timezone'])).date().isoformat(): Decimal(str(price))
           for t,price in zip(raw['time'],raw['close'])}
-    av = read_json(alternate)['Time Series (Daily)']
+    independent,_ = _london_alpha_data(alternate,source['symbol'],alternate['retrieved_at'])
+    av = independent['Time Series (Daily)']
     if set(av) - set(ib):
         raise ValueError('MEMBER_MARKET_INDEPENDENT_SOURCE_SESSION_CONFLICT')
     if second['rows'] <= original['rows']:
@@ -346,6 +442,8 @@ def _read_market(source, *, symbol, evaluation_at, repo_root, profile, is_etf, o
         source_descriptor_digest=digest(source),
         **calendar_evidence,
         **({'provider_completion_evidence':completion} if completion else {}))
+    if source.get('prior_source_sha256') is not None:
+        observed['history_quality'].update(used_rows=len(used),analysis_start=used[0]['Date'],analysis_end=used[-1]['Date'])
     if supplement_audit is not None:observed['current_quote_append']=supplement_audit
     if reference_quote is not None:observed['current_reference_quote']=reference_quote
     return observed

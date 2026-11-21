@@ -281,3 +281,24 @@ def test_private_source_requires_exact_original_recipient_snapshot_before_accoun
     with pytest.raises((PermissionError,FileNotFoundError)):
         broker_observations(req,save(tmp_path/'invalid_recipient.json',m))
     assert calls==[]
+
+
+def test_london_standalone_public_receipt_keeps_exact_main_session_query(tmp_path):
+    source, batch = fixture(tmp_path)
+    source['provider_exchange'] = 'LSEETF'
+    chart = batch['observations'][0]['source']
+    chart.pop('corp_actions')
+    original = {
+        'symbol':'TEST', 'provider':'Interactive Brokers', 'retrieved_at_utc':source['retrieved_at'],
+        'request':{**batch['query'],'period':'TWO_YEARS','contract_id':123,'exchange':'LSEETF','security_type':'STK'},
+        'response':chart,
+    }
+    update(source,original)
+    data,receipt = history(source)
+    assert data == chart and receipt['started_at'] is None
+    assert receipt['query']['outside_rth'] is False
+    assert receipt['provider_exchange'] == 'LSEETF'
+    original['request']['outside_rth'] = True
+    update(source,original)
+    with pytest.raises(PermissionError,match='QUERY_CONTRACT_OR_CAPTURE_MISMATCH'):
+        history(source)

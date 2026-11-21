@@ -86,7 +86,7 @@ def document_analysis_configuration(request,symbol,descriptor):
         'source_commit':source.get('source_commit')}
 
 
-def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None,issuer_facts_sources=None,equity_only=False):
+def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_cache=None,reconciliation_source=None,public_history_sources=None,issuer_facts_sources=None,equity_only=False,london_market_source=None):
     raw=Path(descriptor['local_path']).read_bytes()
     if sha256(raw).hexdigest()!=descriptor['sha256']:raise PermissionError('MEMBER_PRODUCER_SOURCE_BYTES_CHANGED')
     data=json.loads(raw)
@@ -217,6 +217,8 @@ def produce(root,request,symbol,descriptor,*,producer_factory=None,observation_c
         cfg['family_c7_assembly_inputs']['member_reconciliation_source']=deepcopy(reconciliation_source)
     if public_binding is not None:
         cfg['family_c7_assembly_inputs']['public_history_source_binding']=deepcopy(public_binding)
+    if london_market_source is not None:
+        cfg['family_c7_assembly_inputs']['current_london_daily_source']=deepcopy(london_market_source)
     if producer_factory is None:
         from native_asset_source import AssetSourceProducer
         producer_factory=AssetSourceProducer

@@ -5,7 +5,8 @@ changing the public {market, engine} API. See Report_HTML_Contract_20261030.md.
 No strategy, funding, confirmation, or transport-cycle computation lives here.
 """
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
+from calendar import monthrange
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 import importlib
@@ -200,6 +201,140 @@ def make_report_sources(source, request, result=None, *, c7=None, sections=None,
     return out
 
 
+def _member_zero_decision(source, request, row):
+    """Receive two named upstream zero decisions, never calculate a buy amount.
+
+    A member review is still not Work9/canonical output. A scoped financial
+    stage and a normal-buy pause have their own provenance and do not resolve
+    the original all-member formal stage or any missing financial inputs.
+    """
+    amount, quantity = row.get("proposed_amount"), row.get("proposed_quantity")
+    scoped, pause = row.get("owner_scoped_financial_result"), row.get("normal_buy_pause")
+    if amount is None and quantity is None and scoped is None and pause is None:
+        return None
+    require(isinstance(amount, dict) and set(amount) == {"amount", "currency"}
+            and _number(amount.get("amount")) == 0 and _number(quantity) == 0
+            and re.fullmatch(r"[A-Z]{3}", str(amount.get("currency", ""))),
+            "W6_MEMBER_ITEM_REVIEW_ONLY")
+    require((scoped is None) != (pause is None), "W6_MEMBER_ZERO_SOURCE_REQUIRED")
+    conclusion = row.get("formal_conclusion")
+    require(isinstance(conclusion, dict)
+            and conclusion.get("schema_version") == "Family.W8.FormalModeConclusion.v1"
+            and conclusion.get("conclusion_digest") == digest(
+                {k: v for k, v in conclusion.items() if k != "conclusion_digest"})
+            and conclusion.get("trade_action") == "NO_TRADE"
+            and conclusion.get("buy_permission", {}).get("broker_trade_authorization") == "NONE",
+            "W6_MEMBER_ZERO_CONCLUSION")
+    same_run = {"client_id": source["client_id"], "run_id": request["run_id"],
+                "evaluation_at": request["evaluation_at"], "source_db_sha256": source["source_db_sha256"]}
+    price = row.get("same_run_gap_price")
+    require(isinstance(price, dict) and all(price.get(k) == v for k, v in same_run.items()
+                                          if k != "source_db_sha256")
+            and price.get("symbol") == row["symbol"]
+            and price.get("currency") == amount["currency"]
+            and price.get("currency") == row.get("market", {}).get("market_identity", {}).get("currency")
+            and price.get("source_sha256") == row.get("market", {}).get("source_sha256")
+            and price.get("session") == row.get("market", {}).get("observed_date"), "W6_MEMBER_ZERO_PRICE_BINDING")
+    if scoped is not None:
+        require(isinstance(scoped, dict)
+                and scoped.get("schema_version") == "Family.W8.OwnerQQQFinancial.v1"
+                and all(scoped.get(k) == v for k, v in same_run.items())
+                and scoped.get("asset_id") == row["symbol"]
+                and scoped.get("result_digest") == digest(
+                    {k: v for k, v in scoped.items() if k != "result_digest"}),
+                "W6_MEMBER_ZERO_FINANCIAL_BINDING")
+        owner, rule = scoped.get("owner", {}), scoped.get("owner_rule", {})
+        require(isinstance(owner, dict) and isinstance(rule, dict)
+                and owner.get("client_id") == source["client_id"]
+                and owner.get("currency") == amount["currency"]
+                and all(isinstance(owner.get(k), str) and owner[k] for k in ("broker", "account", "funding_domain"))
+                and rule.get("owner") == owner and rule.get("member") == source["member_alias"]
+                and all(rule.get(k) == v for k, v in same_run.items())
+                and rule.get("asset_id") == row["symbol"]
+                and bool(rule.get("rule_id")) and rule["rule_id"] == scoped.get("rule_id")
+                and rule.get("trade_authorization") == "NONE"
+                and rule.get("digest") == digest({k: v for k, v in rule.items() if k != "digest"}),
+                "W6_MEMBER_ZERO_OWNER_BINDING")
+        attempt = row.get("financial_source_attempt")
+        require(isinstance(attempt, dict)
+                and attempt.get("schema_version") == "Family.W8.MemberFinancialProducerAttempt.v1"
+                and all(attempt.get(k) == v for k, v in same_run.items())
+                and attempt.get("asset_id") == row["symbol"]
+                and attempt.get("target_version") == request.get("confirmed_target", {}).get("target_version")
+                and attempt.get("owner_scoped_financial_result") == scoped
+                and attempt.get("status") == scoped.get("status")
+                and attempt.get("qualified_financial_pack") is False
+                and attempt.get("trade_action") == "NO_TRADE", "W6_MEMBER_ZERO_PRODUCER_BINDING")
+        source_binding, account = attempt.get("same_run_source_binding", {}), attempt.get("account_analysis_binding", {})
+        accounts = request["client_snapshot"]["payload"]["tables"].get("portfolio_account", [])
+        document_scope = account.get("approved_document_category_scope", {})
+        original_account = document_scope.get("original_account_row")
+        require(all(source_binding.get(k) == v for k, v in same_run.items() if k != "evaluation_at")
+                and source_binding.get("target_version") == attempt.get("target_version")
+                and account.get("owner") == owner
+                and document_scope.get("schema_version") == "Family.W5.DocumentAccountScope.v1"
+                and document_scope.get("owner") == owner and document_scope.get("trade_authorization") == "NONE"
+                and document_scope.get("source_snapshot_digest") == source["snapshot_payload_sha256"]
+                and isinstance(original_account, dict) and original_account in accounts
+                and original_account.get("account_key") == owner["account"]
+                and original_account.get("client_id") == source["client_id"], "W6_MEMBER_ZERO_ACCOUNT_BINDING")
+        quote = scoped.get("canonical_quote_proof", {})
+        require(quote.get("valuation") == price and quote.get("position", {}).get("owner") == owner
+                and quote["position"].get("symbol") == row["symbol"]
+                and quote["position"].get("currency") == amount["currency"], "W6_MEMBER_ZERO_QUOTE_BINDING")
+        plan, gap, ledger = scoped.get("execution_plan", {}), scoped.get("position_gap", {}), scoped.get("test_ledger", {})
+        require(scoped.get("status") == "SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY"
+                and scoped.get("known_zero_basis") == "NO_POSITIVE_DEPLOYMENT_GAP"
+                and scoped.get("final_amount") == amount and scoped.get("final_quantity") == quantity
+                and _number(gap.get("positive_deployment_gap")) == 0
+                and _number(gap.get("final_deployment_gap_amount"), signed=True) <= 0
+                and plan.get("action") == "NO_NEW_BUY"
+                and all(_number(plan.get(k)) == 0 for k in (
+                    "maximum_allowed_buy_amount", "execution_amount", "execution_quantity"))
+                and plan.get("order_plan", {}).get("should_place_order") is False
+                and plan["order_plan"].get("order_intent_id") is None
+                and _number(plan["order_plan"].get("quantity")) == 0
+                and re.fullmatch(r"STAGE_[1-9]", str(scoped.get("selected_stage", "")))
+                and scoped.get("full_family_native_pipeline_complete") is False
+                and scoped.get("formal_deployment_ready") is False
+                and scoped.get("trade_action") == "NO_TRADE" and scoped.get("production") == "HOLD"
+                and ledger.get("new_cycles") == 0 and type(ledger.get("new_cycles")) is int
+                and ledger.get("new_intents") == 0 and type(ledger.get("new_intents")) is int
+                and isinstance(ledger.get("before"), dict)
+                and ledger.get("before") == ledger.get("after")
+                and ledger.get("broker_cash_reserved") is False,
+                "W6_MEMBER_ZERO_FINANCIAL_DECISION")
+        return "SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY"
+    require(isinstance(pause, dict) and pause.get("status") == "NORMAL_NEW_BUYS_PAUSED"
+            and pause.get("rule") == "V82 CMR7 / 44-A / 44-E"
+            and pause.get("run_id") == request["run_id"]
+            and pause.get("evaluation_at") == request["evaluation_at"]
+            and pause.get("symbol") == row["symbol"]
+            and pause.get("amount") == amount and pause.get("quantity") == quantity
+            and pause.get("sell_intent_created") is False
+            and pause.get("target_and_gap_preserved") is True, "W6_MEMBER_ZERO_PAUSE_BINDING")
+    market, core = row.get("market", {}), row.get("core_observation", {})
+    require(re.fullmatch(r"[0-9a-f]{64}", str(pause.get("source_sha256", "")))
+            and pause["source_sha256"] == market.get("source_sha256") == price.get("source_sha256")
+            == pause.get("position_valuation_source_sha256")
+            and pause.get("session") == market.get("observed_date") == price.get("session")
+            and market.get("market_identity", {}).get("currency") == amount["currency"]
+            and core.get("result", {}).get("technical", {}).get("runaway_down") == "TRUE"
+            and market.get("v82_original_aggregation", {}).get("runaway_down") == "TRUE",
+            "W6_MEMBER_ZERO_PAUSE_SOURCE")
+    signals = market.get("approved_technical", {}).get("signals", {})
+    votes = pause.get("votes", {})
+    for name in ("down_break", "down_accel"):
+        raw, declared = signals.get(name), votes.get(name)
+        require(isinstance(raw, list) and isinstance(declared, list)
+                and all(isinstance(x, str) for x in declared)
+                and all(isinstance(x, dict) for x in raw)
+                and len(set(declared)) == len(declared)
+                and declared == [x.get("name") for x in raw if x.get("truth") == "TRUE"],
+                "W6_MEMBER_ZERO_PAUSE_VOTES")
+    return "NORMAL_NEW_BUYS_PAUSED"
+
+
 def _member_analysis(source, request, result, producer, *, targets=None):
     """Verify the original all-account Menu04 report without treating it as Work9."""
     require(isinstance(result, dict) and result.get("schema_version") == "Family.W8.MemberV82Analysis.v1"
@@ -273,7 +408,7 @@ def _member_analysis(source, request, result, producer, *, targets=None):
     for row in rows:
         require(row.get("owner") == owner and row.get("result_digest") == digest(
                 {k: v for k, v in row.items() if k != "result_digest"}), "W6_MEMBER_ITEM_DIGEST")
-        require(row.get("proposed_amount") is None and row.get("full_native_pipeline_complete") is False
+        require(row.get("full_native_pipeline_complete") is False
                 and row.get("trade_action") == "NO_TRADE" and row.get("trade_authorization") == "NONE",
                 "W6_MEMBER_ITEM_REVIEW_ONLY")
         conclusion = row.get("formal_conclusion")
@@ -283,6 +418,7 @@ def _member_analysis(source, request, result, producer, *, targets=None):
                 ("client_id", source["client_id"]), ("run_id", request["run_id"]),
                 ("owner", owner), ("source_db_sha256", source["source_db_sha256"]),
                 ("request_digest", result["request_digest"]))), "W6_MEMBER_CONCLUSION_BINDING")
+        _member_zero_decision(source, request, row)
     _runtime("report_financial_sections", "W8").validate_coverage(result, source, request)
     return deepcopy(result)
 
@@ -295,9 +431,11 @@ def member_review_sections(source, request, result, producer, *, targets=None):
     for row in original["positions"]:
         conclusion = row.get("formal_conclusion") or {}
         classification = conclusion.get("classification") or row.get("native_product_identity") or {}
+        decision = _member_zero_decision(source, request, row)
         payload.append({"heading": row["symbol"] + "｜" + str(classification.get("primary_class") or "UNKNOWN"),
             "body": "原逐檔分析狀態：" + str(conclusion.get("status") or row.get("execution_status"))
-                    + "。資料尚不足，正式判斷待補；新增金額尚未提供。",
+                    + ("。同輪具來源零額裁定：" + decision + "；原正式階位與其餘缺值分列，交易NONE。"
+                       if decision else "。資料尚不足，正式判斷待補；新增金額尚未提供。"),
             "source_reference": source_id + "#" + row["symbol"] + ":" + row["result_digest"]})
     if not payload:
         return {}
@@ -337,6 +475,111 @@ def make_member_review_inputs(source, request, result, *, source_id, rules_sha, 
                        "trade_authorization": "NONE", "report_sources": binding}}
 
 
+def _member_display_sections(source, request, original, producer):
+    """Keep GDP observation periods as periods, without inventing release times.
+
+    The legacy display checker expects ISO dates. Use an isolated copy for
+    macro observation-quarter compatibility; never alter its cached module,
+    input objects or strict market/publication timestamp checks.
+    """
+    module = _runtime("report_financial_sections", "W8")
+    periods = []
+    def collect(value, path):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                pointer = path + "/" + key
+                if key == "as_of" and isinstance(child, str) and re.fullmatch(r"[0-9]{4}-Q[1-4]", child):
+                    periods.append({"pointer": pointer, "value": child, "kind": "OBSERVATION_QUARTER"})
+                collect(child, pointer)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                collect(child, path + "/" + str(index))
+    for index, row in enumerate(original["positions"]):
+        collect(row.get("macro_observations"), f"/result/positions/{index}/macro_observations")
+    collect(request.get("macro_snapshot"), "/request/macro_snapshot")
+    view = deepcopy(original)
+    empty_containers = []
+    for index, bond in enumerate((view.get("all_asset_coverage") or {}).get("bonds", [])):
+        if "market" in bond and bond["market"] is None:
+            bond["market"] = {}  # Legacy field selector only; raw source stays null.
+            empty_containers.append(f"/result/all_asset_coverage/bonds/{index}/market")
+    if not periods and not empty_containers:
+        return module.member_sections(source, request, original, producer)
+    cutoff = _time(request["evaluation_at"])
+    for row in original["positions"]:
+        module._check_dates({k: row.get(k) for k in ("market", "valuation_observations")}, cutoff)
+    spec = importlib.util.spec_from_file_location("family_w8_period_display", FAMILY / "W8/report_financial_sections.py")
+    isolated = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(isolated)
+    original_time = isolated._time
+    def period_time(value):
+        if isinstance(value, str) and re.fullmatch(r"[0-9]{4}-Q[1-4]", value):
+            year, quarter = int(value[:4]), int(value[-1])
+            month = quarter * 3
+            # Upper bound for the period-only cutoff check, not a release date.
+            return datetime(year, month, monthrange(year, month)[1], 23, 59, 59, tzinfo=timezone.utc)
+        return original_time(value)
+    isolated._time = period_time
+    # The compatibility view only guides optional field selectors. Validate
+    # and quote the untouched original receipt, including its nulls/digests.
+    isolated.validate_coverage = lambda _view, src, req: module.validate_coverage(original, src, req)
+    isolated._Quotes = lambda _view, req, prod: module._Quotes(original, req, prod)
+    display = isolated.member_sections(source, request, view, producer)
+    display["projection"]["source_result_sha256"] = digest(original)
+    display["projection"]["observation_period_adapter"] = {
+        "rules_sha": sha256(Path(__file__).read_bytes()).hexdigest(), "original_periods": periods,
+        "legacy_null_container_selectors": empty_containers,
+        "release_time_invented": False, "raw_values_changed": False}
+    return display
+
+
+def _member_zero_sections(display, source, request, original, producer):
+    """Append source quotations inside existing chapters, leaving old cards intact."""
+    module = _runtime("report_financial_sections", "W8")
+    quotes = module._Quotes(original, request, producer)
+    decisions = {}
+    for index, row in enumerate(original["positions"]):
+        decision = _member_zero_decision(source, request, row)
+        if decision is None:
+            continue
+        decisions[row["symbol"]] = decision
+        base = f"/result/positions/{index}"
+        formal = base + "/formal_conclusion"
+        if decision == "SCOPED_FINANCIAL_COMPLETE_NO_NEW_BUY":
+            origin = base + "/owner_scoped_financial_result"
+            fields = [("局部金融原狀態", origin + "/status"),
+                      ("本人核准範圍階位", origin + "/selected_stage"),
+                      ("局部零額依據", origin + "/known_zero_basis"),
+                      ("局部原缺口", origin + "/position_gap/final_deployment_gap_amount")]
+            note = "本人核准範圍的局部資金裁定；不取代原正式階位，不升格完整金融或帳本完成。"
+        else:
+            origin = base + "/normal_buy_pause"
+            fields = [("正常新增原裁定", origin + "/status"), ("原規則", origin + "/rule"),
+                      ("原Down條件", base + "/core_observation/result/technical/runaway_down"),
+                      ("已建立賣出意圖", origin + "/sell_intent_created")]
+            note = "僅為正式暫停正常新增；零額不代表階位已定，也不是賣出指示。"
+        quotes.add("valuation", row["symbol"] + "｜已核局部裁定與原正式階位",
+                   fields + [("原正式階位", formal + "/formal_stage"),
+                             ("原階位缺項", formal + "/stage_required_unknown_fields")], note=note)
+        quotes.add("actions", row["symbol"] + "｜同輪具來源零額",
+                   [("原新增金額", base + "/proposed_amount"), ("原新增股數", base + "/proposed_quantity"),
+                    ("原交易授權", base + "/trade_authorization")],
+                   note=note + "其餘缺值逐項保留UNKNOWN，沒有將缺值補成零。")
+    if not decisions:
+        return
+    rules_sha = sha256(Path(__file__).read_bytes()).hexdigest()
+    for name in ("valuation", "actions"):
+        envelope = display["envelopes"][name]
+        envelope["payload"].extend(quotes.rows[name])
+        envelope["payload_sha256"] = digest(envelope["payload"])
+        envelope.setdefault("base_display_rules_sha", envelope["rules_sha"])
+        envelope["rules_sha"] = rules_sha
+        display["projection"]["quoted_fields"][name].extend(quotes.field_map[name])
+    display["projection"]["scoped_zero_display"] = {
+        "rules_sha": rules_sha, "decisions": decisions,
+        "scope": "SOURCE_REVIEW", "financial_completeness_asserted": False}
+
+
 def _member_sources(source, market, engine, binding):
     require(binding["scope"] == "SOURCE_REVIEW" and binding.get("c7") is None
             and binding.get("target_context") is None, "W6_MEMBER_REVIEW_SCOPE_ONLY")
@@ -370,8 +613,8 @@ def _member_sources(source, market, engine, binding):
     # Validate supplied envelopes even when a legacy display fallback will be
     # regenerated. A bad hash/client/time is never hidden by a fallback.
     _sections(incoming, source, request["run_id"], _time(request["evaluation_at"]))
-    display = _runtime("report_financial_sections", "W8").member_sections(
-        source, request, original, binding["member_producer"])
+    display = _member_display_sections(source, request, original, binding["member_producer"])
+    _member_zero_sections(display, source, request, original, binding["member_producer"])
     active = display["envelopes"]
     generated = set(active)
     for name, envelope in incoming.items():

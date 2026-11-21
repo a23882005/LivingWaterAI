@@ -24,6 +24,27 @@ class MemberAnalysisReportProducer:
         self.target_context=deepcopy(target_context)
         self.target_validator=target_validator
 
+    @classmethod
+    def from_menu04(cls, same_run, *, source_id, rules_sha,
+                    expected_request_digest, expected_result_digest, **options):
+        """Construct from an operator-pinned original {request, result} receipt.
+
+        Supply this callable as build_project_menu's trusted W6 input producer,
+        alongside the pinned approved_w6_archive and a private staging folder.
+        Menu payloads never supply or replace this receipt or its expected hashes.
+        """
+        spec=importlib.util.spec_from_file_location("family_w8_menu04_report_binding",
+                                                  SRC.with_name("report_canonical_adapter.py"))
+        adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
+        if (not isinstance(same_run,dict) or set(same_run)!={"request","result"}
+                or not isinstance(same_run["request"],dict)
+                or not isinstance(same_run["result"],dict)
+                or adapter.digest(same_run["request"])!=expected_request_digest
+                or adapter.digest(same_run["result"])!=expected_result_digest):
+            raise ValueError("W6_MENU04_RECEIPT_DIGEST_MISMATCH")
+        return cls(same_run["request"],same_run["result"],
+                   source_id=source_id,rules_sha=rules_sha,**options)
+
     def __call__(self, formal_source, payload):
         spec=importlib.util.spec_from_file_location("family_w8_member_report_producer",
                                                   SRC.with_name("report_canonical_adapter.py"))

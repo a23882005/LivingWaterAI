@@ -154,6 +154,9 @@ class FamilyMenu:
         if (choice['operation']=='deployment_pace' and isinstance(result,dict)
                 and result.get('status') in ('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')):
             return {'status':result['status'],'result':result,'menu':render_menu(self.project_name)}
+        if (choice['operation'] == 'adjust_target' and isinstance(result, dict)
+                and str(result.get('status', '')).startswith('FAMILY03_')):
+            return {'status': result['status'], 'result': result, 'pending_operation': 'adjust_target'}
         # A locally rendered report is not a completed Drive publication.
         # The ChatGPT tool executor must upload/read back every artifact,
         # publish the manifest last and verify its remote bytes.

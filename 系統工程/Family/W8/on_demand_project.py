@@ -176,7 +176,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                        report_staging_dir=None, mutation_staging_dir=None,
                        trusted_report_archive_reader=None,
                        trusted_member_w6_receiver=None,
-                       trusted_public_fetcher=None, trusted_account_change=None):
+                       trusted_public_fetcher=None, trusted_account_change=None,
+                       family03_market_reader=None):
     """Return the existing W7 menu without using a permanent Python host."""
     if trusted_member_w6_receiver is not None and (
             not callable(trusted_member_w6_receiver)
@@ -271,6 +272,17 @@ def build_project_menu(*, family_login, project_name, login_account,
         if set(writes)&set(handlers):
             raise ValueError("CONFLICTING_FAMILY_MUTATION_HANDLERS")
         handlers.update(writes)
+    if "adjust_target" not in (other_handlers or {}):
+        target_writer = handlers.get("adjust_target")
+        advisor = _load(ROOT/"family03_guide.py", "family03_guide")
+        equity = _load(ROOT/"equity_sleeve.py", "family03_equity")
+        guide_target = advisor.menu_handler(public_entry, family_alias,
+            Path(downloaded_db_path).resolve().parent, equity, market_reader=family03_market_reader)
+        def adjust_target(payload):
+            if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
+                return target_writer(payload)
+            return guide_target(payload)
+        handlers["adjust_target"] = adjust_target
     # The legacy W6 report store uses a direct REST transport. Under the
     # Owner-approved ChatGPT execution model, hand verified upload receipts
     # back to the tool executor instead of pretending Python uploaded files.

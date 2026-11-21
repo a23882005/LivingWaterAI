@@ -1215,6 +1215,32 @@ function renderCapControls() {
     elC.innerHTML = groups.crisis.map(id => row(wrap(id))).join('');
     elR.innerHTML = groups.recession.map(id => row(wrap(id))).join('');
 
+    // Only lower the four value boxes when a line of their name crosses the box.
+    for (const id of ['m12', 'm13', 'm17', 'm18']) {
+        const box = document.getElementById('cap_in_' + id).parentElement;
+        const row = box.parentElement.parentElement;
+        const name = row.firstElementChild.querySelector('.font-bold');
+        const text = document.createRange();
+        text.selectNodeContents(name);
+        const placeBox = () => {
+            const bounds = box.parentElement.getBoundingClientRect();
+            const field = box.getBoundingClientRect();
+            let top = bounds.top;
+            for (const line of text.getClientRects()) {
+                if (line.right > field.left && line.left < field.right &&
+                    line.bottom > top && line.top < top + field.height) {
+                    top = line.bottom + 2;
+                }
+            }
+            box.style.top = (top - bounds.top) + 'px';
+        };
+        const resize = new ResizeObserver(placeBox);
+        resize.observe(name);
+        resize.observe(row);
+        document.fonts.ready.then(placeBox);
+    }
+
+
 
 
     // Insert LEI 3M quick check inside recession section

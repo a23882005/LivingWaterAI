@@ -4904,8 +4904,15 @@ if (recBlack) {
 (async function showViewCounts() {
   const output = document.getElementById('v70-view-counts');
   try {
+    if (!['www.happihelp.com', 'happihelp.com'].includes(location.hostname)) return;
+    const editions = {
+      '/': 'education', '/index.html': 'education',
+      '/v70-engineering/': 'engineering', '/v70-engineering/index.html': 'engineering'
+    };
+    const edition = editions[location.pathname];
+    if (!edition) return;
     const endpoint = 'https://script.google.com/macros/s/AKfycbwSd5yYr-bUzMgSq9c8T6Q3cJW02g7nLJq_UxwpxdU9qMlwobzvxndxDGiEivsSMYd9/exec';
-    const response = await fetch(endpoint, {method: 'POST', credentials: 'omit', body: new URLSearchParams({event: 'v70-view'})});
+    const response = await fetch(endpoint, {method: 'POST', credentials: 'omit', body: new URLSearchParams({event: 'v70-view', edition})});
     const counts = await response.json();
     const fields = [['全部','total'],['本月','month'],['本週','week'],['本日','day']];
     if (!response.ok || !fields.every(([, key]) => Number.isSafeInteger(counts[key]) && counts[key] >= 0)) throw Error();

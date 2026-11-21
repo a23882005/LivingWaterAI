@@ -6,7 +6,37 @@ import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
+from v70_cap.rules import evaluate, snapshot_inputs
+
 KEYS = "m01 m08 m05 m13 m17 m14 m18 m19 m20 m06_rate m06_inf m06_rstar m06_output_gap".split()
+
+
+ALERT_MESSAGES = {
+    "normal": ("", "本期無特別警示。"),
+    "yellow": ("黃牌", "市場波動值得留意。"),
+    "orange": ("橘牌", "市場風險偏高。"),
+    "red": ("紅牌", "市場風險警示已達最高級別。"),
+    "unknown": ("", "本期資料待更新。"),
+}
+
+
+def render_market_alert(page, feed):
+    level = evaluate(snapshot_inputs(feed))["level"]
+    if feed.get("publication", {}).get("scoringAllowed") is not True:
+        level = "unknown"
+    label, message = ALERT_MESSAGES[level]
+    page.locator("#education-alert").evaluate("""(section, [level, label, message]) => {
+        section.dataset.level = level;
+        const line = section.querySelector("p");
+        line.textContent = message;
+        if (label) {
+            line.className = "alert-card";
+            const badge = document.createElement("strong");
+            badge.textContent = label;
+            line.prepend(badge, " ");
+        }
+    }""", [level, label, message])
+    return level
 
 
 def build(site, template, output):
@@ -82,10 +112,12 @@ def build(site, template, output):
                 }""")
         if len(scenarios) != 40:
             raise ValueError("Expected forty education scenarios")
+        alert_level = render_market_alert(page, feed)
         output.mkdir(parents=True, exist_ok=True)
         # This intermediate is consumed by the public layout renderer. It contains only outputs.
         (output / "education-results.json").write_text(json.dumps({
             "asOf":feed["asOf"], "scenarios":scenarios,
+            "marketAlert": alert_level,
             "indicators":rows.all_inner_texts(), "indicatorData":indicators
         },ensure_ascii=False),encoding="utf-8")
         # Serialize the approved public layout after replacing its fixture script.
@@ -166,7 +198,7 @@ new ResizeObserver(redraw).observe(svg.parentElement);
         width = model.locator("#macro-bar").evaluate("node=>node.style.width")
         page.locator("#macro-bar").evaluate("(node,width)=>node.style.width=width", width)
         for ident in ("bond-data-status","bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield",
-                      "bond-score-display", "macro-safety-val", "macro-zone-text"):
+                      "bond-score-display", "macro-safety-val"):
             value = model.locator("#" + ident).text_content()
             page.locator("#" + ident).evaluate("(node,value)=>node.textContent=value", value)
         page.locator("#edu-indicators caption").evaluate(
@@ -251,6 +283,8 @@ showAvailability();"""
             lesson = check.locator("#learning-context").inner_text()
             if not lesson.startswith("情境練習｜") or ("本期市場資料待更新" in lesson) != (result is None):
                 raise ValueError(f"Education scenario mismatch: {pair}")
+        label, message = ALERT_MESSAGES[alert_level]
+        assert check.locator("#education-alert-message").inner_text().split() == (label + " " + message).split()
         assert check.locator("#v703-result article").count() == 9
         assert check.locator("#total-stock,#allocation-list,#strategic-stock").count() == 0
         for ident in ("bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield", "bond-score-display"):

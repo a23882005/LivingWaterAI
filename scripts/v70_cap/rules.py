@@ -34,6 +34,14 @@ RULES += [rule(21,'衰退',55,['s04']), rule(30,'衰退',45,['jobs']),
           rule(34,'衰退',45,['lei4','u45'])]
 RULES.sort(key=lambda r:r['id'])
 
+def snapshot_inputs(feed):
+    values = {key: feed['indicators'].get(key, {}).get('value') for key in FIELDS}
+    values['m21'] = feed.get('derived', {}).get('m21', {}).get('value')
+    if isinstance(values['m02'], (int, float)) and values['m02'] >= 50:
+        values['m02'] /= 100
+    return values
+
+
 def evaluate(values):
     flags = {}
     for key,(field,op,threshold) in TESTS.items():

@@ -115,10 +115,37 @@ def build(site, template, output):
             node.dispatchEvent(new MouseEvent('click', {bubbles:true}));
             return document.getElementById('r15-point').textContent;
         })""")
-        page.locator("#r15-chart circle[aria-label]").evaluate_all("""(nodes, details) => {
-            if (nodes.length !== details.length) throw Error('Rolling chart point mismatch');
-            nodes.forEach((node, index) => node.setAttribute('aria-label', details[index]));
-        }""", details)
+        # Ship the engineering chart's drawing functions with public observations only.
+        source = model.locator("script").evaluate_all(
+            "nodes=>nodes.map(node=>node.textContent).find(code=>code.includes('function smoothSegments(coordinates)'))")
+        draw = []
+        for pattern in (r"^ const esc=.*;$", r"^ const numberFormat=.*;$", r"^ const fmt=.*;$",
+                        r"^ function smoothSegments\(coordinates\)\{[\s\S]*?^ \}$",
+                        r"^ function chart\(points\)\{[\s\S]*?^ \}$"):
+            match = re.search(pattern, source, re.M)
+            if not match:
+                raise ValueError("Engineering trend chart drawing function missing")
+            draw.append(match.group())
+        observations = model.evaluate("""() => window.v703Rolling15.state.points.map(
+            ({date, score, snapshotDateTaipei, kind}) => ({date, score, snapshotDateTaipei, kind}))""")
+        if len(observations) != len(details):
+            raise ValueError("Rolling chart observations and details differ")
+        chart_data = json.dumps([observations, details], ensure_ascii=False).replace("<", "\\u003c")
+        chart_script = "\n".join(draw) + "\nconst [observations,details]=" + chart_data + ";\n" + """
+const svg=document.getElementById('r15-chart');
+let lastWidth=0;
+function redraw(){
+ const width=svg.parentElement.clientWidth;
+ if(!width || width===lastWidth)return;
+ lastWidth=width;
+ chart(observations);
+ svg.querySelectorAll('circle[data-r15-index]').forEach(node=>{
+    node.setAttribute('aria-label',details[Number(node.dataset.r15Index)]);
+ });
+}
+redraw();
+new ResizeObserver(redraw).observe(svg.parentElement);
+"""
         for ident in ("family-data-status","family-news","v703-update-banner","v703-data-state"):
             page.locator("#" + ident).evaluate("(node)=>node.textContent=''")
         page.locator("#v703-update-banner").evaluate(
@@ -183,6 +210,8 @@ function display(){
 for(const id of ['family-life','family-style'])el(id).addEventListener('change',display);
 display();"""
         page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}", display)
+        page.evaluate("(code)=>{const s=document.createElement('script');s.textContent=code;document.body.append(s)}",
+                      "(() => {" + chart_script + "})();")
         if page.locator("#education-sources li").count() != 13:
             raise ValueError("Expected thirteen attributions")
         if page.locator("#edu-indicators tbody tr").count() != 13:
@@ -191,6 +220,15 @@ display();"""
         check = browser.new_page()
         check.route("**/*", lambda route: route.abort())
         check.set_content(html)
+        for width in (390, 844, 360):
+            check.set_viewport_size({"width": width, "height": 844})
+            check.wait_for_function("""() => {
+                const svg=document.getElementById('r15-chart'), box=svg.viewBox.baseVal;
+                const width=svg.parentElement.clientWidth, compact=width<520;
+                return box.width===width && box.height===(compact?230:285) &&
+                    [...svg.querySelectorAll('.r15-date')].every(node=>
+                        (node.getAttribute('transform') || '').includes('rotate(-58)')===compact);
+            }""")
         for point, detail in zip(check.locator("#r15-chart circle[aria-label]").all(), details):
             point.dispatch_event("click")
             if check.locator("#r15-point").text_content() != detail or "體質分" not in detail:

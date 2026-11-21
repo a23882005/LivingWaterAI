@@ -186,10 +186,16 @@ def build_project_menu(*, family_login, project_name, login_account,
         config['member_db_path']=str(Path(downloaded_db_path).resolve())
         config['member_drive_binding']={'account':login_account,'client_id':client_id,
             'file_id':official_drive_file_id,'family_alias':family_alias}
-        if registered_project_sources is not None:
-            register_project_mandate(config, registered_project_sources, family_alias)
         member=_load(ROOT/'member_v82_analysis.py','family_w8_member_v82_source')
-        trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
+        if registered_project_sources is None:
+            trusted_analysis_source_producer=member.MemberV82SourceProducer(**config)
+        else:
+            def registered_producer(snapshot, payload):
+                auth.require_login()
+                current_config = dict(config)
+                register_project_mandate(current_config, registered_project_sources, family_alias)
+                return member.MemberV82SourceProducer(**current_config)(snapshot, payload)
+            trusted_analysis_source_producer = registered_producer
     if native_source_config is not None:
         if trusted_analysis_source_producer is not None:
             raise ValueError('CONFLICTING_NATIVE_SOURCE_PRODUCERS')

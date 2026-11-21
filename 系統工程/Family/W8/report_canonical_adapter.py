@@ -448,6 +448,7 @@ def _member_analysis(source, request, result, producer, *, targets=None):
                 ("request_digest", result["request_digest"]))), "W6_MEMBER_CONCLUSION_BINDING")
         _member_zero_decision(source, request, row)
     _runtime("report_financial_sections", "W8").validate_coverage(result, source, request)
+    _member_current_portfolio(source, request, result)
     return deepcopy(result)
 
 
@@ -507,6 +508,109 @@ def make_member_review_inputs(source, request, result, *, source_id, rules_sha, 
                        "trade_authorization": "NONE", "report_sources": binding}}
 
 
+def _member_current_portfolio(source, request, original):
+    """Verify an existing NAV qualification for quotation, without valuation."""
+    portfolio = original.get("current_portfolio_reference")
+    if not isinstance(portfolio, dict) or portfolio.get("formal_NAV_source_qualified") is not True:
+        return None
+    binding = {"client_id": source["client_id"], "run_id": request["run_id"],
+               "evaluation_at": request["evaluation_at"], "source_db_sha256": source["source_db_sha256"]}
+    def bound(value, schema):
+        return (isinstance(value, dict) and value.get("schema_version") == schema
+                and all(value.get(k) == v for k, v in binding.items())
+                and value.get("digest") == digest({k: v for k, v in value.items() if k != "digest"}))
+    require(bound(portfolio, "Family.W8.CurrentPortfolioReference.v1")
+            and portfolio.get("issues") == [] and portfolio.get("formal_source_qualification_dependencies") == []
+            and portfolio.get("cash_counted_once") is True and portfolio.get("SGOV_physical_value_counted_once") is True
+            and portfolio.get("SGOV_roles_added_to_cash") is False
+            and portfolio.get("approved_pool_and_target_amounts_rebased") is False
+            and portfolio.get("new_buy_permission_created") is False
+            and portfolio.get("historical_PIT_or_qP_qV_qualified") is False
+            and portfolio.get("trade_action") == "NO_TRADE", "W6_MEMBER_CURRENT_NAV_BINDING")
+    qualification, contract = portfolio.get("project_NAV_source_qualification"), portfolio.get("contract")
+    require(bound(qualification, "Family.W8.ProjectNAVSourceQualification.v1")
+            and bound(contract, "Family.W8.CurrentMarketContract.v1")
+            and all(x.get("member") == source["member_alias"]
+                    and x.get("target_version") == request.get("confirmed_target", {}).get("target_version")
+                    for x in (qualification, contract))
+            and contract.get("nav_source_qualification") == qualification
+            and contract.get("trade_authorization") == "NONE"
+            and qualification.get("new_buy_permission_created") is False
+            and qualification.get("historical_PIT_or_qP_qV_qualified") is False
+            and _time(qualification.get("available_at")) <= _time(request["evaluation_at"]),
+            "W6_MEMBER_CURRENT_NAV_QUALIFICATION")
+    approved = qualification.get("approved_member_sources", {})
+    require(isinstance(approved, dict)
+            and approved.get("qualification") == "PM_VERIFIED_SOURCE_FOR_CURRENT_PROJECT_NAV_INPUT"
+            and approved.get("client_id") == source["client_id"]
+            and approved.get("source_db_sha256") == source["source_db_sha256"]
+            and approved.get("all_positive_positions_valued") is True
+            and approved.get("unreported_positions_orders_and_commitments_absent_by_explicit_Owner_policy") is True
+            and approved.get("cash_counted_once") is True
+            and approved.get("new_buy_permission_created") is False
+            and approved.get("approved_target_pool_rebased") is False
+            and approved.get("historical_PIT_or_qP_qV_qualified") is False
+            and portfolio.get("accepted_net_cash_by_currency") == approved.get("accepted_net_cash_by_currency")
+            and portfolio.get("cash_TWD") == approved.get("cash_reporting_TWD")
+            and portfolio.get("positions_plus_accepted_cash_TWD") == approved.get("current_project_portfolio_NAV_TWD")
+            and portfolio.get("reporting_FX") == qualification.get("reporting_FX"),
+            "W6_MEMBER_CURRENT_NAV_APPROVAL")
+    rows, originals = portfolio.get("positions"), approved.get("positions")
+    require(isinstance(rows, list) and bool(rows) and isinstance(originals, list)
+            and len(rows) == len(originals), "W6_MEMBER_CURRENT_NAV_ROWS")
+    for index, (row, accepted) in enumerate(zip(rows, originals)):
+        require(isinstance(row, dict) and isinstance(accepted, dict)
+                and type(accepted.get("source_representation_index")) is int
+                and accepted["source_representation_index"] == index
+                and isinstance(row.get("symbol"), str) and bool(row["symbol"])
+                and row.get("symbol") == accepted.get("symbol")
+                and row.get("quantity") == accepted.get("quantity")
+                and row.get("reporting_amount_TWD") == accepted.get("security_value_TWD")
+                and row.get("issue") is None, "W6_MEMBER_CURRENT_NAV_ROWS")
+        quantity = _number(row.get("quantity"))
+        if quantity == 0:
+            require(_number(row.get("amount")) == _number(row.get("reporting_amount_TWD")) == 0
+                    and row.get("currency") == accepted.get("currency")
+                    and row.get("observed_market_date") == accepted.get("observed_market_date"),
+                    "W6_MEMBER_CURRENT_NAV_ROWS")
+        else:
+            require(row.get("currency") == accepted.get("currency")
+                    and re.fullmatch(r"[A-Z]{3}", str(row.get("currency", "")))
+                    and row.get("amount") == accepted.get("security_value_native")
+                    and row.get("observed_market_date") == accepted.get("observed_market_date")
+                    and isinstance(row.get("observed_market_date"), str)
+                    and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", row["observed_market_date"])
+                    and datetime.fromisoformat(row["observed_market_date"]).date() <= _time(request["evaluation_at"]).date()
+                    and _number(row.get("amount")) >= 0 and _number(row.get("reporting_amount_TWD")) >= 0,
+                    "W6_MEMBER_CURRENT_NAV_ROWS")
+    fx = portfolio.get("reporting_FX", {})
+    require(isinstance(fx, dict) and fx.get("base_currency") == "USD" and fx.get("quote_currency") == "TWD"
+            and _number(fx.get("quote_per_base")) > 0
+            and re.fullmatch(r"[0-9a-f]{64}", str(fx.get("source_sha256", "")))
+            and _time(fx.get("as_of_time")) <= _time(request["evaluation_at"])
+            and fx.get("as_of") == datetime.fromisoformat(fx["as_of_time"].replace("Z", "+00:00")).date().isoformat()
+            and _time(fx.get("retrieved_at")) <= _time(request["evaluation_at"]),
+            "W6_MEMBER_CURRENT_NAV_FX")
+    accounts = request["client_snapshot"]["payload"]["tables"].get("portfolio_account", [])
+    for analysis in original["positions"]:
+        holding = analysis.get("holding") or {}
+        broker = holding.get("current_broker_position")
+        if broker is None:
+            continue
+        matches = [r for r in rows if r["symbol"] == analysis["symbol"]]
+        owner = broker.get("owner", {}) if isinstance(broker, dict) else {}
+        require(isinstance(broker, dict) and isinstance(owner, dict) and len(matches) == 1
+                and broker.get("symbol") == analysis["symbol"]
+                and broker.get("quantity") == holding.get("quantity") == matches[0]["quantity"]
+                and broker.get("currency") == owner.get("currency") == matches[0]["currency"]
+                and owner.get("client_id") == source["client_id"]
+                and any(a.get("client_id") == source["client_id"] and a.get("account_key") == owner.get("account") for a in accounts)
+                and re.fullmatch(r"[0-9a-f]{64}", str(broker.get("source_sha256", "")))
+                and _time(broker.get("retrieved_at")) <= _time(request["evaluation_at"]),
+                "W6_MEMBER_CURRENT_HOLDING_BINDING")
+    return portfolio
+
+
 def _member_display_sections(source, request, original, producer):
     """Keep GDP observation periods as periods, without inventing release times.
 
@@ -515,6 +619,7 @@ def _member_display_sections(source, request, original, producer):
     input objects or strict market/publication timestamp checks.
     """
     module = _runtime("report_financial_sections", "W8")
+    portfolio = _member_current_portfolio(source, request, original)
     periods = []
     def collect(value, path):
         if isinstance(value, dict):
@@ -535,7 +640,7 @@ def _member_display_sections(source, request, original, producer):
         if "market" in bond and bond["market"] is None:
             bond["market"] = {}  # Legacy field selector only; raw source stays null.
             empty_containers.append(f"/result/all_asset_coverage/bonds/{index}/market")
-    if not periods and not empty_containers:
+    if not periods and not empty_containers and portfolio is None:
         return module.member_sections(source, request, original, producer)
     cutoff = _time(request["evaluation_at"])
     for row in original["positions"]:
@@ -556,6 +661,23 @@ def _member_display_sections(source, request, original, producer):
     # and quote the untouched original receipt, including its nulls/digests.
     isolated.validate_coverage = lambda _view, src, req: module.validate_coverage(original, src, req)
     isolated._Quotes = lambda _view, req, prod: module._Quotes(original, req, prod)
+    if portfolio is not None:
+        def holding_fields(base, holdings):
+            fields = [(label.replace("來源", "歷史", 1), pointer) for label, pointer in module._holding_fields(base, holdings)]
+            match = re.fullmatch(r"/result/positions/([0-9]+)/holding/source_facts", base)
+            bond = re.fullmatch(r"/result/all_asset_coverage/bonds/([0-9]+)/holdings", base)
+            row = (original["positions"][int(match[1])] if match else
+                   original["all_asset_coverage"]["bonds"][int(bond[1])] if bond else None)
+            current = [(i, p) for i, p in enumerate(portfolio["positions"]) if row and p["symbol"] == row["symbol"]]
+            if match and len(current) == 1:
+                pointer = f"/result/current_portfolio_reference/positions/{current[0][0]}"
+                history_differs = any(h.get("quantity") != current[0][1]["quantity"]
+                                      or h.get("currency") != current[0][1]["currency"] for h in holdings)
+                fields = [("當輪已核現持", pointer + "/quantity"), ("當輪現持幣別", pointer + "/currency")] + (fields if history_differs else [])
+                if (row.get("holding") or {}).get("current_broker_position") is not None:
+                    fields.insert(2, ("現持來源可得時間", base.removesuffix("/source_facts") + "/current_broker_position/retrieved_at"))
+            return fields
+        isolated._holding_fields = holding_fields
     display = isolated.member_sections(source, request, view, producer)
     display["projection"]["source_result_sha256"] = digest(original)
     display["projection"]["observation_period_adapter"] = {
@@ -563,6 +685,48 @@ def _member_display_sections(source, request, original, producer):
         "legacy_null_container_selectors": empty_containers,
         "release_time_invented": False, "raw_values_changed": False}
     return display
+
+
+def _member_portfolio_sections(display, source, request, original, producer):
+    """Quote all approved source rows and NAV; keep canonical W6 totals unknown."""
+    portfolio = _member_current_portfolio(source, request, original)
+    if portfolio is None:
+        return
+    quotes = _runtime("report_financial_sections", "W8")._Quotes(original, request, producer)
+    base = "/result/current_portfolio_reference"
+    quotes.add("radar", f"當輪已核持倉與淨值｜{len(portfolio['positions'])}筆原列", [
+        ("評估時間", base + "/evaluation_at"), ("來源核定時間", base + "/project_NAV_source_qualification/available_at"),
+        ("原件淨值TWD", base + "/positions_plus_accepted_cash_TWD"), ("原現金TWD", base + "/cash_TWD"),
+        ("證券市值分幣", base + "/security_subtotals_by_currency"), ("淨現金分幣", base + "/accepted_net_cash_by_currency"),
+        ("匯率日期", base + "/reporting_FX/as_of"), ("USD/TWD原匯率", base + "/reporting_FX/quote_per_base")],
+        note="這是原04已核來源值，未重新估價或加總；與完整配置分母、階位及買進資格分列。")
+    analyses = {r["symbol"]: i for i, r in enumerate(original["positions"])}
+    rows = []
+    for index, row in enumerate(portfolio["positions"]):
+        pointer = base + f"/positions/{index}"
+        fields = [("現持", pointer + "/quantity"), ("幣別", pointer + "/currency"),
+                  ("原幣市值", pointer + "/amount"), ("TWD市值", pointer + "/reporting_amount_TWD"),
+                  ("採價日", pointer + "/observed_market_date")]
+        if row["symbol"] in analyses:
+            origin = f"/result/positions/{analyses[row['symbol']]}"
+            fields += [("模式", origin + "/formal_conclusion/selected_mode"),
+                       ("正式階位", origin + "/formal_conclusion/formal_stage"),
+                       ("新增金額", origin + "/proposed_amount"), ("新增股數", origin + "/proposed_quantity")]
+        rows.append((row["symbol"] + f"〔原列{index + 1}〕", fields))
+    quotes.compact_rows("radar", rows, note="依原列序引用；重複標的不合併，零部位保留0，未提供值保留UNKNOWN。")
+    rules_sha = sha256(Path(__file__).read_bytes()).hexdigest()
+    for name in ("radar", "valuation", "bond"):
+        envelope = display["envelopes"][name]
+        if name == "radar":
+            envelope["payload"] = quotes.rows[name] + envelope["payload"]
+            display["projection"]["quoted_fields"][name] = quotes.field_map[name] + display["projection"]["quoted_fields"][name]
+        envelope["payload_sha256"] = digest(envelope["payload"])
+        envelope.setdefault("base_display_rules_sha", envelope["rules_sha"])
+        envelope["rules_sha"] = rules_sha
+    display["projection"]["current_portfolio_display"] = {
+        "rules_sha": rules_sha, "source_digest": portfolio["digest"], "rows_quoted": len(portfolio["positions"]),
+        "history_labelled": True, "amounts_recalculated": False, "scope": "SOURCE_REVIEW",
+        "canonical_allocation_or_buy_permission_created": False}
 
 
 def _member_zero_sections(display, source, request, original, producer):
@@ -659,6 +823,7 @@ def _member_sources(source, market, engine, binding):
     # regenerated. A bad hash/client/time is never hidden by a fallback.
     _sections(incoming, source, request["run_id"], _time(request["evaluation_at"]))
     display = _member_display_sections(source, request, original, binding["member_producer"])
+    _member_portfolio_sections(display, source, request, original, binding["member_producer"])
     _member_zero_sections(display, source, request, original, binding["member_producer"])
     active = display["envelopes"]
     generated = set(active)

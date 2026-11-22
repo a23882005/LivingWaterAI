@@ -111,6 +111,31 @@ def incomplete_case():
     return case
 
 
+def dual_source_pause_case():
+    """Invented independent histories with the same last-session identity."""
+    case = zero_case("pause"); row = case["result"]["positions"][0]
+    market, price, pause = row["market"], row["same_run_gap_price"], row["normal_buy_pause"]
+    market.update(symbol=row["symbol"], source_sha256="d" * 64, observed_close="63.125", rows=41,
+        provider_verified_at="2026-10-29T14:00:00Z")
+    market["market_identity"]["exchange"] = "XTSY"
+    market["market_identity"]["provider_symbol"] = row["symbol"]
+    price.update(observed_close="63.1250", exchange="XTSY", scope="CURRENT_POSITION_EXPOSURE_ONLY")
+    pause["source_sha256"] = "d" * 64
+    row["core_observation"]["source_sha256"] = "d" * 64
+    position = deepcopy(market)
+    position.update(source_sha256="c" * 64, rows=19, provider_verified_at="2026-10-29T13:00:00Z")
+    for observation in (market, position):
+        observation["provider_completion_evidence"] = {
+            "provider": "IBKR_LAST_DAILY_OBSERVATION", "original_document_sha256": observation["source_sha256"],
+            "contract_id": 12345, "provider_exchange": "SYNTHETIC_EXCHANGE",
+            "query": {"contract_id": 12345, "exchange": "SYNTHETIC_EXCHANGE", "outside_rth": False},
+            "retrieved_at": observation["provider_verified_at"], "returned_end": observation["observed_date"],
+            "returned_rows": observation["rows"], "independent_identity_sha256": "f" * 64}
+    market["position_valuation_observation"] = position
+    seal(case)
+    return case
+
+
 class SourceZeroTests(unittest.TestCase):
     def inputs(self, case):
         return F.A.make_member_review_inputs(case["source"], case["request"], case["result"],
@@ -139,6 +164,97 @@ class SourceZeroTests(unittest.TestCase):
                 if kind == "pause": self.assertIn("已建立賣出意圖：FALSE", text)
                 self.assertIsNone(case["result"]["positions"][1]["proposed_amount"])
                 self.assertEqual(set(cards), set(F.A.SECTION_NAMES))
+
+    def test_distinct_source_hashes_preserve_original_zero_and_both_receipts(self):
+        case = dual_source_pause_case(); before = deepcopy(case)
+        current = self.current(case)
+        self.assertEqual(case, before)
+        self.assertEqual(current["report_source_lineage"]["member_analysis"], case["result"])
+        self.assertEqual(current["report_source_lineage"]["section_projection"]["scoped_zero_display"]["decisions"],
+            {case["result"]["positions"][0]["symbol"]: "NORMAL_NEW_BUYS_PAUSED"})
+        self.assertIsNone(current["current_total_twd"])
+        self.assertEqual(current["report_scope"], "SOURCE_REVIEW")
+
+    def test_distinct_source_identity_price_date_exchange_or_currency_mismatch_rejected(self):
+        for component in ("price", "market", "position"):
+            for key, value in (("symbol", "FOREIGN"), ("provider_symbol", "FOREIGN"), ("exchange", "XBAD"), ("currency", "TWD"),
+                               ("date", "2026-10-28"), ("close", "63.126")):
+                if key == "provider_symbol" and component == "price":
+                    continue
+                with self.subTest(component=component, key=key):
+                    case = dual_source_pause_case(); row = case["result"]["positions"][0]
+                    node = row["same_run_gap_price"] if component == "price" else row["market"]
+                    if component == "position": node = node["position_valuation_observation"]
+                    if key in ("exchange", "currency", "provider_symbol") and component != "price": node["market_identity"][key] = value
+                    else: node[{"date": "session" if component == "price" else "observed_date", "close": "observed_close"}.get(key,key)] = value
+                    seal(case)
+                    with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_each_distinct_sha_must_match_its_own_original_receipt_and_role(self):
+        for attack in ("price_sha", "market_sha", "pause_sha", "valuation_sha", "position_sha", "core_sha",
+                       "market_document_sha", "position_document_sha", "missing_position", "missing_market_proof", "missing_position_proof"):
+            with self.subTest(attack=attack):
+                case = dual_source_pause_case(); row = case["result"]["positions"][0]
+                market = row["market"]; position = market["position_valuation_observation"]
+                if attack == "price_sha": row["same_run_gap_price"]["source_sha256"] = "e" * 64
+                elif attack == "market_sha": market["source_sha256"] = "e" * 64
+                elif attack == "pause_sha": row["normal_buy_pause"]["source_sha256"] = "e" * 64
+                elif attack == "valuation_sha": row["normal_buy_pause"]["position_valuation_source_sha256"] = "e" * 64
+                elif attack == "position_sha": position["source_sha256"] = "e" * 64
+                elif attack == "core_sha": row["core_observation"]["source_sha256"] = "e" * 64
+                elif attack.endswith("document_sha"):
+                    (market if attack.startswith("market") else position)["provider_completion_evidence"]["original_document_sha256"] = "e" * 64
+                elif attack == "missing_position": market.pop("position_valuation_observation")
+                else: (market if attack == "missing_market_proof" else position).pop("provider_completion_evidence")
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_distinct_source_contract_capture_and_original_44E_are_required(self):
+        for key, value in (("contract_id", 12346), ("provider_exchange", "FOREIGN"),
+                ("independent_identity_sha256", "e" * 64), ("retrieved_at", "2030-01-01T00:00:00Z"),
+                ("returned_end", "2026-10-28"), ("returned_rows", 0), ("provider", "UNVERIFIED")):
+            with self.subTest(key=key):
+                case = dual_source_pause_case(); position = case["result"]["positions"][0]["market"]["position_valuation_observation"]
+                proof = position["provider_completion_evidence"]; proof[key] = value
+                if key == "contract_id": proof["query"]["contract_id"] = value
+                if key == "retrieved_at": position["provider_verified_at"] = value
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+        for attack in ("down", "vote", "sell", "amount", "scope"):
+            with self.subTest(attack=attack):
+                case = dual_source_pause_case(); row = case["result"]["positions"][0]
+                if attack == "down": row["core_observation"]["result"]["technical"]["runaway_down"] = "FALSE"
+                elif attack == "vote": row["normal_buy_pause"]["votes"]["down_accel"] = []
+                elif attack == "sell": row["normal_buy_pause"]["sell_intent_created"] = True
+                elif attack == "amount": row["proposed_amount"]["amount"] = "1"
+                else: row["same_run_gap_price"]["scope"] = "ORDER_EXECUTION"
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_same_source_rich_price_receipt_cannot_disagree_on_price(self):
+        case = dual_source_pause_case(); row = case["result"]["positions"][0]
+        row["same_run_gap_price"]["source_sha256"] = row["market"]["source_sha256"]
+        row["normal_buy_pause"]["position_valuation_source_sha256"] = row["market"]["source_sha256"]
+        seal(case); self.current(case)
+        row["same_run_gap_price"]["observed_close"] = "63.126"; seal(case)
+        with self.assertRaises(ValueError): self.inputs(case)
+
+    def test_distinct_source_invalid_numeric_values_or_proof_shapes_rejected(self):
+        for value in (False, "0", "-1", "NaN", "Infinity", None):
+            with self.subTest(close=value):
+                case = dual_source_pause_case(); case["result"]["positions"][0]["same_run_gap_price"]["observed_close"] = value
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
+        for attack in ("identity", "proof", "query", "outside_rth", "boolean_count"):
+            with self.subTest(attack=attack):
+                case = dual_source_pause_case(); market = case["result"]["positions"][0]["market"]
+                if attack == "identity": market["market_identity"] = {}
+                elif attack == "proof": market["provider_completion_evidence"] = None
+                elif attack == "query": market["provider_completion_evidence"]["query"] = None
+                elif attack == "outside_rth": market["provider_completion_evidence"]["query"]["outside_rth"] = True
+                else: market["provider_completion_evidence"]["returned_rows"] = True
+                seal(case)
+                with self.assertRaises(ValueError): self.inputs(case)
 
     def test_original_blank_rows_and_old_display_are_exact(self):
         case = F.member_case()

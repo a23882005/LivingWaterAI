@@ -201,6 +201,67 @@ def make_report_sources(source, request, result=None, *, c7=None, sections=None,
     return out
 
 
+def _member_pause_price_sources(request, row, price):
+    """Bind each original SHA to its own observation, then compare identity.
+
+    A price observation and the longer original 44-E history need not have
+    identical bytes. Native row/report digests bind both original receipts;
+    the operator verifies the original document bytes before this handoff.
+    """
+    market, pause = row["market"], row["normal_buy_pause"]
+    valuation_sha, decision_sha = price.get("source_sha256"), market.get("source_sha256")
+    require(all(re.fullmatch(r"[0-9a-f]{64}", str(x)) for x in (valuation_sha, decision_sha))
+            and pause.get("source_sha256") == decision_sha
+            and pause.get("position_valuation_source_sha256") == valuation_sha,
+            "W6_MEMBER_ZERO_PAUSE_SOURCE")
+    distinct = valuation_sha != decision_sha
+    if not distinct and not any(k in price for k in ("exchange", "observed_close")):
+        return  # Preserve the previously accepted minimal same-source receipt.
+    observations = [market]
+    if distinct:
+        position = market.get("position_valuation_observation")
+        require(isinstance(position, dict) and position.get("source_sha256") == valuation_sha
+                and price.get("scope") == "CURRENT_POSITION_EXPOSURE_ONLY"
+                and row.get("core_observation", {}).get("source_sha256") == decision_sha,
+                "W6_MEMBER_ZERO_PAUSE_ORIGINAL_SOURCE")
+        observations.append(position)
+    exchange = price.get("exchange")
+    require(isinstance(exchange, str) and bool(exchange) and _number(price.get("observed_close")) > 0,
+            "W6_MEMBER_ZERO_PAUSE_PRICE_IDENTITY")
+    proofs = []
+    for observation in observations:
+        identity = observation.get("market_identity", {})
+        require(isinstance(identity, dict) and observation.get("symbol") == row["symbol"]
+                and (not distinct or identity.get("provider_symbol") == row["symbol"])
+                and identity.get("exchange") == exchange and identity.get("currency") == price.get("currency")
+                and observation.get("observed_date") == price.get("session") == pause.get("session")
+                and _number(observation.get("observed_close")) == _number(price["observed_close"]),
+                "W6_MEMBER_ZERO_PAUSE_PRICE_IDENTITY")
+        if not distinct:
+            continue
+        proof = observation.get("provider_completion_evidence", {})
+        query = proof.get("query") if isinstance(proof, dict) else None
+        require(isinstance(proof, dict) and isinstance(query, dict)
+                and proof.get("provider") == "IBKR_LAST_DAILY_OBSERVATION"
+                and proof.get("original_document_sha256") == observation["source_sha256"]
+                and type(proof.get("contract_id")) is int and proof["contract_id"] > 0
+                and type(query.get("contract_id")) is int and query["contract_id"] == proof["contract_id"]
+                and isinstance(proof.get("provider_exchange"), str) and bool(proof["provider_exchange"])
+                and query.get("exchange") == proof["provider_exchange"] and query.get("outside_rth") is False
+                and proof.get("retrieved_at") == observation.get("provider_verified_at")
+                and _time(proof.get("retrieved_at")) <= _time(request["evaluation_at"])
+                and proof.get("returned_end") == observation["observed_date"]
+                and type(observation.get("rows")) is int and observation["rows"] > 0
+                and type(proof.get("returned_rows")) is int and proof["returned_rows"] == observation["rows"]
+                and re.fullmatch(r"[0-9a-f]{64}", str(proof.get("independent_identity_sha256", ""))),
+                "W6_MEMBER_ZERO_PAUSE_ORIGINAL_SOURCE")
+        proofs.append(proof)
+    if distinct:
+        require(all(proofs[0][k] == proofs[1][k] for k in (
+                    "contract_id", "provider_exchange", "independent_identity_sha256")),
+                "W6_MEMBER_ZERO_PAUSE_PRICE_IDENTITY")
+
+
 def _member_zero_decision(source, request, row):
     """Receive named zero decisions or unfinished scoped source receipts.
 
@@ -235,7 +296,7 @@ def _member_zero_decision(source, request, row):
             and price.get("symbol") == row["symbol"]
             and price.get("currency") == amount["currency"]
             and price.get("currency") == row.get("market", {}).get("market_identity", {}).get("currency")
-            and price.get("source_sha256") == row.get("market", {}).get("source_sha256")
+            and (pause is not None or price.get("source_sha256") == row.get("market", {}).get("source_sha256"))
             and price.get("session") == row.get("market", {}).get("observed_date")), "W6_MEMBER_ZERO_PRICE_BINDING")
     if scoped is not None:
         require(isinstance(scoped, dict)
@@ -342,10 +403,8 @@ def _member_zero_decision(source, request, row):
             and pause.get("sell_intent_created") is False
             and pause.get("target_and_gap_preserved") is True, "W6_MEMBER_ZERO_PAUSE_BINDING")
     market, core = row.get("market", {}), row.get("core_observation", {})
-    require(re.fullmatch(r"[0-9a-f]{64}", str(pause.get("source_sha256", "")))
-            and pause["source_sha256"] == market.get("source_sha256") == price.get("source_sha256")
-            == pause.get("position_valuation_source_sha256")
-            and pause.get("session") == market.get("observed_date") == price.get("session")
+    _member_pause_price_sources(request, row, price)
+    require(pause.get("session") == market.get("observed_date") == price.get("session")
             and market.get("market_identity", {}).get("currency") == amount["currency"]
             and core.get("result", {}).get("technical", {}).get("runaway_down") == "TRUE"
             and market.get("v82_original_aggregation", {}).get("runaway_down") == "TRUE",

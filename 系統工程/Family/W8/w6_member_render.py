@@ -325,6 +325,11 @@ def render_current_w6(data, w6_zip, *, executable=None):
     if data.get("member_alias") not in ("mou","Joseph","Arthur","Lilian"):
         raise PermissionError("W6_MEMBER_REQUIRED")
     css,mother,images=_extract_approved(w6_zip)
+    # SOURCE_REVIEW chapter 10 spacing only: retain 21px text, all cards,
+    # the unchanged approved mother and the existing <=45-page/overflow QA.
+    if data.get("report_scope") == "SOURCE_REVIEW":
+        css += ('.page[data-chapter="10"] article{padding:13px 23px;margin:9px 0}'
+                '.page[data-chapter="10"] p{margin:6px 0}')
     blocks=_build_blocks(data)
     try: from playwright.sync_api import sync_playwright
     except ImportError:raise RuntimeError("W6_ON_DEMAND_PLAYWRIGHT_MISSING") from None

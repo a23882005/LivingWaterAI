@@ -21,6 +21,36 @@ F = importlib.util.module_from_spec(spec); spec.loader.exec_module(F)
 
 
 class RenderedHTMLTests(unittest.TestCase):
+    def test_source_review_chapter10_spacing_preserves_text_fonts_and_other_chapters(self):
+        css, _, images = F.R._extract_approved(os.environ["W6_APPROVED_ARCHIVE"])
+        source = F.R._source_html(self.financial_current, css, images, F.R._build_blocks(self.financial_current))
+        baseline = self.browser.new_page(viewport={"width":1135,"height":1600})
+        actual = self.browser.new_page(viewport={"width":1135,"height":1600})
+        try:
+            baseline.set_content(source, wait_until="load")
+            baseline.evaluate("document.fonts.ready")
+            baseline.evaluate(F.R.PAGINATION_SCRIPT, {"client":self.financial_current["member_alias"]})
+            actual.set_content(self.financial_rendered["artifacts"]["report.html"].decode(), wait_until="load")
+            def capture(page):
+                return page.evaluate('''() => Object.fromEntries(Array.from({length:14},(_,i)=>i+1).map(ch=>[ch,
+                  [...document.querySelectorAll('.page[data-chapter="'+ch+'"] article')].map(a=>({
+                    text:a.textContent, padding:getComputedStyle(a).padding, margin:getComputedStyle(a).margin,
+                    paragraphs:[...a.querySelectorAll('p')].map(p=>({text:p.textContent,
+                      font:getComputedStyle(p).fontSize,margin:getComputedStyle(p).margin}))}))]))''')
+            before, after = capture(baseline), capture(actual)
+            for chapter in before:
+                with self.subTest(chapter=chapter):
+                    if chapter != "10":
+                        self.assertEqual(before[chapter], after[chapter])
+                    else:
+                        self.assertEqual([x["text"] for x in before[chapter]], [x["text"] for x in after[chapter]])
+                        self.assertTrue(any(x["padding"]!=y["padding"] for x,y in zip(before[chapter],after[chapter])))
+                        for x,y in zip(before[chapter],after[chapter]):
+                            self.assertEqual([p["font"] for p in x["paragraphs"]], [p["font"] for p in y["paragraphs"]])
+                            self.assertTrue(all(p["font"]=="21px" for p in y["paragraphs"]))
+        finally:
+            baseline.close(); actual.close()
+
     @classmethod
     def setUpClass(cls):
         archive = os.environ.get("W6_APPROVED_ARCHIVE")

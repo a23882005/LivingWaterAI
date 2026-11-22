@@ -375,7 +375,6 @@ jobs:
           path: build/site/
           if-no-files-found: warn
       - name: Verify engineering directory requires its dedicated login
-        if: vars.V70_ENGINEERING_ENABLED == 'true'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
         run: |
@@ -385,10 +384,8 @@ jobs:
           test "$status" = 401
           grep -iq '^www-authenticate: Basic ' "$RUNNER_TEMP/engineering-headers"
       - name: Build engineering-only risk panels
-        if: vars.V70_ENGINEERING_ENABLED == 'true'
         run: python scripts/v70_cap/build.py build/engineering build/engineering-cap
       - name: Upload verified engineering files to the protected directory
-        if: vars.V70_ENGINEERING_ENABLED == 'true'
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOSTINGER_SFTP_HOST }}
@@ -400,7 +397,6 @@ jobs:
           strip_components: 2
           overwrite: true
       - name: Read back password-protected engineering HTML and data
-        if: vars.V70_ENGINEERING_ENABLED == 'true'
         env:
           SITE_BASE_URL: ${{ vars.V703_SITE_BASE_URL }}
           ENGINEERING_USER: ${{ secrets.V70_ENGINEERING_USER }}

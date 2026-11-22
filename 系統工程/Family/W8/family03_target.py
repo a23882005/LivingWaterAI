@@ -63,10 +63,21 @@ def resolve_target_rows(db, client, record, folder, calc, planner, market, stamp
     return {**record, "allocations":resolved}
 
 
-def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision):
-    """Use the member’s established account target for both preview and confirmation."""
+def bond_tickers(pool_path):
     from openpyxl import load_workbook
 
+    book = load_workbook(pool_path, read_only=True, data_only=True)
+    try:
+        rows = iter(book["債券參照"].values)
+        if not any(row and row[0] == "代碼" for row in rows):
+            raise ValueError("請核對候選表的債券參照")
+        return {r[0] for r in rows if len(r) >= 3 and r[0] and r[2]}
+    finally:
+        book.close()
+
+
+def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision):
+    """Use the member’s established account target for both preview and confirmation."""
     if not final:
         raise ValueError("請先指定本人的股票方案")
     tables = snapshot["tables"]
@@ -83,14 +94,7 @@ def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision
     version = latest["version_no"]
     instruments = {r["instrument_key"]: r for r in tables["portfolio_instrument"]}
     equities = set().union(*(group.keys() for group in catalog.values()))
-    book = load_workbook(pool_path, read_only=True, data_only=True)
-    try:
-        rows = iter(book["債券參照"].values)
-        if not any(row and row[0] == "代碼" for row in rows):
-            raise ValueError("請核對候選表的債券參照")
-        bonds = {r[0] for r in rows if len(r) >= 3 and r[0] and r[2]}
-    finally:
-        book.close()
+    bonds = bond_tickers(pool_path)
     equity_units, retained, existing = 0, {}, {}
     for line in tables["final_target_allocation"]:
         if line["target_key"] != target_key or line["version_no"] != version:

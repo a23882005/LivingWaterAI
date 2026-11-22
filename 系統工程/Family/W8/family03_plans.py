@@ -135,6 +135,55 @@ def next_layer(st):
     st["step"]="fund" if "fund" not in p["prefs"] else "review"
 
 
+def explain_choices(plans, rows, guide):
+    """Apply one member-selected preference set at a time to all six common-period rows."""
+    reports=[]
+    questions=guide.QUESTIONS
+    for slot,plan in zip(SLOTS,plans):
+        prefs=plan["prefs"]
+        goal=prefs.get("goal")
+        returns=prefs.get("returns")
+        loss=prefs.get("loss")
+        if any(v not in questions[k][1] for k,v in (("goal",goal),("returns",returns),("loss",loss))):
+            continue
+        band=questions["returns"][1].index(returns)
+        low,high=guide.comparison.RETURN_BANDS[band] if band<4 else (None,None)
+        idx=questions["loss"][1].index(loss)
+        cap=(.1,.2,.3,.4)[idx] if idx<4 else None
+        details=[]
+        eligible=[]
+        for r in rows:
+            h=r["歷史試算"]
+            ret=h.get("年化報酬率")
+            dd=h.get("最大回撤幅度")
+            excess=max(0,dd-cap) if cap is not None and dd is not None else None
+            risk=("未設硬上限" if cap is None else "待補共同歷史" if excess is None else
+                  f"超出 {excess*100:.2f} 個百分點" if excess>1e-10 else "在上限內")
+            match=("先看歷史結果" if low is None else "年化資料不足" if ret is None else
+                   "低於區間" if ret<low else "高於區間" if ret>=high else "在區間內")
+            details.append({"名稱":r["名稱"],"報酬對照":match,"回撤對照":risk})
+            if (r["名稱"] in SLOTS and ret is not None and dd is not None and
+                    (cap is None or dd<=cap+1e-10) and (low is None or low<=ret<high)):
+                eligible.append(r)
+        if not eligible:
+            advice="先看各案與本人區間的差距，再選要微調哪一案。"
+        elif goal==questions["goal"][1][2]:
+            advice="先比較符合區間的方案："+ "、".join(r["名稱"] for r in eligible)+"。逐項看共同成分與已知比重，資料涵蓋不同時保留判斷。"
+        else:
+            index=questions["goal"][1].index(goal)
+            metric,op={0:("最大回撤幅度",min),1:("年化報酬率",max),3:("Sharpe",max)}[index]
+            measured=[r for r in eligible if r["歷史試算"].get(metric) is not None]
+            advice="風險調整後報酬資料不足，先看原始報酬與跌幅。"
+            if measured:
+                best=op(r["歷史試算"][metric] for r in measured)
+                names="、".join(r["名稱"] for r in measured if abs(r["歷史試算"][metric]-best)<1e-10)
+                value=f"{best:.2f}" if metric=="Sharpe" else f"{best:.2%}"
+                advice=f"依本人目標，符合所選區間的自選方案中，先比較{names}（歷史{metric} {value}）。"
+        reports.append({"偏好來自":slot,"目標":goal,"年報區間":returns,"跌幅偏好":loss,
+                        "六組對照":details,"家人版建議":advice})
+    return reports
+
+
 def six(plans, prices, exposures, calc, single_stocks=()):
     allocation=[weights(p) for p in plans]+[{s:100} for s in BENCH]
     relevant=set().union(*allocation)
@@ -334,6 +383,7 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                 title="六組使用共同觀察日。看過結果後，你想修改哪一案，或指定最後方案？"
                 options=["調整"+s for s in SLOTS]+["指定"+s for s in SLOTS]+["回三方案"]
                 info["六組比較"]=evaluate(st["plans"],True)
+                info["本人偏好對照"]=explain_choices(st["plans"],info["六組比較"],guide)
                 lesson="review"
 
             else:
@@ -481,7 +531,7 @@ def write(st,q,choice,key,history,revision,snapshot,progress,folder,member,calc)
     stage={"save":"本人已儲存版本","final":"本人指定最後方案","restore":"從歷史複製"}.get(key,"本人暫選")
     now=datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
     event={"id":event_id,"time":now,"key":key,"title":q["問題"],"options":q["選項"],
-           "advice":{k:q[k] for k in ("整組試算","六組比較") if k in q},
+           "advice":{k:q[k] for k in ("整組試算","六組比較","本人偏好對照") if k in q},
            "choice":choice,"url":q.get("影片",{}).get("網址",""),"stage":stage,"answers":st,
            "next":st["step"],"previous":len(history),"token":digest(st["plans"][st["slot"]])}
     candidate=folder/("03-"+uuid.uuid4().hex+".xlsx")

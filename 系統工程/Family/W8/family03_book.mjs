@@ -69,6 +69,15 @@ if (args.event) {
     header(table,'A1:R1');widths(table,[180,88,280,120,120,70,180,105,105,105,105,90,90,90,360,400,330,330]);
     table.freezePanes.freezeRows(1);
   }
+  if(e.advice?.本人偏好對照?.length){
+    const preference=book.worksheets.items.find(s=>s.name==='本人偏好對照')||book.worksheets.add('本人偏好對照');
+    preference.getRange('A1:I1').values=[['選擇時間','偏好來自','本人目標','年報區間','跌幅偏好','比較對象','歷史年報對照','歷史跌幅對照','家人版建議']];
+    const checks=e.advice.本人偏好對照.flatMap(p=>p.六組對照.map(r=>[e.time,p.偏好來自,p.目標,p.年報區間,p.跌幅偏好,r.名稱,r.報酬對照,r.回撤對照,p.家人版建議]));
+    const start=preference.getUsedRange().rowCount;
+    preference.getRangeByIndexes(start,0,checks.length,9).values=checks;
+    header(preference,'A1:I1');widths(preference,[195,105,220,165,165,110,145,190,540]);
+    preference.freezePanes.freezeRows(1);
+  }
   const advice=lines ? {六組比較:lines.map(r=>({...r,共同曝險:{共幾項:r.共同曝險.共同曝險.length,明細:'見六組比較頁'}}))} : e.advice;
   log.getRangeByIndexes(e.previous+1,0,1,12).values=[[e.id,e.time,member,e.key,e.title,
     JSON.stringify(e.options),JSON.stringify(advice),e.choice,e.url,e.stage,JSON.stringify(e.answers),e.token || '']];

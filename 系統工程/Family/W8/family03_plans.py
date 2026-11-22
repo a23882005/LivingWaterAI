@@ -302,7 +302,7 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
         catalog=pool_rows(pool)
         versions=old_versions(history)
         st=initial(history)
-        if history and json.loads(history[-1]["作答後有效答案"]).get("schema")!=2 and payload.get("action") not in ("history","start_plans","restore","lookup"):
+        if history and json.loads(history[-1]["作答後有效答案"]).get("schema")!=2 and payload.get("action") not in ("history","start_plans","restore","lookup","account_preview"):
             # Preserve resumability of older partial interviews.
             if "review" not in json.loads(history[-1]["作答後有效答案"]):
                 q=legacy(payload)
@@ -310,6 +310,16 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                 q["查詢入口"]={"action":"history"}
                 return q
         action=payload.get("action")
+        if action == "account_preview":
+            if set(payload) != {"action"}:
+                raise ValueError("請從本人的最後指定方案讀取")
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("family03_target", Path(__file__).with_name("family03_target.py"))
+            target = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(target)
+            final = st.get("final")
+            return target.account_preview(snapshot, final, weights(final["配置"]) if final else {},
+                                          catalog, pool, revision)
         if action=="lookup":
             symbol=str(payload.get("symbol","")).strip().upper()
             if set(payload)!={"action","symbol"} or not 1<=len(symbol)<=25 or any(
@@ -353,6 +363,8 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                 info["三案進度"]={s:{"已配":sum(weights(a).values()),"已儲存":st["saved"].get(str(i))==digest(a)}
                                    for i,(s,a) in enumerate(zip(SLOTS,st["plans"]))}
                 info["本人最後指定"]=st.get("final")
+                if st.get("final"):
+                    info["查看全帳戶目標"] = {"action":"account_preview"}
                 info["操作"]="每次選擇後自動儲存；查詢支援代碼、角色或日期。找到版本後，選擇複製到哪一案。"
             elif key in ("goal","returns","loss","fund","amount","replace"):
                 title,options,*_=oldprefs[key]
@@ -588,3 +600,4 @@ def write(st,q,choice,key,history,revision,snapshot,progress,folder,member,calc)
     return {"status":"FAMILY03_PROGRESS_WRITEBACK_REQUIRED","本人":member,"檔名":progress.name,
             "原檔摘要":revision,"新檔摘要":sha256(candidate.read_bytes()).hexdigest(),"候選檔":str(candidate),
             "事件識別":event_id,"保存步驟":"核對本人雲端原檔摘要，備份、原 ID 更新，下載核對後再呼叫選單 03 續答。"}
+

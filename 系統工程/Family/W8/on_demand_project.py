@@ -289,6 +289,14 @@ def build_project_menu(*, family_login, project_name, login_account,
         guide_target = planner.menu_handler(public_entry, family_alias,
             Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices)
         def adjust_target(payload):
+            if payload.get("action") == "confirm_account":
+                if target_writer is None:
+                    return {"status":"FAMILY03_SOURCE_REQUIRED","缺項":"本人帳本寫回暫存目錄"}
+                preview = guide_target({"action":"account_preview"})
+                if preview["status"] != "FAMILY03_ACCOUNT_PREVIEW":
+                    return preview
+                target = _load(ROOT/"family03_target.py", "family03_full_target")
+                return target_writer(target.confirmed_request(preview, payload, client_id))
             if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
                 return target_writer(payload)
             return guide_target(payload)
@@ -426,3 +434,4 @@ def build_project_menu(*, family_login, project_name, login_account,
         member_report_run_observer=remember_member_run if trusted_member_w6_receiver is not None else None,
         other_handlers=handlers,
         completion_checks=completion_checks)
+

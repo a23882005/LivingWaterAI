@@ -95,9 +95,60 @@ def old_versions(history):
             i=0
         else:
             continue
-        versions.append({"版本":e["事件識別"],"時間":e["台灣時間"],"當時方案":SLOTS[i],
+        time_text = str(e["台灣時間"])
+        try:
+            when = datetime.fromisoformat(time_text.replace("Z", "+00:00"))
+            if when.tzinfo is not None:
+                time_text = when.astimezone(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
+        except ValueError:
+            pass  # Older workbooks may already contain a localized display string.
+        versions.append({"版本":e["事件識別"],"時間":time_text,"當時方案":SLOTS[i],
                          "狀態":e["選擇狀態"],"配置":p})
     return versions[::-1]
+
+
+def history_page(versions, catalog, payload, revision):
+    if set(payload) - {"action", "search", "offset", "role", "stage"}:
+        raise ValueError("歷史查詢只接受搜尋、篩選與翻頁")
+    role = payload.get("role", "全部")
+    stage = payload.get("stage", "全部")
+    stages = ("全部", "本人已儲存版本", "本人指定最後方案")
+    offset = payload.get("offset", 0)
+    if role not in ("全部", *ROLES) or stage not in stages:
+        raise ValueError("請從配置角色與版本狀態選項中選擇")
+    if type(offset) != int or offset < 0:
+        raise ValueError("查詢起點需為非負整數")
+    terms = str(payload.get("search", "")).casefold().split()
+    hits = []
+    for version in versions:
+        if stage != "全部" and version["狀態"] != stage:
+            continue
+        layers = version["配置"]["layers"]
+        selected = ROLES if role == "全部" else (role,)
+        parts = [str(version[k]) for k in ("時間", "當時方案", "狀態", "版本")]
+        summary = []
+        for layer in selected:
+            items = layers.get(layer, {})
+            if items:
+                summary.append(layer + " " + "、".join(f"{s} {w}%" for s, w in items.items()))
+                parts.extend(catalog[layer].get(s, {}).get("名稱", "") for s in items)
+        if role != "全部" and not summary:
+            continue
+        parts.extend(summary)
+        parts.extend(str(value) for value in version["配置"].get("prefs", {}).values())
+        description = " ".join(parts).casefold()
+        if all(word in description for word in terms):
+            hits.append({**version, "配置摘要": "｜".join(summary)})
+    page_size = 10
+    page = hits[offset:offset + page_size]
+    result = {"status": "FAMILY03_HISTORY", "唯讀": True, "共幾筆": len(hits), "起點": offset,
+              "版本": page, "revision": revision, "角色選項": ["全部", *ROLES], "狀態選項": list(stages),
+              "操作說明": "選角色或狀態縮小範圍，也能輸入代碼、名稱或日期。選好版本，再選要複製到哪一案。"}
+    if offset:
+        result["上一頁"] = {**payload, "offset": max(0, offset - page_size)}
+    if offset + page_size < len(hits):
+        result["下一頁"] = {**payload, "offset": offset + page_size}
+    return result
 
 
 def initial(history):
@@ -271,17 +322,7 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
                     "候選池":[r for r in ROLES if symbol in catalog[r]],
                     "補入方式":"想列入共用名單時，依核准分類更新 B 候選表，重新開啟 03 即會讀入。"}
         if action=="history":
-            if set(payload)-{"action","search","offset"}:
-                raise ValueError("歷史查詢只接受搜尋與翻頁")
-            term=str(payload.get("search","")).strip().casefold()
-            offset=payload.get("offset",0)
-            if type(offset)!=int or offset<0:
-                raise ValueError("頁碼需為非負整數")
-            names={s:c["名稱"] for pool in catalog.values() for s,c in pool.items()}
-            hits=[v for v in versions if term in (json.dumps(v,ensure_ascii=False)+" "+
-                  " ".join(names.get(s,"") for s in weights(v["配置"]))).casefold()]
-            return {"status":"FAMILY03_HISTORY","唯讀":True,"共幾筆":len(hits),"起點":offset,
-                    "版本":hits[offset:offset+10],"revision":revision}
+            return history_page(versions, catalog, payload, revision)
         if action=="restore":
             if set(payload)!={"action","version","slot","revision"} or payload["revision"]!=revision:
                 raise ValueError("請重新查詢最新版本")

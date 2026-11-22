@@ -122,3 +122,27 @@ jobs:
             cmp "staging/$file" "$RUNNER_TEMP/readback"
             echo "LOGIN_READBACK_PASS $file"
           done
+      - name: Verify the protected engineering allocation as rendered
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          batch = json.loads(Path("staging/V70_macro_latest.json").read_bytes())
+          if batch["publication"]["mode"] == "FORMAL":
+              origin = "https://www.happihelp.com"
+              with sync_playwright() as pw:
+                  browser = pw.chromium.launch(channel="chrome")
+                  page = browser.new_page(viewport={"width": 390, "height": 844}, http_credentials={
+                      "origin": origin, "username": os.environ["WEB_USER"], "password": os.environ["WEB_PASSWORD"]})
+                  page.goto(origin + "/v70-engineering/?verify=" + os.environ["GITHUB_RUN_ID"], wait_until="domcontentloaded")
+                  page.wait_for_function("window.v703BondInputsQualified === true && window.v703CanPublishFormalAllocation?.() === true", timeout=60000)
+                  ids = ["bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield", "bond-score-display", "total-cash", "total-bond", "total-stock"]
+                  results = {key: page.locator("#" + key).inner_text().strip() for key in ids}
+                  assert all(any(c.isdigit() for c in value) for value in results.values()), results
+                  print("VERIFIED_ENGINEERING_SCREEN", batch["asOf"], json.dumps(results, ensure_ascii=False))
+                  browser.close()
+          PY

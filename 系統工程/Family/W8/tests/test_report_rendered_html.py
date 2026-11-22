@@ -21,6 +21,22 @@ F = importlib.util.module_from_spec(spec); spec.loader.exec_module(F)
 
 
 class RenderedHTMLTests(unittest.TestCase):
+    def test_account_holdings_review_uses_approved_template_without_changing_unknowns(self):
+        current=self.holdings_current
+        rendered=self.holdings_rendered
+        page=self.browser.new_page(viewport={"width":1135,"height":1600})
+        try:
+            page.set_content(rendered["artifacts"]["report.html"].decode(),wait_until="load")
+            text=page.inner_text("body")
+            for word in ("REFERENCE_ACCOUNT_A","REFERENCE_ACCOUNT_B","UNKNOWN","SYNTHETIC_REFERENCE_structural"):
+                self.assertIn(word,text)
+            self.assertEqual(len(set(page.locator(".page[data-chapter]").evaluate_all("es=>es.map(e=>e.dataset.chapter)"))),14)
+            self.assertEqual(page.locator(".page[data-chapter='7'] p").first.evaluate("e=>getComputedStyle(e).fontSize"),"21px")
+            self.assertEqual(page.locator("article p").evaluate_all('''es=>es.filter(p=>{const b=p.closest('article').getBoundingClientRect();const r=document.createRange();r.selectNodeContents(p);return [...r.getClientRects()].some(x=>x.left<b.left-1||x.right>b.right+1)}).length'''),0)
+            self.assertIsNone(current["current_total_twd"])
+        finally:
+            page.close()
+
     def test_source_review_chapter10_spacing_preserves_text_fonts_and_other_chapters(self):
         css, _, images = F.R._extract_approved(os.environ["W6_APPROVED_ARCHIVE"])
         source = F.R._source_html(self.financial_current, css, images, F.R._build_blocks(self.financial_current))
@@ -84,6 +100,13 @@ class RenderedHTMLTests(unittest.TestCase):
         cls.owner_case=F.owner_decision_case(cls.folder/'synthetic-owner.sqlite')
         cls.owner_current=F.current(cls.owner_case)
         cls.owner_rendered=F.R.render_current_w6(cls.owner_current,archive)
+        spec=importlib.util.spec_from_file_location("browser_holdings_fixture", Path(__file__).with_name("test_report_holdings_review.py"))
+        h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
+        holding_case=h.case()
+        holding_case['result']['analysis_result']['scope']='SYNTHETIC_SCOPE_'*20
+        h.seal(holding_case)
+        cls.holdings_current=h.current(holding_case)
+        cls.holdings_rendered=F.R.render_current_w6(cls.holdings_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:

@@ -201,6 +201,12 @@ def make_report_sources(source, request, result=None, *, c7=None, sections=None,
     return out
 
 
+def make_holdings_review_inputs(source, request, result, *, source_id, rules_sha, review_sources=None):
+    """Receive the original account-scoped report; preserve its review scope."""
+    return _runtime("report_holdings_review", "W8").make_inputs(
+        source, request, result, source_id=source_id, rules_sha=rules_sha, review_sources=review_sources)
+
+
 def _member_pause_price_sources(request, row, price):
     """Bind each original SHA to its own observation, then compare identity.
 
@@ -1050,6 +1056,10 @@ def prepare_report_sources(source, market, engine):
     request = binding.get("request")
     if isinstance(request, dict) and request.get("schema_version") == "Family.W8.MemberV82Request.v1":
         return _with_owner_decision(_member_sources(source, market, engine, binding), decision, source, binding)
+    if (isinstance(binding.get("result"), dict)
+            and binding["result"].get("schema_version") == "Family.W8.HoldingsAnalysisReport.v1"):
+        return _with_owner_decision(_runtime("report_holdings_review", "W8").prepare_sources(
+            source, market, engine, binding), decision, source, binding)
     require(isinstance(request, dict) and request.get("schema_version") == "Family.W5.request.v1"
             and request.get("client_id") == source["client_id"] and request.get("run_id") == engine["run_id"]
             and request.get("evaluation_at") == engine["evaluation_at"]

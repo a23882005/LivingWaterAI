@@ -174,6 +174,7 @@ def _holding_fields(base, holdings):
 class _Quotes:
     def __init__(self, result, request, producer):
         self.data = {"result": result, "request": request}
+        self.source_result_sha256 = digest(result)
         self.producer = producer
         self.rows = {name: [] for name in SECTIONS}
         self.field_map = {name: [] for name in SECTIONS}
@@ -199,7 +200,7 @@ class _Quotes:
             ref = reference or self.producer["source_id"]
             self.rows[section].append({"heading": heading + (f"（續{index + 1}）" if index else ""),
                 "body": body, "source_reference": ref, "quoted_fields": deepcopy(part),
-                "source_result_sha256": digest(self.data["result"])})
+                "source_result_sha256": self.source_result_sha256})
             self.field_map[section].extend(deepcopy(part))
 
     def compact_rows(self, section, rows, *, note):
@@ -217,7 +218,7 @@ class _Quotes:
             self.rows[section].append({"heading": "原逐檔資料｜" + "、".join(x[0] for x in batch),
                 "body": "。".join(body_parts) + "。" + note,
                 "source_reference": self.producer["source_id"], "quoted_fields": deepcopy(facts),
-                "source_result_sha256": digest(self.data["result"])})
+                "source_result_sha256": self.source_result_sha256})
             self.field_map[section].extend(deepcopy(facts))
         for symbol, fields in rows:
             parts = []

@@ -64,18 +64,23 @@ def resolve_target_rows(db, client, record, folder, calc, planner, market, stamp
 
 
 def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision):
-    """Use the last confirmed MAIN allocation as the baseline, keeping each other line."""
+    """Use the member’s established account target for both preview and confirmation."""
     from openpyxl import load_workbook
 
     if not final:
         raise ValueError("請先指定本人的股票方案")
     tables = snapshot["tables"]
-    versions = [r["version_no"] for r in tables["final_target_version"]
-                if r["target_key"] == "MAIN" and r["lifecycle_state"] == "CONFIRMED"
-                and r["completeness_state"] == "COMPLETE"]
-    if not versions:
+    versions = tables["final_target_version"]
+    account_keys = {row["target_key"] for row in versions} & {"MAIN", "LONG_TERM"}
+    if not account_keys:
         raise ValueError("尚缺已確認的全帳戶配置，請先由原流程建立資產框架")
-    version = max(versions)
+    if len(account_keys) != 1:
+        raise ValueError("有兩組全帳戶目標，請先核對本戶目前使用的配置")
+    target_key = account_keys.pop()
+    latest = max((r for r in versions if r["target_key"] == target_key), key=lambda r: r["version_no"])
+    if latest["lifecycle_state"] != "CONFIRMED" or latest["completeness_state"] != "COMPLETE":
+        raise ValueError("最新全帳戶配置仍待確認或補齊")
+    version = latest["version_no"]
     instruments = {r["instrument_key"]: r for r in tables["portfolio_instrument"]}
     equities = set().union(*(group.keys() for group in catalog.values()))
     book = load_workbook(pool_path, read_only=True, data_only=True)
@@ -88,7 +93,7 @@ def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision
         book.close()
     equity_units, retained, existing = 0, {}, {}
     for line in tables["final_target_allocation"]:
-        if line["target_key"] != "MAIN" or line["version_no"] != version:
+        if line["target_key"] != target_key or line["version_no"] != version:
             continue
         key = line["instrument_key"]
         item = instruments[key]
@@ -108,7 +113,7 @@ def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision
         key = {"instrument_key":existing[symbol]} if symbol in existing else {"candidate_ticker":symbol}
         rows.append({**key, "weight":format(Decimal(value) / 1_000_000, "f")})
     return {"status":"FAMILY03_ACCOUNT_PREVIEW", "唯讀":True, "股票方案":final["方案"],
-            "原全帳戶版本":version, "原股票占比單位":equity_units, "每百萬單位":units,
+            "原全帳戶目標":target_key, "原全帳戶版本":version, "原股票占比單位":equity_units, "每百萬單位":units,
             "保留部位":retained, "allocations":rows, "revision":revision,
             "帳本摘要":snapshot["source_sha256"]}
 
@@ -148,5 +153,5 @@ def confirmed_request(preview, payload, client):
         raise ValueError("正式確認結果與本人看過的全帳戶配置不同")
     token = result["work6_snapshot_id"]
     return {"request_id":token, "owner_confirmed":True,
-            "record":{"confirmed":True, "target_key":"MAIN", "allocations":preview["allocations"],
+            "record":{"confirmed":True, "target_key":preview["原全帳戶目標"], "allocations":preview["allocations"],
                       "source_reference":f"Family03 {token} / Excel {preview['revision']}"}}

@@ -140,6 +140,8 @@ def build_w6_current_data(source, market, engine):
              "report_scope":"SOURCE_REVIEW","data_provenance":"SOURCE_BACKED",
              "report_content_state":"SOURCE_REVIEW_READY__VALUATION_AND_FINANCIAL_PIPELINE_UNKNOWN",
              "trade_authorization":"NONE"}
+        if prepared.get("current_position_display") is not None:
+            out["current_position_display"]=deepcopy(prepared["current_position_display"])
         if decision is not None:
             out["target_decision"]=deepcopy(decision)
             out["target_key"]=decision["historical_targets"][0]["target_key"]

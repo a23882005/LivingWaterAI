@@ -114,7 +114,115 @@ def current(c=None):
     return F.D.build_w6_current_data(c["source"], **inputs(c))
 
 
+def tw_case():
+    c=case();q=c['request'];r=c['result'];snap=q['client_snapshot']['payload'];tables=snap['tables']
+    owner={'client_id':F.CLIENT,'account':'SYNTH_TW_ACCOUNT','broker':'SYNTH_TW_BROKER',
+           'currency':'TWD','funding_domain':'TW_LOCAL_BROKER'}
+    account={'client_id':F.CLIENT,'account_key':owner['account']}
+    tables['portfolio_account'].append(account)
+    tables['account_broker_link']=[{'client_id':F.CLIENT,'account_key':owner['account'],'broker_key':owner['broker']}]
+    for symbol,quantity in [('BOTH','7'),('SELL','9')]:
+        next(x for x in tables['portfolio_instrument'] if x['ticker']==symbol)['quote_currency']='TWD'
+        tables['portfolio_position'].append({'client_id':F.CLIENT,'account_key':owner['account'],
+            'instrument_key':symbol,'quantity_decimal':quantity,'as_of_utc':F.ASOF})
+    broker_original=[{'symbol':'BOTH','broker_label':'SYNTH_BROKER_ONE','quantity':7,'currency':'TWD'},
+                     {'symbol':'BOTH','broker_label':'SYNTH_OTHER_BROKER','quantity':2,'currency':'TWD'}]
+    raw={'client_id':F.CLIENT,'field_key':'SYNTHETIC_BROKER_SOURCE','value_text':json.dumps(broker_original)}
+    tables['synthetic_broker_sources']=[raw]
+    snap['payload_digest']=F.A.digest(tables);q['client_snapshot']['digest']=F.A.digest(snap)
+    c['source']=F.S.build_report_source(snap,account='AR',expected_client_id=F.CLIENT)
+    r['snapshot_digest']=F.A.digest(snap)
+    registered={};market={};holdings=[]
+    for symbol,quantity,value in [('BOTH','7','185.50'),('SELL','9','238.50')]:
+        source_row=next(x for x in tables['portfolio_position'] if x['account_key']==owner['account'] and x['instrument_key']==symbol)
+        registered[symbol]={'symbol':symbol,'instrument_key':symbol,'account_key':owner['account'],
+            'quantity':quantity,'currency':'TWD','observed_at':F.ASOF,'source_row':deepcopy(source_row)}
+        market[symbol]={'currency':'TWD','exchange':'TPEX','observed_session':'2026-10-29','completed_close':'26.5',
+            'sessions':30,'market_available_at':F.ASOF,'expected_last_completed_session':'2026-10-29',
+            'calendar_sha256':'f'*64,'missing_calendar_sessions':[],'extra_calendar_sessions':[],
+            'completed_price_is_current':True,'volume_unit':'BOARD_LOTS','predicate_observations':{
+                'PRED-009':{'original_result':{'aggregate_state':'TECHNICAL_NEUTRAL','assessment_status':'VALID'},
+                            'metrics':{'rsi14':'42','ma20':'26.1'},'input_freshness_verified':False}}}
+        holdings.append({'asset_id':symbol,'broker_account_id':owner['account'],'amount':{'amount':value,'currency':'TWD'}})
+    identity={'run_id':q['run_id'],'broker_account_id':owner['account'],'currency':'TWD'}
+    w3={**identity,'evaluation_state':'REVIEW_REQUIRED','work3_complete':False,'gap_calculations':[
+        {'asset_id':symbol,'eligibility_state':'ELIGIBLE' if symbol=='BOTH' else 'INELIGIBLE_NEW_ALLOCATION',
+         'target_amount':{'amount':'15','currency':'TWD'},'eligible_existing_amount':{'status':'KNOWN','value':h['amount']},
+         'remaining_target_gap_amount':{'status':'KNOWN','value':{'amount':'0','currency':'TWD'}}}
+        for symbol,h in zip(registered,holdings)]}
+    output={**identity,'formal_output_eligible':False,'per_asset_decisions':[],
+            'bond_allocation_final':{'account_scope':{**{k:v for k,v in identity.items() if k!='run_id'},'broker_domain_type':'TW_LOCAL_BROKER'}}}
+    t={'schema_version':'Family.W8.TWLocalBondAnalysis.v1','run_id':q['run_id'],'evaluation_at':q['evaluation_at'],
+       'source_db_sha256':c['source']['source_db_sha256'],'owner':owner,'account_binding':{
+           'owner':deepcopy(owner),'source_rows':[deepcopy(account)],'approved_document_category_scope':{
+               'owner':deepcopy(owner),'original_account_row':deepcopy(account),'source_snapshot_digest':snap['payload_digest'],
+               'trade_authorization':'NONE'}},'registered_positions':registered,'market':market,
+       'native_validation':{'state':'ACCEPT','accepted':True},'trade_authorization':'NONE','trade_action':'NO_TRADE',
+       'formal_deployment_eligible':False,'canonical_result':None,'native_input':{
+           'client_ref':F.CLIENT,**identity,'analysis_timestamp':q['evaluation_at'],'broker_domain_type':'TW_LOCAL_BROKER',
+           'existing_bond_holdings':holdings,'bond_executable_budget':{'amount':'0','currency':'TWD'},
+           'broker_cash_total':{'status':'UNKNOWN','value':None},'broker_cash_available':{'status':'UNKNOWN','value':None}},
+       'work3':w3,'work4':{'status':'QUALIFIED_PREDICATES_AND_ACCOUNT_FUNDING_REQUIRED',
+           'missing':['SYNTHETIC_SAME_ACCOUNT_CASH'],'predicate_source_gaps':{s:{'PRED-009':{'assessment_status':'VALID'}} for s in registered}},
+       'work5':{'snapshot':{**identity,'output':output,'final_classification':'REVIEW_REQUIRED','gate_state':'INSUFFICIENT_DATA'}},
+       'original_broker_rows':[{**x,'quantity':str(x['quantity']),'source_row':deepcopy(raw),
+           'account_key':None,'account_mapping_state':'UNKNOWN','received_at':F.ASOF,'source_run_id':'SYNTHETIC_EARLIER_BROKER'}
+           for x in broker_original]}
+    r['tw_local_bond_analysis']=t
+    documents_raw={k:json.loads(v['original_text']) for k,v in c['review_sources'].items()}
+    for old,new in [('TW_A','BOTH'),('TW_B','SELL')]:
+        documents_raw['raw']['bond_positions'][new]=documents_raw['raw']['bond_positions'].pop(old)
+        documents_raw['raw']['bond_positions'][new]['symbol']=new
+        documents_raw['structural']['assets'][new]=documents_raw['structural']['assets'].pop(old)
+    c['review_sources']=documents(documents_raw['raw'],documents_raw['structural'])
+    seal(c);return c
+
+
 class HoldingsReviewTest(unittest.TestCase):
+    def test_same_run_native_TW_is_quoted_as_native_and_older_rows_are_not_relabelled(self):
+        c=tw_case();before=deepcopy(c);out=current(c);cards=out['verified_sections']['bond']
+        self.assertTrue(out['report_source_lineage']['section_projection']['same_run_native_TW_present'])
+        self.assertTrue(any(x['heading'].startswith('BOTH｜當輪原生臺幣逐檔結果') for x in cards))
+        self.assertFalse(any(x['heading'].startswith('BOTH｜補充實持') for x in cards))
+        technical=[f for card in cards for f in card.get('quoted_fields',[]) if f['pointer'].endswith('/predicate_observations/PRED-009/original_result/aggregate_state')]
+        self.assertEqual(len(technical),2);self.assertTrue(all(f['present'] and f['value']=='TECHNICAL_NEUTRAL' for f in technical))
+        self.assertEqual(out['report_source_lineage']['holdings_analysis'],c['result'])
+        positions=out['current_position_display']['positions']
+        self.assertEqual([(x['ticker'],x['quantity']) for x in positions],[('KEEP','4'),('BOTH','7'),('SELL','9')])
+        self.assertEqual(len(c['result']['tw_local_bond_analysis']['original_broker_rows']),2)
+        self.assertEqual(c,before)
+
+    def test_rehashed_native_TW_wrong_run_owner_DB_quantity_work5_and_other_broker_rejected(self):
+        attacks=[lambda t:t.update(run_id='OTHER'),lambda t:t.update(source_db_sha256='0'*64),
+            lambda t:t['owner'].update(account='OTHER'),lambda t:t['native_input'].update(run_id='OTHER'),
+            lambda t:t['registered_positions']['BOTH'].update(quantity='99'),
+            lambda t:t['market']['BOTH'].update(market_available_at='2027-01-01T00:00:00Z'),
+            lambda t:t['work3'].update(currency='USD'),lambda t:t['work5']['snapshot']['output'].update(run_id='OTHER'),
+            lambda t:t['original_broker_rows'][1].update(account_key='SYNTH_TW_ACCOUNT'),
+            lambda t:t['original_broker_rows'][1].update(quantity='999'),
+            lambda t:t['native_validation'].update(accepted=False)]
+        for index,attack in enumerate(attacks):
+            c=tw_case();attack(c['result']['tw_local_bond_analysis']);seal(c)
+            with self.subTest(attack=index),self.assertRaises(ValueError):current(c)
+
+    def test_current_holdings_precede_historical_DB_only_in_chapter3(self):
+        out=current(tw_case());blocks=F.R._build_blocks(out);legacy=deepcopy(out);legacy.pop('current_position_display')
+        before=F.R._build_blocks(legacy)
+        for actual,old in zip(blocks,before):
+            if actual['chapter']!=3:self.assertEqual(actual,old)
+        text=' '.join(blocks[2]['parts'])
+        self.assertLess(text.index('KEEP｜當輪來源持倉'),text.index('歷史資料庫持倉'))
+        self.assertIn('現持：4 股',text);self.assertIn('歷史數量',text)
+
+    def test_current_holding_unknown_quantity_and_reference_amount_are_not_zero_filled(self):
+        c=case();row=c['result']['analysis_result']['positions'][0]
+        row['holding']['quantity']=None;row['current_analysis']['holding']['quantity']=None
+        c['result']['recommendation_report']['rows'][0]['quantity']=None;seal(c)
+        out=current(c);position=out['current_position_display']['positions'][0]
+        self.assertIsNone(position['quantity']);self.assertIsNone(position['reference_amount'])
+        text=' '.join(F.R._build_blocks(out)[2]['parts'])
+        self.assertIn('現持：UNKNOWN 股',text)
+
     def test_original_result_and_earlier_six_references_remain_distinct(self):
         c = case(); before = deepcopy(c); out = current(c)
         self.assertEqual(c, before)

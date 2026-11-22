@@ -186,6 +186,20 @@ def _build_blocks(data):
                     for r in records[i:i+8]]))
         else:
             parts[3].append(_card("持倉資料狀態", "UNKNOWN；缺少已記錄持倉不表示持倉為零。"))
+        current_positions=data.get("current_position_display")
+        if current_positions is not None:
+            parts[3]=[_card("當輪原04持倉優先", "以下採本人同輪原04已綁定帳戶的來源持倉，各列保留持股原日期與行情原日期。行情參考估值不代表全戶淨值；未提供的值仍為UNKNOWN。")]
+            for row in current_positions["positions"]:
+                text=("現持："+str(row["quantity"] if row["quantity"] is not None else "UNKNOWN")+" 股；幣別："+row["currency"]+
+                    "；帳戶："+row["account"]+"。持股原日期："+str(row.get("quantity_as_of") or "UNKNOWN")+
+                    "；行情原日期："+str(row.get("reference_price_as_of") or "UNKNOWN")+
+                    "；行情參考估值："+row["currency"]+" "+_format_money(row.get("reference_amount"))+"（非全戶淨值）。")
+                parts[3].extend(_section_items([{"heading":row["ticker"]+"｜當輪來源持倉",
+                    "body":text,"source_reference":row["source_reference"]}]))
+            parts[3].append(_card("歷史資料庫持倉（不作當輪現持）", "下列為資料庫原日期的歷史紀錄；與上列當輪採用來源分開，不加總、不覆蓋當輪數量。"))
+            for i in range(0,len(records),8):
+                parts[3].append(_table(["標的","歷史帳戶","歷史數量","原記錄日期"],[
+                    [r.get("ticker"),r.get("account_key"),r.get("quantity"),r.get("as_of_utc")] for r in records[i:i+8]]))
         parts[4]=[_card("目前比例與統計", "UNKNOWN；市值分母尚未核實，不以舊值、零或推算比例填入。")]
     decision=data.get("target_decision")
     if decision:

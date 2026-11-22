@@ -21,6 +21,7 @@ def _load(filename, name):
 
 A = _load("report_canonical_adapter.py", "holdings_review_common_adapter")
 Q = _load("report_financial_sections.py", "holdings_review_quotations")
+TW = _load("report_tw_local_review.py", "holdings_review_tw")
 STATES = ("ANALYSIS_COMPLETE", "ANALYSIS_PARTIAL", "ANALYSIS_BLOCKED")
 
 
@@ -181,6 +182,7 @@ def validate(source, request, result, producer):
         A.require(state.get("run_id") == request["run_id"]
                   and state.get("broker_account_id") == owner["account"]
                   and state.get("currency") == owner["currency"], "W6_HOLDINGS_BOND_BINDING")
+    TW.validate(source, request, result)
 
 
 def supplement_documents(sources, source, request):
@@ -240,6 +242,7 @@ def supplement_documents(sources, source, request):
 def sections(source, request, result, producer, docs, sources):
     q = _ReviewQuotes(result, request, producer)
     q.data["supplement"] = docs
+    tw = result.get("tw_local_bond_analysis")
     q.add("bond", "本輪債券資料範圍與資格", [("本人原04狀態", "/result/status"),
         ("原分析帳戶", "/request/owner/account"), ("帳戶幣別", "/request/owner/currency"),
         ("原04輪號", "/request/run_id"), ("原04查核時間", "/request/evaluation_at"),
@@ -290,6 +293,8 @@ def sections(source, request, result, producer, docs, sources):
             ("原來源包SHA256", "/supplement/raw/source_pack_sha256")],
             note="較早原件的參考引用；不冒充本輪原04的臺灣帳戶Work3/4/5或全戶金融結論。")
         for symbol, asset in docs["structural"]["assets"].items():
+            if tw is not None and symbol in tw["registered_positions"]:
+                continue  # The same-run native TW result is quoted below.
             base = "/supplement/structural/assets/" + symbol
             raw = "/supplement/raw/bond_positions/" + symbol
             ref = sources["structural"]["source_id"] + ":" + sources["structural"]["sha256"]
@@ -327,6 +332,7 @@ def sections(source, request, result, producer, docs, sources):
         ("原市場來源資格", "/result/native_source_freshness/market/state"),
         ("來源時點不代表金融資格", "/result/native_source_freshness/market/source_recency_is_not_canonical_market_attestation")],
         note="非新的金融或總經計算。")
+    TW.quote_sections(q, tw)
     for i, line in enumerate(request.get("confirmed_target", {}).get("payload", {}).get("draft", {}).get("target_lines", [])):
         if line.get("ticker") not in (docs.get("structural", {}).get("assets", {}) or bond.get("targets", {})):
             continue
@@ -373,6 +379,7 @@ def prepare_sources(source, market, engine, binding):
     envelopes, fields = sections(source, request, result, producer, docs, sources)
     normalized, receipts = A._sections(envelopes, source, request["run_id"], A._time(request["evaluation_at"]))
     return {"scope": "SOURCE_REVIEW", "canonical": None, "radar": None, "sections": normalized,
+        "current_position_display": TW.current_position_display(source, request, result, producer),
         "lineage": {"binding_sha256": binding["digest"], "sections": receipts,
             "holdings_analysis": deepcopy(result), "holdings_review_documents": deepcopy(docs),
             "request_sha256": A.digest(request), "result_sha256": A.digest(result),
@@ -380,5 +387,6 @@ def prepare_sources(source, market, engine, binding):
                 "schema_version": "Family.W8.HoldingsSectionDisplay.v1", "quoted_fields": fields,
                 "source_result_sha256": A.digest(result), "financial_completeness_asserted": False,
                 "private_source_review_eligible": True, "canonical_financial_report_eligible": False,
+                "same_run_native_TW_present": result.get("tw_local_bond_analysis") is not None,
                 "supplement_qualification": "EARLIER_REFERENCE_ONLY__NOT_SAME_RUN_ACCOUNT_FINANCIAL_OUTPUT",
                 "document_receipts": {k: {x: v[x] for x in ("source_id", "sha256")} for k, v in (sources or {}).items()}}}}

@@ -21,6 +21,22 @@ F = importlib.util.module_from_spec(spec); spec.loader.exec_module(F)
 
 
 class RenderedHTMLTests(unittest.TestCase):
+    def test_same_run_native_TW_and_current_holdings_are_readable_with_history_separate(self):
+        page=self.browser.new_page(viewport={"width":1135,"height":1600})
+        try:
+            page.set_content(self.tw_rendered['artifacts']['report.html'].decode(),wait_until='load')
+            chapter3=page.locator('.page[data-chapter="3"]')
+            text=' '.join(chapter3.all_inner_texts())
+            self.assertLess(text.index('KEEP｜當輪來源持倉'),text.index('歷史資料庫持倉'))
+            self.assertIn('現持：4 股',text)
+            self.assertIn('BOTH｜當輪原生臺幣逐檔結果',page.inner_text('body'))
+            self.assertNotIn('BOTH｜補充實持',page.inner_text('body'))
+            self.assertEqual(page.locator('article p:not(.source-reference)').evaluate_all('es=>[...new Set(es.map(e=>getComputedStyle(e).fontSize))]'),['21px'])
+            self.assertEqual(page.locator('.source-reference').evaluate_all('es=>[...new Set(es.map(e=>getComputedStyle(e).fontSize))]'),['18px'])
+            self.assertEqual(page.locator('article p').evaluate_all('''es=>es.filter(p=>{const b=p.closest('article').getBoundingClientRect();const r=document.createRange();r.selectNodeContents(p);return [...r.getClientRects()].some(x=>x.left<b.left-1||x.right>b.right+1)}).length'''),0)
+        finally:
+            page.close()
+
     def test_account_holdings_review_uses_approved_template_without_changing_unknowns(self):
         current=self.holdings_current
         rendered=self.holdings_rendered
@@ -107,6 +123,8 @@ class RenderedHTMLTests(unittest.TestCase):
         h.seal(holding_case)
         cls.holdings_current=h.current(holding_case)
         cls.holdings_rendered=F.R.render_current_w6(cls.holdings_current,archive)
+        cls.tw_current=h.current(h.tw_case())
+        cls.tw_rendered=F.R.render_current_w6(cls.tw_current,archive)
         for name, raw in cls.rendered["artifacts"].items():
             (cls.folder / name).write_bytes(raw)
         with zipfile.ZipFile(io.BytesIO(cls.rendered["artifacts"]["report.zip"])) as z:

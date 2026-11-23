@@ -28,9 +28,10 @@
       "status": "OK"
     },
     "m05": {
-      "consecutive_failures": 34,
-      "last_alert_date": "2026-11-23",
-      "status": "STALE"
+      "consecutive_failures": 0,
+      "last_alert_date": null,
+      "status": "STALE",
+      "alert_disposition": "OFFICIAL_CPI_BASE_PERIOD_UNAVAILABLE"
     },
     "m09": {
       "consecutive_failures": 0,

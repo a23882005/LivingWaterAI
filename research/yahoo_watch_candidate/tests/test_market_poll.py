@@ -86,6 +86,64 @@ class ActionableRiskTests(unittest.TestCase):
                     {**o, 'last_session':'tomorrow'}):
             self.assertFalse(actionable_daily_risk(bad))
 
+class DailyRiskEvidenceTests(unittest.TestCase):
+    def test_pinned_daily_inputs_are_forwarded_as_flat_public_facts(self):
+        from original_rd_observer import daily_risk_evidence
+        observed = {
+            'observed_close': 150.65, 'rows': 25,
+            'swings': {'lows': [{'index': 13, 'value': 151.25,
+                                 'pivot_session': '2026-11-05'}]},
+            'approved_technical': {
+                'trend_timing_inputs': {
+                    'previous_close': '152.36',
+                    'bars': [{'Low': '149.77', 'Close': '150.65'}],
+                },
+                'signals': {
+                    'down_break': [
+                        {'truth': 'FALSE', 'rule_ref': 'v1.0 D1'},
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 D2'},
+                        {'truth': 'UNKNOWN', 'rule_ref': 'v1.0 D3'},
+                    ],
+                    'down_accel': [
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 A1'},
+                        {'truth': 'FALSE', 'rule_ref': 'v1.0 A2'},
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 A3'},
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 A4'},
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 A5'},
+                        {'truth': 'FALSE', 'rule_ref': 'v1.0 A6'},
+                        {'truth': 'TRUE', 'rule_ref': 'v1.0 A7'},
+                        {'truth': 'UNKNOWN', 'rule_ref': 'v1.0 A8'},
+                    ],
+                },
+            },
+        }
+        evidence = daily_risk_evidence(observed)
+        self.assertEqual(evidence['daily_close'], 150.65)
+        self.assertEqual(evidence['daily_previous_close'], 152.36)
+        self.assertEqual(evidence['daily_low'], 149.77)
+        self.assertAlmostEqual(evidence['daily_change_percent'], -1.1223, places=4)
+        self.assertEqual(evidence['rd_break_true_codes'], 'D2')
+        self.assertEqual(evidence['rd_accel_true_codes'], 'A1|A3|A4|A5|A7')
+        self.assertEqual(evidence['daily_confirmed_swing_low'], 151.25)
+        self.assertEqual(evidence['daily_confirmed_swing_session'], '2026-11-05')
+        from safe_notify import canonical
+        payload = dict(schema='LW_MARKET_NOTICE_V1', event_id='risk-observation',
+                       symbol='VT', source='Yahoo Finance chart',
+                       observed_at='2026-11-18T14:21:00Z',
+                       data_status='OLD_OBSERVATION_NOT_CURRENT',
+                       reason='ORIGINAL_RD_FORMULA_ON_PROVIDER_OBSERVATIONS',
+                       **evidence)
+        self.assertEqual(json.loads(canonical(payload))['daily_low'], 149.77)
+
+    def test_missing_source_does_not_invent_daily_close_or_rd_votes(self):
+        from original_rd_observer import daily_risk_evidence
+        evidence = daily_risk_evidence({'observed_close': None, 'approved_technical': {}})
+        self.assertNotIn('daily_close', evidence)
+        self.assertNotIn('daily_change_percent', evidence)
+        self.assertEqual(evidence['rd_break_true_codes'], '')
+        self.assertEqual(evidence['rd_accel_true_codes'], '')
+
+
 class EndToEndActionAlerts(unittest.TestCase):
     def test_notify_only_actionable_daily_risk_and_dedupe_intraday(self):
         import copy,contextlib,io,json,os

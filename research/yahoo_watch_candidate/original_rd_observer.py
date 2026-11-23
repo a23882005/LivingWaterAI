@@ -4,9 +4,79 @@ No valuation dependency, financial eligibility, buy recommendation or trading.
 from datetime import datetime,timezone,timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
-import hashlib,json,subprocess,sys,tempfile,urllib.request,urllib.parse
+import hashlib,json,math,re,subprocess,sys,tempfile,urllib.request,urllib.parse
 
 COMMIT='3f7ea0dcd2963ae55598ffa90b36893ed47cc9bb'
+
+def _positive_number(value):
+    if isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if math.isfinite(number) and number > 0 else None
+
+
+def daily_risk_evidence(observed):
+    """Extract flat, observed daily facts from the pinned original producer.
+
+    Source observations only: no independent technical decision and no trades.
+    """
+    approved = observed.get('approved_technical') or {}
+    timing = approved.get('trend_timing_inputs') or {}
+    bars = timing.get('bars') or []
+    signals = approved.get('signals') or {}
+    close = _positive_number(observed.get('observed_close'))
+    previous = _positive_number(timing.get('previous_close'))
+    low = _positive_number(bars[-1].get('Low')) if bars and isinstance(bars[-1], dict) else None
+    evidence = {}
+    if close is not None:
+        evidence['daily_close'] = close
+    if previous is not None:
+        evidence['daily_previous_close'] = previous
+    if low is not None:
+        evidence['daily_low'] = low
+    if close is not None and previous is not None:
+        evidence['daily_change_percent'] = round((close / previous - 1) * 100, 4)
+
+    def true_codes(group, prefix, count):
+        found = []
+        for slot in signals.get(group, []):
+            if not isinstance(slot, dict) or slot.get('truth') != 'TRUE':
+                continue
+            ref = str(slot.get('rule_ref') or '')
+            code = ref.rsplit(' ', 1)[-1]
+            if re.fullmatch(prefix + '[1-' + str(count) + ']', code):
+                found.append(code)
+        return '|'.join(found)
+
+    breaks = true_codes('down_break', 'D', 3)
+    evidence['rd_break_true_codes'] = breaks
+    evidence['rd_accel_true_codes'] = true_codes('down_accel', 'A', 8)
+
+    # If D2 was confirmed by the original producer, show its exact pivot only
+    # when the completed-session crossing independently matches that value.
+    if 'D2' in breaks.split('|') and close is not None and previous is not None:
+        t = observed.get('rows')
+        lows = (observed.get('swings') or {}).get('lows') or []
+        if isinstance(t, int) and t >= 3:
+            index = t - 1
+            eligible = []
+            for pivot in lows:
+                if not isinstance(pivot, dict) or not isinstance(pivot.get('index'), int):
+                    continue
+                p = pivot['index']
+                level = _positive_number(pivot.get('value'))
+                if level is not None and p + 2 <= index - 1 and index - 21 <= p <= index - 1:
+                    eligible.append((p, level, pivot.get('pivot_session')))
+            if eligible:
+                _, level, day = max(eligible, key=lambda item: item[0])
+                if previous >= level > close and isinstance(day, str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', day):
+                    evidence['daily_confirmed_swing_low'] = level
+                    evidence['daily_confirmed_swing_session'] = day
+    return evidence
+
 
 def observed_rd(symbol,root,now=None):
     now=now or datetime.now(timezone.utc);root=Path(root).resolve()
@@ -53,7 +123,8 @@ def observed_rd(symbol,root,now=None):
     # The original boundary explicitly flags provider OHLC as observations,
     # not canonical financial input. Preserve that distinction downstream.
     aggregate=observed['v82_original_aggregation']
-    return {**result,'status':'OBSERVED_DAILY_FORMULA' if fresh else 'UNKNOWN','last_session':observed['observed_date'],
+    evidence=daily_risk_evidence(observed) if fresh else {}
+    return {**result,**evidence,'status':'OBSERVED_DAILY_FORMULA' if fresh else 'UNKNOWN','last_session':observed['observed_date'],
             'rows':observed['rows'],'source_sha256':source['sha256'],'calendar':cal_id,
             'reason':'ORIGINAL_RD_FORMULA_ON_PROVIDER_OBSERVATIONS' if fresh else 'LATEST_COMPLETED_SESSION_MISSING',
             'runaway_down':aggregate.get('runaway_down','UNKNOWN') if fresh else 'UNKNOWN',

@@ -176,7 +176,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                        report_staging_dir=None, mutation_staging_dir=None,
                        trusted_report_archive_reader=None,
                        trusted_member_w6_receiver=None,
-                       trusted_public_fetcher=None, trusted_account_change=None):
+                       trusted_public_fetcher=None, trusted_account_change=None,
+                       family03_market_reader=None):
     """Return the existing W7 menu without using a permanent Python host."""
     if trusted_member_w6_receiver is not None and (
             not callable(trusted_member_w6_receiver)
@@ -271,6 +272,35 @@ def build_project_menu(*, family_login, project_name, login_account,
         if set(writes)&set(handlers):
             raise ValueError("CONFLICTING_FAMILY_MUTATION_HANDLERS")
         handlers.update(writes)
+    if "adjust_target" not in (other_handlers or {}):
+        target_writer = handlers.get("adjust_target")
+        advisor = _load(ROOT/"family03_guide.py", "family03_guide")
+        equity = _load(ROOT/"equity_sleeve.py", "family03_equity")
+        planner = _load(ROOT/"family03_plans.py", "family03_plans")
+        prices = _load(ROOT/"family03_prices.py", "family03_prices")
+        cached = prices.reader(Path(downloaded_db_path).resolve().parent/prices.ARCHIVE)
+        def plan_prices(symbols):
+            result=cached(symbols)
+            missing=tuple(s for s in symbols if s not in result)
+            if missing and family03_market_reader:
+                result.update(family03_market_reader(missing))
+            return result
+        positions = _load(ROOT.parent/"W5"/"official_holdings_source.py","family03_positions")
+        guide_target = planner.menu_handler(public_entry, family_alias,
+            Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices)
+        def adjust_target(payload):
+            if payload.get("action") == "confirm_account":
+                if target_writer is None:
+                    return {"status":"FAMILY03_SOURCE_REQUIRED","缺項":"本人帳本寫回暫存目錄"}
+                preview = guide_target({"action":"account_preview"})
+                if preview["status"] != "FAMILY03_ACCOUNT_PREVIEW":
+                    return preview
+                target = _load(ROOT/"family03_target.py", "family03_full_target")
+                return target_writer(target.confirmed_request(preview, payload, client_id))
+            if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
+                return target_writer(payload)
+            return guide_target(payload)
+        handlers["adjust_target"] = adjust_target
     # The legacy W6 report store uses a direct REST transport. Under the
     # Owner-approved ChatGPT execution model, hand verified upload receipts
     # back to the tool executor instead of pretending Python uploaded files.
@@ -404,3 +434,4 @@ def build_project_menu(*, family_login, project_name, login_account,
         member_report_run_observer=remember_member_run if trusted_member_w6_receiver is not None else None,
         other_handlers=handlers,
         completion_checks=completion_checks)
+

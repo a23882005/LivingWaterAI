@@ -82,6 +82,15 @@ class OnDemandMutationStager:
             with sqlite3.connect(working) as db:
                 db.execute("PRAGMA foreign_keys=ON")
                 db.execute("BEGIN IMMEDIATE")
+                if operation == "adjust_target" and any(
+                        isinstance(row, dict) and "candidate_ticker" in row
+                        for row in record.get("allocations", []) or []):
+                    target = _load("family03_target", "family03_target.py")
+                    record = target.resolve_target_rows(
+                        db, self.client_id, record, self.original.parent,
+                        _load("family03_equity", "equity_sleeve.py"),
+                        _load("family03_plans", "family03_plans.py"),
+                        _load("family03_prices", "family03_prices.py"), mutation.now())
                 handler=mutation.make_writer(operation,self.client_id)
                 result=handler(db,{"client_id":self.client_id,"record":record})
                 if not isinstance(result,dict) or result.get("status")!="STORED":
@@ -110,3 +119,4 @@ def mutation_handlers(stager):
         raise ValueError("W8_MUTATION_STAGER_REQUIRED")
     return {op:lambda payload,operation=op:stager.stage(operation,payload)
             for op in OPERATIONS}
+

@@ -177,7 +177,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        trusted_report_archive_reader=None,
                        trusted_member_w6_receiver=None,
                        trusted_public_fetcher=None, trusted_account_change=None,
-                       family03_market_reader=None):
+                       family03_market_reader=None, family03_approved_target_source=None):
     """Return the existing W7 menu without using a permanent Python host."""
     if trusted_member_w6_receiver is not None and (
             not callable(trusted_member_w6_receiver)
@@ -286,8 +286,14 @@ def build_project_menu(*, family_login, project_name, login_account,
                 result.update(family03_market_reader(missing))
             return result
         positions = _load(ROOT.parent/"W5"/"official_holdings_source.py","family03_positions")
+        def approved_document():
+            reader = _load(ROOT/"approved_target_input.py", "family03_approved_reader")
+            target = _load(ROOT/"family03_target.py", "family03_document_target")
+            return target.approved_framework(family03_approved_target_source, client_id, reader.build_approved_target_view)
+
         guide_target = planner.menu_handler(public_entry, family_alias,
-            Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices)
+            Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices,
+            document_source=approved_document if family03_approved_target_source is not None else None)
         def adjust_target(payload):
             if payload.get("action") == "confirm_account":
                 if target_writer is None:
@@ -298,6 +304,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                 target = _load(ROOT/"family03_target.py", "family03_full_target")
                 return target_writer(target.confirmed_request(preview, payload, client_id))
             if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
+                if any("approved_role" in row for row in payload.get("record", {}).get("allocations", [])):
+                    raise ValueError("文件角色需從已確認的預覽保存")
                 return target_writer(payload)
             return guide_target(payload)
         handlers["adjust_target"] = adjust_target

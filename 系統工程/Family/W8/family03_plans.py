@@ -279,7 +279,7 @@ def six(plans, prices, exposures, calc, single_stocks=()):
     return rows
 
 
-def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market_reader=None):
+def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market_reader=None, document_source=None):
     folder=Path(folder)
     progress=folder/(member+"_03_股票配置選擇進度.xlsx")
     pool=folder/POOL_NAME
@@ -319,7 +319,7 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
             spec.loader.exec_module(target)
             final = st.get("final")
             return target.account_preview(snapshot, final, weights(final["配置"]) if final else {},
-                                          catalog, pool, revision)
+                                          catalog, pool, revision, document_source)
         if action=="lookup":
             symbol=str(payload.get("symbol","")).strip().upper()
             if set(payload)!={"action","symbol"} or not 1<=len(symbol)<=25 or any(

@@ -83,7 +83,7 @@ class OnDemandMutationStager:
                 db.execute("PRAGMA foreign_keys=ON")
                 db.execute("BEGIN IMMEDIATE")
                 if operation == "adjust_target" and any(
-                        isinstance(row, dict) and "candidate_ticker" in row
+                        isinstance(row, dict) and ("candidate_ticker" in row or "approved_role" in row)
                         for row in record.get("allocations", []) or []):
                     target = _load("family03_target", "family03_target.py")
                     record = target.resolve_target_rows(

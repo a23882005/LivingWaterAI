@@ -1,0 +1,2321 @@
+{
+  "schema": "LivingWaterAI-macro-source-options-v1",
+  "approved_at_taipei": "2026-11-18T21:17:06.072423+08:00",
+  "min_websites": 4,
+  "max_websites": 6,
+  "website_count_rule": "同站多網址合併；FRED/ALFRED、Yahoo子網域、CNN/cnn.io、GitHub/raw均合併。同一資料的鏡像是不同網站，不宣稱為獨立上游。",
+  "execution_policy": "已驗免費來源優先，原來源保留備援；新增候選先通過原解析與品質檢查才自動採用。既有抓取／公式／分數／配置不因候選站數增加而改寫。",
+  "items": {
+    "m07": {
+      "label": "VIX",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/VIXCLS",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=VIXCLS&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:15:49.580028+00:00",
+            "evidence_sha256": "f446df921245c3998246c77c05218dd3d59db15c2dc6b24f14ff94d00ffb9653",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "cboe.com",
+          "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+          "same_website_endpoints": [
+            "https://cdn-api.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:35.244125+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "yahoo.com",
+          "url": "https://finance.yahoo.com/quote/%5EVIX/",
+          "same_website_endpoints": [
+            "https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:30.228668+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/indices/volatility-s-p-500",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:15:49.580287+00:00",
+            "evidence_sha256": "7e3611519a31227e2b336c86c56f9dad20f95723cc19074b9411536df610bf82",
+            "title": "VIX Index | CBOE Volatility (indexcboe: vix) - Investing.com",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m01": {
+      "label": "10Y−2Y 殖利率曲線",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10Y2Y",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/T10Y2Y",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=T10Y2Y&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:15:54.912718+00:00",
+            "evidence_sha256": "0ff2f595179d555cb932cc5838abb3390df04b3cb7152feb76a18e905de38e52",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "treasury.gov",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "same_website_endpoints": [
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_yield_curve&field_tdr_date_value=2025&page&_format=csv"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:52:35.275709+00:00",
+            "evidence_sha256": "d4d116eec0d400cffd49908f8a28f27977d3bb0e04b36d0119cb36d3c8cc567a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H15",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:37.482880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "gurufocus.com",
+          "url": "https://www.gurufocus.com/economic_indicators/249/102-treasury-yield-spread",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:15:54.912679+00:00",
+            "evidence_sha256": "91f35b911b689aed4e8db1da3c68d79c6185f1703fd0f769982046f86c628da2",
+            "title": "10-2 Treasury Yield Spread: 0.29% (Nov 2026) — Historical Chart & Data | GuruFocus",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m08": {
+      "label": "10Y 實質殖利率",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/DFII10",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=DFII10&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:00.932173+00:00",
+            "evidence_sha256": "ee8a89f308b77f6bc9b3cea6564fd272e3ee69ffff54468600cc607a5b45a3a6",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "treasury.gov",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:46.005087+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H15",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:37.482880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "ycharts.com",
+          "url": "https://ycharts.com/indicators/10_year_real_treasury_rate",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 202,
+            "checked_at": "2026-11-18T13:16:00.932127+00:00",
+            "evidence_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m02": {
+      "label": "HY OAS",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=BAMLH0A0HYM2&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:06.703820+00:00",
+            "evidence_sha256": "3626f2ef6c0e036bc716cc2dfeb963f9d69b0ab613ff20e8fc4b58377296aef4",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "gurufocus.com",
+          "url": "https://www.gurufocus.com/economic_indicators/5735/bofa-us-high-yield-index-optionadjusted-spread",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:57.147877+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "ycharts.com",
+          "url": "https://ycharts.com/indicators/us_high_yield_master_ii_optionadjusted_spread",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:02.161937+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/bofa-merrill-lynch-us-high-yield-option-adjusted-spread-fed-data.html",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:06.703779+00:00",
+            "evidence_sha256": "c051e8050affb459d8c661984778d7d39f03f84005a215072d3b9d1deb94bd5d",
+            "title": "United States - ICE BofA US High Yield Index Option-Adjusted Spread - 2026 Data 2027 Forecast 1996 Historical",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m04": {
+      "label": "ISM 製造業 PMI",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "ismworld.org",
+          "url": "https://www.ismworld.org/globalassets/pub/research-and-surveys/rob/pmi/r4in202610pmi.pdf",
+          "same_website_endpoints": [
+            "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/",
+            "https://www.ismworld.org/supply-management-news-and-reports/",
+            "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/october/",
+            "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:31.424387+00:00",
+            "evidence_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/business-confidence",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:07.176855+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/ism-manufacturing-pmi-173",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:11.567726+00:00",
+            "evidence_sha256": "9a996153da0904255bf1c84caa2d8ddb6133b0a85a86a06d03db35f234439af1",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "prnewswire.com",
+          "url": "https://www.prnewswire.com/news-releases/manufacturing-pmi-at-55-5-october-2026-ism-manufacturing-pmi-report-302925617.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:23.737880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m05": {
+      "label": "Core CPI YoY",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "bls.gov",
+          "url": "https://api.bls.gov/publicAPI/v2/timeseries/data/CUSR0000SA0L1E?startyear=2025&endyear=2026",
+          "same_website_endpoints": [
+            "https://www.bls.gov/news.release/cpi.toc.htm",
+            "https://api.bls.gov/publicAPI/v1/timeseries/data/CUSR0000SA0L1E?startyear=2025&endyear=2026"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:27.612434+00:00",
+            "evidence_sha256": "e716247e82359f41fb523201615bd2a19962310a79cbb5df63a068f8585dc7f4",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原CPILFESL同比，核對SA與基期；原CPI核准沿用保持，NSA參考數字不得替代。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/CPILFESL",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=CPILFESL&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:12.563291+00:00",
+            "evidence_sha256": "b9f2504703e841cc721242ffab7c638f2e26a97baec9783502c8b606e352f58c",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原CPILFESL同比，核對SA與基期；原CPI核准沿用保持，NSA參考數字不得替代。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/core-inflation-rate",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:12.511810+00:00",
+            "evidence_sha256": "9c99e8c98d11a5270fd1e0f095fcd7f41999f0c2e578e24d352319e9522b4b90",
+            "title": "United States Core Inflation Rate",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原CPILFESL同比，核對SA與基期；原CPI核准沿用保持，NSA參考數字不得替代。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/core-cpi-56",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:12.563248+00:00",
+            "evidence_sha256": "67663f0991f91545549330a71187213b2d2acfc89afd494e1fada042bf659829",
+            "title": "United States Core Consumer Price Index (CPI) MoM",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原CPILFESL同比，核對SA與基期；原CPI核准沿用保持，NSA參考數字不得替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "原CPILFESL同比，核對SA與基期；原CPI核准沿用保持，NSA參考數字不得替代。"
+    },
+    "m09": {
+      "label": "DXY",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "yahoo.com",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?range=1mo&interval=1d&includePrePost=false",
+          "same_website_endpoints": [
+            "https://finance.yahoo.com/quote/DX-Y.NYB/history/",
+            "https://finance.yahoo.com/quote/DX-Y.NYB/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:36.437072+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "gurufocus.com",
+          "url": "https://www.gurufocus.com/economic_indicators/5747/us-dollar-index-dxy",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:41.372603+00:00",
+            "evidence_sha256": "a0a2d72da662e9466ee3511545b5d861e7796a416be952c35e156e666d817c10",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/currency",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:41.449863+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/indices/usdollar",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:19.241485+00:00",
+            "evidence_sha256": "4e149abcfad4b448b0988e4518988a9a7e83d019c19b8e31e000ed1a1efdcd9a",
+            "title": "DXY US Dollar Index - Investing.com",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m10": {
+      "label": "WTI",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "yahoo.com",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/CL%3DF?range=1mo&interval=1d&includePrePost=false",
+          "same_website_endpoints": [
+            "https://finance.yahoo.com/quote/CL%3DF/history/",
+            "https://finance.yahoo.com/quote/CL=F/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:41.751160+00:00",
+            "evidence_sha256": "d3f00bd6e4c2c49be6e14b83b058cc0dac35f970fa7c57e8b7a5f4131228dc6d",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同一WTI近月期貨與轉倉日期；原油現貨價格不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "cmegroup.com",
+          "url": "https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.quotes.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:46.462946+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同一WTI近月期貨與轉倉日期；原油現貨價格不替代。"
+        },
+        {
+          "rank": 3,
+          "website": "investing.com",
+          "url": "https://www.investing.com/commodities/crude-oil?cid=1178038",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:46.763882+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同一WTI近月期貨與轉倉日期；原油現貨價格不替代。"
+        },
+        {
+          "rank": 4,
+          "website": "tradingview.com",
+          "url": "https://www.tradingview.com/symbols/NYMEX-CL1!/",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:19.241447+00:00",
+            "evidence_sha256": "05deff0b8e103c6856e1105a26f2659615406e74c4f5c9f55076fae3277d09a4",
+            "title": "WTI Crude Oil Futures Price & Chart — CL Futures — TradingView",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同一WTI近月期貨與轉倉日期；原油現貨價格不替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "同一WTI近月期貨與轉倉日期；原油現貨價格不替代。"
+    },
+    "m12": {
+      "label": "MOVE",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "yahoo.com",
+          "url": "https://finance.yahoo.com/quote/%5EMOVE/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:59.239242+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "investing.com",
+          "url": "https://www.investing.com/indices/ice-bofaml-move-historical-data",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:53:52.431127+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingview.com",
+          "url": "https://www.tradingview.com/symbols/ICE-MOVE/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:53:52.948909+00:00",
+            "evidence_sha256": "28c3f63beaeb6907f7d9e256e1eb4e0885b4dc0453875103941e23c850832b55",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "ice.com",
+          "url": "https://developer.ice.com/fixed-income-data-services/catalog/ice-data-indices-move-index",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:19.427585+00:00",
+            "evidence_sha256": "d2d3f59730754977a26b72a5f65772b004546a9924ecffcbbdaad7c514b1ae09",
+            "title": "ICE Data Indices - MOVE Index | ICE Developer Portal",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m13": {
+      "label": "5Y Breakeven",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "treasury.gov",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "same_website_endpoints": [
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_yield_curve&field_tdr_date_value=2025&page&_format=csv",
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2025&page&_format=csv"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:52:35.275709+00:00",
+            "evidence_sha256": "d4d116eec0d400cffd49908f8a28f27977d3bb0e04b36d0119cb36d3c8cc567a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/T5YIE",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:25.127417+00:00",
+            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+        },
+        {
+          "rank": 3,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H15",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:37.482880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+        },
+        {
+          "rank": 4,
+          "website": "ycharts.com",
+          "url": "https://ycharts.com/indicators/5_year_breakeven_inflation_rate_daily",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 202,
+            "checked_at": "2026-11-18T13:16:25.556363+00:00",
+            "evidence_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "5年同日名目－實質或原T5YIE日序列；月平均不替代。"
+    },
+    "m17": {
+      "label": "5Y Breakeven 近1月變化（pp）",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "treasury.gov",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+          "same_website_endpoints": [
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_yield_curve&field_tdr_date_value=2025&page&_format=csv",
+            "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2025&page&_format=csv"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:52:35.275709+00:00",
+            "evidence_sha256": "d4d116eec0d400cffd49908f8a28f27977d3bb0e04b36d0119cb36d3c8cc567a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T5YIE",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/T5YIE",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=T5YIE&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:25.127417+00:00",
+            "evidence_sha256": "70c05f2041af029d6f83deb8fe0a8bda280de0aa610aa269e38728608b1d9284",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+        },
+        {
+          "rank": 3,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H15",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:52:37.482880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+        },
+        {
+          "rank": 4,
+          "website": "ycharts.com",
+          "url": "https://ycharts.com/indicators/5_year_breakeven_inflation_rate_daily",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 202,
+            "checked_at": "2026-11-18T13:16:25.556363+00:00",
+            "evidence_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "取足原T5YIE日序列，沿原日曆月基準差；網站月平均變動不替代。"
+    },
+    "m14": {
+      "label": "淨流動性 13週變化（$bn）",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 5,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
+          "same_website_endpoints": [
+            "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H41&filetype=zip",
+            "https://www.federalreserve.gov/datadownload/Choose.aspx?rel=H41"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T15:23:15.036110+00:00",
+            "evidence_sha256": "3a790961abae3bc20af182e9ec9fa4108c847bd99c0ee99aa45769ea165e253d",
+            "kind": "REAL_RESPONSE_PARSED; final main run will have its own receipt"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        },
+        {
+          "rank": 2,
+          "website": "newyorkfed.org",
+          "url": "https://markets.newyorkfed.org/api/rp/reverserepo/propositions/search.json?startDate=2026-08-01&endDate=2026-11-10",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:54:03.597902+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        },
+        {
+          "rank": 3,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/WALCL",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=WALCL&cosd=2024-08-01",
+            "https://fred.stlouisfed.org/series/WDTGAL",
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL",
+            "https://fred.stlouisfed.org/series/RRPONTSYD",
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:54:20.462661+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        },
+        {
+          "rank": 4,
+          "website": "nomics.world",
+          "url": "https://api.db.nomics.world/v22/series?series_ids=FED/H41/RESPPA_N.WW,FED/H41/RESPPLLDT_N.WW&observations=1",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:17:12.843605+00:00",
+            "evidence_sha256": "5e4a95bb7891c11b05ca4b69beab5d6cd21ea6fd1744f8fb0d0bdada1e187417",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        },
+        {
+          "rank": 5,
+          "website": "treasury.gov",
+          "url": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/operating-cash-balance",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:30.210661+00:00",
+            "evidence_sha256": "f3c42a9126a1726f5d0fe606785b4cbb16431ee6de890c391e94b39217d7ee08",
+            "title": "Daily Treasury Statement (DTS) | U.S. Treasury Fiscal Data",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "三成分WALCL/WDTGAL/RRPONTSYD、原共同週三與91日差；網站可提供成分，但不把單一成分視為完整指標。"
+    },
+    "m15": {
+      "label": "ISM 服務業 PMI",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "ismworld.org",
+          "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/",
+          "same_website_endpoints": [
+            "https://www.ismworld.org/supply-management-news-and-reports/",
+            "https://www.ismworld.org/supply-management-news-and-reports/reports/rob-report-calendar/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 302,
+            "checked_at": "2026-11-18T11:53:13.055282+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:54:26.754880+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/ism-non-manufacturing-pmi-176",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:54:30.995284+00:00",
+            "evidence_sha256": "3da6df46314c29a1b038adbcd84f1c50fd1e2e5faaa4864732472310af3c318f",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "prnewswire.com",
+          "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:54:31.574806+00:00",
+            "evidence_sha256": "15b4394e3f789eb119ff43d848fe5f1ed3308642ebf41f7834c88395fe7f801f",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m16": {
+      "label": "LEI YoY",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "pnc.com",
+          "url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+          "same_website_endpoints": [
+            "https://www.pnc.com/en/about-pnc/topics/economic-reports.html",
+            "https://www.pnc.com/en/about-pnc/media/economic-reports.html",
+            "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_Leading_Economic_Index_20_July_2026.pdf",
+            "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_20_August_2026.pdf",
+            "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_CB_LEI_September_182026.pdf"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": null,
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。",
+          "last_numeric_verification": {
+            "url": "https://www.pnc.com/content/dam/pnc-com/pdf/aboutpnc/EconomicReports/EconomicUpdates/2026/PNC_Economics_Research_LEI_22_October_2026.pdf",
+            "value": -0.5,
+            "date": "2026-09-01",
+            "verified_at": null
+          }
+        },
+        {
+          "rank": 2,
+          "website": "conference-board.org",
+          "url": "https://www.conference-board.org/topics/us-leading-indicators/",
+          "same_website_endpoints": [
+            "https://www.conference-board.org/topics/us-leading-indicators"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:54:36.016306+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。"
+        },
+        {
+          "rank": 3,
+          "website": "prnewswire.com",
+          "url": "https://www.prnewswire.com/news-releases/the-conference-board-leading-economic-index-lei-for-the-us-was-flat-in-september-302917003.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:54:36.744347+00:00",
+            "evidence_sha256": "ad1f60f67f78129ab234786784fd7823b8351b2c694d82be96aa6ff98d5f34e8",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。"
+        },
+        {
+          "rank": 4,
+          "website": "fedprimerate.com",
+          "url": "https://economy.fedprimerate.com/search/label/Leading_Economic_Index",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:54:41.140722+00:00",
+            "evidence_sha256": "463b287767c47f8a31eb259d3d539975dc46667ef7621b5a9bf9ea43c13e548c",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "原LEI同比口徑／發布vintage，月增、六個月變動不能代替；專題查證暫停維持。"
+    },
+    "m18": {
+      "label": "Sahm Rule",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SAHMREALTIME",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/SAHMREALTIME",
+            "https://alfred.stlouisfed.org/series?seid=SAHMREALTIME",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=SAHMREALTIME&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:30.947624+00:00",
+            "evidence_sha256": "eaee71d67f8a363c989cb3c256683aa256b06120d067e89fc83e9d9971f8d287",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "明示SAHMREALTIME即時vintage；SAHMCURRENT與重算值按原備援規則分別記錄。"
+        },
+        {
+          "rank": 2,
+          "website": "thetrading.tools",
+          "url": "https://www.thetrading.tools/sahm-rule",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:35.621059+00:00",
+            "evidence_sha256": "361bc34648817f6ea1394a85006ecf4e707557c886d5f3444b8f7e038f9af3b0",
+            "title": "Sahm Rule Recession Indicator: Chart, Current Level & History | thetrading.tools",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "明示SAHMREALTIME即時vintage；SAHMCURRENT與重算值按原備援規則分別記錄。"
+        },
+        {
+          "rank": 3,
+          "website": "therationalmoderate.com",
+          "url": "https://therationalmoderate.com/tracker/signals/sahm-rule/",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:36.615329+00:00",
+            "evidence_sha256": "14d271d19c0695d3cb1f91ae81ac97ac4a833795a1b62c38a9489d923ecc1f8b",
+            "title": "Sahm rule (real-time): tracker signals | The Rational Moderate",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "明示SAHMREALTIME即時vintage；SAHMCURRENT與重算值按原備援規則分別記錄。"
+        },
+        {
+          "rank": 4,
+          "website": "economyfacts.us",
+          "url": "https://economyfacts.us/indicator/sahm-rule",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:36.669403+00:00",
+            "evidence_sha256": "cf04d1dc5cebe65a312f78faa03d3615c1fcaa95b8aa9a237242a7f8e554dd6e",
+            "title": "Sahm Rule Recession Indicator: Latest Data and Chart | Economy Facts",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "明示SAHMREALTIME即時vintage；SAHMCURRENT與重算值按原備援規則分別記錄。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://www.bls.gov/cps/",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "明示SAHMREALTIME即時vintage；SAHMCURRENT與重算值按原備援規則分別記錄。"
+    },
+    "m19": {
+      "label": "U3 失業率",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "bls.gov",
+          "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
+          "same_website_endpoints": [
+            "https://www.bls.gov/news.release/empsit.t01.htm",
+            "https://www.bls.gov/developers/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "BLS original series ID validated; official API precedes original BLS alternatives and FRED; source attribution retained."
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/UNRATE",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=UNRATE&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:41.276322+00:00",
+            "evidence_sha256": "fb669461abc34e00324b940be6bad1c7f89117652f28587196a7b8bf4a9f56a1",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/unemployment-rate",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:42.239414+00:00",
+            "evidence_sha256": "8cda23ec76ff9693d34bbd800a2eca39e74eadb45498bbcaf85030512c3ce0e1",
+            "title": "United States Unemployment Rate",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/unemployment-rate-300",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:44.973431+00:00",
+            "evidence_sha256": "685d72ecc0f5edc848fa7ef593c79d15a1c631e2059c9b6b249bf3fc7610333e",
+            "title": "United States Unemployment Rate",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m20": {
+      "label": "3個月平均非農新增就業（千人）",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "bls.gov",
+          "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
+          "same_website_endpoints": [
+            "https://download.bls.gov/pub/time.series/ce/ce.data.00a.TotalNonfarm.Employment",
+            "https://www.bls.gov/developers/"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "BLS original series ID validated; official API precedes original BLS alternatives and FRED; source attribution retained."
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=PAYEMS",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/PAYEMS",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=PAYEMS&cosd=2024-08-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:46.615637+00:00",
+            "evidence_sha256": "968f9252d00246e2b6cf40307e01eef7a413ec936fcc45c7498347a509a2dc32",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同次發布修訂口徑、連續三個月月增平均；單月新增不是三月平均。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/non-farm-payrolls",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:47.896031+00:00",
+            "evidence_sha256": "94f6fefb31cb5eab2db339fab98be4cd1382f229ef943af9477ef4ed98a89ae8",
+            "title": "United States Non Farm Payrolls",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同次發布修訂口徑、連續三個月月增平均；單月新增不是三月平均。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/nonfarm-payrolls-227",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:53.320301+00:00",
+            "evidence_sha256": "fc189c4d1e4c6588b0952d9af2cbb9a9d03e52b84896b172d5555141006be12a",
+            "title": "United States Nonfarm Payrolls",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "同次發布修訂口徑、連續三個月月增平均；單月新增不是三月平均。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "同次發布修訂口徑、連續三個月月增平均；單月新增不是三月平均。"
+    },
+    "s04": {
+      "label": "CNN Fear & Greed",
+      "owner": "ORIGINAL_MACRO18",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "feargreedflow.com",
+          "url": "https://feargreedflow.com/api/fear-greed/csv",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:55:09.805081+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "CNN原指數及實際日期；其他自製或加密貨幣恐懼貪婪指數不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "cnn.com",
+          "url": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+          "same_website_endpoints": [
+            "https://www.cnn.com/markets/fear-and-greed",
+            "https://edition.cnn.com/markets/fear-and-greed"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 418,
+            "checked_at": "2026-11-18T11:55:14.606421+00:00",
+            "evidence_sha256": "7e3a93a98b1151b303ad690e6b05f7cbd91747d5b87d06031db32df963286997",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "CNN原指數及實際日期；其他自製或加密貨幣恐懼貪婪指數不替代。"
+        },
+        {
+          "rank": 3,
+          "website": "github.com",
+          "url": "https://raw.githubusercontent.com/whit3rabbit/fear-greed-data/main/json/cnn_output.json",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:55:19.624753+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "CNN原指數及實際日期；其他自製或加密貨幣恐懼貪婪指數不替代。"
+        },
+        {
+          "rank": 4,
+          "website": "finhacker.cz",
+          "url": "https://www.finhacker.cz/en/fear-and-greed-index-historical-data-and-chart/",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:53.659337+00:00",
+            "evidence_sha256": "3754cf8bddd4db9a4bf6a895361df6c3e618f248c7be8efddcf11865b8249d4f",
+            "title": "Fear and Greed Index: Historical Data & Chart (2011–2026)",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "CNN原指數及實際日期；其他自製或加密貨幣恐懼貪婪指數不替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "CNN原指數及實際日期；其他自製或加密貨幣恐懼貪婪指數不替代。"
+    },
+    "m06_rate": {
+      "label": "Fed目前目標利率區間中點",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "federalreserve.gov",
+          "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
+          "same_website_endpoints": [
+            "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:34.659395+00:00",
+            "evidence_sha256": "e8491698e12b6983766d6f26ae89ac3cb0b54195ea4d395a9195f78d4e2c05c6",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "現行政策區間上下限之中點，不用EFFR代替；沿原fed-target-evidence-v1及26小時期限。"
+        },
+        {
+          "rank": 2,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFEDTARL",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/DFEDTARL",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=DFEDTARL&cosd=2024-08-01",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=DFEDTARU&cosd=2026-01-01",
+            "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFEDTARU"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:53.667668+00:00",
+            "evidence_sha256": "b62529dea3c3a0ae7ffa48793e881d26f35126927af8419e483014de4af6feaf",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "現行政策區間上下限之中點，不用EFFR代替；沿原fed-target-evidence-v1及26小時期限。"
+        },
+        {
+          "rank": 3,
+          "website": "tradingeconomics.com",
+          "url": "https://tradingeconomics.com/united-states/interest-rate",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:59.813282+00:00",
+            "evidence_sha256": "dce48aab0517bf03158e6e07f4eaf0fde2341e48c846b99e69f50223947888b2",
+            "title": "United States Fed Funds Interest Rate",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "現行政策區間上下限之中點，不用EFFR代替；沿原fed-target-evidence-v1及26小時期限。"
+        },
+        {
+          "rank": 4,
+          "website": "investing.com",
+          "url": "https://www.investing.com/economic-calendar/interest-rate-decision-168",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:16:59.923282+00:00",
+            "evidence_sha256": "2d387313dfac7db4de749e2102e05af5a95994b9c13113054fffcb4cba430fc8",
+            "title": "United States Federal Reserve Interest Rate Decision",
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "現行政策區間上下限之中點，不用EFFR代替；沿原fed-target-evidence-v1及26小時期限。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "現行政策區間上下限之中點，不用EFFR代替；沿原fed-target-evidence-v1及26小時期限。"
+    },
+    "m06_inf": {
+      "label": "未來12個月通膨預期",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 5,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "newyorkfed.org",
+          "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
+          "same_website_endpoints": [
+            "https://www.newyorkfed.org/medialibrary/interactives/sce/sce/downloads/data/frbny-sce-data.xlsx",
+            "https://www.newyorkfed.org/microeconomics/sce"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:33.596984+00:00",
+            "evidence_sha256": "43e91165a60ae8ec4c51362dfa04934c11340f64f36f627c56d4886741502d8c",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+        },
+        {
+          "rank": 2,
+          "website": "clevelandfed.org",
+          "url": "https://www.clevelandfed.org/indicators-and-data/inflation-expectations",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:43.099961+00:00",
+            "evidence_sha256": "53fc90554ae56a35b33542c1d039d4bfd397784e10f540e31266b833b7a4cbd3",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+        },
+        {
+          "rank": 3,
+          "website": "umich.edu",
+          "url": "https://www.sca.isr.umich.edu/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T12:59:19.986676+00:00",
+            "evidence_sha256": "898646305af913f9872fe341c35aa36a273c19adb6c360736d1f91e7ef9875a3",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+        },
+        {
+          "rank": 4,
+          "website": "philadelphiafed.org",
+          "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/inflation-forecasts",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:40.921025+00:00",
+            "evidence_sha256": "52fb52eb90c113cb2bed0a6c1e9ff78f7482ea1c7000c5428d62efdbcc2a581a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+        },
+        {
+          "rank": 5,
+          "website": "ycharts.com",
+          "url": "https://ycharts.com/indicators/us_oneyear_ahead_inflation_expectations",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:55:33.684071+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://tradingeconomics.com/united-states/inflation-expectations",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "沿原Task核准備援定義；NY Fed SCE優先，其他調查／模型明確標示且不混合平均。"
+    },
+    "m06_rstar": {
+      "label": "NY Fed HLW 即時版本實質自然利率 r*",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "newyorkfed.org",
+          "url": "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_real_time_estimates.xlsx",
+          "same_website_endpoints": [
+            "https://www.newyorkfed.org/research/policy/rstar",
+            "https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx",
+            "https://www.newyorkfed.org/research/staff_reports/sr1063"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:50.406391+00:00",
+            "evidence_sha256": "189dd5b5198047754cd6766ef59cb6f190b210d0e7008efeb1ee566fad1cb4b9",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "正式優先NY Fed HLW real-time。econdata三鏡像須逐次核對US欄、季度、模型版本及real-time vintage；有歷史HLW不等於已核准即時備援。"
+        },
+        {
+          "rank": 2,
+          "website": "jsdelivr.net",
+          "url": "https://cdn.jsdelivr.net/gh/kvasilopoulos/econdata@master/docs/data/hlw2017.csv",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:17:01.220090+00:00",
+            "evidence_sha256": "cb3c88ed1ae92417d8614655bc0ebb1e6ae4f8de1370222fde2b1d343b215bcf",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "正式優先NY Fed HLW real-time。econdata三鏡像須逐次核對US欄、季度、模型版本及real-time vintage；有歷史HLW不等於已核准即時備援。"
+        },
+        {
+          "rank": 3,
+          "website": "github.com",
+          "url": "https://raw.githubusercontent.com/kvasilopoulos/econdata/master/docs/data/hlw2017.csv",
+          "same_website_endpoints": [
+            "https://github.com/michaeltkiley/equilibrium_rate/blob/2d467efd5629341e70a0fedf79b902cb40c4659e/data/20261101_lw_rstar.csv"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:17:05.568368+00:00",
+            "evidence_sha256": "cb3c88ed1ae92417d8614655bc0ebb1e6ae4f8de1370222fde2b1d343b215bcf",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "正式優先NY Fed HLW real-time。econdata三鏡像須逐次核對US欄、季度、模型版本及real-time vintage；有歷史HLW不等於已核准即時備援。"
+        },
+        {
+          "rank": 4,
+          "website": "github.io",
+          "url": "https://kvasilopoulos.github.io/econdata/data/hlw2017.csv",
+          "same_website_endpoints": [],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:17:05.660825+00:00",
+            "evidence_sha256": "cb3c88ed1ae92417d8614655bc0ebb1e6ae4f8de1370222fde2b1d343b215bcf",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "正式優先NY Fed HLW real-time。econdata三鏡像須逐次核對US欄、季度、模型版本及real-time vintage；有歷史HLW不等於已核准即時備援。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://www.richmondfed.org/research/national_economy/natural_rate_interest",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "正式優先NY Fed HLW real-time。econdata三鏡像須逐次核對US欄、季度、模型版本及real-time vintage；有歷史HLW不等於已核准即時備援。"
+    },
+    "m06_output_gap": {
+      "label": "實際GDP相對CBO潛在GDP產出缺口",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 4,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "bea.gov",
+          "url": "https://apps.bea.gov/national/Release/XLS/Survey/Section1All_xls.xlsx",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:17.657483+00:00",
+            "evidence_sha256": "a920921a004910f973021dc89236f11fca5120fadefcaba4a8e1ff55f7625e2d",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原BEA實質GDP與CBO2026-02同季潛在GDP、相同單位；四站含原始成分及官方鏡像，沿原公式計算。"
+        },
+        {
+          "rank": 2,
+          "website": "cbo.gov",
+          "url": "https://www.cbo.gov/system/files/2026-02/51135-2026-02-Economic-Projections.xlsx",
+          "same_website_endpoints": [
+            "https://www.cbo.gov/system/files/2026-02/55022-2026-02-Historical-Economic-Data.zip"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:50.891146+00:00",
+            "evidence_sha256": "ae8f4920702fabf8fb3136bc94a42c53466cff5e890dec22396d8dc49dc2f776",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原BEA實質GDP與CBO2026-02同季潛在GDP、相同單位；四站含原始成分及官方鏡像，沿原公式計算。"
+        },
+        {
+          "rank": 3,
+          "website": "stlouisfed.org",
+          "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDPC1",
+          "same_website_endpoints": [
+            "https://fred.stlouisfed.org/series/GDPPOT",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=GDPPOT&cosd=2024-08-01",
+            "https://fred.stlouisfed.org/graph/graph.csv?id=GDPC1&cosd=2024-01-01"
+          ],
+          "origin": "ADDED_CANDIDATE",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:17:08.720920+00:00",
+            "evidence_sha256": "1c6c6e9f59e383e20c849dd299175c7a307526c09abdc18f18da9754fc5b3343",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原BEA實質GDP與CBO2026-02同季潛在GDP、相同單位；四站含原始成分及官方鏡像，沿原公式計算。"
+        },
+        {
+          "rank": 4,
+          "website": "github.com",
+          "url": "https://raw.githubusercontent.com/US-CBO/cbo-data/main/data/economic/historical_economic/quarterly_2026-02.csv",
+          "same_website_endpoints": [
+            "https://github.com/US-CBO/cbo-data/blob/main/data/economic/historical_economic/quarterly_2026-02.csv"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "COMPONENT_OR_DERIVED",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:20.027956+00:00",
+            "evidence_sha256": "e51170462dab40316574a38f691f302794aaa7500f7f89b97d79d4dfa4193934",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "原BEA實質GDP與CBO2026-02同季潛在GDP、相同單位；四站含原始成分及官方鏡像，沿原公式計算。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "原BEA實質GDP與CBO2026-02同季潛在GDP、相同單位；四站含原始成分及官方鏡像，沿原公式計算。"
+    },
+    "s05": {
+      "label": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 5,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "eoddata.com",
+          "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
+          "same_website_endpoints": [
+            "https://www.eoddata.com/stockquote/NYSE/MMFI.htm"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T12:59:47.663388+00:00",
+            "evidence_sha256": "feca21a8e673e74abea7a5c82910daa50c6928ae6282d63deb59e574fad0c743",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+        },
+        {
+          "rank": 2,
+          "website": "macroaxis.com",
+          "url": "https://www.macroaxis.com/index/MMFI.INDX/Percent-Of-Stocks",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 403,
+            "checked_at": "2026-11-18T13:00:57.326414+00:00",
+            "evidence_sha256": "af1f44ff00863cae24f6bed6a298744414ec2c46d55e0318a8bc15c524181b93",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+        },
+        {
+          "rank": 3,
+          "website": "barchart.com",
+          "url": "https://www.barchart.com/stocks/quotes/$MMFI/technical-analysis",
+          "same_website_endpoints": [
+            "https://www.barchart.com/stocks/quotes/%24MMFI/price-history"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 202,
+            "checked_at": "2026-11-18T13:00:56.074872+00:00",
+            "evidence_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+        },
+        {
+          "rank": 4,
+          "website": "tradingview.com",
+          "url": "https://www.tradingview.com/symbols/INDEX-MMFI/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:00.900707+00:00",
+            "evidence_sha256": "035fee3f24f6ae1ac57e1d749ce68bdbad47b0db894f7b1ad2d7ccee93a09c38",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+        },
+        {
+          "rank": 5,
+          "website": "stockcharts.com",
+          "url": "https://stockcharts.com/json/data?cmd=get-symbol-data&symbols=%24NYA50R&optionalFields=symbolsummary&src=freecharts-symbol-summary",
+          "same_website_endpoints": [
+            "https://chartschool.stockcharts.com/table-of-contents/market-indicators/introduction-to-market-indicators/market-indicator-dictionary.md",
+            "https://chartschool.stockcharts.com/table-of-contents/market-indicators/percent-above-moving-average"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:56:07.091008+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+        }
+      ],
+      "retained_unselected_sources": [],
+      "validation_rule": "NYSE全市場高於50日線、0至100%、完整收盤；NYA50R須先核對母體，SP500/Nasdaq廣度不替代。"
+    },
+    "m03_qqq": {
+      "label": "QQQ未來12個月Forward P/E",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 6,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stockanalysis.com",
+          "url": "https://stockanalysis.com/etf/qqq/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T12:59:55.793479+00:00",
+            "evidence_sha256": "66b367d0a9a8a01e29eacace1cfc2b89560420e06d9b2a993dbbd710ab04b6b9",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "yahoo.com",
+          "url": "https://finance.yahoo.com/quote/QQQ/key-statistics/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:03.564376+00:00",
+            "evidence_sha256": "be4aeef99a3fdbf30d4d56f26aef928298fe27a66b2139b27636d6aa9309e594",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "invesco.com",
+          "url": "https://www.invesco.com/qqq-etf/en/about.html",
+          "same_website_endpoints": [
+            "https://www.invesco.com/content/dam/invesco/us/en/product-documents/etf/fact-sheet/qqq-invesco-qqq-etf-fact-sheet.pdf"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:07.044497+00:00",
+            "evidence_sha256": "fcbddac47067664acefb92e65d1e02eda220a15307518486fd886b67f3a55a46",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "portfoliovisualizer.com",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=QQQ",
+          "same_website_endpoints": [
+            "https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=QQQ"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:06.201733+00:00",
+            "evidence_sha256": "6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 5,
+          "website": "etf-metrics.com",
+          "url": "https://etf-metrics.com/ticker/qqq",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:56:22.477143+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 6,
+          "website": "quotelinks.com",
+          "url": "https://www.quotelinks.com/valuation/qqq.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:56:24.312672+00:00",
+            "evidence_sha256": "b594468f1d3b93272e17870d9e53dd5a260af06e8bc4b3c7c4e9501d167ecefa",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://www.trefis.com/data/companies/QQQ",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m03_spy": {
+      "label": "SPY未來12個月Forward P/E",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 6,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stockanalysis.com",
+          "url": "https://stockanalysis.com/etf/spy/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:02.815766+00:00",
+            "evidence_sha256": "8a04a168ba1e694fb4c72be4dbb9f7da23f6c006b43130a787d06629a04bb2de",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "yahoo.com",
+          "url": "https://finance.yahoo.com/quote/SPY/key-statistics/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:11.251833+00:00",
+            "evidence_sha256": "d40630b306188b11ef963c619f7eebc6cf91fae793e6ef4c8fb0ff8b0ddf5774",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "ssga.com",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-sp-500-etf-trust-spy",
+          "same_website_endpoints": [
+            "https://www.ssga.com/us/en/institutional/etfs/state-street-spdr-sp-500-etf-trust-spy",
+            "https://www.ssga.com/us/en/individual/etfs/state-street-spdr-sp-500-etf-trust-spy"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T12:59:58.456963+00:00",
+            "evidence_sha256": "208cc31f22b8234cfc8799391b8c77e948c1c6404591f1bfd01eaedc6ab27495",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "portfoliovisualizer.com",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=SPY",
+          "same_website_endpoints": [
+            "https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=SPY"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:00:01.011001+00:00",
+            "evidence_sha256": "39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 5,
+          "website": "etf-metrics.com",
+          "url": "https://etf-metrics.com/ticker/spy",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:56:35.216651+00:00",
+            "evidence_sha256": "99014d6c4a2e352d46fa85733a2023bd08bad22785b1ad6c02554dd310fa4973",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 6,
+          "website": "quotelinks.com",
+          "url": "https://www.quotelinks.com/valuation/spy.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:56:34.287696+00:00",
+            "evidence_sha256": "0e26161b24abd53abe77fff132e1c4e934d853d4fd3c75c9f8fb2c8e3f088632",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://www.trefis.com/data/companies/SPY",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    },
+    "m03_vt": {
+      "label": "VT未來12個月Forward P/E",
+      "owner": "TOTAL_MACRO_TASK",
+      "website_count": 6,
+      "sources": [
+        {
+          "rank": 1,
+          "website": "stockanalysis.com",
+          "url": "https://stockanalysis.com/etf/vt/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:16.025844+00:00",
+            "evidence_sha256": "8959db163698854da0182fa9b9a8912db8b18581f33c7905ddfc1c63d2c3cff9",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 2,
+          "website": "yahoo.com",
+          "url": "https://finance.yahoo.com/quote/VT/key-statistics/",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T12:59:59.591829+00:00",
+            "evidence_sha256": "6c0c7766a18673bf253b7b9467a8c4253f2820bf475bd86bee552a2f42ca2a8e",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 3,
+          "website": "vanguard.com",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+          "same_website_endpoints": [
+            "https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:12.980979+00:00",
+            "evidence_sha256": "f5ae968a3a5bb076ef72ed1a77f1863cbec64a1134733af2b983153105e2843f",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 4,
+          "website": "portfoliovisualizer.com",
+          "url": "https://www.portfoliovisualizer.com/fund-performance?symbol=VT",
+          "same_website_endpoints": [
+            "https://www.portfoliovisualizer.com/fund-performance?s=y&symbol=VT"
+          ],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T13:01:12.287137+00:00",
+            "evidence_sha256": "a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 5,
+          "website": "etf-metrics.com",
+          "url": "https://etf-metrics.com/ticker/vt",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": null,
+            "checked_at": "2026-11-18T11:56:47.738817+00:00",
+            "evidence_sha256": null,
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        },
+        {
+          "rank": 6,
+          "website": "quotelinks.com",
+          "url": "https://www.quotelinks.com/valuation/vt.html",
+          "same_website_endpoints": [],
+          "origin": "EXISTING",
+          "data_scope": "DIRECT_OR_MIRROR",
+          "last_http": {
+            "status": 200,
+            "checked_at": "2026-11-18T11:56:48.167585+00:00",
+            "evidence_sha256": "09a3ed1721df7368efe74116f0d268d321ab7d98ce8c89ee33e2aef063593fe0",
+            "title": null,
+            "kind": "AVAILABILITY_ONLY; original numeric validation still required"
+          },
+          "automatic_adoption": "EXISTING_VALIDATED_ADAPTER_ONLY",
+          "eligibility_note": "核對原指標定義、日期、單位與資料品質；匿名可讀不等於已核准自動備援。"
+        }
+      ],
+      "retained_unselected_sources": [
+        {
+          "url": "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf",
+          "reason": "原歷史候選保留供追溯；本輪優先名單已限4至6站，不同ETF／不同模型／不同期限不自動代換。"
+        }
+      ],
+      "validation_rule": "沿原V70指標定義、單位、觀測日期、期限與驗證。"
+    }
+  },
+  "availability_check_summary": {
+    "new_or_corrected_endpoints_checked": 37,
+    "final_selected_added_endpoints": 36,
+    "http_200_selected_added": 34,
+    "http_202_selected_added": 2,
+    "corrected_404_retained_in_evidence": true
+  },
+  "dated_link_policy": "月份與日期固定的原件均保留本次期間；後續每輪仍須按原官方發布期更新並驗證，不把舊月份當成新資料。"
+}

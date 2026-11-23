@@ -1,0 +1,51 @@
+{
+  "schema": "V70_M14_ACTUAL_FRED_RESPONSES_1",
+  "acquisition": "ACTUAL_HTTP_2026_11_17__NO_SYNTHETIC_VALUES",
+  "sources": {
+    "WALCL": {
+      "series": "WALCL",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL",
+      "final_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL",
+      "requested_at_utc": "2026-11-17T04:23:24.955143+00:00",
+      "received_at_utc": "2026-11-17T04:23:25.296573+00:00",
+      "http_status": 200,
+      "content_type": "application/csv",
+      "response_bytes": 23434,
+      "response_sha256": "9c9ae53f712d5e2f7ec4aa10d30450630e44b4440f307176756d64ffffac7b55",
+      "archive": "fred_WALCL_9c9ae53f712d5e2f7ec4aa10d30450630e44b4440f307176756d64ffffac7b55.body.gz",
+      "archive_bytes": 8416,
+      "archive_sha256": "4a7a1e7b4b70faedebef7226001d695ec03226f573a8d58ce7d7e55b8ef21c82",
+      "archive_path": "data/audit/m14_fred_WALCL_9c9ae53f712d5e2f7ec4aa10d30450630e44b4440f307176756d64ffffac7b55.body.gz"
+    },
+    "WDTGAL": {
+      "series": "WDTGAL",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL",
+      "final_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WDTGAL",
+      "requested_at_utc": "2026-11-17T04:23:25.311909+00:00",
+      "received_at_utc": "2026-11-17T04:23:26.067733+00:00",
+      "http_status": 200,
+      "content_type": "application/csv",
+      "response_bytes": 21633,
+      "response_sha256": "6ca89135d093ca30b3b9db1fe787a4e0f65e14493cf6d34490535f6478f13dc7",
+      "archive": "fred_WDTGAL_6ca89135d093ca30b3b9db1fe787a4e0f65e14493cf6d34490535f6478f13dc7.body.gz",
+      "archive_bytes": 7758,
+      "archive_sha256": "34ac846d46b29fb4b654517d3a00cf432fd618500409e9af23350a190e680c30",
+      "archive_path": "data/audit/m14_fred_WDTGAL_6ca89135d093ca30b3b9db1fe787a4e0f65e14493cf6d34490535f6478f13dc7.body.gz"
+    },
+    "RRPONTSYD": {
+      "series": "RRPONTSYD",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD",
+      "final_url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RRPONTSYD",
+      "requested_at_utc": "2026-11-17T04:23:26.072389+00:00",
+      "received_at_utc": "2026-11-17T04:23:27.071485+00:00",
+      "http_status": 200,
+      "content_type": "application/csv",
+      "response_bytes": 95874,
+      "response_sha256": "a8279f7c2fbbd07e08b9e0026629e5a0c09c905ace3addc14e497e263ff393f8",
+      "archive": "fred_RRPONTSYD_a8279f7c2fbbd07e08b9e0026629e5a0c09c905ace3addc14e497e263ff393f8.body.gz",
+      "archive_bytes": 27826,
+      "archive_sha256": "da6f5bd4ceaeb8c4a5b7fce725afa8205ce1b2c0baed5e76b24abeecb64f1040",
+      "archive_path": "data/audit/m14_fred_RRPONTSYD_a8279f7c2fbbd07e08b9e0026629e5a0c09c905ace3addc14e497e263ff393f8.body.gz"
+    }
+  }
+}

@@ -1,5 +1,6 @@
-"""Yahoo reference observation + honest pipeline-status mail, NOT V82 execution.
-This entry point never invents formal predicates from intraday bars.
+"""Yahoo reference observation + actionable daily-risk alerts, not trade execution.
+Regular polling records non-events in Actions logs; Gmail is reserved for a new
+completed-session risk observation that warrants checking existing orders.
 """
 from datetime import datetime,timezone,timedelta
 import hashlib
@@ -46,6 +47,22 @@ def build_notice(symbol,payload,now,run,repo):
         monitor_status='FORMAL_AUTOSTART_BLOCKED_UNKNOWN')
 
 
+def actionable_daily_risk(observation):
+    """Alert only on an original, current completed daily RD TRUE observation."""
+    if not isinstance(observation,dict):
+        return False
+    session=observation.get('last_session')
+    expected=observation.get('expected_session')
+    digest=observation.get('source_sha256')
+    return (observation.get('status')=='OBSERVED_DAILY_FORMULA'
+            and observation.get('runaway_down')=='TRUE'
+            and isinstance(session,str)
+            and re.fullmatch(r'\d{4}-\d{2}-\d{2}',session) is not None
+            and expected==session
+            and isinstance(digest,str)
+            and re.fullmatch(r'[0-9a-f]{64}',digest) is not None)
+
+
 def activity(observation,previously_active=False,manual_stop=False):
     if manual_stop:return False
     return previously_active or (observation.get('status')=='OBSERVED_DAILY_FORMULA' and observation.get('runaway_down')=='TRUE')
@@ -89,10 +106,6 @@ def main():
     for index,symbol in enumerate(symbols):
         if time.monotonic()-started>300:
             counts['NOT_EVALUATED_TIME_BUDGET']=len(symbols)-index
-            for remaining in symbols[index:]:
-                report=build_notice(remaining,{},datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo)
-                report.update(reason='NOT_EVALUATED_TIME_BUDGET',monitor_status='NOT_EVALUATED')
-                reports.append(report)
             break
         if symbol in stopped:
             counts['MANUALLY_STOPPED']=counts.get('MANUALLY_STOPPED',0)+1;continue
@@ -110,28 +123,33 @@ def main():
             if state=='RESERVED':activation.mark_sent(event_key(activation_id))
         if not active and observation.get('runaway_down')=='FALSE':
             counts['INACTIVE_NO_RD_OBSERVATION']=counts.get('INACTIVE_NO_RD_OBSERVATION',0)+1;continue
+        # Continue prior active reference observation, including when the newest
+        # original source is UNKNOWN; these routine results stay in Actions logs.
         payload={}
         if active:
             try:payload=fetch(symbol)
             except Exception:pass
+        if not actionable_daily_risk(observation):
+            counts['ROUTINE_OBSERVATION_LOGGED']=counts.get('ROUTINE_OBSERVATION_LOGGED',0)+1
+            continue
         report=build_notice(symbol,payload,now,os.environ['GITHUB_RUN_ID'],repo)
-        rd=observation.get('runaway_down','UNKNOWN')
-        reason=observation.get('reason','UNKNOWN')
-        report.update(rd_observation=rd,daily_session=observation.get('last_session'),
+        report.update(rd_observation='TRUE',daily_session=observation['last_session'],
             activation_basis='ORIGINAL_APPROVED_RD_DAILY_PRICE_FORMULA_OBSERVATION_ONLY',
-            monitor_status='ACTIVE_OBSERVATION_NOT_BUY' if active else 'ACTIVATION_UNKNOWN',
-            reason=reason)
-        report['event_id']='observation-item:'+hashlib.sha256(json.dumps(fingerprint(report),sort_keys=True).encode()).hexdigest()
+            monitor_status='ACTIVE_OBSERVATION_NOT_BUY',
+            reason=observation.get('reason','ORIGINAL_RD_FORMULA_ON_PROVIDER_OBSERVATIONS'))
+        # A completed daily signal is one actionable event even if a 5m bar
+        # changes on subsequent 10-minute runs, or a rerun has a new run_id.
+        report['event_id']='rd-daily-action-v1:'+symbol+':'+observation['last_session']
         reports.append(report)
     if reports:
         execution=collect_execution(repo,os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_TOKEN'],os.environ.get('GITHUB_EVENT_NAME','UNKNOWN'))
         print(json.dumps({'execution_health':execution},sort_keys=True))
-        batch=build_batch(reports,datetime.now(timezone.utc),os.environ['GITHUB_RUN_ID'],repo,execution)
-        state=send_notice(batch,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
-            recipient=os.environ['GMAIL_ADDRESS'],app_password=os.environ['GMAIL_APP_PASSWORD'])
-        counts[state]=counts.get(state,0)+1
+        for report in reports:
+            state=send_notice(report,outbox=outbox,sender=os.environ['GMAIL_ADDRESS'],
+                recipient=os.environ['GMAIL_ADDRESS'],app_password=os.environ['GMAIL_APP_PASSWORD'])
+            counts[state]=counts.get(state,0)+1
     print(json.dumps({'status_counts':counts,'formal_v82_executed':False},sort_keys=True))
-    allowed={'ALREADY_SENT','SENT_SMTP_ACCEPTED','MANUALLY_STOPPED','INACTIVE_NO_RD_OBSERVATION'}
+    allowed={'ALREADY_SENT','SENT_SMTP_ACCEPTED','MANUALLY_STOPPED','INACTIVE_NO_RD_OBSERVATION','ROUTINE_OBSERVATION_LOGGED'}
     if any(k not in allowed for k in counts):raise SystemExit(1)
 
 if __name__=='__main__':

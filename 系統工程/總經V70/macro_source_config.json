@@ -4,27 +4,39 @@
   "note": "Declared source preferences are not proof that each adapter is implemented. Never promote an unverified fallback.",
   "indicators": {
     "m07": {
-      "primary_source": "CBOE_OFFICIAL_VIX",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV",
+        "CBOE_OFFICIAL_VIX",
         "YAHOO_VIX_CHART"
       ],
       "max_age_days": 12,
       "tolerance": {
         "absolute": 1
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "cboe.com",
+        "yahoo.com",
+        "investing.com"
+      ]
     },
     "m01": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "FRED_OFFICIAL_API"
       ],
       "max_age_days": 12,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "gurufocus.com"
+      ]
     },
     "m08": {
       "primary_source": "FRED_OFFICIAL_API",
@@ -35,41 +47,68 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "treasury.gov",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m02": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FRED_CSV",
       "backup_sources": [
-        "FRED_CSV"
+        "FRED_OFFICIAL_API"
       ],
       "max_age_days": 12,
       "tolerance": {
         "absolute": 0.1
       },
-      "unit": "%"
+      "unit": "%",
+      "candidate_websites": [
+        "stlouisfed.org",
+        "gurufocus.com",
+        "ycharts.com",
+        "tradingeconomics.com"
+      ]
     },
     "m04": {
-      "primary_source": "ISM_OFFICIAL",
+      "primary_source": "ISM_OFFICIAL_PDF",
       "backup_sources": [
+        "ISM_OFFICIAL",
         "VERIFIED_OVERRIDE"
       ],
       "max_age_days": 65,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "ismworld.org",
+        "tradingeconomics.com",
+        "investing.com",
+        "prnewswire.com"
+      ]
     },
     "m05": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m09": {
       "primary_source": "YAHOO_DXY",
@@ -80,7 +119,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "gurufocus.com",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m10": {
       "primary_source": "YAHOO_WTI_FUTURES",
@@ -91,7 +136,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "cmegroup.com",
+        "investing.com",
+        "tradingview.com"
+      ]
     },
     "m12": {
       "primary_source": "YAHOO_MOVE",
@@ -102,10 +153,16 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "yahoo.com",
+        "investing.com",
+        "tradingview.com",
+        "ice.com"
+      ]
     },
     "m13": {
-      "primary_source": "US_TREASURY",
+      "primary_source": "US_TREASURY_DIRECT",
       "backup_sources": [
         "FRED_CSV"
       ],
@@ -113,29 +170,57 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "treasury.gov",
+        "stlouisfed.org",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m14": {
-      "primary_source": "FRED_OFFICIAL_API",
+      "primary_source": "FED_NYFED_DIRECT",
       "backup_sources": [
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 12,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "holiday_outstanding_rule": {
+        "version": "V70-M14-HOLIDAY-OUTSTANDING-20261117",
+        "fallback": "NYFED_TREASURY_ON_RRP_OUTSTANDING_ON_CONFIRMED_HOLIDAY_ONLY",
+        "fred_value_priority": true,
+        "max_age_days_unchanged": 12
+      },
+      "candidate_websites": [
+        "federalreserve.gov",
+        "newyorkfed.org",
+        "stlouisfed.org",
+        "nomics.world",
+        "treasury.gov"
+      ],
+      "official_direct_rule": "SAME_H41_WEDNESDAY_LEVELS_EXACT_91_DAYS_ORIGINAL_NYFED_HOLIDAY_RULE"
     },
     "m15": {
       "primary_source": "ISM_OFFICIAL",
       "backup_sources": [
+        "ISM_TRADINGECONOMICS",
         "VERIFIED_OVERRIDE"
       ],
       "max_age_days": 65,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "ismworld.org",
+        "tradingeconomics.com",
+        "investing.com",
+        "prnewswire.com"
+      ]
     },
     "m16": {
       "primary_source": "PNC_PUBLISHED_LEI",
@@ -147,10 +232,16 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "pnc.com",
+        "conference-board.org",
+        "prnewswire.com",
+        "fedprimerate.com"
+      ]
     },
     "m17": {
-      "primary_source": "US_TREASURY",
+      "primary_source": "US_TREASURY_DIRECT",
       "backup_sources": [
         "FRED_CSV"
       ],
@@ -158,7 +249,13 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "treasury.gov",
+        "stlouisfed.org",
+        "federalreserve.gov",
+        "ycharts.com"
+      ]
     },
     "m18": {
       "primary_source": "FRED_CSV",
@@ -169,31 +266,54 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "stlouisfed.org",
+        "thetrading.tools",
+        "therationalmoderate.com",
+        "economyfacts.us"
+      ]
     },
     "m19": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_EMPLOYMENT_TABLE",
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "m20": {
-      "primary_source": "BLS_HISTORY_V2",
+      "primary_source": "BLS_OFFICIAL_API",
       "backup_sources": [
+        "BLS_HISTORY_V2",
         "BLS_HISTORY_V1",
+        "FRED_OFFICIAL_API",
         "FRED_CSV"
       ],
       "max_age_days": 65,
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "bls.gov",
+        "stlouisfed.org",
+        "tradingeconomics.com",
+        "investing.com"
+      ]
     },
     "s04": {
       "primary_source": "CNN_FEAR_GREED",
@@ -204,7 +324,15 @@
       "tolerance": {
         "absolute": 0.5
       },
-      "unit": null
+      "unit": null,
+      "candidate_websites": [
+        "feargreedflow.com",
+        "cnn.com",
+        "github.com",
+        "finhacker.cz"
+      ]
     }
-  }
+  },
+  "candidate_registry_file": "macro_source_candidates.json",
+  "candidate_registry_policy": "Owner-approved 4-6 distinct website options per original 18+8 variable; existing verified adapters and scoring rules unchanged."
 }

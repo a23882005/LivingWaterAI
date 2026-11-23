@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# 最後修改：2026/10/19 18:14（台灣時間）｜版本：D009-v3｜檔案：總經爬蟲18項.py
+# 最後修改：2026/11/17（台灣時間）｜版本：D009-v4＋核准m14假日未到期本金（91天與12天期限不變）｜檔案：總經爬蟲18項.py
+# 2026/11/18 Owner：實測免費來源優先，原來源保留備援；18項／計算／驗證不變。
 # -*- coding: utf-8 -*-
 """LivingWaterAI V70.3: 18 independently sourced/calculated indicators.
 Eight supplementary raw inputs (four m06 components, three Forward P/E fields, and s05) are supplied by the 10:00 Task; m06 is derived downstream. They are EXCLUDED from this 18-item crawler.
@@ -19,8 +20,12 @@ import sys
 import time
 import tempfile
 import hashlib
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from urllib.parse import urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts import m14_holiday_rrp as holiday_rrp
 
 D009_RUN_STARTED=time.monotonic()
 D009_FETCH_DEADLINE_SECONDS=18*60
@@ -62,7 +67,8 @@ for k, series in {'m07':'VIXCLS','m01':'T10Y2Y','m08':'DFII10',
 for k in ('m17',): SOURCES[k]=['https://fred.stlouisfed.org/series/T5YIE']
 SOURCES['m14']=['https://fred.stlouisfed.org/series/'+s for s in ('WALCL','WDTGAL','RRPONTSYD')]
 SOURCES['m20']=['https://fred.stlouisfed.org/series/PAYEMS']
-SOURCES['m05']=['https://fred.stlouisfed.org/series/CPILFESL']
+BLS_CORE_CPI = 'https://api.bls.gov/publicAPI/v1/timeseries/data/CUSR0000SA0L1E'
+SOURCES['m05']=[BLS_CORE_CPI,'https://fred.stlouisfed.org/series/CPILFESL']
 SOURCES['m09']=['https://finance.yahoo.com/quote/DX-Y.NYB/']
 SOURCES['m10']=['https://finance.yahoo.com/quote/CL=F/']
 
@@ -212,6 +218,7 @@ class Fetcher:
         })
         self.timeout=timeout
         self.fredcache={}
+        self.m14_originals={}
         # D009: one-run HTTP cache; keep cached responses only after success.
         self._http_cache={}
         self._host_last_request={}
@@ -249,12 +256,18 @@ class Fetcher:
         self.fredsources={}
         self.fredattempts={}
 
-    def fred(self, series):
+    def fred(self, series, *, require_history=False):
         if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
             raise TimeoutError('D009 fetch deadline: FRED request refused')
         if hasattr(self,'job_series'): self.job_series.add(series)
-        if series in self.fredcache: return self.fredcache[series]
-        if series in self.frederrors: raise RuntimeError(self.frederrors[series])
+        # Current U3 may use the short free employment table. Sahm must keep
+        # its original full-history route rather than reuse that short cache.
+        history_request = series=='UNRATE' and require_history
+        short_u3_cache = (series=='UNRATE' and
+                         self.fredsources.get(series,('', ''))[0]=='BLS_EMPLOYMENT_TABLE')
+        if series in self.fredcache and not (history_request and short_u3_cache):
+            return self.fredcache[series]
+        if series in self.frederrors and not history_request: raise RuntimeError(self.frederrors[series])
         from io import StringIO
         errors=[]
         # DBnomics series API requires provider/dataset/series; the former
@@ -265,11 +278,17 @@ class Fetcher:
             providers.append(('YAHOO_VIX_CHART','https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=1mo&interval=1d'))
         bls_map={'UNRATE':'LNS14000000','CPILFESL':'CUSR0000SA0L1E','PAYEMS':'CES0000000001'}
         if series in bls_map:
-            providers.insert(0,('BLS_OFFICIAL_API','https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]))
+            bls_url='https://api.bls.gov/publicAPI/v1/timeseries/data/'+bls_map[series]
+            if series=='CPILFESL':
+                year=dt.datetime.now(dt.timezone.utc).year
+                bls_url=f'{BLS_CORE_CPI}?startyear={year-2}&endyear={year}'
+            providers.insert(0,('BLS_OFFICIAL_API',bls_url))
         if series in bls_map:
             providers.insert(0,('BLS_HISTORY_V2','https://api.bls.gov/publicAPI/v2/timeseries/data/'))
         if series in bls_map:
             providers.insert(1,('BLS_HISTORY_V1','https://api.bls.gov/publicAPI/v1/timeseries/data/'))
+        if series=='UNRATE' and not history_request:
+            providers.insert(0,('BLS_EMPLOYMENT_TABLE','https://www.bls.gov/news.release/empsit.t01.htm'))
         # Optional official FRED API when a GitHub Actions secret is configured.
         api_key=os.environ.get('FRED_API_KEY','').strip()
         if api_key:
@@ -287,10 +306,24 @@ class Fetcher:
         required_vix_session = None
         if series == 'VIXCLS':
             required_vix_session = last_completed_vix_session()
-            priority = {'CBOE_OFFICIAL_VIX': 0, 'YAHOO_VIX_CHART': 1,
-                        'FRED_OFFICIAL_API': 2, 'FRED_CSV': 3}
+            priority = {'FRED_CSV': 0, 'CBOE_OFFICIAL_VIX': 1,
+                        'YAHOO_VIX_CHART': 2, 'FRED_OFFICIAL_API': 3}
             providers.sort(key=lambda item: priority.get(item[0], 99))
+        # Owner-approved tested free endpoints first; stable sort keeps all
+        # existing providers in their previous relative fallback order.
+        if series in ('VIXCLS','T10Y2Y','BAMLH0A0HYM2','T5YIE','SAHMREALTIME'):
+            providers.sort(key=lambda item: 0 if item[0]=='FRED_CSV' else 1)
+        elif series in ('CPILFESL','PAYEMS') or (series=='UNRATE' and not history_request):
+            # Prefer a direct BLS source for current CPI, U3 and nonfarm data.
+            # Sahm's separate full-history U3 request retains its existing order.
+            priority={'BLS_OFFICIAL_API':0,'BLS_EMPLOYMENT_TABLE':1,
+                      'BLS_HISTORY_V2':2,'BLS_HISTORY_V1':3,
+                      'FRED_OFFICIAL_API':4,'FRED_CSV':5}
+            providers.sort(key=lambda item:priority.get(item[0],99))
+        elif series=='UNRATE':
+            providers.sort(key=lambda item: 0 if item[0]=='BLS_EMPLOYMENT_TABLE' else 1)
         retried=set()
+        latest_cpi_month=None
         self.fredattempts[series]=[]
         for provider,url in providers:
             if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
@@ -305,7 +338,25 @@ class Fetcher:
                 else:
                     response=self.s.get(url,timeout=(5,self.timeout))
                 response.raise_for_status()
-                if provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2','BLS_HISTORY_V1'):
+                if provider=='BLS_EMPLOYMENT_TABLE':
+                    table=pd.read_html(StringIO(response.text))[0]
+                    rate=table[table.iloc[:,0].eq('Unemployment rate')].iloc[0]
+                    parsed=[]
+                    for i,col in enumerate(table.columns):
+                        if not str(col[0]).startswith('Seasonally adjusted'): continue
+                        token=re.sub(r'\([^)]*\)','',str(col[1])).replace('.','').replace('Sept ','Sep ')
+                        observed=None
+                        for fmt in ('%b %Y','%B %Y'):
+                            try:
+                                observed=dt.datetime.strptime(token,fmt).date().replace(day=1)
+                                break
+                            except ValueError: pass
+                        if observed is not None:
+                            value=pd.to_numeric(rate.iloc[i],errors='coerce')
+                            if pd.notna(value): parsed.append((observed,value))
+                    if not parsed: raise ValueError('BLS table has no dated seasonally-adjusted total unemployment rate')
+                    dates=pd.to_datetime([x[0] for x in parsed]); values=[x[1] for x in parsed]
+                elif provider in ('BLS_OFFICIAL_API','BLS_HISTORY_V2','BLS_HISTORY_V1'):
                     obj=response.json()
                     if obj.get('status')!='REQUEST_SUCCEEDED':
                         raise ValueError('BLS response: '+str(obj.get('message'))[:130])
@@ -348,6 +399,15 @@ class Fetcher:
                     dates=pd.to_datetime(doc['period'],errors='coerce')
                     values=pd.to_numeric(doc['value'],errors='coerce')
                 data=pd.DataFrame({'date':dates,'value':values}).dropna()
+                if series=='CPILFESL':
+                    months=data['date'].dt.to_period('M')
+                    if months.duplicated().any() or not all(math.isfinite(v) and v>0 for v in data['value']):
+                        raise ValueError('CPI monthly observations must be unique, finite and positive')
+                    period=months.max()
+                    if pd.notna(period):
+                        if latest_cpi_month is not None and period<latest_cpi_month:
+                            raise ValueError(f'CPILFESL fallback precedes observed month {latest_cpi_month}')
+                        latest_cpi_month=period
                 data=data.sort_values('date').drop_duplicates('date',keep='last')
                 if data.empty: raise ValueError('No numeric observations')
                 if series == 'VIXCLS':
@@ -375,11 +435,21 @@ class Fetcher:
                     missing=[str(p) for p in required if p not in monthly.index]
                     if missing:
                         raise ValueError('Insufficient '+series+' history; missing '+','.join(missing))
+                if series in ('WALCL','WDTGAL','RRPONTSYD'):
+                    from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
+                    parts=urlsplit(url)
+                    safe_url=urlunsplit(parts._replace(query=urlencode([(k,v) for k,v in parse_qsl(parts.query) if k!='api_key'])))
+                    self.m14_originals[series]=holiday_rrp.receipt(response.content,safe_url,dt.datetime.now(dt.timezone.utc).isoformat())
                 self.fredcache[series]=out
                 self.fredsources[series]=(provider,url.split('?')[0] if provider=='FRED_OFFICIAL_API' else url)
                 self.fredattempts[series].append({'provider':provider,'result':'OK',
                     'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),
                     'observation_date':str(out.index[-1].date())})
+                if series in bls_map and provider.startswith('BLS_'):
+                    self.fredattempts[series][-1].update(
+                        source_url=url,series_id=bls_map[series],
+                        response_sha256=hashlib.sha256(response.content).hexdigest(),
+                        source_attribution='Source: U.S. Bureau of Labor Statistics')
                 print('FRED_PROVIDER',series,provider,str(out.index[-1].date()),flush=True)
                 return out
             except Exception as exc:
@@ -464,42 +534,58 @@ def row(key, value=None, date=None, src=None, method=None, error=None, status=No
             'method':method or '', 'status':status,'detail':detail or '', 'error':error or ''}
 
 def treasury_breakeven(f, key):
-    """5Y market breakeven from matching Treasury nominal and real yield dates."""
+    """Same-date Treasury 5Y nominal-real, preserving the original calendar-month delta."""
     from io import StringIO
+    import hashlib
     today=dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).date()
-    for year in (today.year, today.year-1):
-        def load(kind):
-            url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
-                 +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
-            resp=f.s.get(url,timeout=(5,f.timeout));resp.raise_for_status()
-            df=pd.read_csv(StringIO(resp.text))
-            df.columns=[str(x).strip().lower() for x in df.columns]
-            if 'date' not in df.columns: raise ValueError('Treasury missing Date')
-            col=next((x for x in ('5-year','5 year','5 yr') if x in df.columns),None)
-            if col is None: raise ValueError('Treasury missing 5Y yield')
-            df['date']=pd.to_datetime(df['date'],errors='coerce')
-            df['yield']=pd.to_numeric(df[col],errors='coerce')
-            return df[['date','yield']].dropna().drop_duplicates('date'),url
-        try:
-            nominal,u1=load('daily_treasury_yield_curve')
-            real,u2=load('daily_treasury_real_yield_curve')
-            both=nominal.merge(real,on='date',suffixes=('_nominal','_real')).sort_values('date')
-            if both.empty: raise ValueError('Treasury nominal/real dates do not overlap')
-            both['be']=both['yield_nominal']-both['yield_real']
-            end=both.iloc[-1];asof=end['date']
-            if key=='m13': val=float(end['be']);detail='5Y nominal minus 5Y TIPS real yield on same day'
-            else:
-                target=asof-pd.DateOffset(months=1)
-                prior=both.loc[both['date']<=target]
-                if prior.empty or (target-prior.iloc[-1]['date']).days>7:
-                    raise ValueError('One-month breakeven reference unavailable or too old')
-                val=float(end['be']-prior.iloc[-1]['be'])
-                detail='5Y breakeven change from '+prior.iloc[-1]['date'].date().isoformat()
-            return row(key,val,asof.date().isoformat(),u1+' | '+u2,
-                       'Treasury derived five-year breakeven; not direct FRED T5YIE',detail=detail)
-        except (ValueError,KeyError,requests.RequestException):
-            if year==today.year-1: raise
-    raise ValueError('Treasury breakeven unavailable')
+    cache=getattr(f,'official_treasury_cache',{})
+    f.official_treasury_cache=cache
+    def load(year,kind):
+        ident=(year,kind)
+        if ident in cache:return cache[ident]
+        url=('https://home.treasury.gov/resource-center/data-chart-center/interest-rates/'
+             +f'daily-treasury-rates.csv/{year}/all?type={kind}&field_tdr_date_value={year}&page&_format=csv')
+        resp=f.s.get(url,timeout=(5,f.timeout));resp.raise_for_status()
+        actual=__import__('urllib.parse',fromlist=['urlparse']).urlparse(getattr(resp,'url',None) or url)
+        if actual.hostname!='home.treasury.gov' or not actual.path.endswith('/all'):
+            raise ValueError('Treasury source redirect mismatch')
+        df=pd.read_csv(StringIO(resp.text));df.columns=[str(x).strip().lower() for x in df.columns]
+        if 'date' not in df.columns:raise ValueError('Treasury missing Date')
+        col=next((x for x in ('5-year','5 year','5 yr') if x in df.columns),None)
+        if col is None:raise ValueError('Treasury missing 5Y yield')
+        df['date']=pd.to_datetime(df['date'],errors='coerce');df['yield']=pd.to_numeric(df[col],errors='coerce')
+        df=df[['date','yield']].dropna();df=df[df['date'].dt.date<=today]
+        if df['date'].duplicated().any() or not df['yield'].map(math.isfinite).all():raise ValueError('Treasury duplicate dates or nonfinite yield')
+        result=(df,{'url':url,'response_sha256':hashlib.sha256(resp.content).hexdigest(),
+                    'retrieved_at':dt.datetime.now(dt.timezone.utc).isoformat(),'response_bytes':len(resp.content)})
+        cache[ident]=result;return result
+    nominal,r1=load(today.year,'daily_treasury_yield_curve')
+    real,r2=load(today.year,'daily_treasury_real_yield_curve');receipts=[r1,r2]
+    both=nominal.merge(real,on='date',suffixes=('_nominal','_real')).sort_values('date')
+    if both.empty:raise ValueError('Treasury nominal/real dates do not overlap')
+    end=both.iloc[-1];asof=end['date'];target=asof-pd.DateOffset(months=1)
+    if key=='m17' and target.year<today.year:
+        n,rn=load(target.year,'daily_treasury_yield_curve');r,rr=load(target.year,'daily_treasury_real_yield_curve')
+        both=pd.concat([n.merge(r,on='date',suffixes=('_nominal','_real')),both]).sort_values('date');receipts+=[rn,rr]
+    both['be']=both['yield_nominal']-both['yield_real'];end=both.iloc[-1]
+    legs={'end':{'date':asof.date().isoformat(),'nominal_5y':float(end['yield_nominal']),
+                 'real_5y':float(end['yield_real']),'breakeven':float(end['be'])}}
+    if key=='m13':val=float(end['be']);detail='5Y nominal minus 5Y TIPS real yield on same day'
+    else:
+        prior=both.loc[both['date']<=target]
+        if prior.empty or (target-prior.iloc[-1]['date']).days>7:raise ValueError('One-month breakeven reference unavailable or too old')
+        base=prior.iloc[-1];val=float(end['be']-base['be']);detail='5Y breakeven change from '+base['date'].date().isoformat()
+        legs['begin']={'date':base['date'].date().isoformat(),'nominal_5y':float(base['yield_nominal']),
+                       'real_5y':float(base['yield_real']),'breakeven':float(base['be'])}
+    r=row(key,val,asof.date().isoformat(),' | '.join(x['url'] for x in receipts),
+          'Treasury derived five-year breakeven; not direct FRED T5YIE',detail=detail)
+    r['source_evidence']={'provider':'US_TREASURY_DIRECT','sources':receipts,'legs':legs,'same_date_intersection':True}
+    if not hasattr(f,'fredattempts'):f.fredattempts={}
+    if not hasattr(f,'job_series'):f.job_series=set()
+    ident='TREASURY_'+key;f.job_series.add(ident)
+    f.fredattempts[ident]=[{'provider':'US_TREASURY_DIRECT','result':'OK',
+        'verified_at':min(x['retrieved_at'] for x in receipts),'observation_date':asof.date().isoformat()}]
+    return r
 
 def treasury_latest(f, key):
     """Treasury official daily CSV fallback for nominal 10Y-2Y and real 10Y."""
@@ -530,9 +616,21 @@ def treasury_latest(f, key):
             data=data.dropna(subset=['date','computed']).sort_values('date')
             if data.empty: raise ValueError('Treasury CSV no numeric dated rows')
             last=data.iloc[-1]
-            return row(key,float(last['computed']),last['date'].date().isoformat(),
+            result = row(key,float(last['computed']),last['date'].date().isoformat(),
                        url,'Treasury official '+kind+' daily CSV',
                        detail='Matched observation date for nominal 10Y minus 2Y' if key=='m01' else '10Y TIPS real yield')
+            if key == 'm01':
+                observed = result['observation_date']
+                verified = dt.datetime.now(dt.timezone.utc).isoformat()
+                result['source_evidence'] = {
+                    'provider': 'US_TREASURY_DIRECT', 'date': observed, 'url': url,
+                    'nominal_10y': float(y10.loc[last.name]), 'nominal_2y': float(y2.loc[last.name]),
+                    'response_sha256': hashlib.sha256(resp.content).hexdigest(),
+                }
+                f.job_series.add('TREASURY_m01')
+                f.fredattempts['TREASURY_m01'] = [{'provider': 'US_TREASURY_DIRECT', 'result': 'OK',
+                    'verified_at': verified, 'observation_date': observed}]
+            return result
         except Exception as exc: last_error=str(exc)[:230]
     raise RuntimeError('Treasury direct fallback failed: '+str(last_error))
 
@@ -557,26 +655,34 @@ def core_cpi(f):
     prior=float(prior_series.iloc[0])
     if prior<=0 or float(last)<=0: raise ValueError('CPILFESL 指數必須大於0')
     val=(last/prior-1)*100
-    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),getattr(f,'fredsources',{}).get('CPILFESL',('FRED',SOURCES['m05'][0]))[1],
-               'FRED CPILFESL 同一數列 YoY','',detail=f'比較基期 {prior_date.date()}')
+    provider,source=getattr(f,'fredsources',{}).get('CPILFESL',('FRED',SOURCES['m05'][-1]))
+    series_label='BLS CUSR0000SA0L1E' if provider.startswith('BLS_') else 'FRED CPILFESL'
+    return row('m05',val,s.index[-1].strftime('%Y-%m-%d'),source,
+               series_label+' 同一季調序列 YoY','',detail=f'比較基期 {prior_date.date()}')
 
 def breakeven_5y(f):
     try: return treasury_breakeven(f,'m13')
-    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
-    return latest(f,'m13','T5YIE')
+    except Exception as exc: print('TREASURY_PRIMARY_FAILED','m13',str(exc)[:180],flush=True)
+    try: return latest(f,'m13','T5YIE')
+    except Exception as exc: print('FREE_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
+    raise RuntimeError('Treasury primary and original FRED breakeven sources unavailable')
 
 def month_delta(f):
     try: return treasury_breakeven(f,'m17')
-    except Exception as exc: print('TREASURY_BREAKEVEN_FALLBACK',str(exc)[:180],flush=True)
-    s=f.fred('T5YIE'); latest_date=s.index[-1]
-    target=latest_date-pd.DateOffset(months=1)
-    hist=s.loc[:target]
-    if hist.empty: raise ValueError('5YBE 無 1 個月以前資料')
-    # Never silently use a very old observation as the one-month baseline.
-    if (target-hist.index[-1]).days>7:
-        raise ValueError(f'5YBE 近1月基期過舊：目標 {target.date()}，實際 {hist.index[-1].date()}')
-    return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
-               '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
+    except Exception as exc: print('TREASURY_PRIMARY_FAILED','m17',str(exc)[:180],flush=True)
+    try:
+        s=f.fred('T5YIE'); latest_date=s.index[-1]
+        target=latest_date-pd.DateOffset(months=1)
+        hist=s.loc[:target]
+        if hist.empty: raise ValueError('5YBE 無 1 個月以前資料')
+        # Never silently use a very old observation as the one-month baseline.
+        if (target-hist.index[-1]).days>7:
+            raise ValueError(f'5YBE 近1月基期過舊：目標 {target.date()}，實際 {hist.index[-1].date()}')
+        return row('m17',float(s.iloc[-1]-hist.iloc[-1]),str(latest_date.date()),SOURCES['m17'][0],
+                   '近1個月前最近交易日差值（百分點）',detail=f'起點 {hist.index[-1].date()}')
+    except Exception as exc:
+        print('FREE_BREAKEVEN_MONTH_FALLBACK',str(exc)[:180],flush=True)
+    raise RuntimeError('Treasury primary and original FRED month baseline unavailable')
 
 def ism_official(f, key):
     """Official ISM monthly headline PMI only; reject wrong month and subindex."""
@@ -591,6 +697,23 @@ def ism_official(f, key):
     # Do not return last month's PMI as a newly fetched current headline.
     target=(pd.Period(now.strftime('%Y-%m'),freq='M')-1)
     attempts=[]
+    if key=='m04' and str(target)=='2026-10':
+        url='https://www.ismworld.org/globalassets/pub/research-and-surveys/rob/pmi/r4in202610pmi.pdf'
+        series='ISM_'+key
+        f.job_series.add(series)
+        try:
+            from scripts.refresh_v703_predeploy import manufacturing_headline_from_official_pdf
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            value=manufacturing_headline_from_official_pdf(response.content)
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL_PDF','result':'OK',
+                'verified_at':dt.datetime.now(dt.timezone.utc).isoformat(),'observation_date':'2026-10-01',
+                'response_sha256':hashlib.sha256(response.content).hexdigest()})
+            return row(key,value,'2026-10-01',url,'ISM original approved official PDF headline parser')
+        except Exception as exc:
+            attempts.append('preferred official PDF: '+str(exc)[:150])
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_OFFICIAL_PDF','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':str(exc)[:220]})
     candidates=(target,)
     for period in candidates:
         slug=months[period.month-1]
@@ -665,14 +788,94 @@ def ism_official(f, key):
                 url,'Official ISM dated monthly roundup headline PMI')
         except Exception as exc:
             attempts.append('official roundup: '+str(exc)[:140])
+    if key=='m15':
+        # Only after the original official route fails, use the candidate
+        # already verified with the approved P01 sector/period/news parser.
+        from scripts.ism_services_backup import SERVICES_BACKUP_URL, parse_services_pmi
+        url=SERVICES_BACKUP_URL
+        series='ISM_'+key
+        f.job_series.add(series)
+        try:
+            if time.monotonic()-D009_RUN_STARTED>=D009_FETCH_DEADLINE_SECONDS:
+                raise TimeoutError('ISM backup fetch deadline exceeded')
+            response=f.s.get(url,timeout=(5,f.timeout))
+            response.raise_for_status()
+            final=urlparse(getattr(response,'url',url))
+            if final.hostname not in ('tradingeconomics.com','www.tradingeconomics.com') or final.path.rstrip('/')!='/united-states/non-manufacturing-pmi':
+                raise ValueError('ISM backup redirected away from the registered source')
+            value,observed,published,evidence=parse_services_pmi(response.content,str(target),now)
+            stamp=dt.datetime.now(dt.timezone.utc).isoformat()
+            digest=hashlib.sha256(response.content).hexdigest()
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_TRADINGECONOMICS','result':'OK',
+                'verified_at':stamp,'observation_date':observed,'publication_date':published,
+                'response_sha256':digest,'source_url':url})
+            result=row(key,value,observed,url,'ISM services headline via original approved Trading Economics parser',
+                detail='Original official source unavailable; sector, current target month and dated release verified')
+            result['publication_date']=published
+            result['source_evidence']={'provider':'ISM_TRADINGECONOMICS','source_url':url,
+                'response_sha256':digest,'verified_at':stamp,**evidence}
+            return result
+        except Exception as exc:
+            attempts.append('Trading Economics services backup: '+str(exc)[:180])
+            f.fredattempts.setdefault(series,[]).append({'provider':'ISM_TRADINGECONOMICS','result':'FAILED',
+                'attempted_at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':str(exc)[:220]})
     raise RuntimeError('ISM official monthly headline source failed: '+' | '.join(attempts))
 
+def sahm_bls_crosscheck(f, published):
+    """Check a contemporaneous BLS U-3 snapshot against the published series."""
+    now = dt.datetime.now(dt.timezone.utc)
+    series_id = 'LNS14000000'
+    url = ('https://api.bls.gov/publicAPI/v1/timeseries/data/'
+           f'{series_id}?startyear={now.year-2}&endyear={now.year}')
+    check = {'source_url':url, 'series_id':series_id,
+             'published_observation_date':published['observation_date']}
+    try:
+        response = f.s.get(url, timeout=(5, min(f.timeout, 15)))
+        response.raise_for_status()
+        check.update(retrieved_at_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
+                     response_sha256=hashlib.sha256(response.content).hexdigest())
+        payload = response.json()
+        if payload.get('status') != 'REQUEST_SUCCEEDED':
+            raise ValueError('BLS U-3 request unsuccessful')
+        series = payload['Results']['series']
+        if len(series) != 1 or series[0].get('seriesID') != series_id:
+            raise ValueError('BLS U-3 series mismatch')
+        rates = {}
+        for item in series[0]['data']:
+            period = item['period']
+            if not re.fullmatch(r'M(?:0[1-9]|1[0-2])', period):
+                continue
+            month = pd.Period(f"{item['year']}-{period[1:]}", freq='M')
+            if month in rates:
+                raise ValueError(f'Duplicate BLS U-3 month {month}')
+            value = None if item['value'] in ('-', '') else Decimal(item['value'])
+            if value is not None and (not value.is_finite() or not 0 <= value <= 100):
+                raise ValueError(f'Invalid BLS U-3 rate for {month}')
+            rates[month] = value
+        latest_month = max(month for month, value in rates.items() if value is not None)
+        check['bls_observation_month'] = str(latest_month)
+        if latest_month >= pd.Period(now.date(), freq='M'):
+            raise ValueError('BLS U-3 observation month is not complete')
+        published_month = pd.Period(published['observation_date'], freq='M')
+        if latest_month != published_month:
+            return {**check, 'status':'MONTH_MISMATCH'}
+        window = pd.period_range(published_month-14, published_month, freq='M')
+        missing = [str(month) for month in window if rates.get(month) is None]
+        if missing:
+            return {**check, 'status':'MISSING_MONTHS', 'missing_months':missing}
+        values = [rates[month] for month in window]
+        sums = [sum(values[i:i+3]) for i in range(13)]
+        value = ((sums[-1]-min(sums[:-1])) / 3).quantize(Decimal('0.01'))
+        matches = value == Decimal(str(published['value']))
+        return {**check, 'status':'MATCH' if matches else 'VALUE_MISMATCH',
+                'calculated_value_pp':float(value)}
+    except (requests.RequestException, ValueError, KeyError, TypeError, InvalidOperation) as exc:
+        return {**check, 'status':'SOURCE_ERROR', 'error':str(exc)[:180]}
+
 def sahm_from_published(f):
-    """Read the published official Sahm Rule first; independent U3 calculation is diagnostic fallback."""
+    """Keep the published real-time value and record the independent BLS check."""
     try:
         r=latest(f,'m18','SAHMREALTIME')
-        r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
-        return r
     except Exception as published_exc:
         print('SAHM_PUBLISHED_FAILED',type(published_exc).__name__,str(published_exc)[:450],flush=True)
         try:
@@ -681,10 +884,13 @@ def sahm_from_published(f):
             raise RuntimeError(
                 'SAHMREALTIME official series failed: '+str(published_exc)[:180]+
                 ' | verified U3 calculation failed: '+str(calc_exc)[:180]) from calc_exc
+    r['method']='Official FRED Sahm Rule Recession Indicator (real-time vintage), published series'
+    r['sahm_bls_check']=sahm_bls_crosscheck(f,r)
+    return r
 
 def sahm_from_unrate(f):
     try:
-        s=f.fred('UNRATE').sort_index()
+        s=f.fred('UNRATE',require_history=True).sort_index()
         x=s.groupby(s.index.to_period('M')).last().sort_index()
         # The latest reported 15 calendar months must be consecutive; never bridge gaps.
         end=x.index[-1]
@@ -725,23 +931,111 @@ def nfp(f):
                'BLS/FRED 非農就業存量，近3個月月增平均，單位千人',detail='注意歷史值可能修訂')
 
 def netliq(f):
+    try:
+        from scripts import macro_official_direct
+        value,observed,evidence=macro_official_direct.netliq(f)
+        r=row('m14',value,observed,' | '.join(x['url'] for x in evidence['sources']),
+              'Official Fed H41 Wednesday levels + NYFed Treasury ON RRP; original 91-day and holiday rules',
+              detail='Official publishers direct; USD bn; begin='+evidence['begin']+', end='+evidence['end'])
+        r['source_evidence']={'official_direct':evidence}
+        if not hasattr(f,'fredattempts'):f.fredattempts={}
+        if not hasattr(f,'job_series'):f.job_series=set()
+        ident='NETLIQ_DIRECT';f.job_series.add(ident)
+        f.fredattempts[ident]=[{'provider':'FED_NYFED_DIRECT','result':'OK','observation_date':observed,
+             'verified_at':min(x['retrieved_at'] for x in evidence['sources'])}]
+        return r
+    except Exception as exc:
+        print('NETLIQ_DIRECT_FAILED',type(exc).__name__,str(exc)[:230],flush=True)
+        r=netliq_legacy(f)
+        r['official_source_failure']=str(exc)[:400]
+        return r
+
+
+def netliq_legacy(f):
     # Units: WALCL, WDTGAL millions USD; RRPONTSYD billions USD.
-    fed=f.fred('WALCL')/1000.0
-    tga=f.fred('WDTGAL')/1000.0
-    rrp=f.fred('RRPONTSYD')
+    diagnostics={'schema':'V70.3/netliq-date-intersection-v1',
+                 'policy':'SAME_WEDNESDAY_EXACT_91_DAYS_HOLIDAY_OUTSTANDING',
+                 'source_units':{'WALCL':'USD million','WDTGAL':'USD million','RRPONTSYD':'USD billion'},
+                 'source_latest_dates':{},'status':'FETCH_INCOMPLETE'}
+    f.netliq_diagnostics=diagnostics
+    series={}
+    for name in ('WALCL','WDTGAL','RRPONTSYD'):
+        series[name]=f.fred(name)
+        diagnostics['source_latest_dates'][name]=str(series[name].index[-1].date())
+    fed=series['WALCL']/1000.0
+    tga=series['WDTGAL']/1000.0
+    rrp=series['RRPONTSYD']
+    # Preserve the raw FRED series; derived holiday balances have their own
+    # receipts and never overwrite original missing observations.
+    derived={};attempt_errors={}
+    weekly_common=fed.dropna().index.intersection(tga.dropna().index)
+    weekly_common=weekly_common[(weekly_common.dayofweek==2) &
+        (weekly_common<=pd.Timestamp(dt.datetime.now(dt.timezone.utc).date()))]
+    if len(weekly_common):
+        candidate=weekly_common[-1]
+        rrp=rrp.copy()
+        for day in (candidate,candidate-pd.Timedelta(days=91)):
+            if day not in weekly_common or (day in rrp.index and pd.notna(rrp.loc[day])):continue
+            try:
+                # No helper calls without actual original-response receipts.
+                originals=getattr(f,'m14_originals',{})
+                if set(originals)!={'WALCL','WDTGAL','RRPONTSYD'}:raise ValueError('m14 original receipts unavailable')
+                original=holiday_rrp.fred_values(originals['RRPONTSYD'],'RRPONTSYD')
+                key=str(day.date())
+                if key not in original and not min(original)<key<max(original):raise ValueError('m14 missing date outside retrieved FRED interval')
+                if original.get(key) is not None:raise ValueError('m14 FRED real value has priority')
+                component=holiday_rrp.fetch_holiday(f,day.date())
+                derived[key]=component;rrp.loc[day]=component['value_usd_bn']
+            except Exception as exc:
+                attempt_errors[str(day.date())]=str(exc)[:240]
+    diagnostics['holiday_attempt_errors']=attempt_errors
     df=pd.concat([fed.rename('fed'),tga.rename('tga'),rrp.rename('rrp')],axis=1,join='inner').dropna()
+    df=df[df.index<=pd.Timestamp(dt.datetime.now(dt.timezone.utc).date())]
     # same observation Wednesday and exactly 91 days (13 weeks) prior
     df=df[df.index.dayofweek==2]
+    # Diagnose the newest Wednesday reported by either weekly source, including
+    # a missing peer. These diagnostic values always remain the original FRED
+    # values, separate from the approved holiday component above.
+    weekly=series['WALCL'].index.union(series['WDTGAL'].index)
+    weekly=weekly[weekly.dayofweek==2].sort_values()
+    latest_weekly=weekly[-1] if len(weekly) else None
+    dates=set()
+    if latest_weekly is not None:dates.update((latest_weekly,latest_weekly-pd.Timedelta(weeks=13)))
+    if not df.empty:dates.update((df.index[-1],df.index[-1]-pd.Timedelta(weeks=13)))
+    diagnostics.update(status='ALIGNED' if not df.empty else 'NO_COMMON_WEDNESDAY',
+        latest_weekly_wednesday=str(latest_weekly.date()) if latest_weekly is not None else None,
+        latest_common_wednesday=str(df.index[-1].date()) if not df.empty else None,
+        values_at_required_dates={str(day.date()):{name:float(s.loc[day])
+            if day in s.index and pd.notna(s.loc[day]) else None for name,s in series.items()}
+            for day in sorted(dates)})
+    diagnostics['missing_at_latest_weekly']=[name for name,s in series.items()
+        if latest_weekly is not None and (latest_weekly not in s.index or pd.isna(s.loc[latest_weekly]))]
     if df.empty: raise ValueError('缺少同日週三 TGA/Fed/RRP')
     end=df.index[-1];begin=end-pd.Timedelta(weeks=13)
-    if begin not in df.index: raise ValueError(f'缺少 13 週前同日值: {begin.date()}')
+    diagnostics.update(selected_begin=str(begin.date()),selected_end=str(end.date()))
+    if begin not in df.index:
+        diagnostics['status']='MISSING_EXACT_91_DAY_BASE'
+        raise ValueError(f'缺少 13 週前同日值: {begin.date()}')
     now=df.loc[end];before=df.loc[begin]
     d=(now-before);ans=d['fed']-d['tga']-d['rrp']
     detail=(f"開始={begin.date()}, 結束={end.date()}, 單位十億美元; "
             f"Fed Δ={d['fed']:.6f}, TGA Δ={d['tga']:.6f}, RRP Δ={d['rrp']:.6f}; "
             f"淨流動性 Δ={ans:.6f}")
-    return row('m14',ans,str(end.date()),' | '.join(SOURCES['m14']),
+    if diagnostics['missing_at_latest_weekly']:
+        detail+=(f"; 最新週資料日={latest_weekly.date()} 缺有效觀測="
+                 +','.join(diagnostics['missing_at_latest_weekly'])+'；維持同日交集，未補值')
+    result=row('m14',ans,str(end.date()),' | '.join(SOURCES['m14']),
                'FRED 三數列同週三觀測；WALCL/WDTGAL 百萬美元÷1000，RRP 十億美元',detail=detail)
+    selected={k:v for k,v in derived.items() if k in (str(begin.date()),str(end.date()))}
+    if selected:
+        result['method']+='；HOLIDAY_OUTSTANDING_DERIVED（NYFed官方假日存續Treasury ON RRP本金，非FRED當日發布值）'
+        result['source_url']+=' | '+holiday_rrp.HOLIDAYS+' | '+holiday_rrp.OPERATIONS
+        result['source_evidence']={'holiday_outstanding':dict(rule_version=holiday_rrp.RULE,
+            begin=str(begin.date()),end=str(end.date()),endpoints=selected,fred_originals=f.m14_originals)}
+        holiday_rrp.validate_item(result,dt.datetime.now(dt.timezone.utc))
+        diagnostics['holiday_outstanding_dates']=sorted(selected)
+    result['alignment_diagnostics']=diagnostics
+    return result
 
 def cnn(f):
     # Unofficial endpoint: keep timestamp validation and reject absence of asof.
@@ -985,7 +1279,10 @@ def run(outdir,overrides_path=None,cache_path=None):
             else:r=row(k,src=(SOURCES.get(k) or [''])[0],method='須人工核實或授權 API',error=reasons.get(k,'無穩定來源'))
         except Exception as ex:
             r=row(k,src=(SOURCES.get(k) or [''])[0],method='抓取失敗',error=str(ex)[:220])
+        if k=='m14' and hasattr(f,'netliq_diagnostics'):
+            r['alignment_diagnostics']=f.netliq_diagnostics
         attempts={series:list(f.fredattempts.get(series,[])) for series in sorted(f.job_series)}
+        scoped_evidence=r.get('source_evidence')
         r.update(attempted_at=started_at, attempt_result='SUCCESS' if r.get('value') is not None else 'FAILED',
                  source_attempts=attempts, cache_used=False, cache_source=None,
                  last_verified_at=None, source_evidence=None)
@@ -993,7 +1290,7 @@ def run(outdir,overrides_path=None,cache_path=None):
         successes=[a for entries in attempts.values() for a in entries if a.get('result')=='OK']
         if r.get('value') is not None and attempts and all(any(a.get('result')=='OK' for a in entries) for entries in attempts.values()):
             r['last_verified_at']=min(a['verified_at'] for a in successes)
-            r['source_evidence']={'series':attempts}
+            r['source_evidence']={'series':attempts,**(scoped_evidence or {})}
         results[k]=r
         print(f"{k:9s} {r['status']:7s} {str(r['value']):>12s} {r['observation_date'] or '---'}",flush=True)
     # Optional dated and source-backed records; never overwrite the results automatically via HTML defaults.
@@ -1028,11 +1325,14 @@ def run(outdir,overrides_path=None,cache_path=None):
                 if k=='s03':
                     continue  # s03 僅由 m07 複製，不得從快取獨立還原
                 prior=old.get('items',{}).get(k,{})
-                if results[k]['value'] is None and prior.get('value') is not None:
+                holiday_failed=(k=='m14' and results[k].get('alignment_diagnostics',{}).get('holiday_attempt_errors')
+                    and prior.get('observation_date','')>results[k].get('observation_date',''))
+                if (results[k]['value'] is None or holiday_failed) and prior.get('value') is not None:
                     try:
                         # 快取只讀入先前 OK/STALE 且有來源的紀錄；重新驗日期、數值、單位。
                         if prior.get('status') not in ('OK','USABLE','STALE'):
                             continue
+                        if k=='m14':holiday_rrp.validate_item(prior,dt.datetime.now(dt.timezone.utc))
                         checked=validate_manual(k, {'value':prior['value'],
                             'observation_date':prior['observation_date'],
                             'source_url':prior['source_url'],
@@ -1043,13 +1343,20 @@ def run(outdir,overrides_path=None,cache_path=None):
                         # as a retained reference, never a new live-source retrieval.
                         checked['status']='USABLE' if k in ('m04','m15','m18') else 'STALE'
                         checked['detail']='歷史快取備援；本次未重新取得來源；僅在觀測日期有效期限內保留使用'
+                        if k=='m14':
+                            checked['method']=prior.get('method',checked['method'])
+                            checked['detail']+='；'+str(prior.get('detail',''))
                         failed=results[k]
+                        if holiday_failed:
+                            failed=dict(failed,error='m14 holiday retrieval failed: '+json.dumps(failed['alignment_diagnostics']['holiday_attempt_errors'],ensure_ascii=False),attempt_result='FAILED')
                         checked.update(error=failed.get('error',''), retrieval_error=failed.get('error',''),
                             attempted_at=failed.get('attempted_at'), attempt_result=failed.get('attempt_result','FAILED'),
                             source_attempts=failed.get('source_attempts',{}), cache_used=True,
                             cache_source={'file':Path(cache_path).name,'sha256':hashlib.sha256(Path(cache_path).read_bytes()).hexdigest(),
                                           'generated_at':old.get('generated_at'),'observation_date':prior.get('observation_date')},
                             last_verified_at=prior.get('last_verified_at'), source_evidence=prior.get('source_evidence'))
+                        if k=='m14' and failed.get('alignment_diagnostics'):
+                            checked['alignment_diagnostics']=failed['alignment_diagnostics']
                         results[k]=checked
                     except (ValueError,TypeError,KeyError,OverflowError) as e:
                         print('拒絕不合格快取',k,str(e),file=sys.stderr)
@@ -1366,5 +1673,4 @@ if __name__=='__main__':
         default_overrides=Path(__file__).resolve().parents[2]/'data'/'verified_overrides.json'
         overrides=a.overrides or (str(default_overrides) if default_overrides.is_file() else None)
         run(a.out,overrides,a.cache)
-
 

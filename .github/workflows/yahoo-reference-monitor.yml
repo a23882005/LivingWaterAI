@@ -1,4 +1,5 @@
 # Authorized observation deployment: enabled on main; set variable to false or disable workflow to pause.
+# Manual run verification requested 2026-11-18 (Asia/Taipei); no behavior, cron, or secrets changes.
 name: Yahoo ten-minute reference monitor (not full V82)
 on:
   push:

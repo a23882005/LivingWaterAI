@@ -1,0 +1,51 @@
+{
+  "schema": "V703_CALENDAR_ORIGINAL_HTTP_FIXTURE_20261117",
+  "clock_utc": "2026-11-17T01:28:47.721351+00:00",
+  "observation_month": "2026-10",
+  "sources": {
+    "ism": {
+      "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
+      "final_url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
+      "http_status": 200,
+      "fetched_at_utc": "2026-11-17T01:28:45.307324+00:00",
+      "response_sha256": "75e9d3ba01504952c387e2ebd3be7e2b3961e47629a3783a5af67c1e415fee29",
+      "response_bytes": 264174,
+      "archive_path": "data/audit/monthly_calendar_facts_e928ff325f03c131dcdd05c7e16607d1d4c67a9912af2cf1d7a4998d994cbc03.json",
+      "archive_kind": "EXTRACTED_CALENDAR_FACTS_JSON",
+      "archive_sha256": "e928ff325f03c131dcdd05c7e16607d1d4c67a9912af2cf1d7a4998d994cbc03"
+    },
+    "bls": {
+      "url": "https://www.bls.gov/schedule/news_release/empsit.htm",
+      "final_url": "https://www.bls.gov/schedule/news_release/empsit.htm",
+      "http_status": 200,
+      "fetched_at_utc": "2026-11-17T01:28:45.723607+00:00",
+      "response_sha256": "939d7d01d2d4e136e54f7fec49ea3108e73dfcf9f50dba383fc7c723e21a556e",
+      "response_bytes": 55395,
+      "archive_path": "data/audit/monthly_calendar_939d7d01d2d4e136e54f7fec49ea3108e73dfcf9f50dba383fc7c723e21a556e.html.gz",
+      "archive_kind": "ORIGINAL_HTTP_GZIP",
+      "archive_sha256": "e10d0e3a640b8544d5dc3a826d82d8f3aa2037f8db613d9746766d3f6cc4e475"
+    },
+    "bls_timezone": {
+      "url": "https://www.bls.gov/schedule/2026/12_sched.htm",
+      "final_url": "https://www.bls.gov/schedule/2026/12_sched.htm",
+      "http_status": 200,
+      "fetched_at_utc": "2026-11-17T01:28:45.800298+00:00",
+      "response_sha256": "dd68b0973d7bf66dbbb86b3b8b0b3a8d2235ffb4b67818546a813e6a5134ec06",
+      "response_bytes": 56757,
+      "archive_path": "data/audit/monthly_calendar_dd68b0973d7bf66dbbb86b3b8b0b3a8d2235ffb4b67818546a813e6a5134ec06.html.gz",
+      "archive_kind": "ORIGINAL_HTTP_GZIP",
+      "archive_sha256": "9888dc8bce9444c598f96f30fcbb87c2d0233a8e31a5c654b068449fb9f0d5d2"
+    },
+    "fred": {
+      "url": "https://fred.stlouisfed.org/releases/calendar?rid=456&y=2026",
+      "final_url": "https://fred.stlouisfed.org/releases/calendar?rid=456&y=2026",
+      "http_status": 200,
+      "fetched_at_utc": "2026-11-17T01:28:46.721351+00:00",
+      "response_sha256": "7c2ac7b470a097859c44a2edd79e1553221968dc43439a620cec95da1d7a2a28",
+      "response_bytes": 72136,
+      "archive_path": "data/audit/monthly_calendar_7c2ac7b470a097859c44a2edd79e1553221968dc43439a620cec95da1d7a2a28.html.gz",
+      "archive_kind": "ORIGINAL_HTTP_GZIP",
+      "archive_sha256": "62520a81aae871eaec16ead9e54e782b9e255340f93a82eb2492ec1ef7aa697b"
+    }
+  }
+}

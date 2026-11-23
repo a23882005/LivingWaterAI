@@ -73,6 +73,10 @@ def validate_publication_gate(feed, now=None):
                 or any(not p.startswith('m05:') for p in v['problems'])
                 or not builder.valid_official_gap(evidence, now)):
             raise ValueError('data-only publication requires exact verified CPI-only exception')
+    carry = rows.get('m05', {}).get('carryForward')
+    if carry is not None and (not formal or publication.get('calculationPolicy') != builder.CARRY_POLICY
+            or publication.get('carriedIndicators') != ['m05'] or publication.get('excludedIndicators') != []):
+        raise ValueError('approved CPI carry publication policy disagrees')
     # Recheck the actual non-CPI fields, not merely the producer's ready/count flags.
     mapping={'dataDate':'observation_date','source':'source_url','policySchema':'policy_schema','effectiveDate':'effective_date','publicationDate':'publication_date','retrievalTime':'retrieval_time','lastVerifiedAt':'last_verified_at','sourceEvidence':'source_evidence','lowerBound':'lower_bound','upperBound':'upper_bound','candidateChecks':'candidate_checks'}
     today = now.astimezone(dt.timezone(dt.timedelta(hours=8))).date()

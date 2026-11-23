@@ -1,0 +1,12 @@
+{
+  "schema": "V703_ISM_CALENDAR_FACTS_1",
+  "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
+  "publisher": "Institute for Supply Management",
+  "observation_month": "2026-10",
+  "publication_at_utc": "2026-11-04T15:00:00Z",
+  "next_release_at_utc": "2026-12-03T15:00:00Z",
+  "release_time_basis": "ISM_PUBLISHER_DISTRIBUTED_RELEASE",
+  "fetched_at_utc": "2026-11-17T01:28:45.307324+00:00",
+  "original_response_sha256": "75e9d3ba01504952c387e2ebd3be7e2b3961e47629a3783a5af67c1e415fee29",
+  "original_response_bytes": 264174
+}

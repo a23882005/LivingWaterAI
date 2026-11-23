@@ -4,6 +4,7 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
+import gzip
 import html
 import json
 import math
@@ -17,9 +18,9 @@ try:
 except ModuleNotFoundError:
     from scripts.v703_rolling_history import embed_history, history_payload, observation_summary
 try:
-    from v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
+    from v703_cpi_availability import previous_valid_cpi, valid_cpi_carry, CARRY_POLICY, valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
 except ModuleNotFoundError:
-    from scripts.v703_cpi_availability import valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
+    from scripts.v703_cpi_availability import previous_valid_cpi, valid_cpi_carry, CARRY_POLICY, valid_official_gap, REASON as CPI_REASON, NOTICE as CPI_NOTICE, CALCULATION_POLICY as CPI_CALCULATION_POLICY
 
 SUPPLEMENT_IDS = frozenset((
     "s05", "m06_rate", "m06_inf", "m06_rstar",
@@ -315,8 +316,19 @@ def _validate(key, item, today, releases=None, now_utc=None):
     problems = []
     if not isinstance(item, dict):
         return [f"{key}: record not object"]
+    if key == "m14":
+        try:
+            try:
+                from m14_holiday_rrp import validate_item
+            except ModuleNotFoundError:
+                from scripts.m14_holiday_rrp import validate_item
+            validate_item(item, now_utc)
+        except (KeyError, TypeError, ValueError, OSError) as exc:
+            problems.append("m14: invalid holiday evidence: " + str(exc))
     if item.get("status") not in ACCEPTED_STATUS:
         problems.append(f"{key}: status {item.get('status')}")
+    if key == "m05" and "carryForward" in item and not valid_cpi_carry(item, now_utc):
+        problems.append("m05: invalid approved carry-forward evidence")
     value = item.get("value")
     if isinstance(value, bool) or value is None:
         problems.append(f"{key}: no numeric value")
@@ -345,7 +357,7 @@ def _validate(key, item, today, releases=None, now_utc=None):
                 # Observation dates denote the reference month, not the report date.
                 # Permit >46 days only when a verified official calendar confirms
                 # that the NEXT release has not yet occurred.
-                if age > 46:
+                if age > 46 and not (key == "m05" and valid_cpi_carry(item, now_utc)):
                     release = (releases or {}).get(key)
                     next_at = (dt.datetime.fromisoformat(release["next_release_at_utc"].replace("Z", "+00:00"))
                                if release else None)
@@ -356,8 +368,8 @@ def _validate(key, item, today, releases=None, now_utc=None):
                 if age > 90:
                     problems.append(f"{key}: slow monthly data over 90 days")
             elif key in WEEKLY:
-                if age > 14:
-                    problems.append(f"{key}: weekly data over 14 days")
+                if age > 12:
+                    problems.append(f"{key}: weekly data over 12 days")
             elif key in VALUATION_REFERENCE:
                 if age > 90:
                     problems.append(f"{key}: valuation reference over 90 days")
@@ -433,6 +445,9 @@ def _normalize(item, indicator_id=None):
         "method": item.get("method", ""), "status": item.get("status", "MISSING"),
         "detail": item.get("detail", ""),
     }
+    # Make the Sahm unit explicit without changing values or existing units.
+    if indicator_id == "m18" and not normalized["unit"]:
+        normalized["unit"] = "pp"
     for source, target in (("policy_schema", "policySchema"), ("effective_date", "effectiveDate"),
                            ("lower_bound", "lowerBound"), ("upper_bound", "upperBound"),
                            ("last_verified_at", "lastVerifiedAt"), ("source_evidence", "sourceEvidence")):
@@ -471,6 +486,8 @@ def _normalize(item, indicator_id=None):
                 "value": selected["value"],
                 "source_url": selected["url"],
             }
+    if "carryForward" in item:
+        normalized["carryForward"] = item["carryForward"]
     if item.get("retrieval_time") is not None:
         normalized["retrievalTime"] = item["retrieval_time"]
     if item.get("publication_date") is not None:
@@ -510,7 +527,7 @@ def _wallstreet_five_verified(path, today):
     return forecast
 
 
-def build(macro_path, supplement_path, html_path, dest):
+def build(macro_path, supplement_path, html_path, dest, batch_time=None):
     src = _read(macro_path)
     base = src.get("items")
     if not isinstance(base, dict) or len(base) != 19 or DUPLICATE_ID not in base:
@@ -524,12 +541,20 @@ def build(macro_path, supplement_path, html_path, dest):
     if base["s03"].get("value") != base["m07"].get("value") or base["s03"].get("observation_date") != base["m07"].get("observation_date"):
         raise ValueError("s03 and m07 VIX value/date mismatch")
 
-    now = dt.datetime.now(dt.timezone.utc)
+    now = batch_time or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("Batch timestamp requires a time zone")
+    now = now.astimezone(dt.timezone.utc)
     taipei = dt.timezone(dt.timedelta(hours=8))
     today = now.astimezone(taipei).date()
     official_releases = _official_release_calendar(OFFICIAL_RELEASE_CALENDAR_PATH, today)
     inputs = dict(base)
     inputs.update(records)
+    # The raw October YoY remains unavailable; the scoring row explicitly carries September.
+    evidence = inputs['m05'].get('official_unavailable')
+    if valid_official_gap(evidence, now):
+        archive = Path('data/audit/cpi_unavailable_20261110_series.csv.gz')
+        inputs['m05'] = previous_valid_cpi(gzip.decompress(archive.read_bytes()), evidence, now)
     m06_children = [inputs[key] for key in M06_COMPONENTS]
     m06_issues = _m06_component_issues(inputs, today, official_releases, now)
     m06_ready = not m06_issues
@@ -619,10 +644,11 @@ def build(macro_path, supplement_path, html_path, dest):
             "mode":"FORMAL" if scoring_ready else ("DATA_ONLY" if data_only else "BLOCKED"),
             "scoringAllowed":scoring_ready,
             "provisionalScoringAllowed":data_only,
-            "calculationPolicy":CPI_CALCULATION_POLICY if data_only else None,
+            "calculationPolicy":CPI_CALCULATION_POLICY if data_only else (CARRY_POLICY if "carryForward" in inputs["m05"] else None),
+            "carriedIndicators":["m05"] if "carryForward" in inputs["m05"] else [],
             "excludedIndicators":["m05"] if data_only else [],
             "reason":CPI_REASON if data_only else (None if scoring_ready else "QUALITY_GATE_FAILED"),
-            "notice":CPI_NOTICE if data_only else ("資料完整，可正式計分。" if scoring_ready else "資料未通過品質檢查。")},
+            "notice":CPI_NOTICE if data_only else (inputs["m05"].get("detail") if scoring_ready and "carryForward" in inputs["m05"] else "資料完整，可正式計分。" if scoring_ready else "資料未通過品質檢查。")},
         "indicators": indicators, "news": [], "leiHistory": lei_history,
         "monthlyReleaseCalendar": {
             "schema": "V70.3/monthly-official-release-calendar-v1",
@@ -716,8 +742,9 @@ if __name__ == "__main__":
     parser.add_argument("--supplement", default="data/8_macro_supplement_verified.json")
     parser.add_argument("--html", default="系統工程/總經V70/V70-3-27.html")
     parser.add_argument("--out", default="build/site")
+    parser.add_argument("--batch-time", type=dt.datetime.fromisoformat)
     args = parser.parse_args()
     try:
-        build(args.macro, args.supplement, args.html, args.out)
+        build(args.macro, args.supplement, args.html, args.out, args.batch_time)
     except (ValueError, OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
         raise SystemExit(str(exc) + " | preserve existing published site")

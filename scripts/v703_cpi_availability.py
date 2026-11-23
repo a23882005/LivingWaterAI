@@ -130,3 +130,44 @@ def valid_official_gap(evidence, now):
                 and all(re.fullmatch('[0-9a-f]{64}', evidence.get(k,'')) for k in ('sourceSha256','seriesSha256')))
     except (KeyError, ValueError, TypeError, AttributeError):
         return False
+
+# Owner decision 2026-11-16: retain the previous complete YoY for this one gap.
+CARRY_POLICY = 'CPI_PREVIOUS_VALID_YOY_OWNER_20261116'
+
+def previous_valid_cpi(csv_raw, evidence, now):
+    """Derive September YoY from the same authenticated series, keeping its date."""
+    if not valid_official_gap(evidence, now):
+        raise ValueError('CPI carry requires current official gap evidence')
+    if hashlib.sha256(csv_raw).hexdigest() != evidence['seriesSha256']:
+        raise ValueError('CPI carry series hash mismatch')
+    rows = csv.DictReader(io.StringIO(csv_raw.decode('utf-8-sig')))
+    values = {(r.get('observation_date') or r.get('DATE')): r.get('CPILFESL') for r in rows}
+    current, base = (float(values[d]) for d in ('2026-09-01', '2025-09-01'))
+    if not all(math.isfinite(v) and v > 0 for v in (current, base)):
+        raise ValueError('previous complete CPI pair invalid')
+    value = round((current/base-1)*100, 6)
+    carry = {'policy':CARRY_POLICY, 'observationDate':'2026-09-01',
+             'currentIndex':current, 'baseIndex':base, 'value':value,
+             'seriesSha256':evidence['seriesSha256'], 'officialGap':evidence}
+    return {'value':value, 'observation_date':'2026-09-01', 'unit':'%',
+            'source_url':FRED_CPI, 'status':'USABLE',
+            'method':'CPILFESL 2026-09 / 2025-09 同序列年增率；2026-11-16 指揮官核准沿用',
+            'detail':f'10月同比基期缺失，沿用2026年9月核心CPI年增率 {value}%；維持原權重。',
+            'last_verified_at':evidence['verifiedAtUtc'], 'carryForward':carry}
+
+def valid_cpi_carry(item, now):
+    try:
+        c = item['carryForward']
+        ev = c['officialGap']
+        value = item['value']
+        return (c['policy'] == CARRY_POLICY and valid_official_gap(ev, now)
+            and c['observationDate'] == '2026-09-01'
+            and item.get('observation_date',item.get('dataDate')) == c['observationDate']
+            and item.get('source_url',item.get('source')) == FRED_CPI
+            and item.get('status') == 'USABLE'
+            and c['seriesSha256'] == ev['seriesSha256']
+            and all(isinstance(v,(float,int)) and not isinstance(v,bool) and math.isfinite(v) and v>0 for v in (c['currentIndex'],c['baseIndex']))
+            and isinstance(value,(float,int)) and not isinstance(value,bool) and math.isfinite(value)
+            and value == c['value'] == round((c['currentIndex']/c['baseIndex']-1)*100,6))
+    except (KeyError,TypeError,ValueError,ZeroDivisionError):
+        return False

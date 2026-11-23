@@ -1,0 +1,70 @@
+name: V70 engineering research charts
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v70-engineering-charts.yml'
+      - 'experiments/macro-safety-monthly-research/quarterly_12charts_consensus_20261020/**'
+permissions:
+  contents: read
+concurrency:
+  group: lw-v703-site-deploy-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  charts:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare existing research assets
+        run: |
+          python -c "from scripts.build_daily_v703_site import copy_research_charts; copy_research_charts('staging')"
+          test "$(curl -sS -o /dev/null -w '%{http_code}' https://www.happihelp.com/v70-engineering/index.html)" = 401
+      - name: Upload only chart files to the engineering chart directory
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: staging/v70-research-charts
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/v70-engineering
+          strip_components: 1
+          overwrite: true
+      - name: Check displayed image pixels on the live engineering page
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          python -m pip -q install playwright
+          python - <<'PY'
+          import os, shutil
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          origin = 'https://www.happihelp.com'
+          expected = {p.name for p in Path('staging/v70-research-charts').glob('*.png')}
+          assert len(expected) == 13
+          with sync_playwright() as pw:
+              browser = pw.chromium.launch(executable_path=shutil.which('google-chrome'))
+              page = browser.new_page(viewport={'width': 390, 'height': 844},
+                  http_credentials={'origin': origin, 'username': os.environ['WEB_USER'], 'password': os.environ['WEB_PASSWORD']})
+              response = page.goto(origin + '/v70-engineering/index.html', wait_until='domcontentloaded')
+              assert response.status == 200
+              charts = page.locator('#v703-research-charts img')
+              assert charts.count() == len(expected)
+              seen = set()
+              for chart in charts.all():
+                  chart.evaluate("(img) => { img.loading = 'eager'; }")
+                  chart.evaluate("(img) => img.decode()")
+                  name, width, height = chart.evaluate("(img) => [new URL(img.currentSrc).pathname.split('/').pop(), img.naturalWidth, img.naturalHeight]")
+                  assert width > 1 and height > 1
+                  seen.add(name)
+                  print(name, width, height)
+              assert seen == expected
+              print('13/13 live engineering charts decoded')
+              browser.close()
+          PY

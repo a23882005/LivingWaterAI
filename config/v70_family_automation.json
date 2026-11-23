@@ -1,0 +1,8 @@
+{
+  "schema": "V70.3/family-automation-activation-v1",
+  "V70_FAMILY_JSON_FORMAL_ENABLED": true,
+  "authorization_status": "PM_AUTHORIZED",
+  "scope": "Maintain previously PM-approved numeric signals, original V70 judgments and documented UNKNOWNs; no new source adoption or judgment rule.",
+  "configuration_precedence": "An explicit repository variable true or false overrides this versioned activation setting.",
+  "activation_acceptance": "Technical activation is authorized; independent activation acceptance remains with the highest PM."
+}

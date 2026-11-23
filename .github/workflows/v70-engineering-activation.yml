@@ -1,0 +1,148 @@
+name: V70 engineering directory activation
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v70-engineering-activation.yml']
+permissions:
+  contents: read
+concurrency:
+  group: lw-v703-site-deploy-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  activate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Select the current verified engineering snapshot
+        run: |
+          mkdir -p staging
+          cp '系統工程/總經V70/V70-3-27.html' staging/index.html
+          cp data/V70_macro_latest.json staging/V70_macro_latest.json
+          python - <<'PY'
+          import json, re, urllib.request
+          from pathlib import Path
+          feed = json.loads(Path('staging/V70_macro_latest.json').read_bytes())
+          html = Path('staging/index.html').read_text()
+          embedded = re.search(r'<script id="v70-embedded-feed" type="application/json">(.*?)</script>', html, re.S)
+          assert 'id="sc_${c.id}"' in html and 'id="sl_${c.id}"' in html, 'Missing engineering score displays'
+          assert embedded and json.loads(embedded[1]) == feed
+          with urllib.request.urlopen('https://www.happihelp.com/v703_deployment_receipt.json?engineering=' + __import__('os').environ['GITHUB_RUN_ID'], timeout=30) as response:
+              receipt = json.load(response)
+          assert receipt['status'] == 'LIVE_VERIFIED' and receipt['asOf'] == feed['asOf']
+          print('VERIFIED_BATCH', receipt['githubRunId'], feed['asOf'])
+          PY
+      - name: Build engineering risk panels
+        run: python scripts/v70_cap/build.py staging staging
+      - name: Verify the cap note on the protected engineering build
+        run: |
+          python -m pip install --quiet 'playwright>=1.50,<2'
+          python tests/check_v70_engineering_cap_note.py staging
+      - name: Prepare private password verifier
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          set -eu
+          umask 077
+          test -n "$WEB_USER" && test -n "$WEB_PASSWORD"
+          printf '%s\n' "$WEB_PASSWORD" | htpasswd -niBC 12 "$WEB_USER" > staging/engineering.htpasswd
+      - name: Install verifier outside the web root
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: staging/engineering.htpasswd
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/../v70-engineering-auth
+          strip_components: 1
+          overwrite: true
+      - name: Protect only the engineering directory
+        uses: appleboy/ssh-action@v1
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR
+          script: |
+            set -eu
+            cd "$LW_DIR"
+            test "$(basename "$PWD")" = public_html
+            private=$(cd ../v70-engineering-auth && pwd -P)
+            test -s "$private/engineering.htpasswd"
+            # Keep this verifier outside public_html and apart from private model files.
+            chmod 711 "$private"
+            chmod 644 "$private/engineering.htpasswd"
+            mkdir -p v70-engineering
+            test ! -L v70-engineering
+            cd v70-engineering
+            if test -e .htaccess && ! grep -qx '# Managed V70 engineering login' .htaccess; then
+              echo "Existing directory rules require review"; exit 1
+            fi
+            temp=$(mktemp "$private/engineering-access.XXXXXX")
+            printf '%s\n' '# Managed V70 engineering login' 'AuthType Basic' 'AuthName "V70 Engineering"' "AuthUserFile $private/engineering.htpasswd" 'Require valid-user' 'Options -Indexes' > "$temp"
+            chmod 644 "$temp"
+            mv -- "$temp" .htaccess
+      - name: Require password before placing either file
+        run: |
+          for file in index.html V70_macro_latest.json; do
+            code=$(curl -sS -o /dev/null -D "$RUNNER_TEMP/headers" -w '%{http_code}' "https://www.happihelp.com/v70-engineering/$file?check=$GITHUB_RUN_ID")
+            test "$code" = 401
+            grep -iq '^www-authenticate: Basic ' "$RUNNER_TEMP/headers"
+          done
+      - name: Upload matching engineering files
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          source: staging/index.html,staging/V70_macro_latest.json
+          target: ${{ vars.HOSTINGER_SITE_DIRECTORY }}/v70-engineering
+          strip_components: 1
+          overwrite: true
+      - name: Verify protected content against both original files
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          set -eu
+          for file in index.html V70_macro_latest.json; do
+            url="https://www.happihelp.com/v70-engineering/$file?verify=$GITHUB_RUN_ID"
+            test "$(curl -sS -o /dev/null -w '%{http_code}' "$url&anonymous=1")" = 401
+            curl --fail --silent --show-error --basic --user "$WEB_USER:$WEB_PASSWORD" "$url&authenticated=1" -o "$RUNNER_TEMP/readback"
+            cmp "staging/$file" "$RUNNER_TEMP/readback"
+            echo "LOGIN_READBACK_PASS $file"
+          done
+      - name: Verify the protected engineering allocation as rendered
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          batch = json.loads(Path("staging/V70_macro_latest.json").read_bytes())
+          if batch["publication"]["mode"] == "FORMAL":
+              origin = "https://www.happihelp.com"
+              with sync_playwright() as pw:
+                  browser = pw.chromium.launch(channel="chrome")
+                  page = browser.new_page(viewport={"width": 390, "height": 844}, http_credentials={
+                      "origin": origin, "username": os.environ["WEB_USER"], "password": os.environ["WEB_PASSWORD"]})
+                  page.goto(origin + "/v70-engineering/?verify=" + os.environ["GITHUB_RUN_ID"], wait_until="domcontentloaded")
+                  page.wait_for_function("window.v703BondInputsQualified === true && window.v703CanPublishFormalAllocation?.() === true", timeout=60000)
+                  ids = ["bond-nominal-yield", "bond-cpi-yoy", "bond-real-yield", "bond-score-display", "total-cash", "total-bond", "total-stock"]
+                  results = {key: page.locator("#" + key).inner_text().strip() for key in ids}
+                  assert all(any(c.isdigit() for c in value) for value in results.values()), results
+                  print("VERIFIED_ENGINEERING_SCREEN", batch["asOf"], json.dumps(results, ensure_ascii=False))
+                  browser.close()
+          PY

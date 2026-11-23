@@ -18,7 +18,7 @@ def benchmark_source(root, descriptor, evaluated_at):
     actual = sha256(path.read_bytes()).hexdigest()
     if (descriptor.get('drive_file_id') != reader.FORMAL_DRIVE_FILE_ID
             or path.name != reader.FORMAL_WORKBOOK_NAME
-            or actual != descriptor.get('sha256') or actual != reader.CURRENT_CLOSEOUT_SHA256):
+            or actual != descriptor.get('sha256') or actual not in reader.APPROVED_B_SHA256):
         raise PermissionError('CONFIGURATION_BENCHMARK_SOURCE_MISMATCH')
     # The immutable, engine-pinned workbook establishes the header contract;
     # a different workbook cannot authorize its own headers here.

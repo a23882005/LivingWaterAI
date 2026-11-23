@@ -16,6 +16,8 @@ No V70/V82/V75 business rule is implemented here.
 """
 from __future__ import annotations
 
+from work2.benchmark_reader import APPROVED_B_SHA256
+
 from copy import deepcopy
 from datetime import date, datetime, timezone
 import math
@@ -25,7 +27,6 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 WORK3_VERSION = "C-W3-v1.0.1"
 WORK2_VERSION = "C-W2-v1.0.1"
 WORK1_CONTRACT_VERSION = "C-W1-v1.0.1"
-CURRENT_B_SOT_SHA256 = "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02"
 CURRENT_B_DRIVE_FILE_ID = "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-"
 B_SOURCE_ID = "SRC_B_WORKBOOK"
 MODULE_NAME = "C_WORK3_PERFORMANCE_RISK"
@@ -362,7 +363,7 @@ def _validate_benchmark(benchmark: Mapping[str, Any], issues: List[Dict[str, Any
     br = benchmark.get("benchmark_reference") or {}
     if br.get("drive_file_id") != CURRENT_B_DRIVE_FILE_ID:
         fail("C_SOURCE_SOT_MISMATCH", "benchmark.benchmark_reference.drive_file_id", "B formal Drive SOT identity mismatch.")
-    if br.get("file_fingerprint_sha256") != CURRENT_B_SOT_SHA256:
+    if br.get("file_fingerprint_sha256") not in APPROVED_B_SHA256:
         fail("C_SOURCE_FINGERPRINT_MISMATCH", "benchmark.benchmark_reference.file_fingerprint_sha256", "B formal SOT fingerprint mismatch.")
     if (benchmark.get("formal_output_eligibility") or {}).get("scope") == "NONE":
         fail("C_FORMAL_OUTPUT_BLOCKED", "benchmark.formal_output_eligibility", "Work2 benchmark snapshot has no formal output eligibility.")

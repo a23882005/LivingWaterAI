@@ -237,8 +237,8 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work2/benchmark_reader.py",
-    "sha256": "af979cb9abe0d305b62539db65aefa34b9dd804be5b8e5328d29e07217b4adf2",
-    "sha": "85e08c45e6ffd495972a339c75f6750ae389fdfa",
+    "sha256": "c17c9760b5bb8f529a5488ea314f398019ed1f6c940638447200da995818da6d",
+    "sha": "6a301a23eefc1e827c50e8d66e5273e49e7a40d6",
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {
@@ -255,8 +255,8 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/engine.py",
-    "sha256": "d158e92d61781dc93fcafde94cecd5c29c19c379d66b999d457752b2550b0e9c",
-    "sha": "8824540b2c87d60e7276c0bc73b2b6778ca03350",
+    "sha256": "9338e74ae45bece8c428425f29fa23e763b9d93a5358c1e40fa7b984cff41f8d",
+    "sha": "4ace43110bb42e4b072c30ed3f1deb4b82e9fcd5",
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {
@@ -267,8 +267,8 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/engine.py",
-    "sha256": "b36d763a07c476d2e085b4e0595a2ca86145dbd80dcaf60a62393f35e5a46c04",
-    "sha": "98f5fa18b7609edd0624ca203844a49453bd27b5",
+    "sha256": "3d08eb18d956c5155b69d90b835e4b795fbad9c7d13e130e7388e6608245e796",
+    "sha": "907bfb3fea7dd941f9d81392abef60c6177a57cc",
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {

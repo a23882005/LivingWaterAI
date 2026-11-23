@@ -248,9 +248,15 @@
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {
+    "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/cash_position.py",
+    "reason": "選單03同幣別現金配置，Work3 與 Work4 直接相依",
+    "sha256": "08852b28f1475f32e0efba56dd7844b7c16b286db4ccc73c27ef253976099d63",
+    "sha": "98861b8cf4e3aaab550149f24f9c8509cd90e2da"
+  },
+  {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work3/engine.py",
-    "sha256": "6e8d683809a1e080c3db06042c47005302e4cb6ac758d98877e46318405783f4",
-    "sha": "0d7688aa24ccca8112c53d496673046860a76efb",
+    "sha256": "d158e92d61781dc93fcafde94cecd5c29c19c379d66b999d457752b2550b0e9c",
+    "sha": "8824540b2c87d60e7276c0bc73b2b6778ca03350",
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {
@@ -261,8 +267,8 @@
   },
   {
     "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/work4/engine.py",
-    "sha256": "32107a0789ff9f6ca8dad48fc4e2bbb06db1934a5a3d347506cd214f8067545a",
-    "sha": "95942f1de44c26b011011045cda0dceeacf5da96",
+    "sha256": "b36d763a07c476d2e085b4e0595a2ca86145dbd80dcaf60a62393f35e5a46c04",
+    "sha": "98f5fa18b7609edd0624ca203844a49453bd27b5",
     "reason": "Authorized C Work7 runtime, direct import closure, or supplied schema argument; baseline 32c9322c"
   },
   {

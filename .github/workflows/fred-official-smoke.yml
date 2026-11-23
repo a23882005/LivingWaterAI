@@ -1,0 +1,48 @@
+name: FRED isolated official API smoke (read only)
+on:
+  push:
+    branches:
+      - audit/fred-smoke-independent-20261014
+    paths:
+      - .github/workflows/fred-official-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-fred:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify four official FRED observations without exposing credentials
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os, json, urllib.parse, urllib.request
+          from datetime import date
+          key = os.environ.get("FRED_API_KEY", "").strip()
+          if not key:
+              print("FRED_SMOKE=FAIL: secret FRED_API_KEY absent")
+              raise SystemExit(1)
+          targets = ["BAMLH0A0HYM2", "WALCL", "WDTGAL", "RRPONTSYD"]
+          failures = []
+          for series in targets:
+              p = urllib.parse.urlencode({"series_id":series, "api_key":key, "file_type":"json", "sort_order":"desc", "limit":8})
+              req = urllib.request.Request("https://api.stlouisfed.org/fred/series/observations?"+p, headers={"User-Agent":"LivingWaterAI-FRED-Validation/1.0"})
+              try:
+                  with urllib.request.urlopen(req, timeout=18) as resp:
+                      payload = json.load(resp)
+                      code = resp.status
+                  valid = [(r["date"],r["value"]) for r in payload.get("observations",[]) if r.get("value") not in ("", ".", None)]
+                  assert code==200 and valid, "no valid observation"
+                  observed = date.fromisoformat(valid[0][0])
+                  assert observed <= date.today(), "future observation"
+                  print(f"FRED_SMOKE {series} HTTP=200 OBS_DATE={observed} NUMERIC=TRUE")
+              except Exception as e:
+                  print(f"FRED_SMOKE {series} FAIL={type(e).__name__}")
+                  failures.append(series)
+          print("FRED_SMOKE_OVERALL="+("PASS" if not failures else "FAIL"))
+          if failures:
+              raise SystemExit(1)
+          PY

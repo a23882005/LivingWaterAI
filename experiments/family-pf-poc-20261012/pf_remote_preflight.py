@@ -1,0 +1,98 @@
+"""Read-only public HTTPS MCP preflight. Does NOT certify OAuth or Gate A.
+
+Usage (only against an explicitly approved test endpoint):
+  python pf_remote_preflight.py https://mcp.your-approved-domain.example/mcp
+
+No credentials, user records, or OAuth tokens are sent. Redirects are disabled.
+"""
+import json
+import sys
+import ipaddress
+from urllib.parse import urlsplit
+import httpx
+
+def validated_url(url):
+    if not isinstance(url, str):
+        raise ValueError("An explicit HTTPS endpoint is required")
+    if any(c.isspace() for c in url) or "\\" in url:
+        raise ValueError("Ambiguous URL characters forbidden")
+    p=urlsplit(url)
+    if p.scheme!="https" or not p.hostname or p.username or p.password or p.query or p.fragment:
+        raise ValueError("HTTPS origin without embedded credentials or query required")
+    if p.hostname.lower() in ("localhost","127.0.0.1","::1") or p.hostname.lower().endswith((".test",".invalid",".example",".localhost")):
+        raise ValueError("Placeholder or loopback URL cannot be used as remote evidence")
+    if p.port not in (None,443):
+        raise ValueError("Nonstandard HTTPS port not permitted")
+    try:
+        parsed_ip = ipaddress.ip_address(p.hostname)
+    except ValueError:
+        parsed_ip = None
+    if parsed_ip is not None and not parsed_ip.is_global:
+        raise ValueError("Non-public IP cannot be used as evidence")
+    if p.path != "/mcp":
+        raise ValueError("Endpoint must end in /mcp")
+    return url
+
+def verify_remote_metadata(url, transport=None):
+    """Unauthenticated read-only probe. Output contains no request secrets."""
+    url=validated_url(url)
+    p=urlsplit(url)
+    origin=f"{p.scheme}://{p.netloc}"
+    expected=origin+"/.well-known/oauth-protected-resource"
+    result={"remote_transport":"NOT_VERIFIED","metadata":"NOT_VERIFIED",
+            "external_oauth_login":"NOT_TESTED","cross_client_isolation":"NOT_TESTED",
+            "audit_logs":"NOT_TESTED","gate_a":"HOLD"}
+    client=transport or httpx.Client(timeout=8,follow_redirects=False,trust_env=False)
+    try:
+        response=client.get(expected,headers={"Accept":"application/json"})
+        if response.status_code!=200:
+            result["reason"]="metadata_http_status_"+str(response.status_code)
+            return result
+        result["remote_transport"]="HTTPS_RESPONSE"
+        obj=response.json()
+        if not isinstance(obj,dict) or obj.get("resource")!=url:
+            result["reason"]="resource_identifier_mismatch"
+            return result
+        issuers=obj.get("authorization_servers")
+        if not isinstance(issuers,list) or len(issuers)!=1 or not isinstance(issuers[0],str):
+            result["reason"]="invalid_authorization_server"
+            return result
+        try:
+            issuer=urlsplit(issuers[0])
+            if any(c.isspace() for c in issuers[0]) or "\\" in issuers[0]:
+                result["reason"]="invalid_authorization_server"
+                return result
+            if issuer.scheme!="https" or not issuer.hostname or issuer.username or issuer.password or issuer.query or issuer.fragment or issuer.port not in (None,443):
+                result["reason"]="invalid_authorization_server"
+                return result
+        except ValueError:
+            result["reason"]="invalid_authorization_server"
+            return result
+        try:
+            issuer_ip=ipaddress.ip_address(issuer.hostname)
+        except ValueError:
+            issuer_ip=None
+        if issuer.hostname.lower()=="localhost" or issuer.hostname.lower().endswith((".localhost",".test",".invalid",".example")) or (issuer_ip is not None and not issuer_ip.is_global):
+            result["reason"]="invalid_authorization_server"
+            return result
+        result["metadata"]="DISCOVERABLE"
+        # No credential or login attempts. A metadata response is NOT OAuth verification.
+        return result
+    except (httpx.HTTPError,ValueError,KeyError,json.JSONDecodeError):
+        result["reason"]="request_or_metadata_error"
+        return result
+    finally:
+        if transport is None:
+            client.close()
+
+if __name__=="__main__":
+    if len(sys.argv)!=2:
+        print("Usage: python pf_remote_preflight.py https://approved-test-host/mcp",file=sys.stderr)
+        sys.exit(2)
+    try:
+        result=verify_remote_metadata(sys.argv[1])
+    except ValueError as exc:
+        print(str(exc),file=sys.stderr)
+        sys.exit(2)
+    print(json.dumps(result,indent=2,sort_keys=True))
+    sys.exit(0 if result["metadata"]=="DISCOVERABLE" else 1)

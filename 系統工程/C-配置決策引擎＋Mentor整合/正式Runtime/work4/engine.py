@@ -6,6 +6,8 @@ performance proxy and never infers missing theme/style/market-cap/currency expos
 """
 from __future__ import annotations
 
+from work3.cash_position import cash_description, is_native_cash
+
 from datetime import datetime, timezone
 from itertools import combinations
 import math
@@ -289,6 +291,7 @@ def _aggregate_positions(allocation: Mapping[str, Any], assets: Mapping[str, Map
                              "Declared total weight must be KNOWN numeric portfolio_weight.", blocking=True,
                              source_reference_ids=declared.get("source_reference_ids", [])))
         ok = False
+    has_native_cash = False
     grouped: Dict[str, Dict[str, Any]] = {}
     order: List[str] = []
     total = 0.0
@@ -327,13 +330,14 @@ def _aggregate_positions(allocation: Mapping[str, Any], assets: Mapping[str, Map
         if weight <= WEIGHT_TOLERANCE:
             continue
         ticker = str(p.get("ticker") or "").upper()
-        if ticker not in assets:
+        cash = is_native_cash(p, currency)
+        if not cash and ticker not in assets:
             issues.append(_issue("C_DATA_INSUFFICIENT", "BLOCKING", path + ".ticker",
                                  f"Ticker {ticker or '<blank>'} is not in Work2 benchmark universe.", blocking=True,
                                  source_reference_ids=p.get("source_reference_ids", [])))
             ok = False
             continue
-        if p.get("base_currency") != assets[ticker].get("base_currency"):
+        if not cash and p.get("base_currency") != assets[ticker].get("base_currency"):
             issues.append(_issue("C_CROSS_MODULE_CONFLICT", "BLOCKING", path + ".base_currency",
                                  f"Allocation base_currency conflicts with Work2 {ticker} base_currency.", blocking=True,
                                  source_reference_ids=_uniq(list(p.get("source_reference_ids", [])) + [B_SOURCE_ID])))
@@ -352,6 +356,9 @@ def _aggregate_positions(allocation: Mapping[str, Any], assets: Mapping[str, Map
                                      "Explicit portfolio_amount conflicts with denominator × allocation weight.", blocking=True,
                                      source_reference_ids=_uniq(list(pa.get("source_reference_ids", [])) + list(w.get("source_reference_ids", [])))))
                 ok = False
+        if cash:
+            has_native_cash = True
+            continue
         if ticker not in grouped:
             grouped[ticker] = {"ticker": ticker, "weight": 0.0, "source_reference_ids": []}
             order.append(ticker)
@@ -369,7 +376,7 @@ def _aggregate_positions(allocation: Mapping[str, Any], assets: Mapping[str, Map
                              "Declared total weight must agree with positions and equal 1.0.", blocking=True,
                              source_reference_ids=declared.get("source_reference_ids", [])))
         ok = False
-    if not grouped:
+    if not grouped and not has_native_cash:
         issues.append(_issue("C_DATA_INSUFFICIENT", "BLOCKING", "allocation.positions",
                              "No positive-weight effective positions remain for Work4.", blocking=True))
         ok = False
@@ -732,6 +739,8 @@ def evaluate_lookthrough_exposure(allocation: Mapping[str, Any], benchmark: Mapp
             "traceability": [],
         }
 
+    cash = [cash_description(p) for p in allocation["positions"]
+            if is_native_cash(p, currency) and p["weight"]["value"] > WEIGHT_TOLERANCE]
     roots = [t["exposure_id"] for t in benchmark.get("exposure_taxonomy", []) if not t.get("parent_id")]
     dims = [_dimension_result(r, positions, assets, taxonomy, by_ticker, denominator, currency, evaluated_at, issues) for r in roots]
     dim_map = {d["dimension_root"]: d for d in dims}
@@ -824,6 +833,8 @@ def evaluate_lookthrough_exposure(allocation: Mapping[str, Any], benchmark: Mapp
         "unsupported_required_views": unsupported,
         "formal_data_gaps": formal_data_gaps,
     }
+    if cash:
+        payload["native_cash_positions"] = cash
     return {
         "module_name": MODULE_NAME,
         "status": status,

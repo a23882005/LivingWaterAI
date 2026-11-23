@@ -16,6 +16,8 @@ No V70/V82/V75 business rule is implemented here.
 """
 from __future__ import annotations
 
+from work3.cash_position import cash_description, is_native_cash
+
 from copy import deepcopy
 from datetime import date, datetime, timezone
 import math
@@ -501,6 +503,9 @@ def _validate_allocation(allocation: Mapping[str, Any], benchmark: Mapping[str, 
         total += weight
         if weight > WEIGHT_TOLERANCE:
             ticker = str(p.get("ticker") or "").upper()
+            if is_native_cash(p, denom.get("currency")):
+                effective.append(p)
+                continue
             if not ticker or ticker not in assets:
                 issues.append(_issue("C_DATA_INSUFFICIENT", "BLOCKING", path + ".ticker",
                                      f"Ticker {ticker or '<blank>'} is not available in the Work2 benchmark universe.",
@@ -561,21 +566,21 @@ def _aggregate_effective_positions(effective: Sequence[Mapping[str, Any]]) -> Li
     return [grouped[t] for t in order]
 
 
-def _empty_historical(evaluated_at: str) -> Dict[str, Any]:
-    m = lambda unit, key, method: _unsupported_metric(unit, source_metric_key=key, method=method,
+def _empty_historical(evaluated_at: str, method: str = "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES") -> Dict[str, Any]:
+    m = lambda unit, key: _unsupported_metric(unit, source_metric_key=key, method=method,
                                                        rule_references=HISTORICAL_METHOD_RULES,
                                                        evaluated_at=evaluated_at)
     return {
-        "long_term_cagr": m("ratio", "tax_after_total_return_central_cagr", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
-        "max_drawdown": {w: m("ratio", f"max_drawdown_{w}", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES") for w in WINDOWS},
+        "long_term_cagr": m("ratio", "tax_after_total_return_central_cagr"),
+        "max_drawdown": {w: m("ratio", f"max_drawdown_{w}") for w in WINDOWS},
         "worst_drawdown": {
-            "peak_date": m("date", "worst_drawdown_peak_date", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
-            "trough_date": m("date", "worst_drawdown_trough_date", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
-            "peak_to_trough_calendar_days": m("calendar_days", None, "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
-            "recovery_date": m("date", "worst_drawdown_recovery_date", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
-            "recovery_period": m("duration_text", "worst_drawdown_recovery_period", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES"),
+            "peak_date": m("date", "worst_drawdown_peak_date"),
+            "trough_date": m("date", "worst_drawdown_trough_date"),
+            "peak_to_trough_calendar_days": m("calendar_days", None),
+            "recovery_date": m("date", "worst_drawdown_recovery_date"),
+            "recovery_period": m("duration_text", "worst_drawdown_recovery_period"),
         },
-        **{family: {w: m("ratio", f"{family}_{w}", "MIXED_PORTFOLIO_REQUIRES_ALIGNED_WEALTH_SERIES") for w in WINDOWS}
+        **{family: {w: m("ratio", f"{family}_{w}") for w in WINDOWS}
            for family in RATIO_FAMILIES},
     }
 
@@ -1012,12 +1017,17 @@ def evaluate_performance_risk(allocation: Mapping[str, Any], benchmark: Mapping[
         }
 
     assets = _asset_map(benchmark)
-    effective_assets = _aggregate_effective_positions(effective)
-    mixed = len(effective_assets) != 1
+    currency = allocation["denominator"].get("currency")
+    cash = [cash_description(p) for p in effective if is_native_cash(p, currency)]
+    effective_assets = _aggregate_effective_positions([p for p in effective if not is_native_cash(p, currency)])
+    cash_only = bool(cash) and not effective_assets
+    mixed = bool(cash) or len(effective_assets) != 1
     single_asset = None if mixed else assets[effective_assets[0]["ticker"]]
     denom = allocation["denominator"]
 
-    if mixed:
+    if cash_only:
+        historical = _empty_historical(evaluated_at, "NATIVE_CASH_RETURN_SERIES_REQUIRED")
+    elif mixed:
         historical = _empty_historical(evaluated_at)
         issues.append(_issue("C_UNSUPPORTED_BY_BASELINE", "ERROR", "payload.historical_performance_risk",
                              "Current Work2 baseline contains per-asset summary metrics but no aligned portfolio total-return wealth series; mixed-portfolio historical CAGR/MDD/recovery/Sharpe/Sortino/Calmar are returned UNKNOWN instead of weighted approximations.",
@@ -1092,7 +1102,19 @@ def evaluate_performance_risk(allocation: Mapping[str, Any], benchmark: Mapping[
         "proxy_disclosures": proxy_disclosures,
         "formal_data_gaps": [],
     }
-    if mixed:
+    if cash:
+        definition = payload["portfolio_definition"]
+        definition["positions"].extend(cash)
+        definition["effective_position_count"] += len({p["instrument_id"] for p in cash})
+        definition["is_single_effective_asset"] = definition["effective_position_count"] == 1
+        payload["formal_data_gaps"].append({
+            "scope": "NATIVE_CASH_RETURN_HISTORY",
+            "required_input": "verified cash return history for the valuation period",
+            "code": "C_UNSUPPORTED_BY_BASELINE", "current_behavior": "UNKNOWN_FAIL_CLOSED",
+        })
+    if cash_only:
+        payload["methodology"]["historical_portfolio_method"] = "NATIVE_CASH_RETURN_SERIES_REQUIRED"
+    if mixed and not cash_only:
         payload["formal_data_gaps"].append({
             "code": "C_UNSUPPORTED_BY_BASELINE",
             "scope": "MIXED_PORTFOLIO_HISTORICAL_PERFORMANCE_RISK",

@@ -5,7 +5,19 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 const runtime = process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES;
 const requireHere = createRequire(runtime ? path.join(runtime, '../package.json') : import.meta.url);
-const { Workbook, SpreadsheetFile, FileBlob } = await import(pathToFileURL(requireHere.resolve('@oai/artifact-tool')).href);
+let artifactPath;
+try {
+  artifactPath = requireHere.resolve('@oai/artifact-tool');
+} catch (error) {
+  const request = JSON.parse(await fs.readFile(process.argv[2], 'utf8'));
+  if (error.code !== 'MODULE_NOT_FOUND' || !request.input || !request.event || request.verify) throw error;
+  const { execFileSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const writer = fileURLToPath(new URL('./family03_save.py', import.meta.url));
+  execFileSync(process.env.CODEX_PRIMARY_RUNTIME_PYTHON || 'python3', [writer, process.argv[2]], { stdio: 'inherit' });
+  process.exit(0);
+}
+const { Workbook, SpreadsheetFile, FileBlob } = await import(pathToFileURL(artifactPath).href);
 const args = JSON.parse(await fs.readFile(process.argv[2], 'utf8'));
 const { member, input, output } = args;
 const questions = JSON.parse(await fs.readFile(new URL('./family03_questions.json', import.meta.url),'utf8'));

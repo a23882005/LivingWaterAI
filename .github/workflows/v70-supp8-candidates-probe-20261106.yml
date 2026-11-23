@@ -1,0 +1,31 @@
+# Test-only: 8 variables x 4 candidate URLs. Do not publish or modify live Task.
+name: V70 10AM Supplement8 Candidate32 Probe 20261106
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'experiments/v70_supp8_candidates_probe_20261106.py'
+      - '.github/workflows/v70-supp8-candidates-probe-20261106.yml'
+permissions:
+  contents: read
+jobs:
+  supplement8:
+    if: github.event.pull_request.head.ref == 'test/v70-free-sources-probe-20261106'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run actual read-only 8 x 4 candidate HTTP probe
+        timeout-minutes: 10
+        run: python -u experiments/v70_supp8_candidates_probe_20261106.py
+      - name: Preserve individual HTTP results (not data authorization)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v70-8x4-candidate-http-probe
+          path: build/v70_supp8_probe_20261106/
+          if-no-files-found: warn
+          retention-days: 7

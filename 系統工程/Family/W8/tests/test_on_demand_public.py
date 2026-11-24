@@ -100,9 +100,8 @@ class PublicHandlersTests(unittest.TestCase):
                              handlers=self.handlers)
         self.assertEqual(menu.select(14,payload={"action":"change_password",
                         "current_password":"old","new_password":"new"})["status"],
-                         "ACCOUNT_CHANGE_WRITEBACK_REQUIRED")
-        self.assertEqual(menu.select(14,payload={"action":"logout"})["status"],
-                         "COMPLETED")
+                         "LOGGED_OUT")
+        self.assertEqual(menu.select(14), {"status":"LOGGED_OUT", "text":"👋 Goodbye！"})
 
     def test_w7_menu_does_not_mark_missing_public_data_done(self):
         menu=MENU.FamilyMenu(self.auth,project_name="Joseph",login_account="JO",

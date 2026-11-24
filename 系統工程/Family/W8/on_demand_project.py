@@ -34,7 +34,7 @@ def _load(path, name):
 class FamilyLoginAdapter:
     """Use the approved Sources FamilyLogin, adapting W7's two-arg login API."""
     def __init__(self, family_login, login_account, client_id, *, clear_report_run=None,
-                 trusted_login_revision_reader=None):
+                 trusted_login_revision_reader=None, trusted_logout_release=None):
         if (login_account not in FAMILY_NAMES
                 or getattr(family_login,"user_id",None)!=login_account
                 or getattr(family_login,"client_id",None)!=client_id):
@@ -43,6 +43,8 @@ class FamilyLoginAdapter:
         self.account=login_account
         self.clear_report_run=clear_report_run
         self.login_revision_reader = trusted_login_revision_reader
+        self.logout_release = trusted_logout_release
+        self.pending_release = None
 
     def check_menu_request(self):
         """Validate this turn against the original conversation's bound login."""
@@ -67,6 +69,22 @@ class FamilyLoginAdapter:
                 self.clear_report_run()
             return 'SESSION_NO_LONGER_VALID'
         return None
+
+    def logout_from_menu(self):
+        revision = getattr(self.family_login, 'login_revision', None) or self.pending_release
+        self.family_login.logout()
+        if self.clear_report_run is not None:
+            self.clear_report_run()
+        self.pending_release = revision
+        if revision is not None:
+            if not callable(self.logout_release):
+                return {'status': 'LOGOUT_RELEASE_UNCONFIRMED'}
+            try:
+                self.logout_release(self.account, revision)
+            except (OSError, RuntimeError, ValueError):
+                return {'status': 'LOGOUT_RELEASE_UNCONFIRMED'}
+        self.pending_release = None
+        return {'status': 'LOGGED_OUT', 'text': '👋 Goodbye！'}
 
     def require_login(self):
         try:
@@ -204,7 +222,7 @@ def build_project_menu(*, family_login, project_name, login_account,
                        trusted_member_w6_receiver=None,
                        trusted_public_fetcher=None, trusted_account_change=None,
                        family03_market_reader=None, family03_approved_target_source=None,
-                       trusted_login_revision_reader=None):
+                       trusted_login_revision_reader=None, trusted_logout_release=None):
     """Return the existing W7 menu without using a permanent Python host."""
     if trusted_member_w6_receiver is not None and (
             not callable(trusted_member_w6_receiver)
@@ -222,7 +240,8 @@ def build_project_menu(*, family_login, project_name, login_account,
         last_member_run = None if request is None else (deepcopy(request), deepcopy(result))
 
     auth=FamilyLoginAdapter(family_login,login_account,client_id,
-        trusted_login_revision_reader=trusted_login_revision_reader, clear_report_run=(
+        trusted_login_revision_reader=trusted_login_revision_reader,
+        trusted_logout_release=trusted_logout_release, clear_report_run=(
         lambda: remember_member_run(None, None)) if trusted_member_w6_receiver is not None else None)
     coordinator=OnDemandReadCoordinator(
         auth,login_account=login_account,client_id=client_id,

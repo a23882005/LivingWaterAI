@@ -35,6 +35,7 @@ class ConversationEntry:
         self.recover_receipt = recover_receipt
         self.lock = RLock()
         self.bound_request = None
+        self._rejected_write = None
         with self.db() as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS work (
@@ -158,22 +159,27 @@ class ConversationEntry:
         return {"status": "CANCELLED"}
 
     def _write(self):
-        receipt = None
         if not self.session._sent:
             args = self.session.patch_args()
             try:
                 receipt = self.patch_page(**args)
-            except (OSError, TimeoutError):
-                pass  # The same write may have landed. Read it before deciding.
+            except OSError:
+                receipt = None  # The same write may have landed. Read it first.
+            if isinstance(receipt, dict) and (receipt.get("error") or {}).get("commit_status") == "not_committed":
+                self._rejected_write = receipt
         page = self.read_page()
-        if isinstance(receipt, dict) and (receipt.get("error") or {}).get("commit_status") == "not_committed":
-            return self.session.reject_write(receipt, page)
         try:
-            return self.session.finish_write(page)
+            if self._rejected_write is not None:
+                result = self.session.reject_write(self._rejected_write, page)
+            else:
+                result = self.session.finish_write(page)
+            self._rejected_write = None
+            return result
         except RuntimeError as exc:
             if str(exc) == "SPACE_WRITE_NOT_OBSERVED_READBACK_REQUIRED":
                 return "AWAIT_REGISTRATION_READBACK"
             if str(exc) == "SPACE_WRITE_UNCONFIRMED_RECHECK":
+                self._rejected_write = None
                 return "RECHECK_PENDING_ACTION"
             raise
 
@@ -183,13 +189,18 @@ class ConversationEntry:
             db.execute("UPDATE work SET phase='closed' WHERE phase='done'")
             db.execute("UPDATE work SET phase='cancelled' WHERE phase IN ('open','running','writeback')")
         self.mobile.clear()
-        if self.session.stage in ("READBACK_LOGIN", "READBACK_LOGOUT") and self.session._sent:
+        if self.session.stage == "READBACK_LOGIN" and self.session._sent:
             status = self._write()
             if status == "AWAIT_REGISTRATION_READBACK":
                 return {"status": status}
-        status = self.session.logout_request(self.read_page())
-        if status == "RELEASE_WITH_PATCH":
+        if self.session.stage == "READBACK_LOGOUT":
             status = self._write()
+        else:
+            auth = self.session.auth
+            page = self.read_page() if auth and auth.active and auth.login_revision else None
+            status = self.session.logout_request(page)
+            if status == "RELEASE_WITH_PATCH":
+                status = self._write()
         if status == "Goodbye 👋":
             with self.db() as db:
                 db.execute("UPDATE logouts SET done=1 WHERE id=?", (message_id,))

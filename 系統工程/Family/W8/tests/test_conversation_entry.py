@@ -15,6 +15,7 @@ class BoundSession:
     """Small V2.1 interface fixture; the hosted verification service is tested separately."""
     def __init__(self, active=False):
         self.active = active
+        self.auth = None
         self.stage = "IDLE"
         self._sent = False
         self.dispatch = Mock(return_value={"status": "COMPLETED", "result": "07"})
@@ -171,6 +172,25 @@ class ConversationTests(unittest.TestCase):
         self.assertEqual(self.entry().handle_message("late", "好了")["status"], "NO_PENDING_REQUEST")
         self.assertEqual(self.page["owner"], "previous")
         self.session.dispatch.assert_not_called()
+
+    def test_local_logout_needs_no_space_read(self):
+        entry = self.entry()
+        entry.read_page = Mock(side_effect=AssertionError("no locally owned login"))
+        self.assertEqual(entry.handle_message("out", "14")["status"], "LOGGED_OUT")
+
+    def test_definitively_rejected_logout_retries_release_before_goodbye(self):
+        entry = self.entry()
+        self.session.stage = "READBACK_LOGOUT"
+        self.session._sent = True
+        entry._rejected_write = {"error": {"commit_status":"not_committed"}}
+        def rejected(receipt, page):
+            self.session._sent = False
+            return "RELEASE_WITH_PATCH"
+        self.session.reject_write = Mock(side_effect=rejected)
+        self.assertEqual(entry.handle_message("out", "14")["status"], "RELEASE_WITH_PATCH")
+        self.session.finish_write = Mock(return_value="Goodbye 👋")
+        self.assertEqual(entry.handle_message("again", "繼續")["status"], "LOGGED_OUT")
+        self.patch.assert_called_once()
 
     def test_replayed_result_requires_current_login(self):
         self.open_verification()

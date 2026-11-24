@@ -103,7 +103,14 @@ class FamilyMenu:
                 'menu': render_menu(self.project_name)}
 
     def login(self, password):
-        self.auth.login(self.login_account, password)
+        result = self.auth.login(self.login_account, password)
+        if isinstance(result, dict) and result.get('status') == 'PENDING_REGISTRATION':
+            # The trusted caller performs the conditional write and read-back,
+            # confirms registration, and then calls resume_registered().
+            return result
+        return self.resume_registered()
+
+    def resume_registered(self):
         self._require_own_session()
         if self.pending is not None:
             number, payload = self.pending
@@ -115,17 +122,22 @@ class FamilyMenu:
         payload = {} if payload is None else payload
         if not isinstance(payload, dict):
             raise ValueError('INVALID_MENU_PAYLOAD')
+        if choice['number'] <= 13:
+            check_request = getattr(self.auth, 'check_menu_request', None)
+            reason = check_request() if check_request is not None else None
+            if reason is not None:
+                self.pending = (choice['number'], dict(payload))
+                return {'status': reason, 'pending_operation': choice['operation']}
+        try:
+            self._require_own_session()
+        except PermissionError:
+            self.pending = (choice['number'], dict(payload))
+            return {'status': 'LOGIN_REQUIRED', 'text': LOGIN_PROMPT,
+                    'pending_operation': choice['operation']}
         if choice['operation'] == 'macro_link':
             self.pending = None
             return complete_work({'text': '請登入活水 AI 工程版查看完整總經', 'url': MACRO_URL},
                                  self.project_name)
-        if choice['private'] or payload.get('use_private_portfolio'):
-            try:
-                self._require_own_session()
-            except PermissionError:
-                self.pending = (choice['number'], dict(payload))
-                return {'status': 'LOGIN_REQUIRED', 'text': LOGIN_PROMPT,
-                        'pending_operation': choice['operation']}
         if choice['operation'] == 'account' and payload.get('action') == 'logout':
             self.pending = None
             return complete_work(self.auth.logout(), self.project_name)

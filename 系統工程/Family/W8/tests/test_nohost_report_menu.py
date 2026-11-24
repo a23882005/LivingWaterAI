@@ -35,6 +35,20 @@ class Auth:
     def require_login(self):
         if not self.active:raise PermissionError()
         return self.user_id
+    # These synthetic callers represent a registration already written and
+    # read back. The registry transport has its own conditional-write tests.
+    @property
+    def login_revision(self):
+        return 'synthetic-registered-version' if self.active else None
+
+    def begin_request(self):
+        pass
+
+    def check_revision(self, revision):
+        if not self.active or revision != self.login_revision:
+            raise PermissionError('Login registration mismatch')
+        return self.user_id
+
     def logout(self):
         self.active=False
 
@@ -59,6 +73,8 @@ class NoHostReportMenus(unittest.TestCase):
             downloaded_db_path=self.db,
             official_drive_file_id="unit_approved_id",
             verified_drive_sha256=self.sha,
+            trusted_login_revision_reader=lambda _: 'synthetic-registered-version',
+            trusted_logout_release=lambda *_: None,
             official_report_folder_id="unit_approved_folder",
             **options
         )
@@ -76,7 +92,7 @@ class NoHostReportMenus(unittest.TestCase):
         import sys
         with patch.object(sys,"path",[str(W8),str(FAMILY/"W5"),*sys.path]):
             menu=self.menu(member_v82_source_config=config,report_staging_dir=self.temp.name)
-        self.assertEqual(menu.select(13)["status"],"LOGIN_REQUIRED")
+        self.assertEqual(menu.select(13)["status"],"SESSION_CONTEXT_REQUIRED")
         out=menu.login("testpass")
         self.assertEqual(out["status"],"REPORT_INPUTS_REQUIRED")
         self.assertEqual(out["result"]["missing"],["trusted_w6_current_input_producer","approved_w6_archive_or_renderer"])
@@ -87,7 +103,7 @@ class NoHostReportMenus(unittest.TestCase):
             self.fail("Menu13 invoked its receiver without a verified Menu04")
         menu=self.menu(member_v82_source_config=config,report_staging_dir=self.temp.name,
                        trusted_member_w6_receiver=receiver,approved_w6_renderer=lambda _:None)
-        self.assertEqual(menu.select(13)["status"],"LOGIN_REQUIRED")
+        self.assertEqual(menu.select(13)["status"],"SESSION_CONTEXT_REQUIRED")
         out=menu.login("testpass")
         self.assertEqual(out["status"],"REPORT_INPUTS_REQUIRED")
         self.assertEqual(out["result"]["missing"],["same_session_verified_menu04_run"])
@@ -107,7 +123,7 @@ class NoHostReportMenus(unittest.TestCase):
             return {"manifest_file_id":mid,"manifest_bytes":json.dumps(manifest).encode(),
                     "readbacks":{f["id"]:data for f in files},"file_metadata":metadata}
         menu=self.menu(trusted_report_archive_reader=read)
-        self.assertEqual(menu.select(12)["status"],"LOGIN_REQUIRED")
+        self.assertEqual(menu.select(12)["status"],"SESSION_CONTEXT_REQUIRED")
         self.assertEqual(calls,[])
         result=menu.login("testpass")
         self.assertEqual(result["result"]["status"],"REPORT_LOOKUP_REMOTE_VERIFIED")

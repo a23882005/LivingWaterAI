@@ -87,7 +87,7 @@ def test_unbound_request_is_retained():
 def test_logout_then_private_request_reauthenticates():
     auth = Auth(); auth.active = True
     ui = make_menu(auth)
-    assert ui.select(14, payload={'action':'logout'})['menu'] == render_menu('Joseph')
+    assert ui.select(14) == {'status': 'LOGGED_OUT', 'text': '👋 Goodbye！'}
     assert ui.select(2)['status'] == 'LOGIN_REQUIRED'
 
 
@@ -134,8 +134,8 @@ def test_w8_cross_project_logout_rejected_without_revoking_other_account():
     auth = Auth()
     auth.active, auth.login_user = True, 'AR'
     ui = make_menu(auth, project_name='Joseph', login_account='JO')
-    result = ui.select(14, payload={'action':'logout'})
-    assert result['status'] == 'LOGIN_REQUIRED'
+    result = ui.select(14)
+    assert result['status'] == 'LOGGED_OUT'
     assert auth.active is True and auth.login_user == 'AR'
 
 
@@ -210,3 +210,36 @@ def test_project_checker_is_called_on_each_selection_and_blocks_before_handler()
     assert ui.select('03') == {
         'status': 'SESSION_REVISION_UNAVAILABLE', 'pending_operation': 'adjust_target'}
     assert auth.calls == 3 and seen == [{}]
+
+
+def _registration_type():
+    file = Path(__file__).resolve().parents[2] / 'W8' / 'family_login_register.py'
+    spec = importlib.util.spec_from_file_location('family_register', file)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.FamilyRegistration
+
+
+def test_registry_reads_only_revision_for_normal_requests_and_checks_document_identity():
+    calls = []
+    def read(**args):
+        calls.append(args)
+        return {'documentId': 'expected', 'revisionId': 'r1'}
+    registry = _registration_type()('JO', 'expected', get_document=read, batch_update_document=None)
+    assert registry.read_revision('JO') == 'r1'
+    assert calls == [{'document_id': 'expected', 'fields': 'documentId,revisionId'}]
+    with pytest.raises(PermissionError):
+        registry.read_revision('LI')
+    assert len(calls) == 1
+    registry.document_id = 'other'
+    with pytest.raises(RuntimeError, match='DOCUMENT_MISMATCH'):
+        registry.read_revision('JO')
+
+
+def test_old_dialogue_logout_skips_replacement_and_never_writes():
+    def read(**_):
+        return {'documentId': 'expected', 'revisionId': 'new'}
+    def forbidden(**_):
+        raise AssertionError('unexpected write')
+    registry = _registration_type()('JO', 'expected', get_document=read, batch_update_document=forbidden)
+    registry.release('JO', 'old')

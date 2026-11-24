@@ -7,8 +7,10 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import Mock
 
-import on_demand_project
 import test_on_demand_mutations as mutation_fixture
+
+on_demand_project = mutation_fixture.load(
+    Path(__file__).resolve().parents[1] / "on_demand_project.py", "conversation_project_test")
 
 
 class BoundSession:

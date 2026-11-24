@@ -50,8 +50,10 @@ def test_private_intent_resumes_after_login_and_full_menu_follows():
     assert result['menu'] == render_menu('Joseph') and ui.pending is None
 
 
-def test_macro_direct_before_login_without_handler_or_database():
-    result = make_menu().select(7)
+def test_macro_after_login_without_handler_or_portfolio_database():
+    ui = make_menu()
+    assert ui.select('07')['status'] == 'LOGIN_REQUIRED'
+    result = ui.login('synthetic')
     assert result['result']['url'] == 'https://www.happihelp.com/v70-engineering/index.html'
     assert result['menu'] == render_menu('Joseph')
 
@@ -71,7 +73,7 @@ def test_invalid_selection(selection):
 
 def test_research_private_screenshot_scope_requires_auth():
     ui = make_menu(handlers={'research_candidates': lambda p:'RESEARCH'})
-    assert ui.select(5)['result'] == 'RESEARCH'
+    assert ui.select(5)['status'] == 'LOGIN_REQUIRED'
     assert ui.select(5, payload={'use_private_portfolio':True})['status'] == 'LOGIN_REQUIRED'
 
 
@@ -85,7 +87,7 @@ def test_unbound_request_is_retained():
 def test_logout_then_private_request_reauthenticates():
     auth = Auth(); auth.active = True
     ui = make_menu(auth)
-    assert ui.select(14, payload={'action':'logout'})['menu'] == render_menu('Joseph')
+    assert ui.select(14) == {'status': 'LOGGED_OUT', 'text': '👋 Goodbye！'}
     assert ui.select(2)['status'] == 'LOGIN_REQUIRED'
 
 
@@ -111,7 +113,7 @@ def test_swapped_04_05_routes_and_privacy_are_exact():
 def test_swapped_04_deployment_still_requires_auth_and_05_public_research():
     ui = make_menu(handlers={'deployment_pace': lambda p:'DEPLOY', 'research_candidates':lambda p:'RESEARCH'})
     assert ui.select(4)['status'] == 'LOGIN_REQUIRED'
-    assert ui.select(5)['result'] == 'RESEARCH'
+    assert ui.select(5)['status'] == 'LOGIN_REQUIRED'
 
 
 @pytest.mark.parametrize('foreign', ['MOU', 'AR', 'LI'])
@@ -125,15 +127,15 @@ def test_w8_foreign_login_never_reads_joseph_private_handler(foreign):
     assert attempt['status'] == 'LOGIN_REQUIRED'
     assert attempt['pending_operation'] == 'read_portfolio'
     assert touched == []
-    assert ui.select(7)['result']['url'] == 'https://www.happihelp.com/v70-engineering/index.html'
+    assert ui.select(7)['status'] == 'LOGIN_REQUIRED'
 
 
 def test_w8_cross_project_logout_rejected_without_revoking_other_account():
     auth = Auth()
     auth.active, auth.login_user = True, 'AR'
     ui = make_menu(auth, project_name='Joseph', login_account='JO')
-    result = ui.select(14, payload={'action':'logout'})
-    assert result['status'] == 'LOGIN_REQUIRED'
+    result = ui.select(14)
+    assert result['status'] == 'LOGGED_OUT'
     assert auth.active is True and auth.login_user == 'AR'
 
 
@@ -163,3 +165,81 @@ def test_w8_real_input_missing_does_not_claim_completed_execution():
     assert got['result']['missing'] == ['final_target_allocation']
     assert got['pending_operation'] == 'deployment_pace'
     assert got['menu'] == render_menu('Joseph')
+
+@pytest.mark.parametrize('number', range(1, 14))
+def test_every_selection_requires_a_session_before_dispatch(number):
+    ui = make_menu()
+    for selection in (number, f'{number:02}'):
+        assert ui.select(selection)['status'] == 'LOGIN_REQUIRED'
+        assert ui.pending == (number, {})
+
+
+def test_two_phase_registration_preserves_original_selection():
+    class PendingAuth(Auth):
+        def login(self, user, password):
+            return {'status': 'PENDING_REGISTRATION'}
+
+    auth = PendingAuth()
+    ui = make_menu(auth)
+    assert ui.select('07')['status'] == 'LOGIN_REQUIRED'
+    assert ui.login('synthetic')['status'] == 'PENDING_REGISTRATION'
+    with pytest.raises(PermissionError):
+        ui.resume_registered()
+    assert ui.pending == (7, {})
+    auth.active = True
+    assert ui.resume_registered()['result']['url'].startswith('https://')
+    assert ui.pending is None
+
+
+def test_project_checker_is_called_on_each_selection_and_blocks_before_handler():
+    class Checked(Auth):
+        reason = None
+        calls = 0
+
+        def check_menu_request(self):
+            self.calls += 1
+            return self.reason
+
+    auth = Checked()
+    auth.active = True
+    seen = []
+    ui = make_menu(auth, handlers={'adjust_target': lambda p: seen.append(p) or 'OK'})
+    assert ui.select(7)['status'] == 'COMPLETED'
+    assert ui.select('03')['result'] == 'OK'
+    auth.reason = 'SESSION_REVISION_UNAVAILABLE'
+    assert ui.select('03') == {
+        'status': 'SESSION_REVISION_UNAVAILABLE', 'pending_operation': 'adjust_target'}
+    assert auth.calls == 3 and seen == [{}]
+
+
+def _registration_type():
+    file = Path(__file__).resolve().parents[2] / 'W8' / 'family_login_register.py'
+    spec = importlib.util.spec_from_file_location('family_register', file)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.FamilyRegistration
+
+
+def test_registry_reads_only_revision_for_normal_requests_and_checks_document_identity():
+    calls = []
+    def read(**args):
+        calls.append(args)
+        return {'documentId': 'expected', 'revisionId': 'r1'}
+    registry = _registration_type()('JO', 'expected', get_document=read, batch_update_document=None)
+    assert registry.read_revision('JO') == 'r1'
+    assert calls == [{'document_id': 'expected', 'fields': 'documentId,revisionId'}]
+    with pytest.raises(PermissionError):
+        registry.read_revision('LI')
+    assert len(calls) == 1
+    registry.document_id = 'other'
+    with pytest.raises(RuntimeError, match='DOCUMENT_MISMATCH'):
+        registry.read_revision('JO')
+
+
+def test_old_dialogue_logout_skips_replacement_and_never_writes():
+    def read(**_):
+        return {'documentId': 'expected', 'revisionId': 'new'}
+    def forbidden(**_):
+        raise AssertionError('unexpected write')
+    registry = _registration_type()('JO', 'expected', get_document=read, batch_update_document=forbidden)
+    registry.release('JO', 'old')

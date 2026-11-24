@@ -19,9 +19,10 @@
 |11|記錄交易與資金變動|`record_event`|依Sources同版路由與正式handler|
 |12|查看上次我的配置報告|`previous_report`|[12_查看配置報告.md](12_查看配置報告.md)|
 |13|產生我的最新配置報告|`generate_report`|[11_產生配置報告.md](11_產生配置報告.md)|
-|14|帳號：登出／修改密碼|`account`|[14_帳號管理.md](14_帳號管理.md)|
+|14|👋 登出|`account`|[14_帳號管理.md](14_帳號管理.md)|
 
-程式：`../W7/family_menu.py`。入口提供`project_name`與`login_account`建立`FamilyMenu`；登入帳號由各專案Sources指定。`welcome()`先介紹並請輸入密碼；`login()`交由注入的auth驗證後接續待辦；`select()`依新編號分流；`complete_work()`供選單及直接需求交付結果後完整顯示選單。私人功能由呼叫端提供的auth驗證，公開07直接回網站。
+程式：`../W7/family_menu.py`。入口提供`project_name`與`login_account`建立`FamilyMenu`；登入帳號由各專案Sources指定。`welcome()`先介紹並請輸入密碼；`login()`交由注入的auth驗證後接續待辦；`select()`依新編號分流；`complete_work()`供選單及直接需求交付結果後完整顯示選單。01～13 由同一個 select() 入口核對本戶登入後才分流。07 沿用原總經網址。FamilyLogin.login() 回傳 PENDING_REGISTRATION 時，執行端保留原要求，依本人正式 Sources 條件寫入、讀回登記並執行 confirm_registration()、核對本輪版本，再呼叫 resume_registered()。每則輸入及選單按鈕均用 select()；W8 在呼叫原功能前先清除前一輪檢查，並透過執行端注入的 trusted_login_revision_reader(本人帳號) 只讀本戶正式登記當前 revisionId，交原登入物件 check_revision() 核對。讀取器須綁定本戶原件，逐次實讀，不接受使用者或模型填寫的版本。SESSION_CONTEXT_REQUIRED 表示缺本對話原已驗證物件或登記綁定；SESSION_REVISION_READER_REQUIRED 表示缺正式讀取器；SESSION_REVISION_UNAVAILABLE 表示本次讀取失敗。這些狀態保留待辦並停止分流。
+14 直接處理登出；本地登入立即失效，以自身已綁定版本條件釋放同戶登記。舊版本不影響新版，無本地登入直接告別。遠端結果不明時保留待核實狀態。
 12／13共用`report_handlers()`接W6 `report_archive.py`。以Asia/Taipei時間命名，逐次新檔保存、同秒加序號、同run同內容去重、不同內容拒絕；產物讀回通過後才完成manifest，成功報告可查上次或指定日期。報告引擎、私有folder與同一writer lock由正式設定注入，不提供示範正式路徑。
 驗收範圍：本輪路由、登入接續、選單呈現、報告日期命名與Drive協定合成測試。正式renderer／私有報告folder設定與真人端到端併入B07/B16，W7仍6/23。
 

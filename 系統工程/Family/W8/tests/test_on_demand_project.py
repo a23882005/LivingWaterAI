@@ -26,6 +26,20 @@ class FakeFamilyLogin:
         if not self.active:
             raise PermissionError("Login required")
         return self.user_id
+    # These synthetic callers represent a registration already written and
+    # read back. The registry transport has its own conditional-write tests.
+    @property
+    def login_revision(self):
+        return 'synthetic-registered-version' if self.active else None
+
+    def begin_request(self):
+        pass
+
+    def check_revision(self, revision):
+        if not self.active or revision != self.login_revision:
+            raise PermissionError('Login registration mismatch')
+        return self.user_id
+
     def logout(self):
         self.active = False
 
@@ -57,7 +71,9 @@ class ChatGPTRuntimeTest(unittest.TestCase):
                   login_account=self.account,client_id=self.client,
                   family_alias="Joseph",downloaded_db_path=self.db,
                   official_drive_file_id="synthetic-file-id",
-                  verified_drive_sha256=self.hash)
+                  verified_drive_sha256=self.hash,
+                  trusted_login_revision_reader=lambda _: 'synthetic-registered-version',
+                  trusted_logout_release=lambda *_: None)
         args.update(changes)
         return M.build_project_menu(**args)
 
@@ -109,7 +125,7 @@ class ChatGPTRuntimeTest(unittest.TestCase):
         missing = {'local_path':str(self.db.with_name('no-source-file.txt')), 'sha256':'0'*64}
         with patch.object(sys, 'path', [str(ROOT),str(FAMILY/'W5'),*sys.path]):
             menu = self.menu(member_v82_source_config=config, registered_project_sources=missing)
-            self.assertEqual(menu.select(4)['status'], 'LOGIN_REQUIRED')
+            self.assertEqual(menu.select(4)['status'], 'SESSION_CONTEXT_REQUIRED')
             # W7 resumes the pending 04 inside login() after the credential is accepted.
             with self.assertRaisesRegex(FileNotFoundError, 'no-source-file'):
                 menu.login('synthetic-secret')
@@ -117,9 +133,9 @@ class ChatGPTRuntimeTest(unittest.TestCase):
     def test_logout_invalidates_local_session(self):
         menu=self.menu()
         menu.login("synthetic-secret")
-        out=menu.select(14,payload={"action":"logout"})
-        self.assertEqual(out["status"],"COMPLETED")
-        self.assertEqual(menu.select(2)["status"],"LOGIN_REQUIRED")
+        out=menu.select(14)
+        self.assertEqual(out["status"],"LOGGED_OUT")
+        self.assertEqual(menu.select(2)["status"],"SESSION_CONTEXT_REQUIRED")
 
 
 if __name__=="__main__":

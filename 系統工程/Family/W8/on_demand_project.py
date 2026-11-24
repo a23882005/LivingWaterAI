@@ -31,6 +31,27 @@ def _load(path, name):
     return module
 
 
+def open_conversation(live_context, *, project_id, conversation_id, private_dir,
+                      make_session, verification_origin, begin_tool, check_tool,
+                      read_page, patch_page, prepare_account, build_menu, recover_receipt):
+    """Trusted runner: use its same conversation-local context on every incoming message.
+    Pass native tool callbacks and the approved household's session factory from Sources.
+    The private journal survives cold starts. Authentication secrets are strictly in memory.
+    """
+    key = ("family_login_entry", project_id, conversation_id)
+    if key not in live_context:
+        flow = _load(ROOT / "conversation_entry.py", "family_conversation_entry")
+        verification = _load(ROOT / "login_verification.py", "family_login_verification")
+        entry = flow.ConversationEntry(
+            project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
+            session=make_session(), mobile=verification.MobileVerification(
+                origin=verification_origin, begin_tool=begin_tool, check_tool=check_tool),
+            read_page=read_page, patch_page=patch_page, prepare_account=prepare_account,
+            build_menu=build_menu, recover_receipt=recover_receipt)
+        return live_context.setdefault(key, entry)
+    return live_context[key]
+
+
 class FamilyLoginAdapter:
     """Use the approved Sources FamilyLogin, adapting W7's two-arg login API."""
     def __init__(self, family_login, login_account, client_id, *, clear_report_run=None):

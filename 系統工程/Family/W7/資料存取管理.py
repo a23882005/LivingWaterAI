@@ -16,7 +16,6 @@ import tempfile
 import time
 import uuid
 from contextlib import contextmanager
-from resource_headers import authorize, validate_header, validate_policies
 
 LIMIT = 64 * 1024 * 1024
 RECEIPTS = '_family_io_receipts'
@@ -98,6 +97,7 @@ class Coordinator:
     """
     def __init__(self, headers, policies, backend, lock_dir, handlers, clock=time.time,
                  restore_subjects=(), *, session_guard):
+        from resource_headers import validate_header, validate_policies
         self.headers = copy.deepcopy(headers)
         self.policies = copy.deepcopy(validate_policies(policies))
         for key, h in self.headers.items():
@@ -116,6 +116,7 @@ class Coordinator:
         self.lock_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
 
     def _admit(self, resource, principal, operation):
+        from resource_headers import authorize
         file_id = authorize(self.headers[resource], self.policies, principal, operation, int(self.clock()))
         # B07 supplies the authoritative session lookup, including revocation.
         # It may accept its VerifiedPrincipal subclass containing a session ID.

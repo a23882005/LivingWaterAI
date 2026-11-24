@@ -41,3 +41,11 @@
 
 
 測試：在 W8 目錄執行 `PYTHONPATH=. python -m unittest discover -s tests -v`。測試資料為合成四戶，不含正式持倉或私人識別碼。
+
+## 新對話接手及中斷後取回同筆結果
+
+專案每收到一則訊息就呼叫 `on_demand_project.open_conversation(...)`，接著呼叫回傳物件的 `handle_message(message_id, text, number=原選號, payload=原作答)`。第一次只有「07」時直接傳文字即可。工具通知另傳 `notification_id`。專案與對話識別、固定私有目錄及重送時相同的訊息識別都由受信執行端提供。自由作答由原選單辨認，帶回原題號與作答資料。
+
+同一對話沿用同一份只在記憶體內的 `live_context`。每戶由 Sources 傳入原驗密控制器的建構函式、驗證站來源、兩個手機工具、Space 讀寫工具、下載帳號庫及建構原選單的函式。手機工具交回其原生 `structuredContent`。每次 `read_page()` 都讀本戶正式頁。`patch_page(**args)` 將原條件更新一次，然後讀回。若執行環境被重建，只恢復私人暫存裡的原選號及作答，依原驗密流程重新取得登入。
+
+帳本寫回前，暫存程式在同一筆 SQLite 交易中保存業務資料與既有 `_family_io_receipts` 收據。`DB_WRITEBACK_REQUIRED` 仍依上方備份、同 ID 更新與讀回工序辦理。將 `OnDemandMutationStager.receipt_reader(download_original)` 作為共用入口的 `recover_receipt`。該戶的 `download_original(file_id)` 透過原生 Drive 下載回傳 `(工具實際回報的檔案 ID, 新下載的路徑)`。帳本寫入後回覆中斷時，入口用這筆既有收據交回已保存的結果。若下載仍看不到收據，回傳 `AWAIT_DRIVE_CONFIRMATION`，沿用同一個寫回要求查核。私有暫存目錄限該執行身分存取，保存業務待辦，驗證密鑰只留在活的登入物件。

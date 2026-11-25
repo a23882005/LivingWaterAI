@@ -1,0 +1,146 @@
+{
+  "scope": "SYNTHETIC_LATEST_DB_SOURCE_REVIEW__PRIVATE_REAL_REPORTS_SEPARATE",
+  "base_commit": "036f8415cda9f24e8f51c8b73630effbf90f59e6",
+  "reference_pr59_head": "d8dea452ec47e3fb27fbd31e8db15a89b4a36122",
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "329",
+    "time": "52.544",
+    "timestamp": "2026-10-30T20:12:37.944959+00:00",
+    "hostname": "6719d1bfa4f7"
+  },
+  "pytest_summary": "261 passed, 1 warning, 68 subtests passed in 52.54s",
+  "browser_tests": 11,
+  "canonical_contract_tests": 38,
+  "command": "PYTHONDONTWRITEBYTECODE=1 NODE_PATH=/workspace/report-node-deps/node_modules PYTHONPATH=/workspace/report-test-deps:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W8:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W5:/workspace/LivingWaterAI-report-pr60/系統工程/Family/W6/runtime W6_APPROVED_ARCHIVE=/workspace/w6-approved.zip REPORT_HTML_EVIDENCE_DIR=/workspace/report-latestdb-20261031/synthetic python -m pytest 系統工程/Family/W8/tests 系統工程/Family/W6/runtime -q --disable-warnings --tb=short --junitxml=/workspace/report-latestdb-20261031/synthetic/junit.xml",
+  "runtime_dependencies": {
+    "pytest": "9.2.0",
+    "jsdom": "26.1.0",
+    "chromium": "154.0.8037.57"
+  },
+  "approved_zip_sha256": "b9b8d6eb1718b510f82e41e925f7a9145880caa8d3fe0a2dec4320ada515796e",
+  "approved_source_asset_sha256": {
+    "sources/rebuild/src_v16/report.mjs": "7380f5e583cedcc24f550f9183c1f3e1445c2702e847111daa309647a8e77348",
+    "sources/rebuild/mother.html": "c754f2b745fa8fa96a983387aaeac343dad017eb747eff349c8a6ec3339bf537",
+    "assets/cover_reference.jpg": "ca319bc06a965d7d62751e7bb4c617860e31ef5848a2c5c06bb591b69b7d82a5",
+    "assets/header_reference.jpg": "1c218ae48088a24aa9cd5cebd70a366ce94b13f04dcbe7d17169b7427f21f4a7"
+  },
+  "git_diff_check": "PASS",
+  "compile_changed_python": "PASS",
+  "private_data_used": false,
+  "actual_drive_uploads": 0,
+  "financial_engines_run_by_new_fixture": false,
+  "shared_checkpoint_changed": false,
+  "direct_file_navigation": "NOT_VERIFIED: managed Chromium blocks file:// (ERR_BLOCKED_BY_ADMINISTRATOR); exact saved bytes loaded with set_content, no paginator injected",
+  "environment_setup": "Chromium launch needs the authorized local execution permission because the default sandbox denies setsockopt. No browser policy or file:// restriction bypassed; all final tests passed.",
+  "pytest_methods_passed": 261,
+  "pytest_subtests_passed": 68,
+  "junit_records_include_subtests": true,
+  "original_work9_mentor_shape_test": "PASS_ORIGINAL_NORMALIZER_AND_MENTOR_ON_PUBLIC_SYNTHETIC_GOLDEN",
+  "visible_original_section_asof": "PASS_ALL_EIGHT_GROUPS",
+  "external_artifact_export": "PRIVATE_DRIVE_ONLY__NO_RAW_REPORT_IMAGE_PDF_HTML_ZIP_IN_PUBLIC_PR",
+  "github_publication": "PR60_PUBLISHED_BASE_81e741da__LAYOUT_REPAIR_ON_SAME_AUTHORIZED_PATHS",
+  "original_stage": {
+    "pytest_summary": "241 passed, 1 warning, 51 subtests passed in 26.63s",
+    "browser_tests": 7,
+    "canonical_contract_tests": 25,
+    "tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "292",
+      "time": "26.635",
+      "timestamp": "2026-10-30T00:50:40.612869+00:00",
+      "hostname": "d2e5cd18e5f8"
+    }
+  },
+  "continuation_private_execution": {
+    "status": "FOUR_SOURCE_REVIEW_REPORTS_ARCHIVED_AND_READBACK_VERIFIED",
+    "raw_evidence": "PRIVATE_DRIVE_ONLY",
+    "financial_or_independent_PM_acceptance": "NOT_ASSERTED",
+    "project_end_user_login_uat": "NOT_RUN",
+    "private_db_writes": 0
+  },
+  "public_junit_deidentification": "Existing baseline client fixture labels redacted; exact original JUnit kept in private evidence",
+  "previous_continuation_run": {
+    "tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "320",
+      "time": "34.279",
+      "timestamp": "2026-10-30T04:16:30.969314+00:00",
+      "hostname": "d2e5cd18e5f8"
+    },
+    "pytest_summary": "255 passed, 1 warning, 65 subtests passed in 34.28s",
+    "browser_tests": 8
+  },
+  "layout_repair": {
+    "contract": "https://github.com/a23882005/LivingWaterAI/pull/60#issuecomment-6527625954",
+    "base_commit": "81e741da51d79307210dbe061c0f65178ed733aa",
+    "defect": "REPORT_SOURCE_REFERENCE_HORIZONTAL_OVERFLOW",
+    "synthetic_source_cards": 12,
+    "long_url_path_sha_and_chinese_punctuation": true,
+    "text_ranges_and_scroll_widths": "PASS",
+    "pdf_source_card_and_page_boxes": "PASS",
+    "all_source_characters_asof_scope_preserved": "PASS",
+    "font_size": "18px_UNCHANGED",
+    "frozen_real_reports": 4,
+    "real_source_cards": 60,
+    "real_valuation_source_cards": 32,
+    "real_physical_pages": 66,
+    "real_artifact_and_manifest_fresh_readbacks": 20,
+    "private_db_writes": 0,
+    "financial_engines_rerun": false,
+    "middle_pm_layout_reacceptance": "PENDING",
+    "current_remote_db_versions": "SEPARATE_FROM_FROZEN_REPLAY__PRIVATE_SHA_COMPARISON_RECORDED"
+  },
+  "previous_layout_run": {
+    "tests": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "322",
+      "time": "46.362",
+      "timestamp": "2026-10-30T18:10:37.058071+00:00",
+      "hostname": "6719d1bfa4f7"
+    },
+    "pytest_summary": "257 passed, 1 warning, 65 subtests passed in 46.36s",
+    "browser_tests": 10
+  },
+  "latest_DB_execution": {
+    "reports": 4,
+    "scope": "SOURCE_REVIEW",
+    "fresh_official_DB_reads": 4,
+    "new_run_per_member": true,
+    "physical_pages": [
+      23,
+      23,
+      15,
+      16
+    ],
+    "total_pages": 77,
+    "source_cards": 76,
+    "quoted_dated_record_cards": 39,
+    "all_saved_pages_exact_zip_png": true,
+    "source_text_ranges_and_pdf_boxes": "PASS",
+    "narrow_offline_readers": 4,
+    "formal_artifact_and_manifest_fresh_readbacks": 20,
+    "published_manifest_and_engineering_lookup": "4_OF_4_PASS",
+    "final_fresh_DB_bytes_equal_start": true,
+    "db_writes": 0,
+    "financial_engine_runs": 0,
+    "old_native_results_reused": false,
+    "current_NAV_target_amounts_drift_radars": "UNKNOWN",
+    "financial_research": "PARTIAL_DB_QUOTES_AND_SCOPE_NOTES__FORMAL_RESEARCH_PENDING",
+    "Owner_output": "Four direct PDF links plus HTML/ZIP in private delivery entry",
+    "middle_PM_acceptance": "PENDING",
+    "full_financial_or_end_user_login_UAT": "NOT_ASSERTED"
+  }
+}

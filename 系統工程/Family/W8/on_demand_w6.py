@@ -11,6 +11,57 @@ import importlib.util
 SRC = Path(__file__).with_name("w6_current_data.py")
 
 
+class MemberAnalysisReportProducer:
+    """Inject an operator-verified native partial result into the existing API."""
+    def __init__(self, request, result, *, source_id, rules_sha, sections=None,
+                 approved_target=None,target_context=None,target_validator=None,holdings_review_sources=None):
+        self.request=deepcopy(request)
+        self.result=deepcopy(result)
+        self.source_id=source_id
+        self.rules_sha=rules_sha
+        self.sections=deepcopy(sections)
+        self.approved_target=deepcopy(approved_target)
+        self.target_context=deepcopy(target_context)
+        self.target_validator=target_validator
+        self.holdings_review_sources=deepcopy(holdings_review_sources)
+
+    @classmethod
+    def from_menu04(cls, same_run, *, source_id, rules_sha,
+                    expected_request_digest, expected_result_digest, **options):
+        """Construct from an operator-pinned original {request, result} receipt.
+
+        Supply this callable as build_project_menu's trusted W6 input producer,
+        alongside the pinned approved_w6_archive and a private staging folder.
+        Menu payloads never supply or replace this receipt or its expected hashes.
+        """
+        spec=importlib.util.spec_from_file_location("family_w8_menu04_report_binding",
+                                                  SRC.with_name("report_canonical_adapter.py"))
+        adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
+        if (not isinstance(same_run,dict) or set(same_run)!={"request","result"}
+                or not isinstance(same_run["request"],dict)
+                or not isinstance(same_run["result"],dict)
+                or adapter.digest(same_run["request"])!=expected_request_digest
+                or adapter.digest(same_run["result"])!=expected_result_digest):
+            raise ValueError("W6_MENU04_RECEIPT_DIGEST_MISMATCH")
+        return cls(same_run["request"],same_run["result"],
+                   source_id=source_id,rules_sha=rules_sha,**options)
+
+    def __call__(self, formal_source, payload):
+        spec=importlib.util.spec_from_file_location("family_w8_member_report_producer",
+                                                  SRC.with_name("report_canonical_adapter.py"))
+        adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
+        if self.result.get("schema_version")=="Family.W8.HoldingsAnalysisReport.v1":
+            if any(x is not None for x in (self.sections,self.approved_target,self.target_context,self.target_validator)):
+                raise ValueError("W6_HOLDINGS_REVIEW_SOURCE_OPTIONS_CONFLICT")
+            return adapter.make_holdings_review_inputs(formal_source,self.request,self.result,
+                source_id=self.source_id,rules_sha=self.rules_sha,review_sources=self.holdings_review_sources)
+        if self.holdings_review_sources is not None:
+            raise ValueError("W6_HOLDINGS_REVIEW_SOURCES_WITHOUT_HOLDINGS_RESULT")
+        return adapter.make_member_review_inputs(formal_source,self.request,self.result,
+            source_id=self.source_id,rules_sha=self.rules_sha,sections=self.sections,
+            approved_target=self.approved_target,target_context=self.target_context,target_validator=self.target_validator)
+
+
 class OnDemandW6Renderer:
     def __init__(self, trusted_current_input_producer, approved_w6_renderer=None,
                  *, approved_w6_archive=None):

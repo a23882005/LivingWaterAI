@@ -1,0 +1,154 @@
+{
+  "producer_commit": "d250d3c506da3f7bec1dd7f3b5c89639a69765f7",
+  "consumer_base": "4319556a67f83f1cf3fc754446a2c401335db3e1",
+  "source_snapshot": {
+    "path": "upstream_snapshot.json",
+    "sha256": "5417dd4530889a904e7a8e0b9e3616b3b55f4760b64e413c52d5373c141ee833",
+    "files": [
+      {
+        "path": "系統工程/Family/W5/mentor_bridge.py",
+        "bytes": 25228,
+        "sha256": "308c254d60f8ffd42c7ea559cbf948ece1b0fe77ee0f753bd64d0fcdd6dd3907",
+        "git_blob_sha": "9f2cf8fe674b8eb77e7266c9cadef45ee11c78bf"
+      },
+      {
+        "path": "系統工程/Family/W5/runtime_loader.py",
+        "bytes": 3034,
+        "sha256": "4d695ea8a012d249867a6ae10ed0abcff31e86021e11ed5d6ad2263408807d06",
+        "git_blob_sha": "90f98e8706b2a9dc429c150510679bbbbb5ce7ae"
+      },
+      {
+        "path": "系統工程/Family/W5/reason_catalog.json",
+        "bytes": 10348,
+        "sha256": "2c19102d99d21824516069b9dd2db906776caf97d4c9b90b3d740e1b960368f7",
+        "git_blob_sha": "078f269b0cba8089a554668debd309b290c1920c"
+      },
+      {
+        "path": "系統工程/Family/W5/frozen_schema_lock.json",
+        "bytes": 3285,
+        "sha256": "bbb5d28ec17c9f62a501c8e3142f6d14ef351ca987423c116f852d373481051b",
+        "git_blob_sha": "aa0e1e28b1aab2e45ca1706121a685ee45e8ed72"
+      },
+      {
+        "path": "系統工程/Family/W5/tests/fixtures/work9_mentor_request.json",
+        "bytes": 61532,
+        "sha256": "40196c2335ad7a0f2150d36fad61f67aff7f17f005a35138462190de4726ac62",
+        "git_blob_sha": "7b1551ea398ad4a175c7df4ad3d7b8bf71918f54"
+      },
+      {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Mentor_Return.py",
+        "bytes": 40302,
+        "sha256": "cae639465a6791a1272487146e1967904b27c8aba2f86b6bbe61c4031cd58f32",
+        "git_blob_sha": "26666769aa568dc2eda6ee6c5042b83829efd880"
+      },
+      {
+        "path": "系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src/livingwater_v82_runtime/funding_absence.py",
+        "bytes": 4378,
+        "sha256": "a6b65bc9f9310bbfd3ee678cea9cbb8746b7e5d1d8ffaec26cb65f74ebdae14a",
+        "git_blob_sha": "acaabb45289be2aa800f004c6590534acce5752c"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work5_Frozen_V75RunInput.schema_RECHECK1_2026-09-27_0207.json",
+        "bytes": 12888,
+        "sha256": "b7e5eea72add5058c1240a7691c2e5c94a9e9c961d015fcad236f468bf5621f8",
+        "git_blob_sha": "d3bc1020fbf94a818eac3921df0449bec95ead9f"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work5_Frozen_Work6RuntimeReadySnapshot.schema_RECHECK1_2026-09-27_0207.json",
+        "bytes": 11053,
+        "sha256": "a264493246e202a7440b8104a40c127ab39b638f4022e4659dd5c18d79abbee8",
+        "git_blob_sha": "27bc1c0b0923e424219b9953cf3d3a6dad6fae0b"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work6_Frozen_C7_Funding_Context.schema_2026-09-27_0242.json",
+        "bytes": 4081,
+        "sha256": "76e244e9859dd6f72cee748f8a9ece9af55bec7dead401605efa12f9886bb86f",
+        "git_blob_sha": "d2ed33494e2714475d2552a53b8ccbaf0fb3ff82"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work8_Frozen_C7_AssetFrameworkResult.schema_RECHECK2_2026-09-28_0157.json",
+        "bytes": 29102,
+        "sha256": "d9d081a5bcb21de4c5031a7b47bcaee39811c63e48c0fb5d226ad51eb7136dba",
+        "git_blob_sha": "fc5a087706c43bb90b437dc73972b8947b5f3d11"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work9_Frozen_Work4_V82_Integration_Output.schema_2026-09-28_0342.json",
+        "bytes": 157143,
+        "sha256": "332b72d0b947480f9e931c1c11478daef1c4688bcaf04224919cd0ff1a752c6a",
+        "git_blob_sha": "bcee7dd0afb9bccfdf81a72e33ad02295e378c5d"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work9_Frozen_Work5_V75_Integration_Output.schema_2026-09-28_0342.json",
+        "bytes": 16419,
+        "sha256": "24d6c6c3e1c2abd38db69ae3c774d11580ef2b07d6e215dd4a5906e88145778f",
+        "git_blob_sha": "0631f3383621eee7f93ad21757009d460615e5fb"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work9_Frozen_Work6_Funding_Account_Isolation_Output.schema_2026-09-28_0342.json",
+        "bytes": 3648,
+        "sha256": "4d2306fd48c56255f92f8250e93f5492b8edbf32c65d4b4a29f51c4532160f0d",
+        "git_blob_sha": "d28b14cd6d63681fe8a8816638e3d3018159875d"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work9_Frozen_Work7_SGOV_Runtime_Role_Output.schema_2026-09-28_0342.json",
+        "bytes": 5496,
+        "sha256": "0940d4d6e3e5c3715eb40b5341e4801ef63965df3b1721433e3707de929ab73e",
+        "git_blob_sha": "8e17f27869d3d00c75b80a0418a706240a779c80"
+      },
+      {
+        "path": "系統工程/Family/W5/schemas/C8C9_Work9_Frozen_Work8_Protected_Holding_Output.schema_2026-09-28_0342.json",
+        "bytes": 159893,
+        "sha256": "4896a1f7b5343a8d2581beab65dfa50a563c3583aa70170c59c8b1a0ce5327ee",
+        "git_blob_sha": "7f44bc0d353a19736e788dc5acedab2a8e1604dc"
+      },
+      {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Unified_Deployment_Input.schema_2026-09-28_0342.json",
+        "bytes": 1159,
+        "sha256": "6b7c82c2a0e80aad49a8e77d7d6358a54abfcb33e12bbf46d392e95b4afb69cf",
+        "git_blob_sha": "d96ce6ee1db718ef63ea92628b97f45fe462e854"
+      },
+      {
+        "path": "系統工程/C-配置決策引擎＋Mentor整合/正式Runtime/C8C9_RUNTIME/C8C9_Work9_Canonical_Deployment_Result.schema_2026-09-28_0342.json",
+        "bytes": 21040,
+        "sha256": "fd2cc043bdeb9661a13cd793f57b7000f4f1ff930dd0285699c9189647294384",
+        "git_blob_sha": "424ca8e4d0f655397db8bc63632d95c4ec3e6951"
+      }
+    ]
+  },
+  "consumer_tested_file_sha256": {
+    "系統工程/Family/W6/runtime/report_receiver.py": "040408ee5114e66faa5b1698b58e562cc68b005822a28124f26a2afc473761fa",
+    "系統工程/Family/W6/runtime/test_report_receiver.py": "cd11f1d37d24feacdcc77efef695be69fe24efee57463fe00dbda078b4517181",
+    "系統工程/Family/W8/report_canonical_adapter.py": "ee0e94bd7b1b6d2baea152e0b6963edf156ac83f982ae6aea7626451329cb2cf",
+    "系統工程/Family/W8/tests/fixtures/report_html/synthetic.py": "262ce8c81bf691988a0ccbb689ef20e035490ef1ff1c994fd0f408fd042f3bdc",
+    "系統工程/Family/W8/tests/test_report_canonical_adapter.py": "949429a1ce87832ba86244773dfcd7c47fb447260cda034c0ec0246810b02aaa",
+    "系統工程/Family/W8/tests/test_report_rendered_html.py": "c2cbea28b60b1339b3ce670c16112ecc59e1aab00a444592b23a9539514f8e1a"
+  },
+  "PM_provided_four_baseline_blobs_verified": [
+    {
+      "line": "PR59",
+      "path": "系統工程/Family/W5/mentor_bridge.py",
+      "sha256": "308c254d60f8ffd42c7ea559cbf948ece1b0fe77ee0f753bd64d0fcdd6dd3907",
+      "git_blob_sha": "9f2cf8fe674b8eb77e7266c9cadef45ee11c78bf"
+    },
+    {
+      "line": "PR59",
+      "path": "系統工程/Family/W8/tests/test_recommendation_output.py",
+      "sha256": "54f981ec98074f4c65a6dd7238220fddfd9ec5b9aacdfd890c371d678860b280",
+      "git_blob_sha": "87abd5e8b22493820beac3274fe26f0326d9e987"
+    },
+    {
+      "line": "PR60",
+      "path": "系統工程/Family/W6/runtime/report_receiver.py",
+      "sha256": "bae171fbe93a68f23adc0cdd82ce3d3c5ec2fd7b5233aeea15e04a6c89204297",
+      "git_blob_sha": "17873b1d7d93c19bac0bef9a937a7f7c117c3822"
+    },
+    {
+      "line": "PR60",
+      "path": "系統工程/Family/W8/report_canonical_adapter.py",
+      "sha256": "b0d4b287def35bacd68452580dbbd10aec7f878f62a17f3499cdb24b15b7b29d",
+      "git_blob_sha": "b1d84f95246462b1b04c3b213f79e179c8a5e6ef"
+    }
+  ],
+  "source_lock_changes": [],
+  "public_QA_private_identifier_handling": "Known baseline client IDs redacted; raw JUnit private"
+}

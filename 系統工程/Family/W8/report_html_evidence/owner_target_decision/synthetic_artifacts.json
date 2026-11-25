@@ -1,0 +1,31 @@
+{
+  "scope": "SYNTHETIC_ONLY",
+  "binary_location": "Private acceptance evidence package",
+  "artifacts": [
+    {
+      "path": "owner_selection/current.synthetic.json",
+      "bytes": 16302,
+      "sha256": "520c55c11c174232fe8e51de2644fe302086594a80c6d3fd6512435e7e05e27f"
+    },
+    {
+      "path": "owner_selection/index.html",
+      "bytes": 8796250,
+      "sha256": "9e5befa69977803f0508fcd0aa9a4504e9e6536724b38f9f954a8ddcafe9a14e"
+    },
+    {
+      "path": "owner_selection/report.html",
+      "bytes": 869730,
+      "sha256": "a67178f8f49e44fbd8bcc054b3499fa20d82fba6be27786675dcfaef4e88fe74"
+    },
+    {
+      "path": "owner_selection/report.pdf",
+      "bytes": 1206693,
+      "sha256": "cd2f0ec4fa0c817b74c4806228e3f07e378cfd910854081a8b3fc35ff9499eda"
+    },
+    {
+      "path": "owner_selection/report.zip",
+      "bytes": 14529098,
+      "sha256": "b47f5c5e04a882c7cf1eb5475d1f01a6e4780af6de8af2aa9b794dc565a91e15"
+    }
+  ]
+}

@@ -25,7 +25,7 @@ jobs:
           script: |
             set -eu
             python3 - <<'PY'
-            import ctypes, ctypes.util, grp, os, re, stat
+            import ctypes, ctypes.util, grp, os, pwd, re, shutil, stat
             from pathlib import Path
 
             root = Path(os.environ['LW_DIR']).resolve(strict=True)
@@ -47,6 +47,12 @@ jobs:
             print('AUTH_FILE_BOUND', 'AuthUserFile ' + str(verifier) in rules.read_text())
             account = Path.home().resolve()
             print('ACCOUNT_GROUP', grp.getgrgid(account.stat().st_gid).gr_name)
+            print('ACL_TOOL_AVAILABLE', bool(shutil.which('setfacl') and shutil.which('getfacl')))
+            try:
+                web = pwd.getpwnam('nobody')
+                print('NOBODY_UID_GID', web.pw_uid, web.pw_gid)
+            except KeyError:
+                print('NOBODY_NOT_FOUND')
             for label, path in (('account', account), ('domains', root.parent.parent),
                                 ('domain', root.parent), ('private', private), ('verifier', verifier)):
                 info = path.stat()

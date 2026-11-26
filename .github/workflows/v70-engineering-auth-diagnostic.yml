@@ -1,0 +1,56 @@
+name: V70 engineering auth path diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v70-engineering-auth-diagnostic.yml']
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect only the engineering verifier path
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,WEB_USER,WEB_PASSWORD
+          script: |
+            set -eu
+            python3 - <<'PY'
+            import ctypes, ctypes.util, os, re, stat
+            from pathlib import Path
+
+            root = Path(os.environ['LW_DIR']).resolve(strict=True)
+            assert root.name == 'public_html' and root.parent.name == 'happihelp.com'
+            private = root.parent / 'v70-engineering-auth'
+            verifier = private / 'engineering.htpasswd'
+            rules = root / 'v70-engineering' / '.htaccess'
+            assert all(p.is_file() and not p.is_symlink() for p in (verifier, rules))
+            assert not private.is_symlink()
+            user = os.environb['WEB_USER']
+            password = os.environb['WEB_PASSWORD']
+            assert re.fullmatch(rb'[A-Za-z0-9_.@+-]{1,255}', user)
+            matches = re.findall(rb'(?m)^' + re.escape(user) + rb':([^\r\n]*)', verifier.read_bytes())
+            assert len(matches) == 1
+            lib = ctypes.CDLL(ctypes.util.find_library('crypt'))
+            lib.crypt.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+            lib.crypt.restype = ctypes.c_char_p
+            print('VERIFIER_HASH_MATCH', lib.crypt(password, matches[0]) == matches[0])
+            print('AUTH_FILE_BOUND', 'AuthUserFile ' + str(verifier) in rules.read_text())
+            account = Path.home().resolve()
+            for label, path in (('account', account), ('domains', root.parent.parent),
+                                ('domain', root.parent), ('private', private), ('verifier', verifier)):
+                info = path.stat()
+                mode = stat.S_IMODE(info.st_mode)
+                print('PATH', label, 'mode', oct(mode), 'uid', info.st_uid,
+                      'gid', info.st_gid, 'owner_is_ssh', info.st_uid == os.getuid(),
+                      'group_is_ssh', info.st_gid == os.getgid())
+            PY

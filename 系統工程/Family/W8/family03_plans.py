@@ -289,9 +289,6 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
         snapshot=entry.current_snapshot()
         if not progress.is_file():
             return {"status":"FAMILY03_SOURCE_REQUIRED","檔名":progress.name,"本人":member}
-        for f,file_id in ((pool,POOL_ID),(bench,calc.BOOK_ID)):
-            if not f.is_file():
-                return {"status":"FAMILY03_SOURCE_REQUIRED","檔名":f.name,"file_id":file_id}
         raw=progress.read_bytes()
         revision=sha256(raw).hexdigest()
         book=calc.reader_module().read_xlsx(progress)
@@ -299,17 +296,38 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
         if book.sheets["選擇進度"].headers[:2]!=["股票配置・選擇進度",member] or any(
                 e["家人"]!=member for e in history):
             raise PermissionError("FAMILY03_PROGRESS_OWNER_MISMATCH")
+        action=payload.get("action")
+        if action == "progress_receipt":
+            event_id = payload.get("event_id")
+            source_revision = payload.get("source_revision")
+            if set(payload) != {"action", "event_id", "source_revision"} or not all(
+                    isinstance(value, str) and len(value) == 64
+                    and all(char in "0123456789abcdef" for char in value)
+                    for value in (event_id, source_revision)):
+                raise ValueError("FAMILY03_INVALID_PROGRESS_RECEIPT_REQUEST")
+            matches = [index for index, row in enumerate(history, 1)
+                       if row["事件識別"] == event_id]
+            if len(matches) > 1:
+                raise ValueError("FAMILY03_DUPLICATE_PROGRESS_EVENT")
+            status = ("FAMILY03_PROGRESS_EVENT_FOUND" if matches else
+                      "FAMILY03_PROGRESS_NOT_SAVED" if revision == source_revision else
+                      "FAMILY03_PROGRESS_SOURCE_CHANGED")
+            return {"status": status, "本人": member, "檔名": progress.name,
+                    "事件識別": event_id, "事件序號": matches[0] if matches else None,
+                    "歷程筆數": len(history), "revision": revision, "唯讀": True}
+        for f,file_id in ((pool,POOL_ID),(bench,calc.BOOK_ID)):
+            if not f.is_file():
+                return {"status":"FAMILY03_SOURCE_REQUIRED","檔名":f.name,"file_id":file_id}
         catalog=pool_rows(pool)
         versions=old_versions(history)
         st=initial(history)
-        if history and json.loads(history[-1]["作答後有效答案"]).get("schema")!=2 and payload.get("action") not in ("history","start_plans","restore","lookup","account_preview"):
+        if history and json.loads(history[-1]["作答後有效答案"]).get("schema")!=2 and action not in ("history","start_plans","restore","lookup","account_preview"):
             # Preserve resumability of older partial interviews.
             if "review" not in json.loads(history[-1]["作答後有效答案"]):
                 q=legacy(payload)
                 q["新版入口"]={"action":"start_plans"}
                 q["查詢入口"]={"action":"history"}
                 return q
-        action=payload.get("action")
         if action == "account_preview":
             if set(payload) != {"action"}:
                 raise ValueError("請從本人的最後指定方案讀取")
@@ -599,5 +617,7 @@ def write(st,q,choice,key,history,revision,snapshot,progress,folder,member,calc)
         raise ValueError("進度回讀與本次選擇不符")
     return {"status":"FAMILY03_PROGRESS_WRITEBACK_REQUIRED","本人":member,"檔名":progress.name,
             "原檔摘要":revision,"新檔摘要":sha256(candidate.read_bytes()).hexdigest(),"候選檔":str(candidate),
-            "事件識別":event_id,"保存步驟":"核對本人雲端原檔摘要，備份、原 ID 更新，下載核對後再呼叫選單 03 續答。"}
+            "事件識別":event_id,
+            "讀回入口":{"action":"progress_receipt","event_id":event_id,"source_revision":revision},
+            "保存步驟":"核對本人雲端原檔摘要，備份、原 ID 更新，下載核對後再呼叫選單 03 續答。"}
 

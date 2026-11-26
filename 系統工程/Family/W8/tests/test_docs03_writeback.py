@@ -146,6 +146,31 @@ class Docs03WritebackTests(unittest.TestCase):
             self.turn("wrong-revision", document={"documentId": "fixture-doc", "revisionId": "different"})
         self.assertEqual(self.turn("correct-chat")["result"]["request_id"], "confirmation")
 
+    def test_pinned_candidate_reuses_exact_bytes_and_rejects_replacement(self):
+        project, conversation = "fixture-project", "original-chat"
+        journal, _ = docs03._journal_directory(self.workspace, project, conversation, create=True)
+        source = self.workspace / "candidate.xlsx"
+        source.write_bytes(b"approved candidate")
+        revision = sha256(source.read_bytes()).hexdigest()
+
+        def pin(digest):
+            return Path(docs03._pin_candidate(
+                self.workspace, project, conversation, source, digest, "xlsx"))
+
+        with self.assertRaisesRegex(ValueError, "DOCS03_CANDIDATE_DIGEST_MISMATCH"):
+            pin("0" * 64)
+        self.assertEqual(list(journal.iterdir()), [])
+        saved = pin(revision)
+        self.assertEqual(saved.parent, journal)
+        self.assertEqual(saved.stat().st_mode & 0o077, 0)
+        self.assertEqual(revision, sha256(saved.read_bytes()).hexdigest())
+        self.assertEqual(pin(revision), saved)
+        self.assertEqual(list(journal.iterdir()), [saved])
+        saved.write_bytes(b"changed candidate")
+        with self.assertRaisesRegex(ValueError, "DOCS03_CANDIDATE_DIGEST_MISMATCH"):
+            pin(revision)
+        self.assertEqual(saved.read_bytes(), b"changed candidate")
+
     def test_direct_account_entry_uses_the_registered_workbook_download(self):
         source = self.workspace / "ledger.db"
         source.write_bytes(b"fixture")
@@ -186,6 +211,7 @@ class Docs03WritebackTests(unittest.TestCase):
             "receipt became visible": "PERSISTED_REMOTE_VERIFIED",
             "ledger changed": "DOCS03_PREVIEW_STALE",
             "workbook changed": "DOCS03_PREVIEW_STALE",
+            "journal copy gone": "DOCS03_PREVIEW_STALE",
         }
         for case, expected in cases.items():
             with self.subTest(case=case), TemporaryDirectory(dir=self.workspace) as folder:
@@ -229,7 +255,12 @@ class Docs03WritebackTests(unittest.TestCase):
                 if case == "ledger changed":
                     with sqlite3.connect(latest) as db:
                         db.execute("CREATE TABLE independent_change (flag TEXT)")
-                source.unlink()  # The first message's download is gone; the candidate still exists.
+                source.unlink()
+                Path(stage["writeback_plan"]["candidate"]["path"]).unlink()
+                if case == "journal copy gone":
+                    journal, _ = docs03._journal_directory(
+                        root, context["project_id"], context["conversation_id"], create=False)
+                    next(journal.glob("upload-*.db")).unlink()
                 download.side_effect = [("ledger-id", backup), ("ledger-id", latest)]
                 result = docs03.run_project_docs03(**context, message_id="continue",
                     downloaded_db_path=latest, verified_drive_sha256=sha256(latest.read_bytes()).hexdigest(),
@@ -396,9 +427,13 @@ class Docs03NativeHostTests(unittest.TestCase):
             auth=SimpleNamespace(family_login=self.auth), select=select)
         answer = dict(revision=revision, question_id="choice", key="goal", reply="成長")
         self.assertEqual(self.turn(answer, verified_progress_backup=None)["status"], "DOCS03_BACKUP_REQUIRED")
+        candidate.unlink()
         update = self.turn(message_id="backup", verified_progress_backup=("backup-id", backup))
         self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
-        copyfile(update["update_file_args"]["file_uri"], self.workbook)
+        uploaded_artifact = Path(update["update_file_args"]["file_uri"])
+        self.assertEqual(uploaded_artifact.stat().st_mode & 0o077, 0)
+        self.assertNotEqual(uploaded_artifact, candidate)
+        copyfile(uploaded_artifact, self.workbook)
         self.download_ledger.reset_mock(side_effect=True)
         self.download_ledger.side_effect = FileNotFoundError("ledger unavailable")
         self.download_workbook.reset_mock()
@@ -419,7 +454,7 @@ class Docs03NativeHostTests(unittest.TestCase):
         book.save(self.workbook)
         with self.assertRaisesRegex(ValueError, "FAMILY03_DUPLICATE_PROGRESS_EVENT"):
             self.turn(message_id="duplicate-event")
-        copyfile(candidate, self.workbook)
+        copyfile(uploaded_artifact, self.workbook)
         reply = self.turn(message_id="after-relogin")
         self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
         self.assertEqual(reply["result"]["progress_receipt"]["事件序號"], 1)

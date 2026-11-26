@@ -6,7 +6,9 @@ from importlib.util import module_from_spec, spec_from_file_location
 import json
 import os
 from pathlib import Path
+from shutil import copyfileobj
 import sqlite3
+from tempfile import NamedTemporaryFile
 
 
 def _load_module(name):
@@ -35,6 +37,43 @@ def _journal_directory(workspace_dir, project_id, conversation_id, *, create):
             (not directory.is_dir() or directory.stat().st_mode & 0o077)):
         raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
     return directory, directory / f"{scope}.sqlite3"
+
+
+def _digest_stream(stream):
+    digest = sha256()
+    for block in iter(lambda: stream.read(1024 * 1024), b""):
+        digest.update(block)
+    return digest.hexdigest()
+
+
+def _pin_candidate(workspace_dir, project_id, conversation_id, source, revision, suffix):
+    """Keep verified upload bytes beside the journal, outside turn-local downloads."""
+    directory, _ = _journal_directory(workspace_dir, project_id, conversation_id, create=False)
+    path = Path(source)
+    if not isinstance(revision, str) or len(revision) != 64 or any(
+            ch not in "0123456789abcdef" for ch in revision):
+        raise ValueError("DOCS03_INVALID_CANDIDATE_DIGEST")
+    target = directory / f"upload-{revision}.{suffix}"
+    with path.open("rb") as original, NamedTemporaryFile(dir=directory) as temp:
+        copyfileobj(original, temp)
+        temp.flush()
+        with open(temp.name, "rb") as copy:
+            if _digest_stream(copy) != revision:
+                raise ValueError("DOCS03_CANDIDATE_DIGEST_MISMATCH")
+        os.fsync(temp.fileno())
+        try:
+            os.link(temp.name, target)
+        except FileExistsError:
+            with os.fdopen(os.open(target, os.O_RDONLY | os.O_NOFOLLOW), "rb") as existing:
+                if (os.fstat(existing.fileno()).st_mode & 0o077
+                        or _digest_stream(existing) != revision):
+                    raise ValueError("DOCS03_CANDIDATE_DIGEST_MISMATCH")
+        fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+    return str(target)
 
 
 class _Docs03Session:
@@ -304,7 +343,11 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
             key = {"file_id":progress_file_id, "client_id":client_id,
                    "request_id":lookup["event_id"], "source_revision":lookup["source_revision"],
                    "operation":"save_progress"}
-            return {"status":"DB_WRITEBACK_REQUIRED", "result":{**staged, "receipt_key":key}}
+            saved_path = _pin_candidate(
+                workspace_dir, project_id + "|03-progress", conversation_id,
+                staged["候選檔"], staged["新檔摘要"], "xlsx")
+            return {"status":"DB_WRITEBACK_REQUIRED",
+                    "result":{**staged, "候選檔":saved_path, "receipt_key":key}}
 
     def observe(key):
         if (key["file_id"], key["client_id"], key["operation"]) != (
@@ -335,6 +378,9 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
         if update["status"] == "FAMILY03_PROGRESS_SOURCE_CHANGED":
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":key["request_id"],
                     "text":"作答進度已有更新，請重新開啟 03 接續最新題目。"}
+        if update["status"] == "FAMILY03_PROGRESS_CANDIDATE_MISSING":
+            return {"status":"DOCS03_PREVIEW_STALE", "request_id":key["request_id"],
+                    "text":"待寫回的作答副本已遺失，請回到 03 重新確認這一題。"}
         # The first observation missed a save that landed before preflight.
         if update["status"] == "FAMILY03_PROGRESS_EVENT_FOUND":
             return {**key, "status":"PERSISTED_REMOTE_VERIFIED", "progress_receipt":update}
@@ -408,16 +454,24 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
         return Path(path)
 
-    class ConfirmedProgressMenu:
+    class ConfirmationMenu:
         def __init__(self, menu):
             self.menu, self.auth = menu, menu.auth
 
         def select(self, number, *, payload):
             response = self.menu.select(number, payload=payload)
-            if response["status"] == "DB_WRITEBACK_REQUIRED":
-                response = {**response, "result":{**response["result"],
-                    "progress_binding":{"file_id":progress_file_id, "revision":payload["revision"]}}}
-            return response
+            if response["status"] != "DB_WRITEBACK_REQUIRED":
+                return response
+            staged = response["result"]
+            plan = staged["writeback_plan"]
+            candidate = plan["candidate"]
+            path = _pin_candidate(workspace_dir, project_id, conversation_id,
+                                  candidate["path"], candidate["sha256"], "db")
+            staged = {**staged, "writeback_plan":{
+                **plan, "candidate":{**candidate, "path":path}}}
+            if check_progress:
+                staged["progress_binding"] = {"file_id":progress_file_id, "revision":payload["revision"]}
+            return {**response, "result":staged}
 
     def build_menu(login):
         if build_original_menu is None:
@@ -427,7 +481,7 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                 mutation_staging_dir=mutation_staging_dir, **sources, **progress)
         else:
             menu = build_original_menu(login)
-        return ConfirmedProgressMenu(menu) if check_progress else menu
+        return ConfirmationMenu(menu) if managed or native_writeback else menu
 
     def receipt_stager():
         return _load_module("on_demand_mutations").OnDemandMutationStager(
@@ -472,6 +526,9 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                 sha256(downloaded_progress().read_bytes()).hexdigest() != progress_binding["revision"]):
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
                     "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
+        if not Path(plan["candidate"]["path"]).is_file():
+            return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
+                    "text":"待寫回的帳本副本已遺失，請回到 03 重新預覽並確認。"}
         # This turn can have a different download path for the same Drive bytes.
         confirmed_source = {**plan["source"], "path": fresh["path"]}
         writer = drive.OnDemandWriteback(binding, auth.require_login)

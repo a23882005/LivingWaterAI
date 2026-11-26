@@ -637,7 +637,13 @@ def prepare_progress_update(staged, observed, *, file_id, downloaded_id,
     if sha256(Path(backup_path).read_bytes()).hexdigest() != downloaded_sha:
         raise ValueError("FAMILY03_PROGRESS_BACKUP_MISMATCH")
     candidate = Path(staged["候選檔"])
-    if not candidate.is_absolute() or sha256(candidate.read_bytes()).hexdigest() != staged["新檔摘要"]:
+    if not candidate.is_absolute():
+        raise ValueError("FAMILY03_PROGRESS_CANDIDATE_MISMATCH")
+    try:
+        candidate_sha = sha256(candidate.read_bytes()).hexdigest()
+    except FileNotFoundError:
+        return {"status": "FAMILY03_PROGRESS_CANDIDATE_MISSING"}
+    if candidate_sha != staged["新檔摘要"]:
         raise ValueError("FAMILY03_PROGRESS_CANDIDATE_MISMATCH")
     return {"status": "FAMILY03_PROGRESS_UPDATE_REQUIRED",
             "update_file_args": {

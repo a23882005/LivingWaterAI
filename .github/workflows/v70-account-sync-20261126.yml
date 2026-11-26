@@ -1,0 +1,195 @@
+name: V70 scoped engineering account repair
+on:
+  push:
+    branches: [diagnostics/v70-account-sync-20261126]
+    paths: [.github/workflows/v70-account-sync-20261126.yml]
+permissions: {}
+concurrency:
+  group: lw-v703-site-deploy-refs/heads/main
+  cancel-in-progress: false
+jobs:
+  verify-and-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Reconcile only the existing automation account if mismatched
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          timeout: 20s
+          command_timeout: 2m
+          envs: LW_DIR,WEB_USER,WEB_PASSWORD
+          script: |
+            set -eu
+            command -v python3 >/dev/null 2>&1 || { echo HOST_PYTHON_UNAVAILABLE; exit 1; }
+            python3 - <<'PY'
+            import base64, ctypes, ctypes.util, fcntl, hmac, http.client, os, re, stat, tempfile, time
+            from pathlib import Path
+            
+            def stop(code):
+                print(code, flush=True)
+                raise SystemExit(1)
+            
+            def probes(user, password):
+                out = []
+                token = base64.b64encode(user + b":" + password).decode("ascii")
+                for name in ("index.html", "V70_macro_latest.json"):
+                    for authenticated in (False, True):
+                        headers = {"Cache-Control": "no-cache"}
+                        if authenticated:
+                            headers["Authorization"] = "Basic " + token
+                        conn = http.client.HTTPSConnection("www.happihelp.com", timeout=7)
+                        try:
+                            conn.request("GET", f"/v70-engineering/{name}?verification={time.time_ns()}", headers=headers)
+                            res = conn.getresponse()
+                            out.append((res.status, res.getheader("WWW-Authenticate", "").lower().startswith("basic ")))
+                        finally:
+                            conn.close()
+                return out
+            
+            def good(out):
+                return all(out[i] == (401, True) and out[i+1][0] == 200 for i in (0, 2))
+            
+            def put(file, data, info, expected):
+                fd, tmp = tempfile.mkstemp(prefix=".v70-verifier-", dir=file.parent)
+                try:
+                    with os.fdopen(fd, "wb") as fp:
+                        st = os.fstat(fp.fileno())
+                        if (st.st_uid, st.st_gid) != (info.st_uid, info.st_gid):
+                            os.fchown(fp.fileno(), info.st_uid, info.st_gid)
+                        os.fchmod(fp.fileno(), stat.S_IMODE(info.st_mode))
+                        fp.write(data)
+                        fp.flush()
+                        os.fsync(fp.fileno())
+                    check = file.lstat()
+                    if not stat.S_ISREG(check.st_mode) or check.st_nlink != 1 or file.read_bytes() != expected:
+                        raise ValueError("concurrent change")
+                    os.replace(tmp, file)
+                finally:
+                    if os.path.exists(tmp):
+                        os.unlink(tmp)
+            
+            def main():
+                user = os.environb.get(b"WEB_USER", b"")
+                password = os.environb.get(b"WEB_PASSWORD", b"")
+                if not re.fullmatch(rb"[A-Za-z0-9_.@+-]{1,255}", user) or not (1 <= len(password) <= 72) or b"\r" in password or b"\n" in password:
+                    stop("SECRET_FORMAT_REVIEW_REQUIRED")
+                root = Path(os.environ["LW_DIR"]).resolve(strict=True)
+                private = root.parent / "v70-engineering-auth"
+                directory = root / "v70-engineering"
+                if root.name != "public_html" or private.is_symlink() or directory.is_symlink():
+                    stop("CONFIG_REVIEW_REQUIRED")
+                config = directory / ".htaccess"
+                file = private / "engineering.htpasswd"
+                if not config.is_file() or config.is_symlink() or not file.is_file() or file.is_symlink():
+                    stop("CONFIG_REVIEW_REQUIRED")
+                lines = config.read_text().splitlines()
+                bindings = [s.split()[1:] for s in lines if s.split() and s.split()[0].lower() == "authuserfile"]
+                if "# Managed V70 engineering login" not in lines or bindings != [[str(file)]]:
+                    stop("CONFIG_REVIEW_REQUIRED")
+                fd = os.open(private, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    info = file.lstat()
+                    if info.st_size > 1048576 or info.st_nlink != 1 or info.st_mode & 0o022:
+                        stop("CONFIG_REVIEW_REQUIRED")
+                    old = file.read_bytes()
+                    record = re.compile(rb"(?m)^" + re.escape(user) + rb":([^\r\n]*)")
+                    matches = list(record.finditer(old))
+                    if len(matches) != 1:
+                        stop("ACCOUNT_REVIEW_REQUIRED")
+                    before = probes(user, password)
+                    if good(before):
+                        print("HTTPS_ALREADY_VERIFIED_NO_CHANGE", flush=True)
+                        return
+                    if before != [(401, True)] * 4:
+                        stop("HTTPS_BASELINE_REVIEW_REQUIRED")
+                    name = ctypes.util.find_library("crypt")
+                    if not name:
+                        stop("HOST_BCRYPT_UNAVAILABLE")
+                    lib = ctypes.CDLL(name)
+                    lib.crypt.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+                    lib.crypt.restype = ctypes.c_char_p
+                    lib.crypt_gensalt.argtypes = [ctypes.c_char_p, ctypes.c_ulong, ctypes.c_char_p, ctypes.c_int]
+                    lib.crypt_gensalt.restype = ctypes.c_char_p
+                    pattern = rb"\$2[aby]\$\d\d\$[./A-Za-z0-9]{53}"
+                    existing = matches[0][1]
+                    if not re.fullmatch(pattern, existing):
+                        stop("HASH_FORMAT_REVIEW_REQUIRED")
+                    actual = lib.crypt(password, existing)
+                    if not actual or not re.fullmatch(pattern, actual):
+                        stop("HOST_BCRYPT_UNAVAILABLE")
+                    if hmac.compare_digest(actual, existing):
+                        stop("HOST_PASSWORD_MATCH_HTTPS_REJECTED_NO_CHANGE")
+                    print("HOST_PASSWORD_MISMATCH_CONFIRMED", flush=True)
+                    raw = os.urandom(16)
+                    salt = lib.crypt_gensalt(b"$2y$", 12, raw, len(raw))
+                    fresh = lib.crypt(password, salt) if salt else None
+                    if not fresh or not re.fullmatch(pattern, fresh) or not hmac.compare_digest(lib.crypt(password, fresh) or b"", fresh):
+                        stop("HOST_BCRYPT_UNAVAILABLE")
+                    start, end = matches[0].span(1)
+                    updated = old[:start] + fresh + old[end:]
+                    rescue, rescue_path = tempfile.mkstemp(prefix=".v70-auth-backup-", dir=private)
+                    with os.fdopen(rescue, "wb") as fp:
+                        fp.write(old)
+                        fp.flush()
+                        os.fsync(fp.fileno())
+                    if Path(rescue_path).read_bytes() != old:
+                        stop("BACKUP_CHECK_FAILED_NO_CHANGE")
+                    print("PRIVATE_BACKUP_VERIFIED", flush=True)
+                    put(file, updated, info, old)
+                    try:
+                        if good(probes(user, password)) and file.read_bytes() == updated:
+                            print("ONE_ACCOUNT_SYNCED_AND_VERIFIED", flush=True)
+                            return
+                        print("ONLINE_VERIFICATION_FAILED", flush=True)
+                    except Exception:
+                        print("ONLINE_VERIFICATION_FAILED", flush=True)
+                    try:
+                        put(file, old, info, updated)
+                        if file.read_bytes() != old:
+                            stop("ROLLBACK_REVIEW_REQUIRED")
+                    except Exception:
+                        stop("ROLLBACK_REVIEW_REQUIRED")
+                    stop("PREVIOUS_VERIFIER_RESTORED")
+                finally:
+                    os.close(fd)
+            
+            if __name__ == "__main__":
+                try:
+                    main()
+                except Exception:
+                    stop("CHECK_STOPPED_REVIEW_REQUIRED")
+            PY
+      - name: Independently verify engineering sign-in and guest denial
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          import base64, http.client, os, time
+          auth = base64.b64encode((os.environ['WEB_USER']+':'+os.environ['WEB_PASSWORD']).encode()).decode()
+          for path in ('index.html','V70_macro_latest.json'):
+              for login in (False, True):
+                  c = http.client.HTTPSConnection('www.happihelp.com', timeout=8)
+                  headers = {'Cache-Control':'no-cache'}
+                  if login:
+                      headers['Authorization'] = 'Basic '+auth
+                  try:
+                      c.request('GET', f'/v70-engineering/{path}?verify={time.time_ns()}', headers=headers)
+                      r = c.getresponse()
+                      ok = r.status == 200 if login else r.status == 401 and r.getheader('WWW-Authenticate','').lower().startswith('basic ')
+                  finally:
+                      c.close()
+                  if not ok:
+                      print('RUNNER_VERIFICATION_REVIEW_REQUIRED')
+                      raise SystemExit(1)
+          print('RUNNER_ENGINEERING_LOGIN_AND_PROTECTION_VERIFIED')
+          PY

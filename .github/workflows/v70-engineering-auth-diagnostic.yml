@@ -35,8 +35,8 @@ jobs:
             rules = root / 'v70-engineering' / '.htaccess'
             assert all(p.is_file() and not p.is_symlink() for p in (verifier, rules))
             assert not private.is_symlink()
-            user = os.environb['WEB_USER']
-            password = os.environb['WEB_PASSWORD']
+            user = os.environb[b'WEB_USER']
+            password = os.environb[b'WEB_PASSWORD']
             assert re.fullmatch(rb'[A-Za-z0-9_.@+-]{1,255}', user)
             matches = re.findall(rb'(?m)^' + re.escape(user) + rb':([^\r\n]*)', verifier.read_bytes())
             assert len(matches) == 1

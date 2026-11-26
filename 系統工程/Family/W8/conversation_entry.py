@@ -89,18 +89,32 @@ class ConversationEntry:
                 number = int(number)
             if payload is not None and not isinstance(payload, dict):
                 raise ValueError("INVALID_MENU_PAYLOAD")
+            confirm_account = number == 3 and (payload or {}).get("action") == "confirm_account"
+            payload_json = encode(payload) if number is not None else None
             with self.db() as db:
                 db.execute("BEGIN IMMEDIATE")
                 item = db.execute("SELECT * FROM work WHERE id=?", (message_id,)).fetchone()
-                if item and number is not None and (item["number"] != number or item["payload"] != encode(payload)):
+                if item and number is not None and (item["number"] != number or item["payload"] != payload_json):
                     raise ValueError("REQUEST_COLLISION")
                 if not item:
                     item = db.execute("SELECT w.* FROM replies r JOIN work w ON w.id=r.work_id WHERE r.id=?",
                                       (message_id,)).fetchone()
+                    if item and confirm_account and (item["number"] != number or item["payload"] != payload_json):
+                        raise ValueError("REQUEST_COLLISION")
                 if not item:
                     item = db.execute("SELECT * FROM work WHERE phase IN ('open','running','writeback')").fetchone()
+                    if confirm_account:
+                        if item and (item["number"] != number or item["payload"] != payload_json):
+                            return {"status": "ANOTHER_REQUEST_PENDING"}
+                        if not item:
+                            prior = db.execute(
+                                "SELECT * FROM work WHERE number=3 AND payload=? AND phase='done' "
+                                "ORDER BY rowid DESC LIMIT 1", (payload_json,)
+                            ).fetchone()
+                            if prior and json.loads(prior["output"]).get("status") == "PERSISTED_REMOTE_VERIFIED":
+                                item = prior
                     if not item and number is not None:
-                        db.execute("INSERT INTO work VALUES(?,?,?,'open',NULL)", (message_id, number, encode(payload)))
+                        db.execute("INSERT INTO work VALUES(?,?,?,'open',NULL)", (message_id, number, payload_json))
                         item = db.execute("SELECT * FROM work WHERE id=?", (message_id,)).fetchone()
                     elif item:
                         db.execute("INSERT INTO replies VALUES(?,?)", (message_id, item["id"]))

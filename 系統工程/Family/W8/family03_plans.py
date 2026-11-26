@@ -597,6 +597,43 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market
     return run
 
 
+def prepare_progress_update(staged, observed, *, file_id, downloaded_id,
+                            downloaded_path, backup_id=None, backup_path=None):
+    """Authorize the original XLSX update using trusted host downloads.
+
+    The host obtains observed by running progress_receipt on downloaded_path.
+    A successful lookup suppresses a repeat upload, even after later answers.
+    """
+    if not file_id or downloaded_id != file_id:
+        raise PermissionError("FAMILY03_PROGRESS_FILE_MISMATCH")
+    downloaded_sha = sha256(Path(downloaded_path).read_bytes()).hexdigest()
+    if (staged.get("status") != "FAMILY03_PROGRESS_WRITEBACK_REQUIRED"
+            or observed.get("唯讀") is not True
+            or (observed.get("本人"), observed.get("檔名"), observed.get("事件識別"))
+            != (staged.get("本人"), staged.get("檔名"), staged.get("事件識別"))
+            or observed.get("revision") != downloaded_sha):
+        raise ValueError("FAMILY03_PROGRESS_READBACK_MISMATCH")
+    if observed["status"] in ("FAMILY03_PROGRESS_EVENT_FOUND", "FAMILY03_PROGRESS_SOURCE_CHANGED"):
+        return observed
+    if (observed["status"] != "FAMILY03_PROGRESS_NOT_SAVED"
+            or downloaded_sha != staged["原檔摘要"]):
+        raise ValueError("FAMILY03_PROGRESS_READBACK_MISMATCH")
+    if backup_id is None and backup_path is None:
+        return {"status": "FAMILY03_PROGRESS_BACKUP_REQUIRED", "file_id": file_id}
+    if not backup_id or backup_id == file_id or backup_path is None:
+        raise ValueError("FAMILY03_PROGRESS_DISTINCT_BACKUP_REQUIRED")
+    if sha256(Path(backup_path).read_bytes()).hexdigest() != downloaded_sha:
+        raise ValueError("FAMILY03_PROGRESS_BACKUP_MISMATCH")
+    candidate = Path(staged["候選檔"])
+    if not candidate.is_absolute() or sha256(candidate.read_bytes()).hexdigest() != staged["新檔摘要"]:
+        raise ValueError("FAMILY03_PROGRESS_CANDIDATE_MISMATCH")
+    return {"status": "FAMILY03_PROGRESS_UPDATE_REQUIRED",
+            "update_file_args": {
+                "fileId": file_id, "file_uri": str(candidate),
+                "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            }}
+
+
 def write(st,q,choice,key,history,revision,snapshot,progress,folder,member,calc):
     event_id=digest([revision,snapshot["source_sha256"],key,choice,st])
     stage={"save":"本人已儲存版本","final":"本人指定最後方案","restore":"從歷史複製"}.get(key,"本人暫選")

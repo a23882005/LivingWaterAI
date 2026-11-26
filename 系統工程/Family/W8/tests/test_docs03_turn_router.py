@@ -1,6 +1,8 @@
 """Exercise Menu 03 continuation across both original journals."""
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
+import sqlite3
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -183,6 +185,58 @@ class Menu03RouterTests(unittest.TestCase):
                 self.land(second)
                 self.assertEqual(self.turn("continue-second", **context)["result"]["file_id"],
                                  second)
+
+    def test_old_explicit_retry_does_not_steal_latest_plain_continue(self):
+        for first, second in (("account", "progress"), ("progress", "account")):
+            with self.subTest(first=first), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                self.turn("first", getattr(self, first), **context)
+                self.land(first)
+                older = self.turn("first-result", **context)
+                self.turn("second", getattr(self, second), **context)
+                self.land(second)
+                latest = self.turn("second-result", **context)
+                self.assertEqual(self.turn("older-new-id", getattr(self, first), **context), older)
+                self.assertEqual(self.turn("fresh-continue", **context), latest)
+                self.assertEqual(self.turn("older-new-id", **context), older)
+                self.observe[first].return_value = None
+                self.observe[second].return_value = None
+
+    def test_partial_schema_without_requests_resumes_through_original_dispatch(self):
+        for first, other in (("account", "progress"), ("progress", "account")):
+            with self.subTest(first=first), TemporaryDirectory() as folder:
+                scope = self.context["project_id"] + ("|03-progress" if first == "progress" else "")
+                context = {"workspace_dir": Path(folder)}
+
+                def interrupted():
+                    _, journal = docs03._journal_directory(
+                        Path(folder), scope, self.context["conversation_id"], create=True)
+                    with closing(sqlite3.connect(journal)) as db, db:
+                        db.execute("CREATE TABLE work (id TEXT PRIMARY KEY, number INTEGER NOT NULL, "
+                                   "payload TEXT NOT NULL, phase TEXT NOT NULL, output TEXT)")
+                    self.assertGreater(journal.stat().st_size, 0)
+                    raise KeyboardInterrupt("after a first schema write")
+
+                with self.assertRaises(KeyboardInterrupt):
+                    self.turn("first", getattr(self, first), before_dispatch=interrupted, **context)
+                self.assertEqual(self.turn("blocked", getattr(self, other), **context)["status"],
+                                 "ANOTHER_REQUEST_PENDING")
+                self.assertEqual(self.turn("continue-first", **context)["status"], "DOCS03_BACKUP_REQUIRED")
+                self.land(first)
+                self.assertEqual(self.turn("continue-readback", **context)["result"]["file_id"], first)
+                self.observe[first].return_value = None
+
+    def test_partial_schema_with_existing_work_stops_both_routes(self):
+        _, journal = docs03._journal_directory(
+            self.context["workspace_dir"], self.context["project_id"],
+            self.context["conversation_id"], create=True)
+        with closing(sqlite3.connect(journal)) as db, db:
+            db.execute("CREATE TABLE work (id TEXT PRIMARY KEY)")
+            db.execute("INSERT INTO work VALUES ('existing-confirmation')")
+        self.assertEqual(self.turn("other-answer", self.progress)["status"],
+                         "DOCS03_JOURNAL_RECOVERY_REQUIRED")
+        self.stage["progress"].assert_not_called()
+        self.stage["account"].assert_not_called()
 
     def test_empty_journal_from_interrupted_creation_does_not_block_replay(self):
         _, journal = docs03._journal_directory(

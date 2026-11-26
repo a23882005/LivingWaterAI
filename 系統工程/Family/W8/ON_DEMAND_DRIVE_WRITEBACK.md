@@ -58,13 +58,15 @@
 
 兩條路共同使用執行端傳入的 `build_original_menu(login, workbook_path, ledger_path)`；以本戶已指定的選單程式及實際下載的兩個檔案建構選單。呼叫共用 `build_project_menu()` 時，把本機帳本交給 `downloaded_db_path`、本機 Excel 交給 `family03_progress_path`，兩個檔案可由下載工具放在不同目錄。候選池、B 表及行情快取維持從帳本本機目錄讀取。舊訪談續答也會提供同一種事件讀回入口。作答帶原選項，整戶確認帶原 03 的 `confirm_account`；下一則「繼續」將 `payload` 留空。這個共用入口負責分流，既有直接呼叫兩個分支的方式仍可沿用。可信識別或固定私人工作區取不到時，會在下載或寫回前停止；對話文字中的識別不能作為輸入來源。
 
-共同入口先在本對話私人工作區保存首次派送的原作答或確認。第一次派送中斷時，「繼續」用原訊息識別及內容接回原待辦。後續要以程式的回應決定下一步。已收到寫回授權的待辦沿原收據或 Excel 事件唯讀查證，不重送更新。
+共同入口先在本對話私人工作區保存首次派送的原作答或確認。第一次派送中斷時，「繼續」用原訊息識別及內容接回原待辦。後續要以程式的回應決定下一步。已收到寫回授權的待辦沿原收據或 Excel 事件唯讀查證，不重送更新。 建立私人紀錄途中若中斷，空白或尚未接收任何待辦的紀錄可由同一筆原訊息接續補建。舊作答或確認的重送只讀原結果。兩條路都完成時，新的「繼續」依原待辦建立順序讀取最近結果。
 
 | 程式回應 | 執行端動作 |
 |---|---|
 | `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 及路徑以 `verified_progress_backup=(id, path)` 或 `verified_account_backup=(id, path)` 接回當筆。 |
 | `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的 Excel 或帳本原 ID 呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
 | `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
+| `DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION` | 無法由原紀錄確認兩條路的先後時，沿原訊息或原作答回查。 |
+| `DOCS03_JOURNAL_RECOVERY_REQUIRED` | 某條路有無法讀取的原紀錄，先核對原對話的私人工作區，兩條路均暫停派送。 |
 | `DOCS03_PREVIEW_STALE` | 原檔在授權送出前已有變更。回到原 03，重新預覽、確認與備份。 |
 | `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同檔的原 Excel 事件或帳本收據，交付保存結果。 |
 

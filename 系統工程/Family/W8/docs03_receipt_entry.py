@@ -149,7 +149,7 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
         ).fetchone()
         if alias:
             message_id = alias[0]
-        active, finished, known = [], [], {}
+        active, finished, known = [], {}, {}
         for kind, (scope, _) in hosts.items():
             _, journal = _journal_directory(workspace_dir, scope, conversation_id, create=False)
             if not journal.exists():
@@ -159,19 +159,29 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             if journal.stat().st_size == 0:
                 # The host may have stopped after creating the file, before creating its schema.
                 continue
-            with closing(sqlite3.connect(journal.as_uri() + "?mode=ro", uri=True)) as work:
-                row = work.execute("SELECT phase FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
-                original = work.execute(
-                    "SELECT phase FROM work WHERE id=? UNION ALL "
-                    "SELECT w.phase FROM replies r JOIN work w ON w.id=r.work_id "
-                    "WHERE r.id=? LIMIT 1", (message_id, message_id)
-                ).fetchone()
-                if original:
-                    known[kind] = original[0]
-            if row and row[0] in ("open", "running", "writeback"):
+            try:
+                with closing(sqlite3.connect(journal.as_uri() + "?mode=ro", uri=True)) as work:
+                    tables = {row[0] for row in work.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'")}
+                    if not tables:
+                        continue  # SQLite was initialized before its first table was created.
+                    row = work.execute("SELECT id, phase FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
+                    if "replies" not in tables and row is None:
+                        continue  # Initialization stopped before it could accept any request.
+                    original = work.execute(
+                        "SELECT phase FROM work WHERE id=? UNION ALL "
+                        "SELECT w.phase FROM replies r JOIN work w ON w.id=r.work_id "
+                        "WHERE r.id=? LIMIT 1", (message_id, message_id)
+                    ).fetchone()
+            except sqlite3.DatabaseError:
+                return {"status": "DOCS03_JOURNAL_RECOVERY_REQUIRED",
+                        "text": "目前讀不到原 03 的續接紀錄，請先核對原對話的私人工作區。"}
+            if original:
+                known[kind] = original[0]
+            if row and row[1] in ("open", "running", "writeback"):
                 active.append(kind)
-            elif row and row[0] == "done":
-                finished.append(kind)
+            elif row and row[1] == "done":
+                finished[kind] = row[0]
         if len(active) > 1:
             return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
         dispatch_id = None
@@ -213,12 +223,17 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 kind = kind or active[0]
             elif kind is None:
                 if len(finished) == 1:
-                    kind = finished[0]
+                    kind = next(iter(finished))
                 elif len(finished) > 1:
-                    last = route.execute("SELECT kind FROM turns ORDER BY rowid DESC LIMIT 1").fetchone()
-                    if last is None:
+                    # Completed replies and historical redeliveries aren't new requests.
+                    order = route.execute(
+                        "SELECT kind FROM turns WHERE (id=? AND kind='account') "
+                        "OR (id=? AND kind='progress') ORDER BY rowid DESC",
+                        (finished["account"], finished["progress"])
+                    ).fetchall()
+                    if len(order) != len(finished):
                         return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
-                    kind = last[0]
+                    kind = order[0][0]
                 else:
                     return {"status": "NO_PENDING_REQUEST"}
             if not interrupted and payload is not None and not active and kind not in known:

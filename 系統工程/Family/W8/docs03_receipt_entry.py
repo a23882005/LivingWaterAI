@@ -186,11 +186,16 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             interrupted = route.execute(
                 "SELECT id, kind, payload FROM interrupted_dispatch WHERE slot=1"
             ).fetchone()
-            completed_replay = previous is not None and known.get(previous) == "done"
-            if interrupted and (message_id == interrupted[0] or not completed_replay):
+            terminal_replay = known.get(previous) in ("done", "closed", "cancelled")
+            if interrupted and (message_id == interrupted[0] or not terminal_replay):
                 original_id, original_kind, saved_payload = interrupted
                 original_payload = json.loads(saved_payload)
-                if payload is not None and (requested != original_kind or payload != original_payload):
+                if message_id != original_id and previous is not None:
+                    return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
+                if payload is not None and (
+                        requested != original_kind
+                        or json.dumps(payload, sort_keys=True, allow_nan=False)
+                        != json.dumps(original_payload, sort_keys=True, allow_nan=False)):
                     if message_id == original_id:
                         raise ValueError("REQUEST_COLLISION")
                     return {"status": "ANOTHER_REQUEST_PENDING"}
@@ -202,8 +207,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 message_id, kind, payload = original_id, original_kind, original_payload
                 dispatch_id = original_id
             elif active:
-                # A known, completed message can only read its stored result.
-                if kind is not None and kind != active[0] and known.get(kind) != "done":
+                # A terminal message can only read its existing result or cancellation.
+                if kind is not None and kind != active[0] and not terminal_replay:
                     return {"status": "ANOTHER_REQUEST_PENDING"}
                 kind = kind or active[0]
             elif kind is None:

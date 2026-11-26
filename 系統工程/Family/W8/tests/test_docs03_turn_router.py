@@ -96,6 +96,34 @@ class Menu03RouterTests(unittest.TestCase):
         self.assertEqual(self.turn("new-answer", self.progress)["status"],
                          "DOCS03_BACKUP_REQUIRED")
 
+    def test_redelivery_of_cancelled_message_leaves_interrupted_work_untouched(self):
+        self.stage["account"].side_effect = ValueError("preview is stale")
+        with self.assertRaisesRegex(ValueError, "preview is stale"):
+            self.turn("old-confirm", self.account)
+
+        def interrupted():
+            raise KeyboardInterrupt("before opening the business journal")
+
+        with self.assertRaises(KeyboardInterrupt):
+            self.turn("new-answer", self.progress, before_dispatch=interrupted)
+        self.assertEqual(self.turn("old-confirm")["status"], "NO_PENDING_REQUEST")
+        self.stage["progress"].assert_not_called()
+        self.assertEqual(self.turn("continue-new")["status"], "DOCS03_BACKUP_REQUIRED")
+        self.stage["progress"].assert_called_once()
+
+    def test_interrupted_redelivery_distinguishes_boolean_and_number(self):
+        original = {**self.account, "owner_confirmed": True}
+
+        def interrupted():
+            raise KeyboardInterrupt("before opening the business journal")
+
+        with self.assertRaises(KeyboardInterrupt):
+            self.turn("original", original, before_dispatch=interrupted)
+        with self.assertRaisesRegex(ValueError, "REQUEST_COLLISION"):
+            self.turn("original", {**original, "owner_confirmed": 1})
+        self.stage["account"].assert_not_called()
+        self.assertEqual(self.turn("continue-original")["status"], "DOCS03_BACKUP_REQUIRED")
+
     def test_invalid_first_dispatch_releases_router_checkpoint(self):
         self.stage["account"].side_effect = ValueError("preview is stale")
         with self.assertRaisesRegex(ValueError, "preview is stale"):

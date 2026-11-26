@@ -1,6 +1,6 @@
 {
   "schema": "V70.3/family-macro-feed-v3",
-  "asOf": "2026-11-25T12:08:01.422972Z",
+  "asOf": "2026-11-26T11:53:49.297015Z",
   "verification": {
     "ready": true,
     "publicationReady": true,
@@ -37,67 +37,67 @@
   },
   "indicators": {
     "m07": {
-      "value": 26.36,
-      "dataDate": "2026-11-24",
+      "value": 28.29,
+      "dataDate": "2026-11-25",
       "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "unit": "",
       "method": "CBOE_OFFICIAL_VIX 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-25T09:43:53.673307+00:00",
+      "lastVerifiedAt": "2026-11-26T09:20:22.518764+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
-              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-24 observed=2026-11-23; try newer source",
-              "attempted_at": "2026-11-25T09:43:53.540253+00:00",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-25 observed=2026-11-24; try newer source",
+              "attempted_at": "2026-11-26T09:20:22.373622+00:00",
               "http_status": 200,
               "content_type": "application/csv",
-              "response_sha256": "549fd346d0f111f1e3d0949f7eb89171e2c4e20684140ede37f397161210c0fe"
+              "response_sha256": "de66008969442eb61aad83cdeb4d238e91d07a5fef3b9ab8d99949db5c354a44"
             },
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-25T09:43:53.673307+00:00",
-              "observation_date": "2026-11-24"
+              "verified_at": "2026-11-26T09:20:22.518764+00:00",
+              "observation_date": "2026-11-25"
             }
           ]
         }
       }
     },
     "m01": {
-      "value": 0.28,
-      "dataDate": "2026-11-24",
+      "value": 0.24,
+      "dataDate": "2026-11-25",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_yield_curve daily CSV",
       "status": "OK",
       "detail": "Matched observation date for nominal 10Y minus 2Y",
-      "lastVerifiedAt": "2026-11-25T09:44:12.819044+00:00",
+      "lastVerifiedAt": "2026-11-26T09:20:41.862617+00:00",
       "sourceEvidence": {
         "series": {
           "TREASURY_m01": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:12.819044+00:00",
-              "observation_date": "2026-11-24"
+              "verified_at": "2026-11-26T09:20:41.862617+00:00",
+              "observation_date": "2026-11-25"
             }
           ]
         },
         "provider": "US_TREASURY_DIRECT",
-        "date": "2026-11-24",
+        "date": "2026-11-25",
         "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-        "nominal_10y": 4.91,
-        "nominal_2y": 4.63,
-        "response_sha256": "1182c534985ede7d731416df2e48b33a0905ba645370f0ea8413a8be86e82c4a"
+        "nominal_10y": 4.85,
+        "nominal_2y": 4.61,
+        "response_sha256": "7d6dcae74563a23ba35e68aa4477e532f13b70b84fd498445243db0238691b15"
       }
     },
     "m08": {
-      "value": 2.79,
-      "dataDate": "2026-11-24",
+      "value": 2.73,
+      "dataDate": "2026-11-25",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury official daily_treasury_real_yield_curve daily CSV",
@@ -107,22 +107,22 @@
       "sourceEvidence": null
     },
     "m02": {
-      "value": 3.63,
-      "dataDate": "2026-11-23",
+      "value": 3.72,
+      "dataDate": "2026-11-24",
       "source": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BAMLH0A0HYM2",
       "unit": "%",
       "method": "FRED_CSV 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-25T09:44:29.974796+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:00.102168+00:00",
       "sourceEvidence": {
         "series": {
           "BAMLH0A0HYM2": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:29.974796+00:00",
-              "observation_date": "2026-11-23"
+              "verified_at": "2026-11-26T09:21:00.102168+00:00",
+              "observation_date": "2026-11-24"
             }
           ]
         }
@@ -136,14 +136,14 @@
       "method": "2026-11-02公布ISM官方10月製造業PMI",
       "status": "OK",
       "detail": "2026-10官方製造業PMI 55.5；前月54.5",
-      "lastVerifiedAt": "2026-11-25T20:07:52+08:00",
+      "lastVerifiedAt": "2026-11-26T19:53:42+08:00",
       "sourceEvidence": {
         "series": {
           "ISM_m04": [
             {
               "provider": "ISM_OFFICIAL_PDF",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:30.878440+00:00",
+              "verified_at": "2026-11-26T09:21:01.197819+00:00",
               "observation_date": "2026-10-01",
               "response_sha256": "e67bf5694457d7837af6f5b1afdf6f56dc58c111560840f50af588bff63f3ade"
             }
@@ -159,7 +159,7 @@
       "method": "CPILFESL 2026-09 / 2025-09 同序列年增率；2026-11-16 指揮官核准沿用",
       "status": "USABLE",
       "detail": "10月同比基期缺失，沿用2026年9月核心CPI年增率 2.565841%；維持原權重。",
-      "lastVerifiedAt": "2026-11-25T12:07:54.377076+00:00",
+      "lastVerifiedAt": "2026-11-26T11:53:43.870357+00:00",
       "carryForward": {
         "policy": "CPI_PREVIOUS_VALID_YOY_OWNER_20261116",
         "observationDate": "2026-09-01",
@@ -176,7 +176,7 @@
           "baseIndex": null,
           "publicationDate": "2026-11-10",
           "nextReleaseAtUtc": "2026-12-10T13:30:00+00:00",
-          "verifiedAtUtc": "2026-11-25T12:07:54.377076+00:00",
+          "verifiedAtUtc": "2026-11-26T11:53:43.870357+00:00",
           "sourceUrl": "https://www.bls.gov/news.release/cpi.htm",
           "seriesUrl": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPILFESL",
           "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
@@ -188,13 +188,13 @@
             "sourceSha256": "8047d83b52b7839d27240ab2b5607bf84b1408baefc60ca61f806098aec3f268",
             "publicationDate": "2026-11-10"
           },
-          "seriesRetrievedAtUtc": "2026-11-25T12:07:54.377076+00:00"
+          "seriesRetrievedAtUtc": "2026-11-26T11:53:43.870357+00:00"
         }
       }
     },
     "m09": {
-      "value": 104.068001,
-      "dataDate": "2026-11-25",
+      "value": 103.734001,
+      "dataDate": "2026-11-26",
       "source": "https://finance.yahoo.com/quote/DX-Y.NYB/",
       "unit": "",
       "method": "yfinance Yahoo Finance DX-Y.NYB 日K Close",
@@ -204,8 +204,8 @@
       "sourceEvidence": null
     },
     "m10": {
-      "value": 81.900002,
-      "dataDate": "2026-11-25",
+      "value": 83.389999,
+      "dataDate": "2026-11-26",
       "source": "https://finance.yahoo.com/quote/CL=F/",
       "unit": "USD/bbl",
       "method": "yfinance Yahoo Finance CL=F 日K Close",
@@ -215,8 +215,8 @@
       "sourceEvidence": null
     },
     "m12": {
-      "value": 98.839996,
-      "dataDate": "2026-11-24",
+      "value": 97.540001,
+      "dataDate": "2026-11-25",
       "source": "https://finance.yahoo.com/quote/%5EMOVE/",
       "unit": "",
       "method": "yfinance Yahoo Finance ^MOVE 日K Close",
@@ -226,22 +226,22 @@
       "sourceEvidence": null
     },
     "m13": {
-      "value": 2.11,
-      "dataDate": "2026-11-24",
+      "value": 2.13,
+      "dataDate": "2026-11-25",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "%",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
       "detail": "5Y nominal minus 5Y TIPS real yield on same day",
-      "lastVerifiedAt": "2026-11-25T09:44:34.077567+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:04.988026+00:00",
       "sourceEvidence": {
         "series": {
           "TREASURY_m13": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:34.077567+00:00",
-              "observation_date": "2026-11-24"
+              "verified_at": "2026-11-26T09:21:04.988026+00:00",
+              "observation_date": "2026-11-25"
             }
           ]
         },
@@ -249,45 +249,45 @@
         "sources": [
           {
             "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-            "response_sha256": "1182c534985ede7d731416df2e48b33a0905ba645370f0ea8413a8be86e82c4a",
-            "retrieved_at": "2026-11-25T09:44:34.077567+00:00",
-            "response_bytes": 18335
+            "response_sha256": "7d6dcae74563a23ba35e68aa4477e532f13b70b84fd498445243db0238691b15",
+            "retrieved_at": "2026-11-26T09:21:04.988026+00:00",
+            "response_bytes": 18416
           },
           {
             "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-            "response_sha256": "dfa5c9f71a03291e3a2f756e6cbd9945a5e7931b0cfa5ce02640a5110e8008b6",
-            "retrieved_at": "2026-11-25T09:44:34.080301+00:00",
-            "response_bytes": 8142
+            "response_sha256": "d2364714a93e328908b52a8f4f8292b547fd44316d373264c7b938f6099c1e6b",
+            "retrieved_at": "2026-11-26T09:21:04.990404+00:00",
+            "response_bytes": 8178
           }
         ],
         "legs": {
           "end": {
-            "date": "2026-11-24",
-            "nominal_5y": 4.69,
-            "real_5y": 2.58,
-            "breakeven": 2.1100000000000003
+            "date": "2026-11-25",
+            "nominal_5y": 4.65,
+            "real_5y": 2.52,
+            "breakeven": 2.1300000000000003
           }
         },
         "same_date_intersection": true
       }
     },
     "m17": {
-      "value": -0.37,
-      "dataDate": "2026-11-24",
+      "value": -0.35,
+      "dataDate": "2026-11-25",
       "source": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv | https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
       "unit": "pp",
       "method": "Treasury derived five-year breakeven; not direct FRED T5YIE",
       "status": "OK",
       "detail": "5Y breakeven change from 2026-10-23",
-      "lastVerifiedAt": "2026-11-25T09:44:34.077567+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:04.988026+00:00",
       "sourceEvidence": {
         "series": {
           "TREASURY_m17": [
             {
               "provider": "US_TREASURY_DIRECT",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:34.077567+00:00",
-              "observation_date": "2026-11-24"
+              "verified_at": "2026-11-26T09:21:04.988026+00:00",
+              "observation_date": "2026-11-25"
             }
           ]
         },
@@ -295,23 +295,23 @@
         "sources": [
           {
             "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-            "response_sha256": "1182c534985ede7d731416df2e48b33a0905ba645370f0ea8413a8be86e82c4a",
-            "retrieved_at": "2026-11-25T09:44:34.077567+00:00",
-            "response_bytes": 18335
+            "response_sha256": "7d6dcae74563a23ba35e68aa4477e532f13b70b84fd498445243db0238691b15",
+            "retrieved_at": "2026-11-26T09:21:04.988026+00:00",
+            "response_bytes": 18416
           },
           {
             "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_real_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-            "response_sha256": "dfa5c9f71a03291e3a2f756e6cbd9945a5e7931b0cfa5ce02640a5110e8008b6",
-            "retrieved_at": "2026-11-25T09:44:34.080301+00:00",
-            "response_bytes": 8142
+            "response_sha256": "d2364714a93e328908b52a8f4f8292b547fd44316d373264c7b938f6099c1e6b",
+            "retrieved_at": "2026-11-26T09:21:04.990404+00:00",
+            "response_bytes": 8178
           }
         ],
         "legs": {
           "end": {
-            "date": "2026-11-24",
-            "nominal_5y": 4.69,
-            "real_5y": 2.58,
-            "breakeven": 2.1100000000000003
+            "date": "2026-11-25",
+            "nominal_5y": 4.65,
+            "real_5y": 2.52,
+            "breakeven": 2.1300000000000003
           },
           "begin": {
             "date": "2026-10-23",
@@ -331,7 +331,7 @@
       "method": "Official Fed H41 Wednesday levels + NYFed Treasury ON RRP; original 91-day and holiday rules",
       "status": "OK",
       "detail": "Official publishers direct; USD bn; begin=2026-08-19, end=2026-11-18",
-      "lastVerifiedAt": "2026-11-25T09:44:34.218514+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:05.122578+00:00",
       "sourceEvidence": {
         "series": {
           "NETLIQ_DIRECT": [
@@ -339,7 +339,7 @@
               "provider": "FED_NYFED_DIRECT",
               "result": "OK",
               "observation_date": "2026-11-18",
-              "verified_at": "2026-11-25T09:44:34.218514+00:00"
+              "verified_at": "2026-11-26T09:21:05.122578+00:00"
             }
           ]
         },
@@ -389,25 +389,25 @@
           "sources": [
             {
               "url": "https://www.federalreserve.gov/releases/h41/data/FRB_h41_xml.zip",
-              "retrieved_at": "2026-11-25T09:44:34.218514+00:00",
+              "retrieved_at": "2026-11-26T09:21:05.122578+00:00",
               "response_sha256": "df8d6303f5fcab7a8e618b6e8bb56effbf727e068fe007b07ceb61e96515a125",
               "response_bytes": 9113202
             },
             {
               "url": "https://www.newyorkfed.org/aboutthefed/holiday_schedule.html",
-              "retrieved_at": "2026-11-25T09:44:38.669564+00:00",
-              "response_sha256": "76641dc2273452042b99ccf9fd030d9458dcc71f681d75fa740a0f2094ca81b1",
-              "response_bytes": 105265
+              "retrieved_at": "2026-11-26T09:21:09.235704+00:00",
+              "response_sha256": "5ea1272bad9e5d6077fe47198017ed73a9c49785f9a6b09c1e4068c0b0e12309",
+              "response_bytes": 105274
             },
             {
               "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-08-19&endDate=2026-08-19",
-              "retrieved_at": "2026-11-25T09:44:38.935208+00:00",
+              "retrieved_at": "2026-11-26T09:21:09.530695+00:00",
               "response_sha256": "0ff2ffa58295fa705c4f10b89acab2c755bb4783172d777847f05fb5f0fd50b4",
               "response_bytes": 2449
             },
             {
               "url": "https://markets.newyorkfed.org/api/rp/results/search.json?startDate=2026-11-18&endDate=2026-11-18",
-              "retrieved_at": "2026-11-25T09:44:39.808858+00:00",
+              "retrieved_at": "2026-11-26T09:21:10.362691+00:00",
               "response_sha256": "41ee4114bebe3aeee0c2d7a7754c3946153a50383f7ed7a8fe07f1e874b1ffbd",
               "response_bytes": 2186
             }
@@ -426,31 +426,31 @@
       "method": "ISM services headline via original approved Trading Economics parser",
       "status": "OK",
       "detail": "Original official source unavailable; sector, current target month and dated release verified",
-      "lastVerifiedAt": "2026-11-25T09:44:40.430162+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:11.071326+00:00",
       "sourceEvidence": {
         "series": {
           "ISM_m15": [
             {
               "provider": "ISM_OFFICIAL",
               "result": "FAILED",
-              "attempted_at": "2026-11-25T09:44:40.350104+00:00",
+              "attempted_at": "2026-11-26T09:21:10.950567+00:00",
               "error": "ISM report date or sector headline mismatch"
             },
             {
               "provider": "ISM_TRADINGECONOMICS",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:40.430162+00:00",
+              "verified_at": "2026-11-26T09:21:11.071326+00:00",
               "observation_date": "2026-10-01",
               "publication_date": "2026-11-04",
-              "response_sha256": "ce64c84ae6d8d0ebac3ea38b7339816bcbaa06fe7de272ecbf2bc58706be57b1",
+              "response_sha256": "3a29f5235283fc6ae4e9c368d106270ebf46a165bd9e11b26aeefa6b1d9244b0",
               "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi"
             }
           ]
         },
         "provider": "ISM_TRADINGECONOMICS",
         "source_url": "https://tradingeconomics.com/united-states/non-manufacturing-pmi",
-        "response_sha256": "ce64c84ae6d8d0ebac3ea38b7339816bcbaa06fe7de272ecbf2bc58706be57b1",
-        "verified_at": "2026-11-25T09:44:40.430162+00:00",
+        "response_sha256": "3a29f5235283fc6ae4e9c368d106270ebf46a165bd9e11b26aeefa6b1d9244b0",
+        "verified_at": "2026-11-26T09:21:11.071326+00:00",
         "observation_period": "2026-10",
         "observation_date_normalization": "MONTH_START_OF_STATED_REFERENCE_MONTH",
         "headline_excerpt": "The ISM Services PMI decreased to 54.5 in October 2026, the lowest in three months, compared to 54.9",
@@ -481,14 +481,14 @@
       "method": "Official FRED Sahm Rule Recession Indicator (real-time vintage), published series",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-25T09:44:44.553060+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:15.273167+00:00",
       "sourceEvidence": {
         "series": {
           "SAHMREALTIME": [
             {
               "provider": "FRED_CSV",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:44.553060+00:00",
+              "verified_at": "2026-11-26T09:21:15.273167+00:00",
               "observation_date": "2026-10-01"
             }
           ]
@@ -503,18 +503,18 @@
       "method": "BLS_OFFICIAL_API 官方或鏡像時間序列",
       "status": "OK",
       "detail": "",
-      "lastVerifiedAt": "2026-11-25T09:44:45.661531+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:16.356069+00:00",
       "sourceEvidence": {
         "series": {
           "UNRATE": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:45.661531+00:00",
+              "verified_at": "2026-11-26T09:21:16.356069+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000",
               "series_id": "LNS14000000",
-              "response_sha256": "f4828ce3db4766290975ed17bca5254fe0f047da09dfc5f7335b48387b72450b",
+              "response_sha256": "f72fea5b254d89237936fa1d0e43cf088a564114ae7ee57858510b03a13f0ee5",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
@@ -529,18 +529,18 @@
       "method": "BLS/FRED 非農就業存量，近3個月月增平均，單位千人",
       "status": "OK",
       "detail": "注意歷史值可能修訂",
-      "lastVerifiedAt": "2026-11-25T09:44:46.635938+00:00",
+      "lastVerifiedAt": "2026-11-26T09:21:17.357937+00:00",
       "sourceEvidence": {
         "series": {
           "PAYEMS": [
             {
               "provider": "BLS_OFFICIAL_API",
               "result": "OK",
-              "verified_at": "2026-11-25T09:44:46.635938+00:00",
+              "verified_at": "2026-11-26T09:21:17.357937+00:00",
               "observation_date": "2026-10-01",
               "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/CES0000000001",
               "series_id": "CES0000000001",
-              "response_sha256": "4b1f9209c34366944558944637c143bfa4df582f1409bddf4e45db51f9663a2d",
+              "response_sha256": "1a60bc8c0d0c486fc13b37ed1bdaf2dcf1096c292c20d85db368d1b8fd8d9e94",
               "source_attribution": "Source: U.S. Bureau of Labor Statistics"
             }
           ]
@@ -548,39 +548,39 @@
       }
     },
     "s03": {
-      "value": 26.36,
-      "dataDate": "2026-11-24",
+      "value": 28.29,
+      "dataDate": "2026-11-25",
       "source": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
       "unit": "",
       "method": "與 m07 同步",
       "status": "OK",
       "detail": "同一 VIX 數列",
-      "lastVerifiedAt": "2026-11-25T09:43:53.673307+00:00",
+      "lastVerifiedAt": "2026-11-26T09:20:22.518764+00:00",
       "sourceEvidence": {
         "series": {
           "VIXCLS": [
             {
               "provider": "FRED_CSV",
               "result": "FAILED",
-              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-24 observed=2026-11-23; try newer source",
-              "attempted_at": "2026-11-25T09:43:53.540253+00:00",
+              "error": "FRED_CSV: ValueError: VIX_LAGGED_SESSION: expected=2026-11-25 observed=2026-11-24; try newer source",
+              "attempted_at": "2026-11-26T09:20:22.373622+00:00",
               "http_status": 200,
               "content_type": "application/csv",
-              "response_sha256": "549fd346d0f111f1e3d0949f7eb89171e2c4e20684140ede37f397161210c0fe"
+              "response_sha256": "de66008969442eb61aad83cdeb4d238e91d07a5fef3b9ab8d99949db5c354a44"
             },
             {
               "provider": "CBOE_OFFICIAL_VIX",
               "result": "OK",
-              "verified_at": "2026-11-25T09:43:53.673307+00:00",
-              "observation_date": "2026-11-24"
+              "verified_at": "2026-11-26T09:20:22.518764+00:00",
+              "observation_date": "2026-11-25"
             }
           ]
         }
       }
     },
     "s04": {
-      "value": 15.678119,
-      "dataDate": "2026-11-25",
+      "value": 14.996745,
+      "dataDate": "2026-11-26",
       "source": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
       "unit": "",
       "method": "CNN 非官方可讀 JSON（可能變動）",
@@ -596,7 +596,7 @@
       "unit": "%",
       "method": "Federal Reserve官方政策頁現行目標區間3.75%–4.00%之算術中點；並以FRED/ALFRED 2026-11-06每日序列交叉核對；未使用有效聯邦基金利率",
       "status": "OK",
-      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=636058eafdc7ee81762ba484dae34c092562dcdf06c3d8049da0ce813a9aed06，稽核檔data/audit/fed_target_evidence_20261125T120752Z.html.gz",
+      "detail": "Fed官方當期目標3.75–4.00%，真實HTTP原文SHA256=861093998165949a843e17f770ad35b3e10f30d52cb04d03afcd03512bcafd6d，稽核檔data/audit/fed_target_evidence_20261126T115342Z.html.gz",
       "policySchema": "fed-target-evidence-v1",
       "effectiveDate": "2026-09-17",
       "lowerBound": {
@@ -607,13 +607,13 @@
         "value": 4,
         "effective_date": "2026-09-17"
       },
-      "lastVerifiedAt": "2026-11-25T20:07:52+08:00",
+      "lastVerifiedAt": "2026-11-26T19:53:42+08:00",
       "sourceEvidence": {
         "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
-        "checked_at": "2026-11-25T20:07:52+08:00",
+        "checked_at": "2026-11-26T19:53:42+08:00",
         "result": "CURRENT_CONFIRMED",
         "excerpt": "2026 official current target: September 17 3.75-4.00; original response archived",
-        "response_sha256": "636058eafdc7ee81762ba484dae34c092562dcdf06c3d8049da0ce813a9aed06",
+        "response_sha256": "861093998165949a843e17f770ad35b3e10f30d52cb04d03afcd03512bcafd6d",
         "effective_date": "2026-09-17",
         "publication_date": "2026-09-16",
         "lower_bound": {
@@ -632,7 +632,7 @@
           "url": "https://www.federalreserve.gov/monetarypolicy/openmarket.htm",
           "metric_or_horizon": "Fed目前目標利率區間中點",
           "status": "FOUND",
-          "checked_at": "2026-11-25T20:07:52+08:00",
+          "checked_at": "2026-11-26T19:53:42+08:00",
           "value": "3.75-4.00",
           "unit": "%",
           "observation_date": "2026-09-17",
@@ -672,7 +672,7 @@
           "notes": "本輪HTTP 200；SHA256=e5f9963bccefed723cee454f775d80722e5e48fdfa41180cdb2a0c6fa320d0ab；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-25T20:07:52+08:00",
+      "retrievalTime": "2026-11-26T19:53:42+08:00",
       "publicationDate": "2026-09-16",
       "vintage": "current target range effective 2026-09-17; maintained by FOMC 2026-10-28; FRED/ALFRED corroboration through 2026-11-10"
     },
@@ -881,13 +881,13 @@
       "vintage": "BEA 2026-10-29 / CBO 2026-02"
     },
     "s05": {
-      "value": 35.74,
-      "dataDate": "2026-11-24",
+      "value": 33.36,
+      "dataDate": "2026-11-25",
       "source": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
       "unit": "%",
       "method": "EODData INDEX/MMFI：NYSE 50日廣度之最近完整交易日收盤",
       "status": "USABLE",
-      "detail": "INDEX/MMFI 日期2026-11-24收盤35.74%，採EOD收盤非盤中LAST；來源SHA256=393c721a988f93babb2073d6b49947a00a927497edd4c028d6eaaa1471246051",
+      "detail": "INDEX/MMFI 日期2026-11-25收盤33.36%，採EOD收盤非盤中LAST；來源SHA256=d77538eb6a3a8953f21e1dc4f5bc4be1ff5618e3fef8443a0cf735ca788b69b4",
       "lastVerifiedAt": "2026-11-18T13:42:13.485930+00:00",
       "candidateChecks": [
         {
@@ -895,11 +895,11 @@
           "url": "https://www.eoddata.com/stockquote/INDEX/MMFI.htm",
           "metric_or_horizon": "NYSE全市場站上50日移動平均線股票百分比（$MMFI）",
           "status": "FOUND",
-          "checked_at": "2026-11-25T20:07:52+08:00",
-          "value": 35.74,
+          "checked_at": "2026-11-26T19:53:42+08:00",
+          "value": 33.36,
           "unit": "%",
-          "observation_date": "2026-11-24",
-          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=393c721a988f93babb2073d6b49947a00a927497edd4c028d6eaaa1471246051"
+          "observation_date": "2026-11-25",
+          "notes": "INDEX/MMFI End-of-Day OHLC 的 Close，非盤中Last；SHA256=d77538eb6a3a8953f21e1dc4f5bc4be1ff5618e3fef8443a0cf735ca788b69b4"
         },
         {
           "site": "Macroaxis",
@@ -935,22 +935,22 @@
           "notes": "本輪HTTP 200；SHA256=941837da48d69f05a49bfdbbf46a9e0c7cbd3d6e99ee19518482775d0251ae9c；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-25T20:07:52+08:00",
-      "publicationDate": "2026-11-24",
+      "retrievalTime": "2026-11-26T19:53:42+08:00",
+      "publicationDate": "2026-11-25",
       "vintage": "EODData INDEX/MMFI retrieved 2026-11-11; observation 2026-11-10"
     },
     "m03_qqq": {
-      "value": 17.93,
-      "dataDate": "2026-11-24",
+      "value": 17.64,
+      "dataDate": "2026-11-25",
       "source": "https://stockanalysis.com/etf/qqq/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "QQQ Forward PE 17.93，頁面資料日2026-11-24",
-      "lastVerifiedAt": "2026-11-25T20:07:52+08:00",
+      "detail": "QQQ Forward PE 17.64，頁面資料日2026-11-25",
+      "lastVerifiedAt": "2026-11-26T19:53:42+08:00",
       "sourceEvidence": {
         "label": "QQQ未來12個月Forward P/E",
-        "value": 17.93,
+        "value": 17.64,
         "source_url": "https://stockanalysis.com/etf/qqq/"
       },
       "candidateChecks": [
@@ -959,10 +959,10 @@
           "url": "https://stockanalysis.com/etf/qqq/",
           "metric_or_horizon": "QQQ未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-25T20:07:52+08:00",
-          "value": 17.93,
+          "checked_at": "2026-11-26T19:53:42+08:00",
+          "value": 17.64,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-24",
+          "observation_date": "2026-11-25",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         },
         {
@@ -999,22 +999,22 @@
           "notes": "本輪HTTP 200；SHA256=6ed4dba4af744f2bc279f129fad22a32e8ed3786e27a6bb2201e264c04cebef7；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-25T20:07:52+08:00",
-      "publicationDate": "2026-11-24",
+      "retrievalTime": "2026-11-26T19:53:42+08:00",
+      "publicationDate": "2026-11-25",
       "vintage": "Forward PE page observation 2026-11-17"
     },
     "m03_spy": {
-      "value": 17.61,
-      "dataDate": "2026-11-24",
+      "value": 17.64,
+      "dataDate": "2026-11-25",
       "source": "https://stockanalysis.com/etf/spy/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "SPY Forward PE 17.61，頁面資料日2026-11-24",
-      "lastVerifiedAt": "2026-11-25T20:07:52+08:00",
+      "detail": "SPY Forward PE 17.64，頁面資料日2026-11-25",
+      "lastVerifiedAt": "2026-11-26T19:53:42+08:00",
       "sourceEvidence": {
         "label": "SPY未來12個月Forward P/E",
-        "value": 17.61,
+        "value": 17.64,
         "source_url": "https://stockanalysis.com/etf/spy/"
       },
       "candidateChecks": [
@@ -1023,10 +1023,10 @@
           "url": "https://stockanalysis.com/etf/spy/",
           "metric_or_horizon": "SPY未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-25T20:07:52+08:00",
-          "value": 17.61,
+          "checked_at": "2026-11-26T19:53:42+08:00",
+          "value": 17.64,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-24",
+          "observation_date": "2026-11-25",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         },
         {
@@ -1063,22 +1063,22 @@
           "notes": "本輪HTTP 200；SHA256=39047e78d02ee7204e275a5294d71eecc48b20d590d4efbeec50c410376a3e59；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-25T20:07:52+08:00",
-      "publicationDate": "2026-11-24",
+      "retrievalTime": "2026-11-26T19:53:42+08:00",
+      "publicationDate": "2026-11-25",
       "vintage": "Forward PE page observation 2026-11-17"
     },
     "m03_vt": {
-      "value": 14.36,
-      "dataDate": "2026-11-24",
+      "value": 14.11,
+      "dataDate": "2026-11-25",
       "source": "https://stockanalysis.com/etf/vt/",
       "unit": "倍 Forward",
       "method": "StockAnalysis明示Forward PE，採未來預估口徑",
       "status": "OK",
-      "detail": "VT Forward PE 14.36，頁面資料日2026-11-24",
-      "lastVerifiedAt": "2026-11-25T20:07:52+08:00",
+      "detail": "VT Forward PE 14.11，頁面資料日2026-11-25",
+      "lastVerifiedAt": "2026-11-26T19:53:42+08:00",
       "sourceEvidence": {
         "label": "VT未來12個月Forward P/E",
-        "value": 14.36,
+        "value": 14.11,
         "source_url": "https://stockanalysis.com/etf/vt/"
       },
       "candidateChecks": [
@@ -1087,10 +1087,10 @@
           "url": "https://stockanalysis.com/etf/vt/",
           "metric_or_horizon": "VT未來12個月Forward P/E",
           "status": "FOUND",
-          "checked_at": "2026-11-25T20:07:52+08:00",
-          "value": 14.36,
+          "checked_at": "2026-11-26T19:53:42+08:00",
+          "value": 14.11,
           "unit": "倍 Forward",
-          "observation_date": "2026-11-24",
+          "observation_date": "2026-11-25",
           "notes": "真實網頁明示Forward PE；TTM未採用"
         },
         {
@@ -1127,8 +1127,8 @@
           "notes": "本輪HTTP 200；SHA256=a4876b2881ef75d3a3bf1057fb5dfe7e0f3782162abf7779712342e27928916a；未取得可取代正式來源的同定義、單位、觀測期與vintage數值，未採值"
         }
       ],
-      "retrievalTime": "2026-11-25T20:07:52+08:00",
-      "publicationDate": "2026-11-24",
+      "retrievalTime": "2026-11-26T19:53:42+08:00",
+      "publicationDate": "2026-11-25",
       "vintage": "Forward PE page observation 2026-11-17"
     },
     "m06": {
@@ -1152,7 +1152,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-25T09:44:41.594745+00:00"
+      "retrieved_at": "2026-11-26T09:21:12.274034+00:00"
     },
     {
       "observation_date": "2026-08-01",
@@ -1163,7 +1163,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-25T09:44:42.555423+00:00"
+      "retrieved_at": "2026-11-26T09:21:13.359825+00:00"
     },
     {
       "observation_date": "2026-09-01",
@@ -1174,7 +1174,7 @@
       "status": "OK",
       "method": "Read explicitly stated LEI year-over-year growth from PNC research PDF",
       "detail": "As-published monthly YoY; monthly reports have different release vintages, not a same-vintage historical series",
-      "retrieved_at": "2026-11-25T09:44:43.558105+00:00"
+      "retrieved_at": "2026-11-26T09:21:14.196811+00:00"
     }
   ],
   "monthlyReleaseCalendar": {
@@ -1205,15 +1205,15 @@
             "url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
             "final_url": "https://www.prnewswire.com/news-releases/services-pmi-at-54-5-october-2026-ism-services-pmi-report-302928112.html",
             "http_status": 200,
-            "fetched_at_utc": "2026-11-25T12:07:54.471595+00:00",
-            "response_sha256": "bd92d7b644bfaa73fcc22da3110e8bf424bf86ff6c76abb3a6f46e87d757feb8",
+            "fetched_at_utc": "2026-11-26T11:53:43.973654+00:00",
+            "response_sha256": "1a3e8715789ad1cf7c7b197798d7f2cb818f035c4f3ab263531c2a8d5794fed0",
             "response_bytes": 273323,
-            "archive_path": "data/audit/monthly_calendar_facts_aa6998df94b5a9d6aa3972b13f52bf8e8fdd772227362f0ad02237aaa5484bb6.json",
+            "archive_path": "data/audit/monthly_calendar_facts_c8fe9e956fcda8201430d85047ddfbe405d9112ab41c8a342fff596ca4ee7f8d.json",
             "archive_kind": "EXTRACTED_CALENDAR_FACTS_JSON",
-            "archive_sha256": "aa6998df94b5a9d6aa3972b13f52bf8e8fdd772227362f0ad02237aaa5484bb6"
+            "archive_sha256": "c8fe9e956fcda8201430d85047ddfbe405d9112ab41c8a342fff596ca4ee7f8d"
           }
         ],
-        "last_verified_at_utc": "2026-11-25T12:07:54.471595+00:00"
+        "last_verified_at_utc": "2026-11-26T11:53:43.973654+00:00"
       },
       "m18": {
         "observation_month": "2026-10",
@@ -1411,13 +1411,13 @@
       "independentIndicator": false
     }
   },
-  "dataUpdatedAt": "2026-11-25T20:08:01+08:00",
+  "dataUpdatedAt": "2026-11-26T19:53:49+08:00",
   "sourceSnapshot": {
-    "macro18": "a96ec917f83321dd1af7ba606fe6e11c9afe0491",
-    "macro8": "1ae7e20382d065c1a8777c7f5de0cf3b72648432",
-    "officialReleaseCalendar": "e9e49d0cfbdd3b0796b44e1f86b8c0a09ed9e565",
+    "macro18": "576c97277091037ad4c4de02942f11817d467458",
+    "macro8": "70875ae101059a82cfd9f0e70f9d7755f810cba8",
+    "officialReleaseCalendar": "083cf0f8070844495528329dfc197f895c9f7b32",
     "wallstreet5": "df5ab4b3384826fcf0200476aa6627f883cf867e",
-    "macro18GeneratedAt": "2026-11-25T17:44:46.754627+08:00",
-    "macro8GeneratedAt": "2026-11-25T20:07:52+08:00"
+    "macro18GeneratedAt": "2026-11-26T17:21:17.477135+08:00",
+    "macro8GeneratedAt": "2026-11-26T19:53:42+08:00"
   }
 }

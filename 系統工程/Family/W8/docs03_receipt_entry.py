@@ -1,8 +1,12 @@
 """Use the original Docs login for the 03 write and receipt journal."""
+from contextlib import closing
+import fcntl
 from hashlib import sha256
 from importlib.util import module_from_spec, spec_from_file_location
 import json
+import os
 from pathlib import Path
+import sqlite3
 
 
 def _load_module(name):
@@ -98,6 +102,83 @@ def _is_progress_write(payload):
     return (set(payload) == {"revision", "question_id", "key", "reply"}
             or (payload.get("action") == "restore"
                 and set(payload) == {"action", "version", "slot", "revision"}))
+
+
+def run_project_docs03_turn(*, auth, document_id, document, project_id,
+                            conversation_id, workspace_dir, message_id,
+                            account_turn, progress_turn, payload=None):
+    """Route 03 confirmation, answers and plain continue to their original journal.
+
+    Each trusted callback accepts (message_id, payload) and uses the same
+    household, project, conversation and workspace passed to this router.
+    """
+    if not isinstance(message_id, str) or not message_id.strip() or len(message_id) > 256:
+        raise ValueError("STABLE_MESSAGE_ID_REQUIRED")
+    if payload is None:
+        requested = None
+    elif isinstance(payload, dict) and payload.get("action") == "confirm_account":
+        requested = "account"
+    elif isinstance(payload, dict) and _is_progress_write(payload):
+        requested = "progress"
+    else:
+        raise ValueError("DOCS03_CONFIRMATION_PAYLOAD_REQUIRED")
+    if not isinstance(project_id, str) or not project_id.strip():
+        raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
+    _Docs03Session(auth, document_id).check(document)
+    hosts = {"account": (project_id, account_turn),
+             "progress": (project_id + "|03-progress", progress_turn)}
+    directory, routes = _journal_directory(
+        workspace_dir, project_id + "|03-router", conversation_id, create=True)
+    if routes.is_symlink():
+        raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
+    lock_path = directory / "turn.lock"
+    with os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        active, finished, known = [], [], []
+        for kind, (scope, _) in hosts.items():
+            _, journal = _journal_directory(workspace_dir, scope, conversation_id, create=False)
+            if not journal.exists():
+                continue
+            if journal.is_symlink():
+                raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
+            with closing(sqlite3.connect(journal.as_uri() + "?mode=ro", uri=True)) as work:
+                row = work.execute("SELECT phase FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
+                if work.execute(
+                    "SELECT 1 FROM work WHERE id=? UNION ALL "
+                    "SELECT 1 FROM replies WHERE id=? LIMIT 1", (message_id, message_id)
+                ).fetchone():
+                    known.append(kind)
+            if row and row[0] in ("open", "running", "writeback"):
+                active.append(kind)
+            elif row and row[0] == "done":
+                finished.append(kind)
+        if len(active) > 1:
+            return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
+        with closing(sqlite3.connect(routes)) as route, route:
+            route.execute("CREATE TABLE IF NOT EXISTS turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL)")
+            prior = route.execute("SELECT kind FROM turns WHERE id=?", (message_id,)).fetchone()
+            if len(known) > 1:
+                return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
+            previous = prior[0] if prior else (known[0] if known else None)
+            if previous is not None and requested is not None and previous != requested:
+                raise ValueError("REQUEST_COLLISION")
+            kind = previous or requested
+            if active:
+                if kind is not None and kind != active[0]:
+                    return {"status": "ANOTHER_REQUEST_PENDING"}
+                kind = active[0]
+            elif kind is None:
+                if len(finished) == 1:
+                    kind = finished[0]
+                elif len(finished) > 1:
+                    last = route.execute("SELECT kind FROM turns ORDER BY rowid DESC LIMIT 1").fetchone()
+                    if last is None:
+                        return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
+                    kind = last[0]
+                else:
+                    return {"status": "NO_PENDING_REQUEST"}
+            route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
+        return hosts[kind][1](message_id, payload)
 
 
 def run_project_docs03_progress(*, auth, document_id, document, project_id,

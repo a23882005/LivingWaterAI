@@ -283,6 +283,11 @@ class ConversationEntry:
             submission = self.prepare_writeback(staged["result"])
             if isinstance(submission, dict) and submission["status"] == "DOCS03_BACKUP_REQUIRED":
                 return submission
+            if isinstance(submission, dict) and submission["status"] == "DOCS03_PREVIEW_STALE":
+                with self.db() as db:
+                    db.execute("UPDATE work SET phase='done',output=? WHERE id=? AND phase='writeback'",
+                               (encode(submission), key))
+                return submission
             # A crash or ambiguous connector response after this point must
             # recover by reading the original receipt, never by resubmitting.
             staged = {**staged, "_managed_writeback": "attempted"}

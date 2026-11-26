@@ -134,20 +134,25 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
     lock_path = directory / "turn.lock"
     with os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600), "a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        active, finished, known = [], [], []
+        active, finished, known = [], [], {}
         for kind, (scope, _) in hosts.items():
             _, journal = _journal_directory(workspace_dir, scope, conversation_id, create=False)
             if not journal.exists():
                 continue
             if journal.is_symlink():
                 raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
+            if journal.stat().st_size == 0:
+                # The host may have stopped after creating the file, before creating its schema.
+                continue
             with closing(sqlite3.connect(journal.as_uri() + "?mode=ro", uri=True)) as work:
                 row = work.execute("SELECT phase FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
-                if work.execute(
-                    "SELECT 1 FROM work WHERE id=? UNION ALL "
-                    "SELECT 1 FROM replies WHERE id=? LIMIT 1", (message_id, message_id)
-                ).fetchone():
-                    known.append(kind)
+                original = work.execute(
+                    "SELECT phase FROM work WHERE id=? UNION ALL "
+                    "SELECT w.phase FROM replies r JOIN work w ON w.id=r.work_id "
+                    "WHERE r.id=? LIMIT 1", (message_id, message_id)
+                ).fetchone()
+                if original:
+                    known[kind] = original[0]
             if row and row[0] in ("open", "running", "writeback"):
                 active.append(kind)
             elif row and row[0] == "done":
@@ -159,14 +164,15 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             prior = route.execute("SELECT kind FROM turns WHERE id=?", (message_id,)).fetchone()
             if len(known) > 1:
                 return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
-            previous = prior[0] if prior else (known[0] if known else None)
+            previous = prior[0] if prior else next(iter(known), None)
             if previous is not None and requested is not None and previous != requested:
                 raise ValueError("REQUEST_COLLISION")
             kind = previous or requested
             if active:
-                if kind is not None and kind != active[0]:
+                # A known, completed message can only read its stored result.
+                if kind is not None and kind != active[0] and known.get(kind) != "done":
                     return {"status": "ANOTHER_REQUEST_PENDING"}
-                kind = active[0]
+                kind = kind or active[0]
             elif kind is None:
                 if len(finished) == 1:
                     kind = finished[0]

@@ -78,6 +78,41 @@ class Menu03RouterTests(unittest.TestCase):
         for stage in self.stage.values():
             stage.assert_called_once()
 
+    def test_original_receipt_stays_readable_with_other_action_pending(self):
+        for first, second in (("account", "progress"), ("progress", "account")):
+            with self.subTest(first=first), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                self.observe[first].return_value = None
+                self.observe[second].return_value = None
+                self.assertEqual(self.turn("first", getattr(self, first), **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                self.land(first)
+                receipt = self.turn("first-reply", **context)
+                self.assertEqual(receipt["result"]["file_id"], first)
+                self.assertEqual(self.turn("second", getattr(self, second), **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                calls = self.stage[first].call_count, self.stage[second].call_count
+                self.assertEqual(self.turn("first", getattr(self, first), **context), receipt)
+                self.assertEqual(self.turn("first-reply", **context), receipt)
+                changed = {**getattr(self, first), "revision": "different"}
+                with self.assertRaisesRegex(ValueError, "REQUEST_COLLISION"):
+                    self.turn("first", changed, **context)
+                self.assertEqual((self.stage[first].call_count, self.stage[second].call_count), calls)
+                self.land(second)
+                self.assertEqual(self.turn("continue-second", **context)["result"]["file_id"],
+                                 second)
+
+    def test_empty_journal_from_interrupted_creation_does_not_block_replay(self):
+        _, journal = docs03._journal_directory(
+            self.context["workspace_dir"], self.context["project_id"] + "|03-progress",
+            self.context["conversation_id"], create=True)
+        journal.touch(mode=0o600)
+        self.assertEqual(self.turn("interrupted-answer", self.progress)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+        self.land("progress")
+        self.assertEqual(self.turn("continue-answer")["result"]["file_id"], "progress")
+        self.stage["progress"].assert_called_once()
+
     def test_plain_continue_recovers_an_existing_journal(self):
         self.original("account", "old-confirm", self.account)
         self.land("account")

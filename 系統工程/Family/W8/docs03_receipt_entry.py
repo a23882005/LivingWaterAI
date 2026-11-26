@@ -202,7 +202,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                        verified_drive_sha256, mutation_staging_dir,
                        download_original, payload=None,
                        backup_original=None, replace_original=None,
-                       native_writeback=False, verified_backup=None):
+                       native_writeback=False, verified_backup=None,
+                       progress_file_id=None, download_progress=None):
     """Connect 03 to same-account Drive callbacks supplied by the trusted host.
 
     backup_original(file_id) returns a newly saved backup's ID and download path.
@@ -211,6 +212,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     With native_writeback=True the host obtains a backup on a separate tool
     call, passes its ID and downloaded path as verified_backup, and submits the
     returned update arguments once. Continue with a fresh original download.
+    Pass the registered progress_file_id and its download callback to recheck
+    the confirmed workbook revision before an original-ledger update.
     """
     if not callable(download_original):
         raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
@@ -227,6 +230,10 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         raise ValueError("DOCS03_BACKUP_ID_AND_PATH_REQUIRED")
     if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
         raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
+    check_progress = progress_file_id is not None or download_progress is not None
+    if check_progress and not (isinstance(progress_file_id, str) and progress_file_id.strip()
+                               and callable(download_progress) and (managed or native_writeback)):
+        raise ValueError("DOCS03_PROGRESS_RECHECK_CONFIGURATION")
     sources = {
         "login_account": login_account,
         "client_id": client_id,
@@ -236,10 +243,22 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         "verified_drive_sha256": verified_drive_sha256,
     }
 
+    class ConfirmedProgressMenu:
+        def __init__(self, menu):
+            self.menu, self.auth = menu, menu.auth
+
+        def select(self, number, *, payload):
+            response = self.menu.select(number, payload=payload)
+            if response["status"] == "DB_WRITEBACK_REQUIRED":
+                response = {**response, "result":{**response["result"],
+                    "progress_binding":{"file_id":progress_file_id, "revision":payload["revision"]}}}
+            return response
+
     def build_menu(login):
-        return _load_module("on_demand_project").build_project_menu(
+        menu = _load_module("on_demand_project").build_project_menu(
             family_login=login, project_name=project_name,
             mutation_staging_dir=mutation_staging_dir, **sources)
+        return ConfirmedProgressMenu(menu) if check_progress else menu
 
     def recover_receipt(key):
         stager = _load_module("on_demand_mutations").OnDemandMutationStager(
@@ -251,6 +270,12 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         binding_values = (login_account, client_id, official_drive_file_id)
         if (plan["account"], plan["client_id"], plan["file_id"]) != binding_values:
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        progress_binding = staged.get("progress_binding")
+        if progress_binding is not None:
+            if not check_progress or progress_binding["file_id"] != progress_file_id:
+                raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        elif check_progress:
+            raise ValueError("DOCS03_CONFIRMED_PROGRESS_BINDING_REQUIRED")
         if native_writeback and verified_backup is None:
             return {"status":"DOCS03_BACKUP_REQUIRED", "file_id":official_drive_file_id,
                     "request_id":staged["request_id"]}
@@ -259,6 +284,13 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         fresh_id, fresh_path = download_original(official_drive_file_id)
         if fresh_id != official_drive_file_id:
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        if progress_binding is not None:
+            received_id, progress_path = download_progress(progress_file_id)
+            if received_id != progress_file_id:
+                raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+            if sha256(Path(progress_path).read_bytes()).hexdigest() != progress_binding["revision"]:
+                return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
+                        "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
         drive = _load_module("on_demand_drive_io")
         binding = drive.Binding(*binding_values, family_alias)
         writer = drive.OnDemandWriteback(binding, auth.require_login)

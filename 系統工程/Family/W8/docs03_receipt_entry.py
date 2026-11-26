@@ -61,7 +61,8 @@ class _Docs03Session:
 
 def run_docs03(*, auth, document_id, document, project_id, conversation_id,
                build_menu, recover_receipt, message_id, payload=None,
-               workspace_dir=None, private_dir=None, prepare_writeback=None):
+               workspace_dir=None, private_dir=None, prepare_writeback=None,
+               progress_answers=False):
     """Use fresh native Docs metadata and the same host workspace on every turn.
 
     Supply workspace_dir for new runs. The host must reuse it and pass trusted
@@ -70,8 +71,10 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
     """
     if (workspace_dir is None) == (private_dir is None):
         raise ValueError("DOCS03_EXACTLY_ONE_JOURNAL_LOCATION_REQUIRED")
-    if payload is not None and (
-            not isinstance(payload, dict) or payload.get("action") != "confirm_account"):
+    if payload is not None and not (
+            isinstance(payload, dict) and (
+                _is_progress_write(payload) if progress_answers
+                else payload.get("action") == "confirm_account")):
         raise ValueError("DOCS03_CONFIRMATION_PAYLOAD_REQUIRED")
     session = _Docs03Session(auth, document_id)
     session.check(document)
@@ -84,11 +87,112 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
         prepare_account=None, build_menu=build_menu, recover_receipt=recover_receipt,
-        prepare_writeback=prepare_writeback,
+        prepare_writeback=prepare_writeback, progress_answers=progress_answers,
     )
     if payload is None:
         return entry.handle_message(message_id, "繼續")
     return entry.handle_message(message_id, number=3, payload=payload)
+
+
+def _is_progress_write(payload):
+    return (set(payload) == {"revision", "question_id", "key", "reply"}
+            or (payload.get("action") == "restore"
+                and set(payload) == {"action", "version", "slot", "revision"}))
+
+
+def run_project_docs03_progress(*, auth, document_id, document, project_id,
+                                conversation_id, workspace_dir, message_id,
+                                login_account, client_id, family_alias,
+                                progress_file_id, download_progress, build_menu,
+                                payload=None, verified_backup=None):
+    """Stage or resume one XLSX answer using the original 03 menu.
+
+    The trusted host supplies the fixed Excel ID and a fresh download callback.
+    build_menu(login, path) binds that local Excel to the original project menu.
+    After a backup, pass its actual ID and path; issue the returned update once.
+    """
+    if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
+        raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
+    if not isinstance(project_id, str) or not project_id.strip() or not progress_file_id:
+        raise ValueError("DOCS03_PROGRESS_BINDING_REQUIRED")
+    if verified_backup is not None and (
+            not isinstance(verified_backup, tuple) or len(verified_backup) != 2):
+        raise ValueError("DOCS03_BACKUP_ID_AND_PATH_REQUIRED")
+    expected_name = family_alias + "_03_股票配置選擇進度.xlsx"
+    planner = _load_module("family03_plans")
+
+    def current_menu():
+        file_id, path = download_progress(progress_file_id)
+        path = Path(path)
+        if file_id != progress_file_id or path.name != expected_name:
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        menu = build_menu(auth, path)
+        if menu.auth.family_login is not auth:
+            raise PermissionError("DOCS03_MENU_BINDING_MISMATCH")
+        return menu, path
+
+    class ProgressMenu:
+        def __init__(self, menu):
+            self.menu, self.auth = menu, menu.auth
+
+        def select(self, number, *, payload):
+            response = self.menu.select(number, payload=payload)
+            if response["status"] != "FAMILY03_PROGRESS_WRITEBACK_REQUIRED":
+                return response
+            staged = response["result"]
+            if (staged["本人"], staged["檔名"]) != (family_alias, expected_name):
+                raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+            lookup = staged["讀回入口"]
+            key = {"file_id":progress_file_id, "client_id":client_id,
+                   "request_id":lookup["event_id"], "source_revision":lookup["source_revision"],
+                   "operation":"save_progress"}
+            return {"status":"DB_WRITEBACK_REQUIRED", "result":{**staged, "receipt_key":key}}
+
+    def observe(key):
+        if (key["file_id"], key["client_id"], key["operation"]) != (
+                progress_file_id, client_id, "save_progress"):
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        menu, downloaded = current_menu()
+        result = menu.select(3, payload={"action":"progress_receipt",
+            "event_id":key["request_id"], "source_revision":key["source_revision"]})["result"]
+        if (result.get("本人"), result.get("檔名"), result.get("事件識別"), result.get("revision")) != (
+                family_alias, expected_name, key["request_id"], sha256(downloaded.read_bytes()).hexdigest()):
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        return result, downloaded
+
+    def recover(key):
+        observed, _ = observe(key)
+        if observed["status"] == "FAMILY03_PROGRESS_EVENT_FOUND":
+            return {**key, "status":"PERSISTED_REMOTE_VERIFIED", "progress_receipt":observed}
+        return None
+
+    def prepare(staged):
+        key = staged["receipt_key"]
+        observed, downloaded = observe(key)
+        backup_id, backup_path = verified_backup or (None, None)
+        update = planner.prepare_progress_update(staged, observed, file_id=progress_file_id,
+            downloaded_id=progress_file_id, downloaded_path=downloaded,
+            backup_id=backup_id, backup_path=backup_path)
+        if update["status"] == "FAMILY03_PROGRESS_BACKUP_REQUIRED":
+            return {**update, "status":"DOCS03_BACKUP_REQUIRED", "request_id":key["request_id"]}
+        if update["status"] == "FAMILY03_PROGRESS_SOURCE_CHANGED":
+            return {"status":"DOCS03_PREVIEW_STALE", "request_id":key["request_id"],
+                    "text":"作答進度已有更新，請重新開啟 03 接續最新題目。"}
+        # The first observation missed a save that landed before preflight.
+        if update["status"] == "FAMILY03_PROGRESS_EVENT_FOUND":
+            return {**key, "status":"PERSISTED_REMOTE_VERIFIED", "progress_receipt":update}
+        return {**update, "status":"DOCS03_DRIVE_UPDATE_REQUIRED", "request_id":key["request_id"]}
+
+    result = run_docs03(auth=auth, document_id=document_id, document=document,
+        project_id=project_id + "|03-progress", conversation_id=conversation_id,
+        workspace_dir=workspace_dir, message_id=message_id, payload=payload,
+        build_menu=lambda _: ProgressMenu(current_menu()[0]), recover_receipt=recover,
+        prepare_writeback=prepare, progress_answers=True)
+    if result["status"] == "PERSISTED_REMOTE_VERIFIED":
+        receipt = result["result"]
+        if (receipt["file_id"], receipt["client_id"]) != (progress_file_id, client_id):
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+    return result
 
 
 def run_project_docs03(*, auth, document_id, document, project_id,

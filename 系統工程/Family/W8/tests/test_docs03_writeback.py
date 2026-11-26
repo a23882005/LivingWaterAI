@@ -212,5 +212,90 @@ class Docs03WritebackTests(unittest.TestCase):
             build.assert_called_once()
 
 
+class Docs03NativeHostTests(unittest.TestCase):
+    def setUp(self):
+        folder = TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.root = Path(folder.name)
+        self.auth = TestLogin()
+        self.ledger = self.root / "ledger.db"
+        self.ledger.write_bytes(b"fixture ledger")
+        self.workbook = self.root / "mou_03_股票配置選擇進度.xlsx"
+        self.download_ledger = Mock(return_value=("ledger-id", self.ledger))
+        self.download_workbook = Mock(return_value=("progress-id", self.workbook))
+        self.build_menu = Mock()
+
+    def turn(self, payload=None, **overrides):
+        opts = dict(auth=self.auth, document_id="fixture-doc",
+                    document={"documentId": "fixture-doc", "revisionId": "fixture-revision"},
+                    project_id="fixture-project", conversation_id="original-chat",
+                    workspace_dir=self.root, message_id="fixture-message",
+                    project_name="MOU", login_account="MOU", client_id=self.auth.client_id,
+                    family_alias="mou", official_drive_file_id="ledger-id",
+                    progress_file_id="progress-id", download_original=self.download_ledger,
+                    download_progress=self.download_workbook, build_original_menu=self.build_menu,
+                    mutation_staging_dir=self.root, payload=payload,
+                    verified_account_backup=("ledger-backup", self.ledger),
+                    verified_progress_backup=("progress-backup", self.workbook))
+        return docs03.run_project_docs03_native_turn(**(opts | overrides))
+
+    def test_missing_host_inputs_and_wrong_login_stop_before_downloading(self):
+        for edits, error, message in (
+                ({"conversation_id": None}, ValueError, "TRUSTED_CONVERSATION_BINDING_REQUIRED"),
+                ({"message_id": None}, ValueError, "STABLE_MESSAGE_ID_REQUIRED"),
+                ({"workspace_dir": None}, ValueError, "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"),
+                ({"progress_file_id": "ledger-id"}, ValueError, "DOCS03_DISTINCT_SOURCE_IDS_REQUIRED"),
+                ({"login_account": "AR"}, PermissionError, "DOCS03_PROJECT_ACCOUNT_MISMATCH"),
+                ({"document": {"documentId": "wrong"}}, PermissionError, "WRONG_LOGIN_DOCUMENT")):
+            with self.subTest(edits=edits), self.assertRaisesRegex(error, message):
+                self.turn(**edits)
+        self.download_ledger.assert_not_called()
+        self.download_workbook.assert_not_called()
+        self.build_menu.assert_not_called()
+
+    def test_excel_uses_same_host_menu_with_only_the_excel_backup(self):
+        answer = dict(revision="original", question_id="choice", key="goal", reply="成長")
+
+        def stage(**args):
+            self.assertEqual(args["verified_backup"], ("progress-backup", self.workbook))
+            self.assertEqual(args["payload"], answer)
+            downloaded, path = args["download_progress"]("progress-id")
+            self.assertEqual(downloaded, "progress-id")
+            args["build_menu"](self.auth, path)
+            return {"status": "DOCS03_BACKUP_REQUIRED"}
+
+        with patch.object(docs03, "run_project_docs03_progress", side_effect=stage) as progress, \
+                patch.object(docs03, "run_project_docs03") as account:
+            self.assertEqual(self.turn(answer)["status"], "DOCS03_BACKUP_REQUIRED")
+        progress.assert_called_once()
+        account.assert_not_called()
+        self.build_menu.assert_called_once_with(self.auth, self.workbook, self.ledger)
+
+    def test_account_uses_same_host_menu_and_rejects_mismatched_downloads(self):
+        payload = dict(action="confirm_account", revision="original")
+
+        def stage(**args):
+            self.assertEqual(args["verified_backup"], ("ledger-backup", self.ledger))
+            self.assertEqual(args["verified_drive_sha256"], sha256(self.ledger.read_bytes()).hexdigest())
+            args["build_original_menu"](self.auth)
+            return {"status": "DOCS03_BACKUP_REQUIRED"}
+
+        with patch.object(docs03, "run_project_docs03", side_effect=stage) as account, \
+                patch.object(docs03, "run_project_docs03_progress") as progress:
+            self.download_ledger.return_value = ("other-id", self.ledger)
+            with self.assertRaisesRegex(PermissionError, "DOCS03_WRITEBACK_BINDING_MISMATCH"):
+                self.turn(payload)
+            account.assert_not_called()
+            self.download_ledger.return_value = ("ledger-id", self.ledger)
+            self.download_workbook.return_value = ("other-id", self.workbook)
+            with self.assertRaisesRegex(PermissionError, "DOCS03_PROGRESS_BINDING_MISMATCH"):
+                self.turn()
+            self.build_menu.assert_not_called()
+            self.download_workbook.return_value = ("progress-id", self.workbook)
+            self.assertEqual(self.turn()["status"], "DOCS03_BACKUP_REQUIRED")
+        progress.assert_not_called()
+        self.build_menu.assert_called_once_with(self.auth, self.workbook, self.ledger)
+
+
 if __name__ == "__main__":
     unittest.main()

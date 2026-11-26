@@ -343,7 +343,7 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                        download_original, payload=None,
                        backup_original=None, replace_original=None,
                        native_writeback=False, verified_backup=None,
-                       progress_file_id=None, download_progress=None):
+                       progress_file_id=None, download_progress=None, build_original_menu=None):
     """Connect 03 to same-account Drive callbacks supplied by the trusted host.
 
     backup_original(file_id) returns a newly saved backup's ID and download path.
@@ -354,6 +354,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     returned update arguments once. Continue with a fresh original download.
     Pass the registered progress_file_id and its download callback to recheck
     the confirmed workbook revision before an original-ledger update.
+    A trusted host may supply build_original_menu(login) to retain its
+    household's existing menu version and bind its fresh workbook download.
     """
     if not callable(download_original):
         raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
@@ -395,9 +397,12 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             return response
 
     def build_menu(login):
-        menu = _load_module("on_demand_project").build_project_menu(
-            family_login=login, project_name=project_name,
-            mutation_staging_dir=mutation_staging_dir, **sources)
+        if build_original_menu is None:
+            menu = _load_module("on_demand_project").build_project_menu(
+                family_login=login, project_name=project_name,
+                mutation_staging_dir=mutation_staging_dir, **sources)
+        else:
+            menu = build_original_menu(login)
         return ConfirmedProgressMenu(menu) if check_progress else menu
 
     def recover_receipt(key):
@@ -459,3 +464,81 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         if (receipt.get("file_id"), receipt.get("client_id")) != (official_drive_file_id, client_id):
             raise PermissionError("DOCS03_RECEIPT_BINDING_MISMATCH")
     return result
+
+
+def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
+                                   conversation_id, workspace_dir, message_id,
+                                   project_name, login_account, client_id, family_alias,
+                                   official_drive_file_id, progress_file_id,
+                                   download_original, download_progress, build_original_menu,
+                                   mutation_staging_dir, payload=None,
+                                   verified_account_backup=None, verified_progress_backup=None):
+    """Wire both Menu 03 paths to the same trusted host and original menu.
+
+    The host supplies stable IDs and its per-conversation workspace, not values
+    parsed from chat. Download callbacks return the actual Drive ID and local
+    path. build_original_menu(login, workbook_path, ledger_path) uses the
+    already selected household version. Only the routed path consumes a backup.
+    """
+    if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
+        raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
+    if not isinstance(workspace_dir, (str, Path)) or not str(workspace_dir).strip():
+        raise ValueError("DOCS03_WORKSPACE_DIRECTORY_REQUIRED")
+    if (not all(isinstance(value, str) and value.strip()
+                for value in (official_drive_file_id, progress_file_id))
+            or official_drive_file_id == progress_file_id):
+        raise ValueError("DOCS03_DISTINCT_SOURCE_IDS_REQUIRED")
+    if not all(callable(callback) for callback in (download_original, download_progress,
+                                                    build_original_menu)):
+        raise TypeError("DOCS03_HOST_CALLBACKS_REQUIRED")
+
+    context = dict(auth=auth, document_id=document_id, document=document,
+                   project_id=project_id, conversation_id=conversation_id,
+                   workspace_dir=workspace_dir)
+    household = dict(login_account=login_account, client_id=client_id, family_alias=family_alias)
+    workbook_name = family_alias + "_03_股票配置選擇進度.xlsx"
+    ledger_path = None
+
+    def current_ledger():
+        nonlocal ledger_path
+        if ledger_path is None:
+            received_id, path = download_original(official_drive_file_id)
+            if received_id != official_drive_file_id:
+                raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+            ledger_path = Path(path)
+        return ledger_path
+
+    def current_workbook(file_id):
+        received_id, path = download_progress(file_id)
+        workbook = Path(path)
+        if file_id != progress_file_id or received_id != progress_file_id or workbook.name != workbook_name:
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        return received_id, workbook
+
+    def progress_menu(login, workbook):
+        return build_original_menu(login, workbook, current_ledger())
+
+    def account_menu(login):
+        return progress_menu(login, current_workbook(progress_file_id)[1])
+
+    def progress_turn(mid, data):
+        return run_project_docs03_progress(
+            **context, **household, message_id=mid, payload=data,
+            progress_file_id=progress_file_id, download_progress=current_workbook,
+            build_menu=progress_menu, verified_backup=verified_progress_backup)
+
+    def account_turn(mid, data):
+        ledger = current_ledger()
+        return run_project_docs03(
+            **context, **household, message_id=mid, payload=data,
+            project_name=project_name, downloaded_db_path=ledger,
+            official_drive_file_id=official_drive_file_id,
+            verified_drive_sha256=sha256(ledger.read_bytes()).hexdigest(),
+            mutation_staging_dir=mutation_staging_dir, download_original=download_original,
+            native_writeback=True, verified_backup=verified_account_backup,
+            progress_file_id=progress_file_id, download_progress=current_workbook,
+            build_original_menu=account_menu)
+
+    return run_project_docs03_turn(
+        **context, message_id=message_id, payload=payload,
+        account_turn=account_turn, progress_turn=progress_turn)

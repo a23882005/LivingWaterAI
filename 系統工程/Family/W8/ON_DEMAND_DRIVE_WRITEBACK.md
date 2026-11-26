@@ -54,17 +54,19 @@
 
 此節適用於已配置 Docs 登入的 03 候選。沿用本戶 Sources 的固定資料、當則原生登入登記及已確認的票據。由執行端取得可信的專案、對話與訊息識別，並在同一對話的每則訊息沿用同一個私人工作區。只傳本戶固定帳本 ID 和新下載路徑，測試使用獨立私人帳本。
 
-共同入口使用 `docs03_receipt_entry.run_project_docs03_turn()`。執行端提供兩個回呼：Excel 作答呼叫 `run_project_docs03_progress()`，整戶確認呼叫 `run_project_docs03()`。每次以共同入口傳入的訊息識別及原作答內容呼叫對應程式；整戶確認傳原 03 的 `confirm_account`。下一則「繼續」將 `payload` 留空。當次執行端確認 Drive 工具支援本機絕對路徑時，整戶確認才設定 `native_writeback=True`。
+支援絕對本機路徑上傳的執行端，使用 `docs03_receipt_entry.run_project_docs03_native_turn()`。將當則原生 Docs 登記、可信專案／對話／訊息識別及固定私人工作區交給這個入口。固定 `official_drive_file_id` 與 `progress_file_id` 分別取自同一戶 Sources。`download_original` 與 `download_progress` 各回傳下載工具實際回報的 Drive ID 和本機路徑。
+
+兩條路共同使用執行端傳入的 `build_original_menu(login, workbook_path, ledger_path)`；以本戶已指定的選單程式及實際下載的兩個檔案建構選單。作答帶原選項，整戶確認帶原 03 的 `confirm_account`；下一則「繼續」將 `payload` 留空。這個共用入口負責分流，既有直接呼叫兩個分支的方式仍可沿用。可信識別或固定私人工作區取不到時，會在下載或寫回前停止；對話文字中的識別不能作為輸入來源。
 
 共同入口先在本對話私人工作區保存首次派送的原作答或確認。第一次派送中斷時，「繼續」用原訊息識別及內容接回原待辦。後續要以程式的回應決定下一步。已收到寫回授權的待辦沿原收據或 Excel 事件唯讀查證，不重送更新。
 
 | 程式回應 | 執行端動作 |
 |---|---|
-| `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 與下載路徑以 `verified_backup=(id, path)` 接回待辦。 |
-| `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的原帳本呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
+| `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 及路徑以 `verified_progress_backup=(id, path)` 或 `verified_account_backup=(id, path)` 接回當筆。 |
+| `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的 Excel 或帳本原 ID 呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
 | `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
 | `DOCS03_PREVIEW_STALE` | 原檔在授權送出前已有變更。回到原 03，重新預覽、確認與備份。 |
-| `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同帳本的同筆收據，交付保存結果。 |
+| `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同檔的原 Excel 事件或帳本收據，交付保存結果。 |
 
 候選驗收包含原對話真人登入、原 03、私人合成帳本、分開的「確認」與「繼續」訊息，以及用新訊息重送原確認。查核原檔、備份、最後配置版本、收據與下載內容。 每戶應只新增一版與一張收據。跨主機同戶寫回仍依本頁原工序序列化。
 

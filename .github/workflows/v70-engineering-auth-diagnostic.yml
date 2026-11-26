@@ -48,6 +48,7 @@ jobs:
             account = Path.home().resolve()
             print('ACCOUNT_GROUP', grp.getgrgid(account.stat().st_gid).gr_name)
             print('ACL_TOOL_AVAILABLE', bool(shutil.which('setfacl') and shutil.which('getfacl')))
+            print('ACL_LIBRARY_AVAILABLE', bool(ctypes.util.find_library('acl')))
             try:
                 web = pwd.getpwnam('nobody')
                 print('NOBODY_UID_GID', web.pw_uid, web.pw_gid)

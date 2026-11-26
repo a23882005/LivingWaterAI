@@ -1,0 +1,56 @@
+name: V70 serving-path read-only verification
+on:
+  push:
+    branches: [diagnostics/v70-serving-path-20261127]
+    paths: [.github/workflows/v70-serving-path-20261127.yml]
+permissions: {}
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Compare authenticated status without reading page content
+        env:
+          ORIGIN: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          USER: ${{ secrets.V70_ENGINEERING_USER }}
+          PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          import base64, http.client, os, socket, ssl, time
+          site = 'www.happihelp.com'
+          origin = os.environ.get('ORIGIN','')
+          user, pwd = os.environ.get('USER',''), os.environ.get('PASSWORD','')
+          if not origin or not user or not pwd:
+              raise SystemExit('CHECK_INPUT_UNAVAILABLE')
+          authorization = 'Basic ' + base64.b64encode(f'{user}:{pwd}'.encode()).decode()
+          tls = ssl.create_default_context()
+          class OriginHTTPS(http.client.HTTPSConnection):
+              def connect(self):
+                  sock = socket.create_connection((origin, 443), self.timeout)
+                  try:
+                      self.sock = tls.wrap_socket(sock, server_hostname=site)
+                  except Exception:
+                      sock.close()
+                      raise
+          for label, connector in [('NORMAL',http.client.HTTPSConnection), ('HOST_ROUTE',OriginHTTPS)]:
+              for authorized in (False, True):
+                  conn=connector(site, timeout=7)
+                  marker='SIGNED_IN' if authorized else 'GUEST'
+                  try:
+                      headers={'Cache-Control':'no-cache'}
+                      if authorized:
+                          headers['Authorization']=authorization
+                      conn.request('GET',f'/v70-engineering/index.html?status_check={time.time_ns()}',headers=headers)
+                      response=conn.getresponse()
+                      status=response.status
+                      basic=response.getheader('WWW-Authenticate','').lower().strip() == 'basic realm="v70 engineering"'
+                      result = 'AUTH_REQUIRED' if status==401 and basic else 'OK' if status==200 else 'OTHER'
+                      print(f'{label}_{marker}_{result}')
+                  except (OSError, http.client.HTTPException):
+                      print(f'{label}_{marker}_NOT_VERIFIABLE')
+                      break
+                  finally:
+                      conn.close()
+                  if not authorized and result != 'AUTH_REQUIRED':
+                      break
+          PY

@@ -39,13 +39,15 @@ jobs:
             protected = root / 'v70-engineering'
             rules = protected / '.htaccess'
             old = root.parent / 'v70-engineering-auth' / 'engineering.htpasswd'
-            target = root / '.ht-v70-engineering-verifier'
-            probe = root / '.ht-v70-auth-probe'
-            if any(p.is_symlink() for p in (root, protected, rules, old, target, probe)):
+            private = root / 'v70-private-auth'
+            target = private / 'engineering.htpasswd'
+            probe = private / 'access-probe.txt'
+            deny = private / '.htaccess'
+            if any(p.is_symlink() for p in (root, protected, rules, old, private)):
                 raise SystemExit('SYMLINK_REVIEW_REQUIRED')
             if not all(p.is_file() for p in (rules, old, protected / 'index.html', protected / 'V70_macro_latest.json')):
                 raise SystemExit('FILES_MISSING')
-            if target.exists() or probe.exists():
+            if private.exists():
                 raise SystemExit('TARGET_EXISTS_REVIEW_REQUIRED')
             old_rules = rules.read_bytes()
             old_stat = rules.stat()
@@ -81,17 +83,28 @@ jobs:
                 finally:
                     conn.close()
 
-            # Prove the web server denies a harmless .ht file before storing the hash there.
+            # Hostinger may serve hidden files. Explicitly deny the entire directory
+            # and prove the denial before ever putting the verifier inside it.
+            private.mkdir(mode=0o755)
+            deny.write_text('Require all denied\nOptions -Indexes\n')
+            os.chmod(deny, 0o644)
             fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o644)
             try:
                 with os.fdopen(fd, 'wb') as fp:
-                    fp.write(b'v70 hidden path access check\n')
-                status, _, _ = get('/' + probe.name)
-                if status not in (403, 404):
-                    raise RuntimeError('HIDDEN_FILE_DOWNLOAD_RISK')
-                print('HIDDEN_PATH_DENIED', status, flush=True)
+                    fp.write(b'v70 directory access check\n')
+                for filename in (probe.name, deny.name):
+                    for signed in (False, True):
+                        status, _, _ = get('/' + private.name + '/' + filename, authenticated=signed)
+                        if status not in (403, 404):
+                            raise RuntimeError('PRIVATE_DIRECTORY_DOWNLOAD_RISK_' + str(status))
+                print('PRIVATE_DIRECTORY_DENIED', flush=True)
+            except BaseException:
+                probe.unlink(missing_ok=True)
+                deny.unlink(missing_ok=True)
+                private.rmdir()
+                raise
             finally:
-                probe.unlink()
+                probe.unlink(missing_ok=True)
 
             # Only the engineering rule changes. Keep an exact private backup for recovery.
             backup = old.parent / ('engineering-access-' + os.environ['RUN_ID'] + '.backup')
@@ -137,7 +150,7 @@ jobs:
                         if body != (protected / filename).read_bytes():
                             raise RuntimeError('ENGINEERING_CONTENT_MISMATCH')
                         print('SIGNED_IN_READBACK_PASS', filename, flush=True)
-                    status, _, _ = get('/' + target.name, authenticated=True)
+                    status, _, _ = get('/' + private.name + '/' + target.name, authenticated=True)
                     if status not in (403, 404):
                         raise RuntimeError('VERIFIER_DOWNLOAD_RISK')
                     print('VERIFIER_DOWNLOAD_DENIED', status, flush=True)
@@ -149,6 +162,8 @@ jobs:
                     if rules.read_bytes() != old_rules:
                         raise RuntimeError('ROLLBACK_REVIEW_REQUIRED')
                 target.unlink(missing_ok=True)
+                deny.unlink(missing_ok=True)
+                private.rmdir()
                 print('PREVIOUS_RULES_RESTORED', flush=True)
                 raise
             print('ENGINEERING_AUTH_PATH_REPAIRED', flush=True)

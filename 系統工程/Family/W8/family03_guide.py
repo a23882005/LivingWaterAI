@@ -119,7 +119,7 @@ def guide(snapshot, answers, bookpath, calc, extra_series=None):
     return question("review",QUESTIONS["review"][1]+list(trials), **{"方案":result,"方案識別":token,"可試比例":trials})
 
 
-def menu_handler(entry, member, folder, calc, *, market_reader=None):
+def menu_handler(entry, member, folder, calc, *, market_reader=None, progress_path=None):
     """ChatGPT binds a private working directory containing the exact Drive downloads."""
     from datetime import datetime, timezone, timedelta
     from tempfile import TemporaryDirectory
@@ -127,7 +127,8 @@ def menu_handler(entry, member, folder, calc, *, market_reader=None):
     import subprocess
     import uuid
     folder = Path(folder)
-    progress = folder/(member+"_03_股票配置選擇進度.xlsx")
+    progress_name = member + "_03_股票配置選擇進度.xlsx"
+    progress = Path(progress_path) if progress_path is not None else folder / progress_name
     bench = folder/"標的績效基準資料.xlsx"
 
     def run(payload):
@@ -213,5 +214,6 @@ def menu_handler(entry, member, folder, calc, *, market_reader=None):
         return {"status":"FAMILY03_PROGRESS_WRITEBACK_REQUIRED","本人":member,"檔名":progress.name,
                 "原檔摘要":revision,"新檔摘要":sha256(candidate.read_bytes()).hexdigest(),
                 "候選檔":str(candidate),"事件識別":event_id,"下一題":after,
+                "讀回入口":{"action":"progress_receipt","event_id":event_id,"source_revision":revision},
                 "保存步驟":"先重讀本人雲端原檔並核對原檔摘要，備份後沿原 ID 更新，再下載核對新檔摘要。原檔已更新時先讀取最新作答，並保留不同選擇。"}
     return run

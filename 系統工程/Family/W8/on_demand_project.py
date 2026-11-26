@@ -198,7 +198,8 @@ def build_project_menu(*, family_login, project_name, login_account,
                        trusted_report_archive_reader=None,
                        trusted_member_w6_receiver=None,
                        trusted_public_fetcher=None, trusted_account_change=None,
-                       family03_market_reader=None, family03_approved_target_source=None):
+                       family03_market_reader=None, family03_approved_target_source=None,
+                       family03_progress_path=None):
     """Return the existing W7 menu without using a permanent Python host."""
     if trusted_member_w6_receiver is not None and (
             not callable(trusted_member_w6_receiver)
@@ -314,7 +315,8 @@ def build_project_menu(*, family_login, project_name, login_account,
 
         guide_target = planner.menu_handler(public_entry, family_alias,
             Path(downloaded_db_path).resolve().parent, equity, advisor, positions.project_official_holdings, market_reader=plan_prices,
-            document_source=approved_document if family03_approved_target_source is not None else None)
+            document_source=approved_document if family03_approved_target_source is not None else None,
+            progress_path=family03_progress_path)
         def adjust_target(payload):
             if payload.get("action") == "confirm_account":
                 if target_writer is None:

@@ -279,12 +279,15 @@ def six(plans, prices, exposures, calc, single_stocks=()):
     return rows
 
 
-def menu_handler(entry, member, folder, calc, guide, project_holdings, *, market_reader=None, document_source=None):
+def menu_handler(entry, member, folder, calc, guide, project_holdings, *,
+                 market_reader=None, document_source=None, progress_path=None):
     folder=Path(folder)
-    progress=folder/(member+"_03_股票配置選擇進度.xlsx")
+    progress_name = member + "_03_股票配置選擇進度.xlsx"
+    progress = Path(progress_path) if progress_path is not None else folder / progress_name
     pool=folder/POOL_NAME
     bench=folder/"標的績效基準資料.xlsx"
-    legacy=guide.menu_handler(entry,member,folder,calc,market_reader=market_reader)
+    legacy=guide.menu_handler(entry,member,folder,calc,market_reader=market_reader,
+                              progress_path=progress)
     def run(payload):
         snapshot=entry.current_snapshot()
         if not progress.is_file():

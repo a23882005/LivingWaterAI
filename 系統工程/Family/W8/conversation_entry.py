@@ -246,15 +246,25 @@ class ConversationEntry:
             result.pop("pending_operation", None)
         elif phase in ("open", "running"):
             original = json.loads(row["payload"])
+            account_confirmation = (row["number"] == 3 and isinstance(original, dict)
+                                    and original.get("action") == "confirm_account")
             confirmed = (row["number"] in (1, 3, 6, 10, 11) and isinstance(original, dict)
                          and original.get("owner_confirmed") is True and isinstance(original.get("record"), dict))
-            if phase == "running" and not (row["number"] == 7 or confirmed):
+            if phase == "running" and not (row["number"] == 7 or confirmed or account_confirmation):
                 return {"status": "AWAIT_ORIGINAL_RESULT", "request_id": key}
             # These confirmed writes can only stage a candidate here. The host cannot
             # receive an upload plan until its receipt key is committed in this journal.
             if confirmed and "request_id" not in original:
                 original["request_id"] = sha256(encode([self.scope, key]).encode()).hexdigest()
-            result = self.session.select(page, row["number"], build_menu=self.build_menu, payload=original)
+            try:
+                result = self.session.select(page, row["number"], build_menu=self.build_menu, payload=original)
+            except ValueError:
+                if account_confirmation:
+                    # A rejected preview has no emitted Drive plan. Release
+                    # the pending slot so the member can confirm a new preview.
+                    with self.db() as db:
+                        db.execute("UPDATE work SET phase='cancelled' WHERE id=? AND phase='running'", (key,))
+                raise
         else:
             return {"status": "AWAIT_ORIGINAL_RESULT", "request_id":key}
         if not isinstance(result, dict):

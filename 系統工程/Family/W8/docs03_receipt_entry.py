@@ -429,10 +429,12 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             menu = build_original_menu(login)
         return ConfirmedProgressMenu(menu) if check_progress else menu
 
-    def recover_receipt(key):
-        stager = _load_module("on_demand_mutations").OnDemandMutationStager(
+    def receipt_stager():
+        return _load_module("on_demand_mutations").OnDemandMutationStager(
             auth=auth, staging_dir=mutation_staging_dir, **sources)
-        return stager.receipt_reader(download_original)(key)
+
+    def recover_receipt(key):
+        return receipt_stager().receipt_reader(download_original)(key)
 
     def prepare_writeback(staged):
         plan = staged["writeback_plan"]
@@ -453,21 +455,28 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         fresh_id, fresh_path = download_original(official_drive_file_id)
         if fresh_id != official_drive_file_id:
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
-        if progress_binding is not None:
-            if sha256(downloaded_progress().read_bytes()).hexdigest() != progress_binding["revision"]:
-                return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
-                        "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
         drive = _load_module("on_demand_drive_io")
         binding = drive.Binding(*binding_values, family_alias)
-        writer = drive.OnDemandWriteback(binding, auth.require_login)
-        if drive.inspect(fresh_path, binding)["sha256"] != plan["source"]["sha256"]:
+        fresh = drive.inspect(fresh_path, binding)
+        if fresh["sha256"] != plan["source"]["sha256"]:
+            # The original update may have appeared since the earlier receipt lookup.
+            saved = receipt_stager().recover_receipt(staged["receipt_key"], fresh_path, fresh_id)
+            if saved is not None:
+                return saved
             return {
                 "status": "DOCS03_PREVIEW_STALE",
                 "request_id": staged["request_id"],
                 "text": "帳本已有更新，請回 03 重新查看全帳戶目標，再確認一次。",
             }
+        if progress_binding is not None and (
+                sha256(downloaded_progress().read_bytes()).hexdigest() != progress_binding["revision"]):
+            return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
+                    "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
+        # This turn can have a different download path for the same Drive bytes.
+        confirmed_source = {**plan["source"], "path": fresh["path"]}
+        writer = drive.OnDemandWriteback(binding, auth.require_login)
         authorized = writer.authorize_update(
-            plan, fresh_path, backup_path, backup_id,
+            {**plan, "source": confirmed_source}, fresh_path, backup_path, backup_id,
             candidate_file_uri=plan["candidate"]["path"], local_upload_supported=True)
         if native_writeback:
             return {"status":"DOCS03_DRIVE_UPDATE_REQUIRED", "request_id":staged["request_id"],

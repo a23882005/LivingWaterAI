@@ -178,6 +178,69 @@ class Docs03WritebackTests(unittest.TestCase):
         build.assert_called_once()
         self.assertEqual(build.call_args.kwargs["family03_progress_path"], workbook)
 
+    def test_account_preflight_uses_fresh_drive_bytes_and_prefers_original_receipt(self):
+        import sqlite3
+
+        cases = {
+            "download moved": "DOCS03_DRIVE_UPDATE_REQUIRED",
+            "receipt became visible": "PERSISTED_REMOTE_VERIFIED",
+            "ledger changed": "DOCS03_PREVIEW_STALE",
+            "workbook changed": "DOCS03_PREVIEW_STALE",
+        }
+        for case, expected in cases.items():
+            with self.subTest(case=case), TemporaryDirectory(dir=self.workspace) as folder:
+                root = Path(folder)
+                source, backup, latest = (root / name for name in ("turn1.db", "backup.db", "turn2.db"))
+                workbook = root / "progress.xlsx"
+                mutation_fixture.seed(source)
+                copyfile(source, backup)
+                copyfile(source, latest)
+                workbook.write_bytes(b"preview workbook")
+                self.auth.user_id = "JO"
+                self.auth.client_id = mutation_fixture.CLIENT
+                binding = dict(auth=self.auth, login_account="JO", client_id=mutation_fixture.CLIENT,
+                    family_alias="Joseph", official_drive_file_id="ledger-id", staging_dir=root)
+                stager = mutation_fixture.MUT.OnDemandMutationStager(
+                    **binding, downloaded_db_path=source, verified_drive_sha256=sha256(source.read_bytes()).hexdigest())
+                stage = stager.stage("adjust_target", {
+                    "request_id": "fixture-confirm", "owner_confirmed": True,
+                    "record": {"confirmed": True, "source_reference": "fixture",
+                               "allocations": [{"instrument_key": "VT", "weight": "1"}]},
+                })
+                select = Mock(return_value={"status": "DB_WRITEBACK_REQUIRED", "result": stage})
+                menu = SimpleNamespace(auth=SimpleNamespace(family_login=self.auth), select=select)
+                download = Mock(return_value=("ledger-id", source))
+                payload = {**self.payload, "revision": sha256(workbook.read_bytes()).hexdigest()}
+                context = dict(auth=self.auth, document_id="fixture-doc",
+                    document={"documentId": "fixture-doc", "revisionId": "fixture-revision"},
+                    project_id="fixture-project", conversation_id="original-chat", workspace_dir=root,
+                    project_name="fixture", login_account="JO", client_id=self.auth.client_id,
+                    family_alias="Joseph", official_drive_file_id="ledger-id", mutation_staging_dir=root,
+                    download_original=download, native_writeback=True, progress_file_id="workbook-id",
+                    download_progress=lambda _: ("workbook-id", workbook), build_original_menu=lambda _: menu)
+
+                first = docs03.run_project_docs03(**context, message_id="first", payload=payload,
+                    downloaded_db_path=source, verified_drive_sha256=sha256(source.read_bytes()).hexdigest())
+                self.assertEqual(first["status"], "DOCS03_BACKUP_REQUIRED")
+                if case in ("receipt became visible", "workbook changed"):
+                    workbook.write_bytes(b"updated workbook")
+                if case == "receipt became visible":
+                    copyfile(stage["writeback_plan"]["candidate"]["path"], latest)
+                if case == "ledger changed":
+                    with sqlite3.connect(latest) as db:
+                        db.execute("CREATE TABLE independent_change (flag TEXT)")
+                source.unlink()  # The first message's download is gone; the candidate still exists.
+                download.side_effect = [("ledger-id", backup), ("ledger-id", latest)]
+                result = docs03.run_project_docs03(**context, message_id="continue",
+                    downloaded_db_path=latest, verified_drive_sha256=sha256(latest.read_bytes()).hexdigest(),
+                    verified_backup=("backup-id", backup))
+                self.assertEqual(result["status"], expected)
+                self.assertEqual("update_file_args" in result, case == "download moved")
+                if case == "receipt became visible":
+                    self.assertEqual(result["result"]["request_id"], "fixture-confirm")
+                    self.assertEqual(result["result"]["sha256"], sha256(latest.read_bytes()).hexdigest())
+                select.assert_called_once()
+
     def test_native_writeback_checks_backup_and_receipt_account(self):
         source = self.workspace / "downloaded.db"
         remote = self.workspace / "remote.db"

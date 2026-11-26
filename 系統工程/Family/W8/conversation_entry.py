@@ -20,7 +20,7 @@ def encode(value):
 class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
                  read_page, patch_page, prepare_account, build_menu, recover_receipt,
-                 prepare_writeback=None):
+                 prepare_writeback=None, progress_answers=False):
         if not all(isinstance(v, str) and v.strip() for v in (project_id, conversation_id)):
             raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
         folder = Path(private_dir).resolve(strict=True)
@@ -35,6 +35,7 @@ class ConversationEntry:
         self.prepare_account, self.build_menu = prepare_account, build_menu
         self.recover_receipt = recover_receipt
         self.prepare_writeback = prepare_writeback
+        self.progress_answers = progress_answers
         self.lock = RLock()
         self.bound_request = None
         self._rejected_write = None
@@ -91,7 +92,8 @@ class ConversationEntry:
                 number = int(number)
             if payload is not None and not isinstance(payload, dict):
                 raise ValueError("INVALID_MENU_PAYLOAD")
-            confirm_account = number == 3 and (payload or {}).get("action") == "confirm_account"
+            confirm_account = number == 3 and (
+                self.progress_answers or (payload or {}).get("action") == "confirm_account")
             payload_json = encode(payload) if number is not None else None
             with self.db() as db:
                 db.execute("BEGIN IMMEDIATE")
@@ -239,11 +241,11 @@ class ConversationEntry:
             return self._finish_writeback(key, json.loads(row["output"]))
         elif phase in ("open", "running"):
             original = json.loads(row["payload"])
-            account_confirmation = (row["number"] == 3 and isinstance(original, dict)
-                                    and original.get("action") == "confirm_account")
+            tracked_confirmation = (row["number"] == 3 and isinstance(original, dict)
+                                    and (self.progress_answers or original.get("action") == "confirm_account"))
             confirmed = (row["number"] in (1, 3, 6, 10, 11) and isinstance(original, dict)
                          and original.get("owner_confirmed") is True and isinstance(original.get("record"), dict))
-            if phase == "running" and not (row["number"] == 7 or confirmed or account_confirmation):
+            if phase == "running" and not (row["number"] == 7 or confirmed or tracked_confirmation):
                 return {"status": "AWAIT_ORIGINAL_RESULT", "request_id": key}
             # These confirmed writes can only stage a candidate here. The host cannot
             # receive an upload plan until its receipt key is committed in this journal.
@@ -252,7 +254,7 @@ class ConversationEntry:
             try:
                 result = self.session.select(page, row["number"], build_menu=self.build_menu, payload=original)
             except ValueError:
-                if account_confirmation:
+                if tracked_confirmation:
                     # A rejected preview has no emitted Drive plan. Release
                     # the pending slot so the member can confirm a new preview.
                     with self.db() as db:
@@ -267,7 +269,7 @@ class ConversationEntry:
             if not (result.get("result") or {}).get("receipt_key"):
                 raise RuntimeError("STAGED_WRITE_MISSING_RECEIPT_KEY")
             phase = "writeback"
-            if account_confirmation and self.prepare_writeback is not None:
+            if tracked_confirmation and self.prepare_writeback is not None:
                 result = {**result, "_managed_writeback": "ready"}
         with self.db() as db:
             db.execute("UPDATE work SET phase=?,output=? WHERE id=?", (phase, encode(result), key))
@@ -288,18 +290,21 @@ class ConversationEntry:
                     db.execute("UPDATE work SET phase='done',output=? WHERE id=? AND phase='writeback'",
                                (encode(submission), key))
                 return submission
-            # A crash or ambiguous connector response after this point must
-            # recover by reading the original receipt, never by resubmitting.
-            staged = {**staged, "_managed_writeback": "attempted"}
-            with self.db() as db:
-                db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
-            if isinstance(submission, dict):
-                return submission
-            try:
-                submission()
-            except OSError:
-                pass
-            saved = self.recover_receipt(receipt)
+            if isinstance(submission, dict) and submission["status"] == "PERSISTED_REMOTE_VERIFIED":
+                saved = submission
+            else:
+                # A crash or ambiguous connector response after this point must
+                # recover by reading the original receipt, never by resubmitting.
+                staged = {**staged, "_managed_writeback": "attempted"}
+                with self.db() as db:
+                    db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
+                if isinstance(submission, dict):
+                    return submission
+                try:
+                    submission()
+                except OSError:
+                    pass
+                saved = self.recover_receipt(receipt)
         if saved is None:
             return {"status": "AWAIT_DRIVE_CONFIRMATION", "request_id":key}
         if (saved.get("status") != "PERSISTED_REMOTE_VERIFIED"

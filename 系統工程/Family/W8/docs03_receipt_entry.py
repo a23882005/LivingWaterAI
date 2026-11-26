@@ -61,7 +61,7 @@ class _Docs03Session:
 
 def run_docs03(*, auth, document_id, document, project_id, conversation_id,
                build_menu, recover_receipt, message_id, payload=None,
-               workspace_dir=None, private_dir=None):
+               workspace_dir=None, private_dir=None, prepare_writeback=None):
     """Use fresh native Docs metadata and the same host workspace on every turn.
 
     Supply workspace_dir for new runs. The host must reuse it and pass trusted
@@ -84,6 +84,7 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
         prepare_account=None, build_menu=build_menu, recover_receipt=recover_receipt,
+        prepare_writeback=prepare_writeback,
     )
     if payload is None:
         return entry.handle_message(message_id, "繼續")
@@ -95,10 +96,19 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                        project_name, login_account, client_id, family_alias,
                        downloaded_db_path, official_drive_file_id,
                        verified_drive_sha256, mutation_staging_dir,
-                       download_original, payload=None):
-    """Connect the original project menu and its same-account Drive receipt reader."""
+                       download_original, payload=None,
+                       backup_original=None, replace_original=None):
+    """Connect 03 to same-account Drive callbacks supplied by the trusted host.
+
+    backup_original(file_id) returns a newly saved backup's ID and download path.
+    replace_original accepts the authorized native Drive update arguments.
+    Supply both to let the journal own submission, or omit both for staged-only use.
+    """
     if not callable(download_original):
         raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
+    managed = backup_original is not None or replace_original is not None
+    if managed and not (callable(backup_original) and callable(replace_original)):
+        raise TypeError("DOCS03_DRIVE_BACKUP_AND_UPDATE_REQUIRED")
     if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
         raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
     sources = {
@@ -120,11 +130,29 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             auth=auth, staging_dir=mutation_staging_dir, **sources)
         return stager.receipt_reader(download_original)(key)
 
+    def prepare_writeback(staged):
+        plan = staged["writeback_plan"]
+        binding_values = (login_account, client_id, official_drive_file_id)
+        if (plan["account"], plan["client_id"], plan["file_id"]) != binding_values:
+            raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        backup_id, backup_path = backup_original(official_drive_file_id)
+        fresh_id, fresh_path = download_original(official_drive_file_id)
+        if fresh_id != official_drive_file_id:
+            raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        drive = _load_module("on_demand_drive_io")
+        binding = drive.Binding(*binding_values, family_alias)
+        writer = drive.OnDemandWriteback(binding, auth.require_login)
+        authorized = writer.authorize_update(
+            plan, fresh_path, backup_path, backup_id,
+            candidate_file_uri=plan["candidate"]["path"], local_upload_supported=True)
+        return lambda: replace_original(**authorized["update_file_args"])
+
     result = run_docs03(
         auth=auth, document_id=document_id, document=document,
         project_id=project_id, conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
-        build_menu=build_menu, recover_receipt=recover_receipt)
+        build_menu=build_menu, recover_receipt=recover_receipt,
+        prepare_writeback=prepare_writeback if managed else None)
     if result.get("status") == "PERSISTED_REMOTE_VERIFIED":
         receipt = result["result"]
         if (receipt.get("file_id"), receipt.get("client_id")) != (official_drive_file_id, client_id):

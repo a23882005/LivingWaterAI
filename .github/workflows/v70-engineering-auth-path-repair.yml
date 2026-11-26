@@ -77,17 +77,20 @@ jobs:
             if not match or match[1] != records[0]:
                 raise SystemExit('CANDIDATE_ACCOUNT_REVIEW_REQUIRED')
             candidate_data = old_data[:match.start(1)] + candidate + old_data[match.end(1):]
+            proof_user = user + b'-proof-' + os.environb[b'RUN_ID']
+            proof_token = base64.b64encode(proof_user + b':' + password).decode('ascii')
+            proof_data = candidate_data + proof_user + b':' + candidate + b'\n'
             old_line = ('AuthUserFile ' + str(old)).encode()
             new_line = ('AuthUserFile ' + str(target)).encode()
             if old_rules.count(old_line) != 1 or b'# Managed V70 engineering login' not in old_rules:
                 raise SystemExit('AUTH_RULES_REVIEW_REQUIRED')
             login = base64.b64encode(user + b':' + password).decode('ascii')
 
-            def get(path, authenticated=False):
+            def get(path, authenticated=False, proof=False):
                 conn = http.client.HTTPSConnection('www.happihelp.com', timeout=12)
                 headers = {'Cache-Control': 'no-cache'}
                 if authenticated:
-                    headers['Authorization'] = 'Basic ' + login
+                    headers['Authorization'] = 'Basic ' + (proof_token if proof else login)
                 try:
                     conn.request('GET', path + '?v70_auth_repair=' + str(time.time_ns()), headers=headers)
                     response = conn.getresponse()
@@ -157,6 +160,13 @@ jobs:
                         url = '/v70-engineering/' + filename
                         guest, challenge, _ = get(url)
                         signed, _, body = get(url, authenticated=True)
+                        if signed != 200:
+                            with target.open('wb') as fp:
+                                fp.write(proof_data)
+                                fp.flush()
+                                os.fsync(fp.fileno())
+                            proof_status, _, _ = get(url, authenticated=True, proof=True)
+                            print('FRESH_USER_AUTH_STATUS', proof_status, flush=True)
                         if guest != 401 or not challenge.lower().startswith('basic ') or signed != 200:
                             raise RuntimeError('ENGINEERING_AUTH_READBACK_FAILED')
                         if body != (protected / filename).read_bytes():

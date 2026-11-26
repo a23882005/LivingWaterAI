@@ -5,12 +5,12 @@ import json
 from pathlib import Path
 
 
-def _conversation_class():
-    path = Path(__file__).with_name("conversation_entry.py")
-    spec = spec_from_file_location("family_docs03_conversation_entry", path)
+def _load_module(name):
+    path = Path(__file__).with_name(f"{name}.py")
+    spec = spec_from_file_location(f"family_docs03_{name}", path)
     module = module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.ConversationEntry
+    return module
 
 
 def _journal_directory(workspace_dir, project_id, conversation_id, *, create):
@@ -80,7 +80,7 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             workspace_dir, project_id, conversation_id, create=payload is not None)
         if payload is None and not journal.is_file():
             return {"status": "DOCS03_JOURNAL_MISSING"}
-    entry = _conversation_class()(
+    entry = _load_module("conversation_entry").ConversationEntry(
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
         prepare_account=None, build_menu=build_menu, recover_receipt=recover_receipt,
@@ -88,3 +88,38 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
     if payload is None:
         return entry.handle_message(message_id, "繼續")
     return entry.handle_message(message_id, number=3, payload=payload)
+
+
+def run_project_docs03(*, auth, document_id, document, project_id,
+                       conversation_id, workspace_dir, message_id,
+                       project_name, login_account, client_id, family_alias,
+                       downloaded_db_path, official_drive_file_id,
+                       verified_drive_sha256, mutation_staging_dir,
+                       download_original, payload=None):
+    """Connect the original project menu and its same-account Drive receipt reader."""
+    if not callable(download_original):
+        raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
+    sources = {
+        "login_account": login_account,
+        "client_id": client_id,
+        "family_alias": family_alias,
+        "downloaded_db_path": downloaded_db_path,
+        "official_drive_file_id": official_drive_file_id,
+        "verified_drive_sha256": verified_drive_sha256,
+    }
+
+    def build_menu(login):
+        return _load_module("on_demand_project").build_project_menu(
+            family_login=login, project_name=project_name,
+            mutation_staging_dir=mutation_staging_dir, **sources)
+
+    def recover_receipt(key):
+        stager = _load_module("on_demand_mutations").OnDemandMutationStager(
+            auth=auth, staging_dir=mutation_staging_dir, **sources)
+        return stager.receipt_reader(download_original)(key)
+
+    return run_docs03(
+        auth=auth, document_id=document_id, document=document,
+        project_id=project_id, conversation_id=conversation_id,
+        workspace_dir=workspace_dir, message_id=message_id, payload=payload,
+        build_menu=build_menu, recover_receipt=recover_receipt)

@@ -276,15 +276,18 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
     expected_name = family_alias + "_03_股票配置選擇進度.xlsx"
     planner = _load_module("family03_plans")
 
-    def current_menu():
+    def current_workbook():
         file_id, path = download_progress(progress_file_id)
         path = Path(path)
         if file_id != progress_file_id or path.name != expected_name:
             raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
-        menu = build_menu(auth, path)
+        return path
+
+    def progress_menu():
+        menu = build_menu(auth, current_workbook())
         if menu.auth.family_login is not auth:
             raise PermissionError("DOCS03_MENU_BINDING_MISMATCH")
-        return menu, path
+        return menu
 
     class ProgressMenu:
         def __init__(self, menu):
@@ -307,12 +310,11 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
         if (key["file_id"], key["client_id"], key["operation"]) != (
                 progress_file_id, client_id, "save_progress"):
             raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
-        menu, downloaded = current_menu()
-        result = menu.select(3, payload={"action":"progress_receipt",
-            "event_id":key["request_id"], "source_revision":key["source_revision"]})["result"]
-        if (result.get("本人"), result.get("檔名"), result.get("事件識別"), result.get("revision")) != (
-                family_alias, expected_name, key["request_id"], sha256(downloaded.read_bytes()).hexdigest()):
-            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        downloaded = current_workbook()
+        reader = _load_module("equity_sleeve").reader_module()
+        result = planner.progress_receipt(downloaded, family_alias, {
+            "action": "progress_receipt", "event_id": key["request_id"],
+            "source_revision": key["source_revision"]}, reader)
         return result, downloaded
 
     def recover(key):
@@ -341,7 +343,7 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
     result = run_docs03(auth=auth, document_id=document_id, document=document,
         project_id=project_id + "|03-progress", conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
-        build_menu=lambda _: ProgressMenu(current_menu()[0]), recover_receipt=recover,
+        build_menu=lambda _: ProgressMenu(progress_menu()), recover_receipt=recover,
         prepare_writeback=prepare, progress_answers=True)
     if result["status"] == "PERSISTED_REMOTE_VERIFIED":
         receipt = result["result"]
@@ -400,6 +402,12 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         "verified_drive_sha256": verified_drive_sha256,
     }
 
+    def downloaded_progress():
+        received_id, path = download_progress(progress_file_id)
+        if received_id != progress_file_id:
+            raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
+        return Path(path)
+
     class ConfirmedProgressMenu:
         def __init__(self, menu):
             self.menu, self.auth = menu, menu.auth
@@ -413,9 +421,10 @@ def run_project_docs03(*, auth, document_id, document, project_id,
 
     def build_menu(login):
         if build_original_menu is None:
+            progress = {"family03_progress_path": downloaded_progress()} if check_progress else {}
             menu = _load_module("on_demand_project").build_project_menu(
                 family_login=login, project_name=project_name,
-                mutation_staging_dir=mutation_staging_dir, **sources)
+                mutation_staging_dir=mutation_staging_dir, **sources, **progress)
         else:
             menu = build_original_menu(login)
         return ConfirmedProgressMenu(menu) if check_progress else menu
@@ -445,10 +454,7 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         if fresh_id != official_drive_file_id:
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
         if progress_binding is not None:
-            received_id, progress_path = download_progress(progress_file_id)
-            if received_id != progress_file_id:
-                raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
-            if sha256(Path(progress_path).read_bytes()).hexdigest() != progress_binding["revision"]:
+            if sha256(downloaded_progress().read_bytes()).hexdigest() != progress_binding["revision"]:
                 return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
                         "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
         drive = _load_module("on_demand_drive_io")

@@ -146,6 +146,38 @@ class Docs03WritebackTests(unittest.TestCase):
             self.turn("wrong-revision", document={"documentId": "fixture-doc", "revisionId": "different"})
         self.assertEqual(self.turn("correct-chat")["result"]["request_id"], "confirmation")
 
+    def test_direct_account_entry_uses_the_registered_workbook_download(self):
+        source = self.workspace / "ledger.db"
+        source.write_bytes(b"fixture")
+        workbook_folder = self.workspace / "separate-download"
+        workbook_folder.mkdir()
+        workbook = workbook_folder / "mou_03_股票配置選擇進度.xlsx"
+        download = Mock(return_value=("wrong-id", workbook))
+        select = Mock(return_value={"status": "FAMILY03_ACCOUNT_PREVIEW"})
+        build = Mock(return_value=SimpleNamespace(
+            auth=SimpleNamespace(family_login=self.auth), select=select))
+        args = dict(auth=self.auth, document_id="fixture-doc",
+                    document={"documentId": "fixture-doc", "revisionId": "fixture-revision"},
+                    project_id="fixture-project", conversation_id="original-chat",
+                    workspace_dir=self.workspace, message_id="confirm",
+                    project_name="MOU", login_account="MOU", family_alias="mou",
+                    client_id=self.auth.client_id, downloaded_db_path=source,
+                    official_drive_file_id="ledger-id", verified_drive_sha256=sha256(source.read_bytes()).hexdigest(),
+                    mutation_staging_dir=self.workspace, download_original=Mock(),
+                    native_writeback=True, payload=self.payload, progress_file_id="workbook-id",
+                    download_progress=download)
+        original_load = docs03._load_module
+        with patch.object(docs03, "_load_module", side_effect=lambda name:
+                          SimpleNamespace(build_project_menu=build)
+                          if name == "on_demand_project" else original_load(name)):
+            with self.assertRaisesRegex(PermissionError, "DOCS03_PROGRESS_BINDING_MISMATCH"):
+                docs03.run_project_docs03(**args)
+            build.assert_not_called()
+            download.return_value = ("workbook-id", workbook)
+            self.assertEqual(docs03.run_project_docs03(**args)["status"], "FAMILY03_ACCOUNT_PREVIEW")
+        build.assert_called_once()
+        self.assertEqual(build.call_args.kwargs["family03_progress_path"], workbook)
+
     def test_native_writeback_checks_backup_and_receipt_account(self):
         source = self.workspace / "downloaded.db"
         remote = self.workspace / "remote.db"
@@ -270,6 +302,67 @@ class Docs03NativeHostTests(unittest.TestCase):
         progress.assert_called_once()
         account.assert_not_called()
         self.build_menu.assert_called_once_with(self.auth, self.workbook, self.ledger)
+
+    def test_excel_receipt_can_be_recovered_after_relogin_without_ledger(self):
+        from openpyxl import Workbook
+
+        event = "a" * 64
+        book = Workbook()
+        book.active.title = "選擇進度"
+        book.active.append(["股票配置・選擇進度", "mou"])
+        history = book.create_sheet("選擇歷程")
+        history.append(["事件識別", "家人"])
+        book.save(self.workbook)
+        revision = sha256(self.workbook.read_bytes()).hexdigest()
+        candidate = self.root / "candidate.xlsx"
+        history.append([event, "mou"])
+        book.save(candidate)
+        backup = self.root / "backup.xlsx"
+        copyfile(self.workbook, backup)
+
+        def select(number, *, payload):
+            self.assertEqual(number, 3)
+            self.assertEqual(set(payload), {"revision", "question_id", "key", "reply"})
+            return {"status": "FAMILY03_PROGRESS_WRITEBACK_REQUIRED", "result": {
+                "status": "FAMILY03_PROGRESS_WRITEBACK_REQUIRED", "本人": "mou",
+                "檔名": self.workbook.name, "原檔摘要": revision, "新檔摘要": sha256(candidate.read_bytes()).hexdigest(),
+                "候選檔": str(candidate), "事件識別": event,
+                "讀回入口": {"event_id": event, "source_revision": revision}}}
+
+        self.build_menu.return_value = SimpleNamespace(
+            auth=SimpleNamespace(family_login=self.auth), select=select)
+        answer = dict(revision=revision, question_id="choice", key="goal", reply="成長")
+        self.assertEqual(self.turn(answer, verified_progress_backup=None)["status"], "DOCS03_BACKUP_REQUIRED")
+        update = self.turn(message_id="backup", verified_progress_backup=("backup-id", backup))
+        self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+        copyfile(update["update_file_args"]["file_uri"], self.workbook)
+        self.download_ledger.reset_mock(side_effect=True)
+        self.download_ledger.side_effect = FileNotFoundError("ledger unavailable")
+        self.download_workbook.reset_mock()
+        with self.assertRaisesRegex(PermissionError, "stale fixture login"):
+            self.turn(message_id="expired", document={"documentId": "fixture-doc", "revisionId": "expired"})
+        self.download_workbook.assert_not_called()
+        self.auth = TestLogin()
+        self.download_workbook.return_value = ("another-id", self.workbook)
+        with self.assertRaisesRegex(PermissionError, "DOCS03_PROGRESS_BINDING_MISMATCH"):
+            self.turn(message_id="wrong-workbook-id")
+        self.download_workbook.return_value = ("progress-id", self.workbook)
+        book.active["B1"] = "someone-else"
+        book.save(self.workbook)
+        with self.assertRaisesRegex(PermissionError, "FAMILY03_PROGRESS_OWNER_MISMATCH"):
+            self.turn(message_id="wrong-workbook-owner")
+        book.active["B1"] = "mou"
+        history.append([event, "mou"])
+        book.save(self.workbook)
+        with self.assertRaisesRegex(ValueError, "FAMILY03_DUPLICATE_PROGRESS_EVENT"):
+            self.turn(message_id="duplicate-event")
+        copyfile(candidate, self.workbook)
+        reply = self.turn(message_id="after-relogin")
+        self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertEqual(reply["result"]["progress_receipt"]["事件序號"], 1)
+        self.assertEqual(self.turn(message_id="answer-redelivered", payload=answer), reply)
+        self.download_ledger.assert_not_called()
+        self.build_menu.assert_called_once()
 
     def test_account_uses_same_host_menu_and_rejects_mismatched_downloads(self):
         payload = dict(action="confirm_account", revision="original")

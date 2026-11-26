@@ -19,7 +19,8 @@ def encode(value):
 
 class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
-                 read_page, patch_page, prepare_account, build_menu, recover_receipt):
+                 read_page, patch_page, prepare_account, build_menu, recover_receipt,
+                 prepare_writeback=None):
         if not all(isinstance(v, str) and v.strip() for v in (project_id, conversation_id)):
             raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
         folder = Path(private_dir).resolve(strict=True)
@@ -33,6 +34,7 @@ class ConversationEntry:
         self.read_page, self.patch_page = read_page, patch_page
         self.prepare_account, self.build_menu = prepare_account, build_menu
         self.recover_receipt = recover_receipt
+        self.prepare_writeback = prepare_writeback
         self.lock = RLock()
         self.bound_request = None
         self._rejected_write = None
@@ -234,16 +236,7 @@ class ConversationEntry:
             if phase == "open":
                 db.execute("UPDATE work SET phase='running' WHERE id=?", (key,))
         if phase == "writeback":
-            staged = json.loads(row["output"])
-            saved = self.recover_receipt(staged["result"]["receipt_key"])
-            if saved is None:
-                return {"status": "AWAIT_DRIVE_CONFIRMATION", "request_id":key}
-            receipt = staged["result"]["receipt_key"]
-            if (saved.get("status") != "PERSISTED_REMOTE_VERIFIED"
-                    or any(saved.get(k) != value for k, value in receipt.items())):
-                raise ValueError("REMOTE_RECEIPT_MISMATCH")
-            result = {**staged, "status":"PERSISTED_REMOTE_VERIFIED", "result": saved}
-            result.pop("pending_operation", None)
+            return self._finish_writeback(key, json.loads(row["output"]))
         elif phase in ("open", "running"):
             original = json.loads(row["payload"])
             account_confirmation = (row["number"] == 3 and isinstance(original, dict)
@@ -274,6 +267,38 @@ class ConversationEntry:
             if not (result.get("result") or {}).get("receipt_key"):
                 raise RuntimeError("STAGED_WRITE_MISSING_RECEIPT_KEY")
             phase = "writeback"
+            if account_confirmation and self.prepare_writeback is not None:
+                result = {**result, "_managed_writeback": "ready"}
         with self.db() as db:
             db.execute("UPDATE work SET phase=?,output=? WHERE id=?", (phase, encode(result), key))
+        if result.get("_managed_writeback") == "ready":
+            return self._finish_writeback(key, result)
+        return result
+
+    def _finish_writeback(self, key, staged):
+        receipt = staged["result"]["receipt_key"]
+        saved = self.recover_receipt(receipt)
+        if (saved is None and staged.get("_managed_writeback") == "ready"
+                and self.prepare_writeback is not None):
+            submit = self.prepare_writeback(staged["result"])
+            # A crash or ambiguous connector response after this point must
+            # recover by reading the original receipt, never by resubmitting.
+            staged = {**staged, "_managed_writeback": "attempted"}
+            with self.db() as db:
+                db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
+            try:
+                submit()
+            except OSError:
+                pass
+            saved = self.recover_receipt(receipt)
+        if saved is None:
+            return {"status": "AWAIT_DRIVE_CONFIRMATION", "request_id":key}
+        if (saved.get("status") != "PERSISTED_REMOTE_VERIFIED"
+                or any(saved.get(k) != value for k, value in receipt.items())):
+            raise ValueError("REMOTE_RECEIPT_MISMATCH")
+        result = {**staged, "status":"PERSISTED_REMOTE_VERIFIED", "result": saved}
+        result.pop("pending_operation", None)
+        result.pop("_managed_writeback", None)
+        with self.db() as db:
+            db.execute("UPDATE work SET phase='done',output=? WHERE id=?", (encode(result), key))
         return result

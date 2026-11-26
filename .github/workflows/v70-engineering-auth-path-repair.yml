@@ -65,6 +65,18 @@ jobs:
             lib.crypt.restype = ctypes.c_char_p
             if lib.crypt(password, records[0]) != records[0]:
                 raise SystemExit('CREDENTIAL_MISMATCH')
+            lib.crypt_gensalt.argtypes = [ctypes.c_char_p, ctypes.c_ulong, ctypes.c_char_p, ctypes.c_int]
+            lib.crypt_gensalt.restype = ctypes.c_char_p
+            random_bytes = os.urandom(16)
+            salt = lib.crypt_gensalt(b'$2y$', 11, random_bytes, len(random_bytes))
+            candidate = lib.crypt(password, salt) if salt else None
+            if not candidate or lib.crypt(password, candidate) != candidate:
+                raise SystemExit('CANDIDATE_HASH_FAILED')
+            old_data = old.read_bytes()
+            match = re.search(rb'(?m)^' + re.escape(user) + rb':([^\r\n]*)', old_data)
+            if not match or match[1] != records[0]:
+                raise SystemExit('CANDIDATE_ACCOUNT_REVIEW_REQUIRED')
+            candidate_data = old_data[:match.start(1)] + candidate + old_data[match.end(1):]
             old_line = ('AuthUserFile ' + str(old)).encode()
             new_line = ('AuthUserFile ' + str(target)).encode()
             if old_rules.count(old_line) != 1 or b'# Managed V70 engineering login' not in old_rules:
@@ -117,7 +129,7 @@ jobs:
                 raise SystemExit('BACKUP_CHECK_FAILED')
             fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o644)
             with os.fdopen(fd, 'wb') as fp:
-                fp.write(old.read_bytes())
+                fp.write(candidate_data)
                 fp.flush()
                 os.fsync(fp.fileno())
             changed = False
@@ -137,7 +149,7 @@ jobs:
                 lockfd = os.open(old.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
                 try:
                     fcntl.flock(lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    if rules.read_bytes() != old_rules or target.read_bytes() != old.read_bytes():
+                    if rules.read_bytes() != old_rules or target.read_bytes() != candidate_data:
                         raise RuntimeError('CONCURRENT_CHANGE')
                     write_rules(old_rules.replace(old_line, new_line))
                     changed = True

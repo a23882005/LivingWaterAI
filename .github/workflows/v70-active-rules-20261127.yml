@@ -1,0 +1,77 @@
+name: V70 live auth rules read-only
+on:
+  push:
+    branches: [diagnostics/v70-active-rules-20261127]
+    paths: [.github/workflows/v70-active-rules-20261127.yml]
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect account-owned auth scope, file access and available logs
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          timeout: 20s
+          command_timeout: 30s
+          envs: LW_DIR
+          script: |
+            python3 - <<'PY'
+            import datetime, os, re, stat
+            from pathlib import Path
+            root=Path(os.environ['LW_DIR']).resolve(strict=True)
+            if root.name!='public_html':
+                raise SystemExit('ROOT_REVIEW_REQUIRED')
+            domain=root.parent
+            engineering=root/'v70-engineering'
+            managed=engineering/'.htaccess'
+            private=domain/'v70-engineering-auth'/'engineering.htpasswd'
+            if engineering.is_symlink() or managed.is_symlink() or private.is_symlink():
+                raise SystemExit('SYMLINK_REVIEW_REQUIRED')
+            def authlines(path):
+                if not path.is_file() or path.is_symlink() or path.stat().st_size>131072:
+                    return []
+                return [re.sub(r'\s+',' ', line.strip()) for line in path.read_text(errors='replace').splitlines()
+                        if re.match(r'\s*(Auth\w+|Require|Satisfy|AllowOverride|Order|Allow|Deny)\b', line, re.I)]
+            expected=['authtype basic', 'authname "v70 engineering"', 'authuserfile '+str(private).lower(), 'require valid-user']
+            observed=[x.lower() for x in authlines(managed)]
+            print('ENGINEERING_RULES_'+('MATCH_BASELINE' if sorted(observed)==sorted(expected) else 'DIFFER_FROM_BASELINE'))
+            parents=[root/'.htaccess',domain/'.htaccess']
+            inherited=any(any(re.match(r'auth\w+\b|require\b|satisfy\b', x, re.I) for x in authlines(p)) for p in parents)
+            print('PARENT_AUTH_SCOPE_'+('PRESENT' if inherited else 'NOT_FOUND_IN_CHECKED_FILES'))
+            last=datetime.datetime(2026,11,25,12,11,tzinfo=datetime.timezone.utc).timestamp()
+            for label,p in [('ENGINEERING_RULE_FILE',managed),('PRIVATE_VERIFIER_FILE',private),('SITE_ROOT_RULE_FILE',root/'.htaccess')]:
+                if p.is_file() and not p.is_symlink():
+                    st=p.stat()
+                    print(label+('_MODIFIED_SINCE_LAST_SUCCESS' if st.st_mtime>last else '_NOT_MODIFIED_SINCE_LAST_SUCCESS'))
+            print('VERIFIER_OTHER_READ_'+('YES' if private.stat().st_mode&stat.S_IROTH else 'NO'))
+            account=Path.home().resolve()
+            paths=(private.parent,*private.parent.parents)
+            owned=[p for p in paths if p==account or account in p.parents]
+            print('ACCOUNT_ANCESTOR_OTHER_TRAVERSE_'+('YES' if owned and all(p.stat().st_mode&stat.S_IXOTH for p in owned) else 'NO_OR_RESTRICTED'))
+            try:
+                os.getxattr(private, 'system.posix_acl_access')
+                print('VERIFIER_POSIX_ACL_PRESENT')
+            except OSError:
+                print('VERIFIER_POSIX_ACL_NOT_FOUND')
+            candidates=(domain/'logs'/'error.log', domain/'logs'/'error_log', domain/'error.log', account/'logs'/'happihelp.com.error.log', Path('/usr/local/lsws/logs/error.log'))
+            readable=hit=False
+            for p in candidates:
+                try:
+                    if not stat.S_ISREG(p.stat().st_mode):
+                        continue
+                    with p.open('rb') as fp:
+                        fp.seek(max(0,os.fstat(fp.fileno()).st_size-131072))
+                        data=fp.read(131072).lower()
+                    readable=True
+                    hit |= any((b'v70-engineering' in l or b'engineering.htpasswd' in l) and any(x in l for x in (b'auth',b'permission',b'denied')) for l in data.splitlines())
+                except OSError:
+                    pass
+            print('WEB_AUTH_ERROR_LOG_'+('RELEVANT_ENTRY_FOUND' if hit else 'NO_RELEVANT_ENTRY_VISIBLE' if readable else 'NO_READABLE_LOG_IN_CHECKED_LOCATIONS'))
+            PY

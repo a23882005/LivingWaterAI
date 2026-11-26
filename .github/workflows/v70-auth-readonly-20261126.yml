@@ -1,0 +1,91 @@
+name: V70 engineering read-only verification
+on:
+  push:
+    branches: [diagnostics/v70-auth-readonly-20261126]
+    paths: [.github/workflows/v70-auth-readonly-20261126.yml]
+permissions: {}
+concurrency:
+  group: lw-v703-site-deploy-refs/heads/main
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Read existing engineering login configuration
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          timeout: 20s
+          command_timeout: 25s
+          envs: LW_DIR,WEB_USER
+          script: |
+            set -eu
+            if [ -z "$LW_DIR" ] || ! cd "$LW_DIR" 2>/dev/null || [ "$(basename "$PWD")" != public_html ]; then
+              echo "CONFIG_CHECK_UNAVAILABLE"; exit 1
+            fi
+            login=v70-engineering/.htaccess
+            if [ -L v70-engineering ] || [ -L "$login" ] || [ ! -r "$login" ] || ! grep -qx '# Managed V70 engineering login' "$login"; then
+              echo "CONFIG_CHECK_REVIEW_REQUIRED"; exit 1
+            fi
+            if ! private=$(cd ../v70-engineering-auth 2>/dev/null && pwd -P); then
+              echo "CONFIG_CHECK_REVIEW_REQUIRED"; exit 1
+            fi
+            verifier="$private/engineering.htpasswd"
+            if [ -L "$verifier" ] || [ ! -f "$verifier" ] || [ ! -s "$verifier" ] || [ ! -r "$verifier" ]; then
+              echo "CONFIG_CHECK_REVIEW_REQUIRED"; exit 1
+            fi
+            if ! V70_EXPECTED="$verifier" awk 'tolower($1) == "authuserfile" { n++; if ($2 != ENVIRON["V70_EXPECTED"] || NF != 2) bad=1 } END { exit !(n == 1 && !bad) }' "$login"; then
+              echo "CONFIG_CHECK_REVIEW_REQUIRED"; exit 1
+            fi
+            if [ -z "$WEB_USER" ] || ! awk -F: '$1 == ENVIRON["WEB_USER"] && NF == 2 && length($2) { n++ } END { exit !(n == 1) }' "$verifier"; then
+              echo "CI_IDENTITY_CHECK_REVIEW_REQUIRED"; exit 1
+            fi
+            echo "CONFIG_AND_CI_IDENTITY_CHECK_PASS"
+      - name: Verify the normal HTTPS sign-in without publishing
+        if: always()
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+          SITE_BASE: ${{ vars.V703_SITE_BASE_URL }}
+        run: |
+          python3 - <<'PY'
+          import base64, os, time, urllib.error, urllib.request
+          base = (os.environ["SITE_BASE"] or "https://www.happihelp.com").rstrip("/")
+          user, pwd = os.environ["WEB_USER"], os.environ["WEB_PASSWORD"]
+          if base != "https://www.happihelp.com" or not (user and pwd):
+              print("HTTPS_CHECK_UNAVAILABLE")
+              raise SystemExit(1)
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+          opener = urllib.request.build_opener(NoRedirect)
+          token = base64.b64encode(f"{user}:{pwd}".encode()).decode("ascii")
+          failed = False
+          for label, path in (("HTML", "index.html"), ("JSON", "V70_macro_latest.json")):
+              for require_login in (False, True):
+                  url = f"{base}/v70-engineering/{path}?read_only={time.time_ns()}"
+                  headers = {"Cache-Control": "no-cache", "User-Agent": "LivingWaterAI-V70-Verification"}
+                  if require_login:
+                      headers["Authorization"] = "Basic " + token
+                  valid = False
+                  try:
+                      with opener.open(urllib.request.Request(url, headers=headers), timeout=10) as response:
+                          valid = require_login and response.status == 200
+                  except urllib.error.HTTPError as e:
+                      valid = not require_login and e.code == 401 and e.headers.get("WWW-Authenticate", "").lower().startswith("basic ")
+                  except (OSError, urllib.error.URLError):
+                      pass
+                  kind = "SIGNED_IN" if require_login else "ANONYMOUS_DENIED"
+                  print(f"{label}_{kind}_{'PASS' if valid else 'REVIEW_REQUIRED'}")
+                  failed |= not valid
+                  if not require_login and not valid:
+                      break
+          raise SystemExit(int(failed))
+          PY

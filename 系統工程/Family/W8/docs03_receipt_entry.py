@@ -158,6 +158,12 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         drive = _load_module("on_demand_drive_io")
         binding = drive.Binding(*binding_values, family_alias)
         writer = drive.OnDemandWriteback(binding, auth.require_login)
+        if drive.inspect(fresh_path, binding)["sha256"] != plan["source"]["sha256"]:
+            return {
+                "status": "DOCS03_PREVIEW_STALE",
+                "request_id": staged["request_id"],
+                "text": "帳本已有更新，請回 03 重新查看全帳戶目標，再確認一次。",
+            }
         authorized = writer.authorize_update(
             plan, fresh_path, backup_path, backup_id,
             candidate_file_uri=plan["candidate"]["path"], local_upload_supported=True)

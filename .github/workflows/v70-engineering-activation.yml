@@ -50,7 +50,8 @@ jobs:
           set -eu
           umask 077
           test -n "$WEB_USER" && test -n "$WEB_PASSWORD"
-          printf '%s\n' "$WEB_PASSWORD" | htpasswd -niBC 12 "$WEB_USER" > staging/engineering.htpasswd
+          # Hostinger live Basic Auth accepts bcrypt cost 10; cost 12 returns 401.
+          printf '%s\n' "$WEB_PASSWORD" | htpasswd -niBC 10 "$WEB_USER" > staging/engineering.htpasswd
       - name: Install verifier outside the web root
         uses: appleboy/scp-action@v1
         with:

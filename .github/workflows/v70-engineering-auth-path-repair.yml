@@ -1,0 +1,168 @@
+name: V70 engineering auth path repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/v70-engineering-auth-path-repair.yml']
+permissions: {}
+concurrency:
+  group: lw-v703-site-deploy-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  repair:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Repair the single verifier path and require HTTPS readback
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          LW_DIR: ${{ vars.HOSTINGER_SITE_DIRECTORY }}
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+          RUN_ID: ${{ github.run_id }}
+        with:
+          host: ${{ secrets.HOSTINGER_SFTP_HOST }}
+          username: ${{ secrets.HOSTINGER_SFTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SFTP_PASSWORD }}
+          port: 65002
+          envs: LW_DIR,WEB_USER,WEB_PASSWORD,RUN_ID
+          script: |
+            set -eu
+            python3 - <<'PY'
+            import base64, ctypes, ctypes.util, fcntl, http.client, os, re, stat, tempfile, time
+            from pathlib import Path
+
+            root = Path(os.environ['LW_DIR']).resolve(strict=True)
+            if root.name != 'public_html' or root.parent.name != 'happihelp.com':
+                raise SystemExit('WRONG_SITE_ROOT')
+            protected = root / 'v70-engineering'
+            rules = protected / '.htaccess'
+            old = root.parent / 'v70-engineering-auth' / 'engineering.htpasswd'
+            target = root / '.ht-v70-engineering-verifier'
+            probe = root / '.ht-v70-auth-probe'
+            if any(p.is_symlink() for p in (root, protected, rules, old, target, probe)):
+                raise SystemExit('SYMLINK_REVIEW_REQUIRED')
+            if not all(p.is_file() for p in (rules, old, protected / 'index.html', protected / 'V70_macro_latest.json')):
+                raise SystemExit('FILES_MISSING')
+            if target.exists() or probe.exists():
+                raise SystemExit('TARGET_EXISTS_REVIEW_REQUIRED')
+            old_rules = rules.read_bytes()
+            old_stat = rules.stat()
+            old_stat_verifier = old.stat()
+            if old_stat.st_nlink != 1 or old_stat_verifier.st_nlink != 1:
+                raise SystemExit('UNEXPECTED_LINKS')
+            user, password = os.environb[b'WEB_USER'], os.environb[b'WEB_PASSWORD']
+            if not re.fullmatch(rb'[A-Za-z0-9_.@+-]{1,255}', user) or not password:
+                raise SystemExit('SECRET_FORMAT_REVIEW_REQUIRED')
+            records = re.findall(rb'(?m)^' + re.escape(user) + rb':([^\r\n]*)', old.read_bytes())
+            if len(records) != 1 or not re.fullmatch(rb'\$2[aby]\$12\$[./A-Za-z0-9]{53}', records[0]):
+                raise SystemExit('EXISTING_VERIFIER_REVIEW_REQUIRED')
+            lib = ctypes.CDLL(ctypes.util.find_library('crypt'))
+            lib.crypt.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+            lib.crypt.restype = ctypes.c_char_p
+            if lib.crypt(password, records[0]) != records[0]:
+                raise SystemExit('CREDENTIAL_MISMATCH')
+            old_line = ('AuthUserFile ' + str(old)).encode()
+            new_line = ('AuthUserFile ' + str(target)).encode()
+            if old_rules.count(old_line) != 1 or b'# Managed V70 engineering login' not in old_rules:
+                raise SystemExit('AUTH_RULES_REVIEW_REQUIRED')
+            login = base64.b64encode(user + b':' + password).decode('ascii')
+
+            def get(path, authenticated=False):
+                conn = http.client.HTTPSConnection('www.happihelp.com', timeout=12)
+                headers = {'Cache-Control': 'no-cache'}
+                if authenticated:
+                    headers['Authorization'] = 'Basic ' + login
+                try:
+                    conn.request('GET', path + '?v70_auth_repair=' + str(time.time_ns()), headers=headers)
+                    response = conn.getresponse()
+                    return response.status, response.getheader('WWW-Authenticate', ''), response.read()
+                finally:
+                    conn.close()
+
+            # Prove the web server denies a harmless .ht file before storing the hash there.
+            fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o644)
+            try:
+                with os.fdopen(fd, 'wb') as fp:
+                    fp.write(b'v70 hidden path access check\n')
+                status, _, _ = get('/' + probe.name)
+                if status not in (403, 404):
+                    raise RuntimeError('HIDDEN_FILE_DOWNLOAD_RISK')
+                print('HIDDEN_PATH_DENIED', status, flush=True)
+            finally:
+                probe.unlink()
+
+            # Only the engineering rule changes. Keep an exact private backup for recovery.
+            backup = old.parent / ('engineering-access-' + os.environ['RUN_ID'] + '.backup')
+            fd = os.open(backup, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
+            with os.fdopen(fd, 'wb') as fp:
+                fp.write(old_rules)
+                fp.flush()
+                os.fsync(fp.fileno())
+            if backup.read_bytes() != old_rules:
+                raise SystemExit('BACKUP_CHECK_FAILED')
+            fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o644)
+            with os.fdopen(fd, 'wb') as fp:
+                fp.write(old.read_bytes())
+                fp.flush()
+                os.fsync(fp.fileno())
+            changed = False
+            def write_rules(data):
+                fd, name = tempfile.mkstemp(prefix='.v70-auth-', dir=protected)
+                try:
+                    with os.fdopen(fd, 'wb') as fp:
+                        fp.write(data)
+                        fp.flush()
+                        os.fsync(fp.fileno())
+                    os.chmod(name, stat.S_IMODE(old_stat.st_mode))
+                    os.replace(name, rules)
+                finally:
+                    if os.path.exists(name):
+                        os.unlink(name)
+            try:
+                lockfd = os.open(old.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                try:
+                    fcntl.flock(lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    if rules.read_bytes() != old_rules or target.read_bytes() != old.read_bytes():
+                        raise RuntimeError('CONCURRENT_CHANGE')
+                    write_rules(old_rules.replace(old_line, new_line))
+                    changed = True
+                    for filename in ('index.html', 'V70_macro_latest.json'):
+                        url = '/v70-engineering/' + filename
+                        guest, challenge, _ = get(url)
+                        signed, _, body = get(url, authenticated=True)
+                        if guest != 401 or not challenge.lower().startswith('basic ') or signed != 200:
+                            raise RuntimeError('ENGINEERING_AUTH_READBACK_FAILED')
+                        if body != (protected / filename).read_bytes():
+                            raise RuntimeError('ENGINEERING_CONTENT_MISMATCH')
+                        print('SIGNED_IN_READBACK_PASS', filename, flush=True)
+                    status, _, _ = get('/' + target.name, authenticated=True)
+                    if status not in (403, 404):
+                        raise RuntimeError('VERIFIER_DOWNLOAD_RISK')
+                    print('VERIFIER_DOWNLOAD_DENIED', status, flush=True)
+                finally:
+                    os.close(lockfd)
+            except BaseException:
+                if changed:
+                    write_rules(old_rules)
+                    if rules.read_bytes() != old_rules:
+                        raise RuntimeError('ROLLBACK_REVIEW_REQUIRED')
+                target.unlink(missing_ok=True)
+                print('PREVIOUS_RULES_RESTORED', flush=True)
+                raise
+            print('ENGINEERING_AUTH_PATH_REPAIRED', flush=True)
+            PY
+      - name: Independently verify public access denial and signed-in content
+        env:
+          WEB_USER: ${{ secrets.V70_ENGINEERING_USER }}
+          WEB_PASSWORD: ${{ secrets.V70_ENGINEERING_PASSWORD }}
+        run: |
+          set -eu
+          for file in index.html V70_macro_latest.json; do
+            url="https://www.happihelp.com/v70-engineering/$file?independent=${GITHUB_RUN_ID}"
+            guest=$(curl -sS -o /dev/null -w '%{http_code}' "$url")
+            signed=$(curl -sS -o /dev/null -w '%{http_code}' --basic --user "$WEB_USER:$WEB_PASSWORD" "$url&signed=1")
+            test "$guest" = 401 && test "$signed" = 200
+            echo "EXTERNAL_LOGIN_PASS $file"
+          done

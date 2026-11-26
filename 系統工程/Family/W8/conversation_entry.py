@@ -280,14 +280,18 @@ class ConversationEntry:
         saved = self.recover_receipt(receipt)
         if (saved is None and staged.get("_managed_writeback") == "ready"
                 and self.prepare_writeback is not None):
-            submit = self.prepare_writeback(staged["result"])
+            submission = self.prepare_writeback(staged["result"])
+            if isinstance(submission, dict) and submission["status"] == "DOCS03_BACKUP_REQUIRED":
+                return submission
             # A crash or ambiguous connector response after this point must
             # recover by reading the original receipt, never by resubmitting.
             staged = {**staged, "_managed_writeback": "attempted"}
             with self.db() as db:
                 db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
+            if isinstance(submission, dict):
+                return submission
             try:
-                submit()
+                submission()
             except OSError:
                 pass
             saved = self.recover_receipt(receipt)

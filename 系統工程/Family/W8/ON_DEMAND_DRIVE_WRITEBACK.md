@@ -49,3 +49,21 @@
 同一對話沿用同一份只在記憶體內的 `live_context`。每戶由 Sources 傳入原驗密控制器的建構函式、驗證站來源、兩個手機工具、Space 讀寫工具、下載帳號庫及建構原選單的函式。手機工具交回其原生 `structuredContent`。每次 `read_page()` 都讀本戶正式頁。`patch_page(**args)` 將原條件更新一次，然後讀回。若執行環境被重建，只恢復私人暫存裡的原選號及作答，依原驗密流程重新取得登入。
 
 帳本寫回前，暫存程式在同一筆 SQLite 交易中保存業務資料與既有 `_family_io_receipts` 收據。`DB_WRITEBACK_REQUIRED` 仍依上方備份、同 ID 更新與讀回工序辦理。將 `OnDemandMutationStager.receipt_reader(download_original)` 作為共用入口的 `recover_receipt`。該戶的 `download_original(file_id)` 透過原生 Drive 下載回傳 `(工具實際回報的檔案 ID, 新下載的路徑)`。帳本寫入後回覆中斷時，入口用這筆既有收據交回已保存的結果。若下載仍看不到收據，回傳 `AWAIT_DRIVE_CONFIRMATION`，沿用同一個寫回要求查核。私有暫存目錄限該執行身分存取，保存業務待辦，驗證密鑰只留在活的登入物件。
+
+## 原選單 03 的 Docs 登入與分步寫回
+
+此節適用於已配置 Docs 登入的 03 候選。沿用本戶 Sources 的固定資料、當則原生登入登記及已確認的票據。由執行端取得可信的專案、對話與訊息識別，並在同一對話的每則訊息沿用同一個私人工作區。只傳本戶固定帳本 ID 和新下載路徑，測試使用獨立私人帳本。
+
+呼叫 `docs03_receipt_entry.run_project_docs03()`。確認時傳原 03 的 `confirm_account` 內容。下一則「繼續」將 `payload` 留空。當次執行端確認 Drive 工具支援本機絕對路徑時，才設定 `native_writeback=True`。
+
+| 程式回應 | 執行端動作 |
+|---|---|
+| `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 與下載路徑以 `verified_backup=(id, path)` 接回待辦。 |
+| `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的原帳本呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
+| `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀找原收據。 |
+| `DOCS03_PREVIEW_STALE` | 原檔在授權送出前已有變更。回到原 03，重新預覽、確認與備份。 |
+| `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同帳本的同筆收據，交付保存結果。 |
+
+候選驗收包含原對話真人登入、原 03、私人合成帳本、分開的「確認」與「繼續」訊息，以及用新訊息重送原確認。查核原檔、備份、最後配置版本、收據與下載內容。 每戶應只新增一版與一張收據。跨主機同戶寫回仍依本頁原工序序列化。
+
+在 W8 目錄執行 `python -m unittest discover -s tests -p 'test_docs03_writeback.py' -v` 可重跑 03 回歸測試。

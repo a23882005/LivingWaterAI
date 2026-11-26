@@ -99,6 +99,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     """Connect the original project menu and its same-account Drive receipt reader."""
     if not callable(download_original):
         raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
+    if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
+        raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
     sources = {
         "login_account": login_account,
         "client_id": client_id,
@@ -118,8 +120,13 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             auth=auth, staging_dir=mutation_staging_dir, **sources)
         return stager.receipt_reader(download_original)(key)
 
-    return run_docs03(
+    result = run_docs03(
         auth=auth, document_id=document_id, document=document,
         project_id=project_id, conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
         build_menu=build_menu, recover_receipt=recover_receipt)
+    if result.get("status") == "PERSISTED_REMOTE_VERIFIED":
+        receipt = result["result"]
+        if (receipt.get("file_id"), receipt.get("client_id")) != (official_drive_file_id, client_id):
+            raise PermissionError("DOCS03_RECEIPT_BINDING_MISMATCH")
+    return result

@@ -54,13 +54,15 @@
 
 此節適用於已配置 Docs 登入的 03 候選。沿用本戶 Sources 的固定資料、當則原生登入登記及已確認的票據。由執行端取得可信的專案、對話與訊息識別，並在同一對話的每則訊息沿用同一個私人工作區。只傳本戶固定帳本 ID 和新下載路徑，測試使用獨立私人帳本。
 
-呼叫 `docs03_receipt_entry.run_project_docs03()`。確認時傳原 03 的 `confirm_account` 內容。下一則「繼續」將 `payload` 留空。當次執行端確認 Drive 工具支援本機絕對路徑時，才設定 `native_writeback=True`。
+共同入口使用 `docs03_receipt_entry.run_project_docs03_turn()`。執行端提供兩個回呼：Excel 作答呼叫 `run_project_docs03_progress()`，整戶確認呼叫 `run_project_docs03()`。每次以共同入口傳入的訊息識別及原作答內容呼叫對應程式；整戶確認傳原 03 的 `confirm_account`。下一則「繼續」將 `payload` 留空。當次執行端確認 Drive 工具支援本機絕對路徑時，整戶確認才設定 `native_writeback=True`。
+
+共同入口先在本對話私人工作區保存首次派送的原作答或確認。第一次派送中斷時，「繼續」用原訊息識別及內容接回原待辦。後續要以程式的回應決定下一步。已收到寫回授權的待辦沿原收據或 Excel 事件唯讀查證，不重送更新。
 
 | 程式回應 | 執行端動作 |
 |---|---|
 | `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 與下載路徑以 `verified_backup=(id, path)` 接回待辦。 |
 | `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的原帳本呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
-| `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀找原收據。 |
+| `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
 | `DOCS03_PREVIEW_STALE` | 原檔在授權送出前已有變更。回到原 03，重新預覽、確認與備份。 |
 | `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同帳本的同筆收據，交付保存結果。 |
 

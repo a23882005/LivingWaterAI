@@ -132,8 +132,23 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
     if routes.is_symlink():
         raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
     lock_path = directory / "turn.lock"
-    with os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600), "a") as lock:
+    with (os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600), "a") as lock,
+          closing(sqlite3.connect(routes)) as route):
         fcntl.flock(lock, fcntl.LOCK_EX)
+        route.executescript("""
+            CREATE TABLE IF NOT EXISTS turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS interrupted_dispatch (
+                slot INTEGER PRIMARY KEY CHECK(slot=1),
+                id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS recovered_replies (
+                id TEXT PRIMARY KEY, original_id TEXT NOT NULL);
+        """)
+        reply_id = message_id
+        alias = route.execute(
+            "SELECT original_id FROM recovered_replies WHERE id=?", (reply_id,)
+        ).fetchone()
+        if alias:
+            message_id = alias[0]
         active, finished, known = [], [], {}
         for kind, (scope, _) in hosts.items():
             _, journal = _journal_directory(workspace_dir, scope, conversation_id, create=False)
@@ -159,8 +174,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 finished.append(kind)
         if len(active) > 1:
             return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
-        with closing(sqlite3.connect(routes)) as route, route:
-            route.execute("CREATE TABLE IF NOT EXISTS turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL)")
+        dispatch_id = None
+        with route:
             prior = route.execute("SELECT kind FROM turns WHERE id=?", (message_id,)).fetchone()
             if len(known) > 1:
                 return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
@@ -168,7 +183,25 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             if previous is not None and requested is not None and previous != requested:
                 raise ValueError("REQUEST_COLLISION")
             kind = previous or requested
-            if active:
+            interrupted = route.execute(
+                "SELECT id, kind, payload FROM interrupted_dispatch WHERE slot=1"
+            ).fetchone()
+            completed_replay = previous is not None and known.get(previous) == "done"
+            if interrupted and (message_id == interrupted[0] or not completed_replay):
+                original_id, original_kind, saved_payload = interrupted
+                original_payload = json.loads(saved_payload)
+                if payload is not None and (requested != original_kind or payload != original_payload):
+                    if message_id == original_id:
+                        raise ValueError("REQUEST_COLLISION")
+                    return {"status": "ANOTHER_REQUEST_PENDING"}
+                if active and active[0] != original_kind:
+                    return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
+                if reply_id != original_id:
+                    route.execute("INSERT OR IGNORE INTO recovered_replies VALUES(?,?)",
+                                  (reply_id, original_id))
+                message_id, kind, payload = original_id, original_kind, original_payload
+                dispatch_id = original_id
+            elif active:
                 # A known, completed message can only read its stored result.
                 if kind is not None and kind != active[0] and known.get(kind) != "done":
                     return {"status": "ANOTHER_REQUEST_PENDING"}
@@ -183,8 +216,23 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                     kind = last[0]
                 else:
                     return {"status": "NO_PENDING_REQUEST"}
+            if not interrupted and payload is not None and not active and kind not in known:
+                # Record the original input before the business journal can receive it.
+                route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?)", (
+                    message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False)))
+                dispatch_id = message_id
             route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
-        return hosts[kind][1](message_id, payload)
+        try:
+            result = hosts[kind][1](message_id, payload)
+        except ValueError:
+            # A rejected request must not prevent the next valid action.
+            with route:
+                route.execute("DELETE FROM interrupted_dispatch WHERE id=?", (dispatch_id,))
+            raise
+        if dispatch_id is not None:
+            with route:
+                route.execute("DELETE FROM interrupted_dispatch WHERE id=?", (dispatch_id,))
+        return result
 
 
 def run_project_docs03_progress(*, auth, document_id, document, project_id,

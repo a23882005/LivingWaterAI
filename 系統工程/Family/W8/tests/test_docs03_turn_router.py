@@ -43,11 +43,65 @@ class Menu03RouterTests(unittest.TestCase):
             prepare_writeback=lambda _: {"status": "DOCS03_BACKUP_REQUIRED"},
             progress_answers=kind == "progress")
 
-    def turn(self, message, payload=None, **overrides):
+    def turn(self, message, payload=None, *, before_dispatch=None, **overrides):
+        def dispatch(kind, mid, data):
+            if before_dispatch:
+                before_dispatch()
+            return self.original(kind, mid, data, **overrides)
+
         return docs03.run_project_docs03_turn(
             **(self.context | overrides), message_id=message, payload=payload,
-            account_turn=lambda mid, data: self.original("account", mid, data, **overrides),
-            progress_turn=lambda mid, data: self.original("progress", mid, data, **overrides))
+            account_turn=lambda mid, data: dispatch("account", mid, data),
+            progress_turn=lambda mid, data: dispatch("progress", mid, data))
+
+    def test_continue_restores_interrupted_first_dispatch(self):
+        for first, other in (("account", "progress"), ("progress", "account")):
+            with self.subTest(first=first), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                self.observe[first].return_value = None
+                self.observe[other].return_value = None
+
+                def interrupted():
+                    raise KeyboardInterrupt("before opening the business journal")
+
+                with self.assertRaises(KeyboardInterrupt):
+                    self.turn("first", getattr(self, first), before_dispatch=interrupted, **context)
+                self.assertEqual(self.turn("foreign-reply", conversation_id="other-chat", **context)["status"],
+                                 "NO_PENDING_REQUEST")
+                with self.assertRaisesRegex(PermissionError, "stale fixture login"):
+                    self.turn("expired-reply", document={"documentId": "fixture-doc"}, **context)
+                self.assertEqual(self.turn("other", getattr(self, other), **context)["status"],
+                                 "ANOTHER_REQUEST_PENDING")
+                changed = {**getattr(self, first), "revision": "different"}
+                with self.assertRaisesRegex(ValueError, "REQUEST_COLLISION"):
+                    self.turn("first", changed, **context)
+                self.land(first)
+                receipt = self.turn("recovered", **context)
+                self.assertEqual(receipt["result"]["file_id"], first)
+                self.assertEqual(self.turn("other", getattr(self, other), **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                self.assertEqual(self.turn("recovered", **context), receipt)
+                self.assertEqual(self.turn("first", getattr(self, first), **context), receipt)
+
+    def test_interrupted_checkpoint_clears_after_business_journal_rejects_preview(self):
+        self.stage["account"].side_effect = ValueError("preview is stale")
+
+        def interrupted():
+            raise KeyboardInterrupt("before opening the business journal")
+
+        with self.assertRaises(KeyboardInterrupt):
+            self.turn("original-confirm", self.account, before_dispatch=interrupted)
+        with self.assertRaisesRegex(ValueError, "preview is stale"):
+            self.turn("retry-stale")
+        self.assertEqual(self.turn("new-answer", self.progress)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+
+    def test_invalid_first_dispatch_releases_router_checkpoint(self):
+        self.stage["account"].side_effect = ValueError("preview is stale")
+        with self.assertRaisesRegex(ValueError, "preview is stale"):
+            self.turn("stale", self.account)
+        self.assertEqual(self.turn("new-answer", self.progress)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
 
     def land(self, kind):
         self.observe[kind].return_value = {

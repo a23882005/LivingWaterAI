@@ -1,5 +1,5 @@
 """Use the original Docs login for the 03 write and receipt journal."""
-from contextlib import closing
+from contextlib import closing, contextmanager
 import fcntl
 from hashlib import sha256
 from importlib.util import module_from_spec, spec_from_file_location
@@ -76,6 +76,53 @@ def _pin_candidate(workspace_dir, project_id, conversation_id, source, revision,
     return str(target)
 
 
+class _DriveWriteSlot:
+    """Serialize 03 upload authorizations to one Drive file in a shared host workspace."""
+
+    def __init__(self, workspace_dir, file_id, project_id, conversation_id):
+        self.workspace = workspace_dir
+        self.file_id = file_id
+        self.owner = (project_id, conversation_id)
+
+    @contextmanager
+    def connect(self, *, create):
+        _, path = _journal_directory(self.workspace, "03-drive-write", self.file_id, create=create)
+        if not create and not path.exists():
+            yield None
+            return
+        if path.is_symlink():
+            raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
+        if create:
+            os.close(os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600))
+        with closing(sqlite3.connect(path)) as db, db:
+            db.execute("CREATE TABLE IF NOT EXISTS current_write "
+                       "(slot INTEGER PRIMARY KEY CHECK(slot=1), owner TEXT NOT NULL)")
+            yield db
+
+    def _token(self, key):
+        if key["file_id"] != self.file_id:
+            raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        return json.dumps([self.owner, key], sort_keys=True)
+
+    def acquire(self, key):
+        owner = self._token(key)
+        with self.connect(create=True) as db:
+            db.execute("INSERT OR IGNORE INTO current_write VALUES(1,?)", (owner,))
+            return db.execute("SELECT owner FROM current_write WHERE slot=1").fetchone() == (owner,)
+
+    def release(self, key):
+        owner = self._token(key)
+        with self.connect(create=False) as db:
+            if db is not None:
+                db.execute("DELETE FROM current_write WHERE owner=?", (owner,))
+
+    def finish(self, key, result):
+        if (isinstance(result, dict) and result.get("status") == "PERSISTED_REMOTE_VERIFIED"
+                and all(result.get(field) == value for field, value in key.items())):
+            self.release(key)
+        return result
+
+
 class _Docs03Session:
     stage = "IDLE"
 
@@ -105,7 +152,7 @@ class _Docs03Session:
 def run_docs03(*, auth, document_id, document, project_id, conversation_id,
                build_menu, recover_receipt, message_id, payload=None,
                workspace_dir=None, private_dir=None, prepare_writeback=None,
-               progress_answers=False):
+               progress_answers=False, write_slot=None):
     """Use fresh native Docs metadata and the same host workspace on every turn.
 
     Supply workspace_dir for new runs. The host must reuse it and pass trusted
@@ -126,11 +173,32 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             workspace_dir, project_id, conversation_id, create=payload is not None)
         if payload is None and not journal.is_file():
             return {"status": "DOCS03_JOURNAL_MISSING"}
+    def observe(key):
+        result = recover_receipt(key)
+        return write_slot.finish(key, result) if write_slot is not None else result
+
+    def prepare(staged):
+        if write_slot is None:
+            return prepare_writeback(staged)
+        key = staged["receipt_key"]
+        if not write_slot.acquire(key):
+            return {"status":"DOCS03_DRIVE_WRITE_PENDING", "request_id":key["request_id"],
+                    "text":"另一筆 03 正在寫回同一檔案。完成原筆讀回後，再輸入「繼續」。"}
+        try:
+            result = prepare_writeback(staged)
+        except Exception:
+            write_slot.release(key)
+            raise
+        if result.get("status") != "DOCS03_DRIVE_UPDATE_REQUIRED":
+            write_slot.release(key)
+        return result
+
     entry = _load_module("conversation_entry").ConversationEntry(
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
-        prepare_account=None, build_menu=build_menu, recover_receipt=recover_receipt,
-        prepare_writeback=prepare_writeback, progress_answers=progress_answers,
+        prepare_account=None, build_menu=build_menu, recover_receipt=observe,
+        prepare_writeback=prepare if prepare_writeback is not None else None,
+        progress_answers=progress_answers,
     )
     if payload is None:
         return entry.handle_message(message_id, "繼續")
@@ -298,7 +366,7 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
                                 conversation_id, workspace_dir, message_id,
                                 login_account, client_id, family_alias,
                                 progress_file_id, download_progress, build_menu,
-                                payload=None, verified_backup=None):
+                                payload=None, verified_backup=None, write_slot=None):
     """Stage or resume one XLSX answer using the original 03 menu.
 
     The trusted host supplies the fixed Excel ID and a fresh download callback.
@@ -390,7 +458,7 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
         project_id=project_id + "|03-progress", conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
         build_menu=lambda _: ProgressMenu(progress_menu()), recover_receipt=recover,
-        prepare_writeback=prepare, progress_answers=True)
+        prepare_writeback=prepare, progress_answers=True, write_slot=write_slot)
     if result["status"] == "PERSISTED_REMOTE_VERIFIED":
         receipt = result["result"]
         if (receipt["file_id"], receipt["client_id"]) != (progress_file_id, client_id):
@@ -406,7 +474,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                        download_original, payload=None,
                        backup_original=None, replace_original=None,
                        native_writeback=False, verified_backup=None,
-                       progress_file_id=None, download_progress=None, build_original_menu=None):
+                       progress_file_id=None, download_progress=None, build_original_menu=None,
+                       write_slot=None):
     """Connect 03 to same-account Drive callbacks supplied by the trusted host.
 
     backup_original(file_id) returns a newly saved backup's ID and download path.
@@ -545,7 +614,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         project_id=project_id, conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
         build_menu=build_menu, recover_receipt=recover_receipt,
-        prepare_writeback=prepare_writeback if managed or native_writeback else None)
+        prepare_writeback=prepare_writeback if managed or native_writeback else None,
+        write_slot=write_slot if native_writeback else None)
     if result.get("status") == "PERSISTED_REMOTE_VERIFIED":
         receipt = result["result"]
         if (receipt.get("file_id"), receipt.get("client_id")) != (official_drive_file_id, client_id):
@@ -612,7 +682,8 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
         return run_project_docs03_progress(
             **context, **household, message_id=mid, payload=data,
             progress_file_id=progress_file_id, download_progress=current_workbook,
-            build_menu=progress_menu, verified_backup=verified_progress_backup)
+            build_menu=progress_menu, verified_backup=verified_progress_backup,
+            write_slot=_DriveWriteSlot(workspace_dir, progress_file_id, project_id, conversation_id))
 
     def account_turn(mid, data):
         ledger = current_ledger()
@@ -624,7 +695,8 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
             mutation_staging_dir=mutation_staging_dir, download_original=download_original,
             native_writeback=True, verified_backup=verified_account_backup,
             progress_file_id=progress_file_id, download_progress=current_workbook,
-            build_original_menu=account_menu)
+            build_original_menu=account_menu,
+            write_slot=_DriveWriteSlot(workspace_dir, official_drive_file_id, project_id, conversation_id))
 
     return run_project_docs03_turn(
         **context, message_id=message_id, payload=payload,

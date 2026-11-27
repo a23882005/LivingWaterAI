@@ -85,6 +85,50 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertEqual(self.prepare.call_count, 2)
         self.select.assert_called_once()
 
+    def test_shared_workspace_authorizes_only_one_confirmation_until_receipt(self):
+        landed = {}
+        prepares = Mock(return_value={"status": "DOCS03_DRIVE_UPDATE_REQUIRED"})
+
+        def send(chat, message, payload=None):
+            key = {**self.key, "request_id": chat}
+            return self.turn(message, payload=payload, conversation_id=chat,
+                build_menu=lambda auth: SimpleNamespace(
+                    auth=SimpleNamespace(family_login=auth),
+                    select=lambda *_, **__: {**self.staged, "result": {"receipt_key": key}}),
+                recover_receipt=lambda key: landed.get(key["request_id"]), prepare_writeback=prepares,
+                write_slot=docs03._DriveWriteSlot(self.workspace, self.key["file_id"], "fixture-project", chat))
+
+        chats = ("first-chat", "second-chat")
+        with ThreadPoolExecutor(2) as workers:
+            states = list(workers.map(lambda chat: send(chat, "confirm", self.payload)["status"], chats))
+        self.assertCountEqual(states, ["DOCS03_DRIVE_UPDATE_REQUIRED", "DOCS03_DRIVE_WRITE_PENDING"])
+        winner = chats[states.index("DOCS03_DRIVE_UPDATE_REQUIRED")]
+        other = chats[states.index("DOCS03_DRIVE_WRITE_PENDING")]
+        self.assertEqual(send(other, "still-pending")["status"], "DOCS03_DRIVE_WRITE_PENDING")
+        self.assertEqual(send(winner, "waiting-for-drive")["status"], "AWAIT_DRIVE_CONFIRMATION")
+        prepares.assert_called_once()
+        landed[winner] = {"status": "PERSISTED_REMOTE_VERIFIED", **self.key, "request_id": winner}
+        self.assertEqual(send(winner, "check-original")["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertEqual(send(other, "after-readback")["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+        self.assertEqual(prepares.call_count, 2)
+
+    def test_slot_releases_preflight_failures_but_not_unrelated_receipts(self):
+        file_id = self.key["file_id"]
+        first = docs03._DriveWriteSlot(self.workspace, file_id, "fixture-project", "original-chat")
+        other = docs03._DriveWriteSlot(self.workspace, file_id, "fixture-project", "another-chat")
+        different_file = docs03._DriveWriteSlot(self.workspace, "another-file", "fixture-project", "another-chat")
+        self.prepare.side_effect = ValueError("backup mismatch")
+        with self.assertRaisesRegex(ValueError, "backup mismatch"):
+            self.turn("confirm", self.payload, write_slot=first)
+        self.assertTrue(other.acquire(self.key))
+        self.assertTrue(different_file.acquire({**self.key, "file_id": "another-file"}))
+        first.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
+        self.assertFalse(first.acquire(self.key))
+        other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key, "fingerprint": "different"})
+        self.assertFalse(first.acquire(self.key))
+        other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
+        self.assertTrue(first.acquire(self.key))
+
     def test_lost_update_response_and_new_message_replay(self):
         def submit():
             self.land_receipt()

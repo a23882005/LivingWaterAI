@@ -283,7 +283,8 @@ class ConversationEntry:
         if (saved is None and staged.get("_managed_writeback") == "ready"
                 and self.prepare_writeback is not None):
             submission = self.prepare_writeback(staged["result"])
-            if isinstance(submission, dict) and submission["status"] == "DOCS03_BACKUP_REQUIRED":
+            if isinstance(submission, dict) and submission["status"] in (
+                    "DOCS03_BACKUP_REQUIRED", "DOCS03_DRIVE_WRITE_PENDING"):
                 return submission
             if isinstance(submission, dict) and submission["status"] == "DOCS03_PREVIEW_STALE":
                 with self.db() as db:

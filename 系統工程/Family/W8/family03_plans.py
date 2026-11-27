@@ -279,13 +279,19 @@ def six(plans, prices, exposures, calc, single_stocks=()):
     return rows
 
 
-def read_progress(path, member, reader):
+def _progress_snapshot(path, member, reader):
     revision = sha256(path.read_bytes()).hexdigest()
     book = reader.read_xlsx(path)
     history = book.sheets["選擇歷程"].rows
-    if book.sheets["選擇進度"].headers[:2] != ["股票配置・選擇進度", member] or any(
+    progress = book.sheets["選擇進度"]
+    if progress.headers[:2] != ["股票配置・選擇進度", member] or any(
             row["家人"] != member for row in history):
         raise PermissionError("FAMILY03_PROGRESS_OWNER_MISMATCH")
+    return revision, history, progress
+
+
+def read_progress(path, member, reader):
+    revision, history, _ = _progress_snapshot(path, member, reader)
     return revision, history
 
 
@@ -293,21 +299,32 @@ def progress_receipt(path, member, payload, reader):
     """Read the original event using only the already-bound XLSX."""
     event_id = payload.get("event_id")
     source_revision = payload.get("source_revision")
-    if set(payload) != {"action", "event_id", "source_revision"} or not all(
+    if (set(payload) != {"action", "event_id", "source_revision"}
+            or payload.get("action") != "progress_receipt" or not all(
             isinstance(value, str) and len(value) == 64
             and all(char in "0123456789abcdef" for char in value)
-            for value in (event_id, source_revision)):
+            for value in (event_id, source_revision))):
         raise ValueError("FAMILY03_INVALID_PROGRESS_RECEIPT_REQUEST")
-    revision, history = read_progress(path, member, reader)
+    revision, history, progress = _progress_snapshot(path, member, reader)
     matches = [index for index, row in enumerate(history, 1) if row["事件識別"] == event_id]
     if len(matches) > 1:
         raise ValueError("FAMILY03_DUPLICATE_PROGRESS_EVENT")
     status = ("FAMILY03_PROGRESS_EVENT_FOUND" if matches else
               "FAMILY03_PROGRESS_NOT_SAVED" if revision == source_revision else
               "FAMILY03_PROGRESS_SOURCE_CHANGED")
-    return {"status": status, "本人": member, "檔名": path.name,
-            "事件識別": event_id, "事件序號": matches[0] if matches else None,
-            "歷程筆數": len(history), "revision": revision, "唯讀": True}
+    receipt = {"status": status, "本人": member, "檔名": path.name,
+               "事件識別": event_id, "事件序號": matches[0] if matches else None,
+               "歷程筆數": len(history), "revision": revision, "唯讀": True}
+    if matches:
+        receipt["讀回時為最新作答"] = matches[0] == len(history)
+        # The official writers store this label on the progress sheet, even
+        # for legacy interviews that do not store a schema-2 step in history.
+        position = next((row.get(member) for row in progress.rows
+                         if row.get("股票配置・選擇進度") == "續選位置"), None)
+        if isinstance(position, str) and position.strip():
+            receipt["讀回時續選位置"] = position.strip()
+    return receipt
+
 
 
 def menu_handler(entry, member, folder, calc, guide, project_holdings, *,

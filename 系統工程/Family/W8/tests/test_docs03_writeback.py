@@ -871,6 +871,7 @@ class Docs03NativeHostTests(unittest.TestCase):
         revision = sha256(self.workbook.read_bytes()).hexdigest()
         candidate = self.root / "candidate.xlsx"
         history.append([event, "mou"])
+        book.active.append(["續選位置", "偏好年報酬"])
         book.save(candidate)
         backup = self.root / "backup.xlsx"
         copyfile(self.workbook, backup)
@@ -934,6 +935,8 @@ class Docs03NativeHostTests(unittest.TestCase):
         reply = self.turn(message_id="after-relogin")
         self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
         self.assertEqual(reply["result"]["progress_receipt"]["事件序號"], 1)
+        self.assertEqual(reply["result"]["progress_receipt"]["讀回時續選位置"], "偏好年報酬")
+        self.assertTrue(reply["result"]["progress_receipt"]["讀回時為最新作答"])
         self.assertEqual(self.turn(message_id="answer-redelivered", payload=answer), reply)
         self.download_workbook.reset_mock()
         for changed in ({"progress_file_id": "other-workbook"},

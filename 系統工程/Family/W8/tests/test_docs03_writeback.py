@@ -1,6 +1,7 @@
 """Regression tests for the original Menu 03 confirmation journal."""
 from concurrent.futures import ThreadPoolExecutor
 from importlib.util import module_from_spec, spec_from_file_location
+import os
 from pathlib import Path
 from hashlib import sha256
 from shutil import copyfile
@@ -129,6 +130,104 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertFalse(first.acquire(self.key))
         other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
         self.assertTrue(first.acquire(self.key))
+
+    def test_process_exit_during_preflight_does_not_hold_the_file(self):
+        for kind in ("account", "progress"):
+            with self.subTest(kind=kind), TemporaryDirectory(dir=self.workspace) as folder:
+                workspace = Path(folder)
+                slot = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                              "fixture-project", "original-chat")
+                payload = self.payload if kind == "account" else {
+                    "revision": "before", "question_id": "goal", "key": "goal", "reply": "成長",
+                }
+                options = dict(workspace_dir=workspace, progress_answers=kind == "progress")
+                child = os.fork()
+                if child == 0:
+                    try:
+                        self.turn("first", payload, **options, write_slot=slot,
+                                  prepare_writeback=lambda _: os._exit(23))
+                    finally:
+                        os._exit(24)
+                self.assertEqual(os.waitstatus_to_exitcode(os.waitpid(child, 0)[1]), 23)
+
+                competing = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                   "fixture-project", "another-chat")
+                self.allow_update()
+                other_key = {**self.key, "request_id": "competing-request"}
+                other_menu = lambda auth: SimpleNamespace(
+                    auth=SimpleNamespace(family_login=auth),
+                    select=lambda *_, **__: {**self.staged, "result": {"receipt_key": other_key}})
+                other = self.turn("competing", payload, **options, conversation_id="another-chat",
+                                  write_slot=competing, build_menu=other_menu)
+                self.assertEqual(other["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+                self.assertEqual(self.turn("continue", **options, write_slot=slot)["status"],
+                                 "DOCS03_DRIVE_WRITE_PENDING")
+                other_receipt = {"status": "PERSISTED_REMOTE_VERIFIED", **other_key}
+                recover_other = lambda key: other_receipt if key == other_key else None
+                self.assertEqual(self.turn("check-original", **options, conversation_id="another-chat",
+                                           write_slot=competing, recover_receipt=recover_other)["status"],
+                                 "PERSISTED_REMOTE_VERIFIED")
+                self.assertEqual(self.turn("continue-after-readback", **options, write_slot=slot)["status"],
+                                 "DOCS03_DRIVE_UPDATE_REQUIRED")
+                self.assertEqual(self.turn("continue-again", **options, write_slot=slot)["status"],
+                                 "AWAIT_DRIVE_CONFIRMATION")
+
+    def test_preflight_recovery_and_receipt_replay_matrix(self):
+        interruptions = (
+            ("backup required", {"status": "DOCS03_BACKUP_REQUIRED"}, None),
+            ("invalid response", {}, ValueError),
+            ("bad backup", ValueError("fixture backup mismatch"), ValueError),
+            ("timed out", TimeoutError("fixture download timeout"), TimeoutError),
+            ("cancelled locally", KeyboardInterrupt(), KeyboardInterrupt),
+        )
+        for kind in ("account", "progress"):
+            payload = self.payload if kind == "account" else {
+                "revision": "before", "question_id": "goal", "key": "goal", "reply": "成長",
+            }
+            for failure, result, error in interruptions:
+                for delivery in ("original", "new_message", "continue"):
+                    with self.subTest(kind=kind, failure=failure, delivery=delivery), \
+                            TemporaryDirectory(dir=self.workspace) as folder:
+                        workspace = Path(folder)
+                        slot = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                      "fixture-project", "original-chat")
+                        competitor = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                            "fixture-project", "another-chat")
+                        options = dict(workspace_dir=workspace, progress_answers=kind == "progress",
+                                       write_slot=slot)
+                        self.select.reset_mock()
+                        self.prepare.reset_mock(side_effect=True)
+                        self.recover.return_value = None
+                        if isinstance(result, BaseException):
+                            self.prepare.side_effect = result
+                        else:
+                            self.prepare.return_value = result
+                        if error is None:
+                            self.assertEqual(self.turn("original", payload, **options)["status"],
+                                             "DOCS03_BACKUP_REQUIRED")
+                        else:
+                            with self.assertRaises(error):
+                                self.turn("original", payload, **options)
+                        self.assertTrue(competitor.acquire(self.key))
+                        competitor.release(self.key)
+
+                        self.prepare.side_effect = None
+                        self.allow_update()
+                        data = None if delivery == "continue" else payload
+                        update = self.turn(delivery, data, **options)
+                        self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+                        self.assertFalse(competitor.acquire(self.key))
+                        waiting = self.turn("waiting", **options)
+                        self.assertEqual(waiting["status"], "AWAIT_DRIVE_CONFIRMATION")
+                        self.assertNotIn("update_file_args", waiting)
+                        self.land_receipt()
+                        receipt = self.turn("readback", **options)
+                        self.assertEqual(receipt["status"], "PERSISTED_REMOTE_VERIFIED")
+                        self.assertEqual(self.turn("resend", payload, **options), receipt)
+                        self.assertTrue(competitor.acquire(self.key))
+                        self.prepare.assert_has_calls([unittest.mock.call(self.staged["result"])] * 2)
+                        self.assertEqual(self.prepare.call_count, 2)
+                        self.select.assert_called_once()
 
     def test_unrecognized_preflight_response_does_not_consume_original_writeback(self):
         self.turn("first", self.payload)

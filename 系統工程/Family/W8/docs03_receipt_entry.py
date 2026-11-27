@@ -104,6 +104,19 @@ class _DriveWriteSlot:
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
         return json.dumps([self.owner, key], sort_keys=True)
 
+    @contextmanager
+    def preflight(self, key):
+        """Serialize read-only checks without persisting an upload reservation."""
+        owner = self._token(key)
+        directory, _ = _journal_directory(self.workspace, "03-drive-write", self.file_id, create=True)
+        path = directory / "preflight.lock"
+        with os.fdopen(os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600), "a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            with self.connect(create=False) as db:
+                existing = None if db is None else db.execute(
+                    "SELECT owner FROM current_write WHERE slot=1").fetchone()
+            yield existing in (None, (owner,))
+
     def acquire(self, key):
         owner = self._token(key)
         with self.connect(create=True) as db:
@@ -183,17 +196,22 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         if write_slot is None:
             return prepare_writeback(staged)
         key = staged["receipt_key"]
-        if not write_slot.acquire(key):
-            return {"status":"DOCS03_DRIVE_WRITE_PENDING", "request_id":key["request_id"],
-                    "text":"另一筆 03 正在寫回同一檔案。完成原筆讀回後，再輸入「繼續」。"}
-        try:
-            result = prepare_writeback(staged)
-        except Exception:
-            write_slot.release(key)
-            raise
-        if not conversation.is_native_drive_update(result, key):
-            write_slot.release(key)
-        return result
+        pending = {"status":"DOCS03_DRIVE_WRITE_PENDING", "request_id":key["request_id"],
+                   "text":"另一筆 03 正在寫回同一檔案。完成原筆讀回後，再輸入「繼續」。"}
+        with write_slot.preflight(key) as available:
+            if not available:
+                return pending
+            try:
+                result = prepare_writeback(staged)
+            except Exception:
+                write_slot.release(key)
+                raise
+            if conversation.is_native_drive_update(result, key):
+                if not write_slot.acquire(key):
+                    return pending
+            else:
+                write_slot.release(key)
+            return result
 
     entry = conversation.ConversationEntry(
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,

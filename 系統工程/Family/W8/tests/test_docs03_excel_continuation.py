@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 
 from openpyxl import Workbook, load_workbook
 
-from test_docs03_writeback import TestLogin, docs03, mutation_fixture
+from test_docs03_writeback import READBACK_CASES, TestLogin, docs03, incomplete_download_bytes, mutation_fixture
 
 
 calc = docs03._load_module("equity_sleeve")
@@ -46,6 +46,15 @@ class ExcelContinuationTests(unittest.TestCase):
         for operation in ("answer", "restore"):
             for combined in (False, True):
                 for case in cases:
+                    with self.subTest(operation=operation, combined=combined, case=case), TemporaryDirectory() as folder:
+                        root = Path(folder)
+                        with patch.dict(os.environ, {"CODEX_PRIMARY_RUNTIME_NODE_MODULES": str(root / "no-node-package")}):
+                            self.check_turn(root, combined, operation, case)
+
+    def test_progress_incomplete_download_recovers_original_event_matrix(self):
+        for operation in ("answer", "restore"):
+            for combined in (False, True):
+                for case in READBACK_CASES:
                     with self.subTest(operation=operation, combined=combined, case=case), TemporaryDirectory() as folder:
                         root = Path(folder)
                         with patch.dict(os.environ, {"CODEX_PRIMARY_RUNTIME_NODE_MODULES": str(root / "no-node-package")}):
@@ -156,6 +165,17 @@ class ExcelContinuationTests(unittest.TestCase):
         elif case == "candidate empty":
             candidate.write_bytes(b"")
 
+        incomplete = root / "partial-download" / source.name
+        if case in READBACK_CASES:
+            incomplete.parent.mkdir()
+        if case == "readback preflight":
+            incomplete.write_bytes(incomplete_download_bytes(source.read_bytes(), case))
+            download.side_effect = [("progress-id", source), ("progress-id", incomplete)]
+            retry = turn("partial-preflight", verified_backup=("backup-id", backup))
+            self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+            self.assertNotIn("update_file_args", retry)
+            download.side_effect = None
+
         update = turn("backup", verified_backup=("backup-id", backup))
         if case in ("changed workbook", "candidate lost", "candidate changed", "candidate empty"):
             self.assertEqual(update["status"], "DOCS03_PREVIEW_STALE")
@@ -190,6 +210,15 @@ class ExcelContinuationTests(unittest.TestCase):
             later["選擇進度"]["B3"] = "更新後的題目"
             later.save(source)
             later.close()
+        if case in READBACK_CASES:
+            incomplete.write_bytes(incomplete_download_bytes(source.read_bytes(), case))
+            download.return_value = ("progress-id", incomplete)
+            messages = ("partial", "partial-again") if case == "readback repeated" else ("partial",)
+            for message in messages:
+                retry = turn(message, verified_backup=("backup-id", backup))
+                self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+                self.assertNotIn("update_file_args", retry)
+            download.return_value = ("progress-id", source)
         receipt = turn("continue")
         self.assertEqual(receipt["status"], "PERSISTED_REMOTE_VERIFIED")
         observed = receipt["result"]["progress_receipt"]
@@ -198,6 +227,8 @@ class ExcelContinuationTests(unittest.TestCase):
         self.assertEqual(observed["讀回時為最新作答"], case != "later answer present")
         self.assertEqual(observed["讀回時續選位置"], "更新後的題目" if case == "later answer present" else position)
         self.assertEqual(turn("resend", payload), receipt)
+        if case in READBACK_CASES:
+            self.assertEqual(turn("partial"), receipt)
         self.assertEqual(turn("again"), receipt)
         _, rows = plans.read_progress(source, member, calc.reader_module())
         self.assertEqual(len(rows), original_count + 1 + (case == "later answer present"))

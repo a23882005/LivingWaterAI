@@ -75,7 +75,7 @@ MOU 文件登記模式在本人原登入及登記寫入後，以 `project_login_
 | `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 及路徑以 `verified_progress_backup=(id, path)` 或 `verified_account_backup=(id, path)` 接回當筆。 |
 | `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的 Excel 或帳本原 ID 呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
 | `DOCS03_DRIVE_WRITE_PENDING` | 同一工作區內另一筆 03 已占用該 Drive 檔的寫回。先在原對話讀回那筆收據，再繼續目前這筆。 |
-| `DOCS03_READ_RETRY_REQUIRED` | 本輪下載逾時、連線中斷或本機下載檔未取得。下一則「繼續」沿原待辦及階段重試。若先前已發出寫回授權，就只查原收據。 |
+| `DOCS03_READ_RETRY_REQUIRED` | 本輪下載逾時、連線中斷、未取得本機檔，或下載的本人原檔暫時無法讀取。下一則「繼續」沿原待辦及階段重試。若先前已發出寫回授權，就只讀回原事件或收據。 |
 | `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
 | `DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION` | 無法由原紀錄確認兩條路的先後時，沿原訊息或原作答回查。查回舊結果的順序不影響原待辦順序。舊版若兩筆皆有首次派送時的來源紀錄，仍沿原順序續接。已被拒絕而取消的請求不影響下一則「繼續」查看上一筆已完成的結果。 |
 | `DOCS03_JOURNAL_RECOVERY_REQUIRED` | 某條路有無法讀取的原紀錄，先核對原對話的私人工作區，兩條路均暫停派送。 |

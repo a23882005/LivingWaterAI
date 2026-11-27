@@ -9,6 +9,31 @@ from pathlib import Path
 from shutil import copyfileobj
 import sqlite3
 from tempfile import NamedTemporaryFile
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
+
+
+class _IncompleteReadback(Exception):
+    """The original file was downloaded, but its bytes cannot be read yet."""
+
+
+def _read_retry():
+    return {"status": "DOCS03_READ_RETRY_REQUIRED",
+            "text": "這次暫時讀不到 03 所需的資料。請輸入「繼續」接回原待辦。"}
+
+
+@contextmanager
+def _read_ledger_download():
+    try:
+        yield
+    except sqlite3.DatabaseError as exc:
+        if (getattr(exc, "sqlite_errorcode", 0) & 0xff) not in (sqlite3.SQLITE_CORRUPT, sqlite3.SQLITE_NOTADB):
+            raise
+        raise _IncompleteReadback from exc
+    except ValueError as exc:
+        if str(exc) not in ("INVALID_SQLITE_HEADER", "INTEGRITY_FAILED"):
+            raise
+        raise _IncompleteReadback from exc
 
 
 def _load_module(name):
@@ -252,9 +277,12 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         complete_native_writeback=write_slot.complete if write_slot is not None else None,
         progress_answers=progress_answers, continue_latest_completed=True,
     )
-    if payload is None:
-        return entry.handle_message(message_id, "繼續")
-    return entry.handle_message(message_id, number=3, payload=payload)
+    try:
+        if payload is None:
+            return entry.handle_message(message_id, "繼續")
+        return entry.handle_message(message_id, number=3, payload=payload)
+    except _IncompleteReadback:
+        return _read_retry()
 
 
 def _is_progress_write(payload):
@@ -463,14 +491,13 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             result = hosts[kind][1](message_id, payload)
         except (ConnectionError, TimeoutError, FileNotFoundError):
             # Keep the original dispatch and its current writeback phase available.
-            return {"status":"DOCS03_READ_RETRY_REQUIRED",
-                    "text":"這次暫時讀不到 03 所需的資料。請輸入「繼續」接回原待辦。"}
+            return _read_retry()
         except ValueError:
             # A rejected request must not prevent the next valid action.
             with route:
                 route.execute("DELETE FROM interrupted_dispatch WHERE id=?", (dispatch_id,))
             raise
-        if dispatch_id is not None:
+        if dispatch_id is not None and result.get("status") != "DOCS03_READ_RETRY_REQUIRED":
             with route:
                 route.execute("DELETE FROM interrupted_dispatch WHERE id=?", (dispatch_id,))
         return result
@@ -538,9 +565,12 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
             raise PermissionError("DOCS03_PROGRESS_BINDING_MISMATCH")
         downloaded = current_workbook()
         reader = _load_module("equity_sleeve").reader_module()
-        result = planner.progress_receipt(downloaded, family_alias, {
-            "action": "progress_receipt", "event_id": key["request_id"],
-            "source_revision": key["source_revision"]}, reader)
+        try:
+            result = planner.progress_receipt(downloaded, family_alias, {
+                "action": "progress_receipt", "event_id": key["request_id"],
+                "source_revision": key["source_revision"]}, reader)
+        except (BadZipFile, ParseError) as exc:
+            raise _IncompleteReadback from exc
         return result, downloaded
 
     def recover(key):
@@ -688,7 +718,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                            "verified_drive_sha256": revision}
         stager = _load_module("on_demand_mutations").OnDemandMutationStager(
             auth=auth, staging_dir=mutation_staging_dir, **receipt_sources)
-        return stager.recover_receipt(key, fresh_path, fresh_id)
+        with _read_ledger_download():
+            return stager.recover_receipt(key, fresh_path, fresh_id)
 
     def recover_receipt(key):
         account = auth.require_login()
@@ -720,7 +751,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
         drive = _load_module("on_demand_drive_io")
         binding = drive.Binding(*binding_values, family_alias)
-        fresh = drive.inspect(fresh_path, binding)
+        with _read_ledger_download():
+            fresh = drive.inspect(fresh_path, binding)
         if fresh["sha256"] != plan["source"]["sha256"]:
             # The original update may have appeared since the earlier receipt lookup.
             saved = read_receipt(staged["receipt_key"], fresh_path, fresh_id)

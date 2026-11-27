@@ -248,6 +248,22 @@ class Menu03RouterTests(unittest.TestCase):
                 self.assertEqual(self.prepare[kind].call_count, 2)
                 self.stage[kind].assert_called_once()
 
+    def test_incomplete_initial_read_keeps_the_original_dispatch(self):
+        source = ("MOU", "fixture-client", "mou", "ledger", "workbook")
+        self.observe["progress"].side_effect = docs03._IncompleteReadback()
+        retry = self.turn("answer", self.progress, source_binding=source)
+        self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+        self.assertNotIn("update_file_args", retry)
+        with self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+            self.turn("wrong-source", source_binding=(*source[:-1], "other-workbook"))
+        self.observe["progress"].side_effect = None
+        self.assertEqual(self.turn("continue", source_binding=source)["status"], "DOCS03_BACKUP_REQUIRED")
+        self.land("progress")
+        saved = self.turn("read-back", source_binding=source)
+        self.assertEqual(saved["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertEqual(self.turn("continue", source_binding=source), saved)
+        self.stage["progress"].assert_called_once()
+
     def test_interrupted_checkpoint_clears_after_business_journal_rejects_preview(self):
         self.stage["account"].side_effect = ValueError("preview is stale")
 

@@ -22,6 +22,17 @@ spec = spec_from_file_location(
 docs03 = module_from_spec(spec)
 spec.loader.exec_module(docs03)
 
+READBACK_CASES = ("readback empty", "readback truncated", "readback unreadable",
+                  "readback repeated", "readback preflight")
+
+
+def incomplete_download_bytes(contents, case):
+    if case == "readback truncated":
+        return contents[:len(contents) // 2]
+    if case in ("readback unreadable", "readback preflight"):
+        return b"incomplete download"
+    return b""
+
 
 class TestLogin:
     user_id = "MOU"
@@ -1041,6 +1052,14 @@ class Docs03NativeHostTests(unittest.TestCase):
                             TemporaryDirectory() as folder:
                         self.check_account_preview_receipt(Path(folder), from_document, combined, case)
 
+    def test_account_incomplete_download_recovers_original_receipt_matrix(self):
+        for from_document in (False, True):
+            for combined in (False, True):
+                for case in READBACK_CASES:
+                    with self.subTest(from_document=from_document, combined=combined, case=case), \
+                            TemporaryDirectory() as folder:
+                        self.check_account_preview_receipt(Path(folder), from_document, combined, case)
+
     def check_account_preview_receipt(self, root, from_document, combined, case):
         from openpyxl import Workbook
 
@@ -1158,6 +1177,15 @@ class Docs03NativeHostTests(unittest.TestCase):
             copyfile(candidate, source)
             download.side_effect = [("ledger-id", backup), ("ledger-id", source)]
 
+        incomplete = root / "partial-download.db"
+        if case == "readback preflight":
+            incomplete.write_bytes(incomplete_download_bytes(source.read_bytes(), case))
+            download.side_effect = [("ledger-id", source), ("ledger-id", incomplete)]
+            retry = turn("partial-preflight", saved_backup=("backup-id", backup))
+            self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+            self.assertNotIn("update_file_args", retry)
+            download.side_effect = None
+
         update = turn("backup", saved_backup=("backup-id", backup))
         if case in ("workbook changed", "ledger changed", "candidate lost", "candidate changed", "candidate empty"):
             self.assertEqual(update["status"], "DOCS03_PREVIEW_STALE")
@@ -1200,7 +1228,18 @@ class Docs03NativeHostTests(unittest.TestCase):
                 with self.assertRaises(TimeoutError):
                     turn("retry")
                 download.side_effect = None
+            if case in READBACK_CASES:
+                incomplete.write_bytes(incomplete_download_bytes(source.read_bytes(), case))
+                download.return_value = ("ledger-id", incomplete)
+                messages = ("partial", "partial-again") if case == "readback repeated" else ("partial",)
+                for message in messages:
+                    retry = turn(message, saved_backup=("backup-id", backup))
+                    self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+                    self.assertNotIn("update_file_args", retry)
+                download.return_value = ("ledger-id", source)
             reply = turn("continue")
+            if case in READBACK_CASES:
+                self.assertEqual(turn("partial"), reply)
         self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
         self.assertEqual(reply["result"]["request_id"], "fixture-confirmation")
         self.assertEqual(reply["result"]["business_result"]["version"], original_count + 1)

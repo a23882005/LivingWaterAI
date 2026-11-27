@@ -220,7 +220,7 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
 
     Each trusted callback accepts (message_id, payload) and uses the same
     household, project, conversation and workspace passed to this router.
-    The combined entry supplies its registered sources for first-dispatch recovery.
+    The combined entry supplies its registered sources for pending work and recovery.
     """
     if not isinstance(message_id, str) or not message_id.strip() or len(message_id) > 256:
         raise ValueError("STABLE_MESSAGE_ID_REQUIRED")
@@ -255,6 +255,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 slot INTEGER PRIMARY KEY CHECK(slot=1),
                 id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL,
                 source_digest TEXT);
+            CREATE TABLE IF NOT EXISTS original_sources (
+                id TEXT PRIMARY KEY, digest TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS recovered_replies (
                 id TEXT PRIMARY KEY, original_id TEXT NOT NULL);
         """)
@@ -267,7 +269,7 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
         ).fetchone()
         if alias:
             message_id = alias[0]
-        active, finished, known = [], {}, {}
+        active, finished, known = {}, {}, {}
         exact_saved = False
         if requested is not None:
             conversation = _load_module("conversation_entry")
@@ -303,11 +305,12 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             if original:
                 known[kind] = original[0]
             if row and row[1] in ("open", "running", "writeback"):
-                active.append(kind)
+                active[kind] = row[0]
             elif row and row[1] == "done":
                 finished[kind] = row[0]
         if len(active) > 1:
             return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
+        active_kind = next(iter(active), None)
         dispatch_id = None
         with route:
             prior = route.execute("SELECT kind FROM turns WHERE id=?", (message_id,)).fetchone()
@@ -336,7 +339,7 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                     if message_id == original_id:
                         raise ValueError("REQUEST_COLLISION")
                     return {"status": "ANOTHER_REQUEST_PENDING"}
-                if active and active[0] != original_kind:
+                if active_kind is not None and active_kind != original_kind:
                     return {"status": "DOCS03_MULTIPLE_PENDING_REQUESTS"}
                 if reply_id != original_id:
                     route.execute("INSERT OR IGNORE INTO recovered_replies VALUES(?,?)",
@@ -345,9 +348,9 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 dispatch_id = original_id
             elif active:
                 # A terminal message can only read its existing result or cancellation.
-                if kind is not None and kind != active[0] and not terminal_replay:
+                if kind is not None and kind != active_kind and not terminal_replay:
                     return {"status": "ANOTHER_REQUEST_PENDING"}
-                kind = kind or active[0]
+                kind = kind or active_kind
             elif kind is None:
                 if len(finished) == 1:
                     kind = next(iter(finished))
@@ -368,6 +371,15 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?,?)", (
                     message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False), source_digest))
                 dispatch_id = message_id
+            if active_kind is not None and active_kind == kind and not terminal_replay:
+                original_source = route.execute(
+                    "SELECT digest FROM original_sources WHERE id=?", (active[kind],)
+                ).fetchone()
+                if original_source is not None and original_source[0] != source_digest:
+                    raise PermissionError("DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED")
+            if dispatch_id is not None and source_digest is not None:
+                route.execute("INSERT OR IGNORE INTO original_sources VALUES(?,?)",
+                              (dispatch_id, source_digest))
             route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
         try:
             result = hosts[kind][1](message_id, payload)

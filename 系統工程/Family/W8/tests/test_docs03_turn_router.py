@@ -115,6 +115,42 @@ class Menu03RouterTests(unittest.TestCase):
                                  "DOCS03_BACKUP_REQUIRED")
                 self.stage[kind].assert_called_once()
 
+    def test_staged_work_keeps_original_sources_until_receipt_is_read(self):
+        source = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+        changes = (
+            {"source_binding": (*source[:-1], "other-excel")},
+            {"source_binding": (*source[:3], "other-db", source[4])},
+            {"source_binding": None},
+            {"document_id": "different-doc",
+             "document": {"documentId": "different-doc", "revisionId": "fixture-revision"}},
+        )
+        for kind in ("account", "progress"):
+            with self.subTest(kind=kind), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder), "source_binding": source}
+                dispatch = Mock()
+                self.assertEqual(self.turn("first", getattr(self, kind), **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                for phase in ("before-upload", "after-upload"):
+                    for change in changes:
+                        with self.assertRaisesRegex(PermissionError,
+                                                    "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                            self.turn(phase, before_dispatch=dispatch, **(context | change))
+                    dispatch.assert_not_called()
+                    if phase == "before-upload":
+                        self.prepare[kind].return_value = {
+                            "status": "DOCS03_DRIVE_UPDATE_REQUIRED",
+                            "update_file_args": {"fileId": kind, "file_uri": "/fixture/upload"},
+                        }
+                        self.assertEqual(self.turn("authorize", **context)["status"],
+                                         "DOCS03_DRIVE_UPDATE_REQUIRED")
+                self.land(kind)
+                result = self.turn("recover", **context)
+                self.assertEqual(result["status"], "PERSISTED_REMOTE_VERIFIED")
+                self.assertEqual(self.turn("replay", getattr(self, kind), **context), result)
+                self.prepare[kind].assert_called()
+                self.assertEqual(self.prepare[kind].call_count, 2)
+                self.stage[kind].assert_called_once()
+
     def test_legacy_interrupted_record_keeps_its_original_payload_after_upgrade(self):
         _, route = docs03._journal_directory(self.context["workspace_dir"], "fixture-project|03-router",
                                              "original-chat", create=True)

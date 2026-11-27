@@ -325,7 +325,10 @@ def build_project_menu(*, family_login, project_name, login_account,
                 if preview["status"] != "FAMILY03_ACCOUNT_PREVIEW":
                     return preview
                 target = _load(ROOT/"family03_target.py", "family03_full_target")
-                return target_writer(target.confirmed_request(preview, payload, client_id))
+                result = target_writer(target.confirmed_request(preview, payload, client_id))
+                if result.get("status") == "STAGED_NOT_PERSISTED":
+                    return {**result, "family03_progress_revision": preview["進度檔摘要"]}
+                return result
             if target_writer is not None and ("record" in payload or "owner_confirmed" in payload):
                 if any("approved_role" in row for row in payload.get("record", {}).get("allocations", [])):
                     raise ValueError("文件角色需從已確認的預覽保存")

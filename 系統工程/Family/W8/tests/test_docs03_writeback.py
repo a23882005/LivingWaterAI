@@ -1017,6 +1017,171 @@ class Docs03NativeHostTests(unittest.TestCase):
         progress.assert_not_called()
         self.build_menu.assert_called_once_with(self.auth, self.workbook, self.ledger)
 
+    def test_account_preview_to_same_file_receipt_matrix(self):
+        cases = ("normal", "delayed receipt", "download retry", "workbook changed",
+                 "ledger changed", "candidate lost", "same backup ID", "different backup bytes",
+                 "stale confirmation", "receipt during preflight")
+        for from_document in (False, True):
+            for combined in (False, True):
+                for case in cases:
+                    with self.subTest(from_document=from_document, combined=combined, case=case), \
+                            TemporaryDirectory() as folder:
+                        self.check_account_preview_receipt(Path(folder), from_document, combined, case)
+
+    def check_account_preview_receipt(self, root, from_document, combined, case):
+        from openpyxl import Workbook
+
+        source = root / "remote.db"
+        backup = root / "backup.db"
+        workbook = root / "Joseph_03_股票配置選擇進度.xlsx"
+        mutation_fixture.seed(source)
+        auth = TestLogin()
+        auth.user_id, auth.client_id = "JO", mutation_fixture.CLIENT
+        book = Workbook()
+        book.active.title = "選擇進度"
+        book.active["A1"] = "已指定方案一"
+        book.save(workbook)
+        workbook_revision = sha256(workbook.read_bytes()).hexdigest()
+        target = docs03._load_module("family03_target")
+        positions = [{"ticker": "VT", "weight": {"value_state": "KNOWN", "value": 1}}]
+        if from_document:
+            pack = {"target": {"target_hash": "approved-hash", "target_version": 1, "payload": {
+                "draft": {"original_allocation_version": "approved", "target_lines": [
+                    {"asset_type": "股票ETF", "weight": {"value": 1}}]}}},
+                "trusted_approved_target_source": {"source_reference": "synthetic"}}
+            preview = target.document_preview({"方案": "方案一"}, {"VT": 100},
+                workbook_revision, {"source_sha256": sha256(source.read_bytes()).hexdigest()}, pack)
+            # Use the fixture's registered instrument; catalogue mapping has its own tests.
+            preview["allocations"] = [{"instrument_key": "VT", "weight": "1"}]
+            self.assertNotEqual(preview["revision"], workbook_revision)
+        else:
+            with sqlite3.connect(source) as db:
+                db.execute("INSERT INTO final_target_version VALUES "
+                           "(?, 'LONG_TERM', 1, NULL, 'CONFIRMED', 'COMPLETE', "
+                           "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)", (auth.client_id,))
+                db.execute("INSERT INTO final_target_allocation VALUES "
+                           "(?, 'LONG_TERM', 1, 'VT', 1000000, 'ACCEPTED', NULL, NULL, NULL)",
+                           (auth.client_id,))
+            snapshot = {"source_sha256": sha256(source.read_bytes()).hexdigest(), "tables": {
+                "final_target_version": [{"target_key": "LONG_TERM", "version_no": 1,
+                                          "lifecycle_state": "CONFIRMED", "completeness_state": "COMPLETE"}],
+                "portfolio_instrument": [{"instrument_key": "VT", "ticker": "VT", "instrument_type": "STOCK"}],
+                "final_target_allocation": [{"target_key": "LONG_TERM", "version_no": 1,
+                                             "instrument_key": "VT", "weight_units": 1000000}],
+            }}
+            with patch.object(target, "bond_tickers", return_value=set()):
+                preview = target.account_preview(snapshot, {"方案": "方案一"},
+                                                 {"VT": 100}, {}, None, workbook_revision)
+        original_count = 0 if from_document else 1
+        copyfile(source, backup)
+        payload = {"action": "confirm_account", "owner_confirmed": True,
+                   "revision": preview["revision"], "source_sha256": preview["帳本摘要"],
+                   "mentor_result": {
+                       "work6_snapshot_id": "fixture-confirmation", "loop_status": "FINAL_TARGET_CONFIRMED",
+                       "identity": {"client_id": auth.client_id}, "route": {"decision": "C_ONLY"},
+                       "final_target_engine_result": {"formal_output_eligibility": {"eligible": True, "scope": "FULL"}},
+                       "final_target": {"value_state": "KNOWN", "snapshot": {
+                           "positions": positions, "confirmation_status": "CONFIRMED"}}}}
+        project = docs03._load_module("on_demand_project")
+        load = project._load
+        with patch.object(project, "_load", side_effect=lambda path, name:
+                          SimpleNamespace(menu_handler=lambda *_a, **_kw: lambda _data: preview)
+                          if path.name == "family03_plans.py" else load(path, name)):
+            menu = project.build_project_menu(family_login=auth, project_name="Joseph",
+                login_account="JO", client_id=auth.client_id, family_alias="Joseph",
+                downloaded_db_path=source, official_drive_file_id="ledger-id",
+                verified_drive_sha256=preview["帳本摘要"], mutation_staging_dir=root,
+                family03_progress_path=workbook)
+
+        download = Mock(return_value=("ledger-id", source))
+        build = Mock(return_value=menu)
+        args = dict(auth=auth, document_id="fixture-doc",
+                    document={"documentId": "fixture-doc", "revisionId": "fixture-revision"},
+                    project_id="fixture-project", conversation_id="original-chat", workspace_dir=root,
+                    project_name="Joseph", login_account="JO", family_alias="Joseph", client_id=auth.client_id,
+                    official_drive_file_id="ledger-id", progress_file_id="workbook-id",
+                    download_original=download, download_progress=lambda _: ("workbook-id", workbook),
+                    build_original_menu=build, mutation_staging_dir=root)
+
+        def turn(message, data=None, saved_backup=None):
+            if combined:
+                return docs03.run_project_docs03_native_turn(**args, message_id=message, payload=data,
+                                                            verified_account_backup=saved_backup)
+            return docs03.run_project_docs03(**args, message_id=message, payload=data,
+                                             native_writeback=True, verified_backup=saved_backup)
+
+        if case == "stale confirmation":
+            with self.assertRaisesRegex(ValueError, "方案或帳本已有更新"):
+                turn("stale", {**payload, "revision": "not-confirmed"})
+        self.assertEqual(turn("confirm", payload)["status"], "DOCS03_BACKUP_REQUIRED")
+        with sqlite3.connect(source) as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM final_target_version").fetchone(), (original_count,))
+        journal, _ = docs03._journal_directory(root, args["project_id"], args["conversation_id"], create=False)
+        candidate = next(journal.glob("upload-*.db"))
+        if case == "workbook changed":
+            book.active["A1"] = "已指定方案二"
+            book.save(workbook)
+        elif case == "ledger changed":
+            with sqlite3.connect(source) as db:
+                db.execute("CREATE TABLE separate_update (note TEXT)")
+        elif case == "candidate lost":
+            candidate.unlink()
+        elif case == "same backup ID":
+            with self.assertRaisesRegex(ValueError, "DISTINCT_REMOTE_BACKUP_REQUIRED"):
+                turn("bad-backup", saved_backup=("ledger-id", backup))
+        elif case == "different backup bytes":
+            bad_backup = root / "bad-backup.db"
+            copyfile(backup, bad_backup)
+            with sqlite3.connect(bad_backup) as db:
+                db.execute("CREATE TABLE separate_update (note TEXT)")
+            with self.assertRaisesRegex(RuntimeError, "STALE_SOURCE_OR_BACKUP_MISMATCH"):
+                turn("bad-backup", saved_backup=("bad-backup", bad_backup))
+        elif case == "receipt during preflight":
+            copyfile(candidate, source)
+            download.side_effect = [("ledger-id", backup), ("ledger-id", source)]
+
+        update = turn("backup", saved_backup=("backup-id", backup))
+        if case in ("workbook changed", "ledger changed", "candidate lost"):
+            self.assertEqual(update["status"], "DOCS03_PREVIEW_STALE")
+            self.assertNotIn("update_file_args", update)
+            with sqlite3.connect(source) as db:
+                self.assertEqual(db.execute("SELECT COUNT(*) FROM final_target_version").fetchone(), (original_count,))
+            return
+        if case == "receipt during preflight":
+            reply = update
+            self.assertNotIn("update_file_args", reply)
+            download.side_effect = None
+        else:
+            self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+            self.assertEqual(update["update_file_args"]["fileId"], "ledger-id")
+            if case == "delayed receipt":
+                waiting = turn("waiting", saved_backup=("backup-id", backup))
+                self.assertEqual(waiting["status"], "AWAIT_DRIVE_CONFIRMATION")
+                self.assertNotIn("update_file_args", waiting)
+            copyfile(update["update_file_args"]["file_uri"], source)
+            if case == "download retry" and combined:
+                download.side_effect = [TimeoutError("temporary read failure")]
+                self.assertEqual(turn("retry")["status"], "DOCS03_READ_RETRY_REQUIRED")
+                download.side_effect = None
+            elif case == "download retry":
+                download.side_effect = [TimeoutError("temporary read failure")]
+                with self.assertRaises(TimeoutError):
+                    turn("retry")
+                download.side_effect = None
+            reply = turn("continue")
+        self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertEqual(reply["result"]["request_id"], "fixture-confirmation")
+        self.assertEqual(reply["result"]["business_result"]["version"], original_count + 1)
+        self.assertEqual(turn("resend", payload), reply)
+        self.assertEqual(turn("continue-again"), reply)
+        with sqlite3.connect(source) as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM final_target_version").fetchone(), (original_count + 1,))
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM _family_io_receipts").fetchone(), (1,))
+            self.assertEqual(db.execute("SELECT version_no, instrument_key, weight_units "
+                                        "FROM final_target_allocation ORDER BY version_no").fetchall(),
+                             [(version, "VT", 1000000) for version in range(1, original_count + 2)])
+        self.assertEqual(sha256(backup.read_bytes()).hexdigest(), preview["帳本摘要"])
+
 
 if __name__ == "__main__":
     unittest.main()

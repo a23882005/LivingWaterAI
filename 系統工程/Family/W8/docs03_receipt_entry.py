@@ -642,7 +642,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             response = self.menu.select(number, payload=payload)
             if response["status"] != "DB_WRITEBACK_REQUIRED":
                 return response
-            staged = response["result"]
+            staged = dict(response["result"])
+            workbook_revision = staged.pop("family03_progress_revision", None)
             plan = staged["writeback_plan"]
             candidate = plan["candidate"]
             path = _pin_candidate(workspace_dir, project_id, conversation_id,
@@ -650,7 +651,10 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             staged = {**staged, "writeback_plan":{
                 **plan, "candidate":{**candidate, "path":path}}}
             if check_progress:
-                staged["progress_binding"] = {"file_id":progress_file_id, "revision":payload["revision"]}
+                staged["progress_binding"] = {
+                    "file_id":progress_file_id,
+                    "revision":payload["revision"] if workbook_revision is None else workbook_revision,
+                }
             return {**response, "result":staged}
 
     def build_menu(login):

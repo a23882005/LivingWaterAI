@@ -79,7 +79,8 @@ def document_preview(final, stock_weights, revision, snapshot, pack):
             "原股票占比單位":equity, "每百萬單位":units, "保留部位":retained,
             "角色對照":{k:engine_role(k,r["ticker"],r["kind"]) for k,r in roles.items()},
             "核准來源":proof["source_reference"], "配置版本":draft["original_allocation_version"],
-            "allocations":rows, "revision":version, "帳本摘要":snapshot["source_sha256"]}
+            "allocations":rows, "revision":version, "進度檔摘要":revision,
+            "帳本摘要":snapshot["source_sha256"]}
 
 
 def engine_role(role, ticker, kind):
@@ -219,7 +220,7 @@ def account_preview(snapshot, final, stock_weights, catalog, pool_path, revision
         rows.append({**key, "weight":format(Decimal(value) / 1_000_000, "f")})
     return {"status":"FAMILY03_ACCOUNT_PREVIEW", "唯讀":True, "股票方案":final["方案"],
             "原全帳戶目標":target_key, "原全帳戶版本":version, "原股票占比單位":equity_units, "每百萬單位":units,
-            "保留部位":retained, "角色對照":roles, "allocations":rows, "revision":revision,
+            "保留部位":retained, "角色對照":roles, "allocations":rows, "revision":revision, "進度檔摘要":revision,
             "帳本摘要":snapshot["source_sha256"]}
 
 

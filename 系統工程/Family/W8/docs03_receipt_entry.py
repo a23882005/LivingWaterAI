@@ -215,11 +215,12 @@ def _is_progress_write(payload):
 
 def run_project_docs03_turn(*, auth, document_id, document, project_id,
                             conversation_id, workspace_dir, message_id,
-                            account_turn, progress_turn, payload=None):
+                            account_turn, progress_turn, payload=None, source_binding=None):
     """Route 03 confirmation, answers and plain continue to their original journal.
 
     Each trusted callback accepts (message_id, payload) and uses the same
     household, project, conversation and workspace passed to this router.
+    The combined entry supplies its registered sources for first-dispatch recovery.
     """
     if not isinstance(message_id, str) or not message_id.strip() or len(message_id) > 256:
         raise ValueError("STABLE_MESSAGE_ID_REQUIRED")
@@ -234,6 +235,10 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
     if not isinstance(project_id, str) or not project_id.strip():
         raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
     _Docs03Session(auth, document_id).check(document)
+    source_digest = None
+    if source_binding is not None:
+        source_digest = sha256(json.dumps([document_id, source_binding], ensure_ascii=False,
+                                         sort_keys=True, allow_nan=False).encode()).hexdigest()
     hosts = {"account": (project_id, account_turn),
              "progress": (project_id + "|03-progress", progress_turn)}
     directory, routes = _journal_directory(
@@ -248,10 +253,14 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             CREATE TABLE IF NOT EXISTS turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS interrupted_dispatch (
                 slot INTEGER PRIMARY KEY CHECK(slot=1),
-                id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL);
+                id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL,
+                source_digest TEXT);
             CREATE TABLE IF NOT EXISTS recovered_replies (
                 id TEXT PRIMARY KEY, original_id TEXT NOT NULL);
         """)
+        columns = {row[1] for row in route.execute("PRAGMA table_info(interrupted_dispatch)")}
+        if "source_digest" not in columns:
+            route.execute("ALTER TABLE interrupted_dispatch ADD COLUMN source_digest TEXT")
         reply_id = message_id
         alias = route.execute(
             "SELECT original_id FROM recovered_replies WHERE id=?", (reply_id,)
@@ -309,12 +318,14 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 raise ValueError("REQUEST_COLLISION")
             kind = previous or requested
             interrupted = route.execute(
-                "SELECT id, kind, payload FROM interrupted_dispatch WHERE slot=1"
+                "SELECT id, kind, payload, source_digest FROM interrupted_dispatch WHERE slot=1"
             ).fetchone()
             saved_replay = previous is None and exact_saved
             terminal_replay = saved_replay or known.get(previous) in ("done", "closed", "cancelled")
             if interrupted and (message_id == interrupted[0] or not terminal_replay):
-                original_id, original_kind, saved_payload = interrupted
+                original_id, original_kind, saved_payload, original_source_digest = interrupted
+                if original_source_digest is not None and original_source_digest != source_digest:
+                    raise PermissionError("DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED")
                 original_payload = json.loads(saved_payload)
                 if message_id != original_id and previous is not None:
                     return {"status": "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION"}
@@ -354,8 +365,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                     return {"status": "NO_PENDING_REQUEST"}
             if not interrupted and payload is not None and not active and kind not in known and not saved_replay:
                 # Record the original input before the business journal can receive it.
-                route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?)", (
-                    message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False)))
+                route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?,?)", (
+                    message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False), source_digest))
                 dispatch_id = message_id
             route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
         try:
@@ -716,4 +727,5 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
 
     return run_project_docs03_turn(
         **context, message_id=message_id, payload=payload,
-        account_turn=account_turn, progress_turn=progress_turn)
+        account_turn=account_turn, progress_turn=progress_turn,
+        source_binding=(login_account, client_id, family_alias, official_drive_file_id, progress_file_id))

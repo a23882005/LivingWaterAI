@@ -1,6 +1,7 @@
 """Exercise Menu 03 continuation across both original journals."""
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
+import json
 from pathlib import Path
 import sqlite3
 from tempfile import TemporaryDirectory
@@ -47,7 +48,7 @@ class Menu03RouterTests(unittest.TestCase):
             prepare_writeback=self.prepare[kind],
             progress_answers=kind == "progress")
 
-    def turn(self, message, payload=None, *, before_dispatch=None, **overrides):
+    def turn(self, message, payload=None, *, before_dispatch=None, source_binding=None, **overrides):
         def dispatch(kind, mid, data):
             if before_dispatch:
                 before_dispatch()
@@ -55,6 +56,7 @@ class Menu03RouterTests(unittest.TestCase):
 
         return docs03.run_project_docs03_turn(
             **(self.context | overrides), message_id=message, payload=payload,
+            source_binding=source_binding,
             account_turn=lambda mid, data: dispatch("account", mid, data),
             progress_turn=lambda mid, data: dispatch("progress", mid, data))
 
@@ -86,6 +88,47 @@ class Menu03RouterTests(unittest.TestCase):
                                  "DOCS03_BACKUP_REQUIRED")
                 self.assertEqual(self.turn("recovered", **context), receipt)
                 self.assertEqual(self.turn("first", getattr(self, first), **context), receipt)
+
+    def test_interrupted_dispatch_keeps_its_original_source_binding(self):
+        source = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+
+        def interrupted():
+            raise KeyboardInterrupt("before opening the business journal")
+
+        for kind in ("account", "progress"):
+            with self.subTest(kind=kind), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                with self.assertRaises(KeyboardInterrupt):
+                    self.turn("first", getattr(self, kind), before_dispatch=interrupted,
+                              source_binding=source, **context)
+                for wrong in (None, (*source[:-1], "other-excel"),
+                              (*source[:3], "other-db", source[4]),
+                              ("AR", "different-client", "arthur", *source[3:])):
+                    with self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                        self.turn("continue", source_binding=wrong, **context)
+                with self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                    self.turn("continue", source_binding=source, document_id="different-doc",
+                              document={"documentId": "different-doc", "revisionId": "fixture-revision"},
+                              **context)
+                self.stage[kind].assert_not_called()
+                self.assertEqual(self.turn("continue", source_binding=source, **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                self.stage[kind].assert_called_once()
+
+    def test_legacy_interrupted_record_keeps_its_original_payload_after_upgrade(self):
+        _, route = docs03._journal_directory(self.context["workspace_dir"], "fixture-project|03-router",
+                                             "original-chat", create=True)
+        with closing(sqlite3.connect(route)) as db, db:
+            db.execute("CREATE TABLE interrupted_dispatch (slot INTEGER PRIMARY KEY, id TEXT NOT NULL, "
+                       "kind TEXT NOT NULL, payload TEXT NOT NULL)")
+            db.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?)",
+                       ("legacy-confirm", "account", json.dumps(self.account)))
+        source = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+        self.assertEqual(self.turn("continue-legacy", source_binding=source)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+        self.stage["account"].assert_called_once_with(3, payload=self.account)
+        self.land("account")
+        self.assertEqual(self.turn("resume-legacy", source_binding=source)["status"], "PERSISTED_REMOTE_VERIFIED")
 
     def test_transient_failure_before_dispatch_preserves_first_message(self):
         def timed_out():

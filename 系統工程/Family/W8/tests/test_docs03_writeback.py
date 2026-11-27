@@ -464,6 +464,22 @@ class Docs03NativeHostTests(unittest.TestCase):
         self.download_workbook.assert_not_called()
         self.build_menu.assert_not_called()
 
+    def test_native_first_dispatch_rejects_changed_sources_before_downloading(self):
+        self.download_ledger.side_effect = TimeoutError("ledger could not be loaded")
+        result = self.turn({"action": "confirm_account", "revision": "original"})
+        self.assertEqual(result["status"], "DOCS03_READ_RETRY_REQUIRED")
+        self.download_ledger.reset_mock(side_effect=True)
+        for candidate in ({"official_drive_file_id": "other-ledger"}, {"progress_file_id": "other-excel"}):
+            with self.subTest(changed=candidate), \
+                    self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                self.turn(message_id="continue", **candidate)
+        self.download_ledger.assert_not_called()
+        self.download_workbook.assert_not_called()
+        with patch.object(docs03, "run_project_docs03", return_value={"status": "DOCS03_BACKUP_REQUIRED"}) as account:
+            self.assertEqual(self.turn(message_id="continue")["status"], "DOCS03_BACKUP_REQUIRED")
+        self.assertEqual(account.call_args.kwargs["payload"],
+                         {"action": "confirm_account", "revision": "original"})
+
     def test_excel_uses_same_host_menu_with_only_the_excel_backup(self):
         answer = dict(revision="original", question_id="choice", key="goal", reply="成長")
 

@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from hashlib import sha256
 from shutil import copyfile
+import sqlite3
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -171,6 +172,70 @@ class Docs03WritebackTests(unittest.TestCase):
                                  "DOCS03_DRIVE_UPDATE_REQUIRED")
                 self.assertEqual(self.turn("continue-again", **options, write_slot=slot)["status"],
                                  "AWAIT_DRIVE_CONFIRMATION")
+
+    def test_crash_at_authorization_commit_keeps_both_records_consistent(self):
+        for kind in ("account", "progress"):
+            for stop in ("before_update", "before_commit", "after_commit"):
+                with self.subTest(kind=kind, stop=stop), \
+                        TemporaryDirectory(dir=self.workspace) as folder:
+                    workspace = Path(folder)
+                    slot = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                  "fixture-project", "original-chat")
+                    other = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                   "fixture-project", "another-chat")
+                    payload = self.payload if kind == "account" else {
+                        "revision": "before", "question_id": "goal", "key": "goal", "reply": "成長",
+                    }
+                    options = dict(workspace_dir=workspace, progress_answers=kind == "progress",
+                                   write_slot=slot)
+                    self.recover.return_value = None
+                    self.allow_update()
+                    connect = sqlite3.connect
+
+                    def crash_on_attempt(*args, **kwargs):
+                        db = connect(*args, **kwargs)
+
+                        recording_attempt = False
+
+                        def exit_at_stop(sql):
+                            nonlocal recording_attempt
+                            if sql.startswith("UPDATE ") and '"_managed_writeback":"attempted"' in sql:
+                                if stop == "before_update":
+                                    os._exit(23)
+                                recording_attempt = True
+                            if recording_attempt and sql == "COMMIT":
+                                os._exit(23)
+
+                        db.set_trace_callback(exit_at_stop)
+                        return db
+
+                    child = os.fork()
+                    if child == 0:
+                        try:
+                            if stop == "after_commit":
+                                result = self.turn("original", payload, **options)
+                                os._exit(23 if result["status"] == "DOCS03_DRIVE_UPDATE_REQUIRED" else 24)
+                            with patch.object(sqlite3, "connect", side_effect=crash_on_attempt):
+                                self.turn("original", payload, **options)
+                        finally:
+                            os._exit(24)
+                    self.assertEqual(os.waitstatus_to_exitcode(os.waitpid(child, 0)[1]), 23)
+
+                    if stop == "after_commit":
+                        self.assertFalse(other.acquire(self.key))
+                    else:
+                        self.assertTrue(other.acquire(self.key))
+                        other.release(self.key)
+                        self.assertEqual(self.turn("continue-before-send", **options)["status"],
+                                         "DOCS03_DRIVE_UPDATE_REQUIRED")
+                    unknown = self.turn("continue-after-send", **options)
+                    self.assertEqual(unknown["status"], "AWAIT_DRIVE_CONFIRMATION")
+                    self.assertNotIn("update_file_args", unknown)
+                    self.land_receipt()
+                    result = self.turn("confirmed-readback", **options)
+                    self.assertEqual(result["status"], "PERSISTED_REMOTE_VERIFIED")
+                    self.assertEqual(self.turn("resend-original", payload, **options), result)
+                    self.assertTrue(other.acquire(self.key))
 
     def test_preflight_recovery_and_receipt_replay_matrix(self):
         interruptions = (

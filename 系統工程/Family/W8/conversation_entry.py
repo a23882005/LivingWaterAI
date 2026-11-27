@@ -38,7 +38,7 @@ def is_native_drive_update(submission, receipt):
 class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
                  read_page, patch_page, prepare_account, build_menu, recover_receipt,
-                 prepare_writeback=None, progress_answers=False):
+                 prepare_writeback=None, progress_answers=False, prepare_native_writeback=None):
         if not all(isinstance(v, str) and v.strip() for v in (project_id, conversation_id)):
             raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
         folder = Path(private_dir).resolve(strict=True)
@@ -53,6 +53,7 @@ class ConversationEntry:
         self.prepare_account, self.build_menu = prepare_account, build_menu
         self.recover_receipt = recover_receipt
         self.prepare_writeback = prepare_writeback
+        self.prepare_native_writeback = prepare_native_writeback
         self.progress_answers = progress_answers
         self.lock = RLock()
         self.bound_request = None
@@ -297,7 +298,11 @@ class ConversationEntry:
         saved = self.recover_receipt(receipt)
         if (saved is None and staged.get("_managed_writeback") == "ready"
                 and self.prepare_writeback is not None):
-            submission = self.prepare_writeback(staged["result"])
+            attempted = {**staged, "_managed_writeback": "attempted"}
+            if self.prepare_native_writeback is None:
+                submission = self.prepare_writeback(staged["result"])
+            else:
+                submission = self.prepare_native_writeback(staged["result"], self.file, key, encode(attempted))
             status = submission.get("status") if isinstance(submission, dict) else None
             if status in (
                     "DOCS03_BACKUP_REQUIRED", "DOCS03_DRIVE_WRITE_PENDING"):
@@ -314,9 +319,10 @@ class ConversationEntry:
                     raise ValueError("DOCS03_INVALID_WRITEBACK_RESPONSE")
                 # A crash or ambiguous connector response after this point must
                 # recover by reading the original receipt, never by resubmitting.
-                staged = {**staged, "_managed_writeback": "attempted"}
-                with self.db() as db:
-                    db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
+                staged = attempted
+                if self.prepare_native_writeback is None:
+                    with self.db() as db:
+                        db.execute("UPDATE work SET output=? WHERE id=? AND phase='writeback'", (encode(staged), key))
                 if isinstance(submission, dict):
                     return submission
                 try:

@@ -123,6 +123,27 @@ class _DriveWriteSlot:
             db.execute("INSERT OR IGNORE INTO current_write VALUES(1,?)", (owner,))
             return db.execute("SELECT owner FROM current_write WHERE slot=1").fetchone() == (owner,)
 
+    def reserve_attempt(self, key, journal, request_id, attempted):
+        """Commit the file reservation and the conversation's attempt together."""
+        owner = self._token(key)
+        with self.connect(create=True) as db:
+            db.execute("ATTACH DATABASE ? AS turn_journal", (str(journal),))
+            # SQLite's cross-file rollback requires on-disk rollback journals.
+            for schema in ("main", "turn_journal"):
+                if db.execute(f"PRAGMA {schema}.journal_mode").fetchone() != ("delete",):
+                    raise RuntimeError("DOCS03_ROLLBACK_JOURNAL_REQUIRED")
+                db.execute(f"PRAGMA {schema}.synchronous=FULL")
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("INSERT OR IGNORE INTO current_write VALUES(1,?)", (owner,))
+            if db.execute("SELECT owner FROM current_write WHERE slot=1").fetchone() != (owner,):
+                return False
+            updated = db.execute(
+                "UPDATE turn_journal.work SET output=? WHERE id=? AND phase='writeback'",
+                (attempted, request_id))
+            if updated.rowcount != 1:
+                raise RuntimeError("DOCS03_WRITEBACK_ATTEMPT_NOT_RECORDED")
+            return True
+
     def release(self, key):
         owner = self._token(key)
         with self.connect(create=False) as db:
@@ -192,9 +213,7 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         result = recover_receipt(key)
         return write_slot.finish(key, result) if write_slot is not None else result
 
-    def prepare(staged):
-        if write_slot is None:
-            return prepare_writeback(staged)
+    def prepare_native(staged, journal, request_id, attempted):
         key = staged["receipt_key"]
         pending = {"status":"DOCS03_DRIVE_WRITE_PENDING", "request_id":key["request_id"],
                    "text":"另一筆 03 正在寫回同一檔案。完成原筆讀回後，再輸入「繼續」。"}
@@ -206,8 +225,10 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             except Exception:
                 write_slot.release(key)
                 raise
+            if callable(result):
+                raise ValueError("DOCS03_INVALID_WRITEBACK_RESPONSE")
             if conversation.is_native_drive_update(result, key):
-                if not write_slot.acquire(key):
+                if not write_slot.reserve_attempt(key, journal, request_id, attempted):
                     return pending
             else:
                 write_slot.release(key)
@@ -217,7 +238,8 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
         prepare_account=None, build_menu=build_menu, recover_receipt=observe,
-        prepare_writeback=prepare if prepare_writeback is not None else None,
+        prepare_writeback=prepare_writeback,
+        prepare_native_writeback=prepare_native if write_slot is not None else None,
         progress_answers=progress_answers,
     )
     if payload is None:

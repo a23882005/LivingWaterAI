@@ -166,7 +166,10 @@ def menu_handler(entry, member, folder, calc, *, market_reader=None, progress_pa
         stamp=sha256(json.dumps([revision,snapshot["source_sha256"],q],
             ensure_ascii=False,sort_keys=True,default=str).encode()).hexdigest()
         q.update(revision=revision,question_id=stamp,可重選題目={k:QUESTIONS[k][0] for k in answers if k in QUESTIONS and k!="review"})
-        if "reply" not in payload: return q
+        if "reply" not in payload:
+            if edit:
+                q["作答入口"] = {"edit": edit}
+            return q
         if (payload.get("revision")!=revision or payload.get("question_id")!=stamp
                 or payload.get("key")!=q["key"] or payload["reply"] not in q["選項"]):
             raise ValueError("FAMILY03_RELOAD_QUESTION")

@@ -495,6 +495,8 @@ def menu_handler(entry, member, folder, calc, guide, project_holdings, *,
             stamp=digest([revision,snapshot["source_sha256"],prompt])
             prompt.update(revision=revision,question_id=stamp,查詢入口={"action":"history"})
             if "reply" not in payload:
+                if action == "start_plans":
+                    prompt["作答入口"] = {"action": "start_plans"}
                 return prompt
             choice=payload["reply"]
             if (payload.get("revision"),payload.get("question_id"),payload.get("key"))!=(revision,stamp,key) or choice not in options:

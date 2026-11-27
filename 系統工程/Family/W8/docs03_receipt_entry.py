@@ -254,9 +254,14 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
 
 
 def _is_progress_write(payload):
-    return (set(payload) == {"revision", "question_id", "key", "reply"}
-            or (payload.get("action") == "restore"
-                and set(payload) == {"action", "version", "slot", "revision"}))
+    fields = set(payload)
+    answer = {"revision", "question_id", "key", "reply"}
+    return (fields == answer
+            or (fields == answer | {"edit"} and isinstance(payload["edit"], str)
+                and payload["edit"] and payload["edit"] == payload["key"])
+            or (fields == answer | {"action"} and payload["action"] == "start_plans")
+            or (fields == {"action", "version", "slot", "revision"}
+                and payload["action"] == "restore"))
 
 
 def run_project_docs03_turn(*, auth, document_id, document, project_id,

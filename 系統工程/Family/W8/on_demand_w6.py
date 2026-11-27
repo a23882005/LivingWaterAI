@@ -11,6 +11,23 @@ import importlib.util
 SRC = Path(__file__).with_name("w6_current_data.py")
 
 
+def bind_member_report_receiver(approved_report_module, *, source_id, rules_sha):
+    """Use the approved PR60 receipt producer inside the verified Menu04→13 route."""
+    from family_input import digest
+
+    producer = approved_report_module.MemberAnalysisReportProducer.from_menu04
+    renderer = approved_report_module.OnDemandW6Renderer
+
+    def receive(formal_source, payload, *, request, result, approved_w6_archive, approved_w6_renderer):
+        current_inputs = producer({'request': request, 'result': result},
+            source_id=source_id, rules_sha=rules_sha,
+            expected_request_digest=digest(request), expected_result_digest=digest(result))
+        engine = renderer(current_inputs, approved_w6_renderer, approved_w6_archive=approved_w6_archive)
+        return engine(formal_source, payload)
+
+    return receive
+
+
 class OnDemandW6Renderer:
     def __init__(self, trusted_current_input_producer, approved_w6_renderer=None,
                  *, approved_w6_archive=None):

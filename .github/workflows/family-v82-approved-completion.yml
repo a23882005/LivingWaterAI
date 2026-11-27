@@ -1,0 +1,50 @@
+name: Family V82 approved profile and cycle regression
+on:
+  pull_request:
+    paths:
+      - '系統工程/Family/W5/**'
+      - '系統工程/Family/W8/**'
+      - '系統工程/股票V80/正式Runtime/v82_runtime_greenfield/**'
+      - '.github/workflows/family-v82-approved-completion.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      W5_W2_ROOT: 系統工程/Family/W5/vendor/w2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned numeric, schema and calendar dependencies
+        run: |
+          python -m pip install -r 系統工程/Family/W5/requirements.lock exchange_calendars==4.13.2
+          npm install --prefix "$RUNNER_TEMP/family-v82" jsdom@26.1.0
+      - name: Verify current authorized sources
+        run: python 系統工程/Family/W5/verify_dependencies.py
+      - name: Run complete Family W5 and W8 synthetic regressions
+        env:
+          NODE_PATH: ${{ runner.temp }}/family-v82/node_modules
+        run: |
+          python -m pytest 系統工程/Family/W5/tests -q --junitxml=w5-v82-results.xml
+          python -m pytest 系統工程/Family/W8/tests -q --junitxml=w8-v82-results.xml
+      - name: Record scope
+        if: always()
+        run: |
+          echo 'Approved V82 rules and existing Family contracts: synthetic regression only. Private Joseph/MOU evidence is separate; Production HOLD, NO_TRADE. No credentials, broker actions or deployment.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: family-v82-contract-results
+          path: '*-v82-results.xml'
+          if-no-files-found: ignore

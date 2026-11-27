@@ -1,0 +1,18 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "VEA",
+  "source_url": "https://advisors.vanguard.com/investments/products/vea/vanguard-ftse-developed-markets-etf",
+  "source_artifact_sha256": "d0490fcf30c9b6674de963fbebd63a92191b0e0f5fe92385764a638594e2be01",
+  "retrieved_at": "2026-10-30T05:18:00.869070+00:00",
+  "is_stock_etf": true,
+  "replication": "INDEX_REPLICATION",
+  "evidence_kind": "OFFICIAL_ISSUER_BENCHMARK_AND_OBJECTIVE",
+  "evidence_reference": "PRIVATE_HANDOFF:product_sources/VEA.html#SHA256:d0490fcf30c9b6674de963fbebd63a92191b0e0f5fe92385764a638594e2be01",
+  "fund_name": "Vanguard FTSE Developed Markets ETF",
+  "benchmark": "FTSE Developed All Cap ex US Index",
+  "excerpts": [
+    "FTSE Developed All Cap ex US Index",
+    "Canada and the major markets of Europe and the Pacific region"
+  ],
+  "market_scope": "DEVELOPED_EX_US_ALL_CAP_REGIONAL_BROAD_INDEX"
+}

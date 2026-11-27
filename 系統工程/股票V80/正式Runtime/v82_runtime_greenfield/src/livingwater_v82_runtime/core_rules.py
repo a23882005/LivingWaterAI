@@ -65,6 +65,10 @@ def evaluate_sufficiency(facts: Iterable[EvidenceFact]) -> SufficiencyResult:
 class ValuationResult:
     level: ValuationLevel; completion: CompletionState; extreme_flag: ExtremeValuationFlag
     formal_output_eligible: bool; primary_metric: str|None; fallback_used: bool; reason_codes: tuple[str,...]
+    # Qualification of the already source-validated current Primary is not
+    # qualification of a historical cheap/expensive comparison or full report.
+    current_primary_eligible: bool=False
+    current_primary_value: Decimal|None=None
 
 def relative_multiple_level(current: Any, historical_median: Any) -> ValuationLevel:
     c,m=_d(current),_d(historical_median)
@@ -101,7 +105,13 @@ def resolve_valuation(metrics: Sequence[Mapping[str,Any]], waterfall: Sequence[s
     flag=ExtremeValuationFlag.ON if extreme_candidate and (hist_extreme or confirm_extreme) else ExtremeValuationFlag.OFF
     if not extreme_candidate and (hist_extreme or ratio_extreme) and confirm_extreme: flag=ExtremeValuationFlag.ON
     if lvl is ValuationLevel.UNKNOWN: reasons.append('VALUATION_LEVEL_UNKNOWN')
-    return ValuationResult(lvl,CompletionState.COMPLETE if lvl is not ValuationLevel.UNKNOWN else CompletionState.UNKNOWN,flag,lvl is not ValuationLevel.UNKNOWN,str(chosen.get('metric_name')),fallback,tuple(reasons))
+    current=_d(chosen.get('current'))
+    # Ratios keep their positive-value requirement. A source-qualified yield
+    # retains its sign under PV4A; this layer does not redefine its method.
+    current_eligible=(not isinstance(chosen.get('current'),bool) and current is not None
+        and (current>0 or chosen.get('metric_name')=='FCF_YIELD'))
+    return ValuationResult(lvl,CompletionState.COMPLETE if lvl is not ValuationLevel.UNKNOWN else CompletionState.UNKNOWN,flag,lvl is not ValuationLevel.UNKNOWN,str(chosen.get('metric_name')),fallback,tuple(reasons),
+        current_eligible,current if current_eligible else None)
 
 @dataclass(frozen=True, slots=True)
 class FundamentalsResult:

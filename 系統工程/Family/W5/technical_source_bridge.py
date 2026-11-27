@@ -67,7 +67,22 @@ def _originals():
     return scope,numeric
 
 
-def _aggregate(repo_path,vectors):
+def predicate_votes(rows):
+    """Translate the explicitly approved ETF non-voting slot, never UNKNOWN."""
+    values=[]
+    for row in rows:
+        value=row['truth']
+        if value=='NOT_APPLICABLE':
+            if (row['name']!='eps_guidance_not_worse' or row.get('effective_vote')!='FALSE'
+                or row.get('applicability')!='ETF_NOT_ISSUER'
+                or row.get('rule_profile') not in ('V82_COMPLETE_V04_OWNER_APPROVED','V82_FORMAL_IMPLEMENTATION_V1_0')):
+                raise ValueError('UNAUTHORIZED_NONVOTING_TECHNICAL_SLOT')
+            value='FALSE'
+        values.append(value)
+    return values
+
+
+def _aggregate(repo_path,vectors,ma20_ok='UNKNOWN'):
     from verify_dependencies import verify
     verify(repo_path)
     source=Path(repo_path).resolve()/'系統工程/股票V80/正式Runtime/v82_runtime_greenfield/src'
@@ -78,12 +93,40 @@ def _aggregate(repo_path,vectors):
         from livingwater_v82_runtime.enums import PredicateTruth
     finally:sys.path.remove(str(source))
     if Path(native.__file__).resolve().parent!=source/'livingwater_v82_runtime':raise ValueError('RUNTIME_SOURCE_MISMATCH')
-    kwargs={k:[PredicateTruth(x['truth']) for x in vectors[k]] for k in NAMES}
-    result=evaluate_technical(**kwargs,ma20_ok=PredicateTruth.UNKNOWN)
+    kwargs={k:[PredicateTruth(x) for x in predicate_votes(vectors[k])] for k in NAMES}
+    result=evaluate_technical(**kwargs,ma20_ok=PredicateTruth(ma20_ok))
     return {k:getattr(result,k).value for k in ('right_confirmation','runaway_up','runaway_down')}
 
 
+def mapped_numeric_signals(current, previous):
+    """The existing bridge's approved comparisons, shared by observed intake.
+
+    These are named numeric predicates only. Metadata, session receipts and
+    unresolved predicates retain their independent validation requirements.
+    """
+    out=[]
+    def pair(name):return _number(current.get(name)) and _number(previous.get(name))
+    if pair('macd_12_26'):
+        out.append(('right_signals','dif_up',current['macd_12_26']>previous['macd_12_26'],['DIF[t]','DIF[p]']))
+    if pair('macd_histogram'):
+        a,b=previous['macd_histogram'],current['macd_histogram']
+        out.append(('up_confirm','macd_bull_hist_expanding',a>0 and b>0 and abs(b)>abs(a),['H[p]','H[t]']))
+        out.append(('down_accel','macd_bear_hist_expanding',a<0 and b<0 and abs(b)>abs(a),['H[p]','H[t]']))
+    if all(_number(current.get(k)) for k in ('ma5','ma10','ma20')):
+        out.append(('up_confirm','ma5_gt_ma10_gt_ma20',current['ma5']>current['ma10']>current['ma20'],['MA5[t]','MA10[t]','MA20[t]']))
+    return out
+
+
 def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
+    module=sys.modules.get('same_run_market_cache')
+    cache=module.active_cache() if module is not None else None
+    if cache is not None:
+        return cache.memo('W5.build_partial_technical',{'history':history,'metadata':metadata,'evaluated_at':evaluated_at},
+            lambda:_build_partial_technical_original(history,metadata=metadata,evaluated_at=evaluated_at,repo_path=repo_path),repo_root=repo_path)
+    return _build_partial_technical_original(history,metadata=metadata,evaluated_at=evaluated_at,repo_path=repo_path)
+
+
+def _build_partial_technical_original(history,*,metadata,evaluated_at,repo_path):
     """Return partial facts and original aggregation, never deployment permission.
 
     metadata is supplied by the trusted source adapter, not inferred from ticker.
@@ -99,10 +142,15 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
     snapshot_mode=meta.get('evaluation_mode')=='SNAPSHOT_AFTER_ACQUISITION'
     snapshot_at=None
     if snapshot_mode:
-        approved_times={'global':'2026-10-19T23:20:09Z','taiwan':'2026-10-20T07:14:26Z'}
-        snapshot_at=approved_times.get(meta.get('market_region'))
-        if meta.get('data_provenance')=='SYNTHETIC':snapshot_at=meta.get('artifact_written_at')
-        if snapshot_at is None or _time(snapshot_at)>now:issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
+        # Each downloaded artifact has its own availability boundary. A fixed
+        # October acquisition date cannot represent a later incremental file.
+        # This is acquisition timing only, never historical publication proof.
+        snapshot_at=meta.get('artifact_written_at')
+        try:
+            if snapshot_at is None or _time(snapshot_at)>now:
+                issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
+        except (ValueError,TypeError,AttributeError):
+            snapshot_at=None;issues.append('SNAPSHOT_NOT_YET_AVAILABLE')
     required=('asset_id','symbol','exchange','currency','instrument_reference','source_reference','receipt_reference','calendar_reference','session_timezone','provider_price_basis','source_run')
     if any(not meta.get(k) for k in required):issues.append('SOURCE_METADATA_REQUIRED')
     if meta.get('producer_version')!=VERSION:issues.append('PRODUCER_VERSION_MISMATCH')
@@ -120,6 +168,7 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
             incomplete=True;continue
         if incomplete:issues.append('NONCONTIGUOUS_COMPLETED_BARS');break
         if snapshot_mode:
+            if snapshot_at is None:continue
             rec['available_at']=snapshot_at
             count+=1
             continue
@@ -182,13 +231,11 @@ def build_partial_technical(history,*,metadata,evaluated_at,repo_path):
             df=pd.DataFrame([{k:float(r[k]) for k in ('Close','High','Low','Volume')} for r in base])
             current=numeric.technical(df);previous=numeric.technical(df.iloc[:-1]);raw={'current':current,'previous':previous}
             def pair(name):return _number(current.get(name)) and _number(previous.get(name))
-            if pair('macd_12_26'):put('right_signals','dif_up',current['macd_12_26']>previous['macd_12_26'],['DIF[t]','DIF[p]'])
+            for group,name,value,deps in mapped_numeric_signals(current,previous):
+                put(group,name,value,deps)
             if pair('macd_histogram'):
                 a,b=previous['macd_histogram'],current['macd_histogram']
-                put('up_confirm','macd_bull_hist_expanding',a>0 and b>0 and abs(b)>abs(a),['H[p]','H[t]'])
-                put('down_accel','macd_bear_hist_expanding',a<0 and b<0 and abs(b)>abs(a),['H[p]','H[t]'])
                 known['macd_cross_positive']=a<=0 and b>0
-            if all(_number(current.get(k)) for k in ('ma5','ma10','ma20')):put('up_confirm','ma5_gt_ma10_gt_ma20',current['ma5']>current['ma10']>current['ma20'],['MA5[t]','MA10[t]','MA20[t]'])
             if pair('ma20'):
                 known['above_ma20']=float(base[-1]['Close'])>current['ma20']
                 known['reclaim_ma20']=float(base[-2]['Close'])<=previous['ma20'] and float(base[-1]['Close'])>current['ma20']

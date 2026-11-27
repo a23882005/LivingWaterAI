@@ -6,6 +6,8 @@ performance proxy and never infers missing theme/style/market-cap/currency expos
 """
 from __future__ import annotations
 
+from work2.benchmark_reader import APPROVED_B_SHA256
+
 from datetime import datetime, timezone
 from itertools import combinations
 import math
@@ -18,7 +20,6 @@ WORK2_VERSION = "C-W2-v1.0.1"
 WORK1_CONTRACT_VERSION = "C-W1-v1.0.1"
 MODULE_NAME = "lookthrough_exposure_result"
 CURRENT_B_DRIVE_FILE_ID = "1vbaPznrzrDwZ17AeLXSLJErMrXwxPl1-"
-CURRENT_B_SOT_SHA256 = "f639f5b46b7ff0c7ab2884a0ce01739d852c94f8e383f1966463d48178a77b02"
 B_SOURCE_ID = "SRC_B_WORKBOOK"
 WEIGHT_TOLERANCE = 1e-9
 CONSERVATION_TOLERANCE = 0.005  # 50bp; accommodates official rounded buckets such as 100.04%.
@@ -142,7 +143,7 @@ def _validate_benchmark(benchmark: Mapping[str, Any], issues: List[Dict[str, Any
         issues.append(_issue("C_SCHEMA_TYPE_INVALID", "BLOCKING", "benchmark.benchmark_reference",
                              "Benchmark reference must be an object.", blocking=True))
         return False
-    if ref.get("drive_file_id") != CURRENT_B_DRIVE_FILE_ID or ref.get("file_fingerprint_sha256") != CURRENT_B_SOT_SHA256:
+    if ref.get("drive_file_id") != CURRENT_B_DRIVE_FILE_ID or ref.get("file_fingerprint_sha256") not in APPROVED_B_SHA256:
         issues.append(_issue("C_BENCHMARK_REFERENCE_MISMATCH", "BLOCKING", "benchmark.benchmark_reference",
                              "B benchmark File ID/fingerprint does not match the Work4 bound formal SOT.",
                              blocking=True, source_reference_ids=ref.get("source_reference_ids", [])))

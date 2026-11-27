@@ -1,0 +1,41 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "CPAI",
+  "evidence_kind": "OFFICIAL_ISSUER_OBJECTIVE_AND_STRUCTURE",
+  "verified_on": "2026-10-29",
+  "source_scope": "PUBLIC_PRODUCT_STRUCTURE__NOT_CURRENT_VALUATION_OR_SAFETY",
+  "fund_name": "Counterpoint Quantitative Equity ETF",
+  "source_url": "https://counterpointfunds.com/cpai/",
+  "is_stock_etf": true,
+  "structure_kind": "ACTIVE_BROAD_EQUITY_SELECTION",
+  "security_universe": "US_LISTED_COMMON_STOCKS_AND_ADRS_ANY_CAP",
+  "minimum_equity_name_count": 50,
+  "maximum_sector_weight_percent": 35,
+  "maximum_industry_weight_percent": 25,
+  "ISIN": "US66538R5404",
+  "published_position_count": 52,
+  "published_equity_position_count": 50,
+  "excerpts": [
+    "The Counterpoint Quantitative Equity ETF seeks long-term capital appreciation.",
+    "The Counterpoint Quantitative Equity ETF Fund uses multiple machine learning models to select a portfolio. The process dynamically adjusts exposure to different factors to seek outperformance relative to the market.",
+    "The Fund holds at least 50 U.S. listed stocks or American Depository Receipts (“ADRs”)."
+  ],
+  "sources": [
+    {
+      "source_url": "https://counterpointfunds.com/quantitative-equity-etf/",
+      "source_sha256": "c96b6d233b1bea06d7e5b24e08fb8e77e64ad04b1fbb6c9890155a7d173e3727",
+      "available_at": "2026-10-29T01:21:26.519430+00:00"
+    },
+    {
+      "source_url": "https://counterpointfunds.com/wp-content/uploads/2023/11/Counterpoint-ETFs-2-1-26-Pro.pdf",
+      "source_sha256": "67cdb8142146a84f25375560cc67ba5b3ac050aa10959f630fc0c565290aadd3",
+      "available_at": "2026-10-29T01:34:44.202761+00:00"
+    },
+    {
+      "source_url": "https://counterpointfunds.com/etfdata/holdings_cpai.csv",
+      "source_sha256": "ebdb53238e27755abd96b6fc2ab714e6e460ea3658cd6cba16cb17c1979d0a61",
+      "available_at": "2026-10-29T01:34:43.627106+00:00"
+    }
+  ],
+  "classification_notes": "AI describes the stock-selection method, not an AI-industry investment objective. Broad selected-equity exposure is assessed as moderately concentrated core, not a full-market index."
+}

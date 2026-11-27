@@ -5,7 +5,7 @@ unbound operation preserves it for the same conversation. No investment rules.
 """
 VERSION = '1.14'
 LOGIN_PROMPT = '請輸入您的密碼，登入您個人的活水 AI 系統。'
-MACRO_URL = 'https://happihelp.com/'
+MACRO_URL = 'https://www.happihelp.com/v70-engineering/index.html'
 ITEMS = (
     ('🌱', '第一次建倉', 'first_allocation', '01_第一次建倉.md', True),
     ('📋', '查看我的資料與持倉', 'read_portfolio', None, True),
@@ -117,7 +117,7 @@ class FamilyMenu:
             raise ValueError('INVALID_MENU_PAYLOAD')
         if choice['operation'] == 'macro_link':
             self.pending = None
-            return complete_work({'text': '請直接查看活水 AI 總經網站', 'url': MACRO_URL},
+            return complete_work({'text': '請登入活水 AI 工程版查看完整總經', 'url': MACRO_URL},
                                  self.project_name)
         if choice['private'] or payload.get('use_private_portfolio'):
             try:
@@ -151,9 +151,16 @@ class FamilyMenu:
             return {'status': 'DATA_UNAVAILABLE', 'result': result,
                     'pending_operation': 'deployment_pace',
                     'menu': render_menu(self.project_name)}
+        if (choice['operation']=='deployment_pace' and isinstance(result,dict)
+                and result.get('status') in ('ANALYSIS_COMPLETE','ANALYSIS_PARTIAL','ANALYSIS_BLOCKED')):
+            return {'status':result['status'],'result':result,'menu':render_menu(self.project_name)}
         # A locally rendered report is not a completed Drive publication.
         # The ChatGPT tool executor must upload/read back every artifact,
         # publish the manifest last and verify its remote bytes.
+        if (choice['operation']=='generate_report' and isinstance(result,dict)
+                and result.get('status') in ('REPORT_INPUTS_REQUIRED','REPORT_SOURCE_INCOMPATIBLE')):
+            return {'status':result['status'],'result':result,'pending_operation':'generate_report',
+                    'menu':render_menu(self.project_name)}
         if (choice['operation'] == 'generate_report'
             and isinstance(result, dict)
             and result.get('status') == 'STAGED_NOT_PERSISTED'):
@@ -210,3 +217,4 @@ class FamilyMenu:
                         'pending_operation': 'first_allocation', 'result': result,
                         'next_stage': 'VERIFY_CURRENT_HOLDINGS_CASH_AND_INTERVIEW_SAVE'}
         return complete_work(result, self.project_name)
+

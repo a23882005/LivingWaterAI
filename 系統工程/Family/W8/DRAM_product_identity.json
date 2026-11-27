@@ -1,0 +1,34 @@
+{
+  "schema_version": "Family.W8.PublicIssuerIdentity.v1",
+  "symbol": "DRAM",
+  "evidence_kind": "OFFICIAL_ISSUER_OBJECTIVE_AND_STRUCTURE",
+  "verified_on": "2026-10-29",
+  "source_scope": "PUBLIC_PRODUCT_STRUCTURE__NOT_CURRENT_VALUATION_OR_SAFETY",
+  "fund_name": "Roundhill Memory ETF",
+  "source_url": "https://www.roundhillinvestments.com/etf/dram/",
+  "is_stock_etf": true,
+  "structure_kind": "MEMORY_SEMICONDUCTOR_EQUITY_INDUSTRY",
+  "minimum_memory_revenue_or_profit_percent": 50,
+  "minimum_memory_exposure_percent": 80,
+  "maximum_company_weight_percent": 25,
+  "may_use_swaps_and_forwards": true,
+  "non_diversified": true,
+  "ISIN": "US77926X3200",
+  "excerpts": [
+    "The Roundhill Memory ETF (“DRAM”) seeks to offer exposure to a precise basket of global memory chip companies.",
+    "DRAM offers pure memory exposure unlike broader semiconductor funds."
+  ],
+  "sources": [
+    {
+      "source_url": "https://www.roundhillinvestments.com/etf/dram/",
+      "source_sha256": "624eb04f7203896d54bb4b5ee1f4298fd848b78c7e179556fac8e285577c61b0",
+      "available_at": "2026-10-29T01:21:24.833600+00:00"
+    },
+    {
+      "source_url": "https://www.roundhillinvestments.com/assets/pdfs/dram_prospectus.pdf",
+      "source_sha256": "796d64ff345d771aee7048ed7ef2cd6a8d20c6e976d9c937c2edbd7afb5606cc",
+      "available_at": "2026-10-29T01:34:43.829604+00:00"
+    }
+  ],
+  "classification_notes": "Memory-industry exposure uses the existing semiconductor framework. Non-diversification and derivative look-through risks remain explicit; no other semiconductor ETF prices or fundamental metrics are substituted."
+}

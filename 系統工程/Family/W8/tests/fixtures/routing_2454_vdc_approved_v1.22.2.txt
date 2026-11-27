@@ -1,0 +1,77 @@
+Actual approved V82 v1.22.2 excerpts; rule text, not synthetic financial data.
+2. `SECTOR_ETF / INDUSTRY_ETF / THEME_ETF` → `C`。
+| `INDIVIDUAL_STOCK` | 單一上市公司之普通股／股票權益 | 交易所／公司官方資料、券商Instrument Type、監管或公司文件 | ETF、基金、信託型ETF、其他集合投資工具 |
+## 32.8 Semiconductor｜半導體
+SOXX、SMH等及NVDA、AVGO、AMD、MU、QCOM、AMAT、LRCX、KLAC、TSM等主要估值：**Forward P/E → EV/EBITDA → EV/Sales → P/S → FCF Yield**。Trailing P/E不得單獨作核心估值。Context固定加入EPS Revision、AI CAPEX、庫存、晶圓／設備需求、ASP、毛利率、產能利用率與半導體景氣循環。
+##### PV4 9 產業 主題ETF SECTOR_THEME_ETF
+
+正式路徑：依真實投資目標／指數方法匹配所屬Sector/Industry正式Waterfall；不存在通用PE順序或range。
+
+正式路由行為：唯一有正式方法且適用的產業profile → 用該profile；多個正式合法匹配 → PROFILE_CONFLICT。S1沒有既定方法但身份與分類已知時，使用本版已核准的PV4A subtype registry。已屬半導體／國防專屬Primary Class，不再增加第二主類別。
+
+資料：產品結構、指數規則、歷次成分及產業權重、該產業合法估值／context；主題名稱本身不作分類證據。
+
+可確定項：相同normalized規則、下方有限built-in方法與所有UNKNOWN行為；合法資料可計算選階結果，無經濟意義的方法仍不得強行給數字答案。
+
+已核准適用範圍：下方有限方法可直接實作及接線；超出有限支援域的產品仍須另建method/profile，不能冒稱已覆蓋所有產業工具。
+
+特別驗收：無路由與複合主題衝突不被first-match吞掉；相對同業估值只補充，最大持股不代表整檔。
+
+##### PV4 10 大型成熟 高品質個股 LARGE_MATURE_HIGH_QUALITY_STOCK
+
+正式路由由產業與財務subtype唯一解析，不從「高品質」推導PE或Grade。
+
+已定subtype：金融P/TBV → PB → Forward PE；獲利成長Forward PE → EV/EBITDA → FCF Yield → EV/Sales；無意義／不穩定EPS用EV/Sales → PS → 有意義時FCF Yield；半導體與國防沿專屬路徑。S1的OTHER沒有通用順序；本版採用PV4A的有限sector／財務subtype registry補足，不把新generic方法冒稱S1既有獲利成長規則。
+
+資料：原始財報與修訂、指引、股本／負債／現金、合法估值史、公司行動、事前Core Investment Theses及各項Normal／Deterioration／Failure條件。金融另需ROE/ROTCE、NIM、信用成本、charge-off、存放款、資本及信用周期；只對適用subtype要求。
+
+可確定項：subtype路由、分位方向、核准條件及事前Thesis規則消費；不把低估值等同公司論點有效。
+
+須策略選擇項：每項Thesis的具體可檢驗條件及持續期，須事前批准，不能回測後補寫。
+
+特別驗收：金融股不走工業EV/EBITDA；非經常損益／收購／分拆造成方法斷點時不跨制度拼接；公司論點失效不能被qV補償。
+
+##### PV4 11 高Beta 事件型個股 HIGH_BETA_EVENT_STOCK
+
+估值subtype路由同上，但Beta或事件本身不是估值方法；不因股價波動大就自動視為正式HIGH_VOLATILITY_ETF或調換Primary Class。
+
+資料：自身波動／價格、稀釋與融資、cash runway／burn rate、營收及margin、獲利轉折、事件underlying_event_id、原始發布／修訂、Active/Pending/Resolved狀態及事前Thesis。
+
+可確定項：無意義EPS禁PE，runway是風險context而非倍數；事件按canonical identity去重，失敗查詢不存成「零風險」。
+
+須實證項：跳空、停牌、退市、失敗融資、增發及不可成交尾部；普通日線回測不替代事件執行驗證。
+
+特別驗收：高qP不等於低風險；重大事件與流動性禁買沿原Owner優先；複雜公司行動無受支持wealth方法時qP明確UNKNOWN，不跨事件補線。
+
+#### PV4A 新增有限產業路由表
+
+SUBTYPE_RESEARCH_ROUTES 為保留的相容識別碼；本版規則版本為1.0、APPROVED_FOR_IMPLEMENTATION，承接歷史0.1.0-proposed且不改方法名稱與順序。它補足S1未定的方法，不是MSCI／S&P推薦的估值模型。既有正式專屬方法仍優先。本表與共同Stage映射經實作驗證後接入正式Primary與Stage流程。
+
+支援域：有可核實上市身份的普通股，以及未槓桿、非反向、非衍生品主導的股票ETF。排除域：債券／商品／期權策略、槓桿／反向、未上市股權、沒有可核實權益單位的產品；這些返回OUTSIDE_CANDIDATE_SCOPE，不聲稱支援。pre-revenue公司若所有合法估值分母皆無經濟意義，返回VALUATION_DATA_INSUFFICIENT，不發明便宜分數。
+
+有限分類集合：Energy、Materials、Industrials、Consumer Discretionary、Consumer Staples、Health Care、Financials、Information Technology、Real Estate、Communication Services、Utilities，以及BLENDED_EQUITY與UNKNOWN。名稱參照官方GICS分類，只用作分類鍵，不自行從新聞、ticker或價格推分類。輸入須有PIT taxonomy_provider/version及issuer/index classification evidence；如用其他taxonomy，須有版本化且唯一的crosswalk。官方分類來源：[MSCI來源](https://www.msci.com/indexes/index-resources/gics) 。分類來源只支持分類架構，不為以下估值順序或Stage切點背書。
+
+唯一解析程序依序執行：
+
+R1 具正式來源、有效版本且唯一適用的專屬instrument／subtype路由，優先；正式合法路由彼此衝突時PROFILE_CONFLICT，不由新增generic規則裁決。
+
+R2 無適用正式方法時，Financials／已核實mortgage-finance型走FINANCIAL_CANDIDATE；不得因EPS轉負改走工業公司EV。
+
+R3 非金融普通股先作明確sector dispatch。已核准earnings_subtype_basis固定為最新PIT可得的原生reported diluted EPS TTM（同provider／會計方法）；不可得時UNKNOWN，不以Forward EPS、最新單季或未核定的四季簡單加總替代。這項已核准分流基準不改其他正式EPS欄位定義。EPS_NOT_MEANINGFUL／UNSTABLE_EARNINGS必有具名正式producer、有效rule版本及三值狀態；空查詢不證明否定判定不存在。
+
+R3a 已核實Real Estate營運／equity property型先走REAL_ESTATE_OPERATING_CANDIDATE；這個已核准專屬方法優先於一般EPS正負分流，避免因物業折舊下的負EPS直接改成EV/Sales路徑。mortgage-finance在R2已先分走。property／mortgage身份不明時ROUTE_UNRESOLVED。
+
+R3b 其餘非金融普通股：若已發布同方法EPS非正，或已有正式有效EPS_NOT_MEANINGFUL／UNSTABLE_EARNINGS判定，走LOSS_NONFINANCIAL_GENERIC。若EPS為正且沒有上述有效否定判定，Health Care走HEALTHCARE_GENERIC，其餘下表列出的非金融sector走PROFITABLE_NONFINANCIAL_GENERIC。
+
+R3c EPS缺失／非有限或必要財務subtype判定未知時，earnings_state＝UNKNOWN，route返回EARNINGS_SUBTYPE_UNKNOWN；不因落入otherwise就宣稱公司盈利。金融／非金融或sector分類未知時ROUTE_UNRESOLVED，不能誤用EV。這是資料未知的明確結果，非用新的盈利預設補洞。
+
+R4 股票ETF：官方投資目標／指數納入規則只指向一個已知sector，就依本表唯一dispatch：Financials走FINANCIAL_CANDIDATE，Real Estate依property／mortgage證據走REAL_ESTATE_OPERATING_CANDIDATE或FINANCIAL_CANDIDATE，Health Care走HEALTHCARE_GENERIC，其餘列出的非金融sector走PROFITABLE_NONFINANCIAL_GENERIC（路由名稱不代表ETF全部成分盈利）；明示跨sector、或該期可核實成分分類含多sector且沒有唯一單sector目標，走BLENDED_EQUITY_CANDIDATE。不用自造權重占比門檻決定主業，不以最大持股決定sector。分類證據不足仍UNKNOWN。
+
+R5 只在R1至R4均無合法匹配且已確認scope外時返回OUTSIDE_CANDIDATE_SCOPE；不是scope外而是資料缺失時返回ROUTE_UNRESOLVED。不能以「未找到」假稱N/A。
+
+built-in方法表：
+
+FINANCIAL_CANDIDATE：P/TBV → PB → Forward PE。限TBV／book及股本定義可核實的銀行、保險與其他金融業；不同金融subindustry分開保存context。ETF只有provider能提供可靠同口徑portfolio P/TBV時才用，否則合法轉PB；不手拼持股PTBV。
+
+PROFITABLE_NONFINANCIAL_GENERIC：Forward PE → EV/EBITDA → FCF Yield → EV/Sales。用於Energy、Materials、Industrials、Consumer Discretionary、Consumer Staples、Information Technology、Communication Services、Utilities中沒有專屬正式方法的普通股／sector ETF。這是已核准的固定規則，不代表各行業已同質或已驗證；sector鍵與context仍保留，不把這些sector合成一個獨立樣本。
+

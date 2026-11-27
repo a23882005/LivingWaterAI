@@ -52,7 +52,7 @@ def test_private_intent_resumes_after_login_and_full_menu_follows():
 
 def test_macro_direct_before_login_without_handler_or_database():
     result = make_menu().select(7)
-    assert result['result']['url'] == 'https://happihelp.com/'
+    assert result['result']['url'] == 'https://www.happihelp.com/v70-engineering/index.html'
     assert result['menu'] == render_menu('Joseph')
 
 
@@ -125,7 +125,7 @@ def test_w8_foreign_login_never_reads_joseph_private_handler(foreign):
     assert attempt['status'] == 'LOGIN_REQUIRED'
     assert attempt['pending_operation'] == 'read_portfolio'
     assert touched == []
-    assert ui.select(7)['result']['url'] == 'https://happihelp.com/'
+    assert ui.select(7)['result']['url'] == 'https://www.happihelp.com/v70-engineering/index.html'
 
 
 def test_w8_cross_project_logout_rejected_without_revoking_other_account():

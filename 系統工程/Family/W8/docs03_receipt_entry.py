@@ -739,6 +739,48 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     return result
 
 
+def inspect_docs03_host_context(*, project_id=None, conversation_id=None,
+                                message_id=None, workspace_dir=None):
+    """Report whether the host passed usable inputs without exposing values or writing files.
+
+    The host must establish provenance and reuse its workspace across turns.
+    This read-only check only inspects the supplied values and directory.
+    """
+    fields = {}
+    for field, value in (("project_id", project_id), ("conversation_id", conversation_id),
+                         ("message_id", message_id)):
+        if value is None or (isinstance(value, str) and not value.strip()):
+            fields[field] = "missing"
+        elif not isinstance(value, str) or (field == "message_id" and len(value) > 256):
+            fields[field] = "invalid"
+        else:
+            fields[field] = "present"
+
+    if workspace_dir is None or (isinstance(workspace_dir, str) and not workspace_dir.strip()):
+        fields["workspace_dir"] = "missing"
+    elif not isinstance(workspace_dir, (str, Path)):
+        fields["workspace_dir"] = "invalid"
+    else:
+        try:
+            directory = Path(workspace_dir).resolve(strict=True).is_dir()
+        except (OSError, RuntimeError, ValueError):
+            directory = False
+        fields["workspace_dir"] = "present" if directory else "unavailable"
+
+    error = None
+    if fields["workspace_dir"] != "present":
+        error = "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"
+    elif fields["message_id"] != "present":
+        error = "STABLE_MESSAGE_ID_REQUIRED"
+    elif fields["project_id"] != "present" or fields["conversation_id"] != "present":
+        error = "TRUSTED_CONVERSATION_BINDING_REQUIRED"
+    return {
+        "status": "DOCS03_HOST_CONTEXT_UNAVAILABLE" if error else "DOCS03_HOST_CONTEXT_INPUTS_PRESENT",
+        "fields": fields,
+        "error": error,
+    }
+
+
 def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
                                    conversation_id, workspace_dir, message_id,
                                    project_name, login_account, client_id, family_alias,
@@ -755,8 +797,10 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
     """
     if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
         raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
-    if not isinstance(workspace_dir, (str, Path)) or not str(workspace_dir).strip():
-        raise ValueError("DOCS03_WORKSPACE_DIRECTORY_REQUIRED")
+    readiness = inspect_docs03_host_context(project_id=project_id, conversation_id=conversation_id,
+                                            message_id=message_id, workspace_dir=workspace_dir)
+    if readiness["error"] is not None:
+        raise ValueError(readiness["error"])
     if (not all(isinstance(value, str) and value.strip()
                 for value in (official_drive_file_id, progress_file_id))
             or official_drive_file_id == progress_file_id):

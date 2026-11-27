@@ -706,6 +706,54 @@ class Docs03NativeHostTests(unittest.TestCase):
         self.download_workbook.assert_not_called()
         self.build_menu.assert_not_called()
 
+    def test_host_binding_diagnostic_and_three_routes_stop_without_side_effects(self):
+        private_missing = self.root / "unavailable-workspace"
+        loop = self.root / "workspace-loop"
+        loop.symlink_to(loop)
+        cases = (
+            ("project_id", None, "missing", "TRUSTED_CONVERSATION_BINDING_REQUIRED"),
+            ("project_id", " ", "missing", "TRUSTED_CONVERSATION_BINDING_REQUIRED"),
+            ("conversation_id", None, "missing", "TRUSTED_CONVERSATION_BINDING_REQUIRED"),
+            ("conversation_id", 17, "invalid", "TRUSTED_CONVERSATION_BINDING_REQUIRED"),
+            ("message_id", None, "missing", "STABLE_MESSAGE_ID_REQUIRED"),
+            ("message_id", "x" * 257, "invalid", "STABLE_MESSAGE_ID_REQUIRED"),
+            ("workspace_dir", None, "missing", "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"),
+            ("workspace_dir", private_missing, "unavailable", "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"),
+            ("workspace_dir", self.ledger, "unavailable", "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"),
+            ("workspace_dir", loop, "unavailable", "DOCS03_WORKSPACE_DIRECTORY_REQUIRED"),
+        )
+        context = dict(project_id="fixture-project", conversation_id="original-chat",
+                       message_id="fixture-message", workspace_dir=self.root)
+        before = set(self.root.iterdir())
+        for payload in (None, {"action": "confirm_account", "revision": "before"},
+                        {"revision": "before", "question_id": "goal", "key": "goal", "reply": "成長"}):
+            for field, value, state, code in cases:
+                with self.subTest(payload=payload, field=field, state=state, value=value):
+                    problem = {field: value}
+                    check = docs03.inspect_docs03_host_context(**(context | problem))
+                    self.assertEqual(check["status"], "DOCS03_HOST_CONTEXT_UNAVAILABLE")
+                    self.assertEqual(check["fields"][field], state)
+                    self.assertEqual(check["error"], code)
+                    self.assertNotIn("fixture-project", str(check))
+                    self.assertNotIn(str(self.root), str(check))
+                    with self.assertRaisesRegex(ValueError, code):
+                        self.turn(payload, **problem)
+        self.assertEqual(set(self.root.iterdir()), before)
+        self.download_ledger.assert_not_called()
+        self.download_workbook.assert_not_called()
+        self.build_menu.assert_not_called()
+
+    def test_host_binding_diagnostic_reports_available_fields_without_claiming_runtime_trust(self):
+        before = set(self.root.iterdir())
+        empty = docs03.inspect_docs03_host_context()
+        self.assertEqual(set(empty["fields"].values()), {"missing"})
+        result = docs03.inspect_docs03_host_context(
+            project_id="fixture-project", conversation_id="original-chat",
+            message_id="fixture-message", workspace_dir=self.root)
+        self.assertEqual(result["status"], "DOCS03_HOST_CONTEXT_INPUTS_PRESENT")
+        self.assertEqual(set(result["fields"].values()), {"present"})
+        self.assertEqual(set(self.root.iterdir()), before)
+
     def test_native_first_dispatch_rejects_changed_sources_before_downloading(self):
         self.download_ledger.side_effect = TimeoutError("ledger could not be loaded")
         result = self.turn({"action": "confirm_account", "revision": "original"})

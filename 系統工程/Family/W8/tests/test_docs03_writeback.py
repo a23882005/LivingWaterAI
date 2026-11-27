@@ -575,6 +575,14 @@ class Docs03NativeHostTests(unittest.TestCase):
         self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
         self.assertEqual(reply["result"]["progress_receipt"]["事件序號"], 1)
         self.assertEqual(self.turn(message_id="answer-redelivered", payload=answer), reply)
+        self.download_workbook.reset_mock()
+        for changed in ({"progress_file_id": "other-workbook"},
+                        {"official_drive_file_id": "other-ledger"}):
+            with self.subTest(changed=changed), self.assertRaisesRegex(
+                    PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                self.turn(message_id="after-relogin", **changed)
+        self.download_workbook.assert_not_called()
+        self.assertEqual(self.turn(message_id="after-relogin"), reply)
         self.download_ledger.assert_not_called()
         self.build_menu.assert_called_once()
 

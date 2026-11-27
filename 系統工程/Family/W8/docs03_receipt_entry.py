@@ -269,8 +269,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
         ).fetchone()
         if alias:
             message_id = alias[0]
-        active, finished, known = {}, {}, {}
-        exact_saved = False
+        active, finished, known, latest = {}, {}, {}, {}
+        exact_saved = None
         if requested is not None:
             conversation = _load_module("conversation_entry")
             encoded_payload = conversation.encode(payload)
@@ -293,17 +293,19 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                     if "replies" not in tables and row is None:
                         continue  # Initialization stopped before it could accept any request.
                     original = work.execute(
-                        "SELECT phase FROM work WHERE id=? UNION ALL "
-                        "SELECT w.phase FROM replies r JOIN work w ON w.id=r.work_id "
+                        "SELECT id, phase FROM work WHERE id=? UNION ALL "
+                        "SELECT w.id, w.phase FROM replies r JOIN work w ON w.id=r.work_id "
                         "WHERE r.id=? LIMIT 1", (message_id, message_id)
                     ).fetchone()
                     if kind == requested:
-                        exact_saved = conversation.find_saved_confirmation(work, encoded_payload) is not None
+                        exact_saved = conversation.find_saved_confirmation(work, encoded_payload)
             except sqlite3.DatabaseError:
                 return {"status": "DOCS03_JOURNAL_RECOVERY_REQUIRED",
                         "text": "目前讀不到原 03 的續接紀錄，請先核對原對話的私人工作區。"}
             if original:
-                known[kind] = original[0]
+                known[kind] = original
+            if row:
+                latest[kind] = row[0]
             if row and row[1] in ("open", "running", "writeback"):
                 active[kind] = row[0]
             elif row and row[1] == "done":
@@ -323,8 +325,9 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             interrupted = route.execute(
                 "SELECT id, kind, payload, source_digest FROM interrupted_dispatch WHERE slot=1"
             ).fetchone()
-            saved_replay = previous is None and exact_saved
-            terminal_replay = saved_replay or known.get(previous) in ("done", "closed", "cancelled")
+            known_id, known_phase = known.get(previous, (None, None))
+            saved_replay = known_id is None and kind == requested and exact_saved is not None
+            terminal_replay = saved_replay or known_phase in ("done", "closed", "cancelled")
             if interrupted and (message_id == interrupted[0] or not terminal_replay):
                 original_id, original_kind, saved_payload, original_source_digest = interrupted
                 if original_source_digest is not None and original_source_digest != source_digest:
@@ -371,9 +374,16 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?,?)", (
                     message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False), source_digest))
                 dispatch_id = message_id
-            if active_kind is not None and active_kind == kind and not terminal_replay:
+            bound_id = known_id
+            if dispatch_id is not None:
+                bound_id = dispatch_id
+            elif saved_replay:
+                bound_id = exact_saved
+            elif bound_id is None:
+                bound_id = latest.get(kind) if payload is None else active.get(kind)
+            if bound_id is not None:
                 original_source = route.execute(
-                    "SELECT digest FROM original_sources WHERE id=?", (active[kind],)
+                    "SELECT digest FROM original_sources WHERE id=?", (bound_id,)
                 ).fetchone()
                 if original_source is not None and original_source[0] != source_digest:
                     raise PermissionError("DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED")

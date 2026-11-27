@@ -151,6 +151,52 @@ class Menu03RouterTests(unittest.TestCase):
                 self.assertEqual(self.prepare[kind].call_count, 2)
                 self.stage[kind].assert_called_once()
 
+    def test_completed_work_keeps_original_sources_for_every_replay(self):
+        source = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+        other_source = (*source[:-1], "other-excel")
+        for kind in ("account", "progress"):
+            with self.subTest(kind=kind), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                payload = getattr(self, kind)
+                self.observe[kind].return_value = None
+                self.assertEqual(self.turn("first", payload, source_binding=source, **context)["status"],
+                                 "DOCS03_BACKUP_REQUIRED")
+                self.land(kind)
+                receipt = self.turn("first-readback", source_binding=source, **context)
+                self.assertEqual(receipt["status"], "PERSISTED_REMOTE_VERIFIED")
+                dispatch = Mock()
+                for mid, data in (("first", payload), ("first-readback", None),
+                                  ("new-replay", payload), ("plain-continue", None)):
+                    for binding in (None, other_source):
+                        with self.assertRaisesRegex(PermissionError,
+                                                    "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                            self.turn(mid, data, source_binding=binding,
+                                      before_dispatch=dispatch, **context)
+                with self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+                    self.turn("first", payload, source_binding=source, document_id="different-doc",
+                              document={"documentId": "different-doc", "revisionId": "fixture-revision"},
+                              before_dispatch=dispatch, **context)
+                dispatch.assert_not_called()
+                for mid, data in (("first", payload), ("first-readback", None),
+                                  ("new-replay", payload), ("plain-continue", None)):
+                    self.assertEqual(self.turn(mid, data, source_binding=source, **context), receipt)
+
+    def test_old_saved_result_uses_its_own_sources_while_new_work_is_pending(self):
+        original = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+        current = (*original[:-1], "other-excel")
+        self.turn("original-confirm", self.account, source_binding=original)
+        self.land("account")
+        receipt = self.turn("read-old", source_binding=original)
+        self.assertEqual(self.turn("new-answer", self.progress, source_binding=current)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+        with self.assertRaisesRegex(PermissionError, "DOCS03_ORIGINAL_SOURCE_BINDING_CHANGED"):
+            self.turn("repeat-old", self.account, source_binding=current)
+        self.assertEqual(self.turn("repeat-old", self.account, source_binding=original), receipt)
+        self.assertEqual(self.turn("continue-new", source_binding=current)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+        self.stage["account"].assert_called_once()
+        self.stage["progress"].assert_called_once()
+
     def test_legacy_interrupted_record_keeps_its_original_payload_after_upgrade(self):
         _, route = docs03._journal_directory(self.context["workspace_dir"], "fixture-project|03-router",
                                              "original-chat", create=True)

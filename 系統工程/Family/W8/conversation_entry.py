@@ -17,6 +17,14 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False, separators=(",", ":"))
 
 
+def is_native_drive_update(submission, receipt):
+    if not isinstance(submission, dict) or submission.get("status") != "DOCS03_DRIVE_UPDATE_REQUIRED":
+        return False
+    args = submission.get("update_file_args")
+    return (isinstance(args, dict) and args.get("fileId") == receipt["file_id"]
+            and isinstance(args.get("file_uri"), str) and bool(args["file_uri"].strip()))
+
+
 class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
                  read_page, patch_page, prepare_account, build_menu, recover_receipt,
@@ -283,17 +291,20 @@ class ConversationEntry:
         if (saved is None and staged.get("_managed_writeback") == "ready"
                 and self.prepare_writeback is not None):
             submission = self.prepare_writeback(staged["result"])
-            if isinstance(submission, dict) and submission["status"] in (
+            status = submission.get("status") if isinstance(submission, dict) else None
+            if status in (
                     "DOCS03_BACKUP_REQUIRED", "DOCS03_DRIVE_WRITE_PENDING"):
                 return submission
-            if isinstance(submission, dict) and submission["status"] == "DOCS03_PREVIEW_STALE":
+            if status == "DOCS03_PREVIEW_STALE":
                 with self.db() as db:
                     db.execute("UPDATE work SET phase='done',output=? WHERE id=? AND phase='writeback'",
                                (encode(submission), key))
                 return submission
-            if isinstance(submission, dict) and submission["status"] == "PERSISTED_REMOTE_VERIFIED":
+            if status == "PERSISTED_REMOTE_VERIFIED":
                 saved = submission
             else:
+                if not callable(submission) and not is_native_drive_update(submission, receipt):
+                    raise ValueError("DOCS03_INVALID_WRITEBACK_RESPONSE")
                 # A crash or ambiguous connector response after this point must
                 # recover by reading the original receipt, never by resubmitting.
                 staged = {**staged, "_managed_writeback": "attempted"}

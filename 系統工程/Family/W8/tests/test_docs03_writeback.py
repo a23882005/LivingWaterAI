@@ -68,7 +68,7 @@ class Docs03WritebackTests(unittest.TestCase):
     def allow_update(self):
         self.prepare.return_value = {
             "status": "DOCS03_DRIVE_UPDATE_REQUIRED",
-            "update_file_args": {"fileId": self.key["file_id"]},
+            "update_file_args": {"fileId": self.key["file_id"], "file_uri": "/fixture/upload.db"},
         }
 
     def land_receipt(self):
@@ -87,7 +87,8 @@ class Docs03WritebackTests(unittest.TestCase):
 
     def test_shared_workspace_authorizes_only_one_confirmation_until_receipt(self):
         landed = {}
-        prepares = Mock(return_value={"status": "DOCS03_DRIVE_UPDATE_REQUIRED"})
+        prepares = Mock(return_value={"status": "DOCS03_DRIVE_UPDATE_REQUIRED",
+                                      "update_file_args": {"fileId": self.key["file_id"], "file_uri": "/fixture/upload.db"}})
 
         def send(chat, message, payload=None):
             key = {**self.key, "request_id": chat}
@@ -128,6 +129,23 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertFalse(first.acquire(self.key))
         other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
         self.assertTrue(first.acquire(self.key))
+
+    def test_unrecognized_preflight_response_does_not_consume_original_writeback(self):
+        self.turn("first", self.payload)
+        for response in ({}, {"status": "TEMPORARY_TOOL_RESULT"}, None,
+                         {"status": "DOCS03_DRIVE_UPDATE_REQUIRED"},
+                         {"status": "DOCS03_DRIVE_UPDATE_REQUIRED",
+                          "update_file_args": {"fileId": self.key["file_id"]}},
+                         {"status": "DOCS03_DRIVE_UPDATE_REQUIRED",
+                          "update_file_args": {"fileId": "other", "file_uri": "/fixture/upload.db"}}):
+            with self.subTest(response=response):
+                self.prepare.return_value = response
+                with self.assertRaisesRegex(ValueError, "DOCS03_INVALID_WRITEBACK_RESPONSE"):
+                    self.turn("bad-preflight")
+        self.allow_update()
+        self.assertEqual(self.turn("retry")["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+        self.assertEqual(self.turn("wait")["status"], "AWAIT_DRIVE_CONFIRMATION")
+        self.select.assert_called_once()
 
     def test_lost_update_response_and_new_message_replay(self):
         def submit():

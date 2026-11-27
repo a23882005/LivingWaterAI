@@ -65,11 +65,14 @@
 | `DOCS03_BACKUP_REQUIRED` | 備份回傳的本人 Drive 原 ID，下載備份，將原生備份 ID 及路徑以 `verified_progress_backup=(id, path)` 或 `verified_account_backup=(id, path)` 接回當筆。 |
 | `DOCS03_DRIVE_UPDATE_REQUIRED` | 對回傳的 Excel 或帳本原 ID 呼叫一次 `update_file(**update_file_args)`。同一筆待辦已記錄授權送出。 |
 | `DOCS03_DRIVE_WRITE_PENDING` | 同一工作區內另一筆 03 已占用該 Drive 檔的寫回。先在原對話讀回那筆收據，再繼續目前這筆。 |
+| `DOCS03_READ_RETRY_REQUIRED` | 本輪下載逾時、連線中斷或本機下載檔未取得。下一則「繼續」沿原待辦及階段重試。若先前已發出寫回授權，就只查原收據。 |
 | `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
 | `DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION` | 無法由原紀錄確認兩條路的先後時，沿原訊息或原作答回查。 |
 | `DOCS03_JOURNAL_RECOVERY_REQUIRED` | 某條路有無法讀取的原紀錄，先核對原對話的私人工作區，兩條路均暫停派送。 |
 | `DOCS03_PREVIEW_STALE` | 授權送出前發現原帳本或 Excel 已變動，且當筆原收據未保存。回到原 03，重新預覽、確認與備份。 |
 | `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同檔的原 Excel 事件或帳本收據，交付保存結果。 |
+
+寫回準備回應必須包含原待辦的 Drive 檔案 ID 和實際上傳檔案參照，才會把該筆記為已發出授權。其他檢查結果與未完整的工具回應不會消耗授權。
 
 作答 Excel 和整戶帳本的待寫回副本，在首次派送時先核對內容摘要，再保存到原對話的私人待辦目錄。下一則「繼續」從這個目錄取得同一份副本，先前的下載或產檔暫存目錄可釋放。已存在的待辦仍沿原紀錄讀收據。若尚未送出寫回授權，且原待辦引用的副本已遺失，要求重新開啟 03 確認；若已送出授權，就只查原收據。
 

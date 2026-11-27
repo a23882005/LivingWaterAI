@@ -26,12 +26,14 @@ class Menu03RouterTests(unittest.TestCase):
                          "key": "goal", "reply": "兼顧成長與收入"}
         self.stage = {}
         self.observe = {}
+        self.prepare = {}
         for kind, operation in (("account", "adjust_target"), ("progress", "save_progress")):
             key = {"file_id": kind, "client_id": "fixture-client", "operation": operation,
                    "request_id": kind, "fingerprint": "a" * 64}
             self.stage[kind] = Mock(return_value={
                 "status": "DB_WRITEBACK_REQUIRED", "result": {"receipt_key": key}})
             self.observe[kind] = Mock(return_value=None)
+            self.prepare[kind] = Mock(return_value={"status": "DOCS03_BACKUP_REQUIRED"})
 
     def original(self, kind, message, payload, **overrides):
         context = self.context | overrides
@@ -42,7 +44,7 @@ class Menu03RouterTests(unittest.TestCase):
             build_menu=lambda auth: SimpleNamespace(
                 auth=SimpleNamespace(family_login=auth), select=self.stage[kind]),
             recover_receipt=self.observe[kind],
-            prepare_writeback=lambda _: {"status": "DOCS03_BACKUP_REQUIRED"},
+            prepare_writeback=self.prepare[kind],
             progress_answers=kind == "progress")
 
     def turn(self, message, payload=None, *, before_dispatch=None, **overrides):
@@ -84,6 +86,42 @@ class Menu03RouterTests(unittest.TestCase):
                                  "DOCS03_BACKUP_REQUIRED")
                 self.assertEqual(self.turn("recovered", **context), receipt)
                 self.assertEqual(self.turn("first", getattr(self, first), **context), receipt)
+
+    def test_transient_failure_before_dispatch_preserves_first_message(self):
+        def timed_out():
+            raise TimeoutError("test download timeout")
+
+        response = self.turn("confirm", self.account, before_dispatch=timed_out)
+        self.assertEqual(response["status"], "DOCS03_READ_RETRY_REQUIRED")
+        self.assertNotIn("update_file_args", response)
+        self.stage["account"].assert_not_called()
+        self.assertEqual(self.turn("unrelated-answer", self.progress)["status"], "ANOTHER_REQUEST_PENDING")
+        self.assertEqual(self.turn("next-continue")["status"], "DOCS03_BACKUP_REQUIRED")
+        self.stage["account"].assert_called_once()
+
+    def test_read_retry_after_authorization_never_reissues_upload(self):
+        for kind in ("account", "progress"):
+            with self.subTest(kind=kind), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                error = FileNotFoundError("test download missing")
+                self.prepare[kind].side_effect = [
+                    error, {"status": "DOCS03_DRIVE_UPDATE_REQUIRED",
+                            "update_file_args": {"fileId": kind, "file_uri": "/fixture/upload.db"}}]
+                self.assertEqual(self.turn("original", getattr(self, kind), **context)["status"],
+                                 "DOCS03_READ_RETRY_REQUIRED")
+                self.assertEqual(self.turn("before-upload", **context)["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+                self.observe[kind].side_effect = ConnectionError("test readback timeout")
+                retry = self.turn("readback-unavailable", **context)
+                self.assertEqual(retry["status"], "DOCS03_READ_RETRY_REQUIRED")
+                self.assertNotIn("update_file_args", retry)
+                self.observe[kind].side_effect = None
+                self.assertEqual(self.turn("readback-empty", **context)["status"], "AWAIT_DRIVE_CONFIRMATION")
+                self.land(kind)
+                saved = self.turn("readback-landed", **context)
+                self.assertEqual(saved["status"], "PERSISTED_REMOTE_VERIFIED")
+                self.assertEqual(self.turn("readback-landed", **context), saved)
+                self.assertEqual(self.prepare[kind].call_count, 2)
+                self.stage[kind].assert_called_once()
 
     def test_interrupted_checkpoint_clears_after_business_journal_rejects_preview(self):
         self.stage["account"].side_effect = ValueError("preview is stale")

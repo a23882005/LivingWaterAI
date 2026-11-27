@@ -173,6 +173,8 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             workspace_dir, project_id, conversation_id, create=payload is not None)
         if payload is None and not journal.is_file():
             return {"status": "DOCS03_JOURNAL_MISSING"}
+    conversation = _load_module("conversation_entry")
+
     def observe(key):
         result = recover_receipt(key)
         return write_slot.finish(key, result) if write_slot is not None else result
@@ -189,11 +191,11 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         except Exception:
             write_slot.release(key)
             raise
-        if result.get("status") != "DOCS03_DRIVE_UPDATE_REQUIRED":
+        if not conversation.is_native_drive_update(result, key):
             write_slot.release(key)
         return result
 
-    entry = _load_module("conversation_entry").ConversationEntry(
+    entry = conversation.ConversationEntry(
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
         prepare_account=None, build_menu=build_menu, recover_receipt=observe,
@@ -351,6 +353,10 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
         try:
             result = hosts[kind][1](message_id, payload)
+        except (ConnectionError, TimeoutError, FileNotFoundError):
+            # Keep the original dispatch and its current writeback phase available.
+            return {"status":"DOCS03_READ_RETRY_REQUIRED",
+                    "text":"這次暫時讀不到 03 所需的資料。請輸入「繼續」接回原待辦。"}
         except ValueError:
             # A rejected request must not prevent the next valid action.
             with route:

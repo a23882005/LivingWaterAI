@@ -452,6 +452,55 @@ class Menu03RouterTests(unittest.TestCase):
                          "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION")
         self.assertEqual(self.turn("old-account")["result"]["file_id"], "account")
         self.assertEqual(self.turn("confirmed-progress")["result"]["file_id"], "progress")
+        self.assertEqual(self.turn("old-progress")["result"]["file_id"], "progress")
+        self.assertEqual(self.turn("resend-account", self.account)["result"]["file_id"], "account")
+        self.assertEqual(self.turn("still-ambiguous")["status"],
+                         "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION")
+        for stage in self.stage.values():
+            stage.assert_called_once()
+
+    def test_rejected_dispatch_cannot_adopt_a_later_request(self):
+        def reject():
+            raise ValueError("rejected before creating original work")
+
+        with self.assertRaisesRegex(ValueError, "rejected before creating original work"):
+            self.turn("rejected", self.progress, before_dispatch=reject)
+        self.turn("new-answer", self.progress)
+        self.assertEqual(self.turn("rejected")["status"], "NO_PENDING_REQUEST")
+        self.land("progress")
+        self.assertEqual(self.turn("new-continue")["result"]["file_id"], "progress")
+        self.assertEqual(self.turn("rejected")["status"], "NO_PENDING_REQUEST")
+        self.stage["progress"].assert_called_once()
+
+    def test_old_router_order_requires_dispatch_evidence(self):
+        for has_source in (False, True):
+            with self.subTest(has_source=has_source), TemporaryDirectory() as folder:
+                context = {"workspace_dir": Path(folder)}
+                for kind, data in (("account", self.account), ("progress", self.progress)):
+                    self.observe[kind].return_value = None
+                    self.original(kind, "old-" + kind, data, **context)
+                    self.land(kind)
+                    self.original(kind, "old-result-" + kind, None, **context)
+                _, routes = docs03._journal_directory(
+                    Path(folder), self.context["project_id"] + "|03-router",
+                    self.context["conversation_id"], create=True)
+                source = ("MOU", "fixture-client", "mou", "original-db", "original-excel")
+                with closing(sqlite3.connect(routes)) as db, db:
+                    db.execute("CREATE TABLE turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL)")
+                    db.executemany("INSERT INTO turns VALUES(?,?)",
+                                   (("old-progress", "progress"), ("old-account", "account")))
+                    if has_source:
+                        digest = docs03.sha256(json.dumps(
+                            [self.context["document_id"], source], ensure_ascii=False,
+                            sort_keys=True, allow_nan=False).encode()).hexdigest()
+                        db.execute("CREATE TABLE original_sources (id TEXT PRIMARY KEY, digest TEXT NOT NULL)")
+                        db.executemany("INSERT INTO original_sources VALUES(?,?)",
+                                       (("old-progress", digest), ("old-account", digest)))
+                result = self.turn("new-continue", source_binding=source, **context)
+                if has_source:
+                    self.assertEqual(result["result"]["file_id"], "account")
+                else:
+                    self.assertEqual(result["status"], "DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION")
 
     def test_wrong_login_document_and_another_conversation(self):
         self.turn("answer", self.progress)

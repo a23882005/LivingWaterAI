@@ -296,7 +296,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
           closing(sqlite3.connect(routes)) as route):
         fcntl.flock(lock, fcntl.LOCK_EX)
         route.executescript("""
-            CREATE TABLE IF NOT EXISTS turns (id TEXT PRIMARY KEY, kind TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS turns (
+                id TEXT PRIMARY KEY, kind TEXT NOT NULL, started INTEGER);
             CREATE TABLE IF NOT EXISTS interrupted_dispatch (
                 slot INTEGER PRIMARY KEY CHECK(slot=1),
                 id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL,
@@ -309,6 +310,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
         columns = {row[1] for row in route.execute("PRAGMA table_info(interrupted_dispatch)")}
         if "source_digest" not in columns:
             route.execute("ALTER TABLE interrupted_dispatch ADD COLUMN source_digest TEXT")
+        if "started" not in {row[1] for row in route.execute("PRAGMA table_info(turns)")}:
+            route.execute("ALTER TABLE turns ADD COLUMN started INTEGER")
         reply_id = message_id
         alias = route.execute(
             "SELECT original_id FROM recovered_replies WHERE id=?", (reply_id,)
@@ -372,6 +375,9 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 "SELECT id, kind, payload, source_digest FROM interrupted_dispatch WHERE slot=1"
             ).fetchone()
             known_id, known_phase = known.get(previous, (None, None))
+            if payload is None and prior and known_id is None and interrupted is None:
+                # A rejected or incomplete historical message cannot adopt later work.
+                return {"status": "NO_PENDING_REQUEST"}
             saved_replay = known_id is None and kind == requested and exact_saved is not None
             terminal_replay = saved_replay or known_phase in ("done", "closed", "cancelled")
             if interrupted and (message_id == interrupted[0] or not terminal_replay):
@@ -404,10 +410,13 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                 if len(finished) == 1:
                     kind = next(iter(finished))
                 elif len(finished) > 1:
-                    # Completed replies and historical redeliveries aren't new requests.
+                    # Older routers may have logged an original ID upon replay.
+                    # A stored source binding also proves a pre-upgrade dispatch.
                     order = route.execute(
-                        "SELECT kind FROM turns WHERE (id=? AND kind='account') "
-                        "OR (id=? AND kind='progress') ORDER BY rowid DESC",
+                        "SELECT kind FROM turns WHERE ((id=? AND kind='account') "
+                        "OR (id=? AND kind='progress')) AND (started=1 OR EXISTS "
+                        "(SELECT 1 FROM original_sources WHERE original_sources.id=turns.id)) "
+                        "ORDER BY rowid DESC",
                         (finished["account"], finished["progress"])
                     ).fetchall()
                     if len(order) != len(finished):
@@ -436,7 +445,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             if dispatch_id is not None and source_digest is not None:
                 route.execute("INSERT OR IGNORE INTO original_sources VALUES(?,?)",
                               (dispatch_id, source_digest))
-            route.execute("INSERT OR IGNORE INTO turns VALUES(?,?)", (message_id, kind))
+            route.execute("INSERT OR IGNORE INTO turns(id,kind,started) VALUES(?,?,?)",
+                          (message_id, kind, dispatch_id is not None))
         try:
             result = hosts[kind][1](message_id, payload)
         except (ConnectionError, TimeoutError, FileNotFoundError):

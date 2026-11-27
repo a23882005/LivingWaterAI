@@ -40,6 +40,17 @@ class ExcelContinuationTests(unittest.TestCase):
                         with patch.dict(os.environ, {"CODEX_PRIMARY_RUNTIME_NODE_MODULES": str(root / "no-node-package")}):
                             self.check_turn(root, combined, operation, case)
 
+    def test_progress_candidate_recovery_matrix(self):
+        cases = ("candidate lost", "candidate changed", "candidate empty",
+                 "candidate changed after send", "candidate lost after save")
+        for operation in ("answer", "restore"):
+            for combined in (False, True):
+                for case in cases:
+                    with self.subTest(operation=operation, combined=combined, case=case), TemporaryDirectory() as folder:
+                        root = Path(folder)
+                        with patch.dict(os.environ, {"CODEX_PRIMARY_RUNTIME_NODE_MODULES": str(root / "no-node-package")}):
+                            self.check_turn(root, combined, operation, case)
+
     def check_turn(self, root, combined, operation, case):
         member = "mou"
         source = root / f"{member}_03_股票配置選擇進度.xlsx"
@@ -125,6 +136,9 @@ class ExcelContinuationTests(unittest.TestCase):
         first = turn("answer", payload)
         self.assertEqual(first["status"], "DOCS03_BACKUP_REQUIRED")
         self.assertEqual(source.read_bytes(), original_bytes)
+        journal, _ = docs03._journal_directory(
+            root, args["project_id"] + "|03-progress", args["conversation_id"], create=False)
+        candidate = next(journal.glob("upload-*.xlsx"))
         if case == "changed workbook":
             main["B3"] = "另一筆變更"
             book.save(source)
@@ -134,12 +148,23 @@ class ExcelContinuationTests(unittest.TestCase):
             book.save(bad)
             with self.assertRaisesRegex(ValueError, "FAMILY03_PROGRESS_BACKUP_MISMATCH"):
                 turn("bad-backup", verified_backup=("bad-id", bad))
+        elif case == "candidate lost":
+            candidate.unlink()
+        elif case == "candidate changed":
+            with candidate.open("ab") as artifact:
+                artifact.write(b"altered candidate bytes")
+        elif case == "candidate empty":
+            candidate.write_bytes(b"")
 
         update = turn("backup", verified_backup=("backup-id", backup))
-        if case == "changed workbook":
+        if case in ("changed workbook", "candidate lost", "candidate changed", "candidate empty"):
             self.assertEqual(update["status"], "DOCS03_PREVIEW_STALE")
             self.assertNotIn("update_file_args", update)
             self.assertEqual(len(plans.read_progress(source, member, calc.reader_module())[1]), original_count)
+            if case.startswith("candidate"):
+                self.assertEqual(source.read_bytes(), original_bytes)
+                self.assertEqual(turn("continue-stale"), update)
+                self.assertEqual(turn("fresh-answer", payload)["status"], "DOCS03_BACKUP_REQUIRED")
             return
         self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
         self.assertEqual(update["update_file_args"]["fileId"], "progress-id")
@@ -147,7 +172,18 @@ class ExcelContinuationTests(unittest.TestCase):
             pending = turn("wait", verified_backup=("backup-id", backup))
             self.assertEqual(pending["status"], "AWAIT_DRIVE_CONFIRMATION")
             self.assertNotIn("update_file_args", pending)
-        copyfile(update["update_file_args"]["file_uri"], source)
+        if case == "candidate changed after send":
+            good_copy = root / "uploaded-by-connector.xlsx"
+            copyfile(candidate, good_copy)
+            candidate.write_bytes(b"changed after send")
+            pending = turn("candidate-no-longer-needed", verified_backup=("backup-id", backup))
+            self.assertEqual(pending["status"], "AWAIT_DRIVE_CONFIRMATION")
+            self.assertNotIn("update_file_args", pending)
+            copyfile(good_copy, source)
+        else:
+            copyfile(update["update_file_args"]["file_uri"], source)
+        if case == "candidate lost after save":
+            candidate.unlink()
         if case == "later answer present":
             later = load_workbook(source)
             later["選擇歷程"].append(["b" * 64, "2026-11-20T11:00:00+08:00", member])

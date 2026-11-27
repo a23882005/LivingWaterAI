@@ -662,8 +662,10 @@ def prepare_progress_update(staged, observed, *, file_id, downloaded_id,
         candidate_sha = sha256(candidate.read_bytes()).hexdigest()
     except FileNotFoundError:
         return {"status": "FAMILY03_PROGRESS_CANDIDATE_MISSING"}
+    except IsADirectoryError:
+        return {"status": "FAMILY03_PROGRESS_CANDIDATE_CHANGED"}
     if candidate_sha != staged["新檔摘要"]:
-        raise ValueError("FAMILY03_PROGRESS_CANDIDATE_MISMATCH")
+        return {"status": "FAMILY03_PROGRESS_CANDIDATE_CHANGED"}
     return {"status": "FAMILY03_PROGRESS_UPDATE_REQUIRED",
             "update_file_args": {
                 "fileId": file_id, "file_uri": str(candidate),

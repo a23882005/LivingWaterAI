@@ -65,9 +65,13 @@ def _pin_candidate(workspace_dir, project_id, conversation_id, source, revision,
             os.link(temp.name, target)
         except FileExistsError:
             with os.fdopen(os.open(target, os.O_RDONLY | os.O_NOFOLLOW), "rb") as existing:
-                if (os.fstat(existing.fileno()).st_mode & 0o077
-                        or _digest_stream(existing) != revision):
+                if os.fstat(existing.fileno()).st_mode & 0o077:
                     raise ValueError("DOCS03_CANDIDATE_DIGEST_MISMATCH")
+                matches = _digest_stream(existing) == revision
+            if not matches:
+                # Keep any previously issued path intact. Pin the verified new bytes separately.
+                target = target.with_stem(f"{target.stem}-{Path(temp.name).name}")
+                os.link(temp.name, target)
         fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY)
         try:
             os.fsync(fd)
@@ -557,9 +561,9 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
         if update["status"] == "FAMILY03_PROGRESS_SOURCE_CHANGED":
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":key["request_id"],
                     "text":"作答進度已有更新，請重新開啟 03 接續最新題目。"}
-        if update["status"] == "FAMILY03_PROGRESS_CANDIDATE_MISSING":
+        if update["status"] in ("FAMILY03_PROGRESS_CANDIDATE_MISSING", "FAMILY03_PROGRESS_CANDIDATE_CHANGED"):
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":key["request_id"],
-                    "text":"待寫回的作答副本已遺失，請回到 03 重新確認這一題。"}
+                    "text":"待寫回的作答副本已遺失或變更，請回到 03 重新確認這一題。"}
         # The first observation missed a save that landed before preflight.
         if update["status"] == "FAMILY03_PROGRESS_EVENT_FOUND":
             return {**key, "status":"PERSISTED_REMOTE_VERIFIED", "progress_receipt":update}
@@ -731,9 +735,15 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                 sha256(downloaded_progress().read_bytes()).hexdigest() != progress_binding["revision"]):
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
                     "text":"股票方案已有更新，請回 03 重新查看全帳戶目標，再確認一次。"}
-        if not Path(plan["candidate"]["path"]).is_file():
+        candidate = plan["candidate"]
+        try:
+            with Path(candidate["path"]).open("rb") as upload:
+                matches = _digest_stream(upload) == candidate["sha256"]
+        except (FileNotFoundError, IsADirectoryError):
+            matches = False
+        if not matches:
             return {"status":"DOCS03_PREVIEW_STALE", "request_id":staged["request_id"],
-                    "text":"待寫回的帳本副本已遺失，請回到 03 重新預覽並確認。"}
+                    "text":"待寫回的帳本副本已遺失或變更，請回到 03 重新預覽並確認。"}
         # This turn can have a different download path for the same Drive bytes.
         confirmed_source = {**plan["source"], "path": fresh["path"]}
         writer = drive.OnDemandWriteback(binding, auth.require_login)

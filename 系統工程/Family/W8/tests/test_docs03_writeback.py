@@ -467,7 +467,7 @@ class Docs03WritebackTests(unittest.TestCase):
             self.turn("wrong-revision", document={"documentId": "fixture-doc", "revisionId": "different"})
         self.assertEqual(self.turn("correct-chat")["result"]["request_id"], "confirmation")
 
-    def test_pinned_candidate_reuses_exact_bytes_and_rejects_replacement(self):
+    def test_pinned_candidate_reuses_exact_bytes_and_leaves_damaged_path_intact(self):
         project, conversation = "fixture-project", "original-chat"
         journal, _ = docs03._journal_directory(self.workspace, project, conversation, create=True)
         source = self.workspace / "candidate.xlsx"
@@ -488,8 +488,11 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertEqual(pin(revision), saved)
         self.assertEqual(list(journal.iterdir()), [saved])
         saved.write_bytes(b"changed candidate")
-        with self.assertRaisesRegex(ValueError, "DOCS03_CANDIDATE_DIGEST_MISMATCH"):
-            pin(revision)
+        rebuilt = pin(revision)
+        self.assertNotEqual(saved, rebuilt)
+        self.assertEqual(rebuilt.parent, journal)
+        self.assertEqual(rebuilt.stat().st_mode & 0o077, 0)
+        self.assertEqual(rebuilt.read_bytes(), source.read_bytes())
         self.assertEqual(saved.read_bytes(), b"changed candidate")
 
     def test_direct_account_entry_uses_the_registered_workbook_download(self):
@@ -1028,6 +1031,16 @@ class Docs03NativeHostTests(unittest.TestCase):
                             TemporaryDirectory() as folder:
                         self.check_account_preview_receipt(Path(folder), from_document, combined, case)
 
+    def test_account_candidate_recovery_matrix(self):
+        cases = ("candidate lost", "candidate changed", "candidate empty",
+                 "candidate changed after send", "candidate lost after save")
+        for from_document in (False, True):
+            for combined in (False, True):
+                for case in cases:
+                    with self.subTest(from_document=from_document, combined=combined, case=case), \
+                            TemporaryDirectory() as folder:
+                        self.check_account_preview_receipt(Path(folder), from_document, combined, case)
+
     def check_account_preview_receipt(self, root, from_document, combined, case):
         from openpyxl import Workbook
 
@@ -1126,6 +1139,11 @@ class Docs03NativeHostTests(unittest.TestCase):
                 db.execute("CREATE TABLE separate_update (note TEXT)")
         elif case == "candidate lost":
             candidate.unlink()
+        elif case == "candidate changed":
+            with candidate.open("ab") as artifact:
+                artifact.write(b"altered candidate bytes")
+        elif case == "candidate empty":
+            candidate.write_bytes(b"")
         elif case == "same backup ID":
             with self.assertRaisesRegex(ValueError, "DISTINCT_REMOTE_BACKUP_REQUIRED"):
                 turn("bad-backup", saved_backup=("ledger-id", backup))
@@ -1141,11 +1159,14 @@ class Docs03NativeHostTests(unittest.TestCase):
             download.side_effect = [("ledger-id", backup), ("ledger-id", source)]
 
         update = turn("backup", saved_backup=("backup-id", backup))
-        if case in ("workbook changed", "ledger changed", "candidate lost"):
+        if case in ("workbook changed", "ledger changed", "candidate lost", "candidate changed", "candidate empty"):
             self.assertEqual(update["status"], "DOCS03_PREVIEW_STALE")
             self.assertNotIn("update_file_args", update)
             with sqlite3.connect(source) as db:
                 self.assertEqual(db.execute("SELECT COUNT(*) FROM final_target_version").fetchone(), (original_count,))
+            if case.startswith("candidate"):
+                self.assertEqual(turn("continue-stale"), update)
+                self.assertEqual(turn("fresh-confirmation", payload)["status"], "DOCS03_BACKUP_REQUIRED")
             return
         if case == "receipt during preflight":
             reply = update
@@ -1158,7 +1179,18 @@ class Docs03NativeHostTests(unittest.TestCase):
                 waiting = turn("waiting", saved_backup=("backup-id", backup))
                 self.assertEqual(waiting["status"], "AWAIT_DRIVE_CONFIRMATION")
                 self.assertNotIn("update_file_args", waiting)
-            copyfile(update["update_file_args"]["file_uri"], source)
+            if case == "candidate changed after send":
+                good_copy = root / "uploaded-by-connector.db"
+                copyfile(candidate, good_copy)
+                candidate.write_bytes(b"changed after send")
+                pending = turn("candidate-no-longer-needed", saved_backup=("backup-id", backup))
+                self.assertEqual(pending["status"], "AWAIT_DRIVE_CONFIRMATION")
+                self.assertNotIn("update_file_args", pending)
+                copyfile(good_copy, source)
+            else:
+                copyfile(update["update_file_args"]["file_uri"], source)
+            if case == "candidate lost after save":
+                candidate.unlink()
             if case == "download retry" and combined:
                 download.side_effect = [TimeoutError("temporary read failure")]
                 self.assertEqual(turn("retry")["status"], "DOCS03_READ_RETRY_REQUIRED")

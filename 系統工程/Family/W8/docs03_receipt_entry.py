@@ -259,6 +259,10 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
         if alias:
             message_id = alias[0]
         active, finished, known = [], {}, {}
+        exact_saved = False
+        if requested is not None:
+            conversation = _load_module("conversation_entry")
+            encoded_payload = conversation.encode(payload)
         for kind, (scope, _) in hosts.items():
             _, journal = _journal_directory(workspace_dir, scope, conversation_id, create=False)
             if not journal.exists():
@@ -282,6 +286,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                         "SELECT w.phase FROM replies r JOIN work w ON w.id=r.work_id "
                         "WHERE r.id=? LIMIT 1", (message_id, message_id)
                     ).fetchone()
+                    if kind == requested:
+                        exact_saved = conversation.find_saved_confirmation(work, encoded_payload) is not None
             except sqlite3.DatabaseError:
                 return {"status": "DOCS03_JOURNAL_RECOVERY_REQUIRED",
                         "text": "目前讀不到原 03 的續接紀錄，請先核對原對話的私人工作區。"}
@@ -305,7 +311,8 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
             interrupted = route.execute(
                 "SELECT id, kind, payload FROM interrupted_dispatch WHERE slot=1"
             ).fetchone()
-            terminal_replay = known.get(previous) in ("done", "closed", "cancelled")
+            saved_replay = previous is None and exact_saved
+            terminal_replay = saved_replay or known.get(previous) in ("done", "closed", "cancelled")
             if interrupted and (message_id == interrupted[0] or not terminal_replay):
                 original_id, original_kind, saved_payload = interrupted
                 original_payload = json.loads(saved_payload)
@@ -345,7 +352,7 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                     kind = order[0][0]
                 else:
                     return {"status": "NO_PENDING_REQUEST"}
-            if not interrupted and payload is not None and not active and kind not in known:
+            if not interrupted and payload is not None and not active and kind not in known and not saved_replay:
                 # Record the original input before the business journal can receive it.
                 route.execute("INSERT INTO interrupted_dispatch VALUES(1,?,?,?)", (
                     message_id, kind, json.dumps(payload, ensure_ascii=False, allow_nan=False)))

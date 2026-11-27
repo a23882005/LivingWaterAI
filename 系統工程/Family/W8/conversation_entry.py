@@ -17,6 +17,16 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False, separators=(",", ":"))
 
 
+def find_saved_confirmation(db, payload_json):
+    """Find an already verified Menu 03 receipt for an exact historical input."""
+    for request_id, output in db.execute(
+            "SELECT id, output FROM work WHERE number=3 AND payload=? AND phase='done' "
+            "ORDER BY rowid DESC", (payload_json,)):
+        if json.loads(output).get("status") == "PERSISTED_REMOTE_VERIFIED":
+            return request_id
+    return None
+
+
 def is_native_drive_update(submission, receipt):
     if not isinstance(submission, dict) or submission.get("status") != "DOCS03_DRIVE_UPDATE_REQUIRED":
         return False
@@ -113,18 +123,15 @@ class ConversationEntry:
                                       (message_id,)).fetchone()
                     if item and confirm_account and (item["number"] != number or item["payload"] != payload_json):
                         raise ValueError("REQUEST_COLLISION")
+                if not item and confirm_account:
+                    saved_id = find_saved_confirmation(db, payload_json)
+                    if saved_id is not None:
+                        item = db.execute("SELECT * FROM work WHERE id=?", (saved_id,)).fetchone()
+                        db.execute("INSERT INTO replies VALUES(?,?)", (message_id, saved_id))
                 if not item:
                     item = db.execute("SELECT * FROM work WHERE phase IN ('open','running','writeback')").fetchone()
-                    if confirm_account:
-                        if item and (item["number"] != number or item["payload"] != payload_json):
-                            return {"status": "ANOTHER_REQUEST_PENDING"}
-                        if not item:
-                            prior = db.execute(
-                                "SELECT * FROM work WHERE number=3 AND payload=? AND phase='done' "
-                                "ORDER BY rowid DESC LIMIT 1", (payload_json,)
-                            ).fetchone()
-                            if prior and json.loads(prior["output"]).get("status") == "PERSISTED_REMOTE_VERIFIED":
-                                item = prior
+                    if confirm_account and item and (item["number"] != number or item["payload"] != payload_json):
+                        return {"status": "ANOTHER_REQUEST_PENDING"}
                     if not item and number is not None:
                         db.execute("INSERT INTO work VALUES(?,?,?,'open',NULL)", (message_id, number, payload_json))
                         item = db.execute("SELECT * FROM work WHERE id=?", (message_id,)).fetchone()

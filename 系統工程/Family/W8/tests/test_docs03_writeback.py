@@ -190,6 +190,22 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertEqual(self.turn("fresh-confirm", updated)["status"], "DOCS03_BACKUP_REQUIRED")
         self.assertEqual(self.select.call_count, 2)
 
+    def test_exact_historical_replay_does_not_displace_new_confirmation(self):
+        self.allow_update()
+        self.turn("first", self.payload)
+        self.land_receipt()
+        saved = self.turn("landed")
+        self.recover.return_value = None
+        self.prepare.return_value = {"status": "DOCS03_BACKUP_REQUIRED"}
+        latest = {**self.payload, "revision": "latest"}
+        self.assertEqual(self.turn("later-confirmation", latest)["status"], "DOCS03_BACKUP_REQUIRED")
+        self.assertEqual(self.turn("fresh-replay", self.payload), saved)
+        self.assertEqual(self.turn("fresh-replay"), saved)
+        changed = {**self.payload, "revision": "neither"}
+        self.assertEqual(self.turn("different-confirmation", changed)["status"], "ANOTHER_REQUEST_PENDING")
+        self.assertEqual(self.turn("continue-latest")["status"], "DOCS03_BACKUP_REQUIRED")
+        self.assertEqual(self.select.call_count, 2)
+
     def test_different_confirmation_does_not_replace_pending(self):
         self.turn("first", self.payload)
         unrelated = {**self.payload, "revision": "different"}

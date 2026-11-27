@@ -187,7 +187,8 @@ class Menu03RouterTests(unittest.TestCase):
         progress_receipt = self.turn("resume-answer")
         self.assertEqual(progress_receipt["result"]["file_id"], "progress")
         self.assertEqual(self.turn("confirm", self.account)["status"], "DOCS03_BACKUP_REQUIRED")
-        self.assertEqual(self.turn("another-answer", self.progress)["status"],
+        another_answer = {**self.progress, "reply": "不同作答"}
+        self.assertEqual(self.turn("another-answer", another_answer)["status"],
                          "ANOTHER_REQUEST_PENDING")
         self.land("account")
         account_receipt = self.turn("resume-account")
@@ -216,6 +217,8 @@ class Menu03RouterTests(unittest.TestCase):
                 calls = self.stage[first].call_count, self.stage[second].call_count
                 self.assertEqual(self.turn("first", getattr(self, first), **context), receipt)
                 self.assertEqual(self.turn("first-reply", **context), receipt)
+                self.assertEqual(self.turn("fresh-replay", getattr(self, first), **context), receipt)
+                self.assertEqual(self.turn("fresh-replay", **context), receipt)
                 changed = {**getattr(self, first), "revision": "different"}
                 with self.assertRaisesRegex(ValueError, "REQUEST_COLLISION"):
                     self.turn("first", changed, **context)
@@ -223,6 +226,22 @@ class Menu03RouterTests(unittest.TestCase):
                 self.land(second)
                 self.assertEqual(self.turn("continue-second", **context)["result"]["file_id"],
                                  second)
+
+    def test_exact_historical_replay_does_not_displace_interrupted_request(self):
+        self.turn("saved-confirm", self.account)
+        self.land("account")
+        receipt = self.turn("saved-result")
+
+        def interrupted():
+            raise KeyboardInterrupt("before dispatch")
+
+        with self.assertRaises(KeyboardInterrupt):
+            self.turn("new-answer", self.progress, before_dispatch=interrupted)
+        self.assertEqual(self.turn("fresh-replay", self.account), receipt)
+        self.assertEqual(self.turn("fresh-replay"), receipt)
+        self.stage["progress"].assert_not_called()
+        self.assertEqual(self.turn("continue-new")["status"], "DOCS03_BACKUP_REQUIRED")
+        self.stage["progress"].assert_called_once()
 
     def test_old_explicit_retry_does_not_steal_latest_plain_continue(self):
         for first, second in (("account", "progress"), ("progress", "account")):

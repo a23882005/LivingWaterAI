@@ -39,7 +39,7 @@ class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
                  read_page, patch_page, prepare_account, build_menu, recover_receipt,
                  prepare_writeback=None, progress_answers=False, prepare_native_writeback=None,
-                 complete_native_writeback=None):
+                 complete_native_writeback=None, continue_latest_completed=False):
         if not all(isinstance(v, str) and v.strip() for v in (project_id, conversation_id)):
             raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
         folder = Path(private_dir).resolve(strict=True)
@@ -57,6 +57,7 @@ class ConversationEntry:
         self.prepare_native_writeback = prepare_native_writeback
         self.complete_native_writeback = complete_native_writeback
         self.progress_answers = progress_answers
+        self.continue_latest_completed = continue_latest_completed
         self.lock = RLock()
         self.bound_request = None
         self._rejected_write = None
@@ -145,7 +146,10 @@ class ConversationEntry:
                         if item:
                             db.execute("INSERT INTO replies VALUES(?,?)", (message_id, item["id"]))
                     elif text in ("好了", "繼續"):
-                        item = db.execute("SELECT * FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
+                        query = ("SELECT * FROM work WHERE phase='done' ORDER BY rowid DESC LIMIT 1"
+                                 if self.continue_latest_completed
+                                 else "SELECT * FROM work ORDER BY rowid DESC LIMIT 1")
+                        item = db.execute(query).fetchone()
                         if item:
                             db.execute("INSERT INTO replies VALUES(?,?)", (message_id, item["id"]))
             if not item or item["phase"] in ("closed", "cancelled"):

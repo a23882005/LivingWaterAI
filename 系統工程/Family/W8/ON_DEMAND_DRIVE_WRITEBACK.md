@@ -77,7 +77,7 @@ MOU 文件登記模式在本人原登入及登記寫入後，以 `project_login_
 | `DOCS03_DRIVE_WRITE_PENDING` | 同一工作區內另一筆 03 已占用該 Drive 檔的寫回。先在原對話讀回那筆收據，再繼續目前這筆。 |
 | `DOCS03_READ_RETRY_REQUIRED` | 本輪下載逾時、連線中斷或本機下載檔未取得。下一則「繼續」沿原待辦及階段重試。若先前已發出寫回授權，就只查原收據。 |
 | `AWAIT_DRIVE_CONFIRMATION` | 重新下載同一原檔，讓原待辦唯讀查原帳本收據或 Excel 事件。 |
-| `DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION` | 無法由原紀錄確認兩條路的先後時，沿原訊息或原作答回查。查回舊結果的順序不影響原待辦順序。舊版若兩筆皆有首次派送時的來源紀錄，仍沿原順序續接。 |
+| `DOCS03_CONTINUATION_NEEDS_ORIGINAL_ACTION` | 無法由原紀錄確認兩條路的先後時，沿原訊息或原作答回查。查回舊結果的順序不影響原待辦順序。舊版若兩筆皆有首次派送時的來源紀錄，仍沿原順序續接。已被拒絕而取消的請求不影響下一則「繼續」查看上一筆已完成的結果。 |
 | `DOCS03_JOURNAL_RECOVERY_REQUIRED` | 某條路有無法讀取的原紀錄，先核對原對話的私人工作區，兩條路均暫停派送。 |
 | `DOCS03_PREVIEW_STALE` | 授權送出前發現原帳本或 Excel 已變動，且當筆原收據未保存。回到原 03，重新預覽、確認與備份。 |
 | `PERSISTED_REMOTE_VERIFIED` | 已讀到同戶、同檔的原 Excel 事件或帳本收據，交付保存結果。 |

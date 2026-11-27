@@ -246,7 +246,7 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
         prepare_writeback=prepare_writeback,
         prepare_native_writeback=prepare_native if write_slot is not None else None,
         complete_native_writeback=write_slot.complete if write_slot is not None else None,
-        progress_answers=progress_answers,
+        progress_answers=progress_answers, continue_latest_completed=True,
     )
     if payload is None:
         return entry.handle_message(message_id, "繼續")
@@ -343,9 +343,12 @@ def run_project_docs03_turn(*, auth, document_id, document, project_id,
                         "SELECT name FROM sqlite_master WHERE type='table'")}
                     if not tables:
                         continue  # SQLite was initialized before its first table was created.
-                    row = work.execute("SELECT id, phase FROM work ORDER BY rowid DESC LIMIT 1").fetchone()
-                    if "replies" not in tables and row is None:
+                    if "replies" not in tables and work.execute("SELECT 1 FROM work LIMIT 1").fetchone() is None:
                         continue  # Initialization stopped before it could accept any request.
+                    row = work.execute(
+                        "SELECT id, phase FROM work WHERE phase IN ('open','running','writeback','done') "
+                        "ORDER BY rowid DESC LIMIT 1"
+                    ).fetchone()
                     original = work.execute(
                         "SELECT id, phase FROM work WHERE id=? UNION ALL "
                         "SELECT w.id, w.phase FROM replies r JOIN work w ON w.id=r.work_id "

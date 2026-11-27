@@ -384,6 +384,84 @@ class Menu03RouterTests(unittest.TestCase):
                 self.observe[first].return_value = None
                 self.observe[second].return_value = None
 
+    def test_continuation_after_alternating_or_rejected_actions(self):
+        cases = ("none", "reject latest", "reject other", "reject both",
+                 "reject before dispatch", "pending latest", "pending other",
+                 "interrupted latest", "interrupted other", "stale workbook")
+        for recent, other in (("account", "progress"), ("progress", "account")):
+            for has_older_receipt in (False, True):
+                for case in cases:
+                    with self.subTest(recent=recent, older=has_older_receipt, case=case), TemporaryDirectory() as folder:
+                        self.check_alternating_continuation(Path(folder), recent, other, has_older_receipt, case)
+
+    def check_alternating_continuation(self, folder, recent, other, has_older_receipt, case):
+        context = {"workspace_dir": folder,
+                   "source_binding": ("MOU", "fixture-client", "mou", "ledger", "workbook")}
+        for kind in (recent, other):
+            self.stage[kind].reset_mock(side_effect=True)
+            self.prepare[kind].reset_mock(side_effect=True)
+            self.prepare[kind].return_value = {"status": "DOCS03_BACKUP_REQUIRED"}
+            self.observe[kind].reset_mock(side_effect=True)
+            self.observe[kind].return_value = None
+        receipts = {}
+        order = (other, recent) if has_older_receipt else (recent,)
+        for kind in order:
+            self.assertEqual(self.turn("save-" + kind, getattr(self, kind), **context)["status"],
+                             "DOCS03_BACKUP_REQUIRED")
+            self.land(kind)
+            receipts[kind] = self.turn("read-" + kind, **context)
+            self.assertEqual(receipts[kind]["result"]["file_id"], kind)
+            self.observe[kind].return_value = None
+
+        def next_payload(kind):
+            return {**getattr(self, kind), "revision": "new-input"}
+
+        def reject():
+            raise ValueError("rejected confirmation or answer")
+
+        rejected = {"reject latest": (recent,), "reject other": (other,), "reject both": (recent, other),
+                    "reject before dispatch": (recent,)}.get(case, ())
+        for kind in rejected:
+            message = "rejected-" + kind
+            with self.assertRaisesRegex(ValueError, "rejected confirmation or answer"):
+                if case == "reject before dispatch":
+                    self.turn(message, next_payload(kind), before_dispatch=reject, **context)
+                else:
+                    self.stage[kind].side_effect = ValueError("rejected confirmation or answer")
+                    self.turn(message, next_payload(kind), **context)
+            self.stage[kind].side_effect = None
+            self.assertEqual(self.turn(message, **context)["status"], "NO_PENDING_REQUEST")
+
+        waiting_kind = recent if case.endswith("latest") else other
+        if case.startswith("pending"):
+            self.assertEqual(self.turn("pending", next_payload(waiting_kind), **context)["status"],
+                             "DOCS03_BACKUP_REQUIRED")
+        elif case.startswith("interrupted"):
+            def interrupted():
+                raise TimeoutError("download interrupted before reaching Menu 03")
+
+            self.assertEqual(self.turn("pending", next_payload(waiting_kind), before_dispatch=interrupted,
+                                       **context)["status"], "DOCS03_READ_RETRY_REQUIRED")
+        elif case == "stale workbook":
+            self.prepare["progress"].return_value = {"status": "DOCS03_PREVIEW_STALE"}
+            self.assertEqual(self.turn("stale", next_payload("progress"), **context)["status"],
+                             "DOCS03_PREVIEW_STALE")
+
+        before_continue = {k: self.stage[k].call_count for k in (recent, other)}
+        reply = self.turn("fresh-continue", **context)
+        if case.startswith(("interrupted", "pending")):
+            self.assertEqual(reply["status"], "DOCS03_BACKUP_REQUIRED")
+        elif case == "stale workbook":
+            self.assertEqual(reply["status"], "DOCS03_PREVIEW_STALE")
+        else:
+            self.assertEqual(reply, receipts[recent])
+        for kind, receipt in receipts.items():
+            self.assertEqual(self.turn("redelivery-" + kind, getattr(self, kind), **context), receipt)
+        self.assertEqual(self.turn("fresh-continue", **context), reply)
+        for kind in (recent, other):
+            self.assertEqual(self.stage[kind].call_count,
+                             before_continue[kind] + (case.startswith("interrupted") and kind == waiting_kind))
+
     def test_partial_schema_without_requests_resumes_through_original_dispatch(self):
         for first, other in (("account", "progress"), ("progress", "account")):
             with self.subTest(first=first), TemporaryDirectory() as folder:

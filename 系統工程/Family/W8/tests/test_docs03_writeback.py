@@ -586,12 +586,54 @@ class Docs03NativeHostTests(unittest.TestCase):
         self.download_ledger.assert_not_called()
         self.build_menu.assert_called_once()
 
+    def test_native_account_resume_reads_one_fresh_ledger_without_reopening_menu(self):
+        source = self.ledger
+        source.unlink()
+        mutation_fixture.seed(source)
+        self.auth.user_id = "JO"
+        self.auth.client_id = mutation_fixture.CLIENT
+        member = dict(login_account="JO", family_alias="Joseph")
+        self.workbook = self.root / "Joseph_03_股票配置選擇進度.xlsx"
+        self.workbook.write_bytes(b"fixture preview")
+        self.download_workbook.return_value = ("progress-id", self.workbook)
+        stager = mutation_fixture.MUT.OnDemandMutationStager(
+            auth=self.auth, **member, client_id=self.auth.client_id,
+            official_drive_file_id="ledger-id", downloaded_db_path=source,
+            verified_drive_sha256=sha256(source.read_bytes()).hexdigest(), staging_dir=self.root)
+        staged = stager.stage("adjust_target", {
+            "request_id": "fixture-confirm", "owner_confirmed": True,
+            "record": {"confirmed": True, "source_reference": "fixture",
+                       "allocations": [{"instrument_key": "VT", "weight": "1"}]},
+        })
+        self.build_menu.return_value = SimpleNamespace(
+            auth=SimpleNamespace(family_login=self.auth),
+            select=Mock(return_value={"status": "DB_WRITEBACK_REQUIRED", "result": staged}))
+        payload = dict(action="confirm_account", revision=sha256(self.workbook.read_bytes()).hexdigest())
+        self.assertEqual(self.turn(payload, verified_account_backup=None, **member)["status"],
+                         "DOCS03_BACKUP_REQUIRED")
+        backup = self.root / "original-backup.db"
+        copyfile(source, backup)
+        update = self.turn(message_id="backup", verified_account_backup=("backup-id", backup), **member)
+        self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+        copyfile(update["update_file_args"]["file_uri"], source)
+        self.download_ledger.reset_mock()
+        self.download_workbook.reset_mock()
+        self.download_ledger.side_effect = [("ledger-id", source), TimeoutError("unexpected second download")]
+        reply = self.turn(message_id="continue", **member)
+        self.assertEqual(reply["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertEqual(reply["result"]["request_id"], "fixture-confirm")
+        self.download_ledger.assert_called_once_with("ledger-id")
+        self.download_workbook.assert_not_called()
+        self.assertEqual(self.turn(payload, message_id="replay", **member), reply)
+        self.download_ledger.assert_called_once_with("ledger-id")
+        self.build_menu.assert_called_once()
+
     def test_account_uses_same_host_menu_and_rejects_mismatched_downloads(self):
         payload = dict(action="confirm_account", revision="original")
 
         def stage(**args):
             self.assertEqual(args["verified_backup"], ("ledger-backup", self.ledger))
-            self.assertEqual(args["verified_drive_sha256"], sha256(self.ledger.read_bytes()).hexdigest())
+            self.assertNotIn("verified_drive_sha256", args)
             args["build_original_menu"](self.auth)
             return {"status": "DOCS03_BACKUP_REQUIRED"}
 
@@ -600,7 +642,8 @@ class Docs03NativeHostTests(unittest.TestCase):
             self.download_ledger.return_value = ("other-id", self.ledger)
             with self.assertRaisesRegex(PermissionError, "DOCS03_WRITEBACK_BINDING_MISMATCH"):
                 self.turn(payload)
-            account.assert_not_called()
+            self.build_menu.assert_not_called()
+            self.download_workbook.assert_not_called()
             self.download_ledger.return_value = ("ledger-id", self.ledger)
             self.download_workbook.return_value = ("other-id", self.workbook)
             with self.assertRaisesRegex(PermissionError, "DOCS03_PROGRESS_BINDING_MISMATCH"):

@@ -518,8 +518,8 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
 def run_project_docs03(*, auth, document_id, document, project_id,
                        conversation_id, workspace_dir, message_id,
                        project_name, login_account, client_id, family_alias,
-                       downloaded_db_path, official_drive_file_id,
-                       verified_drive_sha256, mutation_staging_dir,
+                       official_drive_file_id, mutation_staging_dir,
+                       downloaded_db_path=None, verified_drive_sha256=None,
                        download_original, payload=None,
                        backup_original=None, replace_original=None,
                        native_writeback=False, verified_backup=None,
@@ -537,6 +537,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     the confirmed workbook revision before an original-ledger update.
     A trusted host may supply build_original_menu(login) to retain its
     household's existing menu version and bind its fresh workbook download.
+    The native combined entry lets that builder download the initial ledger
+    only when needed. Receipt checks use the ledger downloaded for the lookup.
     """
     if not callable(download_original):
         raise TypeError("DOCS03_DRIVE_DOWNLOAD_REQUIRED")
@@ -557,6 +559,10 @@ def run_project_docs03(*, auth, document_id, document, project_id,
     if check_progress and not (isinstance(progress_file_id, str) and progress_file_id.strip()
                                and callable(download_progress) and (managed or native_writeback)):
         raise ValueError("DOCS03_PROGRESS_RECHECK_CONFIGURATION")
+    if (downloaded_db_path is None or verified_drive_sha256 is None) and not (
+            downloaded_db_path is None and verified_drive_sha256 is None
+            and native_writeback and build_original_menu is not None):
+        raise ValueError("DOCS03_INITIAL_LEDGER_REQUIRED")
     sources = {
         "login_account": login_account,
         "client_id": client_id,
@@ -601,12 +607,25 @@ def run_project_docs03(*, auth, document_id, document, project_id,
             menu = build_original_menu(login)
         return ConfirmationMenu(menu) if managed or native_writeback else menu
 
-    def receipt_stager():
-        return _load_module("on_demand_mutations").OnDemandMutationStager(
-            auth=auth, staging_dir=mutation_staging_dir, **sources)
+    def read_receipt(key, fresh_path, fresh_id):
+        if fresh_id != official_drive_file_id:
+            raise PermissionError("DOCS03_RECEIPT_BINDING_MISMATCH")
+        with Path(fresh_path).open("rb") as downloaded:
+            revision = _digest_stream(downloaded)
+        receipt_sources = {**sources, "downloaded_db_path": fresh_path,
+                           "verified_drive_sha256": revision}
+        stager = _load_module("on_demand_mutations").OnDemandMutationStager(
+            auth=auth, staging_dir=mutation_staging_dir, **receipt_sources)
+        return stager.recover_receipt(key, fresh_path, fresh_id)
 
     def recover_receipt(key):
-        return receipt_stager().receipt_reader(download_original)(key)
+        account = auth.require_login()
+        if not isinstance(account, str) or account.upper() != login_account.upper():
+            raise PermissionError("FAMILY_PROJECT_ACCOUNT_MISMATCH")
+        if key["file_id"] != official_drive_file_id:
+            raise PermissionError("RECEIPT_BINDING_MISMATCH")
+        fresh_id, fresh_path = download_original(official_drive_file_id)
+        return read_receipt(key, fresh_path, fresh_id)
 
     def prepare_writeback(staged):
         plan = staged["writeback_plan"]
@@ -632,7 +651,7 @@ def run_project_docs03(*, auth, document_id, document, project_id,
         fresh = drive.inspect(fresh_path, binding)
         if fresh["sha256"] != plan["source"]["sha256"]:
             # The original update may have appeared since the earlier receipt lookup.
-            saved = receipt_stager().recover_receipt(staged["receipt_key"], fresh_path, fresh_id)
+            saved = read_receipt(staged["receipt_key"], fresh_path, fresh_id)
             if saved is not None:
                 return saved
             return {
@@ -705,16 +724,12 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
                    workspace_dir=workspace_dir)
     household = dict(login_account=login_account, client_id=client_id, family_alias=family_alias)
     workbook_name = family_alias + "_03_股票配置選擇進度.xlsx"
-    ledger_path = None
 
     def current_ledger():
-        nonlocal ledger_path
-        if ledger_path is None:
-            received_id, path = download_original(official_drive_file_id)
-            if received_id != official_drive_file_id:
-                raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
-            ledger_path = Path(path)
-        return ledger_path
+        received_id, path = download_original(official_drive_file_id)
+        if received_id != official_drive_file_id:
+            raise PermissionError("DOCS03_WRITEBACK_BINDING_MISMATCH")
+        return Path(path)
 
     def current_workbook(file_id):
         received_id, path = download_progress(file_id)
@@ -727,7 +742,8 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
         return build_original_menu(login, workbook, current_ledger())
 
     def account_menu(login):
-        return progress_menu(login, current_workbook(progress_file_id)[1])
+        ledger = current_ledger()
+        return build_original_menu(login, current_workbook(progress_file_id)[1], ledger)
 
     def progress_turn(mid, data):
         return run_project_docs03_progress(
@@ -736,12 +752,9 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
             build_menu=progress_menu, verified_backup=verified_progress_backup)
 
     def account_turn(mid, data):
-        ledger = current_ledger()
         return run_project_docs03(
             **context, **household, message_id=mid, payload=data,
-            project_name=project_name, downloaded_db_path=ledger,
-            official_drive_file_id=official_drive_file_id,
-            verified_drive_sha256=sha256(ledger.read_bytes()).hexdigest(),
+            project_name=project_name, official_drive_file_id=official_drive_file_id,
             mutation_staging_dir=mutation_staging_dir, download_original=download_original,
             native_writeback=True, verified_backup=verified_account_backup,
             progress_file_id=progress_file_id, download_progress=current_workbook,

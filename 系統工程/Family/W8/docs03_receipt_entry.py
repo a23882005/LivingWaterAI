@@ -781,6 +781,56 @@ def inspect_docs03_host_context(*, project_id=None, conversation_id=None,
     }
 
 
+def probe_docs03_host_roundtrip(*, action, check_id, project_id=None, conversation_id=None,
+                                message_id=None, workspace_dir=None):
+    """Check two genuine host turns without accessing the household's business data.
+
+    The caller supplies the identifiers directly from the host and a 32-hex
+    test label shared by both turns. A label never supplies host identity.
+    """
+    if action not in ("start", "verify") or not isinstance(check_id, str) or len(check_id) != 32 or any(
+            char not in "0123456789abcdef" for char in check_id):
+        raise ValueError("DOCS03_INVALID_HOST_PROBE")
+    readiness = inspect_docs03_host_context(project_id=project_id, conversation_id=conversation_id,
+                                            message_id=message_id, workspace_dir=workspace_dir)
+    if readiness["error"] is not None:
+        return readiness
+    _, journal = _journal_directory(workspace_dir, project_id + "|03-host-probe",
+                                    conversation_id, create=action == "start")
+    if journal.is_symlink():
+        raise PermissionError("DOCS03_PRIVATE_JOURNAL_DIRECTORY_REQUIRED")
+    if action == "verify" and not journal.is_file():
+        return {"status": "DOCS03_HOST_PROBE_NOT_FOUND"}
+    if action == "start":
+        os.close(os.open(journal, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600))
+
+    # Store only a scoped digest of each message, never its raw identifier.
+    digest = sha256(json.dumps([project_id, conversation_id, check_id, message_id],
+                               ensure_ascii=False).encode()).hexdigest()
+    with closing(sqlite3.connect(journal.as_uri() + "?mode=rw", uri=True)) as db, db:
+        db.execute("BEGIN IMMEDIATE")
+        if action == "start":
+            db.execute("CREATE TABLE IF NOT EXISTS host_probe "
+                       "(id TEXT PRIMARY KEY, first TEXT NOT NULL, second TEXT)")
+            db.execute("INSERT OR IGNORE INTO host_probe(id,first) VALUES(?,?)", (check_id, digest))
+        elif db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='host_probe'").fetchone() is None:
+            return {"status": "DOCS03_HOST_PROBE_NOT_FOUND"}
+        row = db.execute("SELECT first,second FROM host_probe WHERE id=?", (check_id,)).fetchone()
+        if row is None:
+            return {"status": "DOCS03_HOST_PROBE_NOT_FOUND"}
+        first, second = row
+        if action == "start":
+            return {"status": "DOCS03_HOST_PROBE_STARTED" if first == digest
+                    else "DOCS03_HOST_PROBE_START_CONFLICT"}
+        if first == digest:
+            return {"status": "DOCS03_HOST_PROBE_SAME_MESSAGE"}
+        if second is not None and second != digest:
+            return {"status": "DOCS03_HOST_PROBE_ALREADY_VERIFIED"}
+        if second is None:
+            db.execute("UPDATE host_probe SET second=? WHERE id=?", (digest, check_id))
+        return {"status": "DOCS03_HOST_PROBE_VERIFIED"}
+
+
 def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
                                    conversation_id, workspace_dir, message_id,
                                    project_name, login_account, client_id, family_alias,

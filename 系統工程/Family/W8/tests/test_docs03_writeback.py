@@ -1,6 +1,7 @@
 """Regression tests for the original Menu 03 confirmation journal."""
 from concurrent.futures import ThreadPoolExecutor
 from importlib.util import module_from_spec, spec_from_file_location
+import json
 import os
 from pathlib import Path
 from hashlib import sha256
@@ -753,6 +754,75 @@ class Docs03NativeHostTests(unittest.TestCase):
         self.assertEqual(result["status"], "DOCS03_HOST_CONTEXT_INPUTS_PRESENT")
         self.assertEqual(set(result["fields"].values()), {"present"})
         self.assertEqual(set(self.root.iterdir()), before)
+
+    def test_host_probe_two_turn_matrix_across_processes(self):
+        cases = (
+            ("two messages", {}, "DOCS03_HOST_PROBE_VERIFIED"),
+            ("same message", {"message_id": "first"}, "DOCS03_HOST_PROBE_SAME_MESSAGE"),
+            ("wrong project", {"project_id": "other-project"}, "DOCS03_HOST_PROBE_NOT_FOUND"),
+            ("wrong conversation", {"conversation_id": "other-chat"}, "DOCS03_HOST_PROBE_NOT_FOUND"),
+            ("new workspace", {"different_workspace": True}, "DOCS03_HOST_PROBE_NOT_FOUND"),
+            ("wrong check", {"check_id": "b" * 32}, "DOCS03_HOST_PROBE_NOT_FOUND"),
+            ("verify before start", {"skip_start": True}, "DOCS03_HOST_PROBE_NOT_FOUND"),
+            ("repeat first turn", {"repeat_start": True}, "DOCS03_HOST_PROBE_VERIFIED"),
+            ("repeat second turn", {"repeat_verify": True}, "DOCS03_HOST_PROBE_VERIFIED"),
+            ("different third turn", {"next_message": True}, "DOCS03_HOST_PROBE_ALREADY_VERIFIED"),
+        )
+
+        def call(separate, **kwargs):
+            if not separate:
+                return docs03.probe_docs03_host_roundtrip(**kwargs)
+            read_fd, write_fd = os.pipe()
+            child = os.fork()
+            if child == 0:
+                os.close(read_fd)
+                with os.fdopen(write_fd, "w") as pipe:
+                    json.dump(docs03.probe_docs03_host_roundtrip(**kwargs), pipe)
+                os._exit(0)
+            os.close(write_fd)
+            with os.fdopen(read_fd) as pipe:
+                output = pipe.read()
+            self.assertEqual(os.waitstatus_to_exitcode(os.waitpid(child, 0)[1]), 0)
+            return json.loads(output)
+
+        for start_separate, verify_separate in ((False, False), (True, False),
+                                                 (False, True), (True, True)):
+            for case, overrides, expected in cases:
+                with self.subTest(case=case, start_process=start_separate, verify_process=verify_separate), \
+                        TemporaryDirectory(dir=self.root) as folder:
+                    workspace = Path(folder)
+                    alternate = workspace / "another-workspace"
+                    alternate.mkdir()
+                    base = dict(project_id="fixture-project", conversation_id="original-chat",
+                                workspace_dir=workspace, check_id="a" * 32)
+                    start = {**base, "action": "start", "message_id": "first"}
+                    verify = {**base, "action": "verify", "message_id": "second"}
+                    if not overrides.get("skip_start"):
+                        self.assertEqual(call(start_separate, **start)["status"], "DOCS03_HOST_PROBE_STARTED")
+                    if overrides.get("repeat_start"):
+                        self.assertEqual(call(start_separate, **start)["status"], "DOCS03_HOST_PROBE_STARTED")
+                        self.assertEqual(call(start_separate, **{**start, "message_id": "wrong"})["status"],
+                                         "DOCS03_HOST_PROBE_START_CONFLICT")
+                    for field in ("project_id", "conversation_id", "message_id", "check_id"):
+                        if field in overrides:
+                            verify[field] = overrides[field]
+                    if overrides.get("different_workspace"):
+                        verify["workspace_dir"] = alternate
+                    result = call(verify_separate, **verify)
+                    if overrides.get("repeat_verify") or overrides.get("next_message"):
+                        self.assertEqual(result["status"], "DOCS03_HOST_PROBE_VERIFIED")
+                        if overrides.get("next_message"):
+                            verify["message_id"] = "third"
+                        result = call(verify_separate, **verify)
+                    self.assertEqual(result["status"], expected)
+                    if expected == "DOCS03_HOST_PROBE_NOT_FOUND":
+                        self.assertEqual(list(alternate.iterdir()), [])
+                    self.assertNotIn("original-chat", str(result))
+                    self.assertNotIn("fixture-project", str(result))
+                    self.assertNotIn(str(workspace), str(result))
+        self.download_ledger.assert_not_called()
+        self.download_workbook.assert_not_called()
+        self.build_menu.assert_not_called()
 
     def test_native_first_dispatch_rejects_changed_sources_before_downloading(self):
         self.download_ledger.side_effect = TimeoutError("ledger could not be loaded")

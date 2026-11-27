@@ -385,6 +385,7 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
     The trusted host supplies the fixed Excel ID and a fresh download callback.
     build_menu(login, path) binds that local Excel to the original project menu.
     After a backup, pass its actual ID and path; issue the returned update once.
+    Direct and combined calls share the same per-file authorization slot.
     """
     if (getattr(auth, "user_id", None), getattr(auth, "client_id", None)) != (login_account, client_id):
         raise PermissionError("DOCS03_PROJECT_ACCOUNT_MISMATCH")
@@ -467,6 +468,8 @@ def run_project_docs03_progress(*, auth, document_id, document, project_id,
             return {**key, "status":"PERSISTED_REMOTE_VERIFIED", "progress_receipt":update}
         return {**update, "status":"DOCS03_DRIVE_UPDATE_REQUIRED", "request_id":key["request_id"]}
 
+    if write_slot is None:
+        write_slot = _DriveWriteSlot(workspace_dir, progress_file_id, project_id, conversation_id)
     result = run_docs03(auth=auth, document_id=document_id, document=document,
         project_id=project_id + "|03-progress", conversation_id=conversation_id,
         workspace_dir=workspace_dir, message_id=message_id, payload=payload,
@@ -622,6 +625,8 @@ def run_project_docs03(*, auth, document_id, document, project_id,
                     "update_file_args":authorized["update_file_args"]}
         return lambda: replace_original(**authorized["update_file_args"])
 
+    if native_writeback and write_slot is None:
+        write_slot = _DriveWriteSlot(workspace_dir, official_drive_file_id, project_id, conversation_id)
     result = run_docs03(
         auth=auth, document_id=document_id, document=document,
         project_id=project_id, conversation_id=conversation_id,
@@ -695,8 +700,7 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
         return run_project_docs03_progress(
             **context, **household, message_id=mid, payload=data,
             progress_file_id=progress_file_id, download_progress=current_workbook,
-            build_menu=progress_menu, verified_backup=verified_progress_backup,
-            write_slot=_DriveWriteSlot(workspace_dir, progress_file_id, project_id, conversation_id))
+            build_menu=progress_menu, verified_backup=verified_progress_backup)
 
     def account_turn(mid, data):
         ledger = current_ledger()
@@ -708,8 +712,7 @@ def run_project_docs03_native_turn(*, auth, document_id, document, project_id,
             mutation_staging_dir=mutation_staging_dir, download_original=download_original,
             native_writeback=True, verified_backup=verified_account_backup,
             progress_file_id=progress_file_id, download_progress=current_workbook,
-            build_original_menu=account_menu,
-            write_slot=_DriveWriteSlot(workspace_dir, official_drive_file_id, project_id, conversation_id))
+            build_original_menu=account_menu)
 
     return run_project_docs03_turn(
         **context, message_id=message_id, payload=payload,

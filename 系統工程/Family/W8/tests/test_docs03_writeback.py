@@ -402,6 +402,13 @@ class Docs03WritebackTests(unittest.TestCase):
             self.assertEqual(turn("first", payload=self.payload)["status"], "DOCS03_BACKUP_REQUIRED")
             with self.assertRaisesRegex(ValueError, "DISTINCT_REMOTE_BACKUP_REQUIRED"):
                 turn("wrong-backup", verified_backup=("original-db", backup))
+            other = docs03._DriveWriteSlot(self.workspace, "original-db", "fixture-project", "other-chat")
+            other_key = {**self.key, "request_id": "other-confirmation"}
+            self.assertTrue(other.acquire(other_key))
+            blocked = turn("while-other-is-writing", verified_backup=("backup-id", backup))
+            self.assertEqual(blocked["status"], "DOCS03_DRIVE_WRITE_PENDING")
+            self.assertNotIn("update_file_args", blocked)
+            other.release(other_key)
             staged = turn("verified-backup", verified_backup=("backup-id", backup))
             self.assertEqual(staged["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
             self.assertEqual(staged["update_file_args"]["fileId"], "original-db")
@@ -506,6 +513,21 @@ class Docs03NativeHostTests(unittest.TestCase):
         answer = dict(revision=revision, question_id="choice", key="goal", reply="成長")
         self.assertEqual(self.turn(answer, verified_progress_backup=None)["status"], "DOCS03_BACKUP_REQUIRED")
         candidate.unlink()
+        other = docs03._DriveWriteSlot(self.root, "progress-id", "fixture-project", "other-chat")
+        other_key = {"file_id": "progress-id", "request_id": "other-excel-event"}
+        self.assertTrue(other.acquire(other_key))
+        direct = docs03.run_project_docs03_progress(
+            auth=self.auth, document_id="fixture-doc",
+            document={"documentId": "fixture-doc", "revisionId": "fixture-revision"},
+            project_id="fixture-project", conversation_id="original-chat",
+            workspace_dir=self.root, message_id="direct-while-other-is-writing",
+            login_account="MOU", client_id=self.auth.client_id, family_alias="mou",
+            progress_file_id="progress-id", download_progress=self.download_workbook,
+            build_menu=lambda *_: self.fail("a staged answer must not re-open the menu"),
+            verified_backup=("backup-id", backup))
+        self.assertEqual(direct["status"], "DOCS03_DRIVE_WRITE_PENDING")
+        self.assertNotIn("update_file_args", direct)
+        other.release(other_key)
         update = self.turn(message_id="backup", verified_progress_backup=("backup-id", backup))
         self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
         uploaded_artifact = Path(update["update_file_args"]["file_uri"])

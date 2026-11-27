@@ -38,7 +38,8 @@ def is_native_drive_update(submission, receipt):
 class ConversationEntry:
     def __init__(self, *, private_dir, project_id, conversation_id, session, mobile,
                  read_page, patch_page, prepare_account, build_menu, recover_receipt,
-                 prepare_writeback=None, progress_answers=False, prepare_native_writeback=None):
+                 prepare_writeback=None, progress_answers=False, prepare_native_writeback=None,
+                 complete_native_writeback=None):
         if not all(isinstance(v, str) and v.strip() for v in (project_id, conversation_id)):
             raise ValueError("TRUSTED_CONVERSATION_BINDING_REQUIRED")
         folder = Path(private_dir).resolve(strict=True)
@@ -54,6 +55,7 @@ class ConversationEntry:
         self.recover_receipt = recover_receipt
         self.prepare_writeback = prepare_writeback
         self.prepare_native_writeback = prepare_native_writeback
+        self.complete_native_writeback = complete_native_writeback
         self.progress_answers = progress_answers
         self.lock = RLock()
         self.bound_request = None
@@ -338,6 +340,10 @@ class ConversationEntry:
         result = {**staged, "status":"PERSISTED_REMOTE_VERIFIED", "result": saved}
         result.pop("pending_operation", None)
         result.pop("_managed_writeback", None)
-        with self.db() as db:
-            db.execute("UPDATE work SET phase='done',output=? WHERE id=?", (encode(result), key))
+        output = encode(result)
+        if self.complete_native_writeback is None:
+            with self.db() as db:
+                db.execute("UPDATE work SET phase='done',output=? WHERE id=?", (output, key))
+        else:
+            self.complete_native_writeback(receipt, self.file, key, output)
         return result

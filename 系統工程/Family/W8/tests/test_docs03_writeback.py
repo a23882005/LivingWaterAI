@@ -115,7 +115,7 @@ class Docs03WritebackTests(unittest.TestCase):
         self.assertEqual(send(other, "after-readback")["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
         self.assertEqual(prepares.call_count, 2)
 
-    def test_slot_releases_preflight_failures_but_not_unrelated_receipts(self):
+    def test_preflight_failure_leaves_file_available(self):
         file_id = self.key["file_id"]
         first = docs03._DriveWriteSlot(self.workspace, file_id, "fixture-project", "original-chat")
         other = docs03._DriveWriteSlot(self.workspace, file_id, "fixture-project", "another-chat")
@@ -125,12 +125,31 @@ class Docs03WritebackTests(unittest.TestCase):
             self.turn("confirm", self.payload, write_slot=first)
         self.assertTrue(other.acquire(self.key))
         self.assertTrue(different_file.acquire({**self.key, "file_id": "another-file"}))
-        first.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
         self.assertFalse(first.acquire(self.key))
-        other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key, "fingerprint": "different"})
-        self.assertFalse(first.acquire(self.key))
-        other.finish(self.key, {"status": "PERSISTED_REMOTE_VERIFIED", **self.key})
+        other.release(self.key)
         self.assertTrue(first.acquire(self.key))
+
+    def test_mismatched_receipt_keeps_authorization_and_prevents_reupload(self):
+        slot = docs03._DriveWriteSlot(self.workspace, self.key["file_id"],
+                                      "fixture-project", "original-chat")
+        other = docs03._DriveWriteSlot(self.workspace, self.key["file_id"],
+                                       "fixture-project", "another-chat")
+        self.allow_update()
+        update = self.turn("confirm", self.payload, write_slot=slot)
+        self.assertEqual(update["status"], "DOCS03_DRIVE_UPDATE_REQUIRED")
+        self.recover.return_value = {**self.key, "status": "PERSISTED_REMOTE_VERIFIED",
+                                     "fingerprint": "another-receipt"}
+        with self.assertRaisesRegex(ValueError, "REMOTE_RECEIPT_MISMATCH"):
+            self.turn("invalid-receipt", write_slot=slot)
+        self.assertFalse(other.acquire(self.key))
+        self.recover.return_value = None
+        self.assertEqual(self.turn("not-visible", write_slot=slot)["status"],
+                         "AWAIT_DRIVE_CONFIRMATION")
+        self.land_receipt()
+        result = self.turn("valid-receipt", write_slot=slot)
+        self.assertEqual(result["status"], "PERSISTED_REMOTE_VERIFIED")
+        self.assertTrue(other.acquire(self.key))
+        self.prepare.assert_called_once()
 
     def test_process_exit_during_preflight_does_not_hold_the_file(self):
         for kind in ("account", "progress"):
@@ -235,6 +254,65 @@ class Docs03WritebackTests(unittest.TestCase):
                     result = self.turn("confirmed-readback", **options)
                     self.assertEqual(result["status"], "PERSISTED_REMOTE_VERIFIED")
                     self.assertEqual(self.turn("resend-original", payload, **options), result)
+                    self.assertTrue(other.acquire(self.key))
+
+    def test_receipt_completion_and_file_release_are_atomic(self):
+        for kind in ("account", "progress"):
+            for crash in ("before_update", "before_commit", "after_commit"):
+                with self.subTest(kind=kind, crash=crash), \
+                        TemporaryDirectory(dir=self.workspace) as folder:
+                    workspace = Path(folder)
+                    slot = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                  "fixture-project", "original-chat")
+                    other = docs03._DriveWriteSlot(workspace, self.key["file_id"],
+                                                   "fixture-project", "another-chat")
+                    payload = self.payload if kind == "account" else {
+                        "revision": "before", "question_id": "goal", "key": "goal", "reply": "成長",
+                    }
+                    options = dict(workspace_dir=workspace, progress_answers=kind == "progress",
+                                   write_slot=slot)
+                    self.recover.return_value = None
+                    self.allow_update()
+                    self.assertEqual(self.turn("original", payload, **options)["status"],
+                                     "DOCS03_DRIVE_UPDATE_REQUIRED")
+                    self.land_receipt()
+                    connect = sqlite3.connect
+
+                    def crash_on_finish(*args, **kwargs):
+                        db = connect(*args, **kwargs)
+                        finishing = False
+
+                        def exit_at_stop(sql):
+                            nonlocal finishing
+                            if sql.startswith("UPDATE ") and "SET phase='done'" in sql:
+                                if crash == "before_update":
+                                    os._exit(23)
+                                finishing = True
+                            if finishing and sql == "COMMIT":
+                                os._exit(23)
+
+                        db.set_trace_callback(exit_at_stop)
+                        return db
+
+                    child = os.fork()
+                    if child == 0:
+                        try:
+                            if crash == "after_commit":
+                                result = self.turn("readback", **options)
+                                os._exit(23 if result["status"] == "PERSISTED_REMOTE_VERIFIED" else 24)
+                            with patch.object(sqlite3, "connect", side_effect=crash_on_finish):
+                                self.turn("readback", **options)
+                        finally:
+                            os._exit(24)
+                    self.assertEqual(os.waitstatus_to_exitcode(os.waitpid(child, 0)[1]), 23)
+                    if crash == "after_commit":
+                        self.assertTrue(other.acquire(self.key))
+                        self.recover.return_value = None
+                    else:
+                        self.assertFalse(other.acquire(self.key))
+                    result = self.turn("continue", **options)
+                    self.assertEqual(result["status"], "PERSISTED_REMOTE_VERIFIED")
+                    self.assertEqual(self.turn("resend", payload, **options), result)
                     self.assertTrue(other.acquire(self.key))
 
     def test_preflight_recovery_and_receipt_replay_matrix(self):

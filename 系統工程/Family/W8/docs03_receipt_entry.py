@@ -123,9 +123,9 @@ class _DriveWriteSlot:
             db.execute("INSERT OR IGNORE INTO current_write VALUES(1,?)", (owner,))
             return db.execute("SELECT owner FROM current_write WHERE slot=1").fetchone() == (owner,)
 
-    def reserve_attempt(self, key, journal, request_id, attempted):
-        """Commit the file reservation and the conversation's attempt together."""
-        owner = self._token(key)
+    @contextmanager
+    def transaction(self, journal):
+        """Update the file reservation and conversation journal in one transaction."""
         with self.connect(create=True) as db:
             db.execute("ATTACH DATABASE ? AS turn_journal", (str(journal),))
             # SQLite's cross-file rollback requires on-disk rollback journals.
@@ -134,6 +134,11 @@ class _DriveWriteSlot:
                     raise RuntimeError("DOCS03_ROLLBACK_JOURNAL_REQUIRED")
                 db.execute(f"PRAGMA {schema}.synchronous=FULL")
             db.execute("BEGIN IMMEDIATE")
+            yield db
+
+    def reserve_attempt(self, key, journal, request_id, attempted):
+        owner = self._token(key)
+        with self.transaction(journal) as db:
             db.execute("INSERT OR IGNORE INTO current_write VALUES(1,?)", (owner,))
             if db.execute("SELECT owner FROM current_write WHERE slot=1").fetchone() != (owner,):
                 return False
@@ -150,11 +155,15 @@ class _DriveWriteSlot:
             if db is not None:
                 db.execute("DELETE FROM current_write WHERE owner=?", (owner,))
 
-    def finish(self, key, result):
-        if (isinstance(result, dict) and result.get("status") == "PERSISTED_REMOTE_VERIFIED"
-                and all(result.get(field) == value for field, value in key.items())):
-            self.release(key)
-        return result
+    def complete(self, key, journal, request_id, result):
+        owner = self._token(key)
+        with self.transaction(journal) as db:
+            updated = db.execute(
+                "UPDATE turn_journal.work SET phase='done',output=? "
+                "WHERE id=? AND phase='writeback'", (result, request_id))
+            if updated.rowcount != 1:
+                raise RuntimeError("DOCS03_WRITEBACK_COMPLETION_NOT_RECORDED")
+            db.execute("DELETE FROM current_write WHERE owner=?", (owner,))
 
 
 class _Docs03Session:
@@ -209,10 +218,6 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             return {"status": "DOCS03_JOURNAL_MISSING"}
     conversation = _load_module("conversation_entry")
 
-    def observe(key):
-        result = recover_receipt(key)
-        return write_slot.finish(key, result) if write_slot is not None else result
-
     def prepare_native(staged, journal, request_id, attempted):
         key = staged["receipt_key"]
         pending = {"status":"DOCS03_DRIVE_WRITE_PENDING", "request_id":key["request_id"],
@@ -230,16 +235,17 @@ def run_docs03(*, auth, document_id, document, project_id, conversation_id,
             if conversation.is_native_drive_update(result, key):
                 if not write_slot.reserve_attempt(key, journal, request_id, attempted):
                     return pending
-            else:
+            elif not isinstance(result, dict) or result.get("status") != "PERSISTED_REMOTE_VERIFIED":
                 write_slot.release(key)
             return result
 
     entry = conversation.ConversationEntry(
         project_id=project_id, conversation_id=conversation_id, private_dir=private_dir,
         session=session, mobile=None, read_page=lambda: document, patch_page=None,
-        prepare_account=None, build_menu=build_menu, recover_receipt=observe,
+        prepare_account=None, build_menu=build_menu, recover_receipt=recover_receipt,
         prepare_writeback=prepare_writeback,
         prepare_native_writeback=prepare_native if write_slot is not None else None,
+        complete_native_writeback=write_slot.complete if write_slot is not None else None,
         progress_answers=progress_answers,
     )
     if payload is None:
